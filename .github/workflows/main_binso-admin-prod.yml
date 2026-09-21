@@ -1,0 +1,99 @@
+name: Build and deploy Binso Admin to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+concurrency:
+  group: binso-admin-production
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Prepare standalone deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f ".next/standalone/server.js" ]; then
+            echo "ERROR: .next/standalone/server.js was not created."
+            echo "Check that next.config.ts contains output: 'standalone'."
+            exit 1
+          fi
+
+          mkdir -p .next/standalone/.next
+
+          if [ -d ".next/static" ]; then
+            cp -r .next/static .next/standalone/.next/static
+          fi
+
+          if [ -d "public" ]; then
+            cp -r public .next/standalone/public
+          fi
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binso-admin
+          path: .next/standalone
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    environment: Production
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: binso-admin
+          path: app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_26AFEFB731284F009ED9276FD775F286 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2CCE2EB4F39347B98167444DC3298211 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_062EB98486644201BBC1D99AE3FDD2FC }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'binso-admin-prod'
+          slot-name: 'Production'
+          package: app
