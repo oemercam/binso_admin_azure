@@ -11,6 +11,7 @@ import './e2e-fixes.css'
 import './responsive-v11.css'
 import './responsive-v12.css'
 import './ux-system-v13.css'
+import './platform-hardening-v14.css'
 
 export const metadata: Metadata = {
   title: {

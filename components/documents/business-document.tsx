@@ -40,7 +40,7 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
     <article className="document-a4" data-document-print>
       <header className="document-head">
         <div className="document-brand">
-          <img src="/brand/logo-white.svg" alt="Binso GmbH" />
+          <img src="/brand/logo-black.svg" alt="Binso GmbH" />
         </div>
         <div className="document-title">
           <strong>{type === 'invoice' ? 'RECHNUNG' : type === 'quote' ? 'ANGEBOT' : 'ZAHLUNGSERINNERUNG'}</strong>
