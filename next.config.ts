@@ -29,10 +29,7 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
-  // Erstellt ein minimales, eigenständig startbares
-  // Produktionspaket für Azure App Service.
   output: 'standalone',
-
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -43,9 +40,6 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: securityHeaders,
       },
-
-      // Service Worker nie langfristig cachen.
-      // So erhalten Clients PWA-Updates zuverlässig.
       {
         source: '/sw.js',
         headers: [
@@ -59,9 +53,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-
-      // API-Antworten enthalten später Unternehmensdaten.
-      // Deshalb grundsätzlich kein Browser-/Proxy-Cache.
       {
         source: '/api/:path*',
         headers: [
