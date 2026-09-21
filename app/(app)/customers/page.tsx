@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { Toggle } from '@/components/ui/toggle'
+import { InteractiveRow } from '@/components/ui/interactive-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { Customer } from '@/types/domain'
 
@@ -77,7 +78,7 @@ export default function CustomersPage() {
         eyebrow="CRM"
         title="Kunden"
         description="Kunden, Kontakte und vollständige Rechnungsadressen verwalten."
-        action={<button className="button primary" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/> Kunde erfassen</button>}
+        action={<button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kunde erfassen</span></button>}
       />
 
       <div className="module-toolbar">
@@ -85,16 +86,16 @@ export default function CustomersPage() {
         <span className="toolbar-meta">{filtered.length} Kunden</span>
       </div>
 
-      <div className="data-list">
+      <div className="data-list compact-overview-list">
         <div className="data-row customer-grid data-head"><span>Kunde</span><span>Kontakt</span><span>Zahlungsziel</span><span>Status</span><span /></div>
         {filtered.map((customer) => (
-          <div className="data-row customer-grid" key={customer.id}>
-            <span className="primary-cell"><strong>{customer.customerNo} · {customer.name}</strong><small>{customer.address || 'Adresse fehlt'}, {customer.zip} {customer.city}</small></span>
-            <span className="primary-cell"><strong>{customer.contact || '–'}</strong><small>{customer.email || 'E-Mail fehlt'}</small></span>
-            <span>{customer.paymentDays} Tage</span>
-            <span className={`status ${customer.status}`}>{customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span>
-            <button className="row-link" onClick={() => setEditing(customer)} aria-label={`${customer.name} öffnen`}><Icon name="chevron" size={15}/></button>
-          </div>
+          <InteractiveRow className="data-row customer-grid compact-overview-row" key={customer.id} onActivate={() => setEditing(customer)} ariaLabel={`${customer.name} öffnen`}>
+            <span className="primary-cell"><strong>{customer.customerNo} · {customer.name}</strong><small className="desktop-row-detail">{customer.address || 'Adresse fehlt'}, {customer.zip} {customer.city}</small><small className="mobile-row-summary">{customer.contact || 'Keine Ansprechperson'} · {customer.city || 'Ort fehlt'} · {customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</small></span>
+            <span className="primary-cell overview-desktop-cell"><strong>{customer.contact || '–'}</strong><small>{customer.email || 'E-Mail fehlt'}</small></span>
+            <span className="overview-desktop-cell">{customer.paymentDays} Tage</span>
+            <span className={`status ${customer.status} overview-desktop-cell`}>{customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span>
+            <span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span>
+          </InteractiveRow>
         ))}
       </div>
 

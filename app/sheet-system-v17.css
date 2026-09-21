@@ -1,0 +1,243 @@
+/* Binso Admin v17 – centralized sheet, dialog and full-screen editor system */
+
+:root{
+  --sheet-radius:22px;
+  --sheet-max-width:640px;
+  --sheet-wide-width:1040px;
+  --sheet-backdrop:rgba(7,9,12,.46);
+  --sheet-header-height:60px;
+  --sheet-footer-height:68px;
+}
+
+/* New centralized primitives. */
+.app-sheet-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  background:var(--sheet-backdrop);
+  overscroll-behavior:contain;
+}
+.app-sheet{
+  width:100%;
+  max-width:var(--sheet-max-width);
+  max-height:min(82dvh,760px);
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--line);
+  box-shadow:0 -20px 54px rgba(0,0,0,.24);
+  overflow:hidden;
+}
+.app-sheet-bottom{border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
+.app-sheet-dialog{border-radius:16px}
+.app-sheet-fullscreen{max-width:none;max-height:none;height:100dvh;border:0;border-radius:0}
+.app-sheet-grabber{width:38px;height:4px;border-radius:999px;background:var(--line-strong);margin:9px auto 2px;flex:0 0 auto}
+.app-sheet-header{min-height:var(--sheet-header-height);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto}
+.app-sheet-title{min-width:0;display:grid;gap:2px}
+.app-sheet-title strong{font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-sheet-title span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-sheet-content{min-height:0;overflow:auto;padding:16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.app-sheet-footer{flex:0 0 auto;padding:10px 16px calc(10px + var(--safe-bottom));border-top:1px solid var(--line);background:var(--surface)}
+.app-sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-sheet-actions>.button{width:100%;min-height:46px}
+
+/* Central behaviour for the existing v16 markup, so every legacy sheet follows one system. */
+@media(max-width:760px){
+  body:has(.sheet-layer),
+  body:has(.app-sheet-backdrop){overflow:hidden!important}
+
+  body:has(.sheet-layer) .mobile-pill,
+  body:has(.app-sheet-backdrop) .mobile-pill{display:none!important}
+
+  /* Short tasks behave like native bottom sheets. */
+  .overlay-layer.sheet-layer:has(.bottom-sheet),
+  .overlay-layer.sheet-layer:has(.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)){
+    position:fixed!important;
+    inset:0!important;
+    z-index:1200!important;
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+    background:var(--sheet-backdrop)!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet){
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+    max-height:min(82dvh,760px)!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:1px solid var(--line)!important;
+    border-bottom:0!important;
+    border-radius:var(--sheet-radius) var(--sheet-radius) 0 0!important;
+    background:var(--surface)!important;
+    box-shadow:0 -20px 54px rgba(0,0,0,.24)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-grabber,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-grabber{
+    display:block!important;
+    width:38px!important;
+    height:4px!important;
+    margin:9px auto 2px!important;
+    border-radius:999px!important;
+    background:var(--line-strong)!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-heading,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:20!important;
+    min-height:54px!important;
+    margin:0 -16px 12px!important;
+    padding:10px 16px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  /* Bottom sheets close via swipe/backdrop convention; avoid redundant X on mobile. */
+  .form-sheet.bottom-sheet>.sheet-heading>.icon-button,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading>.icon-button{
+    display:none!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:20!important;
+    margin:18px -16px 0!important;
+    padding:10px 16px calc(10px + var(--safe-bottom))!important;
+    grid-template-columns:1fr 1fr!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  /* Long tasks are true full-screen editor screens. */
+  body:has(.mobile-fullscreen-sheet) .topbar,
+  body:has(.mobile-fullscreen-sheet) .desktop-nav,
+  body:has(.mobile-fullscreen-sheet) .mobile-pill,
+  body:has(.document-editor) .topbar,
+  body:has(.document-editor) .desktop-nav,
+  body:has(.document-editor) .mobile-pill,
+  body:has(.policy-editor) .topbar,
+  body:has(.policy-editor) .desktop-nav,
+  body:has(.policy-editor) .mobile-pill,
+  body:has(.invoice-builder-sheet) .topbar,
+  body:has(.invoice-builder-sheet) .desktop-nav,
+  body:has(.invoice-builder-sheet) .mobile-pill{display:none!important}
+
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    inset:0!important;
+    z-index:1200!important;
+    width:100vw!important;
+    height:100dvh!important;
+    padding:0!important;
+    background:var(--surface)!important;
+    display:block!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1201!important;
+    width:100vw!important;
+    max-width:none!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    scroll-padding-top:calc(66px + var(--safe-top))!important;
+    scroll-padding-bottom:calc(78px + var(--safe-bottom))!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:30!important;
+    min-height:calc(58px + var(--safe-top))!important;
+    margin:0 -16px 16px!important;
+    padding:calc(8px + var(--safe-top)) 16px 8px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:30!important;
+    margin:18px -16px 0!important;
+    padding:10px 16px calc(10px + var(--safe-bottom))!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  .form-sheet input,.form-sheet select,.form-sheet textarea,
+  .app-sheet input,.app-sheet select,.app-sheet textarea{font-size:16px!important;min-width:0!important;max-width:100%!important}
+  .form-sheet input,.form-sheet select,.app-sheet input,.app-sheet select{min-height:46px!important}
+  .button,.icon-button,.row-link{touch-action:manipulation}
+}
+
+/* Desktop: short sheets become compact dialogs; long editors stay centred and bounded. */
+@media(min-width:761px){
+  .app-sheet-backdrop{align-items:center;padding:24px}
+  .app-sheet-bottom,.app-sheet-dialog{border-radius:16px;max-height:calc(100dvh - 48px);box-shadow:0 24px 70px rgba(0,0,0,.20)}
+  .app-sheet-grabber{display:none}
+  .app-sheet-bottom .app-sheet-close{display:grid}
+
+  .overlay-layer.sheet-layer{padding:24px!important;align-items:center!important;justify-content:center!important}
+  .form-sheet{max-height:calc(100dvh - 48px)!important}
+}
+
+@media(max-width:420px){
+  .app-sheet-actions,
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions{
+    grid-template-columns:1fr!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .app-sheet,.app-sheet-backdrop{animation:none!important;transition:none!important}
+}

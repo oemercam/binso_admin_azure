@@ -154,7 +154,7 @@ export default function TimePage() {
         eyebrow="ZEIT"
         title="Zeiterfassung"
         description="Zeiten erfassen, Nachweise prüfen, freigeben und direkt fakturieren."
-        action={canWrite ? <button className="button primary" onClick={() => setOpen(true)}><Icon name="plus" size={16}/> Zeit erfassen</button> : undefined}
+        action={canWrite ? <button className="button primary page-primary-action" onClick={() => setOpen(true)}><Icon name="plus" size={16}/><span>Zeit erfassen</span></button> : undefined}
       />
       {notice && <div className="inline-notice"><Icon name="check" size={15}/><span>{notice}</span></div>}
 
@@ -164,7 +164,7 @@ export default function TimePage() {
         <div className="selection-bar"><div><strong>{selectedEntries.length} Zeiten ausgewählt</strong><span>{canInvoice ? 'Bereit für Rechnung' : selectedEntries.length ? 'Für eine Rechnung nur Zeiten desselben Auftrags auswählen' : 'Freigegebene und vollständige Zeiten markieren'}</span></div><button className="button primary" disabled={!canInvoice} onClick={createInvoiceFromSelected}><Icon name="invoices" size={15}/> Rechnung aus Zeiten</button></div>
       )}
 
-      <div className="data-list">
+      <div className="data-list operational-desktop-list">
         <div className="data-row time-grid-v5 data-head"><span/><span>Datum</span><span>Auftrag / Person</span><span>Tätigkeit</span><span>Stunden</span><span>Abrechnung</span></div>
         {visibleEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
@@ -187,10 +187,10 @@ export default function TimePage() {
         })}
       </div>
 
-      <div className="mobile-record-list">
+      <div className="mobile-record-list operational-mobile-list">
         {visibleEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-          return <article className="mobile-record" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.note || 'Zeiteintrag'}</strong><small>{entry.orderName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta"><span>{entry.personName}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
+          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.note || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
         })}
       </div>
 

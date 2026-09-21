@@ -12,6 +12,9 @@ export default function AccountingPage() {
   const [supplierOpen, setSupplierOpen] = useState(false)
   const openSupplier = store.supplierInvoices.filter((invoice) => invoice.status !== 'paid').reduce((sum, invoice) => sum + invoice.amount, 0)
   const openCustomer = store.invoices.filter((invoice) => invoice.status !== 'paid' && invoice.status !== 'cancelled').reduce((sum, invoice) => sum + invoice.amount - invoice.paidAmount, 0)
+  const supplierReviewCount = store.supplierInvoices.filter((invoice) => invoice.status === 'review').length
+  const supplierOpenCount = store.supplierInvoices.filter((invoice) => invoice.status === 'open').length
+  const overdueCustomerCount = store.invoices.filter((invoice) => invoice.status === 'overdue').length
 
   function exportCsv() {
     const rows = [
@@ -31,9 +34,19 @@ export default function AccountingPage() {
 
   return (
     <section className="page">
-      <PageHeader eyebrow="BUCHHALTUNG" title="Buchhaltung" description="Debitoren, Kreditoren, Zahlungen und externe Leistungskosten pro Auftrag." action={<div className="page-action-group"><button className="button secondary" onClick={exportCsv}><Icon name="download" size={16}/> Export</button><button className="button primary" onClick={() => setSupplierOpen(true)}><Icon name="plus" size={16}/> Lieferantenrechnung</button></div>} />
+      <PageHeader eyebrow="BUCHHALTUNG" title="Buchhaltung" description="Debitoren, Kreditoren, Zahlungen und externe Leistungskosten pro Auftrag." action={<div className="page-action-group"><button className="button secondary" onClick={exportCsv}><Icon name="download" size={16}/> Export</button><button className="button primary page-primary-action" onClick={() => setSupplierOpen(true)} aria-label="Lieferantenrechnung erfassen" title="Lieferantenrechnung erfassen"><Icon name="plus" size={16}/><span>Lieferantenrechnung</span></button></div>} />
 
-      <div className="metric-strip">
+      <section className="mobile-accounting-tasks">
+        <div className="section-title"><div><h2>Zu erledigen</h2><p>Die nächsten Buchhaltungsaufgaben</p></div></div>
+        <div className="hub-row-list">
+          <button type="button" className="hub-row hub-row-button" onClick={() => setSupplierOpen(true)}><span><strong>Lieferantenrechnung erfassen</strong><small>Neue externe Kosten zuordnen</small></span><Icon name="chevron" size={15}/></button>
+          <div className="hub-row static-hub-row"><span><strong>Kreditoren prüfen</strong><small>{supplierReviewCount} in Prüfung · {supplierOpenCount} freigegeben</small></span><span className="status neutral">{supplierReviewCount}</span></div>
+          <div className="hub-row static-hub-row"><span><strong>Überfällige Debitoren</strong><small>Kundenrechnungen und Mahnungen</small></span><span className={overdueCustomerCount ? 'status overdue' : 'status neutral'}>{overdueCustomerCount}</span></div>
+          <button type="button" className="hub-row hub-row-button" onClick={exportCsv}><span><strong>Export vorbereiten</strong><small>Debitoren und Kreditoren als CSV</small></span><Icon name="chevron" size={15}/></button>
+        </div>
+      </section>
+
+      <div className="metric-strip accounting-metrics">
         <div className="metric"><span>Offene Debitoren</span><strong>{chf.format(openCustomer)}</strong><small>Kundenrechnungen</small></div>
         <div className="metric"><span>Offene Kreditoren</span><strong>{chf.format(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
         <div className="metric"><span>Zahlungen</span><strong>{store.payments.length}</strong><small>verbucht</small></div>
@@ -43,14 +56,14 @@ export default function AccountingPage() {
       <div className="dashboard-bottom-grid">
         <section className="section-block">
           <div className="section-title"><div><h2>Lieferantenrechnungen</h2><p>Externe Leistungen und Fremdkosten</p></div></div>
-          <div className="compact-list">
+          <div className="compact-list operational-compact-list">
             {store.supplierInvoices.map((invoice) => <div key={invoice.id}><span className="primary-cell"><strong>{invoice.number} · {invoice.supplierName}</strong><small>{invoice.orderName || 'Ohne Auftrag'} · {invoice.note || 'Keine Beschreibung'}</small></span><span>{invoice.due}</span><strong>{chf.format(invoice.amount)}</strong><span className={`status ${invoice.status === 'paid' ? 'paid' : invoice.status === 'review' ? 'neutral' : 'active'}`}>{invoice.status === 'paid' ? 'Bezahlt' : invoice.status === 'review' ? 'In Prüfung' : 'Freigegeben'}</span><span className="row-actions">{invoice.status === 'review' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'open' })}>Freigeben</button>}{invoice.status === 'open' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'paid' })}>Bezahlt</button>}</span></div>)}
           </div>
         </section>
 
         <section className="section-block">
           <div className="section-title"><div><h2>Mandatskosten</h2><p>Beispiel WTO Digital Workplace</p></div></div>
-          <div className="compact-list">
+          <div className="compact-list operational-compact-list">
             <div><span className="primary-cell"><strong>Nina Keller</strong><small>Mitarbeiterin im Stundenlohn · interne Kosten</small></span><span>15.5 h</span><strong>{chf.format(15.5 * 72)}</strong></div>
             <div><span className="primary-cell"><strong>Meier Cloud Consulting GmbH</strong><small>Externe Firma · Eingangsrechnung MCC-2026-091</small></span><span>14 h</span><strong>{chf.format(1750)}</strong></div>
             <div><span className="primary-cell"><strong>Ömer Cam</strong><small>Interne Leistung · kalkulatorische Kosten</small></span><span>16 h</span><strong>{chf.format(16 * 105)}</strong></div>

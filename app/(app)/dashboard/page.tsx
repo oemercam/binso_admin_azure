@@ -33,7 +33,7 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
   return (
     <section className="page">
       <PageHeader eyebrow={role === 'owner' ? 'INHABER' : 'ADMINISTRATION'} title="Dashboard" description="Geschäft, Aufträge und Liquidität auf einen Blick." />
-      <div className="metric-strip">
+      <div className="metric-strip owner-metrics">
         <Metric label="Geleisteter Umsatz" value={chf.format(deliveredRevenue)} detail="aus erfassten Zeiten" />
         <Metric label="Noch nicht verrechnet" value={chf.format(billableValue)} detail={`${billableHours} h abrechenbar`} />
         <Metric label="Offene Rechnungen" value={chf.format(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
@@ -52,6 +52,14 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
         </section>
       </div>
 
+      <nav className="mobile-dashboard-summary" aria-label="Dashboard Bereiche">
+        <Link href="/orders" className="hub-row"><span><strong>Aufträge</strong><small>{store.orders.filter((order) => order.status === 'active').length} aktive Mandate</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/quotes" className="hub-row"><span><strong>Pipeline</strong><small>{store.quotes.filter((quote) => ['draft','sent'].includes(quote.status)).length} offene Angebote</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{chf.format(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/finance" className="hub-row"><span><strong>Finanzen</strong><small>Marge, Kosten und Liquidität</small></span><Icon name="chevron" size={15}/></Link>
+      </nav>
+
+      <div className="desktop-dashboard-rich">
       <section className="section-block">
         <SectionTitle title="Aktive Aufträge" subtitle="Budget, Verbrauch und wirtschaftlicher Stand" />
         <div className="data-list desktop-wide">
@@ -75,6 +83,7 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       <div className="dashboard-bottom-grid">
         <section className="section-block"><SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte"/><div className="compact-list">{store.quotes.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span><span>{chf.format(quote.amount)}</span><Status value={quote.status}/></Link>)}</div></section>
         <section className="section-block"><SectionTitle title="Zahlungen" subtitle="Zuletzt verbucht"/><div className="compact-list">{store.payments.slice(0, 5).map((payment) => { const invoice = store.invoices.find((item) => item.id === payment.invoiceId); return <Link href={`/invoices?view=${payment.invoiceId}`} key={payment.id}><span className="primary-cell"><strong>{invoice?.number ?? payment.invoiceId}</strong><small>{payment.date} · {payment.method}</small></span><strong>{chf.format(payment.amount)}</strong></Link> })}</div></section>
+      </div>
       </div>
     </section>
   )

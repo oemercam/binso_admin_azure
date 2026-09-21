@@ -1,0 +1,61 @@
+/* Binso Admin v18 – centralised whole-row interaction pattern */
+
+.interactive-row{
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  touch-action:manipulation;
+  transition:background-color 120ms ease, color 120ms ease;
+}
+
+.interactive-row:hover{
+  background:var(--surface-2);
+}
+
+.interactive-row:focus-visible{
+  outline:2px solid var(--text);
+  outline-offset:-2px;
+}
+
+.interactive-row:active{
+  background:var(--surface-3);
+}
+
+.row-disclosure{
+  width:32px;
+  min-width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  justify-self:end;
+  color:var(--muted);
+  pointer-events:none;
+}
+
+.interactive-row:hover .row-disclosure,
+.interactive-row:focus-visible .row-disclosure{
+  color:var(--text);
+}
+
+@media(max-width:760px){
+  .interactive-row{
+    min-height:58px!important;
+  }
+
+  .interactive-row .row-disclosure{
+    grid-column:2!important;
+    grid-row:1 / span 8!important;
+    align-self:center!important;
+    min-width:44px!important;
+    width:44px!important;
+    height:44px!important;
+  }
+
+  /* Touch feedback should be subtle and immediate, not animated like a card. */
+  .interactive-row:hover{background:transparent}
+  .interactive-row:active{background:var(--surface-2)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .interactive-row{transition:none!important}
+}

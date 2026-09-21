@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const [company, setCompany] = useState(store.companyProfile)
   const [templates, setTemplates] = useState(store.documentTemplates)
   const [saved, setSaved] = useState('')
+  const [mobileDetail, setMobileDetail] = useState(false)
 
   const mailReady = useMemo(
     () =>
@@ -58,13 +59,24 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="settings-toolbar" role="tablist" aria-label="Einstellungen">
+      <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">
         <TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton>
         <TabButton active={tab === 'mail'} onClick={() => setTab('mail')}>E-Mail und Versand</TabButton>
         <TabButton active={tab === 'automation'} onClick={() => setTab('automation')}>Automationen</TabButton>
         <TabButton active={tab === 'documents'} onClick={() => setTab('documents')}>Dokumente</TabButton>
         <TabButton active={tab === 'appearance'} onClick={() => setTab('appearance')}>Darstellung</TabButton>
       </div>
+
+      <nav className={mobileDetail ? 'settings-mobile-hub detail-open' : 'settings-mobile-hub'} aria-label="Einstellungsbereiche">
+        <SettingsHubRow title="Allgemein" meta="Unternehmensdaten und Workflow" onClick={() => { setTab('general'); setMobileDetail(true) }} />
+        <SettingsHubRow title="E-Mail und Versand" meta={mailReady ? 'Absender vollständig' : 'Konfiguration unvollständig'} onClick={() => { setTab('mail'); setMobileDetail(true) }} />
+        <SettingsHubRow title="Automationen" meta="Mahnungen, Lohn und Benachrichtigungen" onClick={() => { setTab('automation'); setMobileDetail(true) }} />
+        <SettingsHubRow title="Dokumente" meta="Rechnung, Angebot und Mahnung" onClick={() => { setTab('documents'); setMobileDetail(true) }} />
+        <SettingsHubRow title="Darstellung" meta="Theme und Push" onClick={() => { setTab('appearance'); setMobileDetail(true) }} />
+      </nav>
+
+      <div className={mobileDetail ? 'settings-content mobile-detail-open' : 'settings-content'}>
+        <button type="button" className="settings-mobile-back" onClick={() => setMobileDetail(false)}>← Einstellungen</button>
 
       {tab === 'general' && (
         <>
@@ -244,8 +256,13 @@ export default function SettingsPage() {
           </section>
         </>
       )}
+      </div>
     </section>
   )
+}
+
+function SettingsHubRow({ title, meta, onClick }: { title:string; meta:string; onClick:()=>void }) {
+  return <button type="button" className="hub-row settings-hub-row" onClick={onClick}><span><strong>{title}</strong><small>{meta}</small></span><span aria-hidden="true">›</span></button>
 }
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {

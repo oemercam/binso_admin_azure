@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import { InteractiveRow } from '@/components/ui/interactive-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { BillingModel } from '@/types/domain'
 
@@ -57,8 +58,8 @@ export default function OrdersPage() {
 
   return (
     <section className="page">
-      <PageHeader eyebrow="PROJEKTE" title="Aufträge" description="Mandate, WTO-Bezug, Mitarbeitende, externe Leistungen, Budget und Abrechnung." action={<button className="button primary" onClick={() => setOpen(true)}><Icon name="plus" size={16}/> Auftrag erstellen</button>} />
-      <div className="data-list">
+      <PageHeader eyebrow="PROJEKTE" title="Aufträge" description="Mandate, WTO-Bezug, Mitarbeitende, externe Leistungen, Budget und Abrechnung." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
+      <div className="data-list compact-overview-list">
         <div className="data-row order-grid data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Umsatz</span><span>Marge</span><span /></div>
         {store.orders.map((order) => {
           const linkedTimes = store.timeEntries.filter((entry) => entry.orderId === order.id)
@@ -66,11 +67,11 @@ export default function OrdersPage() {
           const revenue = linkedTimes.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0) || used * order.salesRate
           const cost = linkedTimes.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0) || used * order.costRate
           const margin = revenue ? Math.round(((revenue - cost) / revenue) * 100) : 0
-          return <div className="data-row order-grid" key={order.id}><span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}{order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}</small></span><span>{order.budgetHours} h</span><span>{used} h</span><span><strong>{Math.max(0, order.budgetHours - used)} h</strong></span><span>{chf.format(revenue)}</span><span>{margin} %</span><Link className="row-link" href={`/orders/${order.id}`} aria-label={`${order.name} öffnen`}><Icon name="chevron" size={15}/></Link></div>
+          return <InteractiveRow className="data-row order-grid compact-overview-row" key={order.id} href={`/orders/${order.id}`} ariaLabel={`${order.name} öffnen`}><span className="primary-cell"><strong>{order.name}</strong><small className="desktop-row-detail">{order.customerName}{order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}</small><small className="mobile-row-summary">{order.customerName} · {used} / {order.budgetHours} h · {order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</small></span><span className="overview-desktop-cell">{order.budgetHours} h</span><span className="overview-desktop-cell">{used} h</span><span className="overview-desktop-cell"><strong>{Math.max(0, order.budgetHours - used)} h</strong></span><span className="overview-desktop-cell">{chf.format(revenue)}</span><span className="overview-desktop-cell">{margin} %</span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span></InteractiveRow>
         })}
       </div>
 
-      <div className="mobile-record-list">
+      <div className="mobile-record-list legacy-mobile-record-list">
         {store.orders.map((order) => {
           const used = store.timeEntries.filter((entry) => entry.orderId === order.id).reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
           return <Link className="mobile-record" href={`/orders/${order.id}`} key={order.id}><div className="record-top"><span><strong>{order.name}</strong><small>{order.customerName}</small></span><Icon name="chevron" size={15}/></div><div className="record-meta"><span>{used} / {order.budgetHours} h</span><span>{Math.max(0, order.budgetHours - used)} h Rest</span></div></Link>
