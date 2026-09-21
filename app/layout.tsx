@@ -5,6 +5,9 @@ import './globals.css'
 import './mobile-polish.css'
 import './enterprise-ux.css'
 import './enterprise-polish-v8.css'
+import './documents.css'
+import './e2e-v10.css'
+import './e2e-fixes.css'
 
 export const metadata: Metadata = {
   title: {

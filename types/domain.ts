@@ -216,6 +216,7 @@ export type Employee = {
   role: Role
   email: string
   employmentType: 'salary' | 'hourly'
+  status: 'active' | 'inactive'
   targetHours: number
   bookedHours: number
   billableHours: number

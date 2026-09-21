@@ -137,7 +137,7 @@ export default function SettingsPage() {
               <div className="settings-group-copy"><h2>Versandoptionen</h2><p>Standardverhalten für alle geschäftlichen E-Mails.</p></div>
               <div className="settings-stack">
                 <SettingToggle label="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen werden als PDF angehängt." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
-                <SettingToggle label="Versand protokollieren" description="Zeitpunkt, Empfänger, Dokumentversion und Versandstatus werden im Audit-Verlauf gespeichert." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
+                <SettingToggle label="Versand protokollieren" description="Speichert die gewünschte Protokollierungsregel. Das revisionssichere serverseitige Audit-Log wird mit der Datenbank angebunden." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
                 <SettingToggle label="Kopie an Absender" description="Optional eine Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
               </div>
             </div>
@@ -147,6 +147,7 @@ export default function SettingsPage() {
 
       {tab === 'automation' && (
         <>
+          <div className="integration-banner"><strong>Automationen sind konfiguriert, aber noch nicht serverseitig aktiv.</strong><span>Die Regeln werden gespeichert. Ausführung benötigt Azure-Datenbank, Microsoft Graph und einen Scheduler/Worker.</span></div>
           <section className="settings-group">
             <div className="settings-group-head">
               <div className="settings-group-copy">
@@ -156,7 +157,7 @@ export default function SettingsPage() {
 
               <div className="settings-stack">
                 <SettingToggle label="Mahnwesen aktiv" description="Überfällige Rechnungen werden für den Mahnprozess berücksichtigt." checked={store.appSettings.reminders.enabled} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, enabled: value } })} />
-                <SettingToggle label="Mahnungen automatisch senden" description="Nur aktivieren, wenn Microsoft-365-Versand, Vorlagen und Empfänger geprüft wurden." checked={store.appSettings.reminders.automaticSend} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, automaticSend: value } })} disabled={!store.appSettings.reminders.enabled} />
+                <SettingToggle label="Mahnungen automatisch senden" description="Regel für den späteren Scheduler. Ohne Microsoft Graph und Worker wird noch keine Mahnung automatisch verschickt." checked={store.appSettings.reminders.automaticSend} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, automaticSend: value } })} disabled={!store.appSettings.reminders.enabled} />
                 <NumberLine label="1. Erinnerung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.firstAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, firstAfterDays: value } })} />
                 <NumberLine label="2. Mahnung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.secondAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, secondAfterDays: value } })} />
                 <NumberLine label="3. Mahnung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.thirdAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, thirdAfterDays: value } })} />
@@ -175,7 +176,7 @@ export default function SettingsPage() {
 
               <div className="settings-stack">
                 <SettingToggle label="Lohnprozess aktiv" description="Freigegebene Monatszeiten können für die Lohnvorbereitung verwendet werden." checked={store.appSettings.payroll.enabled} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, enabled: value } })} />
-                <SettingToggle label="Lohnabrechnung nach Freigabe vorbereiten" description="Nach Monatsfreigabe automatisch einen Abrechnungsentwurf für Stundenlohn-Mitarbeitende erzeugen." checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
+                <SettingToggle label="Lohnabrechnung nach Freigabe vorbereiten" description="Regel für den späteren Lohn-Worker: Nach Monatsfreigabe einen Abrechnungsentwurf für Stundenlohn-Mitarbeitende erzeugen." checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
                 <SettingToggle label="Nur Stundenlohn-Mitarbeitende" description="Festlohn-Mitarbeitende werden nicht aus Zeiterfassungen automatisch abgerechnet." checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled={!store.appSettings.payroll.enabled} />
                 <SettingToggle label="Freigabe durch Buchhaltung erforderlich" description="Empfohlene Enterprise-Einstellung: Entwurf automatisch erzeugen, Versand erst nach Finanzfreigabe." checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled={!store.appSettings.payroll.enabled} />
                 <SettingToggle label="Nach Freigabe automatisch versenden" description="Versendet die freigegebene PDF-Lohnabrechnung automatisch über die konfigurierte Absenderadresse." checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled={!store.appSettings.payroll.enabled} />
