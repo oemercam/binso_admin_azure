@@ -1,35 +1,36 @@
-# Binso Admin v4
+# Binso Admin v5 Demo Workflow
 
-Modularer Next.js-16-Stand fuer das interne Binso-Admin-Portal.
+Binso Admin v5 extends the v4 UI with a connected demo business workflow for customers, quotes, orders, time entries, invoices, payments and supplier costs.
 
-## Zielbild
+## Important: persistence
 
-Der Ablauf ist durchgaengig aufgebaut:
+This demo does **not** use Azure PostgreSQL yet. Changes are stored in the browser via `localStorage` under `binso-admin-demo-v5`. This is intentionally a test layer so the complete workflow can be validated before the production database is introduced.
 
-Kunde -> Angebot -> Auftrag -> Zeit -> Rechnung -> Zahlung -> Buchhaltung / Controlling
+Do not use the local demo store for real customer, employee, invoice or financial data.
 
-Rollen:
-- Inhaber: Gesamtuebersicht, Pipeline, Marge, Liquiditaet, Team und Administration
-- Admin: Kunden, Angebote, Auftraege, Zeiten, Rechnungen, Mitarbeitende und Einstellungen
-- Buchhaltung: Rechnungen, Zahlungen, Forderungen, Belege, Finanzsicht und Export
-- Mitarbeiter: eigene Auftraege und Zeiterfassung
+## Demo scenario
 
-## UI / PWA
+All names other than Binso GmbH are fictional demo data.
 
-- kompakter Header mit Binso-Logo, globaler Suche, Quick Create, Benachrichtigungen und Avatar
-- Desktop mit schmaler Sidebar und voller Flaechennutzung
-- Mobile/PWA mit reduzierter Kopfzeile und schwebender Pill-Navigation
-- Suchfeld auf Mobile mit 16 px Eingabeschrift gegen iOS Auto-Zoom
-- Light/Dark/System
-- keine Business-Daten im Service-Worker-Cache
-- native Systemschriften fuer scharfe Darstellung
+- `Alpine Public IT AG` is the contractual customer / prime contractor and has won a fictional WTO Digital Workplace procurement.
+- Binso performs the mandate `WTO Digital Workplace – Mandat Binso` for the fictional end customer `Bundesstelle Digital Services (Demo)`.
+- Ömer Cam performs internal consulting work.
+- Nina Keller is represented as an employee paid by the hour.
+- Dario Meier / `Meier Cloud Consulting GmbH` is an external company delivering work on the same mandate and invoicing Binso.
+- External supplier costs are visible in Accounting and linked to the same order.
 
-## Demo-Funktionen
+## Testable flows
 
-Die UI-Flows fuer Kunde erfassen, Zeit erfassen, Angebotsvorschau und Zahlung erfassen funktionieren im Browserzustand. Sie sind in diesem Stand noch nicht persistent. Fuer Produktion werden die Writes im naechsten Schritt an Azure PostgreSQL angebunden.
+1. Create a customer. The customer remains available after page navigation/reload in the same browser.
+2. Record time against an order and identify whether the service comes from an internal employee, hourly employee or external company.
+3. Select open billable time entries in Time Tracking and create an invoice directly from them.
+4. Alternatively open Invoices, choose an order, select open time entries and create a draft invoice.
+5. Invoice preview shows each selected time entry as an invoice line with quantity, rate, VAT and totals.
+6. Time entries used for an invoice are marked as invoiced and cannot be selected again.
+7. Record full or partial payments. Invoice status becomes partially paid or paid.
+8. Mark an offer as accepted and create an order from the accepted offer.
+9. Accounting shows receivables, payables and the external supplier invoice linked to the WTO mandate.
 
-## Wichtig fuer GitHub
+## Next production step
 
-Die bestehende `package-lock.json` im Repository behalten. Dieses Paket enthaelt absichtlich keine neue Lock-Datei.
-
-Der Azure-Workflow bleibt auf `main` und baut `output: standalone`.
+Replace `components/state/business-store.tsx` with server-side repositories backed by Azure Database for PostgreSQL. The existing domain model is already split into customers, suppliers, quotes, orders, time entries, invoices, invoice lines, payments and supplier invoices so the UI workflow can remain largely unchanged.
