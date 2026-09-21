@@ -1,0 +1,1 @@
+export default function Offline(){ return <main className="auth-page"><div className="auth-card"><div className="brand-mark large">B</div><h1>Keine Verbindung</h1><p className="muted">Die App-Oberfläche ist verfügbar. Geschäftsdaten werden aus Sicherheitsgründen nicht offline zwischengespeichert.</p></div></main> }
