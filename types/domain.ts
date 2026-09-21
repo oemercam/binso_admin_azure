@@ -36,6 +36,36 @@ export type Supplier = {
   status: 'active' | 'inactive'
 }
 
+export type CompanyProfile = {
+  name: string
+  address: string
+  zip: string
+  city: string
+  country: string
+  uid: string
+  email: string
+  phone: string
+  website: string
+  iban: string
+  bankName: string
+  defaultPaymentDays: number
+}
+
+export type DocumentTemplates = {
+  invoiceIntro: string
+  invoiceOutro: string
+  quoteIntro: string
+  quoteOutro: string
+  reminderIntro: string
+  reminderOutro: string
+  invoiceEmailSubject: string
+  invoiceEmailBody: string
+  quoteEmailSubject: string
+  quoteEmailBody: string
+  reminderEmailSubject: string
+  reminderEmailBody: string
+}
+
 export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'declined' | 'expired'
 
 export type QuoteLine = {
@@ -44,6 +74,7 @@ export type QuoteLine = {
   quantity: number
   unit: 'h' | 'Tag' | 'pauschal'
   unitPrice: number
+  vatRate?: number
 }
 
 export type Quote = {
@@ -52,11 +83,23 @@ export type Quote = {
   customerId: string
   customerName: string
   title: string
+  issueDate?: string
   validUntil: string
   status: QuoteStatus
   version: number
   lines: QuoteLine[]
   amount: number
+  recipientName?: string
+  recipientAddress?: string
+  recipientZip?: string
+  recipientCity?: string
+  recipientCountry?: string
+  recipientEmail?: string
+  introText?: string
+  outroText?: string
+  reference?: string
+  sentAt?: string
+  sentTo?: string
 }
 
 export type OrderStatus = 'active' | 'paused' | 'completed'
@@ -137,6 +180,18 @@ export type Invoice = {
   vatAmount: number
   amount: number
   paidAmount: number
+  recipientName?: string
+  recipientAddress?: string
+  recipientZip?: string
+  recipientCity?: string
+  recipientCountry?: string
+  recipientEmail?: string
+  introText?: string
+  outroText?: string
+  reference?: string
+  sentAt?: string
+  sentTo?: string
+  lastReminderAt?: string
 }
 
 export type SupplierInvoice = {
@@ -166,4 +221,55 @@ export type Employee = {
   billableHours: number
   utilisation: number
   internalCostRate: number
+}
+
+
+export type MailProvider = 'microsoft365' | 'smtp'
+
+export type AppSettings = {
+  mail: {
+    provider: MailProvider
+    senderName: string
+    invoiceSender: string
+    quoteSender: string
+    reminderSender: string
+    payrollSender: string
+    replyTo: string
+    financeCc: string
+    attachPdf: boolean
+    deliveryTracking: boolean
+    copySender: boolean
+  }
+  reminders: {
+    enabled: boolean
+    automaticSend: boolean
+    firstAfterDays: number
+    secondAfterDays: number
+    thirdAfterDays: number
+    onlyBusinessDays: boolean
+    stopWhenPaid: boolean
+  }
+  payroll: {
+    enabled: boolean
+    generateAfterApprovedTimesheet: boolean
+    autoSend: boolean
+    requireFinanceApproval: boolean
+    hourlyEmployeesOnly: boolean
+    period: 'monthly'
+    subject: string
+    emailBody: string
+  }
+  workflow: {
+    requireTimeApproval: boolean
+    allowSelfApproval: boolean
+    lockInvoicedTimes: boolean
+    requireQuoteAcceptanceBeforeOrder: boolean
+  }
+  notifications: {
+    overdueInvoice: boolean
+    budgetWarning: boolean
+    expiringQuote: boolean
+    paymentReceived: boolean
+    timesheetReady: boolean
+  }
 }

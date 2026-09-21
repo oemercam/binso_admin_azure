@@ -34,9 +34,13 @@ export function AppShell({
         </button>
 
         <div className="topbar-actions">
-          <button className="topbar-create" onClick={() => setQuickOpen(true)}>
-            <Icon name="plus" size={16} />
-            <span>Neu</span>
+          <button
+            className="topbar-create"
+            onClick={() => setQuickOpen(true)}
+            aria-label="Neu erstellen"
+            title="Neu erstellen"
+          >
+            <Icon name="plus" size={17} />
           </button>
 
           <button className="topbar-icon" aria-label="Benachrichtigungen">

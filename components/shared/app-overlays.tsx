@@ -8,12 +8,52 @@ import type { AppUser } from '@/types/domain'
 const commandEntries = [
   { label: 'Kunde erfassen', meta: 'Aktion', href: '/customers?new=1', icon: 'customers' as const },
   { label: 'Angebot erstellen', meta: 'Aktion', href: '/quotes?new=1', icon: 'quotes' as const },
+  { label: 'Auftrag erstellen', meta: 'Aktion', href: '/orders?new=1', icon: 'orders' as const },
   { label: 'Zeit erfassen', meta: 'Aktion', href: '/time?new=1', icon: 'time' as const },
   { label: 'Rechnung erstellen', meta: 'Aktion', href: '/invoices?new=1', icon: 'invoices' as const },
   { label: 'Muster AG', meta: 'Kunde', href: '/customers', icon: 'building' as const },
   { label: 'Workplace Engineering 2026', meta: 'Auftrag', href: '/orders', icon: 'briefcase' as const },
   { label: 'RE-2026-009', meta: 'Rechnung', href: '/invoices', icon: 'receipt' as const },
 ]
+
+const quickActions = [
+  {
+    label: 'Kunde erfassen',
+    description: 'Firma oder Kontakt neu anlegen',
+    icon: 'customers',
+    href: '/customers?new=1',
+  },
+  {
+    label: 'Angebot erstellen',
+    description: 'Leistungen offerieren und versenden',
+    icon: 'quotes',
+    href: '/quotes?new=1',
+  },
+  {
+    label: 'Auftrag erstellen',
+    description: 'Neues Mandat oder Projekt eröffnen',
+    icon: 'orders',
+    href: '/orders?new=1',
+  },
+  {
+    label: 'Zeit erfassen',
+    description: 'Arbeitszeit direkt auf Auftrag buchen',
+    icon: 'time',
+    href: '/time?new=1',
+  },
+  {
+    label: 'Rechnung erstellen',
+    description: 'Offene Zeiten oder freie Positionen verrechnen',
+    icon: 'invoices',
+    href: '/invoices?new=1',
+  },
+  {
+    label: 'Zahlung erfassen',
+    description: 'Zahlung einer offenen Rechnung zuordnen',
+    icon: 'credit-card',
+    href: '/invoices?payment=1',
+  },
+] as const
 
 export function AppOverlays({
   user,
@@ -63,7 +103,7 @@ export function AppOverlays({
 
   const results = useMemo(() => {
     const cleaned = query.trim().toLowerCase()
-    if (!cleaned) return commandEntries.slice(0, 5)
+    if (!cleaned) return commandEntries.slice(0, 6)
 
     return commandEntries.filter((entry) =>
       `${entry.label} ${entry.meta}`.toLowerCase().includes(cleaned),
@@ -73,10 +113,20 @@ export function AppOverlays({
   return (
     <>
       {searchOpen && (
-        <div className="overlay-layer" onMouseDown={() => setSearchOpen(false)}>
-          <div className="command-dialog" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
+        <div
+          className="overlay-layer search-overlay-layer"
+          onMouseDown={() => setSearchOpen(false)}
+        >
+          <div
+            className="command-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Globale Suche"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <div className="command-input">
               <Icon name="search" size={18} />
+
               <input
                 ref={inputRef}
                 value={query}
@@ -84,18 +134,30 @@ export function AppOverlays({
                 placeholder="Suchen oder Aktion ausführen"
                 aria-label="Globale Suche"
               />
+
               <kbd>ESC</kbd>
             </div>
 
             <div className="command-results">
-              <span className="command-label">{query ? 'Treffer' : 'Schnellzugriff'}</span>
+              <span className="command-label">
+                {query ? 'Treffer' : 'Schnellzugriff'}
+              </span>
+
               {results.map((entry) => (
-                <Link key={`${entry.meta}-${entry.label}`} href={entry.href} onClick={() => setSearchOpen(false)}>
-                  <span className="command-icon"><Icon name={entry.icon} size={17} /></span>
+                <Link
+                  key={`${entry.meta}-${entry.label}`}
+                  href={entry.href}
+                  onClick={() => setSearchOpen(false)}
+                >
+                  <span className="command-icon">
+                    <Icon name={entry.icon} size={17} />
+                  </span>
+
                   <span>
                     <strong>{entry.label}</strong>
                     <small>{entry.meta}</small>
                   </span>
+
                   <Icon name="chevron" size={15} />
                 </Link>
               ))}
@@ -105,34 +167,55 @@ export function AppOverlays({
       )}
 
       {quickOpen && (
-        <div className="overlay-layer sheet-layer" onMouseDown={() => setQuickOpen(false)}>
-          <div className="action-sheet" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
+        <div
+          className="overlay-layer sheet-layer quick-create-layer"
+          onMouseDown={() => setQuickOpen(false)}
+        >
+          <div
+            className="action-sheet quick-create-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Neu erstellen"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <div className="sheet-grabber" />
-            <div className="sheet-heading">
+
+            <div className="sheet-heading quick-create-heading">
               <div>
                 <strong>Neu erstellen</strong>
-                <span>Was möchtest du erfassen?</span>
+                <span>Direkt eine Aktion starten</span>
               </div>
-              <button className="icon-button" onClick={() => setQuickOpen(false)} aria-label="Schliessen">
+
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setQuickOpen(false)}
+                aria-label="Schliessen"
+              >
                 <Icon name="close" size={17} />
               </button>
             </div>
 
-            <div className="quick-actions-grid">
-              {([
-                { label: 'Kunde', icon: 'customers', href: '/customers?new=1' },
-                { label: 'Angebot', icon: 'quotes', href: '/quotes?new=1' },
-                { label: 'Auftrag', icon: 'orders', href: '/orders?new=1' },
-                { label: 'Zeit', icon: 'time', href: '/time?new=1' },
-                { label: 'Rechnung', icon: 'invoices', href: '/invoices?new=1' },
-                { label: 'Zahlung', icon: 'credit-card', href: '/invoices?payment=1' },
-              ] as const).map((action) => (
-                <Link key={action.label} href={action.href} onClick={() => setQuickOpen(false)}>
-                  <span><Icon name={action.icon} size={19} /></span>
-                  <strong>{action.label}</strong>
+            <nav className="quick-actions-list">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  onClick={() => setQuickOpen(false)}
+                >
+                  <span className="quick-action-icon">
+                    <Icon name={action.icon} size={18} />
+                  </span>
+
+                  <span className="quick-action-copy">
+                    <strong>{action.label}</strong>
+                    <small>{action.description}</small>
+                  </span>
+
+                  <Icon name="chevron" size={15} />
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
         </div>
       )}
@@ -141,6 +224,7 @@ export function AppOverlays({
         <div className="profile-popover" role="dialog">
           <div className="profile-card-head">
             <span className="avatar large">{initials(user.name)}</span>
+
             <span>
               <strong>{user.name}</strong>
               <small>{roleLabel(user.role)}</small>
@@ -153,10 +237,12 @@ export function AppOverlays({
               <Icon name="user" size={16} />
               Profil und Einstellungen
             </Link>
+
             <Link href="/settings" onClick={() => setProfileOpen(false)}>
               <Icon name="bell" size={16} />
               Benachrichtigungen
             </Link>
+
             <a href="/.auth/logout?post_logout_redirect_uri=/sign-in">
               <Icon name="logout" size={16} />
               Abmelden
