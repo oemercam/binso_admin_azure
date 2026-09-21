@@ -1,149 +1,110 @@
-import { timeEntries } from '@/lib/data/demo'
+'use client'
+
+import { useState } from 'react'
+import { invoices as initialInvoices } from '@/lib/data/demo'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import type { Invoice, InvoiceStatus } from '@/types/domain'
 
-export default function TimePage() {
-  const totalHours = timeEntries.reduce(
-    (sum, entry) => sum + entry.hours,
-    0,
-  )
+const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 })
+
+const label: Record<InvoiceStatus, string> = {
+  draft: 'Entwurf',
+  sent: 'Versendet',
+  partial: 'Teilbezahlt',
+  paid: 'Bezahlt',
+  overdue: 'Überfällig',
+  cancelled: 'Storniert',
+}
+
+export default function InvoicesPage() {
+  const [invoices, setInvoices] = useState(initialInvoices)
+  const [preview, setPreview] = useState<Invoice | null>(null)
+  const [payment, setPayment] = useState<Invoice | null>(null)
+  const [paymentAmount, setPaymentAmount] = useState('')
+
+  function savePayment(event: React.FormEvent) {
+    event.preventDefault()
+    if (!payment) return
+    const amount = Number(paymentAmount)
+    if (!amount || amount <= 0) return
+    setInvoices((current) => current.map((invoice) => {
+      if (invoice.id !== payment.id) return invoice
+      const paidAmount = Math.min(invoice.amount, invoice.paidAmount + amount)
+      return { ...invoice, paidAmount, status: paidAmount >= invoice.amount ? 'paid' : 'partial' }
+    }))
+    setPayment(null)
+    setPaymentAmount('')
+  }
 
   return (
     <section className="page">
-      <PageHeader
-        eyebrow="ARBEITSZEIT"
-        title="Zeiterfassung"
-        description="Arbeitszeiten erfassen und Monatsabschluss vorbereiten."
-        action={
-          <button
-            type="button"
-            className="button primary"
-          >
-            <Icon
-              name="plus"
-              size={16}
-            />
-            Zeit erfassen
-          </button>
-        }
-      />
+      <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Erstellen, versenden, überwachen und Zahlungseingänge verbuchen." action={<button className="button primary"><Icon name="plus" size={16}/> Rechnung erstellen</button>} />
 
-      <div className="time-summary">
-        <article>
-          <span>Erfasst</span>
-          <strong>{totalHours} h</strong>
-          <small>aktuelle Einträge</small>
-        </article>
-
-        <article>
-          <span>Soll September</span>
-          <strong>168 h</strong>
-          <small>100 % Pensum</small>
-        </article>
-
-        <article>
-          <span>Noch offen</span>
-          <strong>43.5 h</strong>
-          <small>bis Monatsabschluss</small>
-        </article>
+      <div className="workflow-strip invoice-workflow">
+        <div><strong>{chf.format(invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.amount - i.paidAmount, 0))}</strong><span>Offen</span></div>
+        <div><strong>{chf.format(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.paidAmount, 0))}</strong><span>Bezahlt</span></div>
+        <div><strong>{chf.format(invoices.filter(i => i.status === 'overdue').reduce((s, i) => s + i.amount - i.paidAmount, 0))}</strong><span>Überfällig</span></div>
       </div>
 
-      <div className="toolbar-card">
-        <div className="inline-search">
-          <Icon
-            name="search"
-            size={16}
-          />
-
-          <input
-            type="search"
-            placeholder="Zeiteinträge durchsuchen"
-            aria-label="Zeiteinträge durchsuchen"
-          />
-        </div>
-
-        <button
-          type="button"
-          className="button secondary compact-button"
-        >
-          September 2026
-        </button>
-      </div>
-
-      <div className="table-shell">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Datum</th>
-              <th>Auftrag</th>
-              <th>Kunde</th>
-              <th>Tätigkeit</th>
-              <th className="numeric">Stunden</th>
-              <th />
-            </tr>
-          </thead>
-
-          <tbody>
-            {timeEntries.map((entry) => (
-              <tr
-                key={`${entry.date}-${entry.project}-${entry.activity}`}
-              >
-                <td>
-                  <strong>{entry.date}</strong>
-                </td>
-
-                <td>
-                  <strong>{entry.project}</strong>
-                </td>
-
-                <td>{entry.customer}</td>
-
-                <td>{entry.activity}</td>
-
-                <td className="numeric">
-                  {entry.hours} h
-                </td>
-
-                <td className="row-action">
-                  <button
-                    type="button"
-                    aria-label="Zeiteintrag öffnen"
-                  >
-                    <Icon
-                      name="chevron"
-                      size={15}
-                    />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mobile-card-list">
-        {timeEntries.map((entry) => (
-          <article
-            className="mobile-record"
-            key={`${entry.date}-${entry.project}-${entry.activity}`}
-          >
-            <div className="record-head">
-              <span>
-                <strong>{entry.activity}</strong>
-                <small>
-                  {entry.date} · {entry.customer}
-                </small>
-              </span>
-
-              <strong>{entry.hours} h</strong>
+      <div className="data-list">
+        <div className="data-row invoice-grid data-head"><span>Rechnung</span><span>Kunde</span><span>Fällig</span><span>Betrag</span><span>Status</span><span /></div>
+        {invoices.map((invoice) => (
+          <div className="data-row invoice-grid" key={invoice.id}>
+            <span className="primary-cell"><strong>{invoice.number}</strong><small>{invoice.period}</small></span>
+            <span>{invoice.customerName}</span>
+            <span>{invoice.due}</span>
+            <span><strong>{chf.format(invoice.amount)}</strong></span>
+            <span className={`status ${invoice.status}`}>{label[invoice.status]}</span>
+            <div className="row-actions">
+              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                <button className="row-link" title="Zahlung erfassen" onClick={() => { setPayment(invoice); setPaymentAmount(String(invoice.amount - invoice.paidAmount)) }}><Icon name="credit-card" size={15}/></button>
+              )}
+              <button className="row-link" title="Vorschau" onClick={() => setPreview(invoice)}><Icon name="chevron" size={15}/></button>
             </div>
+          </div>
+        ))}
+      </div>
 
-            <p className="record-note">
-              {entry.project}
-            </p>
+      <div className="mobile-record-list">
+        {invoices.map((invoice) => (
+          <article className="mobile-record" key={invoice.id} onClick={() => setPreview(invoice)}>
+            <div className="record-top"><span><strong>{invoice.number}</strong><small>{invoice.customerName}</small></span><span className={`status ${invoice.status}`}>{label[invoice.status]}</span></div>
+            <div className="record-meta"><span>{chf.format(invoice.amount)}</span><span>fällig {invoice.due}</span></div>
           </article>
         ))}
       </div>
+
+      {preview && (
+        <div className="overlay-layer" onMouseDown={() => setPreview(null)}>
+          <div className="document-preview-shell" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="preview-toolbar"><div><strong>{preview.number}</strong><span>{preview.customerName}</span></div><div><button className="icon-button"><Icon name="download" size={16}/></button><button className="icon-button" onClick={() => setPreview(null)}><Icon name="close" size={16}/></button></div></div>
+            <div className="document-preview invoice-document">
+              <header><div className="preview-logo">BINSO</div><div><strong>RECHNUNG</strong><span>{preview.number}</span></div></header>
+              <section><small>Rechnung an</small><strong>{preview.customerName}</strong><p>Leistungen {preview.period}</p></section>
+              <div className="invoice-lines"><div><span>IT-Dienstleistungen</span><span>{chf.format(preview.amount)}</span></div></div>
+              <div className="preview-total"><span>Total</span><strong>{chf.format(preview.amount)}</strong></div>
+              <footer>Fällig am {preview.due}</footer>
+            </div>
+            <div className="preview-actions"><button className="button secondary"><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary"><Icon name="send" size={15}/> Senden</button>{preview.status !== 'paid' && <button className="button primary" onClick={() => { setPayment(preview); setPreview(null); setPaymentAmount(String(preview.amount - preview.paidAmount)) }}><Icon name="credit-card" size={15}/> Zahlung erfassen</button>}</div>
+          </div>
+        </div>
+      )}
+
+      {payment && (
+        <div className="overlay-layer sheet-layer" onMouseDown={() => setPayment(null)}>
+          <form className="form-sheet compact-sheet" onSubmit={savePayment} onMouseDown={(event) => event.stopPropagation()}>
+            <div className="sheet-grabber"/>
+            <div className="sheet-heading"><div><strong>Zahlung erfassen</strong><span>{payment.number} · {payment.customerName}</span></div><button type="button" className="icon-button" onClick={() => setPayment(null)}><Icon name="close" size={17}/></button></div>
+            <div className="form-grid">
+              <label><span>Betrag CHF</span><input inputMode="decimal" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} /></label>
+              <label><span>Zahlungsdatum</span><input type="date" defaultValue="2026-09-21"/></label>
+              <label className="full"><span>Zahlungsart</span><select defaultValue="Bank"><option>Bank</option><option>Bar</option><option>Kreditkarte</option><option>Sonstige</option></select></label>
+            </div>
+            <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setPayment(null)}>Abbrechen</button><button className="button primary">Zahlung speichern</button></div>
+          </form>
+        </div>
+      )}
     </section>
   )
 }

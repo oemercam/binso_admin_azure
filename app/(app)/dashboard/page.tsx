@@ -1,8 +1,8 @@
-import Link from 'next/link'
+import { getSession } from '@/lib/auth/server'
 import { PageHeader } from '@/components/ui/page-header'
-import { StatCard } from '@/components/ui/stat-card'
+import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { Icon } from '@/components/ui/icon'
-import { orders, invoices } from '@/lib/data/demo'
+import { activity, invoices, orders, quotes, timeEntries } from '@/lib/data/demo'
 
 const chf = new Intl.NumberFormat('de-CH', {
   style: 'currency',
@@ -10,247 +10,186 @@ const chf = new Intl.NumberFormat('de-CH', {
   maximumFractionDigits: 0,
 })
 
-export default function DashboardPage() {
-  const activeOrders = orders.filter(
-    (order) => order.status === 'Aktiv',
-  )
+export default async function DashboardPage() {
+  const session = await getSession()
+  const role = session?.user.role ?? 'employee'
 
-  const openInvoices = invoices
-    .filter((invoice) => invoice.status !== 'Bezahlt')
-    .reduce(
-      (sum, invoice) => sum + invoice.amount,
-      0,
-    )
+  if (role === 'employee') {
+    return <EmployeeDashboard />
+  }
+
+  if (role === 'finance') {
+    return <FinanceDashboard />
+  }
+
+  return <OwnerDashboard role={role} />
+}
+
+function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
+  const openInvoices = invoices.filter((invoice) => invoice.status !== 'paid' && invoice.status !== 'cancelled')
+  const openAmount = openInvoices.reduce((sum, invoice) => sum + invoice.amount - invoice.paidAmount, 0)
+  const billableHours = timeEntries.filter((entry) => entry.billable && !entry.invoiced).reduce((sum, entry) => sum + entry.hours, 0)
+  const billableValue = billableHours * 150
 
   return (
     <section className="page">
       <PageHeader
-        eyebrow="ÜBERSICHT"
+        eyebrow={role === 'owner' ? 'INHABER' : 'ADMINISTRATION'}
         title="Dashboard"
-        description="Aktueller Stand von Aufträgen, Zeiten und Finanzen."
+        description="Geschäft, Aufträge und Liquidität auf einen Blick."
       />
 
-      <div className="kpi-grid">
-        <StatCard
-          label="Umsatz aus Zeiten"
-          value="CHF 12'480"
-          helper="September 2026"
-          trend="+8.4 %"
-          icon="money"
-        />
-
-        <StatCard
-          label="Erfasste Stunden"
-          value="124.5 h"
-          helper="von 168 Sollstunden"
-          icon="clock"
-        />
-
-        <StatCard
-          label="Marge"
-          value="32.4 %"
-          helper="nach internen Kosten"
-          trend="+2.1 %"
-          icon="chart"
-        />
-
-        <StatCard
-          label="Offene Rechnungen"
-          value={chf.format(openInvoices)}
-          helper="2 Positionen"
-          icon="receipt"
-        />
+      <div className="metric-strip">
+        <Metric label="Umsatz September" value="CHF 18'660" detail="+34.2 % zum Vormonat" tone="positive" />
+        <Metric label="Noch nicht verrechnet" value={chf.format(billableValue)} detail={`${billableHours} h abrechenbar`} />
+        <Metric label="Offene Rechnungen" value={chf.format(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
+        <Metric label="Deckungsbeitrag" value="CHF 6'048" detail="Marge 32.4 %" />
       </div>
 
-      <div className="dashboard-grid">
-        <article className="panel panel-table">
-          <div className="panel-head">
-            <div>
-              <h2>Aktuelle Aufträge</h2>
-              <p>Budget und Verbrauch</p>
-            </div>
+      <div className="dashboard-layout">
+        <section className="surface chart-surface">
+          <SectionTitle title="Geschäftsentwicklung" subtitle="Umsatz und interne Kosten · letzte 6 Monate" />
+          <RevenueChart />
+        </section>
 
-            <Link
-              className="text-link"
-              href="/orders"
-            >
-              Alle Aufträge
-              <Icon
-                name="chevron"
-                size={14}
-              />
-            </Link>
+        <section className="surface focus-surface">
+          <SectionTitle title="Heute wichtig" subtitle="Priorisierte Aufgaben" />
+          <div className="focus-list">
+            <Focus icon="warning" label="1 Rechnung überfällig" meta="CHF 1'980 · seit 20.09." tone="danger" />
+            <Focus icon="quotes" label="1 Angebot läuft aus" meta="AN-2026-014 · in 9 Tagen" />
+            <Focus icon="time" label="43.5 h fehlen im Monat" meta="Monatsabschluss September" />
           </div>
-
-          <div className="project-list">
-            {activeOrders.map((order) => {
-              const percentage = Math.round(
-                (order.used / order.budget) * 100,
-              )
-
-              return (
-                <div
-                  className="project-row"
-                  key={order.name}
-                >
-                  <div className="project-main">
-                    <div>
-                      <strong>{order.name}</strong>
-                      <span>{order.customer}</span>
-                    </div>
-
-                    <div className="project-numbers">
-                      <strong>
-                        {order.budget - order.used} h
-                      </strong>
-                      <span>verfügbar</span>
-                    </div>
-                  </div>
-
-                  <div className="progress">
-                    <i
-                      style={{
-                        width: `${percentage}%`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="project-foot">
-                    <span>
-                      {order.used} von {order.budget} h
-                    </span>
-
-                    <span>
-                      {percentage} % genutzt
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </article>
-
-        <article className="panel month-panel">
-          <div className="panel-head">
-            <div>
-              <h2>Monatsabschluss</h2>
-              <p>September 2026</p>
-            </div>
-
-            <span className="status status-good">
-              Bereit
-            </span>
-          </div>
-
-          <dl className="summary compact">
-            <div>
-              <dt>Erfasste Zeiten</dt>
-              <dd>124.5 h</dd>
-            </div>
-
-            <div>
-              <dt>Fehlende Einträge</dt>
-              <dd>0</dd>
-            </div>
-
-            <div>
-              <dt>Bereite Rechnungen</dt>
-              <dd>2</dd>
-            </div>
-
-            <div>
-              <dt>Offene Freigaben</dt>
-              <dd>0</dd>
-            </div>
-          </dl>
-
-          <button
-            type="button"
-            className="button primary full"
-          >
-            Monat prüfen
-          </button>
-        </article>
+        </section>
       </div>
 
-      <div className="dashboard-grid secondary-grid">
-        <article className="panel">
-          <div className="panel-head">
-            <div>
-              <h2>Finanzübersicht</h2>
-              <p>Laufender Monat</p>
-            </div>
-
-            <Link
-              className="text-link"
-              href="/finance"
-            >
-              Details
-              <Icon
-                name="chevron"
-                size={14}
-              />
-            </Link>
+      <section className="section-block">
+        <SectionTitle title="Aktive Aufträge" subtitle="Budget, Verbrauch und wirtschaftlicher Stand" />
+        <div className="data-list desktop-wide">
+          <div className="data-row data-head">
+            <span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Auslastung</span><span>Marge</span>
           </div>
+          {orders.map((order) => {
+            const percentage = Math.round((order.usedHours / order.budgetHours) * 100)
+            const margin = Math.round(((order.salesRate - order.costRate) / order.salesRate) * 100)
+            return (
+              <div className="data-row" key={order.id}>
+                <span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span>
+                <span>{order.budgetHours} h</span>
+                <span>{order.usedHours} h</span>
+                <span><strong>{order.budgetHours - order.usedHours} h</strong></span>
+                <span className="progress-cell"><span className="mini-progress"><i style={{ width: `${percentage}%` }} /></span><small>{percentage} %</small></span>
+                <span>{margin} %</span>
+              </div>
+            )
+          })}
+        </div>
+      </section>
 
-          <div className="finance-summary">
-            <div>
-              <span>Umsatz</span>
-              <strong>CHF 18'660</strong>
-            </div>
-
-            <div>
-              <span>Interne Kosten</span>
-              <strong>CHF 12'612</strong>
-            </div>
-
-            <div>
-              <span>Deckungsbeitrag</span>
-              <strong>CHF 6'048</strong>
-            </div>
+      <div className="dashboard-bottom-grid">
+        <section className="section-block">
+          <SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte" />
+          <div className="compact-list">
+            {quotes.map((quote) => (
+              <div key={quote.id}>
+                <span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span>
+                <span>{chf.format(quote.amount)}</span>
+                <Status value={quote.status} />
+              </div>
+            ))}
           </div>
-        </article>
+        </section>
 
-        <article className="panel">
-          <div className="panel-head">
-            <div>
-              <h2>Fälligkeiten</h2>
-              <p>Nächste Termine</p>
-            </div>
+        <section className="section-block">
+          <SectionTitle title="Letzte Aktivitäten" subtitle="Unternehmensweit" />
+          <div className="timeline">
+            {activity.map((item) => (
+              <div key={`${item.time}-${item.title}`}>
+                <i />
+                <span><strong>{item.title}</strong><small>{item.meta}</small></span>
+                <time>{item.time}</time>
+              </div>
+            ))}
           </div>
-
-          <div className="deadline-list">
-            <div>
-              <span className="deadline-date">
-                30 Sep
-              </span>
-
-              <span>
-                <strong>RE-2026-009</strong>
-                <small>
-                  Muster AG · CHF 4'200
-                </small>
-              </span>
-            </div>
-
-            <div>
-              <span className="deadline-date">
-                30 Sep
-              </span>
-
-              <span>
-                <strong>
-                  Monatsabschluss
-                </strong>
-
-                <small>
-                  Zeiterfassung September
-                </small>
-              </span>
-            </div>
-          </div>
-        </article>
+        </section>
       </div>
     </section>
   )
+}
+
+function FinanceDashboard() {
+  const open = invoices.filter((invoice) => invoice.status !== 'paid' && invoice.status !== 'cancelled')
+  const openAmount = open.reduce((sum, invoice) => sum + invoice.amount - invoice.paidAmount, 0)
+
+  return (
+    <section className="page">
+      <PageHeader eyebrow="BUCHHALTUNG" title="Finanzübersicht" description="Forderungen, Zahlungen und anstehende Aufgaben." />
+      <div className="metric-strip">
+        <Metric label="Offene Forderungen" value={chf.format(openAmount)} detail={`${open.length} Rechnungen`} tone="warning" />
+        <Metric label="Bezahlt im Monat" value="CHF 7'755" detail="1 Zahlung" tone="positive" />
+        <Metric label="Überfällig" value="CHF 1'980" detail="1 Rechnung" tone="danger" />
+        <Metric label="Noch verrechenbar" value="CHF 5'700" detail="38 h freigegeben" />
+      </div>
+      <div className="dashboard-layout">
+        <section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Letzte 6 Monate" /><RevenueChart /></section>
+        <section className="surface focus-surface">
+          <SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant" />
+          <div className="focus-list">
+            <Focus icon="credit-card" label="Zahlung verbuchen" meta="RE-2026-009 · Muster AG" />
+            <Focus icon="warning" label="Mahnung prüfen" meta="RE-2026-008 · 1 Tag überfällig" tone="danger" />
+            <Focus icon="accounting" label="Monatsexport vorbereiten" meta="September 2026" />
+          </div>
+        </section>
+      </div>
+    </section>
+  )
+}
+
+function EmployeeDashboard() {
+  return (
+    <section className="page">
+      <PageHeader eyebrow="MEIN ARBEITSTAG" title="Hallo" description="Deine Aufträge, Zeiten und heutige Aufgaben." />
+      <div className="metric-strip employee-metrics">
+        <Metric label="Heute erfasst" value="8.0 h" detail="Soll 8.4 h" tone="positive" />
+        <Metric label="September" value="124.5 h" detail="43.5 h offen" />
+        <Metric label="Verrechenbar" value="112 h" detail="89.9 % deiner Zeiten" />
+      </div>
+
+      <div className="dashboard-layout">
+        <section className="surface">
+          <SectionTitle title="Meine Aufträge" subtitle="Aktuell zugewiesen" />
+          <div className="compact-list">
+            {orders.slice(0, 2).map((order) => (
+              <div key={order.id}>
+                <span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span>
+                <span>{order.budgetHours - order.usedHours} h Rest</span>
+                <span className="status neutral">Aktiv</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="surface">
+          <SectionTitle title="Schnellerfassung" subtitle="Heute" />
+          <a href="/time?new=1" className="big-action"><Icon name="time" size={20}/><span><strong>Zeit erfassen</strong><small>Auf Auftrag oder Tätigkeit buchen</small></span><Icon name="chevron" size={16}/></a>
+        </section>
+      </div>
+    </section>
+  )
+}
+
+function Metric({ label, value, detail, tone }: { label: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) {
+  return <div className="metric"><span>{label}</span><strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div>
+}
+
+function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) {
+  return <div className="section-title"><div><h2>{title}</h2><p>{subtitle}</p></div></div>
+}
+
+function Focus({ icon, label, meta, tone }: { icon: any; label: string; meta: string; tone?: 'danger' }) {
+  return <div className="focus-item"><span className={tone ? `focus-icon ${tone}` : 'focus-icon'}><Icon name={icon} size={17}/></span><span><strong>{label}</strong><small>{meta}</small></span><Icon name="chevron" size={15}/></div>
+}
+
+function Status({ value }: { value: string }) {
+  const map: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', accepted: 'Angenommen', declined: 'Abgelehnt', expired: 'Abgelaufen' }
+  return <span className={`status ${value}`}>{map[value] ?? value}</span>
 }

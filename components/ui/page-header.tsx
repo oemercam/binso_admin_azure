@@ -12,24 +12,13 @@ export function PageHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="page-title">
+    <div className="page-header">
       <div>
-        {eyebrow && (
-          <p className="eyebrow">
-            {eyebrow}
-          </p>
-        )}
-
+        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1>{title}</h1>
-
-        {description && (
-          <p className="page-description">
-            {description}
-          </p>
-        )}
+        {description && <p className="page-description">{description}</p>}
       </div>
-
-      {action}
+      {action && <div className="page-actions">{action}</div>}
     </div>
   )
 }

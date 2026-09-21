@@ -5,20 +5,8 @@ import { getSession } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ProtectedLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
+export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const session = await getSession()
-
-  if (!session) {
-    redirect('/sign-in')
-  }
-
-  return (
-    <AppShell user={session.user}>
-      {children}
-    </AppShell>
-  )
+  if (!session) redirect('/sign-in')
+  return <AppShell user={session.user}>{children}</AppShell>
 }
