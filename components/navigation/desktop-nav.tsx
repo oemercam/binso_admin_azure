@@ -2,51 +2,49 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { navItems } from './nav-items'
 import { Icon } from '@/components/ui/icon'
+import { navForRole } from './nav-items'
+import type { AppUser } from '@/types/domain'
 
-export function DesktopNav() {
+export function DesktopNav({ user }: { user: AppUser }) {
   const pathname = usePathname()
+  const items = navForRole(user.role)
+  const work = items.filter((item) => item.group === 'work')
+  const management = items.filter((item) => item.group === 'management')
+  const system = items.filter((item) => item.group === 'system')
 
-  const work = navItems.filter((item) => item.group === 'work')
-  const system = navItems.filter((item) => item.group === 'system')
-
-  const renderItems = (items: typeof navItems) =>
-    items.map((item) => {
-      const active =
-        pathname === item.href || pathname.startsWith(`${item.href}/`)
+  function render(itemsToRender: typeof items) {
+    return itemsToRender.map((item) => {
+      const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
       return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={active ? 'active' : undefined}
-          aria-current={active ? 'page' : undefined}
-        >
-          <Icon name={item.icon} size={17} />
+        <Link key={item.href} href={item.href} className={active ? 'active' : undefined}>
+          <Icon name={item.icon} size={16} />
           <span>{item.label}</span>
         </Link>
       )
     })
+  }
 
   return (
     <aside className="desktop-nav">
-      <div className="brand">
-        <span className="brand-mark">B</span>
-
-        <span>
-          <strong>Binso</strong>
-          <small>Administration</small>
-        </span>
+      <div className="desktop-nav-section">
+        <span className="nav-section-label">Arbeitsbereich</span>
+        <nav>{render(work)}</nav>
       </div>
 
-      <nav>{renderItems(work)}</nav>
+      {management.length > 0 && (
+        <div className="desktop-nav-section">
+          <span className="nav-section-label">Verwaltung</span>
+          <nav>{render(management)}</nav>
+        </div>
+      )}
 
       <div className="nav-spacer" />
 
-      <nav className="nav-system">
-        {renderItems(system)}
-      </nav>
+      <div className="desktop-nav-section system-section">
+        <nav>{render(system)}</nav>
+      </div>
 
       <div className="nav-footer">
         <span className="status-dot" />

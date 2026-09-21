@@ -5,17 +5,17 @@ export default function manifest(): MetadataRoute.Manifest {
     id: '/',
     name: 'Binso Admin',
     short_name: 'Binso',
-    description: 'Administration, Zeiterfassung, Aufträge und Finanzen für Binso GmbH.',
-    start_url: '/',
+    description: 'Administration, Verkauf, Zeiterfassung und Finanzen für Binso GmbH.',
+    start_url: '/dashboard',
     scope: '/',
     display: 'standalone',
     orientation: 'any',
-    background_color: '#f5f5f7',
-    theme_color: '#f5f5f7',
-    categories: ['business', 'productivity'],
+    background_color: '#ffffff',
+    theme_color: '#ffffff',
+    categories: ['business', 'productivity', 'finance'],
     icons: [
       { src: '/icons/icon-192.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/icons/icon-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' }
-    ]
+      { src: '/icons/icon-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
+    ],
   }
 }

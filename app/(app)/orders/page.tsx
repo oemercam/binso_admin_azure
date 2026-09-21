@@ -2,139 +2,41 @@ import { orders } from '@/lib/data/demo'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 
-const chf = new Intl.NumberFormat('de-CH', {
-  style: 'currency',
-  currency: 'CHF',
-  maximumFractionDigits: 0,
-})
+const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 })
 
 export default function OrdersPage() {
   return (
     <section className="page">
-      <PageHeader
-        eyebrow="LEISTUNGEN"
-        title="Aufträge"
-        description="Budgets, Stundenverbrauch und Marge im Blick behalten."
-        action={
-          <button
-            type="button"
-            className="button primary"
-          >
-            <Icon
-              name="plus"
-              size={16}
-            />
-            Auftrag erfassen
-          </button>
-        }
-      />
+      <PageHeader eyebrow="PROJEKTE" title="Aufträge" description="Budget, Leistung, Marge und Abrechnung im Blick." action={<button className="button primary"><Icon name="plus" size={16}/> Auftrag erstellen</button>} />
 
-      <div className="order-cards">
+      <div className="data-list">
+        <div className="data-row order-grid data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Umsatz</span><span>Marge</span><span /></div>
         {orders.map((order) => {
-          const remaining =
-            order.budget - order.used
-
-          const percentage = Math.round(
-            (order.used / order.budget) * 100,
-          )
-
-          const revenue =
-            order.used * order.salesRate
-
-          const margin =
-            order.used *
-            (order.salesRate -
-              order.costRate)
-
-          const marginPercentage =
-            Math.round(
-              ((order.salesRate -
-                order.costRate) /
-                order.salesRate) *
-                100,
-            )
-
+          const remaining = order.budgetHours - order.usedHours
+          const revenue = order.usedHours * order.salesRate
+          const margin = Math.round(((order.salesRate - order.costRate) / order.salesRate) * 100)
           return (
-            <article
-              className="order-card"
-              key={order.name}
-            >
-              <div className="order-card-head">
-                <div>
-                  <span className="status status-good">
-                    {order.status}
-                  </span>
+            <div className="data-row order-grid" key={order.id}>
+              <span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span>
+              <span>{order.budgetHours} h</span>
+              <span>{order.usedHours} h</span>
+              <span><strong>{remaining} h</strong></span>
+              <span>{chf.format(revenue)}</span>
+              <span>{margin} %</span>
+              <button className="row-link"><Icon name="chevron" size={15}/></button>
+            </div>
+          )
+        })}
+      </div>
 
-                  <h2>{order.name}</h2>
-
-                  <p>{order.customer}</p>
-                </div>
-
-                <button
-                  type="button"
-                  className="icon-button"
-                  aria-label={`${order.name} öffnen`}
-                >
-                  <Icon
-                    name="chevron"
-                    size={16}
-                  />
-                </button>
-              </div>
-
-              <div className="order-metrics">
-                <div>
-                  <span>Budget</span>
-                  <strong>
-                    {order.budget} h
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Verbraucht</span>
-                  <strong>
-                    {order.used} h
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Verfügbar</span>
-                  <strong>
-                    {remaining} h
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Marge</span>
-                  <strong>
-                    {marginPercentage} %
-                  </strong>
-                </div>
-              </div>
-
-              <div className="progress">
-                <i
-                  style={{
-                    width: `${percentage}%`,
-                  }}
-                />
-              </div>
-
-              <div className="order-finance">
-                <span>
-                  Umsatz bisher{' '}
-                  <strong>
-                    {chf.format(revenue)}
-                  </strong>
-                </span>
-
-                <span>
-                  Deckungsbeitrag{' '}
-                  <strong>
-                    {chf.format(margin)}
-                  </strong>
-                </span>
-              </div>
+      <div className="mobile-record-list">
+        {orders.map((order) => {
+          const percentage = Math.round((order.usedHours / order.budgetHours) * 100)
+          return (
+            <article className="mobile-record" key={order.id}>
+              <div className="record-top"><span><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{percentage}%</span></div>
+              <div className="mobile-progress"><i style={{ width: `${percentage}%` }}/></div>
+              <div className="record-meta"><span>{order.usedHours} / {order.budgetHours} h</span><span>{order.budgetHours - order.usedHours} h Rest</span></div>
             </article>
           )
         })}
