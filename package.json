@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "audit:e2e": "node scripts/e2e-audit.mjs"
+    "audit:e2e": "node scripts/e2e-audit.mjs",
+    "verify:release": "node scripts/e2e-audit.mjs && node scripts/release-check.mjs && tsc --noEmit"
   },
   "dependencies": {
     "next": "^16.0.0",
