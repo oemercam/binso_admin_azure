@@ -12,6 +12,8 @@ import './responsive-v11.css'
 import './responsive-v12.css'
 import './ux-system-v13.css'
 import './platform-hardening-v14.css'
+import './ux-system-v16.css'
+import './fullscreen-preview-v15.css'
 
 export const metadata: Metadata = {
   title: {
