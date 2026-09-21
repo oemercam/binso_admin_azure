@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { ServiceWorkerRegister } from '@/components/pwa/service-worker-register'
+import { ViewportMetrics } from '@/components/ui/viewport-metrics'
 import './globals.css'
 import './mobile-polish.css'
 import './enterprise-ux.css'
@@ -21,6 +22,7 @@ import './compact-rows-v18-2.css'
 import './information-density-v18-3.css'
 import './typography-v18-4.css'
 import './close-alignment-v18-5.css'
+import './mobile-shell-v18-6.css'
 
 export const metadata: Metadata = {
   title: {
@@ -73,6 +75,7 @@ export default function RootLayout({
       </head>
 
       <body>
+        <ViewportMetrics />
         {children}
         <ServiceWorkerRegister />
       </body>
