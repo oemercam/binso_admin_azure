@@ -95,6 +95,19 @@ expect('components/shared/app-overlays.tsx', '/customers?edit=${item.id}', 'Glob
 expect('components/shared/app-overlays.tsx', '/quotes?view=${item.id}', 'Globale Suche verlinkt Angebote konkret')
 expect('components/shared/app-overlays.tsx', '/invoices?view=${item.id}', 'Globale Suche verlinkt Rechnungen konkret')
 
+
+// v12 responsive/data visibility safeguards.
+expect('components/state/business-store.tsx', "binso-admin-demo-v12-responsive", 'Versionierter Demo-Speicher aktiv')
+expect('components/state/business-store.tsx', 'customers: parsed.customers?.length ? parsed.customers : seeded.customers', 'Leere Legacy-Kundendaten werden mit Seeds repariert')
+expect('components/state/business-store.tsx', 'quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes', 'Leere Legacy-Angebote werden mit Seeds repariert')
+expect('components/state/business-store.tsx', 'invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices', 'Leere Legacy-Rechnungen werden mit Seeds repariert')
+expect('components/state/business-store.tsx', 'employees: parsed.employees?.length ? parsed.employees : seeded.employees', 'Leere Legacy-Mitarbeitende werden mit Seeds repariert')
+expect('app/layout.tsx', "import './responsive-v12.css'", 'v12 Responsive-Hardening eingebunden')
+expect('app/responsive-v12.css', '.data-list {', 'Mobile Datenlisten werden nicht global versteckt')
+expect('app/responsive-v12.css', 'display:block!important;', 'Mobile Datenlisten sind sichtbar')
+expect('app/responsive-v12.css', '.invoice-builder-sheet', 'Rechnungserstellung hat eigenes Responsive-Hardening')
+expect('app/responsive-v12.css', 'max-height:calc(100dvh', 'Dialoge bleiben innerhalb des Viewports')
+
 console.log(`E2E static audit: ${passes.length} Prüfungen erfolgreich.`)
 if (failures.length) {
   console.error(`\n${failures.length} Fehler:`)

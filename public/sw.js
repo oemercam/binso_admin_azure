@@ -1,4 +1,4 @@
-const CACHE = 'binso-shell-v1'
+const CACHE = 'binso-shell-v13'
 const STATIC_ASSETS = ['/offline']
 
 self.addEventListener('install', event => {
