@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { BusinessDocument } from '@/components/documents/business-document'
+import { DocumentPreviewFrame } from '@/components/documents/document-preview-frame'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { Invoice, InvoiceLine, Payment } from '@/types/domain'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
@@ -127,7 +128,7 @@ export default function InvoicesPage() {
           <div className="document-preview-shell" onMouseDown={(e) => e.stopPropagation()}>
             <div className="preview-toolbar"><div><strong>{preview.number}</strong><span>{preview.customerName}</span></div><div><button className="icon-button" onClick={() => window.print()} title="PDF / Drucken"><Icon name="download" size={16}/></button><button className="icon-button" onClick={() => setPreview(null)}><Icon name="close" size={16}/></button></div></div>
             {readiness(preview).length > 0 && <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {readiness(preview).join(', ')}</span></div>}
-            <BusinessDocument type="invoice" company={store.companyProfile} customer={documentCustomer(preview)} invoice={preview}/>
+            <DocumentPreviewFrame><BusinessDocument type="invoice" company={store.companyProfile} customer={documentCustomer(preview)} invoice={preview}/></DocumentPreviewFrame>
             <div className="preview-actions">
               <button className="button secondary" disabled={preview.status !== 'draft'} onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>
               <button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {preview.status === 'draft' ? 'Senden' : 'Erneut senden'}</button>

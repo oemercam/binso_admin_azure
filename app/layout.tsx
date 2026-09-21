@@ -8,6 +8,7 @@ import './enterprise-polish-v8.css'
 import './documents.css'
 import './e2e-v10.css'
 import './e2e-fixes.css'
+import './responsive-v11.css'
 
 export const metadata: Metadata = {
   title: {
