@@ -30,9 +30,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  reactStrictMode: true,
+
   poweredByHeader: false,
   compress: true,
+  reactStrictMode: true,
 
   async headers() {
     return [
@@ -40,6 +41,7 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: securityHeaders,
       },
+
       {
         source: '/sw.js',
         headers: [
@@ -53,6 +55,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+
       {
         source: '/api/:path*',
         headers: [
