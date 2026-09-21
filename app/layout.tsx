@@ -14,6 +14,13 @@ import './ux-system-v13.css'
 import './platform-hardening-v14.css'
 import './ux-system-v16.css'
 import './fullscreen-preview-v15.css'
+import './sheet-system-v17.css'
+import './interactive-rows-v18.css'
+import './compact-lists-v18-1.css'
+import './compact-rows-v18-2.css'
+import './information-density-v18-3.css'
+import './typography-v18-4.css'
+import './close-alignment-v18-5.css'
 
 export const metadata: Metadata = {
   title: {
