@@ -42,19 +42,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ ! -f ".next/standalone/server.js" ]; then
-            echo "ERROR: .next/standalone/server.js was not created."
-            echo "Check that next.config.ts contains output: 'standalone'."
-            exit 1
-          fi
+          test -f .next/standalone/server.js
 
           mkdir -p .next/standalone/.next
 
-          if [ -d ".next/static" ]; then
+          if [ -d .next/static ]; then
             cp -r .next/static .next/standalone/.next/static
           fi
 
-          if [ -d "public" ]; then
+          if [ -d public ]; then
             cp -r public .next/standalone/public
           fi
 
@@ -71,7 +67,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: build
-    
+
     permissions:
       id-token: write
       contents: read
