@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "strict": false,
+    "noImplicitAny": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "baseUrl": "..",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "../app/**/*.ts",
+    "../app/**/*.tsx",
+    "../components/**/*.ts",
+    "../components/**/*.tsx",
+    "../lib/**/*.ts",
+    "../modules/**/*.ts",
+    "../types/**/*.ts",
+    "./shims.d.ts"
+  ],
+  "exclude": [
+    "../next-env.d.ts"
+  ]
+}

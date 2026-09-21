@@ -19,6 +19,7 @@ export function AppShell({
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
 
   return (
     <div className="app-frame">
@@ -36,21 +37,21 @@ export function AppShell({
         <div className="topbar-actions">
           <button
             className="topbar-create"
-            onClick={() => setQuickOpen(true)}
+            onClick={() => { setQuickOpen(true); setProfileOpen(false); setNotificationsOpen(false) }}
             aria-label="Neu erstellen"
             title="Neu erstellen"
           >
             <Icon name="plus" size={17} />
           </button>
 
-          <button className="topbar-icon" aria-label="Benachrichtigungen">
+          <button className="topbar-icon" aria-label="Benachrichtigungen" onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="bell" size={17} />
             <i />
           </button>
 
           <button
             className="avatar-button"
-            onClick={() => setProfileOpen((current) => !current)}
+            onClick={() => { setProfileOpen((current) => !current); setNotificationsOpen(false); setQuickOpen(false) }}
             aria-label="Profil öffnen"
           >
             <span className="avatar">{initials(user.name)}</span>
@@ -77,6 +78,8 @@ export function AppShell({
         setQuickOpen={setQuickOpen}
         profileOpen={profileOpen}
         setProfileOpen={setProfileOpen}
+        notificationsOpen={notificationsOpen}
+        setNotificationsOpen={setNotificationsOpen}
       />
     </div>
   )

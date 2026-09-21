@@ -1,0 +1,21 @@
+/* E2E polish: functional deep links, empty states, action rows and mobile consistency. */
+.linked-row { text-decoration: none; color: inherit; }
+.empty-state { padding: 28px 0; display: grid; gap: 6px; color: var(--muted); }
+.empty-state strong { color: var(--text); font-size: 13px; }
+.inline-notice { display:flex; align-items:center; gap:8px; margin:0 0 14px; font-size:12px; color:var(--success); }
+.payment-pick-row { width:100%; border:0; border-top:1px solid var(--line); background:transparent; color:var(--text); padding:12px 2px; display:flex; align-items:center; justify-content:space-between; text-align:left; }
+.payment-pick-row:first-child { border-top:0; }
+.text-row-action { border:0; background:transparent; padding:0; }
+.rule-toolbar { display:flex; justify-content:flex-end; margin-bottom:12px; }
+.policy-editor { display:grid; gap:14px; }
+.policy-toggle-list { display:grid; gap:10px; }
+.policy-toggle-row { min-height:42px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); }
+.policy-toggle-row:last-child { border-bottom:0; }
+.assignment-action { display:flex; justify-content:flex-end; }
+@media(max-width:760px){
+  .policy-toggle-row{min-height:48px}
+  .preview-actions{overflow-x:auto; scrollbar-width:none}
+  .preview-actions::-webkit-scrollbar{display:none}
+}
+.send-meta{display:flex;gap:20px;padding:10px 0 14px;border-bottom:1px solid var(--line);margin-bottom:14px}.send-meta>span{display:grid;gap:2px;min-width:0}.send-meta small{font-size:9px;color:var(--muted)}.send-meta strong{font-size:11px;font-weight:600;overflow-wrap:anywhere}@media(max-width:760px){.send-meta{display:grid;gap:8px}}
+.integration-banner{display:grid;gap:3px;margin:0 0 14px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text)}.integration-banner strong{font-size:11px}.integration-banner span{font-size:10px;line-height:1.45;color:var(--muted)}

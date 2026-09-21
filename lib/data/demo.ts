@@ -249,15 +249,15 @@ export const supplierInvoices: SupplierInvoice[] = [
 
 export const employees: Employee[] = [
   {
-    id: 'emp-001', name: 'Ömer Cam', role: 'owner', email: 'oemer.cam@binso.ch', employmentType: 'salary',
+    id: 'emp-001', name: 'Ömer Cam', role: 'owner', email: 'oemer.cam@binso.ch', employmentType: 'salary', status: 'active',
     targetHours: 168, bookedHours: 124.5, billableHours: 112, utilisation: 67, internalCostRate: 105,
   },
   {
-    id: 'emp-002', name: 'Nina Keller', role: 'employee', email: 'nina.keller@demo-binso.ch', employmentType: 'hourly',
+    id: 'emp-002', name: 'Nina Keller', role: 'employee', email: 'nina.keller@demo-binso.ch', employmentType: 'hourly', status: 'active',
     targetHours: 120, bookedHours: 94.5, billableHours: 88, utilisation: 73, internalCostRate: 72,
   },
   {
-    id: 'emp-003', name: 'David Frei', role: 'finance', email: 'david.frei@demo-binso.ch', employmentType: 'salary',
+    id: 'emp-003', name: 'David Frei', role: 'finance', email: 'david.frei@demo-binso.ch', employmentType: 'salary', status: 'active',
     targetHours: 168, bookedHours: 142, billableHours: 41, utilisation: 24, internalCostRate: 86,
   },
 ]
