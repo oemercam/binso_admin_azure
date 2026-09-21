@@ -100,7 +100,7 @@ export default function CustomersPage() {
 
       {open && (
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet" onSubmit={createCustomer} onMouseDown={(e) => e.stopPropagation()}>
+          <form className="form-sheet mobile-fullscreen-sheet" onSubmit={createCustomer} onMouseDown={(e) => e.stopPropagation()}>
             <div className="sheet-grabber"/>
             <div className="sheet-heading"><div><strong>Kunde erfassen</strong><span>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</span></div><button type="button" className="icon-button" onClick={() => setOpen(false)}><Icon name="close" size={17}/></button></div>
             <CustomerFields form={form} setForm={setForm}/>
@@ -122,7 +122,7 @@ export default function CustomersPage() {
     }
     return (
       <div className="overlay-layer sheet-layer" onMouseDown={onClose}>
-        <form className="form-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
+        <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
           <div className="sheet-grabber"/>
           <div className="sheet-heading"><div><strong>{customer.name}</strong><span>{customer.customerNo} · Kundendaten bearbeiten</span></div><button type="button" className="icon-button" onClick={onClose}><Icon name="close" size={17}/></button></div>
           <div className="form-grid">

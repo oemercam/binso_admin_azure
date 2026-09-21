@@ -196,7 +196,7 @@ export default function TimePage() {
 
       {open && canWrite && (
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
+          <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
             <div className="sheet-grabber"/>
             <div className="sheet-heading"><div><strong>Zeit erfassen</strong><span>Direkt einem Auftrag und Leistungserbringer zuordnen.</span></div><button type="button" className="icon-button" onClick={() => setOpen(false)}><Icon name="close" size={17}/></button></div>
             {formError && <div className="field-error">{formError}</div>}
