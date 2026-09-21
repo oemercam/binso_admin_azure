@@ -96,7 +96,6 @@ export function MobilePillNav({
           <span>Suche</span>
         </button>
 
-        <span className="pill-separator" aria-hidden="true" />
 
         <button
           type="button"
@@ -107,7 +106,6 @@ export function MobilePillNav({
           <Icon name="plus" size={18} />
         </button>
 
-        <span className="pill-separator" aria-hidden="true" />
 
         <button
           type="button"
