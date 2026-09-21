@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { WorkerType } from '@/types/domain'
 
@@ -18,6 +19,7 @@ export default function TimePage() {
   const [personName, setPersonName] = useState('Ömer Cam')
   const [workerType, setWorkerType] = useState<WorkerType>('employee')
   const [selected, setSelected] = useState<string[]>([])
+  const [billableEntry, setBillableEntry] = useState(true)
 
   const total = store.timeEntries.reduce((sum, entry) => sum + entry.hours, 0)
   const billable = store.timeEntries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
@@ -49,7 +51,7 @@ export default function TimePage() {
       date: new Date().toISOString().slice(0, 10),
       hours: Number(hours),
       note,
-      billable: true,
+      billable: billableEntry,
       approved: true,
       salesRate: workerType === 'hourly_employee' ? 145 : order.salesRate,
       internalCostRate: isExternal ? 125 : workerType === 'hourly_employee' ? 72 : order.costRate,
@@ -135,7 +137,7 @@ export default function TimePage() {
               <label><span>Leistung durch</span><select value={workerType} onChange={(e) => { const type = e.target.value as WorkerType; setWorkerType(type); if (type === 'employee') { setPersonId('emp-001'); setPersonName('Ömer Cam') } if (type === 'hourly_employee') { setPersonId('emp-002'); setPersonName('Nina Keller') } if (type === 'external') { setPersonId('ext-001'); setPersonName('Dario Meier / Meier Cloud Consulting GmbH') } }}><option value="employee">Festangestellt / Inhaber</option><option value="hourly_employee">Mitarbeiter im Stundenlohn</option><option value="external">Externe Firma</option></select></label>
               <label><span>Person</span><input value={personName} onChange={(e) => setPersonName(e.target.value)} /></label>
               <label><span>Stunden</span><input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} /></label>
-              <label><span>Verrechenbar</span><select defaultValue="Ja"><option>Ja</option><option>Nein</option></select></label>
+              <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry} /></div>
               <label className="full"><span>Beschreibung</span><textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Was wurde gemacht?" /></label>
             </div>
             <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button className="button primary">Speichern</button></div>

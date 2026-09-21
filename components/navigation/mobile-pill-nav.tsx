@@ -23,22 +23,41 @@ export function MobilePillNav({
   return (
     <>
       {menuOpen && (
-        <div className="mobile-menu-layer" onClick={() => setMenuOpen(false)}>
-          <div className="mobile-menu-sheet" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="mobile-menu-layer"
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            className="mobile-menu-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="sheet-grabber" />
+
             <div className="sheet-heading">
               <div>
                 <strong>Navigation</strong>
                 <span>Binso Administration</span>
               </div>
-              <button className="icon-button" onClick={() => setMenuOpen(false)} aria-label="Schliessen">
+
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Schliessen"
+              >
                 <Icon name="close" size={17} />
               </button>
             </div>
 
-            <nav>
+            <nav className="mobile-menu-nav">
               {items.map((item) => {
-                const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                const active =
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`)
+
                 return (
                   <Link
                     key={item.href}
@@ -46,8 +65,14 @@ export function MobilePillNav({
                     className={active ? 'active' : undefined}
                     onClick={() => setMenuOpen(false)}
                   >
-                    <span className="mobile-menu-icon"><Icon name={item.icon} size={17} /></span>
-                    <span>{item.label}</span>
+                    <span className="mobile-menu-icon">
+                      <Icon name={item.icon} size={17} />
+                    </span>
+
+                    <span className="mobile-menu-label">
+                      {item.label}
+                    </span>
+
                     <Icon name="chevron" size={15} />
                   </Link>
                 )
@@ -57,21 +82,43 @@ export function MobilePillNav({
         </div>
       )}
 
-      <div className="mobile-pill" aria-label="Mobile Navigation">
-        <button type="button" className="pill-search" onClick={onSearch}>
+      <nav
+        className="mobile-pill"
+        aria-label="Mobile Navigation"
+      >
+        <button
+          type="button"
+          className="pill-search"
+          onClick={onSearch}
+          aria-label="Suche öffnen"
+        >
           <Icon name="search" size={17} />
           <span>Suche</span>
         </button>
 
-        <button type="button" className="pill-add" onClick={onQuick} aria-label="Neu erstellen">
+        <span className="pill-separator" aria-hidden="true" />
+
+        <button
+          type="button"
+          className="pill-add"
+          onClick={onQuick}
+          aria-label="Neu erstellen"
+        >
           <Icon name="plus" size={18} />
         </button>
 
-        <button type="button" className="pill-menu" onClick={() => setMenuOpen(true)}>
+        <span className="pill-separator" aria-hidden="true" />
+
+        <button
+          type="button"
+          className="pill-menu"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Menü öffnen"
+        >
           <span>Menü</span>
           <Icon name="menu" size={17} />
         </button>
-      </div>
+      </nav>
     </>
   )
 }

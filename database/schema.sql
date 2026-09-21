@@ -174,3 +174,44 @@ create index if not exists idx_time_entries_order_date on time_entries(order_id,
 create index if not exists idx_time_entries_unbilled on time_entries(order_id, invoiced_invoice_id) where billable = true and approved = true;
 create index if not exists idx_invoices_customer_status on invoices(customer_id, status);
 create index if not exists idx_supplier_invoices_order on supplier_invoices(order_id);
+
+-- v6 document configuration / communication fields
+alter table quotes add column if not exists intro_text text;
+alter table quotes add column if not exists closing_text text;
+alter table quotes add column if not exists email_to text;
+alter table quotes add column if not exists email_subject text;
+alter table quotes add column if not exists sent_at timestamptz;
+
+alter table invoices add column if not exists intro_text text;
+alter table invoices add column if not exists closing_text text;
+alter table invoices add column if not exists email_to text;
+alter table invoices add column if not exists email_subject text;
+alter table invoices add column if not exists sent_at timestamptz;
+alter table invoices add column if not exists reminder_level integer not null default 0 check (reminder_level between 0 and 3);
+
+create table if not exists company_profile (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  address text not null,
+  zip text not null,
+  city text not null,
+  country text not null default 'Schweiz',
+  email text not null,
+  phone text,
+  uid text,
+  iban text not null,
+  bank_name text,
+  website text,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists document_templates (
+  key text primary key check (key in ('quote','invoice','reminder')),
+  label text not null,
+  intro_text text not null default '',
+  closing_text text not null default '',
+  email_subject text not null default '',
+  email_text text not null default '',
+  footer_text text not null default '',
+  updated_at timestamptz not null default now()
+);
