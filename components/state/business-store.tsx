@@ -115,7 +115,8 @@ type BusinessStore = BusinessState & {
   resetDemo: () => void
 }
 
-const STORAGE_KEY = 'binso-admin-demo-v10-e2e'
+const STORAGE_KEY = 'binso-admin-demo-v12-responsive'
+const LEGACY_STORAGE_KEYS = ['binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
 
 function freshState(): BusinessState {
   return {
@@ -145,12 +146,40 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
+      let raw = localStorage.getItem(STORAGE_KEY)
+
+      if (!raw) {
+        for (const key of LEGACY_STORAGE_KEYS) {
+          const legacy = localStorage.getItem(key)
+          if (legacy) {
+            raw = legacy
+            break
+          }
+        }
+      }
+
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<BusinessState>
+        const seeded = freshState()
+
+        // Demo releases must always contain usable reference data. Older browser
+        // snapshots could contain empty arrays from previous UI-only versions and
+        // would otherwise make whole modules appear blank after an upgrade.
         setState({
-          ...freshState(),
+          ...seeded,
           ...parsed,
+          customers: parsed.customers?.length ? parsed.customers : seeded.customers,
+          suppliers: parsed.suppliers?.length ? parsed.suppliers : seeded.suppliers,
+          quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes,
+          orders: parsed.orders?.length ? parsed.orders : seeded.orders,
+          timeEntries: parsed.timeEntries?.length ? parsed.timeEntries : seeded.timeEntries,
+          invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices,
+          payments: parsed.payments?.length ? parsed.payments : seeded.payments,
+          supplierInvoices: parsed.supplierInvoices?.length ? parsed.supplierInvoices : seeded.supplierInvoices,
+          employees: parsed.employees?.length ? parsed.employees : seeded.employees,
+          timeEvidence: parsed.timeEvidence?.length ? parsed.timeEvidence : seeded.timeEvidence,
+          orderPolicies: parsed.orderPolicies?.length ? parsed.orderPolicies : seeded.orderPolicies,
+          orderAssignmentRules: parsed.orderAssignmentRules?.length ? parsed.orderAssignmentRules : seeded.orderAssignmentRules,
           companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}) },
           documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
           appSettings: mergeAppSettings(parsed.appSettings),

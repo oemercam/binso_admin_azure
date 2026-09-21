@@ -1,0 +1,512 @@
+/* Binso Admin v12 – module visibility + dialog/form hardening */
+
+/* Avoid legacy browser state making module lists look empty while the store hydrates. */
+.data-list,
+.data-row,
+.module-toolbar,
+.form-sheet,
+.form-grid,
+.line-editor,
+.invoice-source-list {
+  min-width:0;
+}
+
+/* Dialogs: always fit inside the viewport and keep content reachable. */
+.overlay-layer.sheet-layer {
+  overflow:hidden;
+}
+
+.form-sheet {
+  box-sizing:border-box;
+  max-width:calc(100vw - 32px);
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  scroll-padding-top:72px;
+  scroll-padding-bottom:84px;
+}
+
+.form-sheet .sheet-heading {
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:var(--surface);
+}
+
+.form-sheet .sheet-actions {
+  position:sticky;
+  bottom:0;
+  z-index:20;
+  background:var(--surface);
+}
+
+.form-sheet input,
+.form-sheet select,
+.form-sheet textarea,
+.line-editor-row input,
+.line-editor-row select {
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+
+.invoice-builder-sheet,
+.document-editor {
+  width:min(1040px,calc(100vw - 32px))!important;
+}
+
+.invoice-builder-sheet .form-grid,
+.document-editor .form-grid {
+  width:100%;
+}
+
+.line-editor-row,
+.quote-line-editor {
+  width:100%;
+  min-width:0;
+}
+
+/* Desktop / tablet: never crop controls at the viewport edges. */
+@media(min-width:761px) {
+  .overlay-layer.sheet-layer {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:24px!important;
+  }
+
+  .form-sheet {
+    max-height:calc(100dvh - 48px)!important;
+    border-radius:14px!important;
+  }
+
+  .form-sheet.compact-sheet {
+    width:min(620px,calc(100vw - 48px))!important;
+  }
+
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    width:min(1040px,calc(100vw - 48px))!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(220px,1.6fr) minmax(72px,.45fr) minmax(82px,.5fr) minmax(104px,.65fr) minmax(78px,.5fr) 32px!important;
+  }
+
+  .quote-line-editor {
+    grid-template-columns:minmax(240px,1.8fr) minmax(72px,.45fr) minmax(82px,.5fr) minmax(104px,.65fr) 32px!important;
+  }
+}
+
+@media(max-width:1000px) and (min-width:761px) {
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(0,1fr) minmax(90px,.35fr) minmax(90px,.35fr)!important;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1;
+  }
+
+  .line-editor-row .line-remove,
+  .quote-line-editor .line-remove {
+    justify-self:end;
+  }
+}
+
+/* Mobile / installed PWA: modules stay visible as flat lists, not cards. */
+@media(max-width:760px) {
+  .data-list {
+    display:block!important;
+    width:100%!important;
+    overflow:visible!important;
+    border-top:1px solid var(--line);
+  }
+
+  .data-row.data-head {
+    display:none!important;
+  }
+
+  .data-row:not(.data-head),
+  .customer-grid,
+  .quote-grid,
+  .invoice-grid,
+  .employee-grid,
+  .order-grid,
+  .time-grid,
+  .supplier-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-auto-flow:row!important;
+    gap:5px 12px!important;
+    align-items:start!important;
+    padding:13px 2px!important;
+    border-bottom:1px solid var(--line)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  .data-row:not(.data-head) > * {
+    min-width:0!important;
+  }
+
+  .data-row:not(.data-head) > .primary-cell {
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+
+  .data-row:not(.data-head) > span:not(.primary-cell) {
+    grid-column:1!important;
+    font-size:10px!important;
+    color:var(--muted)!important;
+  }
+
+  .data-row:not(.data-head) > span.status {
+    width:max-content!important;
+    color:inherit!important;
+  }
+
+  .data-row:not(.data-head) > .row-actions,
+  .data-row:not(.data-head) > .row-link,
+  .data-row:not(.data-head) > button.row-link {
+    grid-column:2!important;
+    grid-row:1 / span 6!important;
+    align-self:center!important;
+    justify-self:end!important;
+  }
+
+  .module-toolbar {
+    display:flex!important;
+    gap:10px!important;
+    align-items:center!important;
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .module-toolbar .search-field {
+    min-width:0!important;
+    flex:1 1 auto!important;
+  }
+
+  .toolbar-meta {
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+  }
+
+  .overlay-layer.sheet-layer {
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+  }
+
+  .form-sheet,
+  .form-sheet.compact-sheet,
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    width:100%!important;
+    max-width:none!important;
+    max-height:calc(100dvh - max(6px,var(--safe-top)))!important;
+    margin:0!important;
+    padding:0 14px!important;
+    border-radius:20px 20px 0 0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-gutter:auto;
+  }
+
+  .form-sheet .sheet-heading {
+    margin:0 -14px 14px!important;
+    padding:14px 14px 12px!important;
+  }
+
+  .form-sheet .sheet-actions {
+    margin:18px -14px 0!important;
+    padding:11px 14px calc(11px + var(--safe-bottom))!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+
+  .form-sheet .sheet-actions .button {
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  .form-grid {
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+  }
+
+  .form-grid label.full {
+    grid-column:auto!important;
+  }
+
+  .form-sheet input,
+  .form-sheet select,
+  .form-sheet textarea {
+    font-size:16px!important;
+  }
+
+  .form-sheet input,
+  .form-sheet select {
+    min-height:44px!important;
+  }
+
+  .form-sheet textarea {
+    min-height:104px!important;
+  }
+
+  .line-editor {
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .line-editor-head {
+    position:relative!important;
+    top:auto!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(96px,.42fr)!important;
+    gap:9px!important;
+    width:100%!important;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1!important;
+  }
+
+  .invoice-source-row {
+    display:grid!important;
+    grid-template-columns:24px minmax(0,1fr)!important;
+    gap:7px 10px!important;
+    width:100%!important;
+  }
+
+  .invoice-source-row > span:last-of-type,
+  .invoice-source-row > strong {
+    grid-column:2!important;
+  }
+
+  .document-preview-shell {
+    width:100%!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+
+  .document-fit-stage {
+    min-height:0!important;
+    overflow:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+@media(max-width:420px) {
+  .form-sheet .sheet-actions {
+    grid-template-columns:1fr!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:1fr!important;
+  }
+
+  .line-editor-row label,
+  .quote-line-editor label,
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1!important;
+  }
+}
+
+
+/* v12.1 – logo transparency, pill centering, mobile navigation polish, dashboard rows */
+
+/* Transparent brand assets behave like native UI logos. */
+.binso-logo,
+.document-brand {
+  background: transparent !important;
+}
+
+/* Dashboard compact rows are rendered as links – style them consistently. */
+.compact-list > a,
+.compact-list > div {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:14px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+  font-size:10px;
+  text-decoration:none;
+}
+
+.compact-list > a:last-child,
+.compact-list > div:last-child {
+  border-bottom:0;
+}
+
+.compact-list > a strong,
+.compact-list > div strong {
+  color:var(--text);
+}
+
+.compact-list > a > :nth-child(2),
+.compact-list > div > :nth-child(2) {
+  justify-self:end;
+  white-space:nowrap;
+}
+
+.compact-list > a > .status,
+.compact-list > div > .status {
+  justify-self:end;
+}
+
+@media (max-width:760px) {
+  .topbar {
+    border-bottom:1px solid var(--line) !important;
+  }
+
+  .topbar-brand {
+    min-width:0;
+  }
+
+  .topbar .binso-logo,
+  .topbar .binso-logo img {
+    background:transparent !important;
+  }
+
+  /* Cleaner floating pill with perfectly balanced central action. */
+  .mobile-pill {
+    grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr) !important;
+    column-gap:8px !important;
+    width:min(304px, calc(100vw - 24px)) !important;
+    height:50px !important;
+    padding:4px 8px !important;
+    overflow:visible !important;
+    border-radius:999px !important;
+  }
+
+  .mobile-pill button {
+    height:40px !important;
+  }
+
+  .mobile-pill .pill-search,
+  .mobile-pill .pill-menu {
+    min-width:0 !important;
+    padding:0 10px !important;
+    background:transparent !important;
+    border:0 !important;
+  }
+
+  .mobile-pill .pill-add {
+    width:64px !important;
+    min-width:64px !important;
+    height:64px !important;
+    margin-top:-11px !important;
+    margin-bottom:-11px !important;
+    align-self:center !important;
+    justify-self:center !important;
+    display:grid !important;
+    place-items:center !important;
+    border-radius:50% !important;
+    border:5px solid var(--surface) !important;
+    background:var(--text) !important;
+    color:var(--bg) !important;
+    box-shadow:0 14px 28px rgba(17, 19, 24, 0.22) !important;
+    transform:none !important;
+    z-index:4 !important;
+  }
+
+  .mobile-pill .pill-add svg {
+    width:24px !important;
+    height:24px !important;
+    stroke-width:2.2 !important;
+  }
+
+  html[data-theme='dark'] .mobile-pill .pill-add {
+    background:#f5f6f7 !important;
+    color:#111318 !important;
+    border-color:#121417 !important;
+    box-shadow:0 16px 30px rgba(0,0,0,.52) !important;
+  }
+
+  /* Remove the visual duplicate line at the top of the mobile nav sheet. */
+  .mobile-menu-sheet {
+    border-top:0 !important;
+  }
+
+  .mobile-menu-nav {
+    margin-top:6px !important;
+  }
+
+  .mobile-menu-sheet nav a:first-child,
+  .mobile-menu-nav a:first-child {
+    border-top:0 !important;
+  }
+
+  .sheet-heading {
+    border-bottom:1px solid var(--line);
+  }
+
+  .mobile-menu-sheet .sheet-heading {
+    border-bottom:1px solid var(--line);
+    margin-bottom:8px !important;
+    padding-bottom:12px !important;
+  }
+
+  /* Sales + Zahlungen readable as stacked rows on mobile. */
+  .dashboard-bottom-grid {
+    gap:16px !important;
+  }
+
+  .compact-list > a,
+  .compact-list > div {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:4px 12px !important;
+    align-items:start !important;
+    padding:12px 0 !important;
+  }
+
+  .compact-list > a > .primary-cell,
+  .compact-list > div > .primary-cell {
+    grid-column:1 / -1 !important;
+  }
+
+  .compact-list > a > :nth-child(2),
+  .compact-list > div > :nth-child(2) {
+    grid-column:1 !important;
+    justify-self:start !important;
+    font-size:10px !important;
+  }
+
+  .compact-list > a > .status,
+  .compact-list > div > .status,
+  .compact-list > a > strong:last-child,
+  .compact-list > div > strong:last-child {
+    grid-column:2 !important;
+    grid-row:1 / span 2 !important;
+    align-self:center !important;
+    justify-self:end !important;
+  }
+
+  .compact-list > a > strong:last-child,
+  .compact-list > div > strong:last-child {
+    font-size:15px !important;
+    line-height:1.1 !important;
+  }
+}
