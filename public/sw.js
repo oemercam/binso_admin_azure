@@ -2,6 +2,16 @@ const VERSION = new URL(self.location.href).searchParams.get('v') || 'legacy'
 const CACHE = `binso-shell-${VERSION}`
 const OFFLINE_URL = '/offline'
 
+function safeAppPath(value) {
+  try {
+    const url = new URL(typeof value === 'string' && value ? value : '/', self.location.origin)
+    if (url.origin !== self.location.origin) return '/'
+    return `${url.pathname}${url.search}${url.hash}`
+  } catch {
+    return '/'
+  }
+}
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
@@ -64,14 +74,14 @@ self.addEventListener('push', event => {
     body: data.body,
     icon: '/icons/app-192.png',
     badge: '/icons/app-192.png',
-    data: { url: data.url || '/' },
+    data: { url: safeAppPath(data.url) },
     tag: data.tag || 'binso-admin'
   }))
 })
 
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  const target = event.notification.data?.url || '/'
+  const target = safeAppPath(event.notification.data?.url)
   event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
     const existing = clients.find(client => 'focus' in client)
     if (existing) { existing.navigate(target); return existing.focus() }
