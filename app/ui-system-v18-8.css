@@ -1,0 +1,279 @@
+/* Binso Admin v18.8 — canonical reusable UI system.
+   Shared component behaviour lives here. Page-specific CSS may remain elsewhere,
+   but must not redefine these primitives. */
+
+:root{
+  --ui-page-gutter:24px;
+  --ui-page-gutter-mobile:30px;
+  --ui-control-h:46px;
+  --ui-touch:44px;
+  --ui-close-size:44px;
+  --ui-radius:12px;
+  --ui-sheet-radius:26px;
+  --ui-divider:var(--line);
+  --ui-sheet-max:720px;
+  --ui-pill-space:118px;
+  --ui-mobile-topbar:72px;
+}
+
+/* Shared close affordance: every X in the product uses this component. */
+.ui-close-button{
+  width:var(--ui-close-size)!important;
+  min-width:var(--ui-close-size)!important;
+  height:var(--ui-close-size)!important;
+  min-height:var(--ui-close-size)!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  flex:0 0 var(--ui-close-size)!important;
+  border-radius:999px!important;
+  color:var(--muted)!important;
+}
+.ui-close-button svg{width:18px!important;height:18px!important;display:block!important}
+
+/* One header geometry for sheets, fullscreen editors, navigation and dialogs. */
+.sheet-heading,.app-sheet-header{
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) var(--ui-close-size)!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:72px!important;
+  padding:12px 16px!important;
+  margin:0!important;
+  border-bottom:1px solid var(--ui-divider)!important;
+  background:var(--surface)!important;
+}
+.sheet-heading>div:first-child,.app-sheet-title{min-width:0!important;display:grid!important;gap:3px!important}
+.sheet-heading strong,.app-sheet-title strong{font-size:15px!important;line-height:1.25!important;font-weight:700!important}
+.sheet-heading span,.app-sheet-title span{font-size:12px!important;line-height:1.4!important;color:var(--muted)!important}
+.sheet-heading>.ui-close-button,.app-sheet-header>.ui-close-button{justify-self:end!important;align-self:center!important}
+
+/* One footer/action geometry. */
+.sheet-actions,.app-sheet-footer,.app-sheet-actions{
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:8px!important;
+  padding:10px 16px calc(10px + var(--safe-bottom))!important;
+  margin:0!important;
+  border-top:1px solid var(--ui-divider)!important;
+  background:var(--surface)!important;
+}
+.sheet-actions .button,.app-sheet-footer .button,.app-sheet-actions .button{width:100%!important;min-height:46px!important}
+
+/* Shared sheet mechanics. */
+.form-sheet,.action-sheet,.app-sheet,.mobile-menu-sheet{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.app-sheet-content{min-width:0;overflow:auto;-webkit-overflow-scrolling:touch}
+
+/* Shared rows. */
+.interactive-row{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.interactive-row:focus-visible{outline:2px solid color-mix(in srgb,var(--text) 35%,transparent);outline-offset:-2px}
+.row-disclosure{pointer-events:none}
+
+@media(max-width:760px){
+  :root{--ui-page-gutter:var(--ui-page-gutter-mobile)}
+
+  .app-main{padding-left:var(--ui-page-gutter)!important;padding-right:var(--ui-page-gutter)!important;padding-bottom:calc(var(--ui-pill-space) + var(--safe-bottom))!important}
+
+  /* Global creation belongs to the bottom pill on mobile.
+     The topbar create control is removed structurally; page-level create actions
+     are hidden here so there is only one + affordance on mobile/PWA. */
+  .topbar-create,.page-primary-action,
+  .page-actions>.page-primary-action,
+  .page-action-group>.page-primary-action{display:none!important}
+
+  /* Canonical bottom sheet. */
+  .sheet-layer,.app-sheet-backdrop{align-items:flex-end!important;padding:0!important}
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet),
+  .app-sheet-bottom,
+  .mobile-menu-sheet{
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(82dvh,var(--ui-sheet-max))!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    border-radius:var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0!important;
+    background:var(--surface)!important;
+  }
+  .form-sheet.bottom-sheet>.sheet-heading,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading,
+  .app-sheet-bottom>.app-sheet-header,
+  .mobile-menu-sheet>.sheet-heading{position:relative!important;top:auto!important;flex:0 0 auto!important}
+  .form-sheet.bottom-sheet>.form-grid,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.form-grid,
+  .app-sheet-bottom>.app-sheet-content{overflow:auto!important;min-height:0!important}
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions,
+  .app-sheet-bottom>.app-sheet-footer{position:relative!important;bottom:auto!important;flex:0 0 auto!important}
+
+  /* Canonical fullscreen task. */
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet,
+  .app-sheet-fullscreen{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    height:var(--app-vh,100dvh)!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    background:var(--surface)!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading,
+  .app-sheet-fullscreen>.app-sheet-header{
+    position:relative!important;
+    top:auto!important;
+    flex:0 0 auto!important;
+    padding-top:calc(12px + var(--safe-top))!important;
+    min-height:calc(72px + var(--safe-top))!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions,
+  .app-sheet-fullscreen>.app-sheet-footer{
+    position:relative!important;
+    bottom:auto!important;
+    flex:0 0 auto!important;
+  }
+  .mobile-fullscreen-sheet>.form-grid,
+  .document-editor>.form-grid,
+  .policy-editor>.form-grid,
+  .invoice-builder-sheet>.form-grid,
+  .app-sheet-fullscreen>.app-sheet-content{
+    overflow:auto!important;
+    min-height:0!important;
+  }
+
+  /* No app chrome may cover an active task. */
+  body:has(.sheet-layer) .mobile-pill,
+  body:has(.app-sheet-backdrop) .mobile-pill,
+  body:has(.mobile-menu-layer) .mobile-pill{display:none!important}
+
+  .ui-close-button{width:44px!important;height:44px!important}
+  .sheet-heading,.app-sheet-header{padding-left:30px!important;padding-right:30px!important}
+  .sheet-actions,.app-sheet-footer,.app-sheet-actions{padding-left:30px!important;padding-right:30px!important}
+}
+
+@media(max-width:420px){
+  .sheet-actions,.app-sheet-footer,.app-sheet-actions{grid-template-columns:1fr!important}
+}
+
+/* v18.8.2 — canonical mobile header behavior.
+   Flat page-colored chrome, no glass/shadow, hides on scroll down and returns on scroll up. */
+@media(max-width:760px){
+  :root{
+    --ui-mobile-topbar-content:48px;
+  }
+
+  .app-frame{
+    padding-top:calc(var(--safe-top) + var(--ui-mobile-topbar-content))!important;
+  }
+
+  .topbar{
+    height:calc(var(--safe-top) + var(--ui-mobile-topbar-content))!important;
+    min-height:0!important;
+    padding:var(--safe-top) var(--ui-page-gutter-mobile) 0!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    background:var(--bg)!important;
+    border:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    transform:translateY(0)!important;
+    transition:transform 150ms ease-out!important;
+    will-change:transform;
+  }
+
+  .topbar.is-hidden{
+    transform:translateY(calc(-1 * (var(--safe-top) + var(--ui-mobile-topbar-content))))!important;
+    pointer-events:none!important;
+  }
+
+  .topbar-actions,
+  .global-search,
+  .topbar-create,
+  .topbar-icon,
+  .avatar-button{
+    display:none!important;
+  }
+
+  .topbar-brand{
+    min-width:0!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+
+  .topbar .binso-logo{
+    height:28px!important;
+    min-height:28px!important;
+    overflow:visible!important;
+  }
+  .topbar .binso-logo img{
+    width:auto!important;
+    height:28px!important;
+    max-height:28px!important;
+    display:block!important;
+  }
+
+  /* On mobile the page-specific create action is represented by the single
+     centre + in the pill. Secondary page actions (e.g. Export) stay visible. */
+  .page-primary-action{display:none!important}
+  .page-action-group:has(.page-primary-action) .page-primary-action{display:none!important}
+
+  .mobile-pill .pill-add{display:grid!important}
+}
+
+@media(max-width:760px) and (prefers-reduced-motion:reduce){
+  .topbar{transition:none!important}
+}
+
+/* v18.9 — one reusable compact information row for non-navigating business lists. */
+.compact-info-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"main amount" "main trailing";
+  gap:3px 12px;
+  min-width:0;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.compact-info-main{grid-area:main;display:grid;gap:3px;min-width:0}
+.compact-info-main strong,.compact-info-main small{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-info-main strong{font-size:13px;line-height:1.3}
+.compact-info-main small{font-size:11px;line-height:1.35;color:var(--muted)}
+.compact-info-amount{grid-area:amount;justify-self:end;white-space:nowrap;font-size:13px;line-height:1.3;font-variant-numeric:tabular-nums}
+.compact-info-trailing{grid-area:trailing;justify-self:end;display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.compact-info-trailing .status{min-height:20px;padding:0 7px}
+.compact-info-trailing .text-row-action{min-width:auto!important;min-height:28px!important;padding:0 4px!important;font-size:11px!important}
+
+@media(max-width:760px){
+  .compact-info-row{min-height:64px;padding:9px 0}
+  .compact-info-main strong{font-size:13px!important}
+  .compact-info-main small{font-size:11.5px!important}
+  .compact-info-amount{font-size:13px!important}
+}

@@ -1,0 +1,167 @@
+/* Binso Admin v18.7 – final mobile UX source of truth.
+   This file is deliberately loaded last. */
+
+:root{
+  --mobile-topbar-content:44px;
+  --mobile-page-gap:16px;
+}
+
+
+/* Supplier invoice rows also stay structured on desktop. */
+.accounting-supplier-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.accounting-row-side{display:flex;align-items:center;justify-content:flex-end;gap:7px}
+.accounting-row-amount{white-space:nowrap}
+
+@media(max-width:760px){
+  /* One create affordance on mobile: the centre + in the floating pill. */
+  .topbar-create,
+  .page-primary-action{display:none!important}
+
+  /* Compact, quiet top chrome. */
+  .app-frame{padding-top:calc(var(--safe-top) + var(--mobile-topbar-content))!important}
+  .topbar{
+    height:calc(var(--safe-top) + var(--mobile-topbar-content))!important;
+    min-height:0!important;
+    padding:var(--safe-top) var(--mobile-page-inline) 0!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+  }
+  .topbar-actions{display:none!important}
+  .topbar .binso-logo{height:22px!important;overflow:visible!important}
+  .topbar .binso-logo img{height:22px!important;width:auto!important}
+
+  /* Page actions are only shown when a non-create action remains, e.g. Export. */
+  .page-actions:has(.page-primary-action:only-child){display:none!important}
+  .page-actions,.page-action-group{align-items:center!important}
+  .page-action-group .button.secondary{min-height:40px!important;padding:0 12px!important}
+
+  /* Stable page start after fixed chrome and a little less vertical waste. */
+  .page{padding-top:14px!important}
+  .page-header{margin-bottom:16px!important}
+
+  /* Dashboard: three useful KPIs, with the third spanning the row. */
+  .owner-metrics{grid-template-columns:1fr 1fr!important}
+  .owner-metrics .metric:nth-child(4){display:none!important}
+  .owner-metrics .metric:nth-child(3){grid-column:1/-1!important;border-right:0!important;padding-left:0!important}
+  .owner-metrics .metric:nth-child(3){border-bottom:0!important}
+  .focus-item{text-decoration:none!important;color:inherit!important}
+  .focus-item strong,.focus-item small{text-decoration:none!important}
+
+  /* Full-screen tasks really fill the app viewport. 100dvh already tracks
+     the dynamic Safari viewport; safe-area padding protects system UI. */
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    padding:0!important;
+    margin:0!important;
+    display:block!important;
+    background:var(--surface)!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0 var(--mobile-page-inline)!important;
+    border:0!important;
+    border-radius:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    box-shadow:none!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    flex:0 0 auto!important;
+    position:sticky!important;
+    top:0!important;
+    min-height:calc(58px + var(--safe-top))!important;
+    margin:0 calc(var(--mobile-page-inline) * -1) 14px!important;
+    padding:calc(8px + var(--safe-top)) var(--mobile-page-inline) 8px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:10px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-heading>.icon-button,
+  .document-editor>.sheet-heading>.icon-button,
+  .policy-editor>.sheet-heading>.icon-button,
+  .invoice-builder-sheet>.sheet-heading>.icon-button{
+    justify-self:end!important;
+    align-self:center!important;
+    width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
+    margin:0!important;padding:0!important;display:grid!important;place-items:center!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions{
+    flex:0 0 auto!important;
+    position:sticky!important;
+    bottom:0!important;
+    margin-top:auto!important;
+    margin-left:calc(var(--mobile-page-inline) * -1)!important;
+    margin-right:calc(var(--mobile-page-inline) * -1)!important;
+    padding:12px var(--mobile-page-inline) calc(12px + var(--safe-bottom))!important;
+    min-height:calc(70px + var(--safe-bottom))!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    z-index:40!important;
+  }
+
+  /* Accounting supplier invoices: exactly two information lines on mobile. */
+  .operational-compact-list>.accounting-supplier-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-rows:auto auto!important;
+    gap:3px 12px!important;
+    min-height:66px!important;
+    padding:10px 0!important;
+    align-items:center!important;
+  }
+  .accounting-supplier-row>.primary-cell{grid-column:1!important;grid-row:1/3!important;min-width:0!important;align-self:center!important}
+  .accounting-supplier-row>.primary-cell strong,
+  .accounting-supplier-row>.primary-cell small{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .accounting-supplier-row>.accounting-row-amount{grid-column:2!important;grid-row:1!important;justify-self:end!important;white-space:nowrap!important;font-size:13px!important}
+  .accounting-supplier-row>.accounting-row-side{grid-column:2!important;grid-row:2!important;justify-self:end!important;display:flex!important;align-items:center!important;gap:6px!important;white-space:nowrap!important}
+  .accounting-supplier-row .status{min-height:20px!important;padding:0 7px!important}
+  .accounting-supplier-row .text-row-action{min-width:auto!important;min-height:28px!important;padding:0 4px!important;font-size:11px!important}
+
+  /* Floating nav remains clear of the final content. */
+  .app-main{padding-bottom:calc(138px + var(--safe-bottom))!important}
+}
+
+@media(max-width:420px){
+  .owner-metrics{grid-template-columns:1fr 1fr!important}
+  .owner-metrics .metric:nth-child(2){border-bottom:1px solid var(--line)!important}
+  .owner-metrics .metric:nth-child(3){grid-column:1/-1!important}
+}

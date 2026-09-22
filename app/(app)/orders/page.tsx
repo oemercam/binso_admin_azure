@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { BillingModel } from '@/types/domain'
@@ -82,7 +83,7 @@ export default function OrdersPage() {
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
           <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
             <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Auftrag erstellen</strong><span>Neues Mandat oder Projekt eröffnen.</span></div><button type="button" className="icon-button" onClick={() => setOpen(false)}><Icon name="close" size={17}/></button></div>
+            <div className="sheet-heading"><div><strong>Auftrag erstellen</strong><span>Neues Mandat oder Projekt eröffnen.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
             <div className="form-grid">
               <label className="full"><span>Kunde *</span><select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</select></label>
               <label className="full"><span>Auftragsname *</span><input value={name} onChange={(e) => setName(e.target.value)} required/></label>

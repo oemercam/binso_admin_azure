@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
@@ -198,7 +199,7 @@ export default function TimePage() {
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
           <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
             <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Zeit erfassen</strong><span>Direkt einem Auftrag und Leistungserbringer zuordnen.</span></div><button type="button" className="icon-button" onClick={() => setOpen(false)}><Icon name="close" size={17}/></button></div>
+            <div className="sheet-heading"><div><strong>Zeit erfassen</strong><span>Direkt einem Auftrag und Leistungserbringer zuordnen.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
             {formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
               <label className="full"><span>Auftrag *</span><select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</select></label>
