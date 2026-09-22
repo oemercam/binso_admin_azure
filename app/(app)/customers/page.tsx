@@ -1,5 +1,7 @@
 'use client'
 
+import { Input } from '@/components/ui/form-controls'
+
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
@@ -83,7 +85,7 @@ export default function CustomersPage() {
       />
 
       <div className="module-toolbar">
-        <label className="search-field"><Icon name="search" size={16}/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden durchsuchen" /></label>
+        <label className="search-field"><Icon name="search" size={16}/><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden durchsuchen" /></label>
         <span className="toolbar-meta">{filtered.length} Kunden</span>
       </div>
 
@@ -117,16 +119,16 @@ export default function CustomersPage() {
     }
     return (
       <StandardFormSheet open title={<>{customer.name}</>} description={<>{customer.customerNo} · Kundendaten bearbeiten</>} onClose={onClose} onSubmit={save} formId="customers-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="customers-page-sheet-2" className="button primary">Änderungen speichern</button></>}><div className="form-grid">
-            <label><span>Firma *</span><input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value, legalName: e.target.value })} required/></label>
-            <label><span>Ansprechperson</span><input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
-            <label><span>E-Mail *</span><input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })} required/></label>
-            <label><span>Telefon</span><input value={draft.phone ?? ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })}/></label>
-            <label className="full"><span>Adresse *</span><input value={draft.address ?? ''} onChange={(e) => setDraft({ ...draft, address: e.target.value })} required/></label>
-            <label><span>PLZ *</span><input value={draft.zip ?? ''} onChange={(e) => setDraft({ ...draft, zip: e.target.value })} required/></label>
-            <label><span>Ort *</span><input value={draft.city ?? ''} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required/></label>
-            <label><span>Land *</span><input value={draft.country} onChange={(e) => setDraft({ ...draft, country: e.target.value })} required/></label>
-            <label><span>UID / MWST</span><input value={draft.uid ?? ''} onChange={(e) => setDraft({ ...draft, uid: e.target.value })}/></label>
-            <label><span>Zahlungsziel *</span><input type="number" min="1" value={draft.paymentDays} onChange={(e) => setDraft({ ...draft, paymentDays: Number(e.target.value) })} required/></label>
+            <label><span>Firma *</span><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value, legalName: e.target.value })} required/></label>
+            <label><span>Ansprechperson</span><Input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
+            <label><span>E-Mail *</span><Input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })} required/></label>
+            <label><span>Telefon</span><Input value={draft.phone ?? ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })}/></label>
+            <label className="full"><span>Adresse *</span><Input value={draft.address ?? ''} onChange={(e) => setDraft({ ...draft, address: e.target.value })} required/></label>
+            <label><span>PLZ *</span><Input value={draft.zip ?? ''} onChange={(e) => setDraft({ ...draft, zip: e.target.value })} required/></label>
+            <label><span>Ort *</span><Input value={draft.city ?? ''} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required/></label>
+            <label><span>Land *</span><Input value={draft.country} onChange={(e) => setDraft({ ...draft, country: e.target.value })} required/></label>
+            <label><span>UID / MWST</span><Input value={draft.uid ?? ''} onChange={(e) => setDraft({ ...draft, uid: e.target.value })}/></label>
+            <label><span>Zahlungsziel *</span><Input type="number" min="1" value={draft.paymentDays} onChange={(e) => setDraft({ ...draft, paymentDays: Number(e.target.value) })} required/></label>
             <div className="form-toggle-field full"><span>Kunde aktiv</span><Toggle label="Kunde aktiv" checked={draft.status === 'active'} onChange={(value) => setDraft({ ...draft, status: value ? 'active' : 'inactive' })}/></div>
           </div></StandardFormSheet>
     )
@@ -135,15 +137,15 @@ export default function CustomersPage() {
 
 function CustomerFields({ form, setForm }: { form: typeof emptyCustomer; setForm: (value: typeof emptyCustomer) => void }) {
   return <div className="form-grid">
-    <label><span>Firma *</span><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required/></label>
-    <label><span>Ansprechperson</span><input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })}/></label>
-    <label><span>E-Mail *</span><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required/></label>
-    <label><span>Telefon</span><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}/></label>
-    <label className="full"><span>Adresse *</span><input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} required/></label>
-    <label><span>PLZ *</span><input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} required/></label>
-    <label><span>Ort *</span><input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} required/></label>
-    <label><span>Land *</span><input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} required/></label>
-    <label><span>UID / MWST</span><input value={form.uid} onChange={(e) => setForm({ ...form, uid: e.target.value })}/></label>
-    <label><span>Zahlungsziel *</span><input type="number" min="1" value={form.paymentDays} onChange={(e) => setForm({ ...form, paymentDays: Number(e.target.value) })} required/></label>
+    <label><span>Firma *</span><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required/></label>
+    <label><span>Ansprechperson</span><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })}/></label>
+    <label><span>E-Mail *</span><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required/></label>
+    <label><span>Telefon</span><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}/></label>
+    <label className="full"><span>Adresse *</span><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} required/></label>
+    <label><span>PLZ *</span><Input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} required/></label>
+    <label><span>Ort *</span><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} required/></label>
+    <label><span>Land *</span><Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} required/></label>
+    <label><span>UID / MWST</span><Input value={form.uid} onChange={(e) => setForm({ ...form, uid: e.target.value })}/></label>
+    <label><span>Zahlungsziel *</span><Input type="number" min="1" value={form.paymentDays} onChange={(e) => setForm({ ...form, paymentDays: Number(e.target.value) })} required/></label>
   </div>
 }

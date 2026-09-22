@@ -1,5 +1,7 @@
 'use client'
 
+import { Input } from '@/components/ui/form-controls'
+
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
@@ -118,7 +120,7 @@ export function AppOverlays({
       >
         <div className="command-input">
           <Icon name="search" size={18} />
-          <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" />
+          <Input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" />
           <kbd>ESC</kbd>
         </div>
         <div className="command-results">

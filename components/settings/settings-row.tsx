@@ -13,19 +13,23 @@ export function SettingsValueRow({
   value,
   description,
   onClick,
-}: BaseProps & { value?: string; onClick: () => void }) {
-  return (
-    <button type="button" className="settings-value-row" onClick={onClick}>
+}: BaseProps & { value?: string; onClick?: () => void }) {
+  const content = (
+    <>
       <span className="settings-value-copy">
         <strong>{title}</strong>
         {description ? <small>{description}</small> : null}
       </span>
       <span className="settings-value-trailing">
         {value ? <span className="settings-current-value">{value}</span> : null}
-        <span className="settings-chevron" aria-hidden="true">›</span>
+        {onClick ? <span className="settings-chevron" aria-hidden="true">›</span> : null}
       </span>
-    </button>
+    </>
   )
+
+  return onClick
+    ? <button type="button" className="settings-value-row" onClick={onClick}>{content}</button>
+    : <div className="settings-value-row settings-value-row-static">{content}</div>
 }
 
 export function SettingsToggleRow({

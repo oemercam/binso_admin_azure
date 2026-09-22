@@ -2,60 +2,66 @@ name: Build and deploy Binso Admin to Azure
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
   group: binso-admin-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     permissions:
       contents: read
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
+      - name: Setup Node
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version-file: package.json
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js application
+      - name: Set build metadata
+        shell: bash
+        run: |
+          echo "NEXT_PUBLIC_BUILD_ID=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Architecture checks
+        run: npm run architecture:check
+
+      - name: Build
         run: npm run build
         env:
           NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
 
       - name: Prepare standalone deployment
         shell: bash
         run: |
           set -euo pipefail
-
           test -f .next/standalone/server.js
-
           mkdir -p .next/standalone/.next
-
-          if [ -d .next/static ]; then
-            cp -r .next/static .next/standalone/.next/static
-          fi
-
-          if [ -d public ]; then
-            cp -r public .next/standalone/public
-          fi
+          if [ -d .next/static ]; then cp -r .next/static .next/standalone/.next/static; fi
+          if [ -d public ]; then cp -r public .next/standalone/public; fi
 
       - name: Upload deployment artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: binso-admin
           path: .next/standalone
@@ -65,22 +71,22 @@ jobs:
 
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs: build
-
+    environment: production
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Download deployment artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: binso-admin
           path: app
 
-      - name: Login to Azure
-        uses: azure/login@v2
+      - name: Azure login (OIDC)
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_26AFEFB731284F009ED9276FD775F286 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2CCE2EB4F39347B98167444DC3298211 }}
@@ -89,6 +95,6 @@ jobs:
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'binso-admin-prod'
-          slot-name: 'Production'
+          app-name: binso-admin-prod
+          slot-name: Production
           package: app

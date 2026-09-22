@@ -1,5 +1,7 @@
 'use client'
 
+import { Select, Textarea, Input } from '@/components/ui/form-controls'
+
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -36,7 +38,7 @@ export default function TimePage() {
   const [open, setOpen] = useState(false)
   const [orderId, setOrderId] = useState(availableOrders[0]?.id ?? '')
   const [hours, setHours] = useState('8')
-  const [note, setNote] = useState('')
+  const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [personId, setPersonId] = useState(currentEmployee?.id ?? '')
   const [selected, setSelected] = useState<string[]>([])
@@ -89,7 +91,7 @@ export default function TimePage() {
     const effective = policy ? (assignment ? resolveTimeTrackingPolicy(policy, assignment) : policy.timeTracking) : undefined
     const rawHours = Number(hours)
     if (!Number.isFinite(rawHours) || rawHours <= 0) { setFormError('Bitte gültige Stunden erfassen.'); return }
-    if (effective?.requireDescription && !note.trim()) { setFormError('Für diesen Auftrag ist eine Beschreibung Pflicht.'); return }
+    if (effective?.requireDescription && !description.trim()) { setFormError('Für diesen Auftrag ist eine Beschreibung Pflicht.'); return }
 
     const selectedDate = new Date(`${date}T12:00:00`)
     const today = new Date()
@@ -122,13 +124,13 @@ export default function TimePage() {
       workerType,
       date,
       hours: roundedHours,
-      note: note.trim(),
+      description: description.trim(),
       billable: billableEntry,
       approved: autoApprove,
       salesRate,
       internalCostRate,
     })
-    setNote('')
+    setDescription('')
     setOpen(false)
     if (effective?.evidence.required) feedback.info(`Zeit gespeichert. Für ${person.name} ist ein ${frequencyLabel(effective.evidence.frequency).toLowerCase()}er Nachweis erforderlich.`)
     else feedback.success('Zeit gespeichert.')
@@ -173,10 +175,10 @@ export default function TimePage() {
           const approval = getTimeEntryApprovalEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           return (
             <div className="data-row time-grid-v5" key={entry.id}>
-              <span>{user.role !== 'employee' && user.role !== 'finance' && <input type="checkbox" disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
+              <span>{user.role !== 'employee' && user.role !== 'finance' && <Input type="checkbox" disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
               <span>{formatDate(entry.date)}</span>
               <span className="primary-cell"><strong>{entry.orderName}</strong><small>{entry.personName} · {workerLabel(entry.workerType)}</small></span>
-              <span>{entry.note || '–'}</span>
+              <span>{entry.description || '–'}</span>
               <span><strong>{entry.hours} h</strong></span>
               <span className="time-status-actions">
                 <span className={entry.invoicedInvoiceId ? 'status paid' : billing.eligible ? 'status active' : 'status neutral'}>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span>
@@ -192,19 +194,19 @@ export default function TimePage() {
       <div className="mobile-record-list operational-mobile-list">
         {visibleEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.note || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
+          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
         })}
       </div>
 
       {open && canWrite && (
         <StandardFormSheet open title={<>Zeit erfassen</>} description={<>Direkt einem Auftrag und Leistungserbringer zuordnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="time-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="time-page-sheet-1" className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></>}>{formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
-              <label className="full"><span>Auftrag *</span><select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</select></label>
-              <label className="full"><span>Leistungserbringer *</span><select value={personId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</select></label>
-              <label><span>Datum *</span><input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required/></label>
-              <label><span>Stunden *</span><input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
+              <label className="full"><span>Auftrag *</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
+              <label className="full"><span>Leistungserbringer *</span><Select value={personId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
+              <label><span>Datum *</span><Input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required/></label>
+              <label><span>Stunden *</span><Input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>
-              <label className="full"><span>Beschreibung</span><textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Was wurde gemacht?"/></label>
+              <label className="full"><span>Beschreibung</span><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Kurze Beschreibung der ausgeführten Arbeiten"/></label>
             </div>
             {!availableOrders.length && <div className="field-error">Für dieses Profil ist aktuell kein aktiver Auftrag zur Zeiterfassung zugewiesen.</div>}</StandardFormSheet>
       )}

@@ -1,4 +1,4 @@
-const CACHE = 'binso-shell-v20.0'
+const CACHE = 'binso-shell-current'
 const OFFLINE_URL = '/offline'
 
 self.addEventListener('install', event => {
@@ -63,8 +63,8 @@ self.addEventListener('push', event => {
   const data = event.data?.json() ?? { title: 'Binso Admin', body: 'Neue Benachrichtigung' }
   event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
-    icon: '/icons/icon-192.svg',
-    badge: '/icons/icon-192.svg',
+    icon: '/icons/app-192.png',
+    badge: '/icons/app-192.png',
     data: { url: data.url || '/' },
     tag: data.tag || 'binso-admin'
   }))

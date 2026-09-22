@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
+import { appIdentity } from '@/lib/config/app-identity'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Binso Admin',
-    short_name: 'Binso',
-    description: 'Administration, Verkauf, Zeiterfassung und Finanzen für Binso GmbH.',
+    name: appIdentity.name,
+    short_name: appIdentity.shortName,
+    description: appIdentity.description,
     start_url: '/dashboard',
     scope: '/',
     display: 'standalone',
@@ -14,8 +15,10 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#ffffff',
     categories: ['business', 'productivity', 'finance'],
     icons: [
-      { src: '/icons/icon-192.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/icons/icon-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
+      { src: '/icons/app-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icons/app-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icons/app-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: '/icons/app-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   }
 }

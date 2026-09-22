@@ -156,42 +156,42 @@ export const timeEntries: TimeEntry[] = [
   {
     id: 'time-001', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-01', hours: 8,
-    note: 'Workplace Architektur, Abstimmung und technische Führung', billable: true, approved: true, salesRate: 165, internalCostRate: 105, invoicedInvoiceId: 'inv-001',
+    description: 'Workplace Architektur, Abstimmung und technische Führung', billable: true, approved: true, salesRate: 165, internalCostRate: 105, invoicedInvoiceId: 'inv-001',
   },
   {
     id: 'time-002', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-02', hours: 7.5,
-    note: 'Client Engineering und Pakettests', billable: true, approved: true, salesRate: 145, internalCostRate: 72, invoicedInvoiceId: 'inv-001',
+    description: 'Client Engineering und Pakettests', billable: true, approved: true, salesRate: 145, internalCostRate: 72, invoicedInvoiceId: 'inv-001',
   },
   {
     id: 'time-003', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-03', hours: 8,
-    note: 'M365 Engineering und technische Analyse', billable: true, approved: true, salesRate: 165, internalCostRate: 125, invoicedInvoiceId: 'inv-001',
+    description: 'M365 Engineering und technische Analyse', billable: true, approved: true, salesRate: 165, internalCostRate: 125, invoicedInvoiceId: 'inv-001',
   },
   {
     id: 'time-004', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-08', hours: 8,
-    note: 'Security Hardening und Review', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
+    description: 'Security Hardening und Review', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
     id: 'time-005', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-09', hours: 8,
-    note: 'Treiber- und Hardwarevalidierung', billable: true, approved: true, salesRate: 145, internalCostRate: 72,
+    description: 'Treiber- und Hardwarevalidierung', billable: true, approved: true, salesRate: 145, internalCostRate: 72,
   },
   {
     id: 'time-006', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-10', hours: 6,
-    note: 'Intune Policy Review', billable: true, approved: true, salesRate: 165, internalCostRate: 125,
+    description: 'Intune Policy Review', billable: true, approved: true, salesRate: 165, internalCostRate: 125,
   },
   {
     id: 'time-007', orderId: 'ord-002', orderName: 'Client Migration Phase 2', customerId: 'cus-002', customerName: 'Muster Industrie AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-15', hours: 7.5,
-    note: 'Migration und Abnahmetest', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
+    description: 'Migration und Abnahmetest', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
     id: 'time-008', orderId: 'ord-003', orderName: 'M365 Security Assessment', customerId: 'cus-003', customerName: 'Helvetic Systems AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-08-28', hours: 6.5,
-    note: 'Assessment und Management Summary', billable: true, approved: true, salesRate: 185, internalCostRate: 105, invoicedInvoiceId: 'inv-002',
+    description: 'Assessment und Management Summary', billable: true, approved: true, salesRate: 185, internalCostRate: 105, invoicedInvoiceId: 'inv-002',
   },
 ]
 

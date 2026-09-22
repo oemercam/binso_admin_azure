@@ -97,7 +97,7 @@ create table if not exists time_entries (
   worker_type text not null check (worker_type in ('employee','hourly_employee','external')),
   work_date date not null,
   hours numeric(8,2) not null check (hours > 0),
-  note text,
+  description text,
   billable boolean not null default true,
   approved boolean not null default false,
   sales_rate numeric(12,2) not null default 0,

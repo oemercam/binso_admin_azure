@@ -1,5 +1,7 @@
 'use client'
 
+import { Textarea, Input } from '@/components/ui/form-controls'
+
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { ThemeControl } from '@/components/settings/theme-control'
@@ -10,6 +12,7 @@ import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/componen
 import { useFeedback } from '@/components/ui/feedback'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { DocumentTemplates } from '@/types/domain'
+import { appIdentity } from '@/lib/config/app-identity'
 
 type Tab = 'general' | 'mail' | 'automation' | 'documents' | 'appearance'
 type CompanyEditor = 'company' | 'address' | 'contact' | 'bank'
@@ -144,6 +147,15 @@ export default function SettingsPage() {
               <SettingsValueRow title="Adresse" value={`${store.companyProfile.zip} ${store.companyProfile.city}`} description={store.companyProfile.address} onClick={() => openCompany('address')} />
               <SettingsValueRow title="Kontakt" value={store.companyProfile.email} description={store.companyProfile.phone || 'Telefon nicht gesetzt'} onClick={() => openCompany('contact')} />
               <SettingsValueRow title="Bank und Zahlungsziel" value={`${store.companyProfile.defaultPaymentDays} Tage`} description={store.companyProfile.iban || 'IBAN nicht gesetzt'} onClick={() => openCompany('bank')} />
+            </SettingsSection>
+
+
+
+            <SettingsSection title="App-Informationen" description="Produkt- und Buildinformationen für Support und Betrieb.">
+              <SettingsValueRow title="Anwendung" value={appIdentity.name} description={appIdentity.company} />
+              <SettingsValueRow title="Version" value={appIdentity.version} description={`Build ${appIdentity.build}`} />
+              <SettingsValueRow title="Umgebung" value={appIdentity.environment} description={appIdentity.buildDate ? `Stand ${appIdentity.buildDate}` : 'Lokaler/ungekennzeichneter Build'} />
+              <SettingsValueRow title="Support" value={appIdentity.supportEmail} description={appIdentity.website} />
             </SettingsSection>
 
             <SettingsSection title="Workflow-Regeln" description="Binäre Regeln können direkt ein- oder ausgeschaltet werden.">
@@ -291,7 +303,7 @@ function EditorSheets({
       >
         <label className="settings-edit-field">
           <span>{editor.title}</span>
-          {multiline ? <textarea rows={10} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus /> : <input type={inputType} min={inputType === 'number' ? 0 : undefined} max={inputType === 'number' ? 90 : undefined} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />}
+          {multiline ? <Textarea rows={10} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus /> : <Input type={inputType} min={inputType === 'number' ? 0 : undefined} max={inputType === 'number' ? 90 : undefined} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />}
         </label>
       </StandardFormSheet>
     )
@@ -309,10 +321,10 @@ function EditorSheets({
         footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="settings-company-form" className="button primary">Speichern</button></>}
       >
         <div className="form-grid settings-editor-grid">
-          {editor.section === 'company' && <><Field label="Firma *"><input value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} required /></Field><Field label="UID / MWST *"><input value={company.uid} onChange={(e) => setCompany({ ...company, uid: e.target.value })} required /></Field></>}
-          {editor.section === 'address' && <><Field label="Adresse *" full><input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} required /></Field><Field label="PLZ *"><input value={company.zip} onChange={(e) => setCompany({ ...company, zip: e.target.value })} required /></Field><Field label="Ort *"><input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} required /></Field><Field label="Land *"><input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} required /></Field></>}
-          {editor.section === 'contact' && <><Field label="E-Mail *"><input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} required /></Field><Field label="Telefon"><input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} /></Field><Field label="Website" full><input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} /></Field></>}
-          {editor.section === 'bank' && <><Field label="IBAN *" full><input value={company.iban} onChange={(e) => setCompany({ ...company, iban: e.target.value })} required /></Field><Field label="Bank"><input value={company.bankName} onChange={(e) => setCompany({ ...company, bankName: e.target.value })} /></Field><Field label="Standard-Zahlungsziel"><input type="number" min="1" max="120" value={company.defaultPaymentDays} onChange={(e) => setCompany({ ...company, defaultPaymentDays: Number(e.target.value) })} /></Field></>}
+          {editor.section === 'company' && <><Field label="Firma *"><Input value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} required /></Field><Field label="UID / MWST *"><Input value={company.uid} onChange={(e) => setCompany({ ...company, uid: e.target.value })} required /></Field></>}
+          {editor.section === 'address' && <><Field label="Adresse *" full><Input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} required /></Field><Field label="PLZ *"><Input value={company.zip} onChange={(e) => setCompany({ ...company, zip: e.target.value })} required /></Field><Field label="Ort *"><Input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} required /></Field><Field label="Land *"><Input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} required /></Field></>}
+          {editor.section === 'contact' && <><Field label="E-Mail *"><Input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} required /></Field><Field label="Telefon"><Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} /></Field><Field label="Website" full><Input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} /></Field></>}
+          {editor.section === 'bank' && <><Field label="IBAN *" full><Input value={company.iban} onChange={(e) => setCompany({ ...company, iban: e.target.value })} required /></Field><Field label="Bank"><Input value={company.bankName} onChange={(e) => setCompany({ ...company, bankName: e.target.value })} /></Field><Field label="Standard-Zahlungsziel"><Input type="number" min="1" max="120" value={company.defaultPaymentDays} onChange={(e) => setCompany({ ...company, defaultPaymentDays: Number(e.target.value) })} /></Field></>}
         </div>
       </StandardFormSheet>
     )
@@ -331,10 +343,10 @@ function EditorSheets({
       footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="settings-template-form" className="button primary">Speichern</button></>}
     >
       <div className="settings-template-fields">
-        <label><span>Einleitungstext</span><textarea rows={5} value={fields.intro} onChange={(e) => setTemplates({ ...templates, [fields.introKey]: e.target.value })} /></label>
-        <label><span>Schlusstext</span><textarea rows={5} value={fields.outro} onChange={(e) => setTemplates({ ...templates, [fields.outroKey]: e.target.value })} /></label>
-        <label><span>E-Mail-Betreff</span><input value={fields.subject} onChange={(e) => setTemplates({ ...templates, [fields.subjectKey]: e.target.value })} /></label>
-        <label><span>E-Mail-Text</span><textarea rows={8} value={fields.body} onChange={(e) => setTemplates({ ...templates, [fields.bodyKey]: e.target.value })} /></label>
+        <label><span>Einleitungstext</span><Textarea rows={5} value={fields.intro} onChange={(e) => setTemplates({ ...templates, [fields.introKey]: e.target.value })} /></label>
+        <label><span>Schlusstext</span><Textarea rows={5} value={fields.outro} onChange={(e) => setTemplates({ ...templates, [fields.outroKey]: e.target.value })} /></label>
+        <label><span>E-Mail-Betreff</span><Input value={fields.subject} onChange={(e) => setTemplates({ ...templates, [fields.subjectKey]: e.target.value })} /></label>
+        <label><span>E-Mail-Text</span><Textarea rows={8} value={fields.body} onChange={(e) => setTemplates({ ...templates, [fields.bodyKey]: e.target.value })} /></label>
         <div className="settings-note">Platzhalter: <code>{'{{number}}'}</code>, <code>{'{{amount}}'}</code>, <code>{'{{customer}}'}</code>, <code>{'{{period}}'}</code>, <code>{'{{name}}'}</code>.</div>
       </div>
     </StandardFormSheet>

@@ -3,19 +3,20 @@ import type { ReactNode } from 'react'
 import './globals.css'
 import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
-import './ui-foundation-v19.css'
+import './app-ui.css'
+import { appIdentity } from '@/lib/config/app-identity'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Binso Admin',
-    template: '%s · Binso Admin',
+    default: appIdentity.name,
+    template: `%s · ${appIdentity.name}`,
   },
-  description: 'Interne Administration für Binso GmbH',
-  applicationName: 'Binso Admin',
+  description: appIdentity.description,
+  applicationName: appIdentity.name,
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Binso Admin',
+    statusBarStyle: 'default',
+    title: appIdentity.name,
   },
   formatDetection: {
     telephone: false,

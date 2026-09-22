@@ -135,7 +135,7 @@ export type TimeEntry = {
   workerType: WorkerType
   date: string
   hours: number
-  note?: string
+  description?: string
   billable: boolean
   approved: boolean
   salesRate: number

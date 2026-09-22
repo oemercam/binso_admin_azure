@@ -173,7 +173,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
           suppliers: parsed.suppliers?.length ? parsed.suppliers : seeded.suppliers,
           quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes,
           orders: parsed.orders?.length ? parsed.orders : seeded.orders,
-          timeEntries: parsed.timeEntries?.length ? parsed.timeEntries : seeded.timeEntries,
+          timeEntries: parsed.timeEntries?.length ? parsed.timeEntries.map((entry) => { const legacy = entry as typeof entry & { note?: string }; return { ...entry, description: entry.description ?? legacy.note ?? '' } }) : seeded.timeEntries,
           invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices,
           payments: parsed.payments?.length ? parsed.payments : seeded.payments,
           supplierInvoices: parsed.supplierInvoices?.length ? parsed.supplierInvoices : seeded.supplierInvoices,
@@ -379,7 +379,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       if (!selected.length && !extraLines.length) return null
       const timeLines: InvoiceLine[] = selected.map((entry, index) => ({
         id: `il-${Date.now()}-${index}`,
-        description: `${formatDate(entry.date)} – ${entry.note || 'Dienstleistung'} – ${entry.personName}`,
+        description: `${formatDate(entry.date)} – ${entry.description || 'Dienstleistung'} – ${entry.personName}`,
         quantity: entry.hours,
         unit: 'h',
         unitPrice: entry.salesRate,
