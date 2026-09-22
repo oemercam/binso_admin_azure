@@ -1,4 +1,4 @@
-const CACHE = 'binso-shell-v18.10.2'
+const CACHE = 'binso-shell-v18.11.2'
 const OFFLINE_URL = '/offline'
 
 self.addEventListener('install', event => {
