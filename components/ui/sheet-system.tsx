@@ -1,10 +1,12 @@
 'use client'
 
-import { useId, useRef, type FormEvent, type ReactNode } from 'react'
+import { Children, Fragment, cloneElement, isValidElement, useEffect, useId, useRef, useState, type FormEvent, type ReactElement, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useDeviceEnvironment } from '@/components/providers/device-environment-provider'
 import { CloseButton } from '@/components/ui/close-button'
 import { useModalOverlay } from '@/components/ui/overlay-manager'
+import { ActionFooter } from '@/components/ui/action-footer'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 
 type SheetMode = 'bottom' | 'fullscreen' | 'dialog'
 type StandardSheetMode = SheetMode | 'auto'
@@ -44,7 +46,7 @@ export function SheetFooter({ children }: { children: ReactNode }) {
 }
 
 export function SheetActions({ children }: { children: ReactNode }) {
-  return <div className="app-sheet-actions">{children}</div>
+  return <ActionFooter className="app-sheet-actions">{children}</ActionFooter>
 }
 
 export function AppSheet({
@@ -130,6 +132,7 @@ export function StandardFormSheet({
   loading = false,
   formId,
   panelClassName,
+  confirmDiscard = true,
 }: {
   open: boolean
   title: ReactNode
@@ -142,25 +145,89 @@ export function StandardFormSheet({
   loading?: boolean
   formId?: string
   panelClassName?: string
+  confirmDiscard?: boolean
 }) {
   const generatedId = useId()
   const { isMobileLayout } = useDeviceEnvironment()
+  const [dirty, setDirty] = useState(false)
+  const [discardOpen, setDiscardOpen] = useState(false)
   const resolvedFormId = formId ?? `sheet-form-${generatedId.replace(/:/g, '')}`
   const resolvedMode: SheetMode = mode === 'auto' ? (isMobileLayout ? 'bottom' : 'dialog') : mode
 
+  useEffect(() => {
+    if (open) setDirty(false)
+  }, [open])
+
+  function requestClose() {
+    if (confirmDiscard && dirty && !loading) {
+      setDiscardOpen(true)
+      return
+    }
+    onClose()
+  }
+
+  function isCancelButton(node: ReactElement<{ children?: ReactNode; type?: string }>) {
+    if (node.props.type !== 'button') return false
+    const label = flattenText(node.props.children).toLowerCase()
+    return label.includes('abbrechen') || label.includes('schliessen')
+  }
+
+  function normalizeFooter(node: ReactNode): ReactNode {
+    return Children.map(node, (child) => {
+      if (!isValidElement(child)) return child
+      if (child.type === Fragment) return cloneElement(child, {}, normalizeFooter((child.props as { children?: ReactNode }).children))
+      const typed = child as ReactElement<{ children?: ReactNode; type?: string; onClick?: () => void }>
+      if (typeof child.type === 'string' && child.type === 'button' && isCancelButton(typed)) {
+        return cloneElement(typed, { onClick: requestClose })
+      }
+      return child
+    })
+  }
+
   return (
-    <AppSheet
-      open={open}
-      mode={resolvedMode}
-      title={title}
-      description={description}
-      onClose={onClose}
-      panelClassName={panelClassName}
-      footer={<div className="app-sheet-actions" aria-busy={loading || undefined}>{footer}</div>}
-    >
-      <form id={resolvedFormId} className="app-sheet-form" onSubmit={onSubmit} aria-busy={loading || undefined}>
-        {children}
-      </form>
-    </AppSheet>
+    <>
+      <AppSheet
+        open={open}
+        mode={resolvedMode}
+        title={title}
+        description={description}
+        onClose={requestClose}
+        panelClassName={panelClassName}
+        footer={<div aria-busy={loading || undefined}><SheetActions>{normalizeFooter(footer)}</SheetActions></div>}
+      >
+        <form
+          id={resolvedFormId}
+          className="app-sheet-form"
+          onSubmit={onSubmit}
+          onInput={() => setDirty(true)}
+          onChange={() => setDirty(true)}
+          aria-busy={loading || undefined}
+        >
+          {children}
+        </form>
+      </AppSheet>
+
+      <ConfirmationDialog
+        open={discardOpen}
+        title="Änderungen verwerfen?"
+        description="Deine nicht gespeicherten Änderungen gehen verloren."
+        cancelLabel="Weiter bearbeiten"
+        confirmLabel="Verwerfen"
+        destructive
+        onCancel={() => setDiscardOpen(false)}
+        onConfirm={() => {
+          setDiscardOpen(false)
+          setDirty(false)
+          onClose()
+        }}
+      />
+    </>
   )
+}
+
+function flattenText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(flattenText).join(' ')
+  if (isValidElement(node)) return flattenText((node.props as { children?: ReactNode }).children)
+  return ''
 }

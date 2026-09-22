@@ -6,15 +6,18 @@ import { NetworkProvider } from '@/components/providers/network-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { NetworkStatus } from '@/components/ui/network-status'
 import { PWAUpdateManager } from '@/components/pwa/pwa-update-manager'
+import { FeedbackProvider } from '@/components/ui/feedback'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <DeviceEnvironmentProvider>
         <NetworkProvider>
-          {children}
-          <NetworkStatus />
-          <PWAUpdateManager />
+          <FeedbackProvider>
+            {children}
+            <NetworkStatus />
+            <PWAUpdateManager />
+          </FeedbackProvider>
         </NetworkProvider>
       </DeviceEnvironmentProvider>
     </ThemeProvider>

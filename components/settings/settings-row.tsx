@@ -36,7 +36,13 @@ export function SettingsToggleRow({
   disabled = false,
 }: BaseProps & { checked: boolean; onChange: (value: boolean) => void; disabled?: boolean }) {
   return (
-    <div className="settings-toggle-row">
+    <div
+      className={`settings-toggle-row${disabled ? ' is-disabled' : ' is-interactive'}`}
+      onClick={(event) => {
+        if (disabled || (event.target as HTMLElement).closest('button')) return
+        onChange(!checked)
+      }}
+    >
       <span className="settings-value-copy">
         <strong>{title}</strong>
         {description ? <small>{description}</small> : null}

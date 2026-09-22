@@ -9,10 +9,11 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "audit:e2e": "node scripts/e2e-audit.mjs",
-    "verify:release": "node scripts/architecture-check.mjs && node scripts/sheet-migration-check.mjs && node scripts/e2e-audit.mjs && node scripts/release-check.mjs && tsc --noEmit",
+    "verify:release": "node scripts/architecture-check.mjs && node scripts/sheet-migration-check.mjs && node scripts/ui-normalization-check.mjs && node scripts/e2e-audit.mjs && node scripts/release-check.mjs && tsc --noEmit",
     "build:turbo": "next build",
     "check:architecture": "node scripts/architecture-check.mjs",
-    "check:sheets": "node scripts/sheet-migration-check.mjs"
+    "check:sheets": "node scripts/sheet-migration-check.mjs",
+    "check:ui": "node scripts/ui-normalization-check.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",

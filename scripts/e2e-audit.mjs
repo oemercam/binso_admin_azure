@@ -113,6 +113,15 @@ expect('app/ui-foundation-v19.css', /\.app-sheet-backdrop\s*\{/, 'Sheet-System z
 expect('app/ui-foundation-v19.css', /\.mobile-menu-nav\s*\{/, 'Mobile Navigation zentral definiert')
 expect('components/ui/binso-logo.tsx', 'binso-logo-image', 'Logo verwendet kanonisches Einzelbild')
 expect('components/navigation/mobile-pill-nav.tsx', '<ResponsiveOverlay', 'Mobile Navigation verwendet zentrales ResponsiveOverlay')
+
+expect('components/ui/action-footer.tsx', 'ActionFooter', 'Kanonischer ActionFooter vorhanden')
+expect('components/ui/feedback.tsx', 'FeedbackProvider', 'Zentrales Feedback-System vorhanden')
+expect('components/ui/confirmation-dialog.tsx', 'ConfirmationDialog', 'Kanonische Bestätigung vorhanden')
+expect('app/globals.css', '--switch-track-off', 'Semantischer OFF-Switch-Token vorhanden')
+expect('app/globals.css', '--switch-track-on', 'Semantischer ON-Switch-Token vorhanden')
+expect('app/ui-foundation-v19.css', 'width:36px', 'Kompakte Switch-Breite definiert')
+expect('app/ui-foundation-v19.css', 'height:20px', 'Kompakte Switch-Höhe definiert')
+
 console.log(`E2E static audit: ${passes.length} Prüfungen erfolgreich.`)
 if (failures.length) {
   console.error(`\n${failures.length} Fehler:`)

@@ -51,6 +51,9 @@ checkNoPattern(pageFiles, /<AppSheet\b/, 'Business-Seiten verwenden keine uneinh
 checkNoPattern(pageFiles, /className=["'][^"']*\b(?:form-sheet|standard-mobile-sheet|sheet-layer|sheet-heading|sheet-actions|sheet-grabber|mobile-fullscreen-sheet)\b/, 'Business-Seiten enthalten keine Legacy-Sheet-Klassen')
 checkNoPattern(pageFiles, /(?:100vh|100dvh|100svh|safe-area-inset|--app-visual-viewport|--app-vh|--visible-viewport)/, 'Business-Seiten berechnen keine Sheet-Viewport-/Safe-Area-Geometrie')
 
+checkNoPattern(pageFiles, /className=["'][^"']*(?:toast|custom-toast|confirmation-dialog|footer-button-grid)[^"']*["']/, 'Business-Seiten definieren keine eigenen Toast-/Confirmation-/Footer-Geometrien')
+checkNoPattern(pageFiles, /(?:toggle|switch).{0,160}(?:width|height|min-height)\s*:\s*\d+px|(?:width|height|min-height)\s*:\s*\d+px.{0,160}(?:toggle|switch)/i, 'Business-Seiten definieren keine Toggle-Geometrie')
+
 checkNoPattern(productFiles, /\blocalStorage\b/, 'localStorage ist zentralisiert', ['lib/browser/storage.ts', 'app/layout.tsx'])
 checkNoPattern(productFiles, /\bsessionStorage\b/, 'sessionStorage ist zentralisiert', ['lib/browser/storage.ts'])
 checkNoPattern(productFiles, /\bfetch\s*\(/, 'fetch() ist im zentralen API-Client gekapselt', ['lib/http/api-client.ts'])
@@ -76,6 +79,15 @@ else passes.push('AppSheet Header/Footer sind natürliche Flex-Bereiche, nicht s
 if (/\.app-sheet[^\n{]*\{[^}]*!important/s.test(foundation)) failures.push('Canonical AppSheet verwendet !important')
 else passes.push('Canonical AppSheet benötigt keine !important-Regeln')
 
+
+const actionFooter = read(path.join(root, 'components/ui/action-footer.tsx'))
+expect(actionFooter, /grid|ActionFooter|SheetFooterActions/, 'Kanonischer ActionFooter ist vorhanden')
+const feedback = read(path.join(root, 'components/ui/feedback.tsx'))
+expect(feedback, /FeedbackProvider/, 'Zentrales Feedback-System ist vorhanden')
+expect(feedback, /toast-viewport/, 'Zentrale Toast-Ausgabe ist vorhanden')
+const confirmDialog = read(path.join(root, 'components/ui/confirmation-dialog.tsx'))
+expect(confirmDialog, /ResponsiveOverlay/, 'Bestätigungen verwenden ResponsiveOverlay')
+expect(confirmDialog, /ActionFooter/, 'Bestätigungen verwenden ActionFooter')
 const sheet = read(path.join(root, 'components/ui/sheet-system.tsx'))
 for (const [pattern, label] of [
   [/className="app-sheet-content"/, 'AppSheet besitzt genau den zentralen Content-Scrollbereich'],

@@ -7,6 +7,8 @@ import { Icon } from '@/components/ui/icon'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { SheetActions, StandardFormSheet } from '@/components/ui/sheet-system'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
+import { useFeedback } from '@/components/ui/feedback'
 import { BusinessDocument } from '@/components/documents/business-document'
 import { DocumentPreviewFrame } from '@/components/documents/document-preview-frame'
 import { ResponsivePreview } from '@/components/documents/responsive-preview'
@@ -14,7 +16,7 @@ import { useBusinessStore } from '@/components/state/business-store'
 import type { Invoice, InvoiceLine, Payment } from '@/types/domain'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
-import { confirmAction, printCurrentDocument } from '@/lib/browser/actions'
+import { printCurrentDocument } from '@/lib/browser/actions'
 
 const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 })
 
@@ -32,7 +34,8 @@ export default function InvoicesPage() {
   const [orderId, setOrderId] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [extraLines, setExtraLines] = useState<InvoiceLine[]>([])
-  const [notice, setNotice] = useState('')
+  const feedback = useFeedback()
+  const [cancelInvoiceTarget, setCancelInvoiceTarget] = useState<Invoice | null>(null)
 
   const [paymentPicker, setPaymentPicker] = useState(false)
 
@@ -103,7 +106,6 @@ export default function InvoicesPage() {
     <section className="page">
       <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Zeiten übernehmen, Entwürfe bearbeiten, PDF prüfen, versenden und Zahlungen verbuchen." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
 
-      {notice && <div className="inline-notice"><Icon name="check" size={15}/><span>{notice}</span></div>}
 
       <div className="data-list compact-overview-list">
         <div className="data-row invoice-grid data-head"><span>Rechnung</span><span>Kunde</span><span>Fällig</span><span>Betrag</span><span>Status</span><span /></div>
@@ -131,13 +133,13 @@ export default function InvoicesPage() {
         onClose={() => setPreview(null)}
         headerActions={preview ? <button className="icon-button" onClick={() => printCurrentDocument()} title="PDF / Drucken"><Icon name="download" size={16}/></button> : null}
         warning={preview && readiness(preview).length > 0 ? <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {readiness(preview).join(', ')}</span></div> : null}
-        actions={preview ? <><button className="button secondary" disabled={preview.status !== 'draft'} onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {preview.status === 'draft' ? 'Senden' : 'Erneut senden'}</button>{effectiveInvoiceStatus(preview) === 'overdue' && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button secondary" onClick={() => { if (confirmAction('Rechnung wirklich stornieren? Zugeordnete Zeiten werden wieder zur Fakturierung freigegeben.')) { const updated = store.cancelInvoice(preview.id); if (updated) { setPreview(updated); setNotice('Rechnung wurde storniert. Zugeordnete Zeiten sind wieder verfügbar.') } } }}>Stornieren</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button primary" onClick={() => setPayment(preview)}><Icon name="credit-card" size={15}/> Zahlung erfassen</button>}</> : null}
+        actions={preview ? <><button className="button secondary" disabled={preview.status !== 'draft'} onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {preview.status === 'draft' ? 'Senden' : 'Erneut senden'}</button>{effectiveInvoiceStatus(preview) === 'overdue' && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button secondary" onClick={() => setCancelInvoiceTarget(preview)}>Stornieren</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button primary" onClick={() => setPayment(preview)}><Icon name="credit-card" size={15}/> Zahlung erfassen</button>}</> : null}
       >
         {preview ? <DocumentPreviewFrame><BusinessDocument type="invoice" company={store.companyProfile} customer={documentCustomer(preview)} invoice={preview}/></DocumentPreviewFrame> : null}
       </ResponsivePreview>
 
       {editing && <InvoiceEditor invoice={editing} onClose={() => setEditing(null)} onSave={(updated) => { setEditing(null); setPreview(updated) }} />}
-      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); setNotice(sending.mode === 'reminder' ? 'Mahnung im Demo-Versand erfasst.' : 'Rechnung im Demo-Versand als versendet markiert.') }} />}
+      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnung im Demo-Versand erfasst.' : 'Rechnung im Demo-Versand als versendet markiert.') }} />}
       {payment && <PaymentDialog invoice={payment} onClose={() => setPayment(null)} />}
       {paymentPicker && <ResponsiveOverlay open={paymentPicker} title="Zahlung erfassen" description="Offene Rechnung auswählen" onClose={() => setPaymentPicker(false)}><div className="compact-list">{store.invoices.filter((item) => !['paid', 'cancelled'].includes(effectiveInvoiceStatus(item))).map((item) => <button type="button" className="payment-pick-row" key={item.id} onClick={() => { setPaymentPicker(false); setPayment(item) }}><span className="primary-cell"><strong>{item.number} · {item.customerName}</strong><small>{chf.format(item.amount - item.paidAmount)} offen</small></span><Icon name="chevron" size={15}/></button>)}</div></ResponsiveOverlay>}
     </section>
