@@ -5847,3 +5847,339 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row { text-de
     --app-mobile-sheet-gutter: 18px;
   }
 }
+/* ===== V19.3 canonical mobile/PWA positioning and sheet layer ===== */
+/* This block is intentionally last. It is the single authority for the floating mobile
+   navigation and all mobile/PWA sheet geometry, overriding historical migration rules. */
+
+:root {
+  --mobile-ui-gutter: max(12px, env(safe-area-inset-left, 0px));
+  --mobile-ui-gutter-right: max(12px, env(safe-area-inset-right, 0px));
+  --mobile-pill-width: 336px;
+  --mobile-pill-height: 56px;
+  --mobile-pill-bottom: 12px;
+  --mobile-sheet-radius: 22px;
+}
+
+.app-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100vw;
+  height: var(--app-vh, 100dvh);
+  max-width: 100vw;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: rgba(10,12,15,.42);
+  padding: 0;
+}
+
+.app-sheet {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.app-sheet-bottom {
+  display: flex;
+  flex-direction: column;
+  width: min(620px, 100%);
+  max-height: min(82dvh, 760px);
+  overflow: hidden;
+  border-radius: var(--mobile-sheet-radius) var(--mobile-sheet-radius) 0 0;
+  box-shadow: 0 -16px 50px rgba(10,12,15,.16);
+}
+
+.app-sheet-grabber {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+}
+
+.app-sheet-header {
+  position: relative;
+  flex: 0 0 auto;
+  top: auto;
+  z-index: 2;
+  margin: 0;
+  padding: 12px 16px 13px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.app-sheet-content {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 16px;
+}
+
+.app-sheet-footer {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 16px calc(10px + var(--safe-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.quick-create-sheet .app-sheet-content {
+  padding-top: 0;
+}
+
+.quick-actions-list {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  border-top: 0;
+}
+
+.quick-actions-list a {
+  display: grid;
+  grid-template-columns: 38px minmax(0,1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.quick-actions-list a:last-child { border-bottom: 0; }
+.quick-action-icon { width: 36px !important; height: 36px !important; border-radius: 10px; display: grid; place-items: center; }
+.quick-action-copy { display: grid; gap: 3px; min-width: 0; }
+.quick-action-copy strong { font-size: 11.5px !important; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
+.quick-action-copy small { font-size: 9.5px !important; line-height: 1.35; white-space: normal; overflow-wrap: anywhere; color: var(--muted); }
+.quick-actions-list a > svg { justify-self: end; }
+
+/* Legacy page forms still use overlay-layer/form-sheet. They share the exact same mobile geometry. */
+html:has(.overlay-layer.sheet-layer),
+body:has(.overlay-layer.sheet-layer),
+html:has(.app-sheet-backdrop),
+body:has(.app-sheet-backdrop) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+@media (max-width: 760px) {
+  .app-main {
+    padding-bottom: calc(92px + var(--safe-bottom)) !important;
+  }
+
+  .mobile-pill {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(var(--mobile-pill-bottom) + var(--safe-bottom)) !important;
+    transform: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) 60px minmax(0,1fr) !important;
+    align-items: center !important;
+    column-gap: 6px !important;
+    box-sizing: border-box !important;
+    width: min(var(--mobile-pill-width), calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px))) !important;
+    max-width: none !important;
+    height: var(--mobile-pill-height) !important;
+    margin: 0 auto !important;
+    padding: 5px 7px !important;
+    overflow: visible !important;
+    border-radius: 999px !important;
+    z-index: 100 !important;
+  }
+
+  .mobile-pill button {
+    min-width: 0 !important;
+    height: 44px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .mobile-pill .pill-search,
+  .mobile-pill .pill-menu {
+    width: 100% !important;
+    padding: 0 10px !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  .mobile-pill .pill-add {
+    width: 60px !important;
+    min-width: 60px !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    align-self: center !important;
+    justify-self: center !important;
+    margin: -7px 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    border: 5px solid var(--surface) !important;
+    border-radius: 50% !important;
+    background: var(--text) !important;
+    color: var(--bg) !important;
+    box-shadow: 0 10px 24px rgba(17,19,24,.22) !important;
+    z-index: 2 !important;
+  }
+
+  .mobile-pill .pill-add svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+
+  html[data-theme='dark'] .mobile-pill .pill-add {
+    background: #f5f6f7 !important;
+    color: #111318 !important;
+    border-color: #121417 !important;
+  }
+
+  .app-sheet-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .app-sheet-bottom,
+  .app-sheet-bottom.quick-create-sheet {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(var(--app-vh, 100dvh) - max(6px, var(--safe-top))) !important;
+    margin: 0 !important;
+    border-radius: var(--mobile-sheet-radius) var(--mobile-sheet-radius) 0 0 !important;
+  }
+
+  .app-sheet-header {
+    padding: 12px 14px !important;
+    min-height: 58px;
+  }
+
+  .app-sheet-content {
+    padding: 0 14px 14px !important;
+  }
+
+  .quick-create-sheet .app-sheet-content {
+    padding-bottom: calc(10px + var(--safe-bottom)) !important;
+  }
+
+  .overlay-layer.sheet-layer {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: var(--app-vh, 100dvh) !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    z-index: 110 !important;
+  }
+
+  .form-sheet,
+  .action-sheet,
+  .form-sheet.compact-sheet,
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(var(--app-vh, 100dvh) - max(6px, var(--safe-top))) !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: var(--mobile-sheet-radius) var(--mobile-sheet-radius) 0 0 !important;
+  }
+
+  .form-sheet .sheet-heading,
+  .action-sheet .sheet-heading {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    flex: 0 0 auto !important;
+    margin: 0 -14px 14px !important;
+    padding: 12px 14px !important;
+    min-height: 58px !important;
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .form-sheet .sheet-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 30 !important;
+    flex: 0 0 auto !important;
+    margin: 18px -14px 0 !important;
+    padding: 10px 14px calc(10px + var(--safe-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    gap: 8px !important;
+    background: var(--surface) !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  .form-sheet .sheet-actions .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+  }
+
+  .mobile-menu-nav {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mobile-menu-nav a {
+    grid-template-columns: 34px minmax(0,1fr) 18px !important;
+    min-height: 52px !important;
+    gap: 10px !important;
+  }
+
+  .mobile-menu-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 390px) {
+  :root { --mobile-pill-width: 304px; }
+  .mobile-pill .pill-search span,
+  .mobile-pill .pill-menu span { display: none !important; }
+  .form-sheet .sheet-actions { grid-template-columns: 1fr !important; }
+}
+
+@media (min-width: 761px) {
+  .app-sheet-backdrop {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .app-sheet-bottom {
+    width: min(620px, calc(100vw - 48px));
+    max-height: calc(100dvh - 48px);
+    border-radius: 14px;
+  }
+
+  .quick-create-sheet { width: min(620px, calc(100vw - 48px)) !important; }
+}

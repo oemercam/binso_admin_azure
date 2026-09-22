@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
 import { CloseButton } from '@/components/ui/close-button'
+import { AppSheet } from '@/components/ui/sheet-system'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { AppUser, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
@@ -128,26 +129,26 @@ export function AppOverlays({
         </div>
       )}
 
-      {quickOpen && (
-        <div className="overlay-layer sheet-layer quick-create-layer" onMouseDown={() => setQuickOpen(false)}>
-          <div className="action-sheet quick-create-sheet" role="dialog" aria-modal="true" aria-label="Neu erstellen" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="sheet-grabber" />
-            <div className="sheet-heading quick-create-heading">
-              <div><strong>Neu erstellen</strong><span>Direkt eine Aktion starten</span></div>
-              <CloseButton onClick={() => setQuickOpen(false)} />
-            </div>
-            <nav className="quick-actions-list">
-              {availableQuickActions.map((action) => (
-                <Link key={action.label} href={action.href} onClick={() => setQuickOpen(false)}>
-                  <span className="quick-action-icon"><Icon name={action.icon} size={18} /></span>
-                  <span className="quick-action-copy"><strong>{action.label}</strong><small>{action.description}</small></span>
-                  <Icon name="chevron" size={15} />
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </div>
-      )}
+      <AppSheet
+        open={quickOpen}
+        mode="bottom"
+        title="Neu erstellen"
+        subtitle="Direkt eine Aktion starten"
+        onClose={() => setQuickOpen(false)}
+        showClose
+        showGrabber
+        panelClassName="quick-create-sheet"
+      >
+        <nav className="quick-actions-list">
+          {availableQuickActions.map((action) => (
+            <Link key={action.label} href={action.href} onClick={() => setQuickOpen(false)}>
+              <span className="quick-action-icon"><Icon name={action.icon} size={18} /></span>
+              <span className="quick-action-copy"><strong>{action.label}</strong><small>{action.description}</small></span>
+              <Icon name="chevron" size={15} />
+            </Link>
+          ))}
+        </nav>
+      </AppSheet>
 
       {notificationsOpen && (
         <div className="profile-popover notifications-popover" role="dialog">

@@ -51,6 +51,7 @@ export function MobilePillNav({
         onClose={() => setMenuOpen(false)}
         showClose
         showGrabber
+        panelClassName="mobile-menu-sheet"
       >
         <nav className="mobile-menu-nav">
           {items.map((item) => {
