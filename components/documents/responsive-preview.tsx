@@ -14,6 +14,8 @@ export function ResponsivePreview({
   warning,
   children,
   actions,
+  mobileActions,
+  mobileMoreActions,
 }: {
   open: boolean
   title: ReactNode
@@ -23,6 +25,8 @@ export function ResponsivePreview({
   warning?: ReactNode
   children: ReactNode
   actions?: ReactNode
+  mobileActions?: ReactNode
+  mobileMoreActions?: ReactNode
 }) {
   const shellRef = useRef<HTMLDivElement>(null)
   useModalOverlay({ open, onClose, containerRef: shellRef })
@@ -48,7 +52,18 @@ export function ResponsivePreview({
           {warning}
           {children}
         </div>
-        {actions ? <footer className="preview-actions">{actions}</footer> : null}
+        {actions ? <footer className="preview-actions preview-actions-desktop">{actions}</footer> : null}
+        {(mobileActions || mobileMoreActions || actions) ? (
+          <footer className="preview-actions-mobile">
+            <div className="preview-mobile-primary">{mobileActions ?? actions}</div>
+            {mobileMoreActions ? (
+              <details className="preview-more-menu">
+                <summary className="button secondary">Mehr</summary>
+                <div className="preview-more-panel">{mobileMoreActions}</div>
+              </details>
+            ) : null}
+          </footer>
+        ) : null}
       </div>
     </div>,
     document.body,
