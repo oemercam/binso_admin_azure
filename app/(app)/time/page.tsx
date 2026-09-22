@@ -59,7 +59,7 @@ export default function TimePage() {
     const all = availablePeople(orderId, store)
     if (user.role !== 'employee') return all
     return currentEmployee ? all.filter((item) => item.id === currentEmployee.id) : []
-  }, [orderId, store.orderAssignmentRules, store.employees, store.suppliers, store.timeEntries, user.role, currentEmployee?.id])
+  }, [orderId, store, user.role, currentEmployee])
 
   useEffect(() => {
     if (!people.some((item) => item.id === personId)) setPersonId(people[0]?.id ?? '')

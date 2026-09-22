@@ -10,15 +10,12 @@ export function PWAUpdateManager() {
     if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return
 
     let disposed = false
-    let activeRegistration: ServiceWorkerRegistration | null = null
-
     const onControllerChange = () => window.location.reload()
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange)
 
     navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
       .then((nextRegistration) => {
         if (disposed) return
-        activeRegistration = nextRegistration
         setRegistration(nextRegistration)
         setUpdateReady(Boolean(nextRegistration.waiting))
 
@@ -37,7 +34,6 @@ export function PWAUpdateManager() {
     return () => {
       disposed = true
       navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange)
-      activeRegistration = null
     }
   }, [])
 

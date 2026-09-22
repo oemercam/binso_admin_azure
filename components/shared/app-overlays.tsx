@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Icon } from '@/components/ui/icon'
+import { Icon, type IconName } from '@/components/ui/icon'
 import { CloseButton } from '@/components/ui/close-button'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { useBusinessStore } from '@/components/state/business-store'
@@ -12,7 +12,7 @@ import type { AppUser, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { signOutUrl } from '@/lib/auth/urls'
 
-const quickActions: Array<{ label: string; description: string; icon: any; href: string; roles: Role[] }> = [
+const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[] }> = [
   { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'] },
   { label: 'Angebot erstellen', description: 'Leistungen offerieren und versenden', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'] },
   { label: 'Auftrag erstellen', description: 'Neues Mandat oder Projekt eröffnen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'] },

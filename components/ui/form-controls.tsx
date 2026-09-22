@@ -144,7 +144,7 @@ export function Select({
         className="ui-select-trigger"
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-required={required || undefined}
+        data-required={required || undefined}
         aria-label={ariaLabel}
         title={title ?? selected?.label}
         disabled={disabled}

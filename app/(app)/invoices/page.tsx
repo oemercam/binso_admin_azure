@@ -59,7 +59,6 @@ export default function InvoicesPage() {
   }, [pathname, router, searchParams, store.invoices])
 
   const selectedOrder = store.orders.find((order) => order.id === orderId)
-  const invoiceCustomerId = selectedOrder?.customerId ?? customerId
   const selectedCustomer = store.customers.find((customer) => customer.id === customerId)
   const eligibleTimes = useMemo(
     () => orderId ? store.timeEntries.filter((entry) => entry.orderId === orderId && getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules).eligible) : [],
@@ -145,6 +144,25 @@ export default function InvoicesPage() {
       {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnung im Demo-Versand erfasst.' : 'Rechnung im Demo-Versand als versendet markiert.') }} />}
       {payment && <PaymentDialog invoice={payment} onClose={() => setPayment(null)} />}
       {paymentPicker && <ResponsiveOverlay open={paymentPicker} title="Zahlung erfassen" description="Offene Rechnung auswählen" onClose={() => setPaymentPicker(false)}><div className="compact-list">{store.invoices.filter((item) => !['paid', 'cancelled'].includes(effectiveInvoiceStatus(item))).map((item) => <button type="button" className="payment-pick-row" key={item.id} onClick={() => { setPaymentPicker(false); setPayment(item) }}><span className="primary-cell"><strong>{item.number} · {item.customerName}</strong><small>{chf.format(item.amount - item.paidAmount)} offen</small></span><Icon name="chevron" size={15}/></button>)}</div></ResponsiveOverlay>}
+      <ConfirmationDialog
+        open={Boolean(cancelInvoiceTarget)}
+        title="Rechnung stornieren?"
+        description="Dieser Vorgang kann nicht rückgängig gemacht werden."
+        confirmLabel="Stornieren"
+        destructive
+        onCancel={() => setCancelInvoiceTarget(null)}
+        onConfirm={() => {
+          if (!cancelInvoiceTarget) return
+          const updated = store.cancelInvoice(cancelInvoiceTarget.id)
+          setCancelInvoiceTarget(null)
+          if (updated) {
+            setPreview(updated)
+            feedback.success('Rechnung storniert.')
+          } else {
+            feedback.error('Rechnung konnte nicht storniert werden.')
+          }
+        }}
+      />
     </section>
   )
 

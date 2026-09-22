@@ -17,8 +17,6 @@ import type { OrderAssignmentRule, ServiceProviderType } from '@/modules/workfor
 import type { EvidenceFrequency, TimeTrackingPolicy } from '@/modules/time/types'
 import type { BillingModel, Order, OrderStatus } from '@/types/domain'
 
-function yesNo(value: boolean) { return value ? 'Aktiv' : 'Nicht aktiv' }
-
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>()
   const store = useBusinessStore()
@@ -177,5 +175,4 @@ function frequencyLabel(value: EvidenceFrequency) { return value === 'daily' ? '
 function evidenceLabel(value: string) { const labels: Record<string,string> = { uploaded:'Hochgeladen', verified:'Geprüft', rejected:'Abgelehnt', missing:'Fehlt', not_required:'Nicht erforderlich' }; return labels[value] ?? value }
 function HubButton({ active, label, meta, onClick }: { active:boolean; label:string; meta:string; onClick:()=>void }) { return <button type="button" className={active ? 'hub-row active' : 'hub-row'} onClick={onClick}><span><strong>{label}</strong><small>{meta}</small></span><Icon name="chevron" size={15}/></button> }
 function SummaryRow({ label, value }: { label:string; value:string }) { return <div className="summary-row"><span>{label}</span><strong>{value}</strong></div> }
-function Rule({ label, value }: { label: string; value: string }) { return <div className="rule-item"><span>{label}</span><strong>{value}</strong></div> }
 function ToggleRow({ label, checked, onChange }: { label:string; checked:boolean; onChange:(value:boolean)=>void }) { return <div className="policy-toggle-row"><span>{label}</span><Toggle label={label} checked={checked} onChange={onChange}/></div> }
