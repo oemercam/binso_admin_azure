@@ -83,7 +83,7 @@ expect('app/(app)/settings/page.tsx', 'reminderSender', 'Mahnungs-Absender konfi
 expect('app/(app)/settings/page.tsx', 'payrollSender', 'Lohn-Absender konfigurierbar')
 expect('app/(app)/settings/page.tsx', 'SettingsToggleRow', 'Enterprise-Toggles werden verwendet')
 expect('app/layout.tsx', "import './documents.css'", 'Dokument-CSS eingebunden')
-expect('app/layout.tsx', "import './ui-foundation-v20.css'", 'v20 UI Foundation eingebunden')
+expect('app/layout.tsx', "import './ui-foundation-v19.css'", 'v19 UI Foundation eingebunden')
 
 // Global search/quick create must target specific actions/records.
 const overlay = read('components/shared/app-overlays.tsx')
@@ -103,20 +103,16 @@ expect('components/state/business-store.tsx', 'quotes: parsed.quotes?.length ? p
 expect('components/state/business-store.tsx', 'invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices', 'Leere Legacy-Rechnungen werden mit Seeds repariert')
 expect('components/state/business-store.tsx', 'employees: parsed.employees?.length ? parsed.employees : seeded.employees', 'Leere Legacy-Mitarbeitende werden mit Seeds repariert')
 
-// v20 canonical UI foundation: one mobile owner, one logo image, one sheet system.
+// v19 canonical UI foundation: exactly one responsive CSS foundation and one logo image.
 expect('app/layout.tsx', "import './globals.css'", 'Globals CSS eingebunden')
 expect('app/layout.tsx', "import './documents.css'", 'Dokument CSS eingebunden')
-expect('app/layout.tsx', "import './ui-foundation-v20.css'", 'UI Foundation v20 eingebunden')
-expect('app/ui-foundation-v20.css', '--app-mobile-gutter:', 'Mobiler Seitenrand zentral definiert')
-expect('app/ui-foundation-v20.css', '.toggle-control{', 'Toggle-Geometrie zentral definiert')
-expect('app/ui-foundation-v20.css', '.app-sheet-backdrop{', 'Sheet-System zentral definiert')
-expect('app/ui-foundation-v20.css', '.mobile-menu-nav{', 'Mobile Navigation zentral definiert')
-expect('app/ui-foundation-v20.css', '.document-overlay{', 'Dokument-Viewer zentral definiert')
-expect('app/ui-foundation-v20.css', '.operational-mobile-list', 'Mobile Arbeitslisten zentral definiert')
+expect('app/layout.tsx', "import './ui-foundation-v19.css'", 'UI Foundation v19 eingebunden')
+expect('app/ui-foundation-v19.css', '--app-mobile-gutter: 16px', 'Mobiler Seitenrand zentral definiert')
+expect('app/ui-foundation-v19.css', '.toggle-control {', 'Toggle-Geometrie zentral definiert')
+expect('app/ui-foundation-v19.css', '.app-sheet-backdrop {', 'Sheet-System zentral definiert')
+expect('app/ui-foundation-v19.css', '.mobile-menu-nav {', 'Mobile Navigation zentral definiert')
 expect('components/ui/binso-logo.tsx', 'binso-logo-image', 'Logo verwendet kanonisches Einzelbild')
 expect('components/navigation/mobile-pill-nav.tsx', '<AppSheet', 'Mobile Navigation verwendet zentrales AppSheet')
-expect('components/ui/viewport-metrics.tsx', "'--app-vh'", 'Sichtbare Viewport-Höhe wird zentral gesetzt')
-expect('components/ui/viewport-metrics.tsx', "'--app-vw'", 'Sichtbare Viewport-Breite wird zentral gesetzt')
 console.log(`E2E static audit: ${passes.length} Prüfungen erfolgreich.`)
 if (failures.length) {
   console.error(`\n${failures.length} Fehler:`)

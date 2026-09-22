@@ -1,13 +1,13 @@
 'use client'
 
-import type { FormEvent, ReactNode } from 'react'
-import { useEffect } from 'react'
+import { useEffect, type FormEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { CloseButton } from '@/components/ui/close-button'
 
-export type SheetMode = 'bottom' | 'fullscreen' | 'dialog'
+type SheetMode = 'bottom' | 'fullscreen' | 'dialog'
 
 export function SheetGrabber() {
-  return <div className="app-sheet-grabber" aria-hidden="true" />
+  return <div className="app-sheet-grabber sheet-grabber" aria-hidden="true" />
 }
 
 export function SheetHeader({
@@ -22,7 +22,7 @@ export function SheetHeader({
   showClose?: boolean
 }) {
   return (
-    <header className="app-sheet-header">
+    <header className="app-sheet-header sheet-heading">
       <div className="app-sheet-title">
         <strong>{title}</strong>
         {subtitle ? <span>{subtitle}</span> : null}
@@ -33,7 +33,7 @@ export function SheetHeader({
 }
 
 export function SheetFooter({ children }: { children: ReactNode }) {
-  return <footer className="app-sheet-footer">{children}</footer>
+  return <footer className="app-sheet-footer sheet-actions">{children}</footer>
 }
 
 export function AppSheet({
@@ -48,6 +48,7 @@ export function AppSheet({
   ariaLabel,
   showClose,
   showGrabber,
+  panelClassName,
 }: {
   open: boolean
   mode?: SheetMode
@@ -60,12 +61,20 @@ export function AppSheet({
   ariaLabel?: string
   showClose?: boolean
   showGrabber?: boolean
+  panelClassName?: string
 }) {
   useEffect(() => {
     if (!open) return
 
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const body = document.body
+    const html = document.documentElement
+    const previousBodyOverflow = body.style.overflow
+    const previousBodyOverscroll = body.style.overscrollBehavior
+    const previousHtmlOverflow = html.style.overflow
+
+    body.style.overflow = 'hidden'
+    body.style.overscrollBehavior = 'none'
+    html.style.overflow = 'hidden'
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -73,50 +82,60 @@ export function AppSheet({
 
     window.addEventListener('keydown', onKeyDown)
     return () => {
+      body.style.overflow = previousBodyOverflow
+      body.style.overscrollBehavior = previousBodyOverscroll
+      html.style.overflow = previousHtmlOverflow
       window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previousOverflow
     }
   }, [open, onClose])
 
-  if (!open) return null
+  if (!open || typeof document === 'undefined') return null
 
-  const modeClass = `app-sheet app-sheet-${mode}`
+  const modeClass = mode === 'fullscreen'
+    ? 'app-sheet app-sheet-fullscreen'
+    : mode === 'dialog'
+      ? 'app-sheet app-sheet-dialog'
+      : 'app-sheet app-sheet-bottom'
+
+  const panelClass = [modeClass, panelClassName].filter(Boolean).join(' ')
 
   const content = (
     <>
       {(showGrabber ?? mode === 'bottom') ? <SheetGrabber /> : null}
-      <SheetHeader
-        title={title}
-        subtitle={subtitle}
-        onClose={onClose}
-        showClose={showClose ?? true}
-      />
+      <SheetHeader title={title} subtitle={subtitle} onClose={onClose} showClose={showClose ?? mode !== 'bottom'} />
       <div className="app-sheet-content">{children}</div>
       {footer ? <SheetFooter>{footer}</SheetFooter> : null}
     </>
   )
 
-  const common = {
-    className: modeClass,
-    role: 'dialog',
-    'aria-modal': true as const,
-    'aria-label': ariaLabel ?? title,
-    'data-sheet-mode': mode,
-    onMouseDown: (event: React.MouseEvent) => event.stopPropagation(),
-  }
+  const panel = onSubmit ? (
+    <form
+      className={panelClass}
+      role="dialog"
+      aria-modal="true"
+      aria-label={ariaLabel ?? title}
+      onSubmit={onSubmit}
+      onMouseDown={(event) => event.stopPropagation()}
+    >
+      {content}
+    </form>
+  ) : (
+    <section
+      className={panelClass}
+      role="dialog"
+      aria-modal="true"
+      aria-label={ariaLabel ?? title}
+      onMouseDown={(event) => event.stopPropagation()}
+    >
+      {content}
+    </section>
+  )
 
-  return (
-    <div className="app-sheet-backdrop" data-sheet-mode={mode} role="presentation" onMouseDown={onClose}>
-      {onSubmit ? (
-        <form {...common} onSubmit={onSubmit}>
-          {content}
-        </form>
-      ) : (
-        <section {...common}>
-          {content}
-        </section>
-      )}
-    </div>
+  return createPortal(
+    <div className="app-sheet-backdrop" role="presentation" onMouseDown={onClose}>
+      {panel}
+    </div>,
+    document.body,
   )
 }
 

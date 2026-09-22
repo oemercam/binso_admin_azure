@@ -11,7 +11,7 @@
 .notice-close{margin-left:auto;border:0;background:transparent;color:inherit;font-size:16px}
 
 .pdf-preview-shell{width:min(980px,calc(100vw - 28px));background:#eef0f3}
-html[data-theme="dark"] .pdf-preview-shell{background:#111318}
+html[data-theme='dark'] .pdf-preview-shell{background:#111318}
 .pdf-preview-stage{padding:22px 18px 30px;overflow:auto}
 .pdf-page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#111;padding:18mm 17mm 16mm;box-shadow:0 12px 34px rgba(0,0,0,.14);font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4}
 .pdf-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20mm;padding-bottom:18mm}.pdf-brand{display:grid;gap:2px}.pdf-brand>strong{font-size:16pt;letter-spacing:.14em}.pdf-brand>span{font-size:8pt;color:#666}.pdf-title-block{display:grid;text-align:right;gap:3px}.pdf-title-block strong{font-size:16pt;letter-spacing:.04em}.pdf-title-block span{font-size:9pt;color:#555}
@@ -26,7 +26,11 @@ html[data-theme="dark"] .pdf-preview-shell{background:#111318}
 .settings-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}.settings-form-grid label,.template-editor-fields label{display:grid;gap:4px}.settings-form-grid label span,.template-editor-fields label span{font-size:8.5px;color:var(--muted)}.settings-form-grid input,.template-editor-fields input,.template-editor-fields textarea{width:100%;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:8px;padding:9px 10px;font-size:10px}.settings-form-grid .full{grid-column:1/-1}
 .template-editor-list{display:grid;border-top:1px solid var(--line)}.template-editor{border-bottom:1px solid var(--line)}.template-editor summary{list-style:none;display:flex;justify-content:space-between;gap:12px;padding:12px 0;cursor:pointer}.template-editor summary::-webkit-details-marker{display:none}.template-editor summary strong{font-size:10.5px}.template-editor summary span{font-size:9px;color:var(--muted)}.template-editor-fields{display:grid;gap:10px;padding:0 0 16px}.template-editor-fields .button{justify-self:start}
 
-
+@media(max-width:760px){
+  .document-editor-sheet{width:100%}.line-editor-row,.quote-line-editor{grid-template-columns:1fr 1fr;gap:8px}.line-editor-row label:first-child,.quote-line-editor label:first-child{grid-column:1/-1}.line-remove{align-self:end}
+  .settings-form-grid{grid-template-columns:1fr}.settings-form-grid .full{grid-column:auto}.template-editor summary{display:grid;gap:2px}
+  .pdf-preview-stage{padding:10px 0 22px}.pdf-page{width:210mm;transform-origin:top left;transform:scale(.47);margin-bottom:-157mm}.pdf-preview-shell{overflow:hidden}.preview-actions{overflow-x:auto}
+}
 
 @media print{
   @page{size:A4;margin:0}
