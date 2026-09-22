@@ -1,9 +1,39 @@
 'use client'
 
 import type { FormEvent, ReactNode } from 'react'
-import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 
 type SheetMode = 'bottom' | 'fullscreen' | 'dialog'
+
+export function SheetGrabber() {
+  return <div className="app-sheet-grabber sheet-grabber" aria-hidden="true" />
+}
+
+export function SheetHeader({
+  title,
+  subtitle,
+  onClose,
+  showClose = true,
+}: {
+  title: ReactNode
+  subtitle?: ReactNode
+  onClose?: () => void
+  showClose?: boolean
+}) {
+  return (
+    <header className="app-sheet-header sheet-heading">
+      <div className="app-sheet-title">
+        <strong>{title}</strong>
+        {subtitle ? <span>{subtitle}</span> : null}
+      </div>
+      {showClose && onClose ? <CloseButton onClick={onClose} /> : null}
+    </header>
+  )
+}
+
+export function SheetFooter({ children }: { children: ReactNode }) {
+  return <footer className="app-sheet-footer sheet-actions">{children}</footer>
+}
 
 export function AppSheet({
   open,
@@ -36,20 +66,10 @@ export function AppSheet({
 
   const content = (
     <>
-      {mode === 'bottom' && <div className="app-sheet-grabber" aria-hidden="true" />}
-      <header className="app-sheet-header">
-        <div className="app-sheet-title">
-          <strong>{title}</strong>
-          {subtitle && <span>{subtitle}</span>}
-        </div>
-        {mode !== 'bottom' && (
-          <button type="button" className="icon-button app-sheet-close" onClick={onClose} aria-label="Schliessen">
-            <Icon name="close" size={18} />
-          </button>
-        )}
-      </header>
+      {mode === 'bottom' ? <SheetGrabber /> : null}
+      <SheetHeader title={title} subtitle={subtitle} onClose={onClose} showClose={mode !== 'bottom'} />
       <div className="app-sheet-content">{children}</div>
-      {footer && <footer className="app-sheet-footer">{footer}</footer>}
+      {footer ? <SheetFooter>{footer}</SheetFooter> : null}
     </>
   )
 

@@ -1,7 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import type { AppUser } from '@/types/domain'
 import { DesktopNav } from '@/components/navigation/desktop-nav'
 import { MobilePillNav } from '@/components/navigation/mobile-pill-nav'
@@ -16,14 +17,60 @@ export function AppShell({
   user: AppUser
   children: ReactNode
 }) {
+  const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false)
+  const lastScrollY = useRef(0)
+
+
+  useEffect(() => {
+    setMobileHeaderHidden(false)
+    lastScrollY.current = 0
+  }, [pathname])
+
+  useEffect(() => {
+    const onPositioned = (event: Event) => {
+      const detail = (event as CustomEvent<{ y?: number }>).detail
+      lastScrollY.current = Math.max(0, detail?.y ?? window.scrollY)
+      setMobileHeaderHidden(false)
+    }
+
+    window.addEventListener('binso:scroll-positioned', onPositioned)
+    return () => window.removeEventListener('binso:scroll-positioned', onPositioned)
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.matchMedia('(min-width: 761px)').matches) {
+        setMobileHeaderHidden(false)
+        return
+      }
+
+      const currentY = Math.max(0, window.scrollY)
+      const delta = currentY - lastScrollY.current
+
+      if (currentY < 24) {
+        setMobileHeaderHidden(false)
+      } else if (delta > 8) {
+        setMobileHeaderHidden(true)
+      } else if (delta < -6) {
+        setMobileHeaderHidden(false)
+      }
+
+      lastScrollY.current = currentY
+    }
+
+    lastScrollY.current = Math.max(0, window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <div className="app-frame">
-      <header className="topbar">
+      <header className={mobileHeaderHidden ? 'topbar is-hidden' : 'topbar'}>
         <div className="topbar-brand">
           <BinsoLogo />
         </div>
@@ -35,15 +82,6 @@ export function AppShell({
         </button>
 
         <div className="topbar-actions">
-          <button
-            className="topbar-create"
-            onClick={() => { setQuickOpen(true); setProfileOpen(false); setNotificationsOpen(false) }}
-            aria-label="Neu erstellen"
-            title="Neu erstellen"
-          >
-            <Icon name="plus" size={17} />
-          </button>
-
           <button className="topbar-icon" aria-label="Benachrichtigungen" onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="bell" size={17} />
             <i />

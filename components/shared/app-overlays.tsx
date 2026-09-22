@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { AppUser, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
@@ -133,7 +134,7 @@ export function AppOverlays({
             <div className="sheet-grabber" />
             <div className="sheet-heading quick-create-heading">
               <div><strong>Neu erstellen</strong><span>Direkt eine Aktion starten</span></div>
-              <button type="button" className="icon-button" onClick={() => setQuickOpen(false)} aria-label="Schliessen"><Icon name="close" size={17} /></button>
+              <CloseButton onClick={() => setQuickOpen(false)} />
             </div>
             <nav className="quick-actions-list">
               {availableQuickActions.map((action) => (
@@ -150,7 +151,7 @@ export function AppOverlays({
 
       {notificationsOpen && (
         <div className="profile-popover notifications-popover" role="dialog">
-          <div className="popover-title"><strong>Benachrichtigungen</strong><button type="button" className="icon-button" onClick={() => setNotificationsOpen(false)}><Icon name="close" size={15} /></button></div>
+          <div className="popover-title"><strong>Benachrichtigungen</strong><CloseButton onClick={() => setNotificationsOpen(false)} /></div>
           <div className="notification-list">
             {overdue.map((invoice) => <Link href={`/invoices?view=${invoice.id}`} key={invoice.id} onClick={() => setNotificationsOpen(false)}><Icon name="warning" size={16} /><span><strong>{invoice.number} überfällig</strong><small>{invoice.customerName}</small></span></Link>)}
             {expiring.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id} onClick={() => setNotificationsOpen(false)}><Icon name="quotes" size={16} /><span><strong>{quote.number} offen</strong><small>Gültig bis {quote.validUntil}</small></span></Link>)}

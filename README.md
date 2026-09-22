@@ -32,3 +32,12 @@ Die bestehende `package-lock.json` aus dem GitHub-Repository behalten. Sie ist a
 - Document preview uses the official Binso wordmark.
 - Mobile/PWA create action is 60 px round and centered vertically so the circle extends equally above and below the pill.
 - No separators around the create action.
+
+
+## v18.8.2 Mobile Header
+- Flacher Mobile-Header in derselben Farbe wie die Seite.
+- Kein Blur, Schatten oder separater Hintergrundeffekt.
+- Header blendet beim Scrollen nach unten aus und beim Scrollen nach oben wieder ein.
+- Binso-Logo auf Mobile auf 28 px vergrössert.
+- Ein einziges Create-Plus auf Mobile: zentral in der unteren Pille.
+- Dieses Plus öffnet auf Kunden, Aufträgen, Angeboten, Rechnungen, Mitarbeitenden, Zeiterfassung und Buchhaltung direkt den passenden Erfassungsdialog; auf anderen Seiten das globale Quick-Create-Menü.
