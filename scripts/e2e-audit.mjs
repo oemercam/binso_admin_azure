@@ -81,7 +81,7 @@ expect('app/(app)/quotes/page.tsx', '<BusinessDocument type="quote"', 'Angebot n
 expect('app/(app)/settings/page.tsx', 'invoiceSender', 'Rechnungs-Absender konfigurierbar')
 expect('app/(app)/settings/page.tsx', 'reminderSender', 'Mahnungs-Absender konfigurierbar')
 expect('app/(app)/settings/page.tsx', 'payrollSender', 'Lohn-Absender konfigurierbar')
-expect('app/(app)/settings/page.tsx', 'SettingToggle', 'Enterprise-Toggles werden verwendet')
+expect('app/(app)/settings/page.tsx', 'SettingsToggleRow', 'Enterprise-Toggles werden verwendet')
 expect('app/layout.tsx', "import './documents.css'", 'Dokument-CSS eingebunden')
 expect('app/layout.tsx', "import './e2e-v10.css'", 'E2E-Fix-CSS eingebunden')
 

@@ -68,6 +68,12 @@ function resolveLocal(fromFile, specifier) {
     ...extensions.map((ext) => `${base}${ext}`),
     ...extensions.map((ext) => path.join(base, `index${ext}`)),
   ]
+
+  // Side-effect imports such as ./globals.css are valid local files too.
+  // Keeping them in this check catches accidentally omitted assets before Next.js build.
+  if (path.extname(base)) {
+    candidates.unshift(base)
+  }
   return candidates.find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile()) ?? null
 }
 
@@ -112,10 +118,29 @@ const forbiddenProductionPatterns = [
   { pattern: /from ['"]\.\.\/qa\//, label: 'QA-Import im Produktivcode' },
 ]
 
+const uiArchitectureChecks = [
+  {
+    pattern: /<Icon\s+name=["']close["']/, 
+    label: 'Direktes Close-Icon gefunden. Verwende CloseButton aus components/ui/close-button.',
+    allow: ['components/ui/close-button.tsx'],
+  },
+]
+
+
 for (const file of files) {
   const source = fs.readFileSync(file, 'utf8')
   for (const check of forbiddenProductionPatterns) {
     if (check.pattern.test(source)) errors.push(`${path.relative(root, file)}: ${check.label}`)
+  }
+}
+
+
+for (const file of files) {
+  const source = fs.readFileSync(file, 'utf8')
+  const relative = path.relative(root, file).replaceAll('\\', '/') 
+  for (const check of uiArchitectureChecks) {
+    if (check.allow?.includes(relative)) continue
+    if (check.pattern.test(source)) errors.push(`${relative}: ${check.label}`)
   }
 }
 

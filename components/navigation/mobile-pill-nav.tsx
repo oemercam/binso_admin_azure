@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
@@ -17,8 +18,28 @@ export function MobilePillNav({
   onQuick: () => void
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const items = navForRole(user.role)
+
+  const createLabels: Record<string, string> = {
+    '/customers': 'Kunde erfassen',
+    '/orders': 'Auftrag erstellen',
+    '/quotes': 'Angebot erstellen',
+    '/invoices': 'Rechnung erstellen',
+    '/employees': 'Mitarbeitende erfassen',
+    '/time': 'Zeit erfassen',
+    '/accounting': 'Lieferantenrechnung erfassen',
+  }
+
+  function handleCreate() {
+    if (createLabels[pathname]) {
+      router.push(`${pathname}?new=1`, { scroll: false })
+      return
+    }
+
+    onQuick()
+  }
 
   return (
     <>
@@ -42,14 +63,7 @@ export function MobilePillNav({
                 <span>Binso Administration</span>
               </div>
 
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Schliessen"
-              >
-                <Icon name="close" size={17} />
-              </button>
+              <CloseButton onClick={() => setMenuOpen(false)} />
             </div>
 
             <nav className="mobile-menu-nav">
@@ -100,8 +114,8 @@ export function MobilePillNav({
         <button
           type="button"
           className="pill-add"
-          onClick={onQuick}
-          aria-label="Neu erstellen"
+          onClick={handleCreate}
+          aria-label={createLabels[pathname] ?? 'Neu erstellen'}
         >
           <Icon name="plus" size={18} />
         </button>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { Toggle } from '@/components/ui/toggle'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { useBusinessStore } from '@/components/state/business-store'
@@ -103,7 +104,7 @@ export default function CustomersPage() {
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
           <form className="form-sheet mobile-fullscreen-sheet" onSubmit={createCustomer} onMouseDown={(e) => e.stopPropagation()}>
             <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Kunde erfassen</strong><span>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</span></div><button type="button" className="icon-button" onClick={() => setOpen(false)}><Icon name="close" size={17}/></button></div>
+            <div className="sheet-heading"><div><strong>Kunde erfassen</strong><span>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
             <CustomerFields form={form} setForm={setForm}/>
             <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button className="button primary">Kunde speichern</button></div>
           </form>
@@ -125,7 +126,7 @@ export default function CustomersPage() {
       <div className="overlay-layer sheet-layer" onMouseDown={onClose}>
         <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
           <div className="sheet-grabber"/>
-          <div className="sheet-heading"><div><strong>{customer.name}</strong><span>{customer.customerNo} · Kundendaten bearbeiten</span></div><button type="button" className="icon-button" onClick={onClose}><Icon name="close" size={17}/></button></div>
+          <div className="sheet-heading"><div><strong>{customer.name}</strong><span>{customer.customerNo} · Kundendaten bearbeiten</span></div><CloseButton onClick={onClose} /></div>
           <div className="form-grid">
             <label><span>Firma *</span><input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value, legalName: e.target.value })} required/></label>
             <label><span>Ansprechperson</span><input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
