@@ -18,6 +18,7 @@ function roleFromClaims(roles: string[]): Role {
   if (normalized.some((role) => role === 'owner' || role.endsWith('.owner') || role.endsWith('-owner'))) return 'owner'
   if (normalized.some((role) => role === 'admin' || role.endsWith('.admin') || role.endsWith('-admin'))) return 'admin'
   if (normalized.some((role) => role === 'finance' || role === 'accounting' || role.endsWith('.finance') || role.endsWith('-finance'))) return 'finance'
+  if (normalized.some((role) => role === 'employee' || role.endsWith('.employee') || role.endsWith('-employee'))) return 'employee'
   return env.authDefaultRole as Role
 }
 

@@ -7,7 +7,7 @@ function resolveAuthMode() {
 
 function resolveDefaultRole() {
   const value = process.env.AUTH_DEFAULT_ROLE?.toLowerCase()
-  return value === 'owner' || value === 'admin' || value === 'finance' || value === 'employee' ? value : 'employee'
+  return value === 'owner' || value === 'admin' || value === 'finance' || value === 'employee' ? value : 'owner'
 }
 
 export const env = {
