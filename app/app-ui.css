@@ -2156,7 +2156,6 @@ body{overflow-x:hidden;}
     display:block!important;font-size:10.5px!important;line-height:1.3!important;color:var(--muted)!important;
     white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
   .compact-overview-row>.row-disclosure{grid-column:2!important;grid-row:1!important;align-self:center!important;justify-self:end!important;}
-  .legacy-mobile-record-list{display:none!important;}
 
   /* Operational lists may use a third compact line because action/status context is required. */
   .operational-desktop-list{display:none!important;}
@@ -2179,7 +2178,7 @@ body{overflow-x:hidden;}
   .operational-compact-list .text-row-action{min-width:auto!important;min-height:36px!important;padding:0 8px!important;}
 }
 
-.mobile-dashboard-summary, .mobile-accounting-tasks, .settings-mobile-hub, .settings-mobile-back, .object-hub-back{display:none;}
+.mobile-dashboard-summary, .settings-mobile-hub, .settings-mobile-back, .object-hub-back{display:none;}
 
 .hub-row-list{display:grid;}
 .hub-row{
@@ -2273,14 +2272,6 @@ body{overflow-x:hidden;}
   .settings-page .settings-group+.settings-group{margin-top:18px;}
   .settings-group-copy p{margin-bottom:10px;}
 
-  /* Accounting: task-first, only two KPIs on first glance. */
-  .mobile-accounting-tasks{display:block;margin-bottom:16px;}
-  .accounting-metrics{grid-template-columns:1fr 1fr!important;}
-  .accounting-metrics .metric:nth-child(n/**/+3){display:none!important;}
-  .accounting-metrics .metric{padding:10px 0!important;border-right:0!important;}
-  .accounting-metrics .metric:first-child{padding-right:12px!important;border-right:1px solid var(--line)!important;}
-  .accounting-metrics .metric:nth-child(2){padding-left:12px!important;}
-
   /* Step forms: each section is one clear task. */
   .edit-step, .policy-group{border-top:1px solid var(--line);border-bottom:0;}
   .edit-step:last-of-type, .policy-group:last-of-type{border-bottom:1px solid var(--line);}
@@ -2292,10 +2283,9 @@ body{overflow-x:hidden;}
 }
 
 @media(max-width:420px){
-  .owner-metrics, .accounting-metrics{grid-template-columns:1fr!important;}
-  .owner-metrics .metric, .accounting-metrics .metric{padding:9px 0!important;border-right:0!important;border-bottom:1px solid var(--line)!important;}
+  .owner-metrics{grid-template-columns:1fr!important;}
+  .owner-metrics .metric{padding:9px 0!important;border-right:0!important;border-bottom:1px solid var(--line)!important;}
   .owner-metrics .metric:nth-child(3){border-bottom:0!important;}
-  .accounting-metrics .metric:nth-child(2){border-bottom:0!important;}
   .summary-row strong{max-width:50vw;}
 }
 
@@ -3756,6 +3746,74 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
   .preview-fit-button{margin-left:2px;}
   .document-fit-stage{
     padding:12px;
-    touch-action:pan-x pan-y pinch-zoom;
+    touch-action:none;
+    overscroll-behavior:contain;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+}
+
+/* V8 — accounting follows the same flat grouped-list language as the other modules. */
+.accounting-task-list{
+  display:grid;
+  min-width:0;
+}
+.accounting-task-row{
+  width:100%;
+  min-width:0;
+  min-height:54px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  font:inherit;
+}
+.accounting-task-row:last-child{border-bottom:0;}
+button.accounting-task-row{cursor:pointer;}
+.accounting-task-copy{
+  display:grid;
+  gap:3px;
+  min-width:0;
+}
+.accounting-task-copy strong{
+  font-size:var(--type-row-title);
+  line-height:1.3;
+  font-weight:650;
+}
+.accounting-task-copy small{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--text-muted);
+  font-size:var(--type-row-meta);
+  line-height:1.3;
+}
+.section-action{
+  min-height:36px;
+  padding-inline:11px;
+}
+.compact-empty-state{
+  padding:18px 0;
+  border:0!important;
+}
+
+@media(max-width:820px){
+  .accounting-task-row{
+    min-height:58px;
+    padding:11px 0;
+  }
+  .section-action{
+    min-width:44px;
+    min-height:40px;
+  }
+  .section-action span{
+    display:none;
   }
 }

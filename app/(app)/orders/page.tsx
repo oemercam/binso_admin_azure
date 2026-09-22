@@ -2,7 +2,6 @@
 
 import { Select, Input } from '@/components/ui/form-controls'
 
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
@@ -78,14 +77,6 @@ export default function OrdersPage() {
           return <InteractiveRow className="data-row order-grid compact-overview-row" key={order.id} href={`/orders/${order.id}`} ariaLabel={`${order.name} öffnen`}><span className="primary-cell"><strong>{order.name}</strong><small className="desktop-row-detail">{order.customerName}{order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}</small><small className="mobile-row-summary">{order.customerName} · {used} / {order.budgetHours} h · {order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</small></span><span className="overview-desktop-cell">{order.budgetHours} h</span><span className="overview-desktop-cell">{used} h</span><span className="overview-desktop-cell"><strong>{Math.max(0, order.budgetHours - used)} h</strong></span><span className="overview-desktop-cell">{chf(revenue)}</span><span className="overview-desktop-cell">{margin} %</span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span></InteractiveRow>
         })}
       </div>
-
-      <div className="mobile-record-list legacy-mobile-record-list">
-        {store.orders.map((order) => {
-          const used = store.timeEntries.filter((entry) => entry.orderId === order.id).reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
-          return <Link className="mobile-record" href={`/orders/${order.id}`} key={order.id}><div className="record-top"><span><strong>{order.name}</strong><small>{order.customerName}</small></span><Icon name="chevron" size={15}/></div><div className="record-meta"><span>{used} / {order.budgetHours} h</span><span>{Math.max(0, order.budgetHours - used)} h Rest</span></div></Link>
-        })}
-      </div>
-
       {open && (
         <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Neues Mandat oder Projekt eröffnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="form-grid">
               <label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label>

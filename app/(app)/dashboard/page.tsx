@@ -41,7 +41,7 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       </div>
 
       <div className="dashboard-layout">
-        <section className="surface chart-surface"><SectionTitle title="Geschäftsentwicklung" subtitle="Demo-Historie · aktuelle KPIs sind live"/><RevenueChart /></section>
+        <section className="surface chart-surface"><SectionTitle title="Geschäftsentwicklung" subtitle="Entwicklung und aktuelle Kennzahlen"/><RevenueChart /></section>
         <section className="surface focus-surface">
           <SectionTitle title="Heute wichtig" subtitle="Priorisierte Aufgaben" />
           <div className="focus-list">
@@ -102,7 +102,7 @@ function FinanceDashboard() {
     <section className="page">
       <PageHeader eyebrow="BUCHHALTUNG" title="Finanzübersicht" description="Forderungen, Zahlungen und anstehende Aufgaben." />
       <div className="metric-strip"><Metric label="Offene Forderungen" value={chf(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
-      <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Demo-Verlauf"/><RevenueChart/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
+      <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Entwicklung der letzten Perioden"/><RevenueChart/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
     </section>
   )
 }
