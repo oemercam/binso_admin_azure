@@ -20,12 +20,21 @@ export function PushSettings() {
 
   useEffect(() => {
     const isSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
-    setSupported(isSupported)
-    if (!isSupported) return
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setSupported(isSupported)
+    })
+    if (!isSupported) return () => { cancelled = true }
+
     navigator.serviceWorker.ready
       .then((registration) => registration.pushManager.getSubscription())
-      .then((subscription) => setEnabled(Boolean(subscription)))
-      .catch(() => feedback.warning('Push-Status konnte nicht gelesen werden.'))
+      .then((subscription) => {
+        if (!cancelled) setEnabled(Boolean(subscription))
+      })
+      .catch(() => {
+        if (!cancelled) feedback.warning('Push-Status konnte nicht gelesen werden.')
+      })
+    return () => { cancelled = true }
   }, [feedback])
 
   async function toggle() {

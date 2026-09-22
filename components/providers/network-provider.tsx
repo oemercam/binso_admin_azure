@@ -15,7 +15,10 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<NetworkState>('online')
 
   useEffect(() => {
-    setState(navigator.onLine ? 'online' : 'offline')
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setState(navigator.onLine ? 'online' : 'offline')
+    })
 
     const onOffline = () => setState('offline')
     const onOnline = () => {
@@ -26,6 +29,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     window.addEventListener('offline', onOffline)
     window.addEventListener('online', onOnline)
     return () => {
+      cancelled = true
       window.removeEventListener('offline', onOffline)
       window.removeEventListener('online', onOnline)
     }

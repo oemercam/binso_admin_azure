@@ -53,8 +53,11 @@ export function AppOverlays({
   )
 
   useEffect(() => {
-    if (searchOpen) setTimeout(() => inputRef.current?.focus(), 40)
-    else setQuery('')
+    const timer = window.setTimeout(() => {
+      if (searchOpen) inputRef.current?.focus()
+      else setQuery('')
+    }, searchOpen ? 40 : 0)
+    return () => window.clearTimeout(timer)
   }, [searchOpen])
 
   useEffect(() => {

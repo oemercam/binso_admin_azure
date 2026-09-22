@@ -22,11 +22,15 @@ export default function EmployeesPage() {
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
-    setCreating(true)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setCreating(true)
+    })
     const params = new URLSearchParams(searchParams.toString())
     params.delete('new')
     const suffix = params.toString() ? `?${params.toString()}` : ''
     router.replace(`${pathname}${suffix}`, { scroll: false })
+    return () => { cancelled = true }
   }, [pathname, router, searchParams])
 
   return (

@@ -37,10 +37,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = readStorage(STORAGE_KEY)
     const nextPreference: ThemePreference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
-    setPreferenceState(nextPreference)
     const nextResolved = resolveTheme(nextPreference)
-    setResolvedTheme(nextResolved)
     applyTheme(nextResolved)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      setPreferenceState(nextPreference)
+      setResolvedTheme(nextResolved)
+    })
 
     const media = window.matchMedia('(prefers-color-scheme: dark)')
     const listener = () => {
@@ -52,7 +56,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     media.addEventListener('change', listener)
-    return () => media.removeEventListener('change', listener)
+    return () => {
+      cancelled = true
+      media.removeEventListener('change', listener)
+    }
   }, [])
 
   function setPreference(next: ThemePreference) {

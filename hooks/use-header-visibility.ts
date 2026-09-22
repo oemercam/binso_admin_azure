@@ -11,8 +11,9 @@ export function useHeaderVisibility() {
   const lastScrollY = useRef(0)
 
   useEffect(() => {
-    setHidden(false)
     lastScrollY.current = 0
+    const reset = window.setTimeout(() => setHidden(false), 0)
+    return () => window.clearTimeout(reset)
   }, [pathname])
 
   useEffect(() => {
@@ -26,10 +27,8 @@ export function useHeaderVisibility() {
   }, [])
 
   useEffect(() => {
-    if (!isMobileLayout) {
-      setHidden(false)
-      return
-    }
+    const reset = window.setTimeout(() => setHidden(false), 0)
+    if (!isMobileLayout) return () => window.clearTimeout(reset)
 
     const onScroll = () => {
       const currentY = Math.max(0, window.scrollY)
@@ -42,8 +41,11 @@ export function useHeaderVisibility() {
 
     lastScrollY.current = Math.max(0, window.scrollY)
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.clearTimeout(reset)
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [isMobileLayout])
 
-  return hidden
+  return isMobileLayout ? hidden : false
 }

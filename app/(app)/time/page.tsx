@@ -48,11 +48,15 @@ export default function TimePage() {
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
-    setOpen(true)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setOpen(true)
+    })
     const params = new URLSearchParams(searchParams.toString())
     params.delete('new')
     const suffix = params.toString() ? `?${params.toString()}` : ''
     router.replace(`${pathname}${suffix}`, { scroll: false })
+    return () => { cancelled = true }
   }, [pathname, router, searchParams])
 
   const people = useMemo(() => {
@@ -61,9 +65,7 @@ export default function TimePage() {
     return currentEmployee ? all.filter((item) => item.id === currentEmployee.id) : []
   }, [orderId, store, user.role, currentEmployee])
 
-  useEffect(() => {
-    if (!people.some((item) => item.id === personId)) setPersonId(people[0]?.id ?? '')
-  }, [people, personId])
+  const effectivePersonId = people.some((item) => item.id === personId) ? personId : (people[0]?.id ?? '')
 
   const visibleEntries = useMemo(
     () => user.role === 'employee' && currentEmployee
@@ -83,7 +85,7 @@ export default function TimePage() {
     event.preventDefault()
     setFormError('')
     const order = store.orders.find((item) => item.id === orderId)
-    const person = people.find((item) => item.id === personId)
+    const person = people.find((item) => item.id === effectivePersonId)
     if (!order || !person) { setFormError('Bitte Auftrag und Leistungserbringer auswählen.'); return }
 
     const policy = store.orderPolicies.find((item) => item.orderId === order.id)
@@ -202,7 +204,7 @@ export default function TimePage() {
         <StandardFormSheet open title={<>Zeit erfassen</>} description={<>Direkt einem Auftrag und Leistungserbringer zuordnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="time-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="time-page-sheet-1" className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></>}>{formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
               <label className="full"><span>Auftrag *</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
-              <label className="full"><span>Leistungserbringer *</span><Select value={personId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
+              <label className="full"><span>Leistungserbringer *</span><Select value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
               <label><span>Datum *</span><Input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required/></label>
               <label><span>Stunden *</span><Input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>

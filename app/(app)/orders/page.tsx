@@ -31,11 +31,15 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
-    setOpen(true)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setOpen(true)
+    })
     const params = new URLSearchParams(searchParams.toString())
     params.delete('new')
     const suffix = params.toString() ? `?${params.toString()}` : ''
     router.replace(`${pathname}${suffix}`, { scroll: false })
+    return () => { cancelled = true }
   }, [pathname, router, searchParams])
 
   function save(event: React.FormEvent) {

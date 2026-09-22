@@ -146,51 +146,56 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    try {
-      let raw = readStorage(STORAGE_KEY)
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      try {
+        let raw = readStorage(STORAGE_KEY)
 
-      if (!raw) {
-        for (const key of LEGACY_STORAGE_KEYS) {
-          const legacy = readStorage(key)
-          if (legacy) {
-            raw = legacy
-            break
+        if (!raw) {
+          for (const key of LEGACY_STORAGE_KEYS) {
+            const legacy = readStorage(key)
+            if (legacy) {
+              raw = legacy
+              break
+            }
           }
         }
-      }
 
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<BusinessState>
-        const seeded = freshState()
+        if (raw) {
+          const parsed = JSON.parse(raw) as Partial<BusinessState>
+          const seeded = freshState()
 
-        // Demo releases must always contain usable reference data. Older browser
-        // snapshots could contain empty arrays from previous UI-only versions and
-        // would otherwise make whole modules appear blank after an upgrade.
-        setState({
-          ...seeded,
-          ...parsed,
-          customers: parsed.customers?.length ? parsed.customers : seeded.customers,
-          suppliers: parsed.suppliers?.length ? parsed.suppliers : seeded.suppliers,
-          quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes,
-          orders: parsed.orders?.length ? parsed.orders : seeded.orders,
-          timeEntries: parsed.timeEntries?.length ? parsed.timeEntries.map((entry) => { const legacy = entry as typeof entry & { note?: string }; return { ...entry, description: entry.description ?? legacy.note ?? '' } }) : seeded.timeEntries,
-          invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices,
-          payments: parsed.payments?.length ? parsed.payments : seeded.payments,
-          supplierInvoices: parsed.supplierInvoices?.length ? parsed.supplierInvoices : seeded.supplierInvoices,
-          employees: parsed.employees?.length ? parsed.employees : seeded.employees,
-          timeEvidence: parsed.timeEvidence?.length ? parsed.timeEvidence : seeded.timeEvidence,
-          orderPolicies: parsed.orderPolicies?.length ? parsed.orderPolicies : seeded.orderPolicies,
-          orderAssignmentRules: parsed.orderAssignmentRules?.length ? parsed.orderAssignmentRules : seeded.orderAssignmentRules,
-          companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}) },
-          documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
-          appSettings: mergeAppSettings(parsed.appSettings),
-        })
+          // Demo releases must always contain usable reference data. Older browser
+          // snapshots could contain empty arrays from previous UI-only versions and
+          // would otherwise make whole modules appear blank after an upgrade.
+          setState({
+            ...seeded,
+            ...parsed,
+            customers: parsed.customers?.length ? parsed.customers : seeded.customers,
+            suppliers: parsed.suppliers?.length ? parsed.suppliers : seeded.suppliers,
+            quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes,
+            orders: parsed.orders?.length ? parsed.orders : seeded.orders,
+            timeEntries: parsed.timeEntries?.length ? parsed.timeEntries.map((entry) => { const legacy = entry as typeof entry & { note?: string }; return { ...entry, description: entry.description ?? legacy.note ?? '' } }) : seeded.timeEntries,
+            invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices,
+            payments: parsed.payments?.length ? parsed.payments : seeded.payments,
+            supplierInvoices: parsed.supplierInvoices?.length ? parsed.supplierInvoices : seeded.supplierInvoices,
+            employees: parsed.employees?.length ? parsed.employees : seeded.employees,
+            timeEvidence: parsed.timeEvidence?.length ? parsed.timeEvidence : seeded.timeEvidence,
+            orderPolicies: parsed.orderPolicies?.length ? parsed.orderPolicies : seeded.orderPolicies,
+            orderAssignmentRules: parsed.orderAssignmentRules?.length ? parsed.orderAssignmentRules : seeded.orderAssignmentRules,
+            companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}) },
+            documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
+            appSettings: mergeAppSettings(parsed.appSettings),
+          })
+        }
+      } catch {
+        // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
+      } finally {
+        if (!cancelled) setHydrated(true)
       }
-    } catch {
-      // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
-    } finally {
-      setHydrated(true)
-    }
+    })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {

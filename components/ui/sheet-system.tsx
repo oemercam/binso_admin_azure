@@ -155,7 +155,9 @@ export function StandardFormSheet({
   const resolvedMode: SheetMode = mode === 'auto' ? (isMobileLayout ? 'bottom' : 'dialog') : mode
 
   useEffect(() => {
-    if (open) setDirty(false)
+    if (!open) return
+    const reset = window.setTimeout(() => setDirty(false), 0)
+    return () => window.clearTimeout(reset)
   }, [open])
 
   function requestClose() {
