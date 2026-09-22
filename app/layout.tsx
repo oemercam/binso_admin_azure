@@ -4,7 +4,7 @@ import { ServiceWorkerRegister } from '@/components/pwa/service-worker-register'
 import { ViewportMetrics } from '@/components/ui/viewport-metrics'
 import './globals.css'
 import './documents.css'
-import './ui-foundation-v19.css'
+import './ui-foundation-v20.css'
 
 export const metadata: Metadata = {
   title: {
