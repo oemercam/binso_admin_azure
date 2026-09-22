@@ -9,8 +9,6 @@ export function DocumentPreviewFrame({ children }: { children: ReactNode }) {
   const [metrics, setMetrics] = useState({ scale: 1, width: 794, height: 1123 })
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
     let frame = 0
 
     const measure = () => {
@@ -43,7 +41,6 @@ export function DocumentPreviewFrame({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame)
       observer.disconnect()
       window.removeEventListener('resize', measure)
-      document.body.style.overflow = previousOverflow
     }
   }, [])
 

@@ -47,6 +47,7 @@ import type { OrderAssignmentRule } from '@/modules/workforce/types'
 import type { TimeEvidence } from '@/modules/time/types'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { createDefaultOrderPolicy } from '@/modules/orders/defaults'
+import { readStorage, removeStorage, writeStorage } from '@/lib/browser/storage'
 
 type BusinessState = {
   customers: Customer[]
@@ -146,11 +147,11 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      let raw = localStorage.getItem(STORAGE_KEY)
+      let raw = readStorage(STORAGE_KEY)
 
       if (!raw) {
         for (const key of LEGACY_STORAGE_KEYS) {
-          const legacy = localStorage.getItem(key)
+          const legacy = readStorage(key)
           if (legacy) {
             raw = legacy
             break
@@ -194,7 +195,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    writeStorage(STORAGE_KEY, JSON.stringify(state))
   }, [state, hydrated])
 
   const store = useMemo<BusinessStore>(() => ({
@@ -479,7 +480,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       setState((current) => ({ ...current, appSettings: mergeAppSettings(changes, current.appSettings) }))
     },
     resetDemo() {
-      localStorage.removeItem(STORAGE_KEY)
+      removeStorage(STORAGE_KEY)
       setState(freshState())
     },
   }), [state])

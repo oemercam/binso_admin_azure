@@ -1,4 +1,4 @@
-const CACHE = 'binso-shell-v19.2'
+const CACHE = 'binso-shell-v20.0'
 const OFFLINE_URL = '/offline'
 
 self.addEventListener('install', event => {
@@ -52,6 +52,11 @@ self.addEventListener('fetch', event => {
       }))
     )
   }
+})
+
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 self.addEventListener('push', event => {

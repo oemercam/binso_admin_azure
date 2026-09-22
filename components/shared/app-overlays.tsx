@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
 import { CloseButton } from '@/components/ui/close-button'
-import { AppSheet } from '@/components/ui/sheet-system'
+import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { AppUser, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
+import { signOutUrl } from '@/lib/auth/urls'
 
 const quickActions: Array<{ label: string; description: string; icon: any; href: string; roles: Role[] }> = [
   { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'] },
@@ -129,9 +130,8 @@ export function AppOverlays({
         </div>
       )}
 
-      <AppSheet
+      <ResponsiveOverlay
         open={quickOpen}
-        mode="bottom"
         title="Neu erstellen"
         subtitle="Direkt eine Aktion starten"
         onClose={() => setQuickOpen(false)}
@@ -148,7 +148,7 @@ export function AppOverlays({
             </Link>
           ))}
         </nav>
-      </AppSheet>
+      </ResponsiveOverlay>
 
       {notificationsOpen && (
         <div className="profile-popover notifications-popover" role="dialog">
@@ -168,7 +168,7 @@ export function AppOverlays({
           <div className="profile-links">
             <Link href="/settings" onClick={() => setProfileOpen(false)}><Icon name="user" size={16} />Profil und Einstellungen</Link>
             <Link href="/settings" onClick={() => setProfileOpen(false)}><Icon name="bell" size={16} />Benachrichtigungen</Link>
-            <a href="/.auth/logout?post_logout_redirect_uri=/sign-in"><Icon name="logout" size={16} />Abmelden</a>
+            <a href={signOutUrl()}><Icon name="logout" size={16} />Abmelden</a>
           </div>
         </div>
       )}

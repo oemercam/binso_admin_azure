@@ -3,7 +3,7 @@ import path from 'node:path'
 import ts from 'typescript'
 
 const root = process.cwd()
-const roots = ['app', 'components', 'lib', 'modules', 'types']
+const roots = ['app', 'components', 'hooks', 'lib', 'modules', 'types']
 const extensions = ['.ts', '.tsx']
 const errors = []
 
@@ -159,7 +159,7 @@ for (const css of appCss) {
 }
 
 const logoSource = fs.readFileSync(path.join(root, 'components', 'ui', 'binso-logo.tsx'), 'utf8')
-const logoImgCount = (logoSource.match(/<img/g) ?? []).length
+const logoImgCount = (logoSource.match(/<img\b/g) ?? []).length
 if (logoImgCount !== 1) errors.push(`components/ui/binso-logo.tsx: erwartet genau ein <img>, gefunden ${logoImgCount}.`)
 if (/binso-logo-(?:light|dark)/.test(logoSource)) errors.push('components/ui/binso-logo.tsx: Light/Dark-Doppelbild ist nicht erlaubt.')
 
