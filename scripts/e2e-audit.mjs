@@ -83,7 +83,7 @@ expect('app/(app)/settings/page.tsx', 'reminderSender', 'Mahnungs-Absender konfi
 expect('app/(app)/settings/page.tsx', 'payrollSender', 'Lohn-Absender konfigurierbar')
 expect('app/(app)/settings/page.tsx', 'SettingsToggleRow', 'Enterprise-Toggles werden verwendet')
 expect('app/layout.tsx', "import './documents.css'", 'Dokument-CSS eingebunden')
-expect('app/layout.tsx', "import './e2e-v10.css'", 'E2E-Fix-CSS eingebunden')
+expect('app/layout.tsx', "import './ui-foundation-v19.css'", 'v19 UI Foundation eingebunden')
 
 // Global search/quick create must target specific actions/records.
 const overlay = read('components/shared/app-overlays.tsx')
@@ -96,18 +96,23 @@ expect('components/shared/app-overlays.tsx', '/quotes?view=${item.id}', 'Globale
 expect('components/shared/app-overlays.tsx', '/invoices?view=${item.id}', 'Globale Suche verlinkt Rechnungen konkret')
 
 
-// v12 responsive/data visibility safeguards.
+// Persistent demo-data safeguards remain required.
 expect('components/state/business-store.tsx', "binso-admin-demo-v12-responsive", 'Versionierter Demo-Speicher aktiv')
 expect('components/state/business-store.tsx', 'customers: parsed.customers?.length ? parsed.customers : seeded.customers', 'Leere Legacy-Kundendaten werden mit Seeds repariert')
 expect('components/state/business-store.tsx', 'quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes', 'Leere Legacy-Angebote werden mit Seeds repariert')
 expect('components/state/business-store.tsx', 'invoices: parsed.invoices?.length ? parsed.invoices : seeded.invoices', 'Leere Legacy-Rechnungen werden mit Seeds repariert')
 expect('components/state/business-store.tsx', 'employees: parsed.employees?.length ? parsed.employees : seeded.employees', 'Leere Legacy-Mitarbeitende werden mit Seeds repariert')
-expect('app/layout.tsx', "import './responsive-v12.css'", 'v12 Responsive-Hardening eingebunden')
-expect('app/responsive-v12.css', '.data-list {', 'Mobile Datenlisten werden nicht global versteckt')
-expect('app/responsive-v12.css', 'display:block!important;', 'Mobile Datenlisten sind sichtbar')
-expect('app/responsive-v12.css', '.invoice-builder-sheet', 'Rechnungserstellung hat eigenes Responsive-Hardening')
-expect('app/responsive-v12.css', 'max-height:calc(100dvh', 'Dialoge bleiben innerhalb des Viewports')
 
+// v19 canonical UI foundation: exactly one responsive CSS foundation and one logo image.
+expect('app/layout.tsx', "import './globals.css'", 'Globals CSS eingebunden')
+expect('app/layout.tsx', "import './documents.css'", 'Dokument CSS eingebunden')
+expect('app/layout.tsx', "import './ui-foundation-v19.css'", 'UI Foundation v19 eingebunden')
+expect('app/ui-foundation-v19.css', '--app-mobile-gutter: 16px', 'Mobiler Seitenrand zentral definiert')
+expect('app/ui-foundation-v19.css', '.toggle-control {', 'Toggle-Geometrie zentral definiert')
+expect('app/ui-foundation-v19.css', '.app-sheet-backdrop {', 'Sheet-System zentral definiert')
+expect('app/ui-foundation-v19.css', '.mobile-menu-nav {', 'Mobile Navigation zentral definiert')
+expect('components/ui/binso-logo.tsx', 'binso-logo-image', 'Logo verwendet kanonisches Einzelbild')
+expect('components/navigation/mobile-pill-nav.tsx', '<AppSheet', 'Mobile Navigation verwendet zentrales AppSheet')
 console.log(`E2E static audit: ${passes.length} Prüfungen erfolgreich.`)
 if (failures.length) {
   console.error(`\n${failures.length} Fehler:`)

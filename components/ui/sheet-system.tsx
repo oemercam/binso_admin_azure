@@ -45,6 +45,8 @@ export function AppSheet({
   footer,
   onSubmit,
   ariaLabel,
+  showClose,
+  showGrabber,
 }: {
   open: boolean
   mode?: SheetMode
@@ -55,6 +57,8 @@ export function AppSheet({
   footer?: ReactNode
   onSubmit?: (event: FormEvent<HTMLFormElement>) => void
   ariaLabel?: string
+  showClose?: boolean
+  showGrabber?: boolean
 }) {
   if (!open) return null
 
@@ -66,8 +70,8 @@ export function AppSheet({
 
   const content = (
     <>
-      {mode === 'bottom' ? <SheetGrabber /> : null}
-      <SheetHeader title={title} subtitle={subtitle} onClose={onClose} showClose={mode !== 'bottom'} />
+      {(showGrabber ?? mode === 'bottom') ? <SheetGrabber /> : null}
+      <SheetHeader title={title} subtitle={subtitle} onClose={onClose} showClose={showClose ?? mode !== 'bottom'} />
       <div className="app-sheet-content">{children}</div>
       {footer ? <SheetFooter>{footer}</SheetFooter> : null}
     </>
