@@ -35,6 +35,8 @@ export type IconName =
   | 'download'
   | 'credit-card'
   | 'clock'
+  | 'back'
+  | 'remove'
 
 export function Icon({
   name,
@@ -91,6 +93,8 @@ export function Icon({
     download: <><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></>,
     'credit-card': <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></>,
     clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+    back: <path d="m15 18-6-6 6-6"/>,
+    remove: <><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></>,
   }
 
   return <svg {...common} {...props}>{paths[name]}</svg>
