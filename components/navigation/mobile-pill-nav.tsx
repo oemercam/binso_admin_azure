@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/icon'
-import { AppSheet } from '@/components/ui/sheet-system'
+import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
@@ -43,9 +43,8 @@ export function MobilePillNav({
 
   return (
     <>
-      <AppSheet
+      <ResponsiveOverlay
         open={menuOpen}
-        mode="bottom"
         title="Navigation"
         subtitle="Binso Administration"
         onClose={() => setMenuOpen(false)}
@@ -79,7 +78,7 @@ export function MobilePillNav({
             )
           })}
         </nav>
-      </AppSheet>
+      </ResponsiveOverlay>
 
       <nav
         className="mobile-pill"

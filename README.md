@@ -41,3 +41,8 @@ Die bestehende `package-lock.json` aus dem GitHub-Repository behalten. Sie ist a
 - Binso-Logo auf Mobile auf 28 px vergrössert.
 - Ein einziges Create-Plus auf Mobile: zentral in der unteren Pille.
 - Dieses Plus öffnet auf Kunden, Aufträgen, Angeboten, Rechnungen, Mitarbeitenden, Zeiterfassung und Buchhaltung direkt den passenden Erfassungsdialog; auf anderen Seiten das globale Quick-Create-Menü.
+
+## Architecture standard v20
+
+The centralized application architecture is documented in [`ARCHITECTURE_STANDARD_V20.md`](./ARCHITECTURE_STANDARD_V20.md). The implementation/verification status and known technical debt are documented in [`STANDARDIZATION_REPORT_V20.md`](./STANDARDIZATION_REPORT_V20.md).
+

@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
 import type { Role } from '@/types/domain'
+export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
   userId?: string
@@ -68,12 +69,4 @@ export async function getSession(): Promise<Session> {
 
   const requestHeaders = await headers()
   return parseAzurePrincipal(requestHeaders.get('x-ms-client-principal'))
-}
-
-export function signInUrl(returnTo = '/') {
-  return `/.auth/login/aad?post_login_redirect_uri=${encodeURIComponent(returnTo)}`
-}
-
-export function signOutUrl() {
-  return '/.auth/logout?post_logout_redirect_uri=/sign-in'
 }

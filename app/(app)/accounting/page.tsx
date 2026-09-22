@@ -5,8 +5,10 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { CloseButton } from '@/components/ui/close-button'
+import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { CompactInfoRow } from '@/components/ui/compact-info-row'
 import { useBusinessStore } from '@/components/state/business-store'
+import { downloadTextFile } from '@/lib/browser/actions'
 
 const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
@@ -38,13 +40,7 @@ export default function AccountingPage() {
       ...store.supplierInvoices.map((invoice) => ['Kreditor', invoice.number, invoice.supplierName, invoice.invoiceDate, invoice.due, invoice.amount.toFixed(2), invoice.status]),
     ]
     const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(';')).join('\n')
-    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = `binso-buchhaltung-${new Date().toISOString().slice(0, 10)}.csv`
-    anchor.click()
-    URL.revokeObjectURL(url)
+    downloadTextFile(`binso-buchhaltung-${new Date().toISOString().slice(0, 10)}.csv`, `\ufeff${csv}`, 'text/csv;charset=utf-8')
   }
 
   return (
@@ -121,6 +117,6 @@ export default function AccountingPage() {
       onClose()
     }
 
-    return <div className="overlay-layer sheet-layer" onMouseDown={onClose}><form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}><div className="sheet-grabber"/><div className="sheet-heading"><div><strong>Lieferantenrechnung erfassen</strong><span>Externe Leistung einem Auftrag zuordnen.</span></div><CloseButton onClick={onClose} /></div><div className="form-grid"><label><span>Lieferant *</span><select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</select></label><label><span>Auftrag</span><select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</select></label><label><span>Rechnungsnummer *</span><input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required/></label><label><span>Fällig *</span><input type="date" value={due} onChange={(e) => setDue(e.target.value)} required/></label><label><span>Netto CHF *</span><input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div><div className="sheet-actions"><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></div></form></div>
+    return <StandardFormSheet onClose={onClose} onSubmit={save} panelClassName="form-sheet bottom-sheet standard-mobile-sheet"><div className="sheet-grabber"/><div className="sheet-heading"><div><strong>Lieferantenrechnung erfassen</strong><span>Externe Leistung einem Auftrag zuordnen.</span></div><CloseButton onClick={onClose} /></div><div className="form-grid"><label><span>Lieferant *</span><select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</select></label><label><span>Auftrag</span><select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</select></label><label><span>Rechnungsnummer *</span><input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required/></label><label><span>Fällig *</span><input type="date" value={due} onChange={(e) => setDue(e.target.value)} required/></label><label><span>Netto CHF *</span><input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div><div className="sheet-actions"><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></div></StandardFormSheet>
   }
 }

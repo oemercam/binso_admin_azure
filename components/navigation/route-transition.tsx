@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
+import { readStorage, writeStorage } from '@/lib/browser/storage'
 
 const STORAGE_PREFIX = 'binso-scroll:'
 
@@ -12,7 +13,7 @@ function storageKey(pathname: string) {
 
 function readPosition(pathname: string) {
   try {
-    const value = sessionStorage.getItem(storageKey(pathname))
+    const value = readStorage(storageKey(pathname), 'session')
     if (!value) return 0
     const parsed = Number(value)
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0
@@ -23,7 +24,7 @@ function readPosition(pathname: string) {
 
 function writePosition(pathname: string, y: number) {
   try {
-    sessionStorage.setItem(storageKey(pathname), String(Math.max(0, Math.round(y))))
+    writeStorage(storageKey(pathname), String(Math.max(0, Math.round(y))), 'session')
   } catch {
     // Scroll restoration is a progressive enhancement.
   }

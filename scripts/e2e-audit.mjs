@@ -112,7 +112,7 @@ expect('app/ui-foundation-v19.css', '.toggle-control {', 'Toggle-Geometrie zentr
 expect('app/ui-foundation-v19.css', '.app-sheet-backdrop {', 'Sheet-System zentral definiert')
 expect('app/ui-foundation-v19.css', '.mobile-menu-nav {', 'Mobile Navigation zentral definiert')
 expect('components/ui/binso-logo.tsx', 'binso-logo-image', 'Logo verwendet kanonisches Einzelbild')
-expect('components/navigation/mobile-pill-nav.tsx', '<AppSheet', 'Mobile Navigation verwendet zentrales AppSheet')
+expect('components/navigation/mobile-pill-nav.tsx', '<ResponsiveOverlay', 'Mobile Navigation verwendet zentrales ResponsiveOverlay')
 console.log(`E2E static audit: ${passes.length} Prüfungen erfolgreich.`)
 if (failures.length) {
   console.error(`\n${failures.length} Fehler:`)

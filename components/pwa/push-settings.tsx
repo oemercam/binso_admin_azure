@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiRequest } from '@/lib/http/api-client'
+import { ApiError } from '@/lib/http/errors'
 
 function urlBase64ToUint8Array(base64: string) {
   const padding = '='.repeat((4 - base64.length % 4) % 4)
@@ -37,12 +39,10 @@ export function PushSettings() {
       const registration = await navigator.serviceWorker.ready
       const current = await registration.pushManager.getSubscription()
       if (current) {
-        const response = await fetch('/api/push/subscriptions', {
+        await apiRequest<{ ok: boolean }>('/api/push/subscriptions', {
           method: 'DELETE',
-          headers: { 'content-type': 'application/json' },
           body: JSON.stringify(current.toJSON()),
         })
-        if (!response.ok) throw new Error('Push-Abonnement konnte serverseitig nicht entfernt werden.')
         await current.unsubscribe()
         setEnabled(false)
         setMessage('Push wurde auf diesem Gerät deaktiviert.')
@@ -60,19 +60,19 @@ export function PushSettings() {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       })
-      const response = await fetch('/api/push/subscriptions', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(subscription.toJSON()),
-      })
-      if (!response.ok) {
+      try {
+        await apiRequest<{ ok: boolean }>('/api/push/subscriptions', {
+          method: 'POST',
+          body: JSON.stringify(subscription.toJSON()),
+        })
+      } catch (error) {
         await subscription.unsubscribe()
-        throw new Error('Push-Abonnement konnte serverseitig nicht gespeichert werden.')
+        throw error
       }
       setEnabled(true)
       setMessage('Push wurde auf diesem Gerät aktiviert. Die serverseitige Zustellung bleibt bis zur Datenbank-/Worker-Anbindung im Demo-Modus.')
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Push konnte nicht geändert werden.')
+      setMessage(error instanceof ApiError || error instanceof Error ? error.message : 'Push konnte nicht geändert werden.')
     } finally {
       setBusy(false)
     }
