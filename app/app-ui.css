@@ -3817,3 +3817,442 @@ button.accounting-task-row{cursor:pointer;}
     display:none;
   }
 }
+
+/* V9 — canonical Apple-like visual system across every route and detail view.
+   Functional components remain unchanged; this layer standardises hierarchy,
+   grouped surfaces, spacing, radii, list geometry and mobile behaviour. */
+
+:root{
+  --apple-radius-lg:16px;
+  --apple-radius-md:12px;
+  --apple-section-gap:16px;
+  --apple-card-border:color-mix(in srgb,var(--line-strong) 82%,transparent);
+  --apple-card-bg:var(--surface);
+  --apple-group-bg:var(--surface-2);
+}
+
+.apple-page{
+  width:100%;
+  max-width:1480px;
+  margin:0 auto;
+  padding-top:24px;
+}
+
+.apple-page .page-header{
+  align-items:flex-end;
+  margin-bottom:18px;
+}
+
+.apple-page .page-header h1{
+  max-width:820px;
+}
+
+.apple-page .page-actions,
+.apple-page .page-action-group{
+  align-items:center;
+}
+
+/* Primary summaries use one inset grouped treatment. */
+.apple-page .metric-strip,
+.apple-page .metric-grid,
+.apple-page .time-hero,
+.apple-page .order-kpi-strip{
+  overflow:hidden;
+  border:1px solid var(--apple-card-border)!important;
+  border-radius:var(--apple-radius-lg);
+  background:var(--apple-group-bg);
+  box-shadow:none;
+  margin-bottom:var(--apple-section-gap);
+}
+
+.apple-page .metric-strip,
+.apple-page .metric-grid{
+  border-top:1px solid var(--apple-card-border)!important;
+  border-bottom:1px solid var(--apple-card-border)!important;
+}
+
+.apple-page .metric{
+  min-width:0;
+  padding:14px 16px!important;
+  border-right:1px solid var(--line);
+}
+
+.apple-page .metric:first-child{padding-left:16px!important;}
+.apple-page .metric:last-child{border-right:0;}
+
+/* All content sections use the same inset-grouped surface. */
+.apple-page .section-block,
+.apple-page .surface,
+.apple-page .panel,
+.apple-page .hub-panel,
+.apple-page .settings-progressive-section{
+  min-width:0;
+  margin:0 0 var(--apple-section-gap);
+  padding:16px;
+  border:1px solid var(--apple-card-border)!important;
+  border-radius:var(--apple-radius-lg);
+  background:var(--apple-card-bg);
+  box-shadow:none!important;
+}
+
+.apple-page .section-block + .section-block,
+.apple-page .settings-progressive-section + .settings-progressive-section{
+  border-top:1px solid var(--apple-card-border)!important;
+}
+
+.apple-page .surface.chart-surface,
+.apple-page .surface.focus-surface{
+  padding:16px;
+  border-left:1px solid var(--apple-card-border)!important;
+}
+
+.apple-page .section-title{
+  min-height:34px;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+
+.apple-page .section-title h2{
+  font-size:14px!important;
+}
+
+.apple-page .section-title p{
+  margin-top:3px;
+}
+
+/* Top-level data collections are grouped surfaces, never loose rows. */
+.apple-page > .data-list,
+.apple-page > .compact-list,
+.apple-page > .operational-desktop-list,
+.apple-page > .operational-mobile-list{
+  overflow:hidden;
+  border:1px solid var(--apple-card-border)!important;
+  border-radius:var(--apple-radius-lg);
+  background:var(--apple-card-bg);
+}
+
+.apple-page > .data-list .data-head{
+  min-height:36px;
+  padding-inline:14px;
+  background:var(--apple-group-bg);
+  border-bottom:1px solid var(--line);
+}
+
+.apple-page > .data-list .data-row:not(.data-head){
+  min-height:54px;
+  padding-inline:14px;
+}
+
+.apple-page .compact-list,
+.apple-page .summary-list,
+.apple-page .hub-row-list,
+.apple-page .customer-contact-list,
+.apple-page .customer-linked-list,
+.apple-page .customer-activity-list,
+.apple-page .finance-ledger,
+.apple-page .accounting-task-list{
+  min-width:0;
+}
+
+.apple-page .summary-row,
+.apple-page .hub-row,
+.apple-page .accounting-task-row{
+  min-height:50px;
+}
+
+/* Search/toolbars feel like native controls, not loose web form fragments. */
+.apple-page .module-toolbar{
+  min-height:48px;
+  padding:6px 0 10px;
+}
+
+.apple-page .search-field{
+  min-height:38px;
+  border-radius:10px;
+  background:var(--apple-group-bg);
+}
+
+/* Dashboard and finance share the same section cards. */
+.apple-page .dashboard-layout{
+  gap:var(--apple-section-gap);
+  margin-bottom:0;
+}
+
+.apple-page .dashboard-bottom-grid{
+  gap:var(--apple-section-gap);
+}
+
+.apple-page .finance-ledger > div{
+  min-height:46px;
+}
+
+/* Customer detail uses the same card language; panel previously had no canonical style. */
+.apple-page .customer-file-grid{
+  gap:var(--apple-section-gap);
+}
+
+.apple-page .customer-quick-actions{
+  gap:8px;
+  margin-bottom:var(--apple-section-gap);
+}
+
+.apple-page .customer-quick-actions .button{
+  border-radius:10px;
+}
+
+/* Order detail: same grouped navigation/content style as Settings. */
+.apple-page .detail-back-row{
+  margin:0 0 10px;
+}
+
+.apple-page .detail-back-row .text-link,
+.apple-page .object-hub-back,
+.apple-page .settings-mobile-back{
+  min-height:36px;
+  display:inline-flex;
+  align-items:center;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+  text-decoration:none;
+}
+
+.apple-page .object-hub-layout{
+  gap:var(--apple-section-gap);
+}
+
+.apple-page .object-hub-nav{
+  overflow:hidden;
+  padding:0 14px;
+  border:1px solid var(--apple-card-border)!important;
+  border-radius:var(--apple-radius-lg);
+  background:var(--apple-card-bg);
+}
+
+.apple-page .object-hub-nav .hub-row{
+  min-height:54px;
+  padding:9px 0;
+}
+
+.apple-page .object-hub-nav .hub-row.active{
+  background:transparent;
+  color:var(--text);
+}
+
+.apple-page .object-hub-nav .hub-row.active strong{
+  font-weight:700!important;
+}
+
+.apple-page .hub-disclosure{
+  margin-top:12px;
+  border-top:1px solid var(--line);
+}
+
+/* Settings: one native segmented selector on desktop/tablet and grouped rows below. */
+.apple-page .settings-toolbar{
+  width:max-content;
+  max-width:100%;
+  gap:3px;
+  margin:0 0 var(--apple-section-gap);
+  padding:3px;
+  border:0;
+  border-radius:11px;
+  background:var(--apple-group-bg);
+}
+
+.apple-page .settings-toolbar button{
+  min-height:34px;
+  padding:0 11px;
+  border:0!important;
+  border-radius:8px;
+}
+
+.apple-page .settings-toolbar button.active{
+  background:var(--surface);
+  box-shadow:var(--shadow-soft);
+}
+
+.apple-page .settings-progressive-head{
+  padding:0 0 10px;
+}
+
+.apple-page .settings-progressive-list{
+  overflow:hidden;
+}
+
+/* Time tracking: desktop and mobile representations share the same outer surface. */
+.apple-page .selection-bar{
+  padding:10px 14px;
+  margin:0 0 10px;
+  border:1px solid var(--apple-card-border);
+  border-radius:var(--apple-radius-md);
+  background:var(--apple-group-bg);
+}
+
+.apple-page .operational-mobile-list{
+  background:var(--apple-card-bg);
+}
+
+/* Forms and task sheets use the same control rhythm. */
+.apple-page .button{
+  border-radius:10px;
+}
+
+.apple-page .status{
+  border-radius:999px;
+}
+
+/* Empty states should look intentional inside grouped content. */
+.apple-page .empty-state,
+.apple-page .search-empty{
+  min-height:92px;
+  padding:22px 10px;
+  border:0!important;
+  text-align:left;
+}
+
+/* Auth/offline/error surfaces use the same calm elevated appearance. */
+.apple-auth-card,
+.app-error-screen{
+  border:1px solid var(--apple-card-border)!important;
+  border-radius:20px!important;
+  background:var(--surface)!important;
+  box-shadow:0 12px 36px rgba(18,22,30,.08)!important;
+}
+
+.apple-auth-card{
+  padding:28px!important;
+}
+
+.app-error-screen{
+  width:min(460px,calc(100vw - 32px));
+  margin:auto;
+  padding:28px!important;
+}
+
+@media(max-width:1100px){
+  .apple-page .dashboard-layout{
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .apple-page .surface.focus-surface{
+    border-left:1px solid var(--apple-card-border)!important;
+  }
+}
+
+@media(max-width:820px){
+  .apple-page{
+    padding-top:18px!important;
+  }
+
+  .apple-page .page-header{
+    margin-bottom:14px!important;
+  }
+
+  .apple-page .page-header .page-description{
+    max-width:34rem;
+  }
+
+  .apple-page .metric-strip,
+  .apple-page .metric-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  .apple-page .metric{
+    min-height:78px;
+    padding:12px!important;
+    border-bottom:1px solid var(--line);
+  }
+
+  .apple-page .metric:first-child{padding-left:12px!important;}
+  .apple-page .metric:nth-child(2n){border-right:0;}
+  .apple-page .metric:nth-last-child(-n+2){border-bottom:0;}
+
+  .apple-page .section-block,
+  .apple-page .surface,
+  .apple-page .panel,
+  .apple-page .hub-panel,
+  .apple-page .settings-progressive-section{
+    padding:14px;
+    border-radius:14px;
+  }
+
+  .apple-page > .data-list,
+  .apple-page > .compact-list,
+  .apple-page > .operational-desktop-list,
+  .apple-page > .operational-mobile-list{
+    border-radius:14px;
+  }
+
+  .apple-page .dashboard-bottom-grid,
+  .apple-page .customer-file-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:0;
+  }
+
+  .apple-page .customer-quick-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .apple-page .customer-quick-actions .button{
+    min-height:44px;
+    justify-content:flex-start;
+    padding-inline:12px;
+  }
+
+  .apple-page .time-hero{
+    grid-template-columns:minmax(0,1fr) minmax(70px,.8fr) minmax(0,1fr);
+    padding:12px;
+  }
+
+  .apple-page .order-kpi-strip{
+    padding:0;
+  }
+
+  .apple-page .order-kpi-strip > span{
+    padding:11px 10px!important;
+  }
+
+  .apple-page .object-hub-nav{
+    padding:0 14px;
+    border-radius:14px;
+  }
+
+  .apple-page .object-hub-content .hub-panel{
+    margin-bottom:12px;
+  }
+
+  .apple-page .settings-toolbar{
+    width:100%;
+    position:static;
+    margin:0 0 14px;
+    padding:3px;
+  }
+
+  .apple-page .settings-toolbar button{
+    min-width:max-content;
+  }
+
+  .apple-page .selection-bar{
+    align-items:flex-start;
+    gap:10px;
+    padding:11px 12px;
+  }
+
+  .apple-page .module-toolbar{
+    padding-top:0;
+  }
+
+  .apple-page .search-field{
+    min-height:42px;
+  }
+
+  .apple-auth-card{
+    width:min(390px,100%)!important;
+    padding:24px!important;
+    border-radius:18px!important;
+  }
+}
+

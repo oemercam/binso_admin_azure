@@ -75,7 +75,7 @@ export default function CustomersPage() {
   }
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader
         eyebrow="CRM"
         title="Kunden"

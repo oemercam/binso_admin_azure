@@ -29,14 +29,14 @@ export default function CustomerDetailPage() {
     contacts: store.customerContacts.filter((item) => item.customerId === id),
   }), [id, store.contracts, store.customerActivities, store.customerContacts, store.invoices, store.orders, store.quotes])
 
-  if (!customer) return <section className="page"><PageHeader eyebrow="CRM" title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
+  if (!customer) return <section className="page apple-page"><PageHeader eyebrow="CRM" title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
 
   const customerId = customer.id
   const openAmount = related.invoices.reduce((sum, invoice) => sum + Math.max(0, invoice.amount - invoice.paidAmount - (invoice.creditedAmount ?? 0)), 0)
 
   function saveNote(event: React.FormEvent) { event.preventDefault(); store.addActivityNote(customerId, note); setNote(''); setNoteOpen(false) }
 
-  return <section className="page">
+  return <section className="page apple-page">
     <PageHeader eyebrow="KUNDENAKTE" title={customer.name} description={`${customer.customerNo} · ${customer.contact || 'Keine Ansprechperson'} · ${customer.email || 'Keine E-Mail'}`} action={<button className="button secondary page-primary-action" onClick={() => router.push(`/customers?edit=${customer.id}`)}><Icon name="edit" size={16}/><span>Bearbeiten</span></button>} />
 
     <div className="customer-quick-actions" aria-label="Schnellaktionen">

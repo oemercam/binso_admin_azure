@@ -52,7 +52,7 @@ export default function ContractsPage() {
     router.push(`/invoices?view=${invoice.id}`)
   }
 
-  return <section className="page">
+  return <section className="page apple-page">
     <PageHeader eyebrow="KUNDENBEZIEHUNG" title="Verträge" description="Laufende Vereinbarungen, Kündigungsfristen und wiederkehrende Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)}><Icon name="plus" size={16}/><span>Vertrag erfassen</span></button>} />
 
     <div className="metric-grid compact-metrics">

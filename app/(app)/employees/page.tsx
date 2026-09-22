@@ -34,7 +34,7 @@ export default function EmployeesPage() {
   }, [pathname, router, searchParams])
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader eyebrow="TEAM" title="Mitarbeitende" description="Rollen, Anstellungsart, Kosten und Zeitstatus verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Mitarbeitende erfassen" title="Mitarbeitende erfassen"><Icon name="plus" size={16}/><span>Mitarbeitende erfassen</span></button>} />
       <div className="data-list">
         <div className="data-row employee-grid data-head"><span>Mitarbeiter</span><span>Rolle</span><span>Gebucht</span><span>Verrechenbar</span><span>Auslastung</span><span /></div>

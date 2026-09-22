@@ -104,7 +104,7 @@ export default function QuotesPage() {
     feedback.success(`Neue Version ${revision.version} als Entwurf erstellt.`)
   }
 
-  return <section className="page">
+  return <section className="page apple-page">
     <PageHeader eyebrow="VERKAUF" title="Angebote" description="Erstellen, bearbeiten, als PDF prüfen, versenden und in Aufträge überführen." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Angebot erstellen" title="Angebot erstellen"><Icon name="plus" size={16}/><span>Angebot erstellen</span></button>} />
 
     <div className="data-list compact-overview-list">

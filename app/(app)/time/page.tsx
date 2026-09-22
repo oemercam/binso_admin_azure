@@ -159,7 +159,7 @@ export default function TimePage() {
   }
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader
         eyebrow="ZEIT"
         title="Zeiterfassung"

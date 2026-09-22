@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Icon } from '@/components/ui/icon'
+import { PageHeader } from '@/components/ui/page-header'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { Toggle } from '@/components/ui/toggle'
@@ -31,7 +32,7 @@ export default function OrderDetailPage() {
   const [sectionOpen, setSectionOpen] = useState(false)
 
   if (!order) {
-    return <section className="page"><div className="detail-back-row"><Link className="text-link" href="/orders">← Aufträge</Link></div><div className="empty-state"><strong>Auftrag nicht gefunden</strong><span>Der Auftrag ist nicht mehr vorhanden oder wurde noch nicht geladen.</span></div></section>
+    return <section className="page apple-page"><div className="detail-back-row"><Link className="text-link" href="/orders">← Aufträge</Link></div><div className="empty-state"><strong>Auftrag nicht gefunden</strong><span>Der Auftrag ist nicht mehr vorhanden oder wurde noch nicht geladen.</span></div></section>
   }
 
   const policy = store.orderPolicies.find((item) => item.orderId === order.id)
@@ -40,9 +41,19 @@ export default function OrderDetailPage() {
   const expenses = store.expenses.filter((item) => item.orderId === order.id)
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <div className="detail-back-row"><Link className="text-link" href="/orders">← Aufträge</Link></div>
-      <div className="page-title"><div><p className="eyebrow">AUFTRAG</p><h1>{order.name}</h1><p className="page-description">{order.customerName}{order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}</p></div><div className="page-action-group"><span className={`status ${order.status === 'active' ? 'active' : 'neutral'}`}>{order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</span><button className="button secondary" onClick={() => setEditOpen(true)}><Icon name="edit" size={15}/> Bearbeiten</button></div></div>
+      <PageHeader
+        eyebrow="AUFTRAG"
+        title={order.name}
+        description={`${order.customerName}${order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}`}
+        action={
+          <div className="page-action-group">
+            <span className={`status ${order.status === 'active' ? 'active' : 'neutral'}`}>{order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</span>
+            <button className="button secondary" onClick={() => setEditOpen(true)}><Icon name="edit" size={15}/> Bearbeiten</button>
+          </div>
+        }
+      />
 
       <div className="order-kpi-strip">
         <span><small>Budget</small><strong>{order.budgetHours} h</strong></span>

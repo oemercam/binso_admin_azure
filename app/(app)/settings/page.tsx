@@ -117,7 +117,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <section className="page settings-page">
+    <section className="page apple-page settings-page">
       <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern." />
 
 

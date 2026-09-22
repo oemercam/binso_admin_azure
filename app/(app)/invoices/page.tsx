@@ -121,7 +121,7 @@ export default function InvoicesPage() {
   }
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Zeiten, Spesen und freie Positionen abrechnen, Rechnungen versenden, Zahlungen und Korrekturen verwalten." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
 
 

@@ -5,7 +5,7 @@ import { BinsoLogo } from '@/components/ui/binso-logo'
 export default function SignInPage() {
   return (
     <main className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card apple-auth-card">
         <BinsoLogo />
         <h1>Binso Admin</h1>
         <p className="muted">Mit deinem Firmenkonto anmelden.</p>

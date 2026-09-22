@@ -21,7 +21,7 @@ export default function FinancePage() {
   const paidIn = store.payments.reduce((sum, payment) => sum + payment.amount, 0)
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader eyebrow="CONTROLLING" title="Finanzen" description="Umsatz, Kosten, Marge und offene Positionen im Überblick." />
       <div className="metric-strip">
         <div className="metric"><span>Geleisteter Umsatz</span><strong>{chf(deliveredRevenue)}</strong><small>aus erfassten Zeiten</small></div>

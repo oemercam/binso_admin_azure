@@ -69,7 +69,7 @@ export default function AccountingPage() {
   }
 
   return (
-    <section className="page">
+    <section className="page apple-page">
       <PageHeader
         eyebrow="BUCHHALTUNG"
         title="Buchhaltung"
