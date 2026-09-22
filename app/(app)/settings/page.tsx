@@ -4,10 +4,26 @@ import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { ThemeControl } from '@/components/settings/theme-control'
 import { PushSettings } from '@/components/pwa/push-settings'
-import { Toggle } from '@/components/ui/toggle'
+import { AppSheet, SheetActions } from '@/components/ui/sheet-system'
+import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
 import { useBusinessStore } from '@/components/state/business-store'
+import type { DocumentTemplates } from '@/types/domain'
 
 type Tab = 'general' | 'mail' | 'automation' | 'documents' | 'appearance'
+type CompanyEditor = 'company' | 'address' | 'contact' | 'bank'
+type MailKey = 'senderName' | 'replyTo' | 'invoiceSender' | 'quoteSender' | 'reminderSender' | 'payrollSender' | 'financeCc'
+type ReminderKey = 'firstAfterDays' | 'secondAfterDays' | 'thirdAfterDays'
+type PayrollTextKey = 'subject' | 'emailBody'
+type TemplateKind = 'invoice' | 'quote' | 'reminder'
+type Editor =
+  | { kind: 'company'; section: CompanyEditor }
+  | { kind: 'mail'; key: MailKey; title: string; inputType?: string }
+  | { kind: 'reminder'; key: ReminderKey; title: string }
+  | { kind: 'payroll'; key: PayrollTextKey; title: string; multiline?: boolean }
+  | { kind: 'template'; template: TemplateKind; title: string }
+  | { kind: 'theme' }
+  | { kind: 'push' }
+  | null
 
 export default function SettingsPage() {
   const store = useBusinessStore()
@@ -16,15 +32,16 @@ export default function SettingsPage() {
   const [templates, setTemplates] = useState(store.documentTemplates)
   const [saved, setSaved] = useState('')
   const [mobileDetail, setMobileDetail] = useState(false)
+  const [editor, setEditor] = useState<Editor>(null)
+  const [editValue, setEditValue] = useState('')
 
   const mailReady = useMemo(
-    () =>
-      Boolean(
-        store.appSettings.mail.invoiceSender &&
-          store.appSettings.mail.quoteSender &&
-          store.appSettings.mail.reminderSender &&
-          store.appSettings.mail.replyTo,
-      ),
+    () => Boolean(
+      store.appSettings.mail.invoiceSender &&
+      store.appSettings.mail.quoteSender &&
+      store.appSettings.mail.reminderSender &&
+      store.appSettings.mail.replyTo,
+    ),
     [store.appSettings.mail],
   )
 
@@ -33,31 +50,73 @@ export default function SettingsPage() {
     window.setTimeout(() => setSaved(''), 2600)
   }
 
-  function saveCompany(event: FormEvent) {
+  function openMail(key: MailKey, title: string, inputType = 'text') {
+    setEditValue(String(store.appSettings.mail[key] ?? ''))
+    setEditor({ kind: 'mail', key, title, inputType })
+  }
+
+  function openReminder(key: ReminderKey, title: string) {
+    setEditValue(String(store.appSettings.reminders[key]))
+    setEditor({ kind: 'reminder', key, title })
+  }
+
+  function openPayroll(key: PayrollTextKey, title: string, multiline = false) {
+    setEditValue(String(store.appSettings.payroll[key] ?? ''))
+    setEditor({ kind: 'payroll', key, title, multiline })
+  }
+
+  function openCompany(section: CompanyEditor) {
+    setCompany(store.companyProfile)
+    setEditor({ kind: 'company', section })
+  }
+
+  function openTemplate(template: TemplateKind, title: string) {
+    setTemplates(store.documentTemplates)
+    setEditor({ kind: 'template', template, title })
+  }
+
+  function closeEditor() {
+    setEditor(null)
+    setEditValue('')
+  }
+
+  function saveScalar(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!editor) return
+    if (editor.kind === 'mail') {
+      store.updateAppSettings({ mail: { ...store.appSettings.mail, [editor.key]: editValue } })
+      flash(`${editor.title} gespeichert.`)
+    }
+    if (editor.kind === 'reminder') {
+      store.updateAppSettings({ reminders: { ...store.appSettings.reminders, [editor.key]: Number(editValue) } })
+      flash(`${editor.title} gespeichert.`)
+    }
+    if (editor.kind === 'payroll') {
+      store.updateAppSettings({ payroll: { ...store.appSettings.payroll, [editor.key]: editValue } })
+      flash(`${editor.title} gespeichert.`)
+    }
+    closeEditor()
+  }
+
+  function saveCompany(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     store.updateCompanyProfile(company)
     flash('Unternehmensdaten gespeichert.')
+    closeEditor()
   }
 
-  function saveTemplates(event: FormEvent) {
+  function saveTemplate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     store.updateDocumentTemplates(templates)
-    flash('Dokumentvorlagen gespeichert.')
+    flash('Dokumentvorlage gespeichert.')
+    closeEditor()
   }
 
   return (
     <section className="page settings-page">
-      <PageHeader
-        eyebrow="EINSTELLUNGEN"
-        title="Einstellungen"
-        description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern."
-      />
+      <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern." />
 
-      {saved && (
-        <div className="inline-notice">
-          <span>{saved}</span>
-        </div>
-      )}
+      {saved ? <div className="inline-notice"><span>{saved}</span></div> : null}
 
       <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">
         <TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton>
@@ -78,190 +137,221 @@ export default function SettingsPage() {
       <div className={mobileDetail ? 'settings-content mobile-detail-open' : 'settings-content'}>
         <button type="button" className="settings-mobile-back" onClick={() => setMobileDetail(false)}>← Einstellungen</button>
 
-      {tab === 'general' && (
-        <>
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy">
-                <h2>Unternehmensdaten</h2>
-                <p>Diese Angaben erscheinen auf Angeboten, Rechnungen, Mahnungen und später auf Lohnabrechnungen.</p>
-              </div>
+        {tab === 'general' && (
+          <>
+            <SettingsSection title="Unternehmensdaten" description="Aktueller Stand. Zum Bearbeiten einen Bereich öffnen.">
+              <SettingsValueRow title="Unternehmen" value={store.companyProfile.name} description={store.companyProfile.uid || 'UID / MWST nicht gesetzt'} onClick={() => openCompany('company')} />
+              <SettingsValueRow title="Adresse" value={`${store.companyProfile.zip} ${store.companyProfile.city}`} description={store.companyProfile.address} onClick={() => openCompany('address')} />
+              <SettingsValueRow title="Kontakt" value={store.companyProfile.email} description={store.companyProfile.phone || 'Telefon nicht gesetzt'} onClick={() => openCompany('contact')} />
+              <SettingsValueRow title="Bank und Zahlungsziel" value={`${store.companyProfile.defaultPaymentDays} Tage`} description={store.companyProfile.iban || 'IBAN nicht gesetzt'} onClick={() => openCompany('bank')} />
+            </SettingsSection>
 
-              <form className="settings-inline-fields" onSubmit={saveCompany}>
-                <Field label="Firma *"><input value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} required /></Field>
-                <Field label="UID / MWST *"><input value={company.uid} onChange={(e) => setCompany({ ...company, uid: e.target.value })} required /></Field>
-                <Field label="Adresse *" full><input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} required /></Field>
-                <Field label="PLZ *"><input value={company.zip} onChange={(e) => setCompany({ ...company, zip: e.target.value })} required /></Field>
-                <Field label="Ort *"><input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} required /></Field>
-                <Field label="Land *"><input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} required /></Field>
-                <Field label="E-Mail *"><input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} required /></Field>
-                <Field label="Telefon"><input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} /></Field>
-                <Field label="IBAN *"><input value={company.iban} onChange={(e) => setCompany({ ...company, iban: e.target.value })} required /></Field>
-                <Field label="Bank"><input value={company.bankName} onChange={(e) => setCompany({ ...company, bankName: e.target.value })} /></Field>
-                <Field label="Standard-Zahlungsziel"><input type="number" min="1" max="120" value={company.defaultPaymentDays} onChange={(e) => setCompany({ ...company, defaultPaymentDays: Number(e.target.value) })} /></Field>
-                <div className="full"><button className="button primary">Speichern</button></div>
-              </form>
-            </div>
-          </section>
+            <SettingsSection title="Workflow-Regeln" description="Binäre Regeln können direkt ein- oder ausgeschaltet werden.">
+              <SettingsToggleRow title="Zeiten müssen freigegeben werden" description="Nur freigegebene Zeiten dürfen fakturiert oder für Stundenlohn verwendet werden." checked={store.appSettings.workflow.requireTimeApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, requireTimeApproval: value } })} />
+              <SettingsToggleRow title="Eigene Zeiten selbst freigeben" description="Freigabe durch die erfassende Person erlauben." checked={store.appSettings.workflow.allowSelfApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, allowSelfApproval: value } })} />
+              <SettingsToggleRow title="Verrechnete Zeiten sperren" description="Nach Übernahme in eine Rechnung nicht mehr verändern." checked={store.appSettings.workflow.lockInvoicedTimes} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, lockInvoicedTimes: value } })} />
+              <SettingsToggleRow title="Auftrag erst nach Angebotsannahme" description="Verhindert Aufträge aus offenen oder abgelehnten Angeboten." checked={store.appSettings.workflow.requireQuoteAcceptanceBeforeOrder} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, requireQuoteAcceptanceBeforeOrder: value } })} />
+            </SettingsSection>
+          </>
+        )}
 
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy">
-                <h2>Workflow-Regeln</h2>
-                <p>Kontrollen, die Fehlbuchungen und versehentliche Änderungen verhindern.</p>
-              </div>
+        {tab === 'mail' && (
+          <>
+            <SettingsSection title="Microsoft 365 Versand" description={mailReady ? 'Absender vollständig · Verbindung noch nicht aktiviert' : 'Versandkonfiguration unvollständig'}>
+              <SettingsValueRow title="Absendername" value={store.appSettings.mail.senderName || 'Nicht gesetzt'} onClick={() => openMail('senderName', 'Absendername')} />
+              <SettingsValueRow title="Antwortadresse" value={store.appSettings.mail.replyTo || 'Nicht gesetzt'} onClick={() => openMail('replyTo', 'Antwortadresse', 'email')} />
+              <SettingsValueRow title="Rechnungen" value={store.appSettings.mail.invoiceSender || 'Nicht gesetzt'} onClick={() => openMail('invoiceSender', 'Rechnungsabsender', 'email')} />
+              <SettingsValueRow title="Angebote" value={store.appSettings.mail.quoteSender || 'Nicht gesetzt'} onClick={() => openMail('quoteSender', 'Angebotsabsender', 'email')} />
+              <SettingsValueRow title="Mahnungen" value={store.appSettings.mail.reminderSender || 'Nicht gesetzt'} onClick={() => openMail('reminderSender', 'Mahnungsabsender', 'email')} />
+              <SettingsValueRow title="Lohnabrechnungen" value={store.appSettings.mail.payrollSender || 'Nicht gesetzt'} onClick={() => openMail('payrollSender', 'Lohnabrechnungsabsender', 'email')} />
+              <SettingsValueRow title="CC Buchhaltung" value={store.appSettings.mail.financeCc || 'Nicht gesetzt'} onClick={() => openMail('financeCc', 'CC Buchhaltung', 'email')} />
+            </SettingsSection>
 
-              <div className="settings-stack">
-                <SettingToggle label="Zeiten müssen freigegeben werden" description="Nur freigegebene Zeiten dürfen fakturiert oder für Stundenlohn verwendet werden." checked={store.appSettings.workflow.requireTimeApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, requireTimeApproval: value } })} />
-                <SettingToggle label="Eigene Zeiten selbst freigeben" description="Für Enterprise-Betrieb standardmässig deaktiviert; Freigabe erfolgt durch berechtigte Rolle." checked={store.appSettings.workflow.allowSelfApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, allowSelfApproval: value } })} />
-                <SettingToggle label="Verrechnete Zeiten sperren" description="Zeiten können nach Übernahme in eine Rechnung nicht mehr verändert werden." checked={store.appSettings.workflow.lockInvoicedTimes} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, lockInvoicedTimes: value } })} />
-                <SettingToggle label="Auftrag erst nach Angebotsannahme" description="Verhindert, dass aus offenen oder abgelehnten Angeboten versehentlich Aufträge entstehen." checked={store.appSettings.workflow.requireQuoteAcceptanceBeforeOrder} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, requireQuoteAcceptanceBeforeOrder: value } })} />
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+            <SettingsSection title="Versandoptionen" description="Standardverhalten für geschäftliche E-Mails.">
+              <SettingsToggleRow title="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen als PDF anhängen." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
+              <SettingsToggleRow title="Versand protokollieren" description="Versandstatus für die spätere revisionssichere Protokollierung speichern." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
+              <SettingsToggleRow title="Kopie an Absender" description="Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
+            </SettingsSection>
+          </>
+        )}
 
-      {tab === 'mail' && (
-        <>
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy">
-                <h2>Microsoft 365 Versand</h2>
-                <p>Absenderadressen je Dokumenttyp. Für den produktiven Versand wird später Microsoft Graph mit serverseitiger Berechtigung verbunden.</p>
-                <div className="integration-status"><i /><span>{mailReady ? 'Adressen vollständig · Verbindung noch nicht aktiviert' : 'Versandkonfiguration unvollständig'}</span></div>
-              </div>
+        {tab === 'automation' && (
+          <>
+            <div className="integration-banner"><strong>Automationen sind konfiguriert, aber noch nicht serverseitig aktiv.</strong><span>Ausführung benötigt Azure-Datenbank, Microsoft Graph und Scheduler/Worker.</span></div>
 
-              <div className="settings-inline-fields">
-                <Field label="Absendername"><input value={store.appSettings.mail.senderName} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, senderName: e.target.value } })} /></Field>
-                <Field label="Antwortadresse"><input type="email" value={store.appSettings.mail.replyTo} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, replyTo: e.target.value } })} /></Field>
-                <Field label="Rechnungen"><input type="email" value={store.appSettings.mail.invoiceSender} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, invoiceSender: e.target.value } })} /></Field>
-                <Field label="Angebote"><input type="email" value={store.appSettings.mail.quoteSender} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, quoteSender: e.target.value } })} /></Field>
-                <Field label="Mahnungen"><input type="email" value={store.appSettings.mail.reminderSender} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, reminderSender: e.target.value } })} /></Field>
-                <Field label="Lohnabrechnungen"><input type="email" value={store.appSettings.mail.payrollSender} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, payrollSender: e.target.value } })} /></Field>
-                <Field label="CC Buchhaltung"><input type="email" placeholder="optional" value={store.appSettings.mail.financeCc} onChange={(e) => store.updateAppSettings({ mail: { ...store.appSettings.mail, financeCc: e.target.value } })} /></Field>
-              </div>
-            </div>
-          </section>
+            <SettingsSection title="Mahnwesen" description="Status direkt ändern, Zeitabstände gezielt öffnen.">
+              <SettingsToggleRow title="Mahnwesen aktiv" checked={store.appSettings.reminders.enabled} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, enabled: value } })} />
+              <SettingsToggleRow title="Mahnungen automatisch senden" checked={store.appSettings.reminders.automaticSend} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, automaticSend: value } })} disabled={!store.appSettings.reminders.enabled} />
+              <SettingsValueRow title="1. Erinnerung" value={`${store.appSettings.reminders.firstAfterDays} Tage`} onClick={() => openReminder('firstAfterDays', '1. Erinnerung')} />
+              <SettingsValueRow title="2. Mahnung" value={`${store.appSettings.reminders.secondAfterDays} Tage`} onClick={() => openReminder('secondAfterDays', '2. Mahnung')} />
+              <SettingsValueRow title="3. Mahnung" value={`${store.appSettings.reminders.thirdAfterDays} Tage`} onClick={() => openReminder('thirdAfterDays', '3. Mahnung')} />
+              <SettingsToggleRow title="Nur Werktage" checked={store.appSettings.reminders.onlyBusinessDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, onlyBusinessDays: value } })} />
+              <SettingsToggleRow title="Nach Zahlung sofort stoppen" checked={store.appSettings.reminders.stopWhenPaid} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, stopWhenPaid: value } })} />
+            </SettingsSection>
 
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy"><h2>Versandoptionen</h2><p>Standardverhalten für alle geschäftlichen E-Mails.</p></div>
-              <div className="settings-stack">
-                <SettingToggle label="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen werden als PDF angehängt." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
-                <SettingToggle label="Versand protokollieren" description="Speichert die gewünschte Protokollierungsregel. Das revisionssichere serverseitige Audit-Log wird mit der Datenbank angebunden." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
-                <SettingToggle label="Kopie an Absender" description="Optional eine Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+            <SettingsSection title="Stundenlohn und Lohnabrechnung" description="Workflow und Versand der monatlichen Lohnvorbereitung.">
+              <SettingsToggleRow title="Lohnprozess aktiv" checked={store.appSettings.payroll.enabled} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, enabled: value } })} />
+              <SettingsToggleRow title="Lohnabrechnung nach Freigabe vorbereiten" checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
+              <SettingsToggleRow title="Nur Stundenlohn-Mitarbeitende" checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled={!store.appSettings.payroll.enabled} />
+              <SettingsToggleRow title="Freigabe durch Buchhaltung erforderlich" checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled={!store.appSettings.payroll.enabled} />
+              <SettingsToggleRow title="Nach Freigabe automatisch versenden" checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled={!store.appSettings.payroll.enabled} />
+              <SettingsValueRow title="E-Mail-Betreff" value={store.appSettings.payroll.subject || 'Nicht gesetzt'} onClick={() => openPayroll('subject', 'E-Mail-Betreff')} />
+              <SettingsValueRow title="E-Mail-Text" value="Text bearbeiten" onClick={() => openPayroll('emailBody', 'E-Mail-Text', true)} />
+            </SettingsSection>
 
-      {tab === 'automation' && (
-        <>
-          <div className="integration-banner"><strong>Automationen sind konfiguriert, aber noch nicht serverseitig aktiv.</strong><span>Die Regeln werden gespeichert. Ausführung benötigt Azure-Datenbank, Microsoft Graph und einen Scheduler/Worker.</span></div>
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy">
-                <h2>Mahnwesen</h2>
-                <p>Automatisierbare Mahnstufen. Automatischer Versand bleibt getrennt aktivierbar, damit die Buchhaltung die Kontrolle behält.</p>
-              </div>
+            <SettingsSection title="Benachrichtigungen" description="Ereignisse, die im Portal und später per Push erscheinen.">
+              <SettingsToggleRow title="Rechnung überfällig" checked={store.appSettings.notifications.overdueInvoice} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, overdueInvoice: value } })} />
+              <SettingsToggleRow title="Auftragsbudget ab 80 %" checked={store.appSettings.notifications.budgetWarning} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, budgetWarning: value } })} />
+              <SettingsToggleRow title="Angebot läuft aus" checked={store.appSettings.notifications.expiringQuote} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, expiringQuote: value } })} />
+              <SettingsToggleRow title="Zahlung eingegangen" checked={store.appSettings.notifications.paymentReceived} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, paymentReceived: value } })} />
+              <SettingsToggleRow title="Monatszeiten bereit zur Freigabe" checked={store.appSettings.notifications.timesheetReady} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, timesheetReady: value } })} />
+            </SettingsSection>
+          </>
+        )}
 
-              <div className="settings-stack">
-                <SettingToggle label="Mahnwesen aktiv" description="Überfällige Rechnungen werden für den Mahnprozess berücksichtigt." checked={store.appSettings.reminders.enabled} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, enabled: value } })} />
-                <SettingToggle label="Mahnungen automatisch senden" description="Regel für den späteren Scheduler. Ohne Microsoft Graph und Worker wird noch keine Mahnung automatisch verschickt." checked={store.appSettings.reminders.automaticSend} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, automaticSend: value } })} disabled={!store.appSettings.reminders.enabled} />
-                <NumberLine label="1. Erinnerung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.firstAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, firstAfterDays: value } })} />
-                <NumberLine label="2. Mahnung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.secondAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, secondAfterDays: value } })} />
-                <NumberLine label="3. Mahnung" description="Tage nach Fälligkeit" value={store.appSettings.reminders.thirdAfterDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, thirdAfterDays: value } })} />
-                <SettingToggle label="Nur Werktage" description="Automatische Mahnungen nicht an Wochenenden auslösen." checked={store.appSettings.reminders.onlyBusinessDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, onlyBusinessDays: value } })} />
-                <SettingToggle label="Nach Zahlung sofort stoppen" description="Keine weitere Mahnung, sobald die Rechnung vollständig bezahlt ist." checked={store.appSettings.reminders.stopWhenPaid} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, stopWhenPaid: value } })} />
-              </div>
-            </div>
-          </section>
+        {tab === 'documents' && (
+          <SettingsSection title="Dokumentvorlagen" description="Vorlage auswählen. Die Texte werden erst im Editor angezeigt.">
+            <SettingsValueRow title="Rechnung" value="Texte und E-Mail-Vorlage" onClick={() => openTemplate('invoice', 'Rechnung')} />
+            <SettingsValueRow title="Angebot" value="Texte und E-Mail-Vorlage" onClick={() => openTemplate('quote', 'Angebot')} />
+            <SettingsValueRow title="Mahnung" value="Texte und E-Mail-Vorlage" onClick={() => openTemplate('reminder', 'Mahnung')} />
+          </SettingsSection>
+        )}
 
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy">
-                <h2>Stundenlohn und Lohnabrechnung</h2>
-                <p>Der Trigger bezieht sich auf die Freigabe des abgeschlossenen Monats, nicht auf einzelne Zeiteinträge. So wird verhindert, dass unvollständige Lohnabrechnungen versendet werden.</p>
-              </div>
-
-              <div className="settings-stack">
-                <SettingToggle label="Lohnprozess aktiv" description="Freigegebene Monatszeiten können für die Lohnvorbereitung verwendet werden." checked={store.appSettings.payroll.enabled} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, enabled: value } })} />
-                <SettingToggle label="Lohnabrechnung nach Freigabe vorbereiten" description="Regel für den späteren Lohn-Worker: Nach Monatsfreigabe einen Abrechnungsentwurf für Stundenlohn-Mitarbeitende erzeugen." checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
-                <SettingToggle label="Nur Stundenlohn-Mitarbeitende" description="Festlohn-Mitarbeitende werden nicht aus Zeiterfassungen automatisch abgerechnet." checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled={!store.appSettings.payroll.enabled} />
-                <SettingToggle label="Freigabe durch Buchhaltung erforderlich" description="Empfohlene Enterprise-Einstellung: Entwurf automatisch erzeugen, Versand erst nach Finanzfreigabe." checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled={!store.appSettings.payroll.enabled} />
-                <SettingToggle label="Nach Freigabe automatisch versenden" description="Versendet die freigegebene PDF-Lohnabrechnung automatisch über die konfigurierte Absenderadresse." checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled={!store.appSettings.payroll.enabled} />
-
-                <div className="setting-line">
-                  <span className="setting-line-copy"><strong>E-Mail-Betreff</strong><small>Platzhalter: {'{{period}}'}, {'{{name}}'}</small></span>
-                  <input type="text" value={store.appSettings.payroll.subject} onChange={(e) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, subject: e.target.value } })} />
-                </div>
-
-                <div className="setting-line" style={{ gridTemplateColumns: '1fr' }}>
-                  <span className="setting-line-copy"><strong>E-Mail-Text</strong><small>Wird zusammen mit der PDF-Lohnabrechnung verwendet.</small></span>
-                  <textarea className="automation-textarea" value={store.appSettings.payroll.emailBody} onChange={(e) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, emailBody: e.target.value } })} />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy"><h2>Benachrichtigungen</h2><p>Welche Ereignisse im Admin-Portal und später per Push erscheinen.</p></div>
-              <div className="settings-stack">
-                <SettingToggle label="Rechnung überfällig" description="Fälligkeit überschritten und noch nicht vollständig bezahlt." checked={store.appSettings.notifications.overdueInvoice} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, overdueInvoice: value } })} />
-                <SettingToggle label="Auftragsbudget ab 80 %" description="Frühwarnung bevor das Stundenbudget ausgeschöpft ist." checked={store.appSettings.notifications.budgetWarning} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, budgetWarning: value } })} />
-                <SettingToggle label="Angebot läuft aus" description="Erinnerung vor dem Gültigkeitsende eines offenen Angebots." checked={store.appSettings.notifications.expiringQuote} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, expiringQuote: value } })} />
-                <SettingToggle label="Zahlung eingegangen" description="Information bei verbuchter Teil- oder Vollzahlung." checked={store.appSettings.notifications.paymentReceived} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, paymentReceived: value } })} />
-                <SettingToggle label="Monatszeiten bereit zur Freigabe" description="Hinweis an Admin/Buchhaltung, sobald die Zeiterfassung vollständig ist." checked={store.appSettings.notifications.timesheetReady} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, timesheetReady: value } })} />
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-
-      {tab === 'documents' && (
-        <section className="settings-group">
-          <div className="settings-group-head">
-            <div className="settings-group-copy">
-              <h2>Dokumentvorlagen</h2>
-              <p>Einleitungs-, Schluss- und E-Mail-Texte. Neue Dokumente übernehmen die Vorlage; danach bleibt die jeweilige Dokumentversion unabhängig bearbeitbar.</p>
-            </div>
-
-            <form className="settings-stack" onSubmit={saveTemplates}>
-              <TemplateSection title="Rechnung" intro={templates.invoiceIntro} outro={templates.invoiceOutro} subject={templates.invoiceEmailSubject} body={templates.invoiceEmailBody} onIntro={(value) => setTemplates({ ...templates, invoiceIntro: value })} onOutro={(value) => setTemplates({ ...templates, invoiceOutro: value })} onSubject={(value) => setTemplates({ ...templates, invoiceEmailSubject: value })} onBody={(value) => setTemplates({ ...templates, invoiceEmailBody: value })} />
-              <TemplateSection title="Angebot" intro={templates.quoteIntro} outro={templates.quoteOutro} subject={templates.quoteEmailSubject} body={templates.quoteEmailBody} onIntro={(value) => setTemplates({ ...templates, quoteIntro: value })} onOutro={(value) => setTemplates({ ...templates, quoteOutro: value })} onSubject={(value) => setTemplates({ ...templates, quoteEmailSubject: value })} onBody={(value) => setTemplates({ ...templates, quoteEmailBody: value })} />
-              <TemplateSection title="Mahnung" intro={templates.reminderIntro} outro={templates.reminderOutro} subject={templates.reminderEmailSubject} body={templates.reminderEmailBody} onIntro={(value) => setTemplates({ ...templates, reminderIntro: value })} onOutro={(value) => setTemplates({ ...templates, reminderOutro: value })} onSubject={(value) => setTemplates({ ...templates, reminderEmailSubject: value })} onBody={(value) => setTemplates({ ...templates, reminderEmailBody: value })} />
-              <div className="settings-note">Verfügbare Platzhalter: <code>{'{{number}}'}</code>, <code>{'{{amount}}'}</code>, <code>{'{{customer}}'}</code>, <code>{'{{period}}'}</code>, <code>{'{{name}}'}</code>.</div>
-              <div><button className="button primary">Vorlagen speichern</button></div>
-            </form>
-          </div>
-        </section>
-      )}
-
-      {tab === 'appearance' && (
-        <>
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy"><h2>Darstellung</h2><p>Systemdarstellung übernehmen oder Hell-/Dunkelmodus manuell festlegen.</p></div>
-              <ThemeControl />
-            </div>
-          </section>
-          <section className="settings-group">
-            <div className="settings-group-head">
-              <div className="settings-group-copy"><h2>Push-Benachrichtigungen</h2><p>PWA-Benachrichtigungen für Fälligkeiten, Budgetwarnungen und Freigaben.</p></div>
-              <PushSettings />
-            </div>
-          </section>
-        </>
-      )}
+        {tab === 'appearance' && (
+          <SettingsSection title="Darstellung und Gerät" description="Gerätespezifische Einstellungen gezielt öffnen.">
+            <SettingsValueRow title="Darstellung" value="System, Hell oder Dunkel" onClick={() => setEditor({ kind: 'theme' })} />
+            <SettingsValueRow title="Push-Benachrichtigungen" value="Geräteeinstellung" onClick={() => setEditor({ kind: 'push' })} />
+          </SettingsSection>
+        )}
       </div>
+
+      <EditorSheets
+        editor={editor}
+        editValue={editValue}
+        setEditValue={setEditValue}
+        company={company}
+        setCompany={setCompany}
+        templates={templates}
+        setTemplates={setTemplates}
+        onClose={closeEditor}
+        onSaveScalar={saveScalar}
+        onSaveCompany={saveCompany}
+        onSaveTemplate={saveTemplate}
+      />
     </section>
   )
 }
 
-function SettingsHubRow({ title, meta, onClick }: { title:string; meta:string; onClick:()=>void }) {
+function EditorSheets({
+  editor,
+  editValue,
+  setEditValue,
+  company,
+  setCompany,
+  templates,
+  setTemplates,
+  onClose,
+  onSaveScalar,
+  onSaveCompany,
+  onSaveTemplate,
+}: {
+  editor: Editor
+  editValue: string
+  setEditValue: (value: string) => void
+  company: ReturnType<typeof useBusinessStore>['companyProfile']
+  setCompany: (value: ReturnType<typeof useBusinessStore>['companyProfile']) => void
+  templates: DocumentTemplates
+  setTemplates: (value: DocumentTemplates) => void
+  onClose: () => void
+  onSaveScalar: (event: FormEvent<HTMLFormElement>) => void
+  onSaveCompany: (event: FormEvent<HTMLFormElement>) => void
+  onSaveTemplate: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  if (!editor) return null
+
+  if (editor.kind === 'theme') {
+    return <AppSheet open mode="bottom" title="Darstellung" subtitle="Systemdarstellung oder manuell wählen." onClose={onClose}><ThemeControl /></AppSheet>
+  }
+  if (editor.kind === 'push') {
+    return <AppSheet open mode="bottom" title="Push-Benachrichtigungen" subtitle="Einstellung für dieses Gerät." onClose={onClose}><PushSettings /></AppSheet>
+  }
+  if (editor.kind === 'mail' || editor.kind === 'reminder' || editor.kind === 'payroll') {
+    const multiline = editor.kind === 'payroll' && editor.multiline
+    const inputType = editor.kind === 'mail' ? editor.inputType ?? 'text' : editor.kind === 'reminder' ? 'number' : 'text'
+    return (
+      <AppSheet
+        open
+        mode={multiline ? 'fullscreen' : 'bottom'}
+        title={editor.title}
+        subtitle="Aktuellen Wert bearbeiten."
+        onClose={onClose}
+        onSubmit={onSaveScalar}
+        footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+      >
+        <label className="settings-edit-field">
+          <span>{editor.title}</span>
+          {multiline ? <textarea rows={10} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus /> : <input type={inputType} min={inputType === 'number' ? 0 : undefined} max={inputType === 'number' ? 90 : undefined} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />}
+        </label>
+      </AppSheet>
+    )
+  }
+  if (editor.kind === 'company') {
+    return (
+      <AppSheet
+        open
+        mode="fullscreen"
+        title={companyTitle(editor.section)}
+        subtitle="Unternehmensdaten bearbeiten."
+        onClose={onClose}
+        onSubmit={onSaveCompany}
+        footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+      >
+        <div className="form-grid settings-editor-grid">
+          {editor.section === 'company' && <><Field label="Firma *"><input value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} required /></Field><Field label="UID / MWST *"><input value={company.uid} onChange={(e) => setCompany({ ...company, uid: e.target.value })} required /></Field></>}
+          {editor.section === 'address' && <><Field label="Adresse *" full><input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} required /></Field><Field label="PLZ *"><input value={company.zip} onChange={(e) => setCompany({ ...company, zip: e.target.value })} required /></Field><Field label="Ort *"><input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} required /></Field><Field label="Land *"><input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} required /></Field></>}
+          {editor.section === 'contact' && <><Field label="E-Mail *"><input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} required /></Field><Field label="Telefon"><input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} /></Field><Field label="Website" full><input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} /></Field></>}
+          {editor.section === 'bank' && <><Field label="IBAN *" full><input value={company.iban} onChange={(e) => setCompany({ ...company, iban: e.target.value })} required /></Field><Field label="Bank"><input value={company.bankName} onChange={(e) => setCompany({ ...company, bankName: e.target.value })} /></Field><Field label="Standard-Zahlungsziel"><input type="number" min="1" max="120" value={company.defaultPaymentDays} onChange={(e) => setCompany({ ...company, defaultPaymentDays: Number(e.target.value) })} /></Field></>}
+        </div>
+      </AppSheet>
+    )
+  }
+
+  const fields = templateFields(editor.template, templates)
+  return (
+    <AppSheet
+      open
+      mode="fullscreen"
+      title={`${editor.title} · Vorlage`}
+      subtitle="Texte und E-Mail-Vorlage bearbeiten."
+      onClose={onClose}
+      onSubmit={onSaveTemplate}
+      footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+    >
+      <div className="settings-template-fields">
+        <label><span>Einleitungstext</span><textarea rows={5} value={fields.intro} onChange={(e) => setTemplates({ ...templates, [fields.introKey]: e.target.value })} /></label>
+        <label><span>Schlusstext</span><textarea rows={5} value={fields.outro} onChange={(e) => setTemplates({ ...templates, [fields.outroKey]: e.target.value })} /></label>
+        <label><span>E-Mail-Betreff</span><input value={fields.subject} onChange={(e) => setTemplates({ ...templates, [fields.subjectKey]: e.target.value })} /></label>
+        <label><span>E-Mail-Text</span><textarea rows={8} value={fields.body} onChange={(e) => setTemplates({ ...templates, [fields.bodyKey]: e.target.value })} /></label>
+        <div className="settings-note">Platzhalter: <code>{'{{number}}'}</code>, <code>{'{{amount}}'}</code>, <code>{'{{customer}}'}</code>, <code>{'{{period}}'}</code>, <code>{'{{name}}'}</code>.</div>
+      </div>
+    </AppSheet>
+  )
+}
+
+function templateFields(kind: TemplateKind, templates: DocumentTemplates) {
+  if (kind === 'quote') return { introKey: 'quoteIntro' as const, outroKey: 'quoteOutro' as const, subjectKey: 'quoteEmailSubject' as const, bodyKey: 'quoteEmailBody' as const, intro: templates.quoteIntro, outro: templates.quoteOutro, subject: templates.quoteEmailSubject, body: templates.quoteEmailBody }
+  if (kind === 'reminder') return { introKey: 'reminderIntro' as const, outroKey: 'reminderOutro' as const, subjectKey: 'reminderEmailSubject' as const, bodyKey: 'reminderEmailBody' as const, intro: templates.reminderIntro, outro: templates.reminderOutro, subject: templates.reminderEmailSubject, body: templates.reminderEmailBody }
+  return { introKey: 'invoiceIntro' as const, outroKey: 'invoiceOutro' as const, subjectKey: 'invoiceEmailSubject' as const, bodyKey: 'invoiceEmailBody' as const, intro: templates.invoiceIntro, outro: templates.invoiceOutro, subject: templates.invoiceEmailSubject, body: templates.invoiceEmailBody }
+}
+
+function companyTitle(section: CompanyEditor) {
+  if (section === 'address') return 'Adresse'
+  if (section === 'contact') return 'Kontakt'
+  if (section === 'bank') return 'Bank und Zahlungsziel'
+  return 'Unternehmen'
+}
+
+function SettingsHubRow({ title, meta, onClick }: { title: string; meta: string; onClick: () => void }) {
   return <button type="button" className="hub-row settings-hub-row" onClick={onClick}><span><strong>{title}</strong><small>{meta}</small></span><span aria-hidden="true">›</span></button>
 }
 
@@ -271,36 +361,4 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function Field({ label, full = false, children }: { label: string; full?: boolean; children: ReactNode }) {
   return <label className={`settings-field${full ? ' full' : ''}`}><span>{label}</span>{children}</label>
-}
-
-function SettingToggle({ label, description, checked, onChange, disabled = false }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void; disabled?: boolean }) {
-  return (
-    <div className="setting-line">
-      <span className="setting-line-copy"><strong>{label}</strong><small>{description}</small></span>
-      <Toggle label={label} checked={checked} onChange={onChange} disabled={disabled} />
-    </div>
-  )
-}
-
-function NumberLine({ label, description, value, onChange }: { label: string; description: string; value: number; onChange: (value: number) => void }) {
-  return (
-    <div className="setting-line">
-      <span className="setting-line-copy"><strong>{label}</strong><small>{description}</small></span>
-      <input type="number" min="0" max="90" value={value} onChange={(e) => onChange(Number(e.target.value))} />
-    </div>
-  )
-}
-
-function TemplateSection({ title, intro, outro, subject, body, onIntro, onOutro, onSubject, onBody }: { title: string; intro: string; outro: string; subject: string; body: string; onIntro: (value: string) => void; onOutro: (value: string) => void; onSubject: (value: string) => void; onBody: (value: string) => void }) {
-  return (
-    <details className="template-editor" open={title === 'Rechnung'}>
-      <summary><strong>{title}</strong><span>Texte und E-Mail-Vorlage</span></summary>
-      <div className="template-editor-fields">
-        <label><span>Einleitungstext</span><textarea rows={4} value={intro} onChange={(e) => onIntro(e.target.value)} /></label>
-        <label><span>Schlusstext</span><textarea rows={4} value={outro} onChange={(e) => onOutro(e.target.value)} /></label>
-        <label><span>E-Mail-Betreff</span><input value={subject} onChange={(e) => onSubject(e.target.value)} /></label>
-        <label><span>E-Mail-Text</span><textarea rows={5} value={body} onChange={(e) => onBody(e.target.value)} /></label>
-      </div>
-    </details>
-  )
 }

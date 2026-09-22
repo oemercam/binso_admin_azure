@@ -23,6 +23,10 @@ import './information-density-v18-3.css'
 import './typography-v18-4.css'
 import './close-alignment-v18-5.css'
 import './mobile-shell-v18-6.css'
+import './mobile-final-v18-7.css'
+import './ui-system-v18-8.css'
+import './progressive-settings-v18-10.css'
+import './visual-cleanup-v18-10-1.css'
 
 export const metadata: Metadata = {
   title: {
