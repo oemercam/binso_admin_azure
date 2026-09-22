@@ -4256,3 +4256,353 @@ button.accounting-task-row{cursor:pointer;}
   }
 }
 
+/* V10 — final visual QA rules.
+   These rules intentionally apply to every authenticated route through .apple-page
+   so page-specific CSS cannot silently diverge from the shared UI system. */
+
+.apple-page{
+  --apple-touch-target:44px;
+  --apple-row-min-height:56px;
+  --apple-row-gap:8px;
+}
+
+/* ----- Text rhythm: maximum two visible lines ----- */
+.apple-page h1,
+.apple-page .page-description,
+.apple-page .section-title h2,
+.apple-page .section-title p,
+.apple-page .primary-cell strong,
+.apple-page .primary-cell small,
+.apple-page .compact-overview-row strong,
+.apple-page .compact-overview-row small,
+.apple-page .summary-row strong,
+.apple-page .summary-row small,
+.apple-page .hub-row strong,
+.apple-page .hub-row small,
+.apple-page .mobile-record strong,
+.apple-page .mobile-record small,
+.apple-page .accounting-task-copy strong,
+.apple-page .accounting-task-copy small,
+.apple-page .settings-value-copy strong,
+.apple-page .settings-value-copy small,
+.apple-page .customer-contact-list strong,
+.apple-page .customer-contact-list small,
+.apple-page .customer-linked-list strong,
+.apple-page .customer-linked-list small,
+.apple-page .customer-activity-list strong,
+.apple-page .customer-activity-list small,
+.apple-page .focus-list strong,
+.apple-page .focus-list small,
+.apple-page .invoice-source-row strong,
+.apple-page .invoice-source-row small,
+.apple-page .record-top strong,
+.apple-page .record-top small,
+.apple-page .record-meta span,
+.apple-page .policy-group strong,
+.apple-page .policy-group small,
+.apple-page .settings-row strong,
+.apple-page .settings-row small{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  overflow-wrap:anywhere;
+}
+
+.apple-page h1{
+  line-height:1.08;
+}
+
+.apple-page .page-description,
+.apple-page .section-title p,
+.apple-page .primary-cell small,
+.apple-page .compact-overview-row small,
+.apple-page .summary-row small,
+.apple-page .hub-row small,
+.apple-page .mobile-record small,
+.apple-page .accounting-task-copy small,
+.apple-page .settings-value-copy small,
+.apple-page .record-meta span{
+  line-height:1.35;
+}
+
+/* Buttons, status chips, compact actions and navigation labels stay on one line. */
+.apple-page .button,
+.apple-page .status,
+.apple-page .row-link,
+.apple-page .text-button,
+.apple-page .compact-action,
+.apple-page .section-action,
+.apple-page .page-primary-action,
+.apple-page .settings-toolbar button,
+.apple-page .object-hub-nav button,
+.apple-page .object-hub-nav a{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ----- Consistent row geometry ----- */
+.apple-page .data-row:not(.data-head),
+.apple-page .compact-overview-row,
+.apple-page .summary-row,
+.apple-page .hub-row,
+.apple-page .accounting-task-row,
+.apple-page .mobile-record,
+.apple-page .invoice-source-row,
+.apple-page .settings-value-row,
+.apple-page .interactive-row{
+  min-height:var(--apple-row-min-height);
+}
+
+.apple-page .data-row,
+.apple-page .compact-overview-row,
+.apple-page .summary-row,
+.apple-page .hub-row,
+.apple-page .accounting-task-row,
+.apple-page .invoice-source-row,
+.apple-page .settings-value-row{
+  align-items:center;
+}
+
+.apple-page .data-row > *,
+.apple-page .compact-overview-row > *,
+.apple-page .summary-row > *,
+.apple-page .hub-row > *,
+.apple-page .accounting-task-row > *,
+.apple-page .invoice-source-row > *,
+.apple-page .settings-value-row > *{
+  min-width:0;
+}
+
+/* No loose vertical stacks between page sections. */
+.apple-page > * + .section-block,
+.apple-page > * + .surface,
+.apple-page > * + .panel,
+.apple-page > * + .data-list,
+.apple-page > * + .compact-list,
+.apple-page > * + .metric-strip,
+.apple-page > * + .metric-grid{
+  margin-top:var(--apple-section-gap);
+}
+
+/* ----- Apple-like controls ----- */
+.apple-page button,
+.apple-page a.button,
+.apple-page .icon-button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+.apple-page .button,
+.apple-page .icon-button,
+.apple-page .row-link,
+.apple-page .text-button{
+  min-height:var(--apple-touch-target);
+}
+
+.apple-page .icon-button{
+  min-width:var(--apple-touch-target);
+}
+
+.apple-page input,
+.apple-page select,
+.apple-page textarea{
+  border-radius:10px;
+}
+
+.apple-page input:not([type="checkbox"]):not([type="radio"]),
+.apple-page select{
+  min-height:44px;
+}
+
+/* Grouped list rows own their separators; no double boxes inside sections. */
+.apple-page .section-block > .compact-list,
+.apple-page .section-block > .summary-list,
+.apple-page .section-block > .hub-row-list,
+.apple-page .section-block > .accounting-task-list,
+.apple-page .surface > .compact-list,
+.apple-page .panel > .compact-list{
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+
+.apple-page .section-block > .compact-list > *:not(:last-child),
+.apple-page .section-block > .summary-list > *:not(:last-child),
+.apple-page .section-block > .hub-row-list > *:not(:last-child),
+.apple-page .surface > .compact-list > *:not(:last-child),
+.apple-page .panel > .compact-list > *:not(:last-child){
+  border-bottom:1px solid var(--line);
+}
+
+/* KPI values must never create three-line cards. */
+.apple-page .metric span,
+.apple-page .metric strong,
+.apple-page .metric small{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.apple-page .metric span,
+.apple-page .metric small{
+  white-space:nowrap;
+}
+
+.apple-page .metric strong{
+  white-space:nowrap;
+}
+
+/* ----- Desktop/tablet page width and reading rhythm ----- */
+@media(min-width:821px){
+  .apple-page .page-header{
+    min-height:76px;
+  }
+
+  .apple-page .page-header > :first-child{
+    min-width:0;
+  }
+
+  .apple-page .section-block,
+  .apple-page .surface,
+  .apple-page .panel,
+  .apple-page .hub-panel,
+  .apple-page .settings-progressive-section{
+    padding:18px;
+  }
+}
+
+/* ----- Mobile/PWA QA ----- */
+@media(max-width:820px){
+  .apple-page{
+    padding-inline:0!important;
+  }
+
+  .apple-page .page-header{
+    align-items:flex-start!important;
+    gap:12px!important;
+  }
+
+  .apple-page .page-header > :first-child{
+    min-width:0;
+    width:100%;
+  }
+
+  .apple-page h1{
+    font-size:clamp(24px,7.4vw,32px)!important;
+  }
+
+  .apple-page .page-description{
+    max-width:100%;
+  }
+
+  .apple-page .section-title{
+    gap:10px;
+  }
+
+  .apple-page .section-title > :first-child{
+    min-width:0;
+  }
+
+  .apple-page .section-title > :last-child{
+    flex:0 0 auto;
+  }
+
+  .apple-page .data-row:not(.data-head),
+  .apple-page .compact-overview-row,
+  .apple-page .summary-row,
+  .apple-page .hub-row,
+  .apple-page .accounting-task-row,
+  .apple-page .mobile-record,
+  .apple-page .invoice-source-row,
+  .apple-page .settings-value-row,
+  .apple-page .interactive-row{
+    min-height:58px;
+  }
+
+  .apple-page .metric-strip,
+  .apple-page .metric-grid{
+    gap:0!important;
+  }
+
+  .apple-page .metric{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  .apple-page .metric span,
+  .apple-page .metric small{
+    font-size:11px;
+  }
+
+  .apple-page .metric strong{
+    font-size:clamp(18px,5.4vw,24px);
+  }
+
+  /* Actions never force titles/descriptions into a third line. */
+  .apple-page .page-action-group{
+    width:100%;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    gap:8px;
+  }
+
+  .apple-page .page-action-group .button,
+  .apple-page .page-primary-action{
+    min-height:44px;
+  }
+
+  /* Lists use the full mobile width inside their single grouped card. */
+  .apple-page .section-block,
+  .apple-page .surface,
+  .apple-page .panel,
+  .apple-page .hub-panel,
+  .apple-page .settings-progressive-section{
+    width:100%;
+    min-width:0;
+  }
+
+  .apple-page .compact-list,
+  .apple-page .summary-list,
+  .apple-page .hub-row-list,
+  .apple-page .accounting-task-list,
+  .apple-page .customer-contact-list,
+  .apple-page .customer-linked-list,
+  .apple-page .customer-activity-list{
+    width:100%;
+    min-width:0;
+  }
+
+  /* Mobile primary/meta text is never allowed to widen the row. */
+  .apple-page .primary-cell,
+  .apple-page .record-top > span,
+  .apple-page .accounting-task-copy,
+  .apple-page .settings-value-copy{
+    min-width:0;
+  }
+}
+
+/* Very narrow phones: preserve information hierarchy instead of squeezing. */
+@media(max-width:390px){
+  .apple-page .metric-strip,
+  .apple-page .metric-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+
+  .apple-page .metric{
+    min-height:68px;
+    border-right:0!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+
+  .apple-page .metric:last-child{
+    border-bottom:0!important;
+  }
+
+  .apple-page .customer-quick-actions{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
+
