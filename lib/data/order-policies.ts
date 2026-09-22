@@ -7,9 +7,9 @@ export const orderPolicies: OrderPolicy[] = [
     orderId: 'ord-001',
     contractChain: {
       id: 'chain-001',
-      label: 'WTO Digital Workplace',
+      label: 'Digital Workplace',
       mandateReference: 'MV-BIN-2026-017',
-      procurementReference: 'WTO-DWP-2026-04',
+      procurementReference: 'DWP-2026-04',
       parties: [
         { id: 'party-end', name: 'Bundesstelle Digital Services (Demo)', role: 'end_customer' },
         { id: 'party-prime', name: 'Alpine Public IT AG', role: 'prime_contractor' },

@@ -17,7 +17,7 @@ create table if not exists customers (
   country text not null default 'Schweiz',
   uid text,
   payment_days integer not null default 30 check (payment_days between 0 and 180),
-  status text not null default 'active' check (status in ('active','inactive')),
+  status text not null default 'active' check (status in ('prospect','active','inactive')),
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

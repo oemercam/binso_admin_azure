@@ -21,7 +21,7 @@ export type Customer = {
   country: string
   uid?: string
   paymentDays: number
-  status: 'active' | 'inactive'
+  status: 'prospect' | 'active' | 'inactive'
   notes?: string
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, Textarea, Input } from '@/components/ui/form-controls'
+import { DatePicker, Select, Textarea, Input } from '@/components/ui/form-controls'
 
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { CompactInfoRow } from '@/components/ui/compact-info-row'
 import { useBusinessStore } from '@/components/state/business-store'
+import { StatusBadge } from '@/components/ui/status-badge'
 import { downloadTextFile } from '@/lib/browser/actions'
 
 const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -52,8 +53,8 @@ export default function AccountingPage() {
         <div className="section-title"><div><h2>Zu erledigen</h2><p>Die nächsten Buchhaltungsaufgaben</p></div></div>
         <div className="hub-row-list">
           <button type="button" className="hub-row hub-row-button" onClick={() => setSupplierOpen(true)}><span><strong>Lieferantenrechnung erfassen</strong><small>Neue externe Kosten zuordnen</small></span><Icon name="chevron" size={15}/></button>
-          <div className="hub-row static-hub-row"><span><strong>Kreditoren prüfen</strong><small>{supplierReviewCount} in Prüfung · {supplierOpenCount} freigegeben</small></span><span className="status neutral">{supplierReviewCount}</span></div>
-          <div className="hub-row static-hub-row"><span><strong>Überfällige Debitoren</strong><small>Kundenrechnungen und Mahnungen</small></span><span className={overdueCustomerCount ? 'status overdue' : 'status neutral'}>{overdueCustomerCount}</span></div>
+          <div className="hub-row static-hub-row"><span><strong>Kreditoren prüfen</strong><small>{supplierReviewCount} in Prüfung · {supplierOpenCount} freigegeben</small></span><StatusBadge status={supplierReviewCount ? "review" : "inactive"} label={String(supplierReviewCount)} /></div>
+          <div className="hub-row static-hub-row"><span><strong>Überfällige Debitoren</strong><small>Kundenrechnungen und Mahnungen</small></span><StatusBadge status={overdueCustomerCount ? 'overdue' : 'inactive'} label={String(overdueCustomerCount)} /></div>
           <button type="button" className="hub-row hub-row-button" onClick={exportCsv}><span><strong>Export vorbereiten</strong><small>Debitoren und Kreditoren als CSV</small></span><Icon name="chevron" size={15}/></button>
         </div>
       </section>
@@ -74,13 +75,13 @@ export default function AccountingPage() {
               title={`${invoice.number} · ${invoice.supplierName}`}
               meta={`${invoice.orderName || 'Ohne Auftrag'} · ${invoice.note || 'Keine Beschreibung'}`}
               amount={chf.format(invoice.amount)}
-              trailing={<><span className={`status ${invoice.status === 'paid' ? 'paid' : invoice.status === 'review' ? 'neutral' : 'active'}`}>{invoice.status === 'paid' ? 'Bezahlt' : invoice.status === 'review' ? 'In Prüfung' : 'Freigegeben'}</span>{invoice.status === 'review' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'open' })}>Freigeben</button>}{invoice.status === 'open' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'paid' })}>Bezahlt</button>}</>}
+              trailing={<><StatusBadge status={invoice.status === 'paid' ? 'paid' : invoice.status === 'review' ? 'review' : 'open'} label={invoice.status === 'paid' ? 'Bezahlt' : invoice.status === 'review' ? 'In Prüfung' : 'Freigegeben'} />{invoice.status === 'review' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'open' })}>Freigeben</button>}{invoice.status === 'open' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'paid' })}>Bezahlt</button>}</>}
             />)}
           </div>
         </section>
 
         <section className="section-block">
-          <div className="section-title"><div><h2>Mandatskosten</h2><p>Beispiel WTO Digital Workplace</p></div></div>
+          <div className="section-title"><div><h2>Auftragskosten</h2><p>Externe Leistungen nach Auftrag</p></div></div>
           <div className="compact-list operational-compact-list">
             <CompactInfoRow title="Nina Keller" meta="Mitarbeiterin im Stundenlohn · 15.5 h" amount={chf.format(15.5 * 72)} />
             <CompactInfoRow title="Meier Cloud Consulting GmbH" meta="Externe Firma · 14 h · MCC-2026-091" amount={chf.format(1750)} />
@@ -118,6 +119,6 @@ export default function AccountingPage() {
       onClose()
     }
 
-    return <StandardFormSheet open title={<>Lieferantenrechnung erfassen</>} description={<>Externe Leistung einem Auftrag zuordnen.</>} onClose={onClose} onSubmit={save} formId="accounting-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="accounting-page-sheet-1" className="button primary">Speichern</button></>}><div className="form-grid"><label><span>Lieferant *</span><Select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</Select></label><label><span>Auftrag</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</Select></label><label><span>Rechnungsnummer *</span><Input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required/></label><label><span>Fällig *</span><Input type="date" value={due} onChange={(e) => setDue(e.target.value)} required/></label><label><span>Netto CHF *</span><Input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><Input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><Textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div></StandardFormSheet>
+    return <StandardFormSheet open title={<>Lieferantenrechnung erfassen</>} description={<>Externe Leistung einem Auftrag zuordnen.</>} onClose={onClose} onSubmit={save} formId="accounting-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="accounting-page-sheet-1" className="button primary">Speichern</button></>}><div className="form-grid"><label><span>Lieferant *</span><Select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</Select></label><label><span>Auftrag</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</Select></label><label><span>Rechnungsnummer *</span><Input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><DatePicker value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required aria-label="Rechnungsdatum"/></label><label><span>Fällig *</span><DatePicker value={due} onChange={(e) => setDue(e.target.value)} required aria-label="Fällig"/></label><label><span>Netto CHF *</span><Input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><Input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><Textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div></StandardFormSheet>
   }
 }

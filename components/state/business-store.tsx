@@ -370,6 +370,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       const policy = createDefaultOrderPolicy(order.id, order.billingModel)
       setState((current) => ({
         ...current,
+        customers: current.customers.map((customer) => customer.id === quote.customerId && customer.status === 'prospect' ? { ...customer, status: 'active' as const } : customer),
         orders: [order, ...current.orders],
         orderPolicies: [policy, ...current.orderPolicies],
       }))

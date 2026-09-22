@@ -44,11 +44,13 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
 .navigation-item-desktop{ min-height: 36px; padding: 0 8px; border-radius: 7px; display: grid; grid-template-columns: var(--nav-icon-column) minmax(0,1fr); align-items: center; gap: 9px; font-size: 12px; font-weight: 500; }
 .navigation-item-desktop:hover, .navigation-item-desktop.active{ background: var(--surface-3); color: var(--text); }
 .navigation-item-desktop.active{ font-weight: 650; }
-.navigation-item-mobile{ min-height: var(--nav-row-height); display: grid; grid-template-columns: var(--nav-icon-column) minmax(0,1fr) var(--nav-chevron-size); align-items: center; gap: 9px; padding: 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; }
-.navigation-item-mobile:last-child{ border-bottom: 0; }
-.navigation-item-mobile:hover{ background: var(--surface-2); }
-.navigation-item-mobile:active{ background: var(--surface-3); }
-.navigation-item-mobile.active{ background: color-mix(in srgb,var(--surface-3) 72%,transparent); color: var(--text); font-weight: 600; }
+.navigation-item-mobile{ position:relative; min-height:var(--nav-row-height); display:grid; grid-template-columns:var(--nav-icon-column) minmax(0,1fr) var(--nav-chevron-size); align-items:center; gap:9px; padding:0; border-bottom:1px solid var(--line); font-size:14px; font-weight:500; transition:background 140ms ease,color 140ms ease,transform 120ms ease; }
+.navigation-item-mobile:last-child{ border-bottom:0; }
+.navigation-item-mobile:hover{ background:color-mix(in srgb,var(--surface-2) 58%,transparent); color:var(--text); }
+.navigation-item-mobile:active{ transform:scale(.99); background:color-mix(in srgb,var(--surface-2) 78%,transparent); }
+.navigation-item-mobile.active{ background:transparent; color:var(--text); font-weight:600; }
+.navigation-item-mobile.active::before{ content:""; position:absolute; left:-8px; top:50%; width:2px; height:20px; transform:translateY(-50%); border-radius:999px; background:var(--text); }
+.navigation-item-mobile.active .navigation-item-icon{ color:var(--text); }
 .navigation-item-icon{ width: var(--nav-icon-column); display: grid; place-items: center; color: var(--muted); }
 .navigation-item-label{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .navigation-item-chevron{ justify-self: end; color: var(--muted); }
@@ -79,6 +81,48 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
 .toggle-thumb{ position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--switch-thumb); box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform 120ms ease; }
 .toggle-control[aria-checked="true"] .toggle-thumb{ transform: translateX(16px); }
 
+
+.ui-search-field{ width:min(360px,100%); height:var(--field-height); min-width:0; display:grid; grid-template-columns:16px minmax(0,1fr) auto; align-items:center; gap:8px; padding:0 10px; border:1px solid var(--line-strong); border-radius:var(--field-radius); background:var(--surface); color:var(--muted); transition:border-color 120ms ease,box-shadow 120ms ease,background 120ms ease; }
+.ui-search-field:focus-within{ border-color:var(--focus-ring); box-shadow:0 0 0 2px color-mix(in srgb,var(--focus-ring) 24%,transparent); }
+.ui-search-field input{ width:100%; min-width:0; height:100%; border:0; outline:0; background:transparent; color:var(--text); font-size:var(--field-font-size); }
+.ui-search-field input::placeholder{ color:var(--muted); opacity:1; font-size:13px; }
+.ui-search-clear{ width:28px; height:28px; padding:0; border:0; border-radius:7px; display:grid; place-items:center; background:transparent; color:var(--muted); }
+.ui-search-clear:hover{ background:var(--surface-2); color:var(--text); }
+.ui-search-loading{ width:14px; height:14px; border:2px solid var(--line-strong); border-top-color:var(--text); border-radius:50%; animation:ui-spin .7s linear infinite; }
+@keyframes ui-spin{to{transform:rotate(360deg)}}
+.ui-checkbox{ appearance:none; -webkit-appearance:none; width:18px; min-width:18px; height:18px; margin:0; border:1px solid var(--line-strong); border-radius:5px; background:var(--surface); display:inline-grid; place-items:center; cursor:pointer; }
+.ui-checkbox::after{ content:""; width:8px; height:4px; border-left:2px solid var(--accent-contrast); border-bottom:2px solid var(--accent-contrast); transform:rotate(-45deg) scale(0); transition:transform 100ms ease; }
+.ui-checkbox:checked{ background:var(--accent); border-color:var(--accent); }
+.ui-checkbox:checked::after{ transform:rotate(-45deg) scale(1); }
+.ui-checkbox:focus-visible{ outline:2px solid var(--focus-ring); outline-offset:3px; }
+.ui-checkbox:disabled{ opacity:.4; cursor:not-allowed; }
+.ui-date-picker{ position:relative; width:100%; min-width:0; }
+.ui-date-trigger{ width:100%; height:var(--field-height); min-width:0; padding:0 11px; display:grid; grid-template-columns:minmax(0,1fr) 16px; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:var(--field-radius); background:var(--surface); color:var(--text); font-size:var(--field-font-size); text-align:left; }
+.ui-date-trigger:focus-visible{ border-color:var(--focus-ring); box-shadow:0 0 0 2px color-mix(in srgb,var(--focus-ring) 24%,transparent); outline:0; }
+.ui-date-popover{ position:absolute; z-index:1250; top:calc(100% + 5px); left:0; width:min(320px,calc(100vw - 32px)); padding:10px; border:1px solid var(--line-strong); border-radius:12px; background:var(--surface-elevated); box-shadow:var(--shadow); }
+.ui-date-sheet{ height:auto; }
+.ui-calendar{ min-width:0; display:grid; gap:10px; }
+.ui-calendar-head{ display:grid; grid-template-columns:32px minmax(0,1fr) 32px; align-items:center; gap:8px; }
+.ui-calendar-head strong{ text-align:center; font-size:14px; text-transform:capitalize; }
+.ui-calendar-nav{ width:32px; height:32px; border:0; border-radius:8px; display:grid; place-items:center; background:transparent; color:var(--text); }
+.ui-calendar-nav:hover{ background:var(--surface-2); }
+.ui-calendar-weekdays,.ui-calendar-grid{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; }
+.ui-calendar-weekdays span{ text-align:center; color:var(--muted); font-size:11px; font-weight:600; }
+.ui-calendar-day,.ui-calendar-blank{ aspect-ratio:1; min-width:0; }
+.ui-calendar-day{ border:0; border-radius:8px; background:transparent; color:var(--text); font-size:13px; }
+.ui-calendar-day:hover,.ui-calendar-day.today{ background:var(--surface-2); }
+.ui-calendar-day.selected{ background:var(--accent); color:var(--accent-contrast); font-weight:650; }
+.ui-calendar-day:disabled{ opacity:.3; cursor:not-allowed; }
+.ui-select-search{ width:100%; margin:0 0 5px; }
+.ui-select-option.active{ background:var(--surface-2); }
+.ui-select-empty{ padding:12px 10px; color:var(--muted); font-size:13px; }
+.inline-form-action{ display:flex; align-items:center; }
+.inline-prospect-form{ display:grid; gap:10px; padding:12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); }
+.status.status-success{ background:var(--green-bg); color:var(--green); }
+.status.status-info{ background:var(--blue-bg); color:var(--blue); }
+.status.status-warning{ background:var(--amber-bg); color:var(--amber); }
+.status.status-danger{ background:var(--red-bg); color:var(--red); }
+.status.status-neutral{ background:var(--surface-3); color:var(--text-2); }
 .ui-input, .ui-textarea, .ui-select-trigger{
   width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
   border: 1px solid var(--line-strong); border-radius: var(--field-radius);
@@ -120,7 +164,7 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
   .topbar{
     height: calc(var(--app-mobile-header-height) + var(--safe-top)); min-height: calc(var(--app-mobile-header-height) + var(--safe-top));
     grid-template-columns: minmax(0,1fr) auto; gap: 8px;
-    padding: var(--safe-top) max(var(--app-mobile-gutter),var(--safe-left)) 0 max(var(--app-mobile-gutter),var(--safe-right));
+    padding: var(--safe-top) max(var(--app-mobile-gutter),var(--safe-right)) 0 max(var(--app-mobile-gutter),var(--safe-left));
     border-bottom: 1px solid var(--line); background: var(--header-background);
   }
   .topbar.is-hidden{ transform: translateY(-100%); }
@@ -213,23 +257,23 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
 }
 
 @media(max-width:820px){
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
+
 
   .pill-separator{
     width:1px;
@@ -242,17 +286,17 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
     background:#30343a;
   }
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
 
   .quick-create-layer{
     background:rgba(10,12,15,.34);
@@ -296,13 +340,13 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
     font-size:9.5px;
   }
 
-  
+
 
   .command-input{
     min-height:52px;
   }
 
-  .command-input input, .search-field input{
+  .command-input input{
     font-size:16px!important;
   }
 
@@ -597,7 +641,7 @@ button, a{
 }
 
 @media(max-width:820px) {
-  
+
 
   @keyframes sheet-enter {
     from { transform:translateY(18px); opacity:.82; }
@@ -739,7 +783,7 @@ button, a, [role="button"]{
     box-shadow:0 18px 46px rgba(0,0,0,.42)!important;
   }
 
-  
+
 
   .quick-create-heading{
     padding:8px 12px 9px!important;
@@ -810,19 +854,19 @@ button, a, [role="button"]{
     -webkit-overflow-scrolling:touch;
   }
 
-  
 
-  
+
+
 
   .page-actions{display:none;}
 
-  
 
-  
 
-  
 
-  
+
+
+
+
 
   .pill-separator{
     height:18px!important;
@@ -843,12 +887,12 @@ button, a, [role="button"]{
   }
 
   /* prevent iOS form auto zoom while keeping the visual shell compact */
-  .command-input input, .search-field input{
+  .command-input input{
     font-size:16px!important;
   }
 
   /* Bottom sheets should scroll internally instead of moving the page behind them */
-  
+
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -870,15 +914,15 @@ button, a, [role="button"]{
 .payment-pick-row:first-child{ border-top:0; }
 .text-row-action{ border:0; background:transparent; padding:0; }
 .rule-toolbar{ display:flex; justify-content:flex-end; margin-bottom:12px; }
-.policy-editor{ display:grid; gap:14px; }
+
 .policy-toggle-list{ display:grid; gap:10px; }
 .policy-toggle-row{ min-height:42px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); }
 .policy-toggle-row:last-child{ border-bottom:0; }
 .assignment-action{ display:flex; justify-content:flex-end; }
 @media(max-width:820px){
   .policy-toggle-row{min-height:48px;}
-  
-  
+
+
 }
 .send-meta{display:flex;gap:20px;padding:10px 0 14px;border-bottom:1px solid var(--line);margin-bottom:14px;}.send-meta>span{display:grid;gap:2px;min-width:0;}.send-meta small{font-size:9px;color:var(--muted);}.send-meta strong{font-size:11px;font-weight:600;overflow-wrap:anywhere;}@media(max-width:820px){.send-meta{display:grid;gap:8px;}}
 .integration-banner{display:grid;gap:3px;margin:0 0 14px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text);}.integration-banner strong{font-size:11px;}.integration-banner span{font-size:10px;line-height:1.45;color:var(--muted);}
@@ -984,7 +1028,7 @@ html[data-theme="dark"] .document-fit-stage{
 
 /* Tablet: keep forms roomy and positions editable without horizontal clipping. */
 @media(max-width:1100px) and (min-width:821px) {
-  
+
 
   .line-editor-row, .quote-line-editor{
     grid-template-columns:minmax(0,1fr) repeat(3,minmax(86px,.34fr)) 32px;
@@ -997,26 +1041,26 @@ html[data-theme="dark"] .document-fit-stage{
 
 /* Mobile / PWA: full-width bottom sheets, sticky controls and no clipped fields. */
 @media(max-width:820px) {
-  
+
 
   .page{
     width:100%;
     min-width:0;
   }
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
 
   .form-grid{
     grid-template-columns:1fr;
@@ -1027,9 +1071,9 @@ html[data-theme="dark"] .document-fit-stage{
     grid-column:auto;
   }
 
-  
 
-  
+
+
 
   .line-editor-head{
     position:sticky;
@@ -1063,11 +1107,11 @@ html[data-theme="dark"] .document-fit-stage{
     grid-column:2;
   }
 
-  
 
-  
 
-  
+
+
+
 
   .document-fit-stage{
     padding:12px 10px 18px;
@@ -1108,7 +1152,7 @@ html[data-theme="dark"] .document-fit-stage{
     gap:6mm!important;
   }
 
-  
+
 }
 
 @media(max-width:420px) {
@@ -1124,7 +1168,7 @@ html[data-theme="dark"] .document-fit-stage{
     justify-self:start;
   }
 
-  
+
 }
 
 @media print {
@@ -1152,21 +1196,21 @@ html[data-theme="dark"] .document-fit-stage{
 }
 
 @media(max-width:820px) {
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 }
 
 .document-brand img{
@@ -1176,23 +1220,23 @@ html[data-theme="dark"] .document-fit-stage{
 }
 
 @media(max-width:820px) {
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
+
 }
 
 @media print {
@@ -1208,13 +1252,9 @@ html[data-theme="dark"] .document-fit-stage{
 
 /* Dialogs: always fit inside the viewport and keep content reachable. */
 
-.invoice-builder-sheet, .document-editor{
-  width:min(1040px,calc(100vw - 32px))!important;
-}
 
-.invoice-builder-sheet .form-grid, .document-editor .form-grid{
-  width:100%;
-}
+
+
 
 .line-editor-row, .quote-line-editor{
   width:100%;
@@ -1223,15 +1263,13 @@ html[data-theme="dark"] .document-fit-stage{
 
 /* Desktop / tablet: never crop controls at the viewport edges. */
 @media(min-width:821px) {
-  
 
-  
 
-  
 
-  .invoice-builder-sheet, .document-editor, .policy-editor{
-    width:min(1040px,calc(100vw - 48px))!important;
-  }
+
+
+
+
 
   .line-editor-row, .quote-line-editor{
     grid-template-columns:minmax(220px,1.6fr) minmax(72px,.45fr) minmax(82px,.5fr) minmax(104px,.65fr) minmax(78px,.5fr) 32px!important;
@@ -1317,7 +1355,7 @@ html[data-theme="dark"] .document-fit-stage{
     overflow:visible!important;
   }
 
-  .module-toolbar .search-field{
+  .module-toolbar .ui-search-field{
     min-width:0!important;
     flex:1 1 auto!important;
   }
@@ -1327,26 +1365,15 @@ html[data-theme="dark"] .document-fit-stage{
     white-space:nowrap!important;
   }
 
-  
 
-  .invoice-builder-sheet, .document-editor, .policy-editor{
-    width:100%!important;
-    max-width:none!important;
-    max-height:calc(100dvh - max(6px,var(--safe-top)))!important;
-    margin:0!important;
-    padding:0 14px!important;
-    border-radius:20px 20px 0 0!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-gutter:auto;
-  }
 
-  
 
-  
 
-  
+
+
+
+
+
 
   .form-grid{
     grid-template-columns:1fr!important;
@@ -1357,11 +1384,11 @@ html[data-theme="dark"] .document-fit-stage{
     grid-column:auto!important;
   }
 
-  
 
-  
 
-  
+
+
+
 
   .line-editor{
     width:100%!important;
@@ -1395,7 +1422,7 @@ html[data-theme="dark"] .document-fit-stage{
     grid-column:2!important;
   }
 
-  
+
 
   .document-fit-stage{
     min-height:0!important;
@@ -1405,7 +1432,7 @@ html[data-theme="dark"] .document-fit-stage{
 }
 
 @media(max-width:420px) {
-  
+
 
   .line-editor-row, .quote-line-editor{
     grid-template-columns:1fr!important;
@@ -1451,35 +1478,35 @@ html[data-theme="dark"] .document-fit-stage{
 }
 
 @media (max-width:820px) {
-  
 
-  
 
-  
+
+
+
 
   /* Cleaner floating pill with perfectly balanced central action. */
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
 
   /* Remove the visual duplicate line at the top of the mobile nav sheet. */
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
 
   /* Sales + Zahlungen readable as stacked rows on mobile. */
   .dashboard-bottom-grid{
@@ -1582,27 +1609,17 @@ html[data-theme="dark"] .document-fit-stage{
 
 /* Mobile + installed PWA */
 @media (max-width: 820px) {
-  
 
-  .invoice-builder-sheet, .document-editor, .policy-editor{
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: calc(100dvh - max(4px, var(--safe-top))) !important;
-    margin: 0 !important;
-    padding: 0 14px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    border-radius: 20px 20px 0 0 !important;
-    scrollbar-gutter: auto !important;
-  }
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
 
   .button, .icon-button, .row-link{
     min-height: var(--touch-h);
@@ -1635,11 +1652,11 @@ html[data-theme="dark"] .document-fit-stage{
     max-width: none !important;
   }
 
-  
 
-  
 
-  
+
+
+
 }
 
 html, body{max-width:100%;overflow-x:clip;}
@@ -1674,26 +1691,26 @@ img, svg{max-width:100%;}
   .document-fit-page .document-total-block{width:82mm!important;}
   .document-fit-page .document-footer{grid-template-columns:1.4fr 1fr 1fr!important;gap:6mm!important;}
 
-  
-  .invoice-builder-sheet, .document-editor, .policy-editor{width:100%!important;max-width:100%!important;max-height:calc(100dvh - max(4px,var(--safe-top)))!important;margin:0!important;padding-left:14px!important;padding-right:14px!important;overflow-y:auto!important;overflow-x:hidden!important;border-radius:20px 20px 0 0!important;}
-  
-  
-  
-  
-  
-  
 
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
   .profile-popover, .notifications-popover{left:10px!important;right:10px!important;width:auto!important;max-height:calc(100dvh - 76px - var(--safe-top) - var(--safe-bottom))!important;overflow-y:auto!important;}
 
-  
-  
-  
-  
+
+
+
+
 
   .compact-list>a, .compact-list>div{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:4px 12px!important;align-items:start!important;padding:12px 0!important;text-decoration:none!important;border-bottom:1px solid var(--line)!important;}
   .compact-list>a:last-child, .compact-list>div:last-child{border-bottom:0!important;}
@@ -1764,13 +1781,13 @@ body{overflow-x:hidden;}
 /* Preview is a dedicated experience, never mixed with app navigation. */
 
 @media (max-width:1100px) and (min-width:821px){
-  
+
   .page-header{align-items:flex-start;}
   .page-actions, .page-action-group{flex-wrap:wrap;justify-content:flex-end;}
 }
 
 @media (max-width:820px){
-  
+
   .page{padding-top:18px!important;}
   .page-header, .page-title{
     align-items:flex-start!important;
@@ -1785,25 +1802,25 @@ body{overflow-x:hidden;}
   .page-description{font-size:12px!important;line-height:1.45!important;}
 
   /* While a task is open the global pill must never cover content/actions. */
-  
+
 
   /* Default compact task = bottom sheet. */
-  
-  
+
+
 
   /* Long task = full-screen editor. */
-  
-  
 
-  
-  
-  
-  
+
+
+
+
+
+
 
   /* Inputs: native feel, no iOS zoom, no horizontal clipping. */
-  
-  
-  
+
+
+
   .form-grid, .settings-inline-fields{grid-template-columns:1fr!important;gap:13px!important;}
   .form-grid .full, .settings-field.full{grid-column:auto!important;}
 
@@ -1849,7 +1866,7 @@ body{overflow-x:hidden;}
 }
 
 @media(max-width:420px){
-  
+
   .page-header{grid-template-columns:1fr!important;}
   .page-actions, .page-action-group{justify-content:flex-start!important;}
 }
@@ -1860,35 +1877,29 @@ body{overflow-x:hidden;}
 
 @media (max-width:820px){
   /* Long edit flows must behave like a native full-screen screen, not a sheet below app chrome. */
-  body:has(.document-editor), body:has(.policy-editor), body:has(.invoice-builder-sheet){
-    overflow:hidden!important;
-  }
 
-  body:has(.document-editor) .desktop-nav, body:has(.policy-editor) .desktop-nav, body:has(.invoice-builder-sheet) .desktop-nav{
-    display:none!important;
-  }
 
-  
 
-  
+
+
+
+
 
   /* Compact native editor header: no dead space above content. */
-  
 
-  
 
-  
 
-  
 
-  
 
-  .document-editor .form-grid, .policy-editor .form-grid, .invoice-builder-sheet .form-grid{
-    padding-bottom:8px!important;
-  }
+
+
+
+
+
+
 
   /* Bottom action bar remains reachable above the home indicator. */
-  
+
 }
 
 :root{
@@ -1918,28 +1929,28 @@ body{overflow-x:hidden;}
 /* Business actions belong to the preview, not to the global app navigation. */
 
 @media(max-width:1100px){
-  
 
-  
 
-  
+
+
+
 }
 
 @media(max-width:820px){
-  
+
 
   /* The overlay fully covers topbar and pill because of z-index 1000. */
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
 }
 
 :root{
@@ -1954,37 +1965,37 @@ body{overflow-x:hidden;}
 /* New centralized primitives. */
 
 @media(max-width:820px){
-  
 
-  
+
+
 
   /* Short tasks behave like native bottom sheets. */
-  
 
-  
 
-  
 
-  
+
+
+
+
 
   /* Bottom sheets close via swipe/backdrop convention; avoid redundant X on mobile. */
-  
 
-  
+
+
 
   /* Long tasks are true full-screen editor screens. */
-  body:has(.document-editor) .desktop-nav, body:has(.policy-editor) .desktop-nav, body:has(.invoice-builder-sheet) .desktop-nav{display:none!important;}
 
-  
 
-  
 
-  
 
-  
 
-  
-  
+
+
+
+
+
+
+
   .button, .icon-button, .row-link{touch-action:manipulation;}
 }
 
@@ -2184,6 +2195,11 @@ body{overflow-x:hidden;}
 .hub-row-button{cursor:pointer;}
 .static-hub-row{cursor:default;}
 
+.dashboard-quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 18px;}
+.dashboard-quick-actions a{min-height:40px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--text);font-size:12px;font-weight:600;text-decoration:none;}
+.dashboard-quick-actions a:hover{background:var(--surface-2);}
+.mobile-trend-summary{display:none;}
+
 /* Order details = one hub, one selected work area. */
 .order-kpi-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 0 18px;}
 .order-kpi-strip>span{display:grid;gap:2px;padding:10px 14px;border-right:1px solid var(--line);}
@@ -2215,7 +2231,7 @@ body{overflow-x:hidden;}
 .evidence-hub-row{grid-template-columns:minmax(0,1fr) auto auto;}
 
 /* Long forms = grouped tasks instead of one visual wall. */
-.policy-groups, .document-editor>.edit-step, .invoice-builder-sheet>.edit-step{display:block;}
+
 .policy-group-body, .edit-step-body{padding:2px 0 16px;}
 .policy-group .policy-toggle-list{margin-top:8px;}
 .edit-step+.edit-step{margin-top:0;}
@@ -2230,12 +2246,17 @@ body{overflow-x:hidden;}
   .owner-metrics .metric{padding:10px 0!important;border-right:0!important;}
   .owner-metrics .metric:nth-child(odd){padding-right:12px!important;border-right:1px solid var(--line)!important;}
   .owner-metrics .metric:nth-child(even){padding-left:12px!important;}
-  .owner-metrics .metric:nth-child(n/**/+4){display:none!important;}
   .dashboard-layout{display:block!important;margin-bottom:14px!important;}
   .dashboard-layout .chart-surface{display:none!important;}
   .dashboard-layout .focus-surface{padding:0!important;border-left:0!important;border-top:1px solid var(--line)!important;}
   .mobile-dashboard-summary{display:grid;border-top:1px solid var(--line);margin-top:14px;}
   .desktop-dashboard-rich{display:none!important;}
+  .dashboard-quick-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:14px;}
+  .dashboard-quick-actions a{min-height:42px;}
+  .mobile-trend-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:14px;}
+  .mobile-trend-summary span{display:grid;gap:2px;min-width:0;}
+  .mobile-trend-summary small{font-size:10px;color:var(--muted);}
+  .mobile-trend-summary strong{font-size:14px;}
 
   /* Order details: Apple-settings style hub first, selected section second. */
   .order-kpi-strip{grid-template-columns:repeat(3,1fr);margin-bottom:14px;}
@@ -2506,7 +2527,7 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 
   body{font-size:var(--type-body)!important;}
 
-  
+
 
   .primary-cell strong, .compact-row-title, .hub-row strong, .record-top strong, .compact-list strong{
     font-size:14px!important;
@@ -2517,8 +2538,8 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
   }
 
   .status{font-size:11px!important;}
-  
-  
+
+
 }
 
 :root{
@@ -2550,11 +2571,10 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 }
 
 :root{
-  
-  
-  
+
+
+
   --mobile-page-inline:16px;
-  --mobile-pill-height:64px;
   --mobile-pill-gap:14px;
   --mobile-content-bottom:132px;
   --sheet-inline:18px;
@@ -2565,35 +2585,35 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 
 @media(max-width:820px){
   /* Normal pages always finish clearly above the floating navigation pill. */
-  
+
 
   .page{min-width:0!important;overflow:visible!important;}
 
   /* Floating pill follows the visible iOS viewport, not the layout viewport. */
-  
+
 
   /* The menu behaves like a native bottom sheet. It owns the bottom edge,
      therefore it does not reserve space for the hidden global pill. */
-  
 
-  
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
 
   /* Short tasks: true bottom sheet. */
   .quick-create-layer{
@@ -2608,31 +2628,31 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
     overflow:hidden!important;
   }
 
-  
+
 
   /* Short-sheet headers/actions use the exact same horizontal insets. */
-  
 
-  
+
+
 
   /* Long forms: size to the *visible* iOS viewport. Safari's bottom toolbar may
      overlap the layout viewport; VisualViewport prevents the footer being cut. */
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
 
   /* Forms stay fully inside the viewport. */
-  
+
 
   /* Dedicated document preview also follows the visible viewport. */
-  
-  
+
+
 }
 
 .app-error-screen{
@@ -2672,11 +2692,11 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
   .page-primary-action{display:none!important;}
 
   /* Compact, quiet top chrome. */
-  
-  
-  
-  
-  
+
+
+
+
+
 
   /* Page actions are only shown when a non-create action remains, e.g. Export. */
   .page-actions:has(.page-primary-action:only-child){display:none!important;}
@@ -2689,7 +2709,6 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 
   /* Dashboard: three useful KPIs, with the third spanning the row. */
   .owner-metrics{grid-template-columns:1fr 1fr!important;}
-  .owner-metrics .metric:nth-child(4){display:none!important;}
   .owner-metrics .metric:nth-child(3){grid-column:1/-1!important;border-right:0!important;padding-left:0!important;}
   .owner-metrics .metric:nth-child(3){border-bottom:0!important;}
   .focus-item{text-decoration:none!important;color:inherit!important;}
@@ -2697,14 +2716,14 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 
   /* Full-screen tasks really fill the app viewport. 100dvh already tracks
      the dynamic Safari viewport; safe-area padding protects system UI. */
-  
 
-  
 
-  
-  
 
-  
+
+
+
+
+
 
   /* Accounting supplier invoices: exactly two information lines on mobile. */
   .operational-compact-list>.accounting-supplier-row{
@@ -2724,7 +2743,7 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
   .accounting-supplier-row .text-row-action{min-width:auto!important;min-height:28px!important;padding:0 4px!important;font-size:11px!important;}
 
   /* Floating nav remains clear of the final content. */
-  
+
 }
 
 @media(max-width:420px){
@@ -2762,35 +2781,32 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 @media(max-width:820px){
   :root{--ui-page-gutter:var(--ui-page-gutter-mobile);}
 
-  
+
 
   /* Global creation belongs to the bottom pill on mobile.
      The topbar create control is removed structurally; page-level create actions
      are hidden here so there is only one + affordance on mobile/PWA. */
   .page-primary-action, .page-actions>.page-primary-action, .page-action-group>.page-primary-action{display:none!important;}
 
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
 
   /* Canonical fullscreen task. */
-  
-  
-  
-  .document-editor>.form-grid, .policy-editor>.form-grid, .invoice-builder-sheet>.form-grid{
-    overflow:auto!important;
-    min-height:0!important;
-  }
+
+
+
+
 
   /* No app chrome may cover an active task. */
-  
 
-  
-  
-  
+
+
+
+
 }
 
 @media(max-width:820px){
@@ -2798,29 +2814,29 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
     --ui-mobile-topbar-content:48px;
   }
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
-  
+
+
+
+
+
+
+
 
   /* On mobile the page-specific create action is represented by the single
      centre + in the pill. Secondary page actions (e.g. Export) stay visible. */
   .page-primary-action{display:none!important;}
   .page-action-group:has(.page-primary-action) .page-primary-action{display:none!important;}
 
-  
+
 }
 
 @media(max-width:820px) and (prefers-reduced-motion:reduce){
-  
+
 }
 
 .compact-info-row{
@@ -2935,37 +2951,37 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 
 @media(max-width:820px){
   /* ---------- Page density ---------- */
-  
+
   .page{max-width:none!important;}
 
   /* ---------- Flat mobile header + correctly sized single logo ---------- */
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
 
   /* ---------- Mobile navigation sheet ---------- */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
 
   /* ---------- Generic sheet geometry: title aligns with content; close glyph aligns with trailing content ---------- */
-  
-  
-  
+
+
+
 
 }
 
@@ -3313,7 +3329,8 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 .confirmation-copy{font-size:11px;line-height:1.5;color:var(--text-2);}
 
 @media(max-width:820px){
-  .toast-viewport{top:calc(var(--app-safe-top) + var(--app-mobile-header-height) + 8px);left:12px;right:12px;width:auto;}
+  .ui-search-field,.ui-date-trigger{height:42px;min-height:42px;}
+  .toast-viewport{top:calc(var(--safe-top) + var(--app-mobile-header-height) + 8px);left:12px;right:12px;width:auto;}
   .action-footer, .app-sheet-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
   .action-footer>.button, .app-sheet-actions>.button{height:42px;min-height:42px;padding:0 8px;font-size:10.5px;}
 }
@@ -3325,14 +3342,6 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
   }
 }
 
-:root{
-  
-  --app-mobile-sheet-gutter: 16px;
-  
-  --app-tap-size: 44px;
-  --app-safe-top: env(safe-area-inset-top, 0px);
-  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
-}
 
 /* One logo node only. Theme is handled by filter, never by two stacked images. */
 
@@ -3343,18 +3352,6 @@ button:disabled, .button:disabled, input:disabled, select:disabled, textarea:dis
 /* Navigation list inside the shared sheet. */
 
 /* Canonical overlay controls and shared navigation geometry. */
-:root{
-  
-  
-  
-  
-  
-  --nav-gap:10px;
-  --nav-hover-surface:var(--surface-2);
-  --nav-selected-surface:var(--surface-3);
-  --overlay-control-visible:34px;
-  --overlay-control-target:44px;
-}
 
 @media(max-width:390px){
   :root{}
@@ -3366,41 +3363,33 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
 
 @media (max-width:820px) {
   html, body{ overflow-x:hidden; }
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
   .page{ width:100%; max-width:none; margin:0; padding-left:0; padding-right:0; }
   .page-header, .module-toolbar, .section-block, .surface{ margin-left:0; margin-right:0; }
 
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
 
   .setting-line, .settings-toggle-row{ min-height:48px; grid-template-columns:minmax(0,1fr) auto; align-items:center; column-gap:12px; }
-  
+
 }
 
 @media (prefers-reduced-motion:reduce) {
-  
+
 }
 
-:root{
-  
-  
-
-  /* Maximise usable width while preserving comfortable edge spacing. */
-  
-  --app-mobile-sheet-gutter: clamp(14px, 4.1vw, 18px);
-  --app-tablet-gutter: clamp(18px, 3vw, 24px);
-}
+:root{ --app-tablet-gutter:clamp(18px,3vw,24px); }
 
 @media (max-width:820px) {
   html, body{
@@ -3410,9 +3399,9 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
     overflow-x:hidden;
   }
 
-  
 
-  
+
+
 
   .page, .page > *, .module-toolbar, .data-list, .compact-list, .summary-list, .section-block, .surface{
     min-width:0;
@@ -3420,13 +3409,13 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
     box-sizing:border-box;
   }
 
-  
 
-  
 
-  
 
-  
+
+
+
+
 
   button{
     max-width:100%;
@@ -3435,33 +3424,9 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
 }
 
 @media (min-width:821px) and (max-width:1100px) {
-  
+
 }
 
-/* Extremely narrow phones: preserve usable content width. */
-@media (max-width:340px) {
-  :root{
-    
-    --app-mobile-sheet-gutter: 12px;
-  }
-}
-
-/* Larger phones: a little more breathing room without wasting width. */
-@media (min-width:430px) and (max-width:820px) {
-  :root{
-    
-    --app-mobile-sheet-gutter: 18px;
-  }
-}
-
-:root{
-  --mobile-ui-gutter: max(12px, env(safe-area-inset-left, 0px));
-  --mobile-ui-gutter-right: max(12px, env(safe-area-inset-right, 0px));
-  --mobile-pill-width: 336px;
-  --mobile-pill-height: 56px;
-  --mobile-pill-bottom: 12px;
-  --mobile-sheet-radius: 22px;
-}
 
 .quick-actions-list{
   display: grid;
@@ -3497,80 +3462,30 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row{ text-dec
 .quick-actions-list a > svg{ justify-self: end; }
 
 @media (max-width: 820px) {
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
 
-  
-
-  .invoice-builder-sheet, .document-editor, .policy-editor{
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    
-    margin: 0 !important;
-    padding: 0 14px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-    border-radius: var(--mobile-sheet-radius) var(--mobile-sheet-radius) 0 0 !important;
-  }
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
 }
 
-@media (max-width: 390px) {
-  :root{ --mobile-pill-width: 304px; }
-  
-  
-}
+
 
 @media (min-width: 821px) {
-  
 
-  
+
+
 
   .quick-create-sheet{ width: min(620px, calc(100vw - 48px)) !important; }
 }
 
-:root{
-  --sheet-mobile-radius:22px;
-  --sheet-mobile-gutter:clamp(14px,4vw,18px);
-  --sheet-mobile-top-gap:max(8px,env(safe-area-inset-top,0px));
-  --sheet-mobile-bottom-safe:env(safe-area-inset-bottom,0px);
-}
 
 /* The viewport itself is the anchor. No calculated height variable. */
 

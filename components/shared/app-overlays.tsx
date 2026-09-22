@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@/components/ui/form-controls'
+import { SearchField } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -15,7 +15,7 @@ import { signOutUrl } from '@/lib/auth/urls'
 const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[] }> = [
   { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'] },
   { label: 'Angebot erstellen', description: 'Leistungen offerieren und versenden', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'] },
-  { label: 'Auftrag erstellen', description: 'Neues Mandat oder Projekt eröffnen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'] },
+  { label: 'Auftrag erstellen', description: 'Neuen Auftrag erfassen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'] },
   { label: 'Zeit erfassen', description: 'Arbeitszeit direkt auf Auftrag buchen', icon: 'time', href: '/time?new=1', roles: ['owner', 'admin', 'employee'] },
   { label: 'Rechnung erstellen', description: 'Offene Zeiten oder freie Positionen verrechnen', icon: 'invoices', href: '/invoices?new=1', roles: ['owner', 'admin', 'finance'] },
   { label: 'Zahlung erfassen', description: 'Zahlung einer offenen Rechnung zuordnen', icon: 'credit-card', href: '/invoices?payment=1', roles: ['owner', 'admin', 'finance'] },
@@ -121,11 +121,7 @@ export function AppOverlays({
         desktop="dialog"
         showGrabber={false}
       >
-        <div className="command-input">
-          <Icon name="search" size={18} />
-          <Input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" />
-          <kbd>ESC</kbd>
-        </div>
+        <div className="command-input"><SearchField ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" /><kbd>ESC</kbd></div>
         <div className="command-results">
           <span className="command-label">{query ? 'Treffer' : 'Schnellzugriff'}</span>
           {results.map((entry) => (

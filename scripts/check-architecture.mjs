@@ -30,7 +30,9 @@ forbid(/(?:Pwa|PWA)(?:Menu|Navigation|Header)/, 'PWA-specific visual navigation/
 forbid(/window\.visualViewport|window\.innerHeight/, 'viewport APIs must stay in DeviceEnvironmentProvider', (f) => f === 'components/providers/device-environment-provider.tsx')
 forbid(/--app-mobile-gutter\s*:/, 'mobile gutter may only be defined in app/app-ui.css', (f) => f === 'app/app-ui.css')
 forbid(/<select\b|<textarea\b|<input\b/, 'business/shared UI must use canonical form controls', (f) => f === 'components/ui/form-controls.tsx')
-forbid(/(?:>\s*[×X]\s*<|name=["']close["'])/, 'raw close/remove controls are forbidden', (f) => f === 'components/ui/close-button.tsx')
+forbid(/<Input\b[^>]*\btype=[\"']date[\"']/, 'business pages must use canonical DatePicker instead of Input type=date')
+forbid(/<Input\b[^>]*\btype=[\"']checkbox[\"']/, 'business pages must use canonical Checkbox instead of Input type=checkbox')
+forbid(/(?:>\s*[×X]\s*<|name=["']close["'])/, 'raw close/remove controls are forbidden', (f) => f === 'components/ui/close-button.tsx' || f === 'components/ui/form-controls.tsx')
 forbid(/\/brand\/(?:logo|icon)-black\.svg/, 'app identity assets must be rendered through AppLogo', (f) => f === 'components/ui/binso-logo.tsx' || f === 'components/documents/business-document.tsx')
 
 const navSource = readFileSync(join(root, 'components/navigation/nav-items.ts'), 'utf8')

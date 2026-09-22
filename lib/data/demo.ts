@@ -27,7 +27,7 @@ export const customers: Customer[] = [
     uid: 'CHE-111.222.333 MWST',
     paymentDays: 30,
     status: 'active',
-    notes: 'Vertragspartner für das WTO-Mandat Digital Workplace. Leistungserbringung für Bundesstelle Digital Services (Demo).',
+    notes: 'Vertragspartner für das Auftrag Digital Workplace. Leistungserbringung für Bundesstelle Digital Services (Demo).',
   },
   {
     id: 'cus-002',
@@ -114,9 +114,9 @@ export const orders: Order[] = [
     customerName: 'Alpine Public IT AG',
     endCustomerName: 'Bundesstelle Digital Services (Demo)',
     primeContractorName: 'Alpine Public IT AG',
-    name: 'WTO Digital Workplace – Mandat Binso',
+    name: 'Digital Workplace',
     mandateRef: 'MV-BIN-2026-017',
-    procurementRef: 'WTO-DWP-2026-04',
+    procurementRef: 'DWP-2026-04',
     budgetHours: 1600,
     usedHours: 334.5,
     salesRate: 165,
@@ -154,32 +154,32 @@ export const orders: Order[] = [
 
 export const timeEntries: TimeEntry[] = [
   {
-    id: 'time-001', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-001', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-01', hours: 8,
     description: 'Workplace Architektur, Abstimmung und technische Führung', billable: true, approved: true, salesRate: 165, internalCostRate: 105, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-002', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-002', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-02', hours: 7.5,
     description: 'Client Engineering und Pakettests', billable: true, approved: true, salesRate: 145, internalCostRate: 72, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-003', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-003', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-03', hours: 8,
     description: 'M365 Engineering und technische Analyse', billable: true, approved: true, salesRate: 165, internalCostRate: 125, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-004', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-004', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-08', hours: 8,
     description: 'Security Hardening und Review', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
-    id: 'time-005', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-005', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-09', hours: 8,
     description: 'Treiber- und Hardwarevalidierung', billable: true, approved: true, salesRate: 145, internalCostRate: 72,
   },
   {
-    id: 'time-006', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-006', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-10', hours: 6,
     description: 'Intune Policy Review', billable: true, approved: true, salesRate: 165, internalCostRate: 125,
   },
@@ -197,7 +197,7 @@ export const timeEntries: TimeEntry[] = [
 
 export const invoices: Invoice[] = [
   {
-    id: 'inv-001', number: 'RE-2026-009', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso',
+    id: 'inv-001', number: 'RE-2026-009', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'Digital Workplace',
     period: 'September 2026', issueDate: '2026-09-18', due: '2026-10-18', status: 'sent',
     lines: [
       { id: 'il-001', description: '01.09.2026 – Workplace Architektur, Abstimmung und technische Führung – Ömer Cam', quantity: 8, unit: 'h', unitPrice: 165, vatRate: 8.1, sourceTimeEntryIds: ['time-001'] },
@@ -241,9 +241,9 @@ export const payments: Payment[] = [
 export const supplierInvoices: SupplierInvoice[] = [
   {
     id: 'sinv-001', number: 'MCC-2026-091', supplierId: 'sup-001', supplierName: 'Meier Cloud Consulting GmbH',
-    orderId: 'ord-001', orderName: 'WTO Digital Workplace – Mandat Binso', invoiceDate: '2026-09-15', due: '2026-10-05',
+    orderId: 'ord-001', orderName: 'Digital Workplace', invoiceDate: '2026-09-15', due: '2026-10-05',
     netAmount: 1750, vatAmount: 141.75, amount: 1891.75, status: 'open',
-    note: '14 h externe Engineering-Leistung à CHF 125.00 für das WTO-Mandat.',
+    note: '14 h externe Engineering-Leistung à CHF 125.00 für das Auftrag.',
   },
 ]
 
@@ -272,7 +272,7 @@ export const revenueSeries = [
 ]
 
 export const activity = [
-  { time: 'Heute, 09:12', title: '8.0 h erfasst', meta: 'WTO Digital Workplace – Mandat Binso' },
+  { time: 'Heute, 09:12', title: '8.0 h erfasst', meta: 'Digital Workplace' },
   { time: 'Gestern, 16:40', title: 'Lieferantenrechnung erfasst', meta: 'MCC-2026-091 · CHF 1’891.75' },
   { time: '18.09, 14:08', title: 'Zahlung verbucht', meta: 'RE-2026-007 · CHF 8’383.16' },
   { time: '17.09, 11:32', title: 'Angebot versendet', meta: 'AN-2026-014 · Muster Industrie AG' },

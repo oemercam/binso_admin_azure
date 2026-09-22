@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { isMobileWidth } from '@/lib/ui/breakpoints'
 
 type Orientation = 'portrait' | 'landscape'
@@ -70,26 +70,57 @@ function readEnvironment(): DeviceEnvironment {
   }
 }
 
-function writeViewportTokens(value: DeviceEnvironment) {
+function sameEnvironment(a: DeviceEnvironment, b: DeviceEnvironment) {
+  return Object.keys(a).every((key) => a[key as keyof DeviceEnvironment] === b[key as keyof DeviceEnvironment])
+}
+
+function writeViewportTokens(value: Pick<DeviceEnvironment, 'layoutViewportWidth' | 'layoutViewportHeight' | 'visualViewportWidth' | 'visualViewportHeight' | 'visualViewportOffsetTop'>) {
   const root = document.documentElement
-  root.style.setProperty('--app-layout-viewport-width', `${value.layoutViewportWidth}px`)
-  root.style.setProperty('--app-layout-viewport-height', `${value.layoutViewportHeight}px`)
-  root.style.setProperty('--app-visual-viewport-width', `${value.visualViewportWidth}px`)
-  root.style.setProperty('--app-visual-viewport-height', `${value.visualViewportHeight}px`)
-  root.style.setProperty('--app-visual-viewport-offset-top', `${value.visualViewportOffsetTop}px`)
+  const values: Record<string, number> = {
+    '--app-layout-viewport-width': value.layoutViewportWidth,
+    '--app-layout-viewport-height': value.layoutViewportHeight,
+    '--app-visual-viewport-width': value.visualViewportWidth,
+    '--app-visual-viewport-height': value.visualViewportHeight,
+    '--app-visual-viewport-offset-top': value.visualViewportOffsetTop,
+  }
+  for (const [name, next] of Object.entries(values)) {
+    const text = `${Math.round(next * 100) / 100}px`
+    if (root.style.getPropertyValue(name) !== text) root.style.setProperty(name, text)
+  }
 }
 
 export function DeviceEnvironmentProvider({ children }: { children: ReactNode }) {
   const [value, setValue] = useState<DeviceEnvironment>(initial)
+  const currentRef = useRef<DeviceEnvironment>(initial)
 
   useEffect(() => {
     let frame = 0
-    const update = () => {
+    let viewportFrame = 0
+
+    const commitEnvironment = () => {
       if (frame) cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => {
         const next = readEnvironment()
         writeViewportTokens(next)
-        setValue(next)
+        if (!sameEnvironment(currentRef.current, next)) {
+          currentRef.current = next
+          setValue(next)
+        }
+      })
+    }
+
+    const updateViewportTokensOnly = () => {
+      if (viewportFrame) cancelAnimationFrame(viewportFrame)
+      viewportFrame = requestAnimationFrame(() => {
+        const visual = window.visualViewport
+        if (!visual) return
+        writeViewportTokens({
+          layoutViewportWidth: window.innerWidth,
+          layoutViewportHeight: window.innerHeight,
+          visualViewportWidth: visual.width,
+          visualViewportHeight: visual.height,
+          visualViewportOffsetTop: visual.offsetTop,
+        })
       })
     }
 
@@ -104,25 +135,27 @@ export function DeviceEnvironmentProvider({ children }: { children: ReactNode })
     ]
     const visual = window.visualViewport
 
-    update()
-    window.addEventListener('resize', update, { passive: true })
-    window.addEventListener('orientationchange', update, { passive: true })
-    visual?.addEventListener('resize', update, { passive: true })
-    visual?.addEventListener('scroll', update, { passive: true })
-    media.forEach((query) => query.addEventListener('change', update))
+    commitEnvironment()
+    window.addEventListener('resize', commitEnvironment, { passive: true })
+    window.addEventListener('orientationchange', commitEnvironment, { passive: true })
+    visual?.addEventListener('resize', commitEnvironment, { passive: true })
+    // offsetTop can change while Safari's chrome/keyboard moves. Keep this lightweight:
+    // update CSS custom properties only, never the broad React context on scroll.
+    visual?.addEventListener('scroll', updateViewportTokensOnly, { passive: true })
+    media.forEach((query) => query.addEventListener('change', commitEnvironment))
 
     return () => {
       if (frame) cancelAnimationFrame(frame)
-      window.removeEventListener('resize', update)
-      window.removeEventListener('orientationchange', update)
-      visual?.removeEventListener('resize', update)
-      visual?.removeEventListener('scroll', update)
-      media.forEach((query) => query.removeEventListener('change', update))
+      if (viewportFrame) cancelAnimationFrame(viewportFrame)
+      window.removeEventListener('resize', commitEnvironment)
+      window.removeEventListener('orientationchange', commitEnvironment)
+      visual?.removeEventListener('resize', commitEnvironment)
+      visual?.removeEventListener('scroll', updateViewportTokensOnly)
+      media.forEach((query) => query.removeEventListener('change', commitEnvironment))
     }
   }, [])
 
-  const memoized = useMemo(() => value, [value])
-  return <DeviceEnvironmentContext.Provider value={memoized}>{children}</DeviceEnvironmentContext.Provider>
+  return <DeviceEnvironmentContext.Provider value={value}>{children}</DeviceEnvironmentContext.Provider>
 }
 
 export function useDeviceEnvironment() {

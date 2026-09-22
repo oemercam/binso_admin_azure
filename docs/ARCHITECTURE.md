@@ -18,7 +18,7 @@
 
 ## Forms
 
-`components/ui/form-controls.tsx` provides canonical `Input`, `Textarea`, `Select` and `FormField`. Select uses a controlled popover on desktop and the existing responsive overlay architecture on mobile/PWA. Business pages do not use raw native selects or page-specific control geometry.
+`components/ui/form-controls.tsx` provides canonical `Input`, `Textarea`, `SearchField`, `Checkbox`, `Select`, `DatePicker` and `FormField`. Select uses a controlled popover on desktop and the existing responsive overlay architecture on mobile/PWA; large datasets can opt into search. DatePicker displays Swiss dates (`DD.MM.YYYY`) while preserving ISO values internally. Business pages do not create parallel form-control geometry.
 
 ## App identity
 
@@ -35,3 +35,11 @@ HTTP behaviour is centralized under `lib/http/`. Authentication logic is central
 ## Azure
 
 Production targets Azure App Service. GitHub Actions builds a Next.js standalone artifact and authenticates to Azure through OIDC/federated credentials.
+
+## Business flow
+
+Customer records support a lightweight `prospect` state so quotes can be drafted before full master data is required. Accepted quote conversion reuses the same customer record and activates the prospect when an order is created. Contextual actions pass known order/customer context into time and invoice creation instead of asking for it again.
+
+## Scroll ownership
+
+Normal application scrolling has one primary page owner. `DeviceEnvironmentProvider` keeps stable environment state in React while high-frequency visual viewport offsets are written through lightweight CSS-variable updates. Overlays use `OverlayManager` for background locking and AppSheet content remains the only scroll region inside a sheet.

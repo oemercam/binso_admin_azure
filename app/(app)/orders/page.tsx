@@ -1,9 +1,9 @@
 'use client'
 
-import { Select, Input } from '@/components/ui/form-controls'
+import { SearchField, Select, Input } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
@@ -22,12 +22,14 @@ export default function OrdersPage() {
   const [open, setOpen] = useState(false)
   const [customerId, setCustomerId] = useState(store.customers[0]?.id ?? '')
   const [name, setName] = useState('')
-  const [mandateRef, setMandateRef] = useState('')
+  const [reference, setReference] = useState('')
   const [endCustomerName, setEndCustomerName] = useState('')
   const [budgetHours, setBudgetHours] = useState('160')
   const [salesRate, setSalesRate] = useState('165')
   const [costRate, setCostRate] = useState('105')
   const [billingModel, setBillingModel] = useState<BillingModel>('time')
+  const [query, setQuery] = useState('')
+  const filteredOrders = useMemo(() => { const q = query.trim().toLocaleLowerCase('de-CH'); return q ? store.orders.filter((order) => `${order.name} ${order.customerName} ${order.mandateRef ?? ''} ${order.procurementRef ?? ''}`.toLocaleLowerCase('de-CH').includes(q)) : store.orders }, [query, store.orders])
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
@@ -52,7 +54,7 @@ export default function OrdersPage() {
       endCustomerName: endCustomerName.trim() || undefined,
       primeContractorName: customer.name,
       name: name.trim(),
-      mandateRef: mandateRef.trim() || undefined,
+      mandateRef: reference.trim() || undefined,
       budgetHours: Number(budgetHours),
       salesRate: Number(salesRate),
       costRate: Number(costRate),
@@ -65,10 +67,10 @@ export default function OrdersPage() {
 
   return (
     <section className="page">
-      <PageHeader eyebrow="PROJEKTE" title="Aufträge" description="Mandate, WTO-Bezug, Mitarbeitende, externe Leistungen, Budget und Abrechnung." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
-      <div className="data-list compact-overview-list">
+      <PageHeader eyebrow="AUFTRÄGE" title="Aufträge" description="Aufträge, Leistungen, Budget und Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
+      <div className="module-toolbar"><SearchField value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Aufträge durchsuchen" aria-label="Aufträge durchsuchen"/><span className="toolbar-meta">{filteredOrders.length} Aufträge</span></div><div className="data-list compact-overview-list">
         <div className="data-row order-grid data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Umsatz</span><span>Marge</span><span /></div>
-        {store.orders.map((order) => {
+        {filteredOrders.map((order) => {
           const linkedTimes = store.timeEntries.filter((entry) => entry.orderId === order.id)
           const used = linkedTimes.reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
           const revenue = linkedTimes.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0) || used * order.salesRate
@@ -79,17 +81,17 @@ export default function OrdersPage() {
       </div>
 
       <div className="mobile-record-list legacy-mobile-record-list">
-        {store.orders.map((order) => {
+        {filteredOrders.map((order) => {
           const used = store.timeEntries.filter((entry) => entry.orderId === order.id).reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
           return <Link className="mobile-record" href={`/orders/${order.id}`} key={order.id}><div className="record-top"><span><strong>{order.name}</strong><small>{order.customerName}</small></span><Icon name="chevron" size={15}/></div><div className="record-meta"><span>{used} / {order.budgetHours} h</span><span>{Math.max(0, order.budgetHours - used)} h Rest</span></div></Link>
         })}
       </div>
 
       {open && (
-        <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Neues Mandat oder Projekt eröffnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="form-grid">
-              <label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label>
+        <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Auftrag mit den wichtigsten Angaben erfassen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="form-grid">
+              <label className="full"><span>Kunde *</span><Select searchable searchPlaceholder="Kunden durchsuchen" value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label>
               <label className="full"><span>Auftragsname *</span><Input value={name} onChange={(e) => setName(e.target.value)} required/></label>
-              <label><span>Mandats-/Vertragsreferenz</span><Input value={mandateRef} onChange={(e) => setMandateRef(e.target.value)}/></label>
+              <label><span>Referenz</span><Input value={reference} onChange={(e) => setReference(e.target.value)}/></label>
               <label><span>Endkunde</span><Input value={endCustomerName} onChange={(e) => setEndCustomerName(e.target.value)} placeholder="Optional"/></label>
               <label><span>Budget Stunden *</span><Input type="number" min="0.25" step="0.25" value={budgetHours} onChange={(e) => setBudgetHours(e.target.value)} required/></label>
               <label><span>Verkaufssatz CHF/h *</span><Input type="number" min="0" step="0.05" value={salesRate} onChange={(e) => setSalesRate(e.target.value)} required/></label>

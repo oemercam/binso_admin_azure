@@ -29,7 +29,7 @@ export default function FinancePage() {
         <div className="metric"><span>Offene Kreditoren</span><strong>{chf.format(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
       </div>
       <div className="dashboard-layout">
-        <section className="surface chart-surface"><div className="section-title"><div><h2>Umsatz und Kosten</h2><p>Demo-Historie · aktuelle Kennzahlen oben sind live</p></div></div><RevenueChart/></section>
+        <section className="surface chart-surface"><div className="section-title"><div><h2>Umsatz und Kosten</h2><p>Entwicklung der wichtigsten Kennzahlen</p></div></div><RevenueChart/></section>
         <section className="surface"><div className="section-title"><div><h2>Cash-Bewegung</h2><p>Aus erfassten Demo-Transaktionen</p></div></div><div className="finance-ledger"><div><span>Zahlungseingänge</span><strong className="tone-positive">+ {chf.format(paidIn)}</strong></div><div><span>Offene Debitoren</span><strong>{chf.format(open)}</strong></div><div><span>Offene Kreditoren</span><strong>- {chf.format(openSupplier)}</strong></div><div className="total"><span>Netto offene Positionen</span><strong>{chf.format(open - openSupplier)}</strong></div></div></section>
       </div>
     </section>

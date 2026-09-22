@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, Textarea, Input } from '@/components/ui/form-controls'
+import { Checkbox, DatePicker, SearchField, Select, Textarea, Input } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { useFeedback } from '@/components/ui/feedback'
+import { StatusBadge } from '@/components/ui/status-badge'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
@@ -44,20 +45,25 @@ export default function TimePage() {
   const [selected, setSelected] = useState<string[]>([])
   const [billableEntry, setBillableEntry] = useState(true)
   const [formError, setFormError] = useState('')
+  const [query, setQuery] = useState('')
   const feedback = useFeedback()
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
     let cancelled = false
+    const requestedOrder = searchParams.get('order')
     queueMicrotask(() => {
-      if (!cancelled) setOpen(true)
+      if (cancelled) return
+      if (requestedOrder && availableOrders.some((order) => order.id === requestedOrder)) setOrderId(requestedOrder)
+      setOpen(true)
     })
     const params = new URLSearchParams(searchParams.toString())
     params.delete('new')
+    params.delete('order')
     const suffix = params.toString() ? `?${params.toString()}` : ''
     router.replace(`${pathname}${suffix}`, { scroll: false })
     return () => { cancelled = true }
-  }, [pathname, router, searchParams])
+  }, [pathname, router, searchParams, availableOrders])
 
   const people = useMemo(() => {
     const all = availablePeople(orderId, store)
@@ -73,6 +79,7 @@ export default function TimePage() {
       : store.timeEntries,
     [currentEmployee, store.timeEntries, user.role],
   )
+  const filteredEntries = useMemo(() => { const q = query.trim().toLocaleLowerCase('de-CH'); return q ? visibleEntries.filter((entry) => `${entry.orderName} ${entry.personName} ${entry.description ?? ''} ${entry.customerName}`.toLocaleLowerCase('de-CH').includes(q)) : visibleEntries }, [query, visibleEntries])
   const total = visibleEntries.reduce((sum, entry) => sum + entry.hours, 0)
   const billable = visibleEntries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
   const unbilled = visibleEntries.filter((entry) => getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules).eligible)
@@ -164,7 +171,7 @@ export default function TimePage() {
         action={canWrite ? <button className="button primary page-primary-action" onClick={() => setOpen(true)}><Icon name="plus" size={16}/><span>Zeit erfassen</span></button> : undefined}
       />
 
-      <div className="time-hero"><div><span>September</span><strong>{total} h</strong><small>erfasst</small></div><div className="time-hero-progress"><i style={{ width: `${Math.min(100, (total / 168) * 100)}%` }}/></div><div><span>Verrechenbar</span><strong>{billable} h</strong><small>{unbilled.reduce((sum, entry) => sum + entry.hours, 0)} h bereit</small></div></div>
+      <div className="module-toolbar"><SearchField value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Zeiten durchsuchen" aria-label="Zeiten durchsuchen"/><span className="toolbar-meta">{filteredEntries.length} Einträge</span></div><div className="time-hero"><div><span>September</span><strong>{total} h</strong><small>erfasst</small></div><div className="time-hero-progress"><i style={{ width: `${Math.min(100, (total / 168) * 100)}%` }}/></div><div><span>Verrechenbar</span><strong>{billable} h</strong><small>{unbilled.reduce((sum, entry) => sum + entry.hours, 0)} h bereit</small></div></div>
 
       {user.role !== 'employee' && user.role !== 'finance' && (
         <div className="selection-bar"><div><strong>{selectedEntries.length} Zeiten ausgewählt</strong><span>{canInvoice ? 'Bereit für Rechnung' : selectedEntries.length ? 'Für eine Rechnung nur Zeiten desselben Auftrags auswählen' : 'Freigegebene und vollständige Zeiten markieren'}</span></div><button className="button primary" disabled={!canInvoice} onClick={createInvoiceFromSelected}><Icon name="invoices" size={15}/> Rechnung aus Zeiten</button></div>
@@ -172,18 +179,18 @@ export default function TimePage() {
 
       <div className="data-list operational-desktop-list">
         <div className="data-row time-grid-v5 data-head"><span/><span>Datum</span><span>Auftrag / Person</span><span>Tätigkeit</span><span>Stunden</span><span>Abrechnung</span></div>
-        {visibleEntries.map((entry) => {
+        {filteredEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           const approval = getTimeEntryApprovalEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           return (
             <div className="data-row time-grid-v5" key={entry.id}>
-              <span>{user.role !== 'employee' && user.role !== 'finance' && <Input type="checkbox" disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
+              <span>{user.role !== 'employee' && user.role !== 'finance' && <Checkbox disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
               <span>{formatDate(entry.date)}</span>
               <span className="primary-cell"><strong>{entry.orderName}</strong><small>{entry.personName} · {workerLabel(entry.workerType)}</small></span>
               <span>{entry.description || '–'}</span>
               <span><strong>{entry.hours} h</strong></span>
               <span className="time-status-actions">
-                <span className={entry.invoicedInvoiceId ? 'status paid' : billing.eligible ? 'status active' : 'status neutral'}>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span>
+                <StatusBadge status={entry.invoicedInvoiceId ? 'paid' : billing.eligible ? 'active' : 'inactive'} label={entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason} />
                 {!entry.approved && !entry.invoicedInvoiceId && canApprove && (approval.eligible
                   ? <button type="button" className="row-link text-row-action" onClick={() => approveEntry(entry.id)}>Freigeben</button>
                   : <Link className="row-link text-row-action" href={`/orders/${entry.orderId}#evidence`}>{approval.reason}</Link>)}
@@ -194,18 +201,18 @@ export default function TimePage() {
       </div>
 
       <div className="mobile-record-list operational-mobile-list">
-        {visibleEntries.map((entry) => {
+        {filteredEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
+          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Checkbox checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
         })}
       </div>
 
       {open && canWrite && (
         <StandardFormSheet open title={<>Zeit erfassen</>} description={<>Direkt einem Auftrag und Leistungserbringer zuordnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="time-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="time-page-sheet-1" className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></>}>{formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
-              <label className="full"><span>Auftrag *</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
-              <label className="full"><span>Leistungserbringer *</span><Select value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
-              <label><span>Datum *</span><Input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required/></label>
+              <label className="full"><span>Auftrag *</span><Select searchable searchPlaceholder="Aufträge durchsuchen" value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
+              <label className="full"><span>Leistungserbringer *</span><Select searchable searchPlaceholder="Leistungserbringer durchsuchen" value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
+              <label><span>Datum *</span><DatePicker value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required aria-label="Datum"/></label>
               <label><span>Stunden *</span><Input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>
               <label className="full"><span>Beschreibung</span><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Kurze Beschreibung der ausgeführten Arbeiten"/></label>

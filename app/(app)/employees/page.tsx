@@ -1,8 +1,8 @@
 'use client'
 
-import { Select, Input } from '@/components/ui/form-controls'
+import { SearchField, Select, Input } from '@/components/ui/form-controls'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
@@ -19,6 +19,8 @@ export default function EmployeesPage() {
   const searchParams = useSearchParams()
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Employee | null>(null)
+  const [query, setQuery] = useState('')
+  const filteredEmployees = useMemo(() => { const q = query.trim().toLocaleLowerCase('de-CH'); return q ? store.employees.filter((employee) => `${employee.name} ${employee.email} ${roleLabel(employee.role)}`.toLocaleLowerCase('de-CH').includes(q)) : store.employees }, [query, store.employees])
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
@@ -36,9 +38,9 @@ export default function EmployeesPage() {
   return (
     <section className="page">
       <PageHeader eyebrow="TEAM" title="Mitarbeitende" description="Rollen, Anstellungsart, Kosten und Zeitstatus verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Mitarbeitende erfassen" title="Mitarbeitende erfassen"><Icon name="plus" size={16}/><span>Mitarbeitende erfassen</span></button>} />
-      <div className="data-list">
+      <div className="module-toolbar"><SearchField value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Mitarbeitende durchsuchen" aria-label="Mitarbeitende durchsuchen"/><span className="toolbar-meta">{filteredEmployees.length} Mitarbeitende</span></div><div className="data-list">
         <div className="data-row employee-grid data-head"><span>Mitarbeiter</span><span>Rolle</span><span>Gebucht</span><span>Verrechenbar</span><span>Auslastung</span><span /></div>
-        {store.employees.map((employee) => (
+        {filteredEmployees.map((employee) => (
           <InteractiveRow className="data-row employee-grid employee-row-compact" key={employee.id} onActivate={() => setEditing(employee)} ariaLabel={`${employee.name} öffnen`}>
             <span className="user-cell"><span className="avatar">{initials(employee.name)}</span><span className="primary-cell"><strong>{employee.name}<i className={`employee-status-dot ${employee.status}`} aria-hidden="true"/></strong><small className="employee-email">{employee.email}</small><small className="employee-mobile-summary">{roleLabel(employee.role)} · {employee.bookedHours} / {employee.targetHours} h im Monat</small></span></span>
             <span className="employee-role">{roleLabel(employee.role)}</span><span className="employee-hours">{employee.bookedHours} / {employee.targetHours} h</span><span className="employee-billable">{employee.billableHours} h</span><span className="progress-cell employee-utilisation"><span className="mini-progress"><i style={{ width: `${Math.min(100, employee.utilisation)}%` }}/></span><small>{employee.utilisation}%</small></span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span>

@@ -1,12 +1,12 @@
 import { env } from '@/lib/config/env'
 import { signInUrl } from '@/lib/auth/server'
-import { BinsoLogo } from '@/components/ui/binso-logo'
+import { AppLogo } from '@/components/ui/binso-logo'
 
 export default function SignInPage() {
   return (
     <main className="auth-page">
       <div className="auth-card">
-        <BinsoLogo />
+        <AppLogo />
         <h1>Binso Admin</h1>
         <p className="muted">Mit deinem Firmenkonto anmelden.</p>
         {env.authMode === 'azure'

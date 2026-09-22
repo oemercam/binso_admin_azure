@@ -15,7 +15,7 @@ The canonical mobile gutter is `--app-mobile-gutter: clamp(14px, 4vw, 18px)`. Th
 - Standard control height: 40px
 - Textarea minimum: 88px
 
-`Input`, `Textarea` and `Select` share border, radius, background, focus and disabled states. Controls always use `width:100%`, `max-width:100%`, `min-width:0` and border-box sizing.
+`Input`, `Textarea`, `SearchField`, `Select` and `DatePicker` share border, radius, background, focus and disabled states. `Checkbox` is a separate compact control with a touch-friendly target. Controls always use `width:100%`, `max-width:100%`, `min-width:0` and border-box sizing.
 
 ## Navigation
 
@@ -44,3 +44,11 @@ The canonical Toggle is visually 36×20px with a 14px thumb. The surrounding set
 - `RemoveButton`: removes a row/item
 
 These controls are not interchangeable.
+
+## Search and status
+
+`SearchField` is the single visual search primitive for global search, list search and searchable selections. The Mobile/PWA pill only opens the shared global search surface. `StatusBadge` maps business states centrally: green is reserved for successful/completed states, blue for active/in-progress states, amber for attention/intermediate states, red for problems/rejections/overdue states and grey for neutral/draft/inactive states.
+
+## Date and selection controls
+
+`DatePicker` uses `DD.MM.YYYY` in the visible Swiss UI and keeps ISO values for application data. `Select` owns keyboard/listbox behaviour and can become searchable for large datasets. Small fixed-option selects remain simple.

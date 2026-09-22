@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { AppUser } from '@/types/domain'
 import { DesktopNav } from '@/components/navigation/desktop-nav'
 import { MobilePillNav } from '@/components/navigation/mobile-pill-nav'
-import { BinsoLogo } from '@/components/ui/binso-logo'
+import { AppLogo } from '@/components/ui/binso-logo'
 import { Icon } from '@/components/ui/icon'
 import { AppOverlays } from '@/components/shared/app-overlays'
 import { useHeaderVisibility } from '@/hooks/use-header-visibility'
@@ -27,7 +27,7 @@ export function AppShell({
     <div className="app-frame">
       <header className={mobileHeaderHidden ? 'topbar is-hidden' : 'topbar'}>
         <div className="topbar-brand">
-          <BinsoLogo />
+          <AppLogo />
         </div>
 
         <button className="global-search" onClick={() => setSearchOpen(true)}>
