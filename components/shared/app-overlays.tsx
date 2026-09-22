@@ -107,33 +107,37 @@ export function AppOverlays({
 
   return (
     <>
-      {searchOpen && (
-        <div className="overlay-layer search-overlay-layer" onMouseDown={() => setSearchOpen(false)}>
-          <div className="command-dialog" role="dialog" aria-modal="true" aria-label="Globale Suche" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="command-input">
-              <Icon name="search" size={18} />
-              <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" />
-              <kbd>ESC</kbd>
-            </div>
-            <div className="command-results">
-              <span className="command-label">{query ? 'Treffer' : 'Schnellzugriff'}</span>
-              {results.map((entry) => (
-                <Link key={`${entry.meta}-${entry.label}-${entry.href}`} href={entry.href} onClick={() => setSearchOpen(false)}>
-                  <span className="command-icon"><Icon name={entry.icon} size={17} /></span>
-                  <span><strong>{entry.label}</strong><small>{entry.meta}</small></span>
-                  <Icon name="chevron" size={15} />
-                </Link>
-              ))}
-              {!results.length && <div className="search-empty">Keine Treffer.</div>}
-            </div>
-          </div>
+      <ResponsiveOverlay
+        open={searchOpen}
+        title="Globale Suche"
+        description="Suchen oder Aktion ausführen"
+        onClose={() => setSearchOpen(false)}
+        mobile="fullscreen"
+        desktop="dialog"
+        showGrabber={false}
+      >
+        <div className="command-input">
+          <Icon name="search" size={18} />
+          <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Suchen oder Aktion ausführen" aria-label="Globale Suche" />
+          <kbd>ESC</kbd>
         </div>
-      )}
+        <div className="command-results">
+          <span className="command-label">{query ? 'Treffer' : 'Schnellzugriff'}</span>
+          {results.map((entry) => (
+            <Link key={`${entry.meta}-${entry.label}-${entry.href}`} href={entry.href} onClick={() => setSearchOpen(false)}>
+              <span className="command-icon"><Icon name={entry.icon} size={17} /></span>
+              <span><strong>{entry.label}</strong><small>{entry.meta}</small></span>
+              <Icon name="chevron" size={15} />
+            </Link>
+          ))}
+          {!results.length && <div className="search-empty">Keine Treffer.</div>}
+        </div>
+      </ResponsiveOverlay>
 
       <ResponsiveOverlay
         open={quickOpen}
         title="Neu erstellen"
-        subtitle="Direkt eine Aktion starten"
+        description="Direkt eine Aktion starten"
         onClose={() => setQuickOpen(false)}
         showClose
         showGrabber

@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
-import { ServiceWorkerRegister } from '@/components/pwa/service-worker-register'
-import { ViewportMetrics } from '@/components/ui/viewport-metrics'
 import './globals.css'
 import './documents.css'
+import { AppProviders } from '@/components/providers/app-providers'
 import './ui-foundation-v19.css'
 
 export const metadata: Metadata = {
@@ -57,9 +56,7 @@ export default function RootLayout({
       </head>
 
       <body>
-        <ViewportMetrics />
-        {children}
-        <ServiceWorkerRegister />
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )

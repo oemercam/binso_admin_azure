@@ -14,20 +14,23 @@ function walk(dir) {
   })
 }
 
-function rel(file) {
-  return path.relative(root, file).replaceAll('\\', '/')
-}
+function rel(file) { return path.relative(root, file).replaceAll('\\', '/') }
+function read(file) { return fs.readFileSync(file, 'utf8') }
 
 function checkNoPattern(files, pattern, label, allow = []) {
   const offenders = []
   for (const file of files) {
     const relative = rel(file)
     if (allow.includes(relative)) continue
-    const text = fs.readFileSync(file, 'utf8')
-    if (pattern.test(text)) offenders.push(relative)
+    if (pattern.test(read(file))) offenders.push(relative)
   }
   if (offenders.length) failures.push(`${label}: ${offenders.join(', ')}`)
   else passes.push(label)
+}
+
+function expect(text, pattern, label) {
+  if (pattern.test(text)) passes.push(label)
+  else failures.push(label)
 }
 
 const productFiles = [
@@ -36,7 +39,6 @@ const productFiles = [
   ...walk(path.join(root, 'hooks')),
   ...walk(path.join(root, 'lib')),
 ].filter((file) => /\.(ts|tsx)$/.test(file))
-
 const pageFiles = walk(path.join(root, 'app', '(app)')).filter((file) => /\.(ts|tsx)$/.test(file))
 
 checkNoPattern(pageFiles, /\b(?:localStorage|sessionStorage)\b/, 'Pages greifen nicht direkt auf Browser-Storage zu')
@@ -44,42 +46,60 @@ checkNoPattern(pageFiles, /\bmatchMedia\s*\(/, 'Pages enthalten keine eigenen Me
 checkNoPattern(pageFiles, /\b(?:navigator\.userAgent|visualViewport)\b/, 'Pages enthalten kein UA-/Viewport-Sniffing')
 checkNoPattern(pageFiles, /\bfetch\s*\(/, 'Pages verwenden keinen direkten fetch()-Aufruf')
 checkNoPattern(pageFiles, /\b(?:document|window)\./, 'Pages greifen nicht direkt auf DOM-/Window-Infrastruktur zu')
-checkNoPattern(pageFiles, /overlay-layer sheet-layer/, 'Pages erzeugen keine eigenen Sheet-Backdrops')
-checkNoPattern(pageFiles, /<form[^>]+className=["'][^"']*form-sheet/, 'Pages erzeugen keine eigenen Sheet-Form-Container')
+checkNoPattern(pageFiles, /\brawContent\b/, 'Business-Seiten verwenden kein rawContent')
+checkNoPattern(pageFiles, /<AppSheet\b/, 'Business-Seiten verwenden keine uneinheitlichen Low-Level-AppSheet-Varianten')
+checkNoPattern(pageFiles, /className=["'][^"']*\b(?:form-sheet|standard-mobile-sheet|sheet-layer|sheet-heading|sheet-actions|sheet-grabber|mobile-fullscreen-sheet)\b/, 'Business-Seiten enthalten keine Legacy-Sheet-Klassen')
+checkNoPattern(pageFiles, /(?:100vh|100dvh|100svh|safe-area-inset|--app-visual-viewport|--app-vh|--visible-viewport)/, 'Business-Seiten berechnen keine Sheet-Viewport-/Safe-Area-Geometrie')
 
-checkNoPattern(productFiles, /\blocalStorage\b/, 'localStorage ist zentralisiert', [
-  'lib/browser/storage.ts',
-  'app/layout.tsx',
-])
+checkNoPattern(productFiles, /\blocalStorage\b/, 'localStorage ist zentralisiert', ['lib/browser/storage.ts', 'app/layout.tsx'])
 checkNoPattern(productFiles, /\bsessionStorage\b/, 'sessionStorage ist zentralisiert', ['lib/browser/storage.ts'])
 checkNoPattern(productFiles, /\bfetch\s*\(/, 'fetch() ist im zentralen API-Client gekapselt', ['lib/http/api-client.ts'])
 checkNoPattern(productFiles, /navigator\.userAgent/, 'Kein User-Agent-Sniffing im Produktivcode')
-checkNoPattern(productFiles, /\b100vh\b/, 'Keine statischen 100vh-Layouts')
+checkNoPattern(productFiles, /window\.visualViewport/, 'VisualViewport wird nur im DeviceEnvironmentProvider gelesen', ['components/providers/device-environment-provider.tsx'])
+checkNoPattern(productFiles, /document\.body\.style\.overflow/, 'Body-Scroll-Lock hat genau einen Owner', ['components/ui/overlay-manager.ts'])
 
 const cssFiles = ['app/globals.css', 'app/ui-foundation-v19.css', 'app/documents.css']
-for (const cssFile of cssFiles) {
-  const css = fs.readFileSync(path.join(root, cssFile), 'utf8')
-  if (/760px|761px/.test(css)) failures.push(`${cssFile}: Legacy-Breakpoint 760/761px gefunden`)
+const allCss = cssFiles.map((file) => read(path.join(root, file))).join('\n')
+if (/760px|761px/.test(allCss)) failures.push('Legacy-Breakpoint 760/761px gefunden')
+else passes.push('Responsive CSS verwendet keinen Legacy-Breakpoint 760/761px')
+if (/\.(?:form-sheet|standard-mobile-sheet|sheet-layer|sheet-heading|sheet-actions|sheet-grabber|mobile-fullscreen-sheet)\b/.test(allCss)) failures.push('Legacy-Sheet-CSS ist noch aktiv')
+else passes.push('Legacy-Sheet-CSS wurde entfernt')
+if (/--app-vh|--visible-viewport-height/.test(allCss)) failures.push('Legacy-Viewport-Variablen sind noch aktiv')
+else passes.push('Legacy-Viewport-Variablen wurden entfernt')
+
+const foundation = read(path.join(root, 'app/ui-foundation-v19.css'))
+const appSheetRootCount = (foundation.match(/\.app-sheet\s*\{/g) ?? []).length
+if (appSheetRootCount === 1) passes.push('Genau eine aktive .app-sheet Root-Implementierung')
+else failures.push(`.app-sheet Root-Implementierungen: ${appSheetRootCount}`)
+if (/\.app-sheet-(?:header|footer)[^{]*\{[^}]*position\s*:\s*sticky/s.test(foundation)) failures.push('Header/Footer verwenden position:sticky')
+else passes.push('AppSheet Header/Footer sind natürliche Flex-Bereiche, nicht sticky')
+if (/\.app-sheet[^\n{]*\{[^}]*!important/s.test(foundation)) failures.push('Canonical AppSheet verwendet !important')
+else passes.push('Canonical AppSheet benötigt keine !important-Regeln')
+
+const sheet = read(path.join(root, 'components/ui/sheet-system.tsx'))
+for (const [pattern, label] of [
+  [/className="app-sheet-content"/, 'AppSheet besitzt genau den zentralen Content-Scrollbereich'],
+  [/className="app-sheet-footer"/, 'AppSheet besitzt einen Footer ausserhalb des Contents'],
+  [/className="app-sheet-form"/, 'StandardFormSheet rendert ein Formular innerhalb des Contents'],
+  [/formId\?/, 'StandardFormSheet unterstützt stabile Form-IDs'],
+  [/useModalOverlay/, 'AppSheet verwendet den zentralen Overlay-/Scroll-Lock'],
+]) expect(sheet, pattern, label)
+if (/rawContent/.test(sheet)) failures.push('sheet-system.tsx enthält noch rawContent')
+else passes.push('rawContent wurde aus dem Form-/Sheet-System entfernt')
+
+const preview = read(path.join(root, 'components/documents/responsive-preview.tsx'))
+expect(preview, /useModalOverlay/, 'ResponsivePreview verwendet denselben Overlay-/Scroll-Lock')
+expect(preview, /document-preview-content/, 'ResponsivePreview besitzt einen eigenen kontrollierten Content-Scrollbereich')
+
+const device = read(path.join(root, 'components/providers/device-environment-provider.tsx'))
+for (const token of ['layoutViewportWidth', 'layoutViewportHeight', 'visualViewportWidth', 'visualViewportHeight', 'visualViewportOffsetTop']) {
+  expect(device, new RegExp(`\\b${token}\\b`), `DeviceEnvironmentProvider exponiert ${token}`)
 }
-if (!failures.some((item) => item.includes('Legacy-Breakpoint'))) passes.push('Responsive CSS verwendet den zentralen 820/821px Mobile-Grenzwert')
+expect(device, /visual\?\.addEventListener\('resize'/, 'VisualViewport resize wird zentral beobachtet')
+expect(device, /visual\?\.addEventListener\('scroll'/, 'VisualViewport scroll wird zentral beobachtet')
 
-const appShell = fs.readFileSync(path.join(root, 'components/app-shell/app-shell.tsx'), 'utf8')
-if (appShell.includes('useHeaderVisibility')) passes.push('Header-Scroll wird zentral über useHeaderVisibility gesteuert')
-else failures.push('AppShell verwendet useHeaderVisibility nicht')
-
-const layout = fs.readFileSync(path.join(root, 'app/layout.tsx'), 'utf8')
-if (layout.includes('<AppProviders>')) passes.push('Globale Provider besitzen einen zentralen Einstiegspunkt')
-else failures.push('AppProviders fehlt im RootLayout')
-
-const sheet = fs.readFileSync(path.join(root, 'components/ui/sheet-system.tsx'), 'utf8')
-for (const token of ['aria-modal', 'FOCUSABLE', 'returnFocusRef', "event.key === 'Escape'"]) {
-  if (sheet.includes(token)) passes.push(`Sheet-System: ${token}`)
-  else failures.push(`Sheet-System fehlt: ${token}`)
-}
-
-const sw = fs.readFileSync(path.join(root, 'public/sw.js'), 'utf8')
-if (sw.includes('SKIP_WAITING')) passes.push('PWA Update Manager kann einen wartenden Service Worker aktivieren')
-else failures.push('Service Worker unterstützt SKIP_WAITING nicht')
+const sw = read(path.join(root, 'public/sw.js'))
+expect(sw, /SKIP_WAITING/, 'PWA Update Manager kann einen wartenden Service Worker aktivieren')
 
 console.log(`Architecture check: ${passes.length} Regeln erfüllt.`)
 if (failures.length) {

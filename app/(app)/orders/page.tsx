@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
-import { CloseButton } from '@/components/ui/close-button'
+import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { BillingModel } from '@/types/domain'
@@ -80,11 +80,7 @@ export default function OrdersPage() {
       </div>
 
       {open && (
-        <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
-            <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Auftrag erstellen</strong><span>Neues Mandat oder Projekt eröffnen.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
-            <div className="form-grid">
+        <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Neues Mandat oder Projekt eröffnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="form-grid">
               <label className="full"><span>Kunde *</span><select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</select></label>
               <label className="full"><span>Auftragsname *</span><input value={name} onChange={(e) => setName(e.target.value)} required/></label>
               <label><span>Mandats-/Vertragsreferenz</span><input value={mandateRef} onChange={(e) => setMandateRef(e.target.value)}/></label>
@@ -93,10 +89,7 @@ export default function OrdersPage() {
               <label><span>Verkaufssatz CHF/h *</span><input type="number" min="0" step="0.05" value={salesRate} onChange={(e) => setSalesRate(e.target.value)} required/></label>
               <label><span>Interner Kostensatz CHF/h *</span><input type="number" min="0" step="0.05" value={costRate} onChange={(e) => setCostRate(e.target.value)} required/></label>
               <label><span>Abrechnungsmodell *</span><select value={billingModel} onChange={(e) => setBillingModel(e.target.value as BillingModel)}><option value="time">Nach Aufwand</option><option value="fixed">Pauschal</option><option value="mixed">Gemischt</option></select></label>
-            </div>
-            <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button className="button primary">Auftrag erstellen</button></div>
-          </form>
-        </div>
+            </div></StandardFormSheet>
       )}
     </section>
   )

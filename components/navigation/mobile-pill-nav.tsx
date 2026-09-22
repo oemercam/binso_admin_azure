@@ -46,7 +46,7 @@ export function MobilePillNav({
       <ResponsiveOverlay
         open={menuOpen}
         title="Navigation"
-        subtitle="Binso Administration"
+        description="Binso Administration"
         onClose={() => setMenuOpen(false)}
         showClose
         showGrabber

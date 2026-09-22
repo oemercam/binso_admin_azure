@@ -1,6 +1,6 @@
 'use client'
 
-import type { FormEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useDeviceEnvironment } from '@/components/providers/device-environment-provider'
 import { AppSheet } from '@/components/ui/sheet-system'
 
@@ -9,11 +9,10 @@ type Presentation = 'bottom' | 'fullscreen' | 'dialog'
 export function ResponsiveOverlay({
   open,
   title,
-  subtitle,
+  description,
   onClose,
   children,
   footer,
-  onSubmit,
   mobile = 'bottom',
   desktop = 'dialog',
   panelClassName,
@@ -21,12 +20,11 @@ export function ResponsiveOverlay({
   showGrabber,
 }: {
   open: boolean
-  title: string
-  subtitle?: string
+  title: ReactNode
+  description?: ReactNode
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
-  onSubmit?: (event: FormEvent<HTMLFormElement>) => void
   mobile?: Presentation
   desktop?: Presentation
   panelClassName?: string
@@ -41,10 +39,9 @@ export function ResponsiveOverlay({
       open={open}
       mode={mode}
       title={title}
-      subtitle={subtitle}
+      description={description}
       onClose={onClose}
       footer={footer}
-      onSubmit={onSubmit}
       panelClassName={panelClassName}
       showClose={showClose}
       showGrabber={showGrabber ?? mode === 'bottom'}
