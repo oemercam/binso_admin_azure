@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/icon'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
+import { NavigationItem } from './navigation-item'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
@@ -45,36 +45,23 @@ export function MobilePillNav({
     <>
       <ResponsiveOverlay
         open={menuOpen}
-        title="Navigation"
-        description="Binso Administration"
+        title="Menü"
         onClose={() => setMenuOpen(false)}
         showClose
-        showGrabber
+        showGrabber={false}
         panelClassName="mobile-menu-sheet"
       >
         <nav className="mobile-menu-nav">
           {items.map((item) => {
-            const active =
-              pathname === item.href ||
-              pathname.startsWith(`${item.href}/`)
-
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
-              <Link
+              <NavigationItem
                 key={item.href}
-                href={item.href}
-                className={active ? 'active' : undefined}
-                onClick={() => setMenuOpen(false)}
-              >
-                <span className="mobile-menu-icon">
-                  <Icon name={item.icon} size={17} />
-                </span>
-
-                <span className="mobile-menu-label">
-                  {item.label}
-                </span>
-
-                <Icon name="chevron" size={15} />
-              </Link>
+                item={item}
+                active={active}
+                variant="mobile"
+                onNavigate={() => setMenuOpen(false)}
+              />
             )
           })}
         </nav>

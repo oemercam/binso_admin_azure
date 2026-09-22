@@ -1,8 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Icon } from '@/components/ui/icon'
+import { NavigationItem } from './navigation-item'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
@@ -17,12 +16,7 @@ export function DesktopNav({ user }: { user: AppUser }) {
     return itemsToRender.map((item) => {
       const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
-      return (
-        <Link key={item.href} href={item.href} className={active ? 'active' : undefined}>
-          <Icon name={item.icon} size={16} />
-          <span>{item.label}</span>
-        </Link>
-      )
+      return <NavigationItem key={item.href} item={item} active={active} variant="desktop" />
     })
   }
 

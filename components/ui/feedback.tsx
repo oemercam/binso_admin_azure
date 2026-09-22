@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Icon } from '@/components/ui/icon'
+import { CloseButton } from '@/components/ui/close-button'
 
 type FeedbackKind = 'success' | 'info' | 'warning' | 'error'
 
@@ -75,7 +76,7 @@ function Toast({ item, onClose }: { item: FeedbackItem; onClose: () => void }) {
         {item.title ? <strong>{item.title}</strong> : null}
         <span>{item.message}</span>
       </span>
-      <button type="button" className="toast-close" aria-label="Meldung schliessen" onClick={onClose}><Icon name="close" size={14} /></button>
+      <CloseButton variant="compact" ariaLabel="Meldung schliessen" onClick={onClose} />
     </div>
   )
 }
