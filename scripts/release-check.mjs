@@ -144,6 +144,25 @@ for (const file of files) {
   }
 }
 
+
+// v19 UI foundation invariants: keep one stylesheet foundation and one logo image.
+const layoutSource = fs.readFileSync(path.join(root, 'app', 'layout.tsx'), 'utf8')
+const cssImports = [...layoutSource.matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)].map((m) => m[1])
+const expectedCss = ['globals.css', 'documents.css', 'ui-foundation-v19.css']
+if (JSON.stringify(cssImports) !== JSON.stringify(expectedCss)) {
+  errors.push(`app/layout.tsx: CSS-Imports muessen exakt ${expectedCss.join(', ')} sein (gefunden: ${cssImports.join(', ')})`)
+}
+
+const appCss = fs.readdirSync(path.join(root, 'app')).filter((name) => name.endsWith('.css')).sort()
+for (const css of appCss) {
+  if (!expectedCss.includes(css)) errors.push(`app/${css}: Legacy-CSS-Datei gefunden; in ui-foundation-v19.css konsolidieren.`)
+}
+
+const logoSource = fs.readFileSync(path.join(root, 'components', 'ui', 'binso-logo.tsx'), 'utf8')
+const logoImgCount = (logoSource.match(/<img/g) ?? []).length
+if (logoImgCount !== 1) errors.push(`components/ui/binso-logo.tsx: erwartet genau ein <img>, gefunden ${logoImgCount}.`)
+if (/binso-logo-(?:light|dark)/.test(logoSource)) errors.push('components/ui/binso-logo.tsx: Light/Dark-Doppelbild ist nicht erlaubt.')
+
 if (errors.length) {
   console.error(`Release-Check fehlgeschlagen: ${errors.length} Fehler`)
   for (const error of errors) console.error(`- ${error}`)

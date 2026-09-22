@@ -29,3 +29,7 @@ Die Anwendung ist nach fachlichen Domänen gegliedert. UI-Routen bleiben im Next
 4. Microsoft Graph für E-Mail
 5. Job/Queue für Mahnungen und Lohnläufe
 6. Audit-Log und unveränderbare Dokumentversionen
+
+## UI Foundation v19
+
+Die UI-Kaskade wurde konsolidiert. `app/layout.tsx` lädt nur noch `globals.css`, `documents.css` und `ui-foundation-v19.css`. Neue responsive oder visuelle Regeln gehören in die Foundation bzw. in klar abgegrenzte zentrale UI-Komponenten; versionierte Patch-CSS-Dateien sind nicht mehr zulässig. Das Mobile-Menü verwendet `AppSheet`, das Logo genau ein Bild, und Toggle/Close/Sheet/Gutter-Geometrien sind zentral definiert.

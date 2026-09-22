@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/icon'
-import { CloseButton } from '@/components/ui/close-button'
+import { AppSheet } from '@/components/ui/sheet-system'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
@@ -43,58 +43,42 @@ export function MobilePillNav({
 
   return (
     <>
-      {menuOpen && (
-        <div
-          className="mobile-menu-layer"
-          onClick={() => setMenuOpen(false)}
-        >
-          <div
-            className="mobile-menu-sheet"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="sheet-grabber" />
+      <AppSheet
+        open={menuOpen}
+        mode="bottom"
+        title="Navigation"
+        subtitle="Binso Administration"
+        onClose={() => setMenuOpen(false)}
+        showClose
+        showGrabber
+      >
+        <nav className="mobile-menu-nav">
+          {items.map((item) => {
+            const active =
+              pathname === item.href ||
+              pathname.startsWith(`${item.href}/`)
 
-            <div className="sheet-heading">
-              <div>
-                <strong>Navigation</strong>
-                <span>Binso Administration</span>
-              </div>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={active ? 'active' : undefined}
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className="mobile-menu-icon">
+                  <Icon name={item.icon} size={17} />
+                </span>
 
-              <CloseButton onClick={() => setMenuOpen(false)} />
-            </div>
+                <span className="mobile-menu-label">
+                  {item.label}
+                </span>
 
-            <nav className="mobile-menu-nav">
-              {items.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`)
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={active ? 'active' : undefined}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <span className="mobile-menu-icon">
-                      <Icon name={item.icon} size={17} />
-                    </span>
-
-                    <span className="mobile-menu-label">
-                      {item.label}
-                    </span>
-
-                    <Icon name="chevron" size={15} />
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
-        </div>
-      )}
+                <Icon name="chevron" size={15} />
+              </Link>
+            )
+          })}
+        </nav>
+      </AppSheet>
 
       <nav
         className="mobile-pill"

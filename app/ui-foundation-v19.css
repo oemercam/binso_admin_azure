@@ -1,0 +1,5569 @@
+
+/* ===== migrated from mobile-polish.css ===== */
+/* Binso Admin – Mobile/PWA polish overrides */
+
+.quick-actions-grid{
+  display:none;
+}
+
+.quick-create-sheet{
+  padding-left:0;
+  padding-right:0;
+}
+
+.quick-create-heading{
+  padding-left:18px;
+  padding-right:18px;
+}
+
+.quick-actions-list{
+  display:grid;
+  border-top:1px solid var(--line);
+}
+
+.quick-actions-list a{
+  min-height:58px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  padding:8px 18px;
+  border-bottom:1px solid var(--line);
+  text-decoration:none;
+  background:transparent;
+  color:var(--text);
+}
+
+.quick-actions-list a:last-child{
+  border-bottom:0;
+}
+
+.quick-actions-list a:hover{
+  background:var(--surface-2);
+}
+
+.quick-action-icon{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  color:var(--text-2);
+}
+
+.quick-action-copy{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.quick-action-copy strong{
+  font-size:11px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.quick-action-copy small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:9px;
+  color:var(--muted);
+}
+
+@media(max-width:760px){
+  .app-main{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .mobile-pill{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 1px 40px 1px minmax(0,1fr);
+    align-items:center;
+    column-gap:4px;
+    position:fixed;
+    left:50%;
+    bottom:calc(9px + var(--safe-bottom));
+    transform:translateX(-50%);
+    width:min(284px,calc(100vw - 24px));
+    height:50px;
+    padding:4px 5px;
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    box-shadow:0 8px 24px rgba(18,22,30,.14);
+    z-index:80;
+  }
+
+  html[data-theme='dark'] .mobile-pill{
+    background:#121417;
+    border-color:#343941;
+    box-shadow:0 10px 28px rgba(0,0,0,.42);
+  }
+
+  .mobile-pill button{
+    min-width:0;
+    height:40px;
+    padding:0 9px;
+    border:0;
+    border-radius:999px;
+    background:transparent;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:11px;
+    font-weight:600;
+    line-height:1;
+    transition:background .14s ease,transform .14s ease,opacity .14s ease;
+  }
+
+  .mobile-pill button:active{
+    transform:scale(.96);
+    opacity:.82;
+  }
+
+  .pill-search{
+    justify-self:stretch;
+  }
+
+  .pill-add{
+    width:40px!important;
+    min-width:40px!important;
+    height:40px!important;
+    padding:0!important;
+    justify-self:center;
+    background:var(--text)!important;
+    color:var(--bg)!important;
+    box-shadow:none!important;
+  }
+
+  .pill-menu{
+    justify-self:stretch;
+    margin:0!important;
+    padding:0 9px!important;
+    background:transparent!important;
+    border:0!important;
+    color:var(--text)!important;
+  }
+
+  html[data-theme='dark'] .pill-menu{
+    background:transparent!important;
+    border:0!important;
+  }
+
+  .pill-separator{
+    width:1px;
+    height:20px;
+    align-self:center;
+    background:var(--line);
+  }
+
+  html[data-theme='dark'] .pill-separator{
+    background:#30343a;
+  }
+
+  .mobile-menu-sheet{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .mobile-menu-nav a{
+    min-height:48px;
+    padding:0 2px;
+    border-top:1px solid var(--line);
+    background:transparent!important;
+    border-radius:0!important;
+  }
+
+  .mobile-menu-nav a.active{
+    color:var(--text);
+    font-weight:650;
+  }
+
+  .mobile-menu-nav a.active .mobile-menu-icon{
+    color:var(--text);
+  }
+
+  .mobile-menu-icon{
+    width:28px;
+    height:28px;
+    border-radius:0;
+    background:transparent;
+    display:grid;
+    place-items:center;
+    color:var(--muted);
+  }
+
+  .mobile-menu-label{
+    min-width:0;
+  }
+
+  .quick-create-layer{
+    background:rgba(10,12,15,.34);
+  }
+
+  .quick-create-sheet{
+    width:100%;
+    max-height:min(80dvh,680px);
+    padding-top:8px;
+    padding-bottom:calc(14px + var(--safe-bottom));
+    border-radius:20px 20px 0 0;
+    background:var(--surface);
+    box-shadow:0 -12px 38px rgba(18,22,30,.12);
+  }
+
+  html[data-theme='dark'] .quick-create-sheet{
+    box-shadow:0 -14px 44px rgba(0,0,0,.4);
+  }
+
+  .quick-create-heading{
+    padding:4px 18px 13px;
+  }
+
+  .quick-actions-list a{
+    min-height:60px;
+    grid-template-columns:32px minmax(0,1fr) auto;
+    gap:10px;
+    padding:8px 18px;
+  }
+
+  .quick-action-icon{
+    width:28px;
+    height:28px;
+  }
+
+  .quick-action-copy strong{
+    font-size:12px;
+  }
+
+  .quick-action-copy small{
+    font-size:9.5px;
+  }
+
+  .command-dialog{
+    width:calc(100vw - 20px);
+    max-height:calc(100dvh - 82px - var(--safe-top));
+  }
+
+  .command-input{
+    min-height:52px;
+  }
+
+  .command-input input,
+  .search-field input,
+  input,
+  select,
+  textarea{
+    font-size:16px!important;
+  }
+
+  .command-results a{
+    min-height:50px;
+  }
+}
+
+
+/* ===== migrated from enterprise-ux.css ===== */
+/* Binso Admin – enterprise interaction and settings polish */
+
+html,
+body {
+  scroll-behavior: auto;
+  overscroll-behavior-x: none;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+.topbar {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.route-stage {
+  min-width: 0;
+  animation: route-enter 110ms ease-out both;
+}
+
+@keyframes route-enter {
+  from { opacity: .72; }
+  to { opacity: 1; }
+}
+
+.toggle-control {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-2);
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.toggle-control[aria-checked='true'] {
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.toggle-control:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
+  transform: translateX(0);
+  transition: transform 130ms cubic-bezier(.2,.8,.2,1);
+}
+
+.toggle-control[aria-checked='true'] .toggle-thumb {
+  transform: translateX(16px);
+}
+
+.settings-toolbar {
+  display:flex;
+  gap:2px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  border-bottom:1px solid var(--line);
+  margin-bottom:4px;
+}
+
+.settings-toolbar::-webkit-scrollbar { display:none; }
+
+.settings-toolbar button {
+  min-height:42px;
+  padding:0 12px;
+  border:0;
+  border-bottom:2px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.settings-toolbar button.active {
+  color:var(--text);
+  border-bottom-color:var(--text);
+}
+
+.settings-group {
+  border-bottom:1px solid var(--line);
+  padding:20px 0;
+}
+
+.settings-group:last-child { border-bottom:0; }
+
+.settings-group-head {
+  display:grid;
+  grid-template-columns:minmax(220px,.72fr) minmax(300px,1.28fr);
+  gap:32px;
+  align-items:start;
+}
+
+.settings-group-copy h2 {
+  margin:0;
+  font-size:12px;
+  font-weight:650;
+}
+
+.settings-group-copy p {
+  margin:5px 0 0;
+  max-width:430px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.55;
+}
+
+.settings-stack {
+  display:grid;
+  gap:0;
+}
+
+.setting-line {
+  min-height:52px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:20px;
+  padding:8px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.setting-line:last-child { border-bottom:0; }
+
+.setting-line-copy {
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+
+.setting-line-copy strong {
+  font-size:10.5px;
+  font-weight:600;
+}
+
+.setting-line-copy small {
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.45;
+}
+
+.setting-line input[type='number'],
+.setting-line input[type='email'],
+.setting-line input[type='text'],
+.setting-line select {
+  width:min(280px,42vw);
+  height:34px;
+  border:1px solid var(--line-strong);
+  border-radius:7px;
+  background:var(--surface);
+  color:var(--text);
+  padding:0 9px;
+  font-size:10.5px;
+  outline:none;
+}
+
+.setting-line input:focus,
+.setting-line select:focus,
+.automation-textarea:focus {
+  border-color:var(--text);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--text) 10%,transparent);
+}
+
+.automation-textarea {
+  width:100%;
+  min-height:104px;
+  resize:vertical;
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--text);
+  padding:10px;
+  font-size:10.5px;
+  line-height:1.5;
+  outline:none;
+}
+
+.settings-inline-fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 18px;
+  padding-top:8px;
+}
+
+.settings-field {
+  display:grid;
+  gap:5px;
+}
+
+.settings-field.full { grid-column:1/-1; }
+
+.settings-field span {
+  font-size:9px;
+  font-weight:600;
+  color:var(--text-2);
+}
+
+.settings-field input,
+.settings-field select {
+  min-width:0;
+  width:100%;
+  height:36px;
+  border:1px solid var(--line-strong);
+  border-radius:7px;
+  background:var(--surface);
+  color:var(--text);
+  padding:0 9px;
+  outline:none;
+  font-size:10.5px;
+}
+
+.integration-status {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.integration-status i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#d79a25;
+}
+
+.settings-note {
+  margin-top:10px;
+  padding:10px 0 0;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.55;
+}
+
+html[data-theme='dark'] .toggle-control {
+  background:#20242a;
+}
+
+html[data-theme='dark'] .toggle-control[aria-checked='true'] {
+  background:#f3f4f6;
+  border-color:#f3f4f6;
+}
+
+html[data-theme='dark'] .toggle-control[aria-checked='true'] .toggle-thumb {
+  background:#111318;
+}
+
+@media(max-width:760px) {
+  html,
+  body {
+    overscroll-behavior-y:contain;
+  }
+
+  body {
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .route-stage {
+    animation-duration:90ms;
+  }
+
+  .settings-toolbar {
+    margin-left:-12px;
+    margin-right:-12px;
+    padding:0 8px;
+    position:sticky;
+    top:calc(52px + var(--safe-top));
+    z-index:25;
+    background:var(--bg);
+  }
+
+  .settings-group {
+    padding:17px 0;
+  }
+
+  .settings-group-head {
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .setting-line {
+    min-height:54px;
+    gap:14px;
+  }
+
+  .setting-line input[type='number'],
+  .setting-line input[type='email'],
+  .setting-line input[type='text'],
+  .setting-line select,
+  .settings-field input,
+  .settings-field select,
+  .automation-textarea {
+    font-size:16px !important;
+  }
+
+  .setting-line input[type='number'] {
+    width:86px;
+  }
+
+  .setting-line input[type='email'],
+  .setting-line input[type='text'],
+  .setting-line select {
+    width:min(190px,48vw);
+  }
+
+  .settings-inline-fields {
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .settings-field.full { grid-column:auto; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .route-stage,
+  .toggle-thumb,
+  .toggle-control {
+    animation:none !important;
+    transition:none !important;
+  }
+}
+
+.overlay-layer,
+.mobile-menu-layer {
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  animation:overlay-enter 100ms ease-out both;
+}
+
+.command-dialog,
+.action-sheet,
+.form-sheet,
+.mobile-menu-sheet,
+.profile-popover {
+  animation:surface-enter 130ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes overlay-enter {
+  from { background-color:rgba(10,12,15,0); }
+  to { background-color:rgba(10,12,15,.34); }
+}
+
+@keyframes surface-enter {
+  from { opacity:.7; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+@media(max-width:760px) {
+  .action-sheet,
+  .form-sheet,
+  .mobile-menu-sheet {
+    animation:sheet-enter 150ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  @keyframes sheet-enter {
+    from { transform:translateY(18px); opacity:.82; }
+    to { transform:translateY(0); opacity:1; }
+  }
+}
+
+.form-toggle-field {
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 2px;
+}
+
+.form-toggle-field > span {
+  font-size:9px;
+  font-weight:600;
+  color:var(--text-2);
+}
+
+
+/* ===== migrated from enterprise-polish-v8.css ===== */
+/* Binso Admin v8 – enterprise interaction and visual polish */
+
+:root{
+  --motion-fast:110ms;
+  --motion-normal:160ms;
+  --ease-ui:cubic-bezier(.2,.75,.2,1);
+}
+
+html{
+  scrollbar-gutter:stable;
+  scroll-behavior:auto;
+}
+
+body{
+  overflow-x:hidden;
+  text-rendering:auto;
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
+}
+
+button,
+a,
+[role='button']{
+  touch-action:manipulation;
+}
+
+/* Header: compact utility bar, not a CTA bar */
+.topbar{
+  grid-template-columns:188px minmax(260px,560px) 1fr;
+  gap:14px;
+  height:56px;
+  padding:0 16px;
+}
+
+.app-frame{padding-top:56px}
+.app-shell{min-height:calc(100dvh - 56px)}
+.desktop-nav{top:56px}
+
+.global-search{
+  height:32px;
+  border-color:transparent;
+  background:var(--surface-2);
+  border-radius:7px;
+  transition:background var(--motion-fast) ease,border-color var(--motion-fast) ease;
+}
+
+.global-search:hover{
+  background:var(--surface-3);
+}
+
+.global-search:focus-visible{
+  border-color:var(--line-strong);
+}
+
+.topbar-actions{gap:3px}
+
+.topbar-create,
+.topbar-icon,
+.avatar-button{
+  transition:background var(--motion-fast) ease,color var(--motion-fast) ease,transform var(--motion-fast) var(--ease-ui);
+}
+
+.topbar-create{
+  width:32px;
+  height:32px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:var(--text-2);
+}
+
+.topbar-create:hover,
+.topbar-icon:hover,
+.avatar-button:hover{
+  background:var(--surface-2);
+  color:var(--text);
+}
+
+.topbar-create:active,
+.topbar-icon:active,
+.avatar-button:active{
+  transform:scale(.95);
+}
+
+.topbar-icon{width:32px;height:32px;border-radius:7px}
+.avatar-button{width:34px;height:34px}
+.avatar{width:27px;height:27px;border:0;background:var(--surface-3)}
+
+/* Sidebar: flatter active state, less "button" appearance */
+.desktop-nav{
+  width:188px;
+  padding:14px 9px 12px;
+}
+
+.desktop-nav nav{gap:1px}
+.desktop-nav nav a{
+  position:relative;
+  min-height:34px;
+  padding:0 8px;
+  border-radius:6px;
+  font-weight:500;
+  transition:background var(--motion-fast) ease,color var(--motion-fast) ease;
+}
+
+.desktop-nav nav a.active{
+  background:var(--surface-2);
+  color:var(--text);
+  font-weight:600;
+}
+
+.desktop-nav nav a.active::before{
+  content:'';
+  position:absolute;
+  left:-5px;
+  width:2px;
+  height:16px;
+  border-radius:99px;
+  background:var(--text);
+}
+
+.nav-section-label{
+  font-size:8px;
+  letter-spacing:.08em;
+  font-weight:600;
+}
+
+/* Page actions: compact toolbar actions, not oversized primary CTAs */
+.page-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.page-actions .button{
+  min-height:32px;
+  padding:0 9px;
+  border-radius:7px;
+  font-size:10.5px;
+  font-weight:600;
+  box-shadow:none;
+}
+
+.page-actions .button.primary{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--line-strong);
+}
+
+.page-actions .button.primary:hover{
+  background:var(--surface-2);
+}
+
+/* Buttons: reserve strong fill for actual commit/submit actions */
+.button{
+  border-radius:7px;
+  font-weight:600;
+  transition:background var(--motion-fast) ease,border-color var(--motion-fast) ease,color var(--motion-fast) ease,transform var(--motion-fast) var(--ease-ui);
+}
+
+.button:not(:disabled):active{transform:scale(.98)}
+.button.secondary:hover{background:var(--surface-2)}
+.icon-button{transition:background var(--motion-fast) ease,color var(--motion-fast) ease,transform var(--motion-fast) var(--ease-ui)}
+.icon-button:active{transform:scale(.94)}
+
+/* Desktop quick-create: small command popover instead of a large sheet/card */
+@media(min-width:761px){
+  .quick-create-layer{
+    display:block;
+    background:transparent!important;
+    pointer-events:none;
+    padding:0!important;
+  }
+
+  .quick-create-sheet{
+    position:fixed;
+    top:50px;
+    right:54px;
+    width:318px!important;
+    max-height:min(70dvh,560px)!important;
+    padding:6px 0!important;
+    border:1px solid var(--line-strong);
+    border-radius:11px!important;
+    background:var(--surface);
+    box-shadow:0 14px 38px rgba(18,22,30,.13)!important;
+    pointer-events:auto;
+    overflow:hidden;
+  }
+
+  html[data-theme='dark'] .quick-create-sheet{
+    box-shadow:0 18px 46px rgba(0,0,0,.42)!important;
+  }
+
+  .quick-create-sheet .sheet-grabber{display:none}
+
+  .quick-create-heading{
+    padding:8px 12px 9px!important;
+    border-bottom:1px solid var(--line);
+  }
+
+  .quick-create-heading>div{display:grid;gap:1px}
+  .quick-create-heading strong{font-size:10.5px;font-weight:650}
+  .quick-create-heading span{font-size:8.5px;color:var(--muted)}
+  .quick-create-heading .icon-button{width:26px;height:26px}
+
+  .quick-actions-list{border-top:0!important}
+  .quick-actions-list a{
+    min-height:48px!important;
+    grid-template-columns:28px minmax(0,1fr) 16px!important;
+    gap:8px!important;
+    padding:6px 11px!important;
+    border-bottom:0!important;
+    border-radius:0!important;
+  }
+
+  .quick-actions-list a:hover{background:var(--surface-2)}
+  .quick-action-icon{width:26px!important;height:26px!important}
+  .quick-action-copy strong{font-size:10.5px!important;font-weight:600!important}
+  .quick-action-copy small{font-size:8.5px!important}
+}
+
+/* Dialogs/forms: less card-like, flatter hierarchy */
+.command-dialog,
+.form-sheet,
+.document-preview-shell{
+  border-color:var(--line-strong);
+}
+
+.form-sheet{
+  border-radius:14px 14px 0 0;
+}
+
+.sheet-heading{
+  border-bottom:1px solid var(--line);
+  padding-bottom:10px;
+}
+
+.form-grid label>span,
+.block-field>span{
+  font-weight:600;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.block-field textarea,
+.editor-line input{
+  transition:border-color var(--motion-fast) ease,box-shadow var(--motion-fast) ease,background var(--motion-fast) ease;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus,
+.block-field textarea:focus,
+.editor-line input:focus{
+  outline:none;
+  border-color:var(--text-2);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--text) 8%,transparent);
+}
+
+/* Tables/lists: subtle hover only, no card motion */
+.data-row:not(.data-head),
+.compact-list>div,
+.timeline>div{
+  transition:background var(--motion-fast) ease;
+}
+
+.data-row:not(.data-head):hover,
+.compact-list>div:hover{
+  background:color-mix(in srgb,var(--surface-2) 72%,transparent);
+}
+
+/* Route change: fast enough to feel native, no blur */
+.route-stage{
+  animation:binso-route-enter 105ms var(--ease-ui) both!important;
+  will-change:opacity,transform;
+}
+
+@keyframes binso-route-enter{
+  from{opacity:.72;transform:translateY(2px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Scrollbars are quiet on desktop, native on touch */
+@media(hover:hover) and (pointer:fine){
+  *{scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+  *::-webkit-scrollbar{width:8px;height:8px}
+  *::-webkit-scrollbar-track{background:transparent}
+  *::-webkit-scrollbar-thumb{background:var(--line-strong);border:2px solid transparent;background-clip:padding-box;border-radius:99px}
+  *::-webkit-scrollbar-thumb:hover{background:var(--faint);border:2px solid transparent;background-clip:padding-box}
+}
+
+/* Mobile/PWA: lighter, smaller utility pill and native-feeling sheets */
+@media(max-width:760px){
+  html{scrollbar-gutter:auto}
+
+  body{
+    overscroll-behavior-x:none;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .topbar{
+    height:calc(50px + var(--safe-top));
+    padding:var(--safe-top) 12px 0;
+  }
+
+  .app-frame{padding-top:calc(50px + var(--safe-top))}
+
+  .page-actions{display:none}
+
+  .mobile-pill{
+    grid-template-columns:minmax(0,1fr) 1px 38px 1px minmax(0,1fr)!important;
+    width:min(268px,calc(100vw - 22px))!important;
+    height:48px!important;
+    padding:4px!important;
+    column-gap:3px!important;
+    border-color:color-mix(in srgb,var(--line-strong) 80%,transparent)!important;
+    box-shadow:0 8px 22px rgba(18,22,30,.12)!important;
+  }
+
+  html[data-theme='dark'] .mobile-pill{
+    background:#121417!important;
+    border-color:#30343a!important;
+    box-shadow:0 10px 28px rgba(0,0,0,.38)!important;
+  }
+
+  .mobile-pill button{
+    height:38px!important;
+    padding:0 7px!important;
+    font-size:10.5px!important;
+    gap:5px!important;
+  }
+
+  .pill-add{
+    width:38px!important;
+    min-width:38px!important;
+    height:38px!important;
+  }
+
+  .pill-separator{
+    height:18px!important;
+    opacity:.85;
+  }
+
+  .mobile-menu-sheet,
+  .quick-create-sheet,
+  .form-sheet{
+    border-radius:18px 18px 0 0!important;
+    box-shadow:0 -8px 28px rgba(18,22,30,.10)!important;
+  }
+
+  html[data-theme='dark'] .mobile-menu-sheet,
+  html[data-theme='dark'] .quick-create-sheet,
+  html[data-theme='dark'] .form-sheet{
+    box-shadow:0 -12px 34px rgba(0,0,0,.34)!important;
+  }
+
+  .mobile-menu-nav a,
+  .quick-actions-list a{
+    min-height:54px!important;
+  }
+
+  /* prevent iOS form auto zoom while keeping the visual shell compact */
+  input,
+  select,
+  textarea,
+  .command-input input,
+  .search-field input{
+    font-size:16px!important;
+  }
+
+  /* Bottom sheets should scroll internally instead of moving the page behind them */
+  .action-sheet,
+  .form-sheet,
+  .mobile-menu-sheet{
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .route-stage,
+  .topbar-create,
+  .topbar-icon,
+  .avatar-button,
+  .button,
+  .icon-button{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+
+/* v9 – order policy detail */
+.detail-back-row{margin-bottom:14px}.detail-tabs{display:flex;gap:18px;overflow:auto;border-bottom:1px solid var(--line);margin:-4px 0 24px;scrollbar-width:none}.detail-tabs::-webkit-scrollbar{display:none}.detail-tabs a{flex:0 0 auto;padding:10px 1px 9px;text-decoration:none;color:var(--muted);font-size:11.5px;font-weight:600;border-bottom:2px solid transparent}.detail-tabs a:hover{color:var(--text);border-bottom-color:var(--line-strong)}.rule-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}.rule-item{min-width:0;padding:13px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}.rule-item span{display:block;font-size:9px;color:var(--muted);margin-bottom:4px}.rule-item strong{display:block;font-size:11px;color:var(--text);overflow-wrap:anywhere}.chain-list{display:flex;align-items:stretch;gap:0;overflow:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.chain-item{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;align-items:center;gap:9px;padding:13px 14px;border-right:1px solid var(--line);min-width:245px}.chain-index{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}.assignment-grid{grid-template-columns:minmax(230px,1.6fr) minmax(120px,.8fr) minmax(150px,.9fr) minmax(170px,1fr)}
+@media(max-width:900px){.rule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.assignment-grid{grid-template-columns:minmax(220px,1.5fr) 1fr 1fr 1fr}}
+@media(max-width:760px){.detail-tabs{margin-top:-2px;gap:14px}.detail-tabs a{font-size:12px;min-height:42px;display:flex;align-items:center}.rule-grid{grid-template-columns:1fr 1fr}.rule-item{padding:12px}.chain-list{margin-left:-12px;margin-right:-12px;padding-left:12px}.assignment-grid{grid-template-columns:1fr}.data-row.assignment-grid{gap:7px}.data-row.assignment-grid>span:not(.primary-cell){display:flex;justify-content:space-between}.data-row.assignment-grid>span:not(.primary-cell)::before{content:'Regel';font-size:9px;color:var(--muted)}}
+
+
+/* ===== migrated from e2e-v10.css ===== */
+/* E2E polish: functional deep links, empty states, action rows and mobile consistency. */
+.linked-row { text-decoration: none; color: inherit; }
+.empty-state { padding: 28px 0; display: grid; gap: 6px; color: var(--muted); }
+.empty-state strong { color: var(--text); font-size: 13px; }
+.inline-notice { display:flex; align-items:center; gap:8px; margin:0 0 14px; font-size:12px; color:var(--success); }
+.payment-pick-row { width:100%; border:0; border-top:1px solid var(--line); background:transparent; color:var(--text); padding:12px 2px; display:flex; align-items:center; justify-content:space-between; text-align:left; }
+.payment-pick-row:first-child { border-top:0; }
+.text-row-action { border:0; background:transparent; padding:0; }
+.rule-toolbar { display:flex; justify-content:flex-end; margin-bottom:12px; }
+.policy-editor { display:grid; gap:14px; }
+.policy-toggle-list { display:grid; gap:10px; }
+.policy-toggle-row { min-height:42px; display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); }
+.policy-toggle-row:last-child { border-bottom:0; }
+.assignment-action { display:flex; justify-content:flex-end; }
+@media(max-width:760px){
+  .policy-toggle-row{min-height:48px}
+  .preview-actions{overflow-x:auto; scrollbar-width:none}
+  .preview-actions::-webkit-scrollbar{display:none}
+}
+.send-meta{display:flex;gap:20px;padding:10px 0 14px;border-bottom:1px solid var(--line);margin-bottom:14px}.send-meta>span{display:grid;gap:2px;min-width:0}.send-meta small{font-size:9px;color:var(--muted)}.send-meta strong{font-size:11px;font-weight:600;overflow-wrap:anywhere}@media(max-width:760px){.send-meta{display:grid;gap:8px}}
+.integration-banner{display:grid;gap:3px;margin:0 0 14px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text)}.integration-banner strong{font-size:11px}.integration-banner span{font-size:10px;line-height:1.45;color:var(--muted)}
+
+
+/* ===== migrated from e2e-fixes.css ===== */
+/* End-to-end interaction polish */
+.page-action-group{display:flex;align-items:center;gap:8px}
+.payment-pick-row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);padding:12px 2px;text-align:left}
+.payment-pick-row:first-child{border-top:0}.payment-pick-row:hover{background:var(--surface-hover)}
+.notifications-popover{right:58px;width:min(380px,calc(100vw - 24px));padding:8px}
+.popover-title{display:flex;align-items:center;justify-content:space-between;padding:6px 6px 8px}.popover-title strong{font-size:11px}
+.notification-list{display:grid}.notification-list>a{display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:start;padding:10px 7px;border-top:1px solid var(--line);text-decoration:none}.notification-list>a:hover{background:var(--surface-hover)}.notification-list>a span{display:grid;gap:2px}.notification-list>a strong{font-size:10.5px}.notification-list>a small{font-size:9px;color:var(--muted)}
+.time-status-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.text-row-action{width:auto!important;padding:0 7px!important;font-size:9px!important}
+.empty-state{display:grid;gap:5px;padding:28px 0;border-top:1px solid var(--line);color:var(--muted)}.empty-state strong{color:var(--text);font-size:13px}
+.status.inactive{background:var(--surface-soft);color:var(--muted)}
+.compact-list .row-link{width:auto;min-width:30px;padding:0 7px}
+@media(max-width:760px){.page-action-group{display:none}.notifications-popover{position:fixed;left:12px;right:12px;top:calc(58px + env(safe-area-inset-top,0px));width:auto;max-height:60dvh;overflow:auto}.payment-pick-row{min-height:50px}.section-title>.button{min-height:34px}}
+.settings-action-stack{display:grid;gap:8px;justify-items:start}.settings-action-hint{margin:0;max-width:560px;color:var(--muted);font-size:10px;line-height:1.5}
+
+
+/* ===== migrated from responsive-v11.css ===== */
+/* Binso Admin v11 – responsive layout and document/form hardening */
+
+html,
+body {
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+.app-main,
+.page,
+.section-block,
+.surface,
+.data-list,
+.data-row,
+.form-sheet,
+.form-grid,
+.form-grid label,
+.line-editor,
+.line-editor-row,
+.document-preview-shell,
+.preview-toolbar,
+.preview-actions {
+  min-width:0;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width:100%;
+}
+
+/* Desktop dialogs use the available viewport and scroll internally. */
+@media(min-width:761px) {
+  .sheet-layer {
+    place-items:center;
+    padding:24px;
+  }
+
+  .form-sheet {
+    width:min(920px,calc(100vw - 48px));
+    max-height:calc(100dvh - 48px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    border-radius:12px;
+    padding:0 18px 0;
+    scrollbar-gutter:stable;
+  }
+
+  .form-sheet.compact-sheet {
+    width:min(560px,calc(100vw - 48px));
+  }
+
+  .form-sheet.document-editor,
+  .form-sheet.invoice-builder-sheet,
+  .form-sheet.policy-editor {
+    width:min(1040px,calc(100vw - 48px));
+  }
+
+  .sheet-heading {
+    position:sticky;
+    top:0;
+    z-index:5;
+    margin:0 -18px 16px;
+    padding:15px 18px 12px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+  }
+
+  .sheet-actions {
+    position:sticky;
+    bottom:0;
+    z-index:5;
+    margin:20px -18px 0;
+    padding:12px 18px 14px;
+    background:var(--surface);
+    border-top:1px solid var(--line);
+  }
+
+  .sheet-grabber {
+    display:none;
+  }
+}
+
+/* Forms remain readable instead of squeezing fields until they clip. */
+.form-grid {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px 16px;
+}
+
+.form-grid label,
+.block-field {
+  min-width:0;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.block-field textarea,
+.editor-line input,
+.line-editor-row input,
+.line-editor-row select {
+  min-width:0;
+  width:100%;
+}
+
+.form-grid textarea,
+.block-field textarea {
+  min-height:96px;
+  line-height:1.45;
+}
+
+.line-editor {
+  overflow:visible;
+}
+
+.line-editor-row,
+.quote-line-editor {
+  grid-template-columns:minmax(240px,1.6fr) minmax(76px,.45fr) minmax(84px,.5fr) minmax(110px,.65fr) minmax(86px,.5fr) 32px;
+  align-items:end;
+}
+
+.quote-line-editor {
+  grid-template-columns:minmax(260px,1.8fr) minmax(76px,.45fr) minmax(84px,.5fr) minmax(110px,.65fr) 32px;
+}
+
+.invoice-source-list {
+  min-width:0;
+}
+
+.invoice-source-row {
+  min-width:0;
+}
+
+.invoice-source-row > * {
+  min-width:0;
+}
+
+/* PDF preview: actual A4 document is preserved and fitted to the available width. */
+.document-overlay {
+  padding:16px;
+  place-items:center;
+}
+
+.document-preview-shell {
+  width:min(1120px,calc(100vw - 32px));
+  max-height:calc(100dvh - 32px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:12px;
+}
+
+.preview-toolbar,
+.document-warning,
+.preview-actions {
+  flex:0 0 auto;
+}
+
+.preview-toolbar {
+  position:relative;
+  top:auto;
+}
+
+.document-fit-stage {
+  flex:1 1 auto;
+  min-height:0;
+  overflow:auto;
+  overscroll-behavior:contain;
+  padding:20px;
+  background:#eceff2;
+  scrollbar-gutter:stable;
+}
+
+html[data-theme='dark'] .document-fit-stage {
+  background:#101215;
+}
+
+.document-fit-sizer {
+  position:relative;
+  margin:0 auto;
+  flex:none;
+}
+
+.document-fit-page {
+  width:max-content;
+  transform-origin:top left;
+}
+
+.document-fit-page .document-a4 {
+  margin:0;
+}
+
+.preview-actions {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  padding:11px 14px calc(11px + var(--safe-bottom));
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.preview-actions::-webkit-scrollbar {
+  display:none;
+}
+
+.preview-actions .button {
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+/* Tablet: keep forms roomy and positions editable without horizontal clipping. */
+@media(max-width:1100px) and (min-width:761px) {
+  .form-sheet.document-editor,
+  .form-sheet.invoice-builder-sheet,
+  .form-sheet.policy-editor {
+    width:min(860px,calc(100vw - 36px));
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(0,1fr) repeat(3,minmax(86px,.34fr)) 32px;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1;
+  }
+}
+
+/* Mobile / PWA: full-width bottom sheets, sticky controls and no clipped fields. */
+@media(max-width:760px) {
+  .app-main {
+    max-width:100vw;
+    overflow-x:hidden;
+  }
+
+  .page {
+    width:100%;
+    min-width:0;
+  }
+
+  .sheet-layer {
+    place-items:end center;
+    padding:0;
+  }
+
+  .form-sheet,
+  .form-sheet.compact-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.invoice-builder-sheet,
+  .form-sheet.policy-editor {
+    width:100%;
+    max-width:none;
+    max-height:calc(100dvh - max(8px,var(--safe-top)));
+    overflow:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    border-radius:18px 18px 0 0!important;
+    padding:0 14px 0;
+    scrollbar-gutter:auto;
+  }
+
+  .sheet-heading {
+    position:sticky;
+    top:0;
+    z-index:8;
+    margin:0 -14px 14px;
+    padding:13px 14px 11px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+  }
+
+  .sheet-heading > div:first-child {
+    min-width:0;
+  }
+
+  .sheet-heading strong,
+  .sheet-heading span {
+    overflow-wrap:anywhere;
+  }
+
+  .sheet-actions {
+    position:sticky;
+    bottom:0;
+    z-index:8;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin:18px -14px 0;
+    padding:11px 14px calc(11px + var(--safe-bottom));
+    background:var(--surface);
+    border-top:1px solid var(--line);
+  }
+
+  .sheet-actions .button {
+    width:100%;
+    min-width:0;
+  }
+
+  .form-grid {
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .form-grid label.full {
+    grid-column:auto;
+  }
+
+  .form-grid input,
+  .form-grid select {
+    min-height:44px;
+    font-size:16px!important;
+  }
+
+  .form-grid textarea,
+  .block-field textarea {
+    min-height:104px;
+    font-size:16px!important;
+  }
+
+  .line-editor-head {
+    position:sticky;
+    top:58px;
+    z-index:4;
+    background:var(--surface);
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(0,1fr) minmax(96px,.42fr);
+    gap:9px;
+    padding:12px 0;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1;
+  }
+
+  .line-editor-row .line-remove,
+  .quote-line-editor .line-remove {
+    justify-self:end;
+    align-self:end;
+  }
+
+  .invoice-source-row {
+    grid-template-columns:24px minmax(0,1fr);
+    gap:8px 10px;
+    align-items:start;
+  }
+
+  .invoice-source-row > span:last-of-type,
+  .invoice-source-row > strong {
+    grid-column:2;
+  }
+
+  .document-overlay {
+    padding:0;
+    place-items:stretch;
+  }
+
+  .document-preview-shell {
+    width:100%;
+    height:100dvh;
+    max-height:100dvh;
+    border:0;
+    border-radius:0;
+  }
+
+  .preview-toolbar {
+    padding-top:calc(10px + var(--safe-top));
+  }
+
+  .document-fit-stage {
+    padding:12px 10px 18px;
+  }
+
+  .document-fit-page .document-a4 {
+    width:210mm!important;
+    min-height:297mm!important;
+    padding:18mm 17mm 14mm!important;
+    font-size:10pt!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.12)!important;
+  }
+
+  .document-fit-page .document-head {
+    padding-bottom:18mm!important;
+  }
+
+  .document-fit-page .document-address-row {
+    grid-template-columns:1fr 75mm!important;
+    gap:15mm!important;
+    margin-top:13mm!important;
+  }
+
+  .document-fit-page .document-line {
+    grid-template-columns:10mm minmax(0,1fr) 24mm 28mm 30mm!important;
+  }
+
+  .document-fit-page .document-line > * {
+    display:block!important;
+  }
+
+  .document-fit-page .document-total-block {
+    width:82mm!important;
+  }
+
+  .document-fit-page .document-footer {
+    grid-template-columns:1.4fr 1fr 1fr!important;
+    gap:6mm!important;
+  }
+
+  .preview-actions {
+    padding-bottom:calc(10px + var(--safe-bottom));
+    justify-content:flex-start;
+  }
+}
+
+@media(max-width:420px) {
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:1fr;
+  }
+
+  .line-editor-row label,
+  .quote-line-editor label,
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1;
+  }
+
+  .line-editor-row .line-remove,
+  .quote-line-editor .line-remove {
+    justify-self:start;
+  }
+
+  .sheet-actions {
+    grid-template-columns:1fr;
+  }
+}
+
+@media print {
+  .document-fit-stage {
+    display:block!important;
+    overflow:visible!important;
+    padding:0!important;
+    background:#fff!important;
+  }
+
+  .document-fit-sizer {
+    width:210mm!important;
+    height:auto!important;
+    margin:0!important;
+  }
+
+  .document-fit-page {
+    width:210mm!important;
+    transform:none!important;
+  }
+
+  .document-fit-page .document-a4 {
+    margin:0!important;
+  }
+}
+
+
+/* v11.1 – mobile/PWA pill polish
+   Three calm actions, no separators. The central create action floats slightly
+   outside the pill to create a native app-like focal point without increasing
+   the overall navigation footprint. */
+@media(max-width:760px) {
+  .mobile-pill {
+    grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr)!important;
+    column-gap:6px!important;
+    width:min(278px,calc(100vw - 24px))!important;
+    height:48px!important;
+    padding:4px 7px!important;
+    overflow:visible!important;
+  }
+
+  .mobile-pill .pill-separator {
+    display:none!important;
+  }
+
+  .mobile-pill button {
+    height:40px!important;
+  }
+
+  .mobile-pill .pill-add {
+    width:56px!important;
+    min-width:56px!important;
+    height:56px!important;
+    padding:0!important;
+    align-self:center!important;
+    justify-self:center!important;
+    border-radius:50%!important;
+    background:var(--text)!important;
+    color:var(--bg)!important;
+    border:4px solid var(--surface)!important;
+    box-shadow:0 8px 20px rgba(17,19,24,.20)!important;
+    transform:translateY(-5px)!important;
+    z-index:2!important;
+    transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease!important;
+  }
+
+  .mobile-pill .pill-add svg {
+    width:21px!important;
+    height:21px!important;
+    stroke-width:2!important;
+  }
+
+  .mobile-pill .pill-add:active {
+    transform:translateY(-4px) scale(.94)!important;
+    box-shadow:0 5px 14px rgba(17,19,24,.16)!important;
+  }
+
+  .mobile-pill .pill-search,
+  .mobile-pill .pill-menu {
+    padding:0 8px!important;
+  }
+
+  html[data-theme='dark'] .mobile-pill .pill-add {
+    background:#f5f6f7!important;
+    color:#111318!important;
+    border-color:#121417!important;
+    box-shadow:0 9px 24px rgba(0,0,0,.48)!important;
+  }
+}
+
+/* v11.2 – official Binso brand assets + balanced floating create action */
+.binso-logo {
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-start;
+  min-width:0;
+  height:30px;
+  overflow:hidden;
+}
+
+.binso-logo img {
+  display:block;
+  width:auto;
+  height:30px;
+  object-fit:contain;
+}
+
+.binso-logo.compact,
+.binso-logo.compact img {
+  width:30px;
+  height:30px;
+}
+
+.binso-logo-dark { display:none!important; }
+html[data-theme='dark'] .binso-logo-light { display:none!important; }
+html[data-theme='dark'] .binso-logo-dark { display:block!important; }
+
+.document-brand img {
+  display:block;
+  width:118px;
+  height:auto;
+}
+
+@media(max-width:760px) {
+  .topbar .binso-logo {
+    height:28px;
+  }
+
+  .topbar .binso-logo img {
+    height:28px;
+  }
+
+  .mobile-pill {
+    grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important;
+    column-gap:7px!important;
+    width:min(282px,calc(100vw - 24px))!important;
+    height:46px!important;
+    padding:3px 7px!important;
+    overflow:visible!important;
+  }
+
+  .mobile-pill button {
+    height:38px!important;
+  }
+
+  .mobile-pill .pill-add {
+    width:60px!important;
+    min-width:60px!important;
+    height:60px!important;
+    padding:0!important;
+    align-self:center!important;
+    justify-self:center!important;
+    border-radius:50%!important;
+    background:var(--text)!important;
+    color:var(--bg)!important;
+    border:4px solid var(--surface)!important;
+    box-shadow:0 10px 24px rgba(17,19,24,.22)!important;
+    transform:none!important;
+    z-index:3!important;
+    transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease!important;
+  }
+
+  .mobile-pill .pill-add svg {
+    width:22px!important;
+    height:22px!important;
+    stroke-width:2!important;
+  }
+
+  .mobile-pill .pill-add:active {
+    transform:scale(.94)!important;
+    box-shadow:0 6px 16px rgba(17,19,24,.18)!important;
+  }
+
+  .mobile-pill .pill-search,
+  .mobile-pill .pill-menu {
+    padding:0 8px!important;
+  }
+
+  html[data-theme='dark'] .mobile-pill .pill-add {
+    background:#f5f6f7!important;
+    color:#111318!important;
+    border-color:#121417!important;
+    box-shadow:0 11px 28px rgba(0,0,0,.5)!important;
+  }
+}
+
+@media print {
+  .document-brand img {
+    width:118px!important;
+  }
+}
+
+
+/* ===== migrated from responsive-v12.css ===== */
+/* Binso Admin v12 – module visibility + dialog/form hardening */
+
+/* Avoid legacy browser state making module lists look empty while the store hydrates. */
+.data-list,
+.data-row,
+.module-toolbar,
+.form-sheet,
+.form-grid,
+.line-editor,
+.invoice-source-list {
+  min-width:0;
+}
+
+/* Dialogs: always fit inside the viewport and keep content reachable. */
+.overlay-layer.sheet-layer {
+  overflow:hidden;
+}
+
+.form-sheet {
+  box-sizing:border-box;
+  max-width:calc(100vw - 32px);
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  scroll-padding-top:72px;
+  scroll-padding-bottom:84px;
+}
+
+.form-sheet .sheet-heading {
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:var(--surface);
+}
+
+.form-sheet .sheet-actions {
+  position:sticky;
+  bottom:0;
+  z-index:20;
+  background:var(--surface);
+}
+
+.form-sheet input,
+.form-sheet select,
+.form-sheet textarea,
+.line-editor-row input,
+.line-editor-row select {
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+
+.invoice-builder-sheet,
+.document-editor {
+  width:min(1040px,calc(100vw - 32px))!important;
+}
+
+.invoice-builder-sheet .form-grid,
+.document-editor .form-grid {
+  width:100%;
+}
+
+.line-editor-row,
+.quote-line-editor {
+  width:100%;
+  min-width:0;
+}
+
+/* Desktop / tablet: never crop controls at the viewport edges. */
+@media(min-width:761px) {
+  .overlay-layer.sheet-layer {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:24px!important;
+  }
+
+  .form-sheet {
+    max-height:calc(100dvh - 48px)!important;
+    border-radius:14px!important;
+  }
+
+  .form-sheet.compact-sheet {
+    width:min(620px,calc(100vw - 48px))!important;
+  }
+
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    width:min(1040px,calc(100vw - 48px))!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(220px,1.6fr) minmax(72px,.45fr) minmax(82px,.5fr) minmax(104px,.65fr) minmax(78px,.5fr) 32px!important;
+  }
+
+  .quote-line-editor {
+    grid-template-columns:minmax(240px,1.8fr) minmax(72px,.45fr) minmax(82px,.5fr) minmax(104px,.65fr) 32px!important;
+  }
+}
+
+@media(max-width:1000px) and (min-width:761px) {
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:minmax(0,1fr) minmax(90px,.35fr) minmax(90px,.35fr)!important;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1;
+  }
+
+  .line-editor-row .line-remove,
+  .quote-line-editor .line-remove {
+    justify-self:end;
+  }
+}
+
+/* Mobile / installed PWA: modules stay visible as flat lists, not cards. */
+@media(max-width:760px) {
+  .data-list {
+    display:block!important;
+    width:100%!important;
+    overflow:visible!important;
+    border-top:1px solid var(--line);
+  }
+
+  .data-row.data-head {
+    display:none!important;
+  }
+
+  .data-row:not(.data-head),
+  .customer-grid,
+  .quote-grid,
+  .invoice-grid,
+  .employee-grid,
+  .order-grid,
+  .time-grid,
+  .supplier-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-auto-flow:row!important;
+    gap:5px 12px!important;
+    align-items:start!important;
+    padding:13px 2px!important;
+    border-bottom:1px solid var(--line)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  .data-row:not(.data-head) > * {
+    min-width:0!important;
+  }
+
+  .data-row:not(.data-head) > .primary-cell {
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+
+  .data-row:not(.data-head) > span:not(.primary-cell) {
+    grid-column:1!important;
+    font-size:10px!important;
+    color:var(--muted)!important;
+  }
+
+  .data-row:not(.data-head) > span.status {
+    width:max-content!important;
+    color:inherit!important;
+  }
+
+  .data-row:not(.data-head) > .row-actions,
+  .data-row:not(.data-head) > .row-link,
+  .data-row:not(.data-head) > button.row-link {
+    grid-column:2!important;
+    grid-row:1 / span 6!important;
+    align-self:center!important;
+    justify-self:end!important;
+  }
+
+  .module-toolbar {
+    display:flex!important;
+    gap:10px!important;
+    align-items:center!important;
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .module-toolbar .search-field {
+    min-width:0!important;
+    flex:1 1 auto!important;
+  }
+
+  .toolbar-meta {
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+  }
+
+  .overlay-layer.sheet-layer {
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+  }
+
+  .form-sheet,
+  .form-sheet.compact-sheet,
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    width:100%!important;
+    max-width:none!important;
+    max-height:calc(100dvh - max(6px,var(--safe-top)))!important;
+    margin:0!important;
+    padding:0 14px!important;
+    border-radius:20px 20px 0 0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-gutter:auto;
+  }
+
+  .form-sheet .sheet-heading {
+    margin:0 -14px 14px!important;
+    padding:14px 14px 12px!important;
+  }
+
+  .form-sheet .sheet-actions {
+    margin:18px -14px 0!important;
+    padding:11px 14px calc(11px + var(--safe-bottom))!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+
+  .form-sheet .sheet-actions .button {
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  .form-grid {
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+  }
+
+  .form-grid label.full {
+    grid-column:auto!important;
+  }
+
+  .form-sheet input,
+  .form-sheet select,
+  .form-sheet textarea {
+    font-size:16px!important;
+  }
+
+  .form-sheet input,
+  .form-sheet select {
+    min-height:44px!important;
+  }
+
+  .form-sheet textarea {
+    min-height:104px!important;
+  }
+
+  .line-editor {
+    width:100%!important;
+    overflow:visible!important;
+  }
+
+  .line-editor-head {
+    position:relative!important;
+    top:auto!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(96px,.42fr)!important;
+    gap:9px!important;
+    width:100%!important;
+  }
+
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1/-1!important;
+  }
+
+  .invoice-source-row {
+    display:grid!important;
+    grid-template-columns:24px minmax(0,1fr)!important;
+    gap:7px 10px!important;
+    width:100%!important;
+  }
+
+  .invoice-source-row > span:last-of-type,
+  .invoice-source-row > strong {
+    grid-column:2!important;
+  }
+
+  .document-preview-shell {
+    width:100%!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+
+  .document-fit-stage {
+    min-height:0!important;
+    overflow:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+@media(max-width:420px) {
+  .form-sheet .sheet-actions {
+    grid-template-columns:1fr!important;
+  }
+
+  .line-editor-row,
+  .quote-line-editor {
+    grid-template-columns:1fr!important;
+  }
+
+  .line-editor-row label,
+  .quote-line-editor label,
+  .line-editor-row label:first-child,
+  .quote-line-editor label:first-child {
+    grid-column:1!important;
+  }
+}
+
+
+/* v12.1 – logo transparency, pill centering, mobile navigation polish, dashboard rows */
+
+/* Transparent brand assets behave like native UI logos. */
+.binso-logo,
+.document-brand {
+  background: transparent !important;
+}
+
+/* Dashboard compact rows are rendered as links – style them consistently. */
+.compact-list > a,
+.compact-list > div {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:14px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+  font-size:10px;
+  text-decoration:none;
+}
+
+.compact-list > a:last-child,
+.compact-list > div:last-child {
+  border-bottom:0;
+}
+
+.compact-list > a strong,
+.compact-list > div strong {
+  color:var(--text);
+}
+
+.compact-list > a > :nth-child(2),
+.compact-list > div > :nth-child(2) {
+  justify-self:end;
+  white-space:nowrap;
+}
+
+.compact-list > a > .status,
+.compact-list > div > .status {
+  justify-self:end;
+}
+
+@media (max-width:760px) {
+  .topbar {
+    border-bottom:1px solid var(--line) !important;
+  }
+
+  .topbar-brand {
+    min-width:0;
+  }
+
+  .topbar .binso-logo,
+  .topbar .binso-logo img {
+    background:transparent !important;
+  }
+
+  /* Cleaner floating pill with perfectly balanced central action. */
+  .mobile-pill {
+    grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr) !important;
+    column-gap:8px !important;
+    width:min(304px, calc(100vw - 24px)) !important;
+    height:50px !important;
+    padding:4px 8px !important;
+    overflow:visible !important;
+    border-radius:999px !important;
+  }
+
+  .mobile-pill button {
+    height:40px !important;
+  }
+
+  .mobile-pill .pill-search,
+  .mobile-pill .pill-menu {
+    min-width:0 !important;
+    padding:0 10px !important;
+    background:transparent !important;
+    border:0 !important;
+  }
+
+  .mobile-pill .pill-add {
+    width:64px !important;
+    min-width:64px !important;
+    height:64px !important;
+    margin-top:-11px !important;
+    margin-bottom:-11px !important;
+    align-self:center !important;
+    justify-self:center !important;
+    display:grid !important;
+    place-items:center !important;
+    border-radius:50% !important;
+    border:5px solid var(--surface) !important;
+    background:var(--text) !important;
+    color:var(--bg) !important;
+    box-shadow:0 14px 28px rgba(17, 19, 24, 0.22) !important;
+    transform:none !important;
+    z-index:4 !important;
+  }
+
+  .mobile-pill .pill-add svg {
+    width:24px !important;
+    height:24px !important;
+    stroke-width:2.2 !important;
+  }
+
+  html[data-theme='dark'] .mobile-pill .pill-add {
+    background:#f5f6f7 !important;
+    color:#111318 !important;
+    border-color:#121417 !important;
+    box-shadow:0 16px 30px rgba(0,0,0,.52) !important;
+  }
+
+  /* Remove the visual duplicate line at the top of the mobile nav sheet. */
+  .mobile-menu-sheet {
+    border-top:0 !important;
+  }
+
+  .mobile-menu-nav {
+    margin-top:6px !important;
+  }
+
+  .mobile-menu-sheet nav a:first-child,
+  .mobile-menu-nav a:first-child {
+    border-top:0 !important;
+  }
+
+  .sheet-heading {
+    border-bottom:1px solid var(--line);
+  }
+
+  .mobile-menu-sheet .sheet-heading {
+    border-bottom:1px solid var(--line);
+    margin-bottom:8px !important;
+    padding-bottom:12px !important;
+  }
+
+  /* Sales + Zahlungen readable as stacked rows on mobile. */
+  .dashboard-bottom-grid {
+    gap:16px !important;
+  }
+
+  .compact-list > a,
+  .compact-list > div {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:4px 12px !important;
+    align-items:start !important;
+    padding:12px 0 !important;
+  }
+
+  .compact-list > a > .primary-cell,
+  .compact-list > div > .primary-cell {
+    grid-column:1 / -1 !important;
+  }
+
+  .compact-list > a > :nth-child(2),
+  .compact-list > div > :nth-child(2) {
+    grid-column:1 !important;
+    justify-self:start !important;
+    font-size:10px !important;
+  }
+
+  .compact-list > a > .status,
+  .compact-list > div > .status,
+  .compact-list > a > strong:last-child,
+  .compact-list > div > strong:last-child {
+    grid-column:2 !important;
+    grid-row:1 / span 2 !important;
+    align-self:center !important;
+    justify-self:end !important;
+  }
+
+  .compact-list > a > strong:last-child,
+  .compact-list > div > strong:last-child {
+    font-size:15px !important;
+    line-height:1.1 !important;
+  }
+}
+
+
+/* ===== migrated from ux-system-v13.css ===== */
+/* Binso Admin v13 – shared interaction system
+   One behaviour model for desktop, tablet, mobile and installed PWA. */
+
+:root {
+  --control-h: 36px;
+  --touch-h: 44px;
+  --sheet-desktop-max: 1040px;
+  --sheet-compact-max: 620px;
+}
+
+/* Global interaction primitives */
+.button,
+.icon-button,
+.row-link,
+.topbar-create,
+.topbar-icon,
+.avatar-button,
+.toggle-control,
+.mobile-pill button,
+.quick-actions-list a,
+.mobile-menu-nav a,
+.command-results a,
+.payment-pick-row {
+  touch-action: manipulation;
+}
+
+.button,
+.icon-button,
+.row-link,
+.toggle-control,
+input,
+select,
+textarea {
+  flex-shrink: 0;
+}
+
+.button:disabled,
+.icon-button:disabled,
+.toggle-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* Overlays always occupy the visual viewport and never leak horizontally. */
+.overlay-layer {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: 100vw !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+.overlay-layer > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Shared sheet behaviour. Sticky top + bottom actions, scrollable content. */
+.form-sheet,
+.action-sheet,
+.document-preview-shell {
+  box-sizing: border-box;
+  min-width: 0;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.form-sheet {
+  position: relative;
+  isolation: isolate;
+  scroll-padding-top: 76px;
+  scroll-padding-bottom: 92px;
+}
+
+.form-sheet .sheet-heading,
+.action-sheet .sheet-heading {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.form-sheet .sheet-actions {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 30 !important;
+  background: var(--surface) !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.form-sheet .sheet-heading > div,
+.action-sheet .sheet-heading > div {
+  min-width: 0;
+}
+
+.form-sheet .sheet-heading strong,
+.form-sheet .sheet-heading span,
+.action-sheet .sheet-heading strong,
+.action-sheet .sheet-heading span {
+  overflow-wrap: anywhere;
+}
+
+.form-grid,
+.line-editor,
+.line-editor-row,
+.quote-line-editor,
+.invoice-source-list,
+.settings-stack,
+.setting-line,
+.template-editor-fields {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.form-grid > *,
+.line-editor-row > *,
+.quote-line-editor > *,
+.setting-line > * {
+  min-width: 0;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  max-width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Toggle is the standard for persistent binary settings. */
+.form-toggle-field,
+.setting-line:has(.toggle-control),
+.policy-toggle-list > div:has(.toggle-control) {
+  min-height: 48px;
+}
+
+.toggle-control {
+  flex: 0 0 auto;
+}
+
+/* Command/search surfaces */
+.command-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: min(72dvh, 720px);
+  overflow: hidden !important;
+}
+
+.command-results {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-popover,
+.notifications-popover {
+  max-height: calc(100dvh - 72px - var(--safe-top) - var(--safe-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Document preview always has a reachable toolbar/actions. */
+.document-preview-shell {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.preview-toolbar,
+.preview-actions {
+  flex: 0 0 auto;
+  background: var(--surface);
+  z-index: 20;
+}
+
+.document-fit-stage,
+.document-preview-stage {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Desktop and tablet */
+@media (min-width: 761px) {
+  .overlay-layer.sheet-layer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 24px !important;
+  }
+
+  .form-sheet,
+  .action-sheet {
+    width: min(var(--sheet-desktop-max), calc(100vw - 48px)) !important;
+    max-height: calc(100dvh - 48px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border-radius: 14px !important;
+    scrollbar-gutter: stable;
+  }
+
+  .form-sheet.compact-sheet,
+  .action-sheet.quick-create-sheet {
+    width: min(var(--sheet-compact-max), calc(100vw - 48px)) !important;
+  }
+
+  .form-sheet .sheet-heading,
+  .action-sheet .sheet-heading {
+    margin: 0 -16px 14px !important;
+    padding: 12px 16px !important;
+  }
+
+  .form-sheet .sheet-actions {
+    margin: 18px -16px -1px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  .form-sheet .sheet-actions .button {
+    width: auto !important;
+    min-width: 96px;
+  }
+}
+
+/* Mobile + installed PWA */
+@media (max-width: 760px) {
+  .overlay-layer.sheet-layer {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  .form-sheet,
+  .action-sheet,
+  .form-sheet.compact-sheet,
+  .invoice-builder-sheet,
+  .document-editor,
+  .policy-editor {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - max(4px, var(--safe-top))) !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border-radius: 20px 20px 0 0 !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  .sheet-grabber {
+    position: sticky;
+    top: 0;
+    z-index: 35;
+  }
+
+  .form-sheet .sheet-heading,
+  .action-sheet .sheet-heading {
+    margin: 0 -14px 14px !important;
+    padding: 14px 14px 12px !important;
+    min-height: 58px;
+    align-items: flex-start;
+  }
+
+  .form-sheet .sheet-actions {
+    margin: 18px -14px 0 !important;
+    padding: 10px 14px calc(10px + var(--safe-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    gap: 8px !important;
+  }
+
+  .form-sheet .sheet-actions .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: var(--touch-h) !important;
+  }
+
+  .button,
+  .icon-button,
+  .row-link,
+  .topbar-create,
+  .topbar-icon,
+  .avatar-button,
+  .toggle-control {
+    min-height: var(--touch-h);
+  }
+
+  .icon-button,
+  .row-link,
+  .topbar-icon,
+  .avatar-button {
+    min-width: var(--touch-h);
+  }
+
+  .form-sheet input,
+  .form-sheet select,
+  .form-sheet textarea,
+  .settings-field input,
+  .settings-field select,
+  .settings-field textarea,
+  .setting-line input,
+  .setting-line select,
+  .setting-line textarea {
+    font-size: 16px !important;
+  }
+
+  .form-sheet input,
+  .form-sheet select,
+  .settings-field input,
+  .settings-field select,
+  .setting-line input,
+  .setting-line select {
+    min-height: var(--touch-h) !important;
+  }
+
+  .quick-create-sheet {
+    padding-bottom: calc(12px + var(--safe-bottom)) !important;
+  }
+
+  .quick-actions-list a,
+  .mobile-menu-nav a,
+  .command-results a,
+  .payment-pick-row {
+    min-height: 50px !important;
+  }
+
+  .profile-popover,
+  .notifications-popover {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .document-preview-shell {
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .preview-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    padding-bottom: calc(10px + var(--safe-bottom)) !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .preview-actions .button {
+    white-space: nowrap;
+    min-height: var(--touch-h) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .form-sheet .sheet-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (display-mode: standalone) {
+  .overlay-layer,
+  .form-sheet,
+  .action-sheet,
+  .document-preview-shell {
+    overscroll-behavior: contain;
+  }
+}
+
+
+/* ===== migrated from platform-hardening-v14.css ===== */
+/* Binso Admin v14 – final cross-platform layout hardening */
+
+html,body{max-width:100%;overflow-x:clip}
+img,svg{max-width:100%}
+
+/* Generic overlays and sheets: content must always remain reachable. */
+.overlay-layer,.mobile-menu-layer{max-width:100vw;overflow:hidden}
+.form-sheet,.action-sheet,.document-preview-shell,.command-dialog,.profile-popover,.notifications-popover{box-sizing:border-box;min-width:0;max-width:100%}
+.form-sheet,.action-sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.form-sheet .sheet-heading,.action-sheet .sheet-heading{position:sticky;top:0;z-index:40;background:var(--surface);border-bottom:1px solid var(--line)}
+.form-sheet .sheet-actions{position:sticky;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line)}
+.form-grid,.form-grid>*,.line-editor,.line-editor-row,.quote-line-editor,.invoice-source-list,.invoice-source-row{min-width:0;max-width:100%}
+input,select,textarea{max-width:100%;min-width:0}
+
+/* A4 preview is always the exact printable document and is scaled as a whole. */
+.document-fit-stage{min-width:0;min-height:0;overflow:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.document-fit-sizer{position:relative;margin:0 auto;flex:none}
+.document-fit-page{width:max-content!important;transform-origin:top left!important}
+.document-fit-page .document-a4{width:210mm!important;min-height:297mm!important;margin:0!important;padding:18mm 17mm 14mm!important;font-size:10pt!important;line-height:1.45!important;background:#fff!important;color:#151515!important;box-shadow:0 8px 24px rgba(0,0,0,.12)!important}
+.document-fit-page .document-head{padding-bottom:18mm!important}
+.document-fit-page .document-address-row{grid-template-columns:1fr 75mm!important;gap:15mm!important;margin-top:13mm!important}
+.document-fit-page .document-line{grid-template-columns:10mm minmax(0,1fr) 24mm 28mm 30mm!important;gap:4mm!important}
+.document-fit-page .document-line>*{display:block!important}
+.document-fit-page .document-line>*:nth-child(n+3){text-align:right!important}
+.document-fit-page .document-total-block{width:82mm!important}
+.document-fit-page .document-footer{grid-template-columns:1.4fr 1fr 1fr!important;gap:6mm!important}
+.document-brand img{display:block;width:118px!important;height:auto!important;background:transparent!important}
+.preview-toolbar,.preview-actions{flex:0 0 auto;background:var(--surface);z-index:30}
+.preview-actions{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.preview-actions::-webkit-scrollbar{display:none}
+.preview-actions .button{flex:0 0 auto;white-space:nowrap}
+
+/* Remove legacy direct mobile document mutations. DocumentPreviewFrame handles scaling. */
+@media(max-width:760px){
+  .document-fit-page .document-a4{width:210mm!important;min-height:297mm!important;margin:0!important;padding:18mm 17mm 14mm!important;font-size:10pt!important}
+  .document-fit-page .document-address-row{grid-template-columns:1fr 75mm!important;gap:15mm!important}
+  .document-fit-page .document-line{grid-template-columns:10mm minmax(0,1fr) 24mm 28mm 30mm!important}
+  .document-fit-page .document-line>*{display:block!important}
+  .document-fit-page .document-total-block{width:82mm!important}
+  .document-fit-page .document-footer{grid-template-columns:1.4fr 1fr 1fr!important;gap:6mm!important}
+
+  .overlay-layer.sheet-layer{display:flex!important;align-items:flex-end!important;justify-content:center!important;padding:0!important}
+  .form-sheet,.action-sheet,.form-sheet.compact-sheet,.invoice-builder-sheet,.document-editor,.policy-editor{width:100%!important;max-width:100%!important;max-height:calc(100dvh - max(4px,var(--safe-top)))!important;margin:0!important;padding-left:14px!important;padding-right:14px!important;overflow-y:auto!important;overflow-x:hidden!important;border-radius:20px 20px 0 0!important}
+  .form-sheet .sheet-heading,.action-sheet .sheet-heading{margin:0 -14px 14px!important;padding:14px!important;min-height:58px!important}
+  .form-sheet .sheet-actions{margin:18px -14px 0!important;padding:10px 14px calc(10px + var(--safe-bottom))!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important}
+  .form-sheet .sheet-actions .button{width:100%!important;min-width:0!important;min-height:44px!important}
+  .form-sheet input,.form-sheet select,.form-sheet textarea{font-size:16px!important}
+  .form-sheet input,.form-sheet select{min-height:44px!important}
+  .form-sheet textarea{min-height:104px!important}
+
+  .mobile-menu-sheet{width:100%!important;max-height:calc(100dvh - max(4px,var(--safe-top)))!important;overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:calc(80px + var(--safe-bottom))!important}
+  .mobile-menu-sheet .sheet-heading{border-bottom:1px solid var(--line)!important;margin-bottom:0!important}
+  .mobile-menu-nav a:first-child{border-top:0!important}
+
+  .command-dialog{width:calc(100vw - 20px)!important;max-height:calc(100dvh - 96px - var(--safe-top) - var(--safe-bottom))!important}
+  .profile-popover,.notifications-popover{left:10px!important;right:10px!important;width:auto!important;max-height:calc(100dvh - 76px - var(--safe-top) - var(--safe-bottom))!important;overflow-y:auto!important}
+
+  .mobile-pill{grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr)!important;column-gap:8px!important;width:min(304px,calc(100vw - 24px))!important;height:50px!important;padding:4px 8px!important;overflow:visible!important}
+  .mobile-pill button{height:40px!important}
+  .mobile-pill .pill-search,.mobile-pill .pill-menu{padding:0 10px!important;background:transparent!important;border:0!important}
+  .mobile-pill .pill-add{width:64px!important;min-width:64px!important;height:64px!important;margin-top:-11px!important;margin-bottom:-11px!important;align-self:center!important;justify-self:center!important;display:grid!important;place-items:center!important;border-radius:50%!important;border:5px solid var(--surface)!important;background:var(--text)!important;color:var(--bg)!important;transform:none!important;z-index:4!important}
+
+  .compact-list>a,.compact-list>div{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:4px 12px!important;align-items:start!important;padding:12px 0!important;text-decoration:none!important;border-bottom:1px solid var(--line)!important}
+  .compact-list>a:last-child,.compact-list>div:last-child{border-bottom:0!important}
+  .compact-list>a>.primary-cell,.compact-list>div>.primary-cell{grid-column:1/-1!important;min-width:0!important}
+  .compact-list>a>:nth-child(2),.compact-list>div>:nth-child(2){grid-column:1!important;justify-self:start!important;white-space:normal!important}
+  .compact-list>a>.status,.compact-list>div>.status,.compact-list>a>strong:last-child,.compact-list>div>strong:last-child{grid-column:2!important;grid-row:1/span 2!important;align-self:center!important;justify-self:end!important}
+}
+
+@media(max-width:420px){
+  .form-sheet .sheet-actions{grid-template-columns:1fr!important}
+}
+
+@media print{
+  .document-fit-stage{display:block!important;overflow:visible!important;padding:0!important;background:#fff!important}
+  .document-fit-sizer{width:210mm!important;height:auto!important;margin:0!important}
+  .document-fit-page{width:210mm!important;transform:none!important}
+  .document-fit-page .document-a4{width:210mm!important;min-height:297mm!important;margin:0!important;box-shadow:none!important}
+}
+
+
+/* ===== migrated from ux-system-v16.css ===== */
+/* Binso Admin v16 – one interaction system across desktop, mobile and PWA */
+
+:root{
+  --page-gutter-desktop:24px;
+  --page-gutter-tablet:20px;
+  --page-gutter-mobile:16px;
+  --tap-min:44px;
+  --motion-fast:120ms;
+  --motion-sheet:180ms;
+}
+
+html{scroll-behavior:auto!important}
+body{overflow-x:hidden}
+.route-stage{min-width:0;animation:none!important}
+.app-main{padding-left:var(--page-gutter-desktop)!important;padding-right:var(--page-gutter-desktop)!important}
+.page{max-width:1600px;margin:0 auto}
+
+/* One button geometry everywhere. */
+.button,.icon-button,.row-link,.text-button,.topbar-create,.topbar-icon,.avatar-button{
+  touch-action:manipulation;
+}
+.button{min-height:36px}
+.icon-button,.row-link{min-width:32px;min-height:32px}
+.button:active,.icon-button:active,.row-link:active{transform:scale(.98)}
+
+/* All overlays must sit above the fixed application chrome. */
+.overlay-layer{z-index:140!important;overscroll-behavior:contain}
+.document-overlay{z-index:180!important}
+
+/* Shared sheet mechanics. */
+.form-sheet,.action-sheet{
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.form-sheet .sheet-heading,.action-sheet .sheet-heading{
+  min-height:58px;
+}
+.form-sheet .sheet-actions{
+  min-height:58px;
+}
+.form-sheet input,.form-sheet select,.form-sheet textarea{
+  width:100%;
+}
+.form-toggle-field,.policy-toggle-row,.setting-line{
+  min-height:48px;
+}
+
+/* Object/detail pages use calm, flat sections instead of card stacks. */
+.section-block,.surface,.settings-group{
+  scroll-margin-top:82px;
+}
+.detail-tabs{
+  scrollbar-width:none;
+}
+.detail-tabs::-webkit-scrollbar{display:none}
+
+/* Settings follow the same progressive disclosure language. */
+.settings-toolbar{
+  scrollbar-width:none;
+}
+.settings-toolbar::-webkit-scrollbar{display:none}
+.settings-group{border-radius:0!important;box-shadow:none!important}
+
+/* Tables/lists always keep content reachable, no accidental clipping. */
+.data-list,.compact-list,.finance-ledger,.timeline{min-width:0}
+.data-row>*{min-width:0}
+.primary-cell strong,.primary-cell small{max-width:100%}
+
+/* Preview is a dedicated experience, never mixed with app navigation. */
+body:has(.document-overlay){overflow:hidden}
+body:has(.document-overlay) .topbar,
+body:has(.document-overlay) .desktop-nav,
+body:has(.document-overlay) .mobile-pill{visibility:hidden!important;pointer-events:none!important}
+.document-overlay{position:fixed!important;inset:0!important;padding:0!important;background:var(--bg)!important}
+.document-preview-shell{width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important}
+
+@media (max-width:1100px) and (min-width:761px){
+  .app-main{padding-left:var(--page-gutter-tablet)!important;padding-right:var(--page-gutter-tablet)!important}
+  .page-header{align-items:flex-start}
+  .page-actions,.page-action-group{flex-wrap:wrap;justify-content:flex-end}
+}
+
+@media (max-width:760px){
+  .app-main{
+    padding-left:var(--page-gutter-mobile)!important;
+    padding-right:var(--page-gutter-mobile)!important;
+    padding-bottom:calc(92px + var(--safe-bottom))!important;
+  }
+  .page{padding-top:18px!important}
+  .page-header,.page-title{
+    align-items:flex-start!important;
+    gap:12px!important;
+    margin-bottom:18px!important;
+  }
+  .page-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important}
+  .page-header>div:first-child{min-width:0}
+  .page-actions,.page-action-group{align-self:start;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .page-actions .button,.page-action-group .button{min-height:38px;padding:0 10px}
+  h1{font-size:24px!important}
+  .page-description{font-size:12px!important;line-height:1.45!important}
+
+  /* While a task is open the global pill must never cover content/actions. */
+  body:has(.sheet-layer) .mobile-pill,
+  body:has(.action-sheet) .mobile-pill,
+  body:has(.command-dialog) .mobile-pill{display:none!important}
+
+  /* Default compact task = bottom sheet. */
+  .sheet-layer{
+    align-items:flex-end!important;
+    padding:0!important;
+  }
+  .form-sheet.bottom-sheet,
+  .action-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet){
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(78dvh,720px)!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border-radius:22px 22px 0 0!important;
+    overflow:auto!important;
+    background:var(--surface)!important;
+    box-shadow:0 -18px 48px rgba(0,0,0,.18)!important;
+  }
+
+  /* Long task = full-screen editor. */
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    box-shadow:none!important;
+    scroll-padding-top:calc(74px + var(--safe-top))!important;
+    scroll-padding-bottom:calc(84px + var(--safe-bottom))!important;
+  }
+  .mobile-fullscreen-sheet .sheet-grabber,
+  .document-editor .sheet-grabber,
+  .policy-editor .sheet-grabber,
+  .invoice-builder-sheet .sheet-grabber{display:none!important}
+
+  .form-sheet .sheet-heading,
+  .action-sheet .sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:25!important;
+    margin:0 -16px 14px!important;
+    padding:calc(12px + var(--safe-top)) 16px 12px!important;
+    background:color-mix(in srgb,var(--surface) 96%,transparent)!important;
+    border-bottom:1px solid var(--line)!important;
+    backdrop-filter:saturate(150%) blur(14px);
+  }
+  .form-sheet.bottom-sheet .sheet-heading,.action-sheet.bottom-sheet .sheet-heading{
+    padding-top:14px!important;
+  }
+  .form-sheet .sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:25!important;
+    margin:18px -16px 0!important;
+    padding:10px 16px calc(10px + var(--safe-bottom))!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    background:color-mix(in srgb,var(--surface) 96%,transparent)!important;
+    border-top:1px solid var(--line)!important;
+    backdrop-filter:saturate(150%) blur(14px);
+  }
+  .form-sheet .sheet-actions .button{width:100%!important;min-height:46px!important}
+
+  /* Inputs: native feel, no iOS zoom, no horizontal clipping. */
+  input,select,textarea{font-size:16px!important}
+  .form-sheet input,.form-sheet select{min-height:46px!important}
+  .form-sheet textarea{min-height:112px!important;resize:vertical}
+  .form-grid,.settings-inline-fields{grid-template-columns:1fr!important;gap:13px!important}
+  .form-grid .full,.settings-field.full{grid-column:auto!important}
+
+  /* Apple Settings-style navigation for detail/settings groups. */
+  .detail-tabs,.settings-toolbar{
+    display:flex!important;
+    width:100%!important;
+    gap:0!important;
+    overflow-x:auto!important;
+    overscroll-behavior-x:contain;
+    padding:0!important;
+    margin:0 0 18px!important;
+    border-top:1px solid var(--line)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  .detail-tabs a,.settings-toolbar button{
+    flex:0 0 auto!important;
+    min-height:44px!important;
+    padding:0 14px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    white-space:nowrap!important;
+  }
+  .settings-toolbar button.active{font-weight:700;color:var(--text)}
+
+  /* Settings rows and toggles remain readable at narrow widths. */
+  .settings-group-head{grid-template-columns:1fr!important;gap:16px!important}
+  .setting-line{grid-template-columns:minmax(0,1fr) auto!important;gap:12px!important;align-items:center!important}
+  .setting-line input:not([type='checkbox']),.setting-line select{max-width:150px!important}
+  .setting-line textarea{max-width:none!important;width:100%!important}
+
+  /* List rows = flat, touch-friendly, no cards. */
+  .data-row:not(.data-head){min-height:58px!important;padding-top:13px!important;padding-bottom:13px!important}
+  .row-link,.icon-button{min-width:44px!important;min-height:44px!important}
+  .compact-list>a,.compact-list>div{min-height:58px!important}
+
+  /* Stable native scroll behavior. */
+  .mobile-menu-sheet,.form-sheet,.action-sheet,.document-fit-stage{
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+}
+
+@media(max-width:420px){
+  .form-sheet .sheet-actions{grid-template-columns:1fr!important}
+  .page-header{grid-template-columns:1fr!important}
+  .page-actions,.page-action-group{justify-content:flex-start!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* v16.1 – mobile full-screen editor hardening */
+@media (max-width:760px){
+  /* Long edit flows must behave like a native full-screen screen, not a sheet below app chrome. */
+  body:has(.mobile-fullscreen-sheet),
+  body:has(.document-editor),
+  body:has(.policy-editor),
+  body:has(.invoice-builder-sheet){
+    overflow:hidden!important;
+  }
+
+  body:has(.mobile-fullscreen-sheet) .topbar,
+  body:has(.mobile-fullscreen-sheet) .desktop-nav,
+  body:has(.mobile-fullscreen-sheet) .mobile-pill,
+  body:has(.document-editor) .topbar,
+  body:has(.document-editor) .desktop-nav,
+  body:has(.document-editor) .mobile-pill,
+  body:has(.policy-editor) .topbar,
+  body:has(.policy-editor) .desktop-nav,
+  body:has(.policy-editor) .mobile-pill,
+  body:has(.invoice-builder-sheet) .topbar,
+  body:has(.invoice-builder-sheet) .desktop-nav,
+  body:has(.invoice-builder-sheet) .mobile-pill{
+    display:none!important;
+  }
+
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    padding:0!important;
+    margin:0!important;
+    background:var(--surface)!important;
+    z-index:1000!important;
+    display:block!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1001!important;
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:contain!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* Compact native editor header: no dead space above content. */
+  .mobile-fullscreen-sheet .sheet-heading,
+  .document-editor .sheet-heading,
+  .policy-editor .sheet-heading,
+  .invoice-builder-sheet .sheet-heading{
+    min-height:calc(58px + var(--safe-top))!important;
+    margin:0 -16px 18px!important;
+    padding:calc(10px + var(--safe-top)) 16px 10px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:10px!important;
+  }
+
+  .mobile-fullscreen-sheet .sheet-heading > div,
+  .document-editor .sheet-heading > div,
+  .policy-editor .sheet-heading > div,
+  .invoice-builder-sheet .sheet-heading > div{
+    min-width:0!important;
+  }
+
+  .mobile-fullscreen-sheet .sheet-heading strong,
+  .document-editor .sheet-heading strong,
+  .policy-editor .sheet-heading strong,
+  .invoice-builder-sheet .sheet-heading strong{
+    display:block!important;
+    font-size:16px!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .mobile-fullscreen-sheet .sheet-heading span,
+  .document-editor .sheet-heading span,
+  .policy-editor .sheet-heading span,
+  .invoice-builder-sheet .sheet-heading span{
+    display:block!important;
+    margin-top:2px!important;
+    font-size:11px!important;
+    line-height:1.3!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .mobile-fullscreen-sheet .sheet-heading .icon-button,
+  .document-editor .sheet-heading .icon-button,
+  .policy-editor .sheet-heading .icon-button,
+  .invoice-builder-sheet .sheet-heading .icon-button{
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    justify-self:end!important;
+  }
+
+  .mobile-fullscreen-sheet .form-grid,
+  .document-editor .form-grid,
+  .policy-editor .form-grid,
+  .invoice-builder-sheet .form-grid{
+    padding-bottom:8px!important;
+  }
+
+  /* Bottom action bar remains reachable above the home indicator. */
+  .mobile-fullscreen-sheet .sheet-actions,
+  .document-editor .sheet-actions,
+  .policy-editor .sheet-actions,
+  .invoice-builder-sheet .sheet-actions{
+    margin-left:-16px!important;
+    margin-right:-16px!important;
+    padding-bottom:calc(10px + var(--safe-bottom))!important;
+  }
+}
+
+
+/* ===== migrated from fullscreen-preview-v15.css ===== */
+/* Binso Admin v15 – fullscreen document preview + standard page spacing */
+
+:root{
+  --page-inline-desktop:24px;
+  --page-inline-tablet:20px;
+  --page-inline-mobile:16px;
+}
+
+/* One spacing system for all normal application pages. */
+.app-main{
+  padding-left:var(--page-inline-desktop)!important;
+  padding-right:var(--page-inline-desktop)!important;
+}
+
+/* Full-screen document mode always sits above the app header, navigation and mobile pill. */
+.document-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:1000!important;
+  width:100vw!important;
+  height:100dvh!important;
+  padding:0!important;
+  margin:0!important;
+  background:var(--bg)!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+
+.document-preview-shell{
+  position:relative!important;
+  width:100vw!important;
+  height:100dvh!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:var(--bg)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+/* No second document header. Only compact floating controls remain. */
+.document-preview-shell > .preview-toolbar{
+  position:absolute!important;
+  top:max(12px,calc(var(--safe-top) + 8px))!important;
+  right:16px!important;
+  left:auto!important;
+  z-index:80!important;
+  width:auto!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:4px!important;
+  border:1px solid var(--line-strong)!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--surface) 92%,transparent)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.12)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
+
+.document-preview-shell > .preview-toolbar > div:first-child{
+  display:none!important;
+}
+
+.document-preview-shell > .preview-toolbar > div:last-child{
+  display:flex!important;
+  align-items:center!important;
+  gap:2px!important;
+}
+
+.document-preview-shell > .preview-toolbar .icon-button{
+  width:38px!important;
+  height:38px!important;
+  border-radius:50%!important;
+  color:var(--text)!important;
+}
+
+/* Warning stays readable but never creates a second header. */
+.document-preview-shell > .document-warning{
+  flex:0 0 auto!important;
+  margin:0!important;
+  padding:10px 88px 10px var(--page-inline-desktop)!important;
+  border-radius:0!important;
+  border-left:0!important;
+  border-right:0!important;
+}
+
+/* The document is the entire viewport content. A4 itself remains exact and is scaled as a whole. */
+.document-preview-shell > .document-fit-stage{
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-height:0!important;
+  padding:max(68px,calc(var(--safe-top) + 60px)) var(--page-inline-desktop) 28px!important;
+  margin:0!important;
+  overflow:auto!important;
+  background:var(--surface-2)!important;
+  scroll-padding:72px 0 100px!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+}
+
+.document-fit-sizer{
+  margin:0 auto!important;
+}
+
+.document-fit-page .document-a4{
+  box-shadow:0 14px 34px rgba(0,0,0,.12)!important;
+}
+
+/* Business actions belong to the preview, not to the global app navigation. */
+.document-preview-shell > .preview-actions{
+  flex:0 0 auto!important;
+  position:relative!important;
+  bottom:auto!important;
+  width:100%!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:8px var(--page-inline-desktop) calc(8px + var(--safe-bottom))!important;
+  border-top:1px solid var(--line)!important;
+  background:var(--surface)!important;
+  display:flex!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  z-index:60!important;
+}
+
+@media(max-width:1100px){
+  .app-main{
+    padding-left:var(--page-inline-tablet)!important;
+    padding-right:var(--page-inline-tablet)!important;
+  }
+
+  .document-preview-shell > .document-fit-stage{
+    padding-left:var(--page-inline-tablet)!important;
+    padding-right:var(--page-inline-tablet)!important;
+  }
+
+  .document-preview-shell > .preview-actions{
+    padding-left:var(--page-inline-tablet)!important;
+    padding-right:var(--page-inline-tablet)!important;
+  }
+}
+
+@media(max-width:760px){
+  .app-main{
+    padding-left:max(var(--page-inline-mobile),env(safe-area-inset-left,0px))!important;
+    padding-right:max(var(--page-inline-mobile),env(safe-area-inset-right,0px))!important;
+  }
+
+  /* The overlay fully covers topbar and pill because of z-index 1000. */
+  .document-preview-shell > .preview-toolbar{
+    top:max(10px,calc(var(--safe-top) + 6px))!important;
+    right:max(10px,env(safe-area-inset-right,0px))!important;
+  }
+
+  .document-preview-shell > .document-warning{
+    padding:10px 96px 10px max(var(--page-inline-mobile),env(safe-area-inset-left,0px))!important;
+  }
+
+  .document-preview-shell > .document-fit-stage{
+    padding-top:max(66px,calc(var(--safe-top) + 58px))!important;
+    padding-left:max(12px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(12px,env(safe-area-inset-right,0px))!important;
+    padding-bottom:18px!important;
+  }
+
+  .document-preview-shell > .preview-actions{
+    min-height:60px!important;
+    padding:8px max(var(--page-inline-mobile),env(safe-area-inset-right,0px)) calc(8px + var(--safe-bottom)) max(var(--page-inline-mobile),env(safe-area-inset-left,0px))!important;
+    justify-content:flex-start!important;
+    scrollbar-width:none!important;
+  }
+
+  .document-preview-shell > .preview-actions::-webkit-scrollbar{
+    display:none!important;
+  }
+
+  .document-preview-shell > .preview-actions .button{
+    min-height:42px!important;
+    flex:0 0 auto!important;
+  }
+}
+
+@media(max-width:420px){
+  .document-preview-shell > .document-fit-stage{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+}
+
+@media print{
+  .document-overlay,
+  .document-preview-shell{
+    position:static!important;
+    width:auto!important;
+    height:auto!important;
+    overflow:visible!important;
+    background:#fff!important;
+  }
+
+  .document-preview-shell > .preview-toolbar,
+  .document-preview-shell > .preview-actions,
+  .document-preview-shell > .document-warning{
+    display:none!important;
+  }
+
+  .document-preview-shell > .document-fit-stage{
+    padding:0!important;
+    overflow:visible!important;
+    background:#fff!important;
+  }
+}
+
+
+/* ===== migrated from sheet-system-v17.css ===== */
+/* Binso Admin v17 – centralized sheet, dialog and full-screen editor system */
+
+:root{
+  --sheet-radius:22px;
+  --sheet-max-width:640px;
+  --sheet-wide-width:1040px;
+  --sheet-backdrop:rgba(7,9,12,.46);
+  --sheet-header-height:60px;
+  --sheet-footer-height:68px;
+}
+
+/* New centralized primitives. */
+.app-sheet-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  background:var(--sheet-backdrop);
+  overscroll-behavior:contain;
+}
+.app-sheet{
+  width:100%;
+  max-width:var(--sheet-max-width);
+  max-height:min(82dvh,760px);
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--line);
+  box-shadow:0 -20px 54px rgba(0,0,0,.24);
+  overflow:hidden;
+}
+.app-sheet-bottom{border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
+.app-sheet-dialog{border-radius:16px}
+.app-sheet-fullscreen{max-width:none;max-height:none;height:100dvh;border:0;border-radius:0}
+.app-sheet-grabber{width:38px;height:4px;border-radius:999px;background:var(--line-strong);margin:9px auto 2px;flex:0 0 auto}
+.app-sheet-header{min-height:var(--sheet-header-height);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto}
+.app-sheet-title{min-width:0;display:grid;gap:2px}
+.app-sheet-title strong{font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-sheet-title span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-sheet-content{min-height:0;overflow:auto;padding:16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.app-sheet-footer{flex:0 0 auto;padding:10px 16px calc(10px + var(--safe-bottom));border-top:1px solid var(--line);background:var(--surface)}
+.app-sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-sheet-actions>.button{width:100%;min-height:46px}
+
+/* Central behaviour for the existing v16 markup, so every legacy sheet follows one system. */
+@media(max-width:760px){
+  body:has(.sheet-layer),
+  body:has(.app-sheet-backdrop){overflow:hidden!important}
+
+  body:has(.sheet-layer) .mobile-pill,
+  body:has(.app-sheet-backdrop) .mobile-pill{display:none!important}
+
+  /* Short tasks behave like native bottom sheets. */
+  .overlay-layer.sheet-layer:has(.bottom-sheet),
+  .overlay-layer.sheet-layer:has(.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)){
+    position:fixed!important;
+    inset:0!important;
+    z-index:1200!important;
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+    background:var(--sheet-backdrop)!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet){
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+    max-height:min(82dvh,760px)!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:1px solid var(--line)!important;
+    border-bottom:0!important;
+    border-radius:var(--sheet-radius) var(--sheet-radius) 0 0!important;
+    background:var(--surface)!important;
+    box-shadow:0 -20px 54px rgba(0,0,0,.24)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-grabber,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-grabber{
+    display:block!important;
+    width:38px!important;
+    height:4px!important;
+    margin:9px auto 2px!important;
+    border-radius:999px!important;
+    background:var(--line-strong)!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-heading,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:20!important;
+    min-height:54px!important;
+    margin:0 -16px 12px!important;
+    padding:10px 16px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  /* Bottom sheets close via swipe/backdrop convention; avoid redundant X on mobile. */
+  .form-sheet.bottom-sheet>.sheet-heading>.icon-button,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading>.icon-button{
+    display:none!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:20!important;
+    margin:18px -16px 0!important;
+    padding:10px 16px calc(10px + var(--safe-bottom))!important;
+    grid-template-columns:1fr 1fr!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  /* Long tasks are true full-screen editor screens. */
+  body:has(.mobile-fullscreen-sheet) .topbar,
+  body:has(.mobile-fullscreen-sheet) .desktop-nav,
+  body:has(.mobile-fullscreen-sheet) .mobile-pill,
+  body:has(.document-editor) .topbar,
+  body:has(.document-editor) .desktop-nav,
+  body:has(.document-editor) .mobile-pill,
+  body:has(.policy-editor) .topbar,
+  body:has(.policy-editor) .desktop-nav,
+  body:has(.policy-editor) .mobile-pill,
+  body:has(.invoice-builder-sheet) .topbar,
+  body:has(.invoice-builder-sheet) .desktop-nav,
+  body:has(.invoice-builder-sheet) .mobile-pill{display:none!important}
+
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    inset:0!important;
+    z-index:1200!important;
+    width:100vw!important;
+    height:100dvh!important;
+    padding:0!important;
+    background:var(--surface)!important;
+    display:block!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1201!important;
+    width:100vw!important;
+    max-width:none!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:0 16px!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    scroll-padding-top:calc(66px + var(--safe-top))!important;
+    scroll-padding-bottom:calc(78px + var(--safe-bottom))!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:30!important;
+    min-height:calc(58px + var(--safe-top))!important;
+    margin:0 -16px 16px!important;
+    padding:calc(8px + var(--safe-top)) 16px 8px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:30!important;
+    margin:18px -16px 0!important;
+    padding:10px 16px calc(10px + var(--safe-bottom))!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    backdrop-filter:none!important;
+  }
+
+  .form-sheet input,.form-sheet select,.form-sheet textarea,
+  .app-sheet input,.app-sheet select,.app-sheet textarea{font-size:16px!important;min-width:0!important;max-width:100%!important}
+  .form-sheet input,.form-sheet select,.app-sheet input,.app-sheet select{min-height:46px!important}
+  .button,.icon-button,.row-link{touch-action:manipulation}
+}
+
+/* Desktop: short sheets become compact dialogs; long editors stay centred and bounded. */
+@media(min-width:761px){
+  .app-sheet-backdrop{align-items:center;padding:24px}
+  .app-sheet-bottom,.app-sheet-dialog{border-radius:16px;max-height:calc(100dvh - 48px);box-shadow:0 24px 70px rgba(0,0,0,.20)}
+  .app-sheet-grabber{display:none}
+  .app-sheet-bottom .app-sheet-close{display:grid}
+
+  .overlay-layer.sheet-layer{padding:24px!important;align-items:center!important;justify-content:center!important}
+  .form-sheet{max-height:calc(100dvh - 48px)!important}
+}
+
+@media(max-width:420px){
+  .app-sheet-actions,
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions{
+    grid-template-columns:1fr!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .app-sheet,.app-sheet-backdrop{animation:none!important;transition:none!important}
+}
+
+
+/* ===== migrated from interactive-rows-v18.css ===== */
+/* Binso Admin v18 – centralised whole-row interaction pattern */
+
+.interactive-row{
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  touch-action:manipulation;
+  transition:background-color 120ms ease, color 120ms ease;
+}
+
+.interactive-row:hover{
+  background:var(--surface-2);
+}
+
+.interactive-row:focus-visible{
+  outline:2px solid var(--text);
+  outline-offset:-2px;
+}
+
+.interactive-row:active{
+  background:var(--surface-3);
+}
+
+.row-disclosure{
+  width:32px;
+  min-width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  justify-self:end;
+  color:var(--muted);
+  pointer-events:none;
+}
+
+.interactive-row:hover .row-disclosure,
+.interactive-row:focus-visible .row-disclosure{
+  color:var(--text);
+}
+
+@media(max-width:760px){
+  .interactive-row{
+    min-height:58px!important;
+  }
+
+  .interactive-row .row-disclosure{
+    grid-column:2!important;
+    grid-row:1 / span 8!important;
+    align-self:center!important;
+    min-width:44px!important;
+    width:44px!important;
+    height:44px!important;
+  }
+
+  /* Touch feedback should be subtle and immediate, not animated like a card. */
+  .interactive-row:hover{background:transparent}
+  .interactive-row:active{background:var(--surface-2)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .interactive-row{transition:none!important}
+}
+
+
+/* ===== migrated from compact-lists-v18-1.css ===== */
+/* Binso Admin v18.1 – compact operational lists + compact page actions */
+
+.employee-mobile-summary{display:none}
+.employee-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:7px;vertical-align:2px;background:var(--faint)}
+.employee-status-dot.active{background:var(--green)}
+.employee-status-dot.inactive{background:var(--faint)}
+
+.page-primary-action{white-space:nowrap}
+
+@media(max-width:760px){
+  /* A page-specific create action is a compact icon on mobile; the label remains accessible. */
+  .page-actions{display:flex!important;align-items:flex-start!important;justify-content:flex-end!important}
+  .page-primary-action{
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    padding:0!important;
+    border-radius:50%!important;
+    border:1px solid var(--line-strong)!important;
+    background:transparent!important;
+    color:var(--text)!important;
+    display:grid!important;
+    place-items:center!important;
+    box-shadow:none!important;
+  }
+  .page-primary-action>span{display:none!important}
+  .page-primary-action svg{width:19px!important;height:19px!important}
+  .page-primary-action:active{background:var(--surface-2)!important;transform:scale(.96)!important}
+
+  /* Employee list is intentionally identification-first: maximum two text lines per person. */
+  .employee-row-compact{
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    min-height:70px!important;
+    padding:11px 0!important;
+    gap:8px!important;
+  }
+  .employee-row-compact .user-cell{
+    grid-column:1!important;
+    grid-row:1!important;
+    min-width:0!important;
+    gap:10px!important;
+    align-items:center!important;
+  }
+  .employee-row-compact .avatar{flex:0 0 auto}
+  .employee-row-compact .primary-cell{gap:3px!important;min-width:0!important}
+  .employee-row-compact .primary-cell strong{
+    display:block!important;
+    font-size:13px!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .employee-row-compact .employee-email,
+  .employee-row-compact .employee-role,
+  .employee-row-compact .employee-hours,
+  .employee-row-compact .employee-billable,
+  .employee-row-compact .employee-utilisation{display:none!important}
+  .employee-row-compact .employee-mobile-summary{
+    display:block!important;
+    font-size:10.5px!important;
+    line-height:1.3!important;
+    color:var(--muted)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .employee-row-compact .row-disclosure{
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:end!important;
+  }
+}
+
+
+/* ===== migrated from compact-rows-v18-2.css ===== */
+/* Binso Admin v18.2 – centralized compact list density */
+
+.mobile-row-summary{display:none}
+
+@media(max-width:760px){
+  /* Overview lists: one title line + one summary line, full row is the target. */
+  .compact-overview-list{display:block!important;width:100%!important;border-top:1px solid var(--line)!important}
+  .compact-overview-list .data-head{display:none!important}
+  .compact-overview-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    gap:8px!important;
+    min-height:66px!important;
+    padding:10px 0!important;
+    align-items:center!important;
+    border-bottom:1px solid var(--line)!important;
+    background:transparent!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  .compact-overview-row>.primary-cell{grid-column:1!important;grid-row:1!important;gap:3px!important;min-width:0!important}
+  .compact-overview-row>.primary-cell>strong{
+    display:block!important;font-size:13px!important;line-height:1.25!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+  }
+  .compact-overview-row .desktop-row-detail,.compact-overview-row .overview-desktop-cell{display:none!important}
+  .compact-overview-row .mobile-row-summary{
+    display:block!important;font-size:10.5px!important;line-height:1.3!important;color:var(--muted)!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+  }
+  .compact-overview-row>.row-disclosure{grid-column:2!important;grid-row:1!important;align-self:center!important;justify-self:end!important}
+  .legacy-mobile-record-list{display:none!important}
+
+  /* Operational lists may use a third compact line because action/status context is required. */
+  .operational-desktop-list{display:none!important}
+  .operational-mobile-list{display:grid!important;border-top:1px solid var(--line)!important}
+  .operational-mobile-list .operational-row{padding:10px 0!important;min-height:72px!important}
+  .operational-mobile-list .record-top strong{display:block;font-size:12px!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .operational-mobile-list .record-top small{display:block;font-size:10px!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .operational-mobile-list .operational-status-line{margin-top:4px!important;font-size:9.5px!important;line-height:1.25!important}
+
+  /* Accounting work lists: maximum three visible lines, actions stay compact. */
+  .operational-compact-list>div{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:4px 10px!important;
+    min-height:68px!important;padding:10px 0!important;align-items:center!important
+  }
+  .operational-compact-list .primary-cell{grid-column:1!important;min-width:0!important}
+  .operational-compact-list .primary-cell strong,.operational-compact-list .primary-cell small{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .operational-compact-list>div>span:not(.primary-cell):not(.status):not(.row-actions){display:none!important}
+  .operational-compact-list>div>strong{grid-column:2!important;grid-row:1!important;justify-self:end!important;white-space:nowrap!important;font-size:12px!important}
+  .operational-compact-list>div>.status{grid-column:1!important;grid-row:2!important;font-size:8.5px!important}
+  .operational-compact-list>div>.row-actions{grid-column:2!important;grid-row:2!important;justify-self:end!important}
+  .operational-compact-list .text-row-action{min-width:auto!important;min-height:36px!important;padding:0 8px!important}
+}
+
+
+/* ===== migrated from information-density-v18-3.css ===== */
+/* Binso Admin v18.3 – progressive disclosure + lower information density */
+
+.mobile-dashboard-summary,
+.mobile-accounting-tasks,
+.settings-mobile-hub,
+.settings-mobile-back,
+.object-hub-back{display:none}
+
+.hub-row-list{display:grid}
+.hub-row{
+  width:100%;min-width:0;min-height:54px;padding:10px 0;border:0;border-bottom:1px solid var(--line);
+  background:transparent;color:var(--text);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+  text-align:left;text-decoration:none;font:inherit
+}
+.hub-row>span:first-child{display:grid;gap:2px;min-width:0}
+.hub-row strong{font-size:11px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-row small{font-size:9.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-row.active{color:var(--text);font-weight:650}
+.hub-row-button{cursor:pointer}
+.static-hub-row{cursor:default}
+
+/* Order details = one hub, one selected work area. */
+.order-kpi-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 0 18px}
+.order-kpi-strip>span{display:grid;gap:2px;padding:10px 14px;border-right:1px solid var(--line)}
+.order-kpi-strip>span:first-child{padding-left:0}
+.order-kpi-strip>span:last-child{border-right:0}
+.order-kpi-strip small{font-size:8.5px;color:var(--muted)}
+.order-kpi-strip strong{font-size:13px}
+.object-hub-layout{display:grid;grid-template-columns:minmax(210px,260px) minmax(0,1fr);gap:28px;align-items:start}
+.object-hub-nav{display:grid;border-top:1px solid var(--line)}
+.object-hub-nav .hub-row{padding:11px 4px}
+.object-hub-nav .hub-row.active{background:var(--surface-2)}
+.object-hub-content{min-width:0}
+.hub-panel{border-top:1px solid var(--line);padding-top:15px}
+.summary-list{display:grid}
+.summary-row{display:grid;grid-template-columns:minmax(140px,.7fr) minmax(0,1fr);gap:16px;align-items:center;min-height:44px;border-bottom:1px solid var(--line)}
+.summary-row span{font-size:9.5px;color:var(--muted)}
+.summary-row strong{font-size:10.5px;font-weight:600;text-align:right;overflow-wrap:anywhere}
+.hub-disclosure,.policy-group,.edit-step{border-bottom:1px solid var(--line)}
+.hub-disclosure summary,.policy-group summary,.edit-step summary{list-style:none;cursor:pointer;min-height:52px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.hub-disclosure summary::-webkit-details-marker,.policy-group summary::-webkit-details-marker,.edit-step summary::-webkit-details-marker{display:none}
+.hub-disclosure summary>span,.policy-group summary>span,.edit-step summary>span{display:grid;gap:2px}
+.hub-disclosure summary strong,.policy-group summary strong,.edit-step summary strong{font-size:10.5px}
+.hub-disclosure summary small,.policy-group summary small,.edit-step summary small{font-size:9px;color:var(--muted)}
+.hub-disclosure[open] summary svg,.policy-group[open] summary svg,.edit-step[open] summary svg{transform:rotate(90deg)}
+.hub-disclosure summary svg,.policy-group summary svg,.edit-step summary svg{transition:transform 120ms ease}
+.compact-chain{padding:4px 0 12px}
+.hub-inline-action{padding-top:14px}
+.interactive-hub-row{cursor:pointer}
+.evidence-hub-row{grid-template-columns:minmax(0,1fr) auto auto}
+
+/* Long forms = grouped tasks instead of one visual wall. */
+.policy-groups,.document-editor>.edit-step,.invoice-builder-sheet>.edit-step{display:block}
+.policy-group-body,.edit-step-body{padding:2px 0 16px}
+.policy-group .policy-toggle-list{margin-top:8px}
+.edit-step+.edit-step{margin-top:0}
+
+/* Settings: desktop tabs, mobile category hub. */
+.settings-mobile-hub{border-top:1px solid var(--line)}
+.settings-mobile-back{border:0;background:transparent;color:var(--muted);font:inherit;font-size:10px;padding:0 0 12px}
+
+@media(max-width:760px){
+  /* Dashboard: current tasks + three KPIs + destinations. */
+  .owner-metrics{grid-template-columns:1fr 1fr!important;margin-bottom:14px!important}
+  .owner-metrics .metric{padding:10px 0!important;border-right:0!important}
+  .owner-metrics .metric:nth-child(odd){padding-right:12px!important;border-right:1px solid var(--line)!important}
+  .owner-metrics .metric:nth-child(even){padding-left:12px!important}
+  .owner-metrics .metric:nth-child(n+4){display:none!important}
+  .dashboard-layout{display:block!important;margin-bottom:14px!important}
+  .dashboard-layout .chart-surface{display:none!important}
+  .dashboard-layout .focus-surface{padding:0!important;border-left:0!important;border-top:1px solid var(--line)!important}
+  .mobile-dashboard-summary{display:grid;border-top:1px solid var(--line);margin-top:14px}
+  .desktop-dashboard-rich{display:none!important}
+
+  /* Order details: Apple-settings style hub first, selected section second. */
+  .order-kpi-strip{grid-template-columns:repeat(3,1fr);margin-bottom:14px}
+  .order-kpi-strip>span{padding:9px 10px}
+  .object-hub-layout{display:block}
+  .object-hub-content{display:none}
+  .object-hub-layout.section-open .object-hub-nav{display:none}
+  .object-hub-layout.section-open .object-hub-content{display:block}
+  .object-hub-nav{display:grid}
+  .object-hub-nav .hub-row{min-height:58px;padding:10px 2px;background:transparent!important}
+  .object-hub-back{display:inline-flex;align-items:center;min-height:40px;padding:0 0 8px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:10px}
+  .hub-panel{padding-top:0;border-top:0}
+  .summary-row{grid-template-columns:minmax(0,1fr) auto;min-height:48px;gap:12px}
+  .summary-row strong{max-width:55vw}
+  .compact-action{min-width:44px!important}
+
+  /* Settings becomes a category list, not a horizontal tab wall. */
+  .desktop-settings-tabs{display:none!important}
+  .settings-mobile-hub{display:grid}
+  .settings-mobile-hub.detail-open{display:none}
+  .settings-content:not(.mobile-detail-open){display:none}
+  .settings-content.mobile-detail-open{display:block}
+  .settings-mobile-back{display:inline-flex}
+  .settings-page .settings-group{padding-top:0!important}
+  .settings-page .settings-group+.settings-group{margin-top:18px}
+  .settings-group-copy p{margin-bottom:10px}
+
+  /* Accounting: task-first, only two KPIs on first glance. */
+  .mobile-accounting-tasks{display:block;margin-bottom:16px}
+  .accounting-metrics{grid-template-columns:1fr 1fr!important}
+  .accounting-metrics .metric:nth-child(n+3){display:none!important}
+  .accounting-metrics .metric{padding:10px 0!important;border-right:0!important}
+  .accounting-metrics .metric:first-child{padding-right:12px!important;border-right:1px solid var(--line)!important}
+  .accounting-metrics .metric:nth-child(2){padding-left:12px!important}
+
+  /* Step forms: each section is one clear task. */
+  .edit-step,.policy-group{border-top:1px solid var(--line);border-bottom:0}
+  .edit-step:last-of-type,.policy-group:last-of-type{border-bottom:1px solid var(--line)}
+  .edit-step summary,.policy-group summary{min-height:56px}
+  .edit-step-body,.policy-group-body{padding-bottom:16px}
+
+  .evidence-hub-row{grid-template-columns:minmax(0,1fr) auto}
+  .evidence-hub-row .text-button{grid-column:1/-1;justify-self:start}
+}
+
+@media(max-width:420px){
+  .owner-metrics,.accounting-metrics{grid-template-columns:1fr!important}
+  .owner-metrics .metric,.accounting-metrics .metric{padding:9px 0!important;border-right:0!important;border-bottom:1px solid var(--line)!important}
+  .owner-metrics .metric:nth-child(3){border-bottom:0!important}
+  .accounting-metrics .metric:nth-child(2){border-bottom:0!important}
+  .summary-row strong{max-width:50vw}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hub-disclosure summary svg,.policy-group summary svg,.edit-step summary svg{transition:none!important}
+}
+
+
+/* ===== migrated from typography-v18-4.css ===== */
+/* Binso Admin v18.4 – centralized typography + readability system */
+
+:root{
+  --font-ui:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+
+  --type-page-title:24px;
+  --type-section-title:14px;
+  --type-row-title:13.5px;
+  --type-body:12.5px;
+  --type-row-meta:11.5px;
+  --type-caption:10.5px;
+  --type-eyebrow:10px;
+
+  --leading-tight:1.2;
+  --leading-ui:1.35;
+  --leading-body:1.5;
+
+  --text-primary:#111317;
+  --text-secondary:#3c424b;
+  --text-muted:#626a75;
+  --text-faint:#7c8490;
+  --border-subtle:#e2e5e9;
+  --border-strong:#d3d8de;
+  --surface-primary:#ffffff;
+  --surface-secondary:#f7f8f9;
+  --surface-tertiary:#f0f2f4;
+}
+
+html[data-theme='dark']{
+  --text-primary:#f7f8fa;
+  --text-secondary:#d7dbe1;
+  --text-muted:#aeb5bf;
+  --text-faint:#89919d;
+  --border-subtle:#2b3037;
+  --border-strong:#3a414a;
+  --surface-primary:#111316;
+  --surface-secondary:#171a1f;
+  --surface-tertiary:#20242a;
+}
+
+html,body{
+  font-family:var(--font-ui)!important;
+  color:var(--text-primary);
+  font-synthesis:none;
+  text-rendering:auto;
+}
+
+body{
+  font-size:var(--type-body);
+  line-height:var(--leading-body);
+}
+
+/* Map legacy tokens to the centralized readability palette. */
+:root{
+  --text:var(--text-primary);
+  --text-2:var(--text-secondary);
+  --muted:var(--text-muted);
+  --faint:var(--text-faint);
+  --line:var(--border-subtle);
+  --line-strong:var(--border-strong);
+  --surface:var(--surface-primary);
+  --surface-2:var(--surface-secondary);
+  --surface-3:var(--surface-tertiary);
+}
+
+/* Core hierarchy */
+h1,.page-title h1{
+  font-size:var(--type-page-title)!important;
+  line-height:var(--leading-tight)!important;
+  letter-spacing:-.025em!important;
+  font-weight:680!important;
+}
+
+h2,.section-title h2{
+  font-size:var(--type-section-title)!important;
+  line-height:1.3!important;
+  letter-spacing:-.01em!important;
+  font-weight:650!important;
+}
+
+h3{
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:650!important;
+}
+
+.eyebrow,.nav-section-label,.command-label{
+  font-size:var(--type-eyebrow)!important;
+  line-height:1.3!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
+}
+
+.page-description,.section-title p{
+  font-size:var(--type-body)!important;
+  line-height:1.45!important;
+  color:var(--text-muted)!important;
+}
+
+/* Navigation */
+.desktop-nav nav a,
+.mobile-menu-nav a,
+.global-search,
+.mobile-pill button{
+  font-size:12px!important;
+  line-height:1.25!important;
+}
+
+.nav-footer,.toolbar-meta{
+  font-size:var(--type-caption)!important;
+  color:var(--text-muted)!important;
+}
+
+/* Lists and rows – optimized for scanning */
+.primary-cell strong,
+.compact-row-title,
+.hub-row strong,
+.record-top strong,
+.compact-list strong{
+  font-size:var(--type-row-title)!important;
+  line-height:1.3!important;
+  font-weight:650!important;
+  letter-spacing:-.005em!important;
+  color:var(--text-primary)!important;
+}
+
+.primary-cell small,
+.compact-row-meta,
+.hub-row small,
+.record-top small,
+.record-meta,
+.compact-list small{
+  font-size:var(--type-row-meta)!important;
+  line-height:1.35!important;
+  color:var(--text-muted)!important;
+}
+
+.data-row{
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+
+.data-head{
+  font-size:var(--type-caption)!important;
+  line-height:1.25!important;
+  letter-spacing:.04em!important;
+  color:var(--text-faint)!important;
+}
+
+.status{
+  min-height:22px!important;
+  padding-inline:8px!important;
+  font-size:var(--type-caption)!important;
+  line-height:1!important;
+  font-weight:650!important;
+}
+
+/* Metrics: keep numbers prominent without oversized dashboard typography. */
+.metric>span,.metric>small,
+.order-kpi-strip small,
+.summary-row span{
+  font-size:var(--type-caption)!important;
+  line-height:1.3!important;
+  color:var(--text-muted)!important;
+}
+
+.metric>strong{
+  font-size:18px!important;
+  line-height:1.15!important;
+  font-weight:680!important;
+  letter-spacing:-.02em!important;
+}
+
+.order-kpi-strip strong,.summary-row strong{
+  font-size:12.5px!important;
+  line-height:1.3!important;
+  font-weight:650!important;
+}
+
+/* Controls */
+.button,.text-button,.topbar-create,
+.form-grid label,.block-field,.settings-field,.template-editor-section label{
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+
+.button{
+  font-weight:650!important;
+}
+
+input,select,textarea{
+  font-family:var(--font-ui)!important;
+  font-size:13px;
+  line-height:1.4;
+  color:var(--text-primary)!important;
+}
+
+input::placeholder,textarea::placeholder{
+  color:var(--text-faint)!important;
+  opacity:1;
+}
+
+.sheet-heading strong,.app-sheet-title strong{
+  font-size:14px!important;
+  line-height:1.3!important;
+  font-weight:680!important;
+}
+
+.sheet-heading span,.app-sheet-title span,
+.demo-hint,.field-error,.template-help,.settings-action-hint{
+  font-size:11.5px!important;
+  line-height:1.45!important;
+}
+
+/* Financial values need stable column alignment. */
+.metric>strong,
+.invoice-builder-total,
+.preview-totals,
+.finance-ledger,
+.document-meta,
+.document-total-block,
+.data-row [data-numeric],
+.tabular-nums{
+  font-variant-numeric:tabular-nums;
+}
+
+/* Focus and disabled states remain readable in both themes. */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--text-primary)!important;
+  outline-offset:2px!important;
+}
+
+button:disabled,.button:disabled,input:disabled,select:disabled,textarea:disabled{
+  opacity:.55!important;
+}
+
+/* Keep genuine documents independent from the application UI typography. */
+.document-a4,.pdf-page,#print-document{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;
+}
+
+@media(max-width:760px){
+  :root{
+    --type-page-title:23px;
+    --type-section-title:14px;
+    --type-row-title:14px;
+    --type-body:13px;
+    --type-row-meta:12px;
+    --type-caption:11px;
+    --type-eyebrow:10px;
+  }
+
+  body{font-size:var(--type-body)!important}
+
+  input,select,textarea{
+    font-size:16px!important; /* prevents iOS focus zoom */
+    line-height:1.35!important;
+  }
+
+  .primary-cell strong,
+  .compact-row-title,
+  .hub-row strong,
+  .record-top strong,
+  .compact-list strong{
+    font-size:14px!important;
+  }
+
+  .primary-cell small,
+  .compact-row-meta,
+  .hub-row small,
+  .record-top small,
+  .record-meta,
+  .compact-list small{
+    font-size:12px!important;
+  }
+
+  .status{font-size:11px!important}
+  .mobile-pill button{font-size:12px!important}
+  .mobile-menu-nav a{font-size:13px!important}
+}
+
+
+/* ===== migrated from close-alignment-v18-5.css ===== */
+/* Binso Admin v18.5 – centralized close-control alignment
+   Visible close glyphs align with the content edge below while retaining a 44px touch target. */
+
+:root{
+  --close-touch-size:44px;
+  --close-glyph-size:18px;
+}
+
+/* Every sheet/editor header uses the same two-column geometry. */
+.sheet-heading,
+.app-sheet-header{
+  grid-template-columns:minmax(0,1fr) var(--close-touch-size)!important;
+  align-items:center!important;
+}
+
+.sheet-heading>div:first-child,
+.app-sheet-title{
+  min-width:0!important;
+}
+
+/* Keep the hit target large, but align the visible X with the right content edge. */
+.sheet-heading>.icon-button,
+.app-sheet-close{
+  width:var(--close-touch-size)!important;
+  min-width:var(--close-touch-size)!important;
+  height:var(--close-touch-size)!important;
+  min-height:var(--close-touch-size)!important;
+  padding:0!important;
+  margin:0!important;
+  justify-self:end!important;
+  align-self:center!important;
+  place-items:center end!important;
+  justify-content:flex-end!important;
+  color:var(--muted)!important;
+  border-radius:10px!important;
+}
+
+.sheet-heading>.icon-button svg,
+.app-sheet-close svg{
+  width:var(--close-glyph-size)!important;
+  height:var(--close-glyph-size)!important;
+  flex:0 0 auto!important;
+}
+
+/* Mobile navigation: title and X use exactly the same inner width as the rows below. */
+@media(max-width:760px){
+  .mobile-menu-sheet{
+    --menu-inline:18px;
+    padding-left:var(--menu-inline)!important;
+    padding-right:var(--menu-inline)!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) var(--close-touch-size)!important;
+    align-items:center!important;
+    gap:12px!important;
+    min-height:94px!important;
+    margin:0!important;
+    padding:14px 0 14px!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading>.icon-button{
+    /* The touch area extends inward; the glyph itself ends on the same line as the chevrons below. */
+    width:var(--close-touch-size)!important;
+    height:var(--close-touch-size)!important;
+    min-width:var(--close-touch-size)!important;
+    min-height:var(--close-touch-size)!important;
+    padding:0!important;
+    margin:0!important;
+    justify-self:end!important;
+    align-self:center!important;
+    display:grid;
+    place-items:center end!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading>.icon-button svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  /* Full-screen editors: X aligns to the same 16px right inset as fields and footer actions. */
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) var(--close-touch-size)!important;
+    align-items:center!important;
+    gap:12px!important;
+  }
+
+  /* Bottom-sheet X remains intentionally hidden on mobile by the centralized sheet system. */
+}
+
+/* Preview / popover close controls follow the same optical edge alignment. */
+.preview-toolbar>div:last-child .icon-button:last-child,
+.popover-title>.icon-button{
+  width:var(--close-touch-size)!important;
+  min-width:var(--close-touch-size)!important;
+  height:var(--close-touch-size)!important;
+  min-height:var(--close-touch-size)!important;
+  padding:0!important;
+  margin:0!important;
+  place-items:center end!important;
+  justify-content:flex-end!important;
+}
+
+.preview-toolbar>div:last-child .icon-button:last-child svg,
+.popover-title>.icon-button svg{
+  width:var(--close-glyph-size)!important;
+  height:var(--close-glyph-size)!important;
+}
+
+
+/* ===== migrated from mobile-shell-v18-6.css ===== */
+/* Binso Admin v18.6 – mobile viewport, sheet and shell hardening.
+   Loaded last on purpose: one final source of truth for mobile chrome. */
+
+:root{
+  --visible-viewport-height:100dvh;
+  --visible-viewport-top:0px;
+  --visible-viewport-bottom:0px;
+  --mobile-page-inline:16px;
+  --mobile-pill-height:64px;
+  --mobile-pill-gap:14px;
+  --mobile-content-bottom:132px;
+  --sheet-inline:18px;
+  --sheet-radius-mobile:24px;
+  --sheet-header-min:72px;
+  --sheet-action-min:72px;
+}
+
+@media(max-width:760px){
+  /* Normal pages always finish clearly above the floating navigation pill. */
+  .app-main{
+    padding-left:var(--mobile-page-inline)!important;
+    padding-right:var(--mobile-page-inline)!important;
+    padding-bottom:calc(var(--mobile-content-bottom) + var(--safe-bottom))!important;
+  }
+
+  .page{min-width:0!important;overflow:visible!important}
+
+  /* Floating pill follows the visible iOS viewport, not the layout viewport. */
+  .mobile-pill{
+    bottom:calc(var(--mobile-pill-gap) + var(--safe-bottom) + var(--visible-viewport-bottom))!important;
+    z-index:900!important;
+  }
+
+  /* The menu behaves like a native bottom sheet. It owns the bottom edge,
+     therefore it does not reserve space for the hidden global pill. */
+  .mobile-menu-layer{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1300!important;
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+    background:rgba(7,9,12,.48)!important;
+    overflow:hidden!important;
+    overscroll-behavior:contain!important;
+  }
+
+  body:has(.mobile-menu-layer){overflow:hidden!important}
+  body:has(.mobile-menu-layer) .mobile-pill{visibility:hidden!important;pointer-events:none!important}
+
+  .mobile-menu-sheet{
+    position:relative!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+    max-height:min(88dvh,calc(var(--visible-viewport-height) - 10px))!important;
+    margin:0!important;
+    padding:0 var(--sheet-inline) calc(18px + var(--safe-bottom))!important;
+    border:1px solid var(--line)!important;
+    border-bottom:0!important;
+    border-radius:var(--sheet-radius-mobile) var(--sheet-radius-mobile) 0 0!important;
+    background:var(--surface)!important;
+    box-shadow:0 -20px 54px rgba(0,0,0,.28)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+  }
+
+  .mobile-menu-sheet>.sheet-grabber{
+    display:block!important;
+    width:38px!important;
+    height:4px!important;
+    margin:12px auto 3px!important;
+    border-radius:999px!important;
+    background:var(--line-strong)!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading{
+    position:relative!important;
+    display:block!important;
+    min-height:92px!important;
+    margin:0!important;
+    padding:18px 56px 16px 4px!important;
+    border-bottom:1px solid var(--line)!important;
+    background:var(--surface)!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading>div:first-child{
+    min-width:0!important;
+    display:grid!important;
+    gap:5px!important;
+  }
+
+  .mobile-menu-sheet>.sheet-heading>.icon-button{
+    position:absolute!important;
+    top:50%!important;
+    right:4px!important;
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center end!important;
+    transform:translateY(-50%)!important;
+  }
+
+  .mobile-menu-nav{
+    display:grid!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  .mobile-menu-nav a{
+    min-height:58px!important;
+    grid-template-columns:32px minmax(0,1fr) 20px!important;
+    gap:10px!important;
+    padding:0 4px!important;
+    border-top:1px solid var(--line)!important;
+    font-size:14px!important;
+  }
+  .mobile-menu-nav a:first-child{border-top:0!important}
+  .mobile-menu-nav a>svg:last-child{justify-self:end!important}
+
+  /* Short tasks: true bottom sheet. */
+  .overlay-layer.sheet-layer:has(.bottom-sheet),
+  .overlay-layer.sheet-layer:has(.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)),
+  .quick-create-layer{
+    position:fixed!important;
+    inset:0!important;
+    z-index:1300!important;
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    padding:0!important;
+    background:rgba(7,9,12,.48)!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet),
+  .action-sheet.quick-create-sheet{
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+    max-height:min(84dvh,calc(var(--visible-viewport-height) - 10px))!important;
+    margin:0!important;
+    padding:0 var(--sheet-inline)!important;
+    border:1px solid var(--line)!important;
+    border-bottom:0!important;
+    border-radius:var(--sheet-radius-mobile) var(--sheet-radius-mobile) 0 0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    background:var(--surface)!important;
+    box-shadow:0 -20px 54px rgba(0,0,0,.28)!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  /* Short-sheet headers/actions use the exact same horizontal insets. */
+  .form-sheet.bottom-sheet>.sheet-heading,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading,
+  .quick-create-sheet>.sheet-heading{
+    margin:0 calc(var(--sheet-inline) * -1) 12px!important;
+    padding:12px var(--sheet-inline)!important;
+    min-height:62px!important;
+  }
+
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions{
+    margin:18px calc(var(--sheet-inline) * -1) 0!important;
+    padding:12px var(--sheet-inline) calc(12px + var(--safe-bottom))!important;
+    min-height:var(--sheet-action-min)!important;
+  }
+
+  /* Long forms: size to the *visible* iOS viewport. Safari's bottom toolbar may
+     overlap the layout viewport; VisualViewport prevents the footer being cut. */
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    top:var(--visible-viewport-top)!important;
+    bottom:auto!important;
+    width:100vw!important;
+    height:var(--visible-viewport-height)!important;
+    z-index:1400!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+    padding:0 var(--mobile-page-inline)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scroll-padding-top:calc(var(--sheet-header-min) + var(--safe-top))!important;
+    scroll-padding-bottom:calc(var(--sheet-action-min) + var(--safe-bottom) + 20px)!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    min-height:calc(var(--sheet-header-min) + var(--safe-top))!important;
+    margin:0 calc(var(--mobile-page-inline) * -1) 16px!important;
+    padding:calc(10px + var(--safe-top)) var(--mobile-page-inline) 10px!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading>.icon-button,
+  .document-editor>.sheet-heading>.icon-button,
+  .policy-editor>.sheet-heading>.icon-button,
+  .invoice-builder-sheet>.sheet-heading>.icon-button{
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions{
+    bottom:0!important;
+    min-height:var(--sheet-action-min)!important;
+    margin:18px calc(var(--mobile-page-inline) * -1) 0!important;
+    padding:12px var(--mobile-page-inline) calc(12px + var(--safe-bottom))!important;
+  }
+
+  /* Forms stay fully inside the viewport. */
+  .form-sheet input,
+  .form-sheet select,
+  .form-sheet textarea{
+    box-sizing:border-box!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  /* Dedicated document preview also follows the visible viewport. */
+  .document-overlay{
+    top:var(--visible-viewport-top)!important;
+    bottom:auto!important;
+    height:var(--visible-viewport-height)!important;
+  }
+  .document-preview-shell{height:100%!important;max-height:100%!important}
+}
+
+@media(max-width:420px){
+  .mobile-menu-nav a{min-height:56px!important}
+}
+
+.app-error-screen{
+  min-height:70dvh;
+  display:grid;
+  place-content:center;
+  justify-items:center;
+  gap:12px;
+  max-width:520px;
+  margin:0 auto;
+  padding:32px 20px;
+  text-align:center;
+}
+.app-error-symbol{width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:14px;color:var(--muted)}
+.app-error-screen h1{margin:4px 0 0;font-size:22px}
+.app-error-screen p{margin:0;max-width:420px;color:var(--muted);line-height:1.5}
+.app-error-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+@media(max-width:520px){.app-error-actions{width:100%;display:grid;grid-template-columns:1fr}.app-error-actions .button{width:100%}}
+
+
+/* ===== migrated from mobile-final-v18-7.css ===== */
+/* Binso Admin v18.7 – final mobile UX source of truth.
+   This file is deliberately loaded last. */
+
+:root{
+  --mobile-topbar-content:44px;
+  --mobile-page-gap:16px;
+}
+
+
+/* Supplier invoice rows also stay structured on desktop. */
+.accounting-supplier-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.accounting-row-side{display:flex;align-items:center;justify-content:flex-end;gap:7px}
+.accounting-row-amount{white-space:nowrap}
+
+@media(max-width:760px){
+  /* One create affordance on mobile: the centre + in the floating pill. */
+  .topbar-create,
+  .page-primary-action{display:none!important}
+
+  /* Compact, quiet top chrome. */
+  .app-frame{padding-top:calc(var(--safe-top) + var(--mobile-topbar-content))!important}
+  .topbar{
+    height:calc(var(--safe-top) + var(--mobile-topbar-content))!important;
+    min-height:0!important;
+    padding:var(--safe-top) var(--mobile-page-inline) 0!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+  }
+  .topbar-actions{display:none!important}
+  .topbar .binso-logo{height:22px!important;overflow:visible!important}
+  .topbar .binso-logo img{height:22px!important;width:auto!important}
+
+  /* Page actions are only shown when a non-create action remains, e.g. Export. */
+  .page-actions:has(.page-primary-action:only-child){display:none!important}
+  .page-actions,.page-action-group{align-items:center!important}
+  .page-action-group .button.secondary{min-height:40px!important;padding:0 12px!important}
+
+  /* Stable page start after fixed chrome and a little less vertical waste. */
+  .page{padding-top:14px!important}
+  .page-header{margin-bottom:16px!important}
+
+  /* Dashboard: three useful KPIs, with the third spanning the row. */
+  .owner-metrics{grid-template-columns:1fr 1fr!important}
+  .owner-metrics .metric:nth-child(4){display:none!important}
+  .owner-metrics .metric:nth-child(3){grid-column:1/-1!important;border-right:0!important;padding-left:0!important}
+  .owner-metrics .metric:nth-child(3){border-bottom:0!important}
+  .focus-item{text-decoration:none!important;color:inherit!important}
+  .focus-item strong,.focus-item small{text-decoration:none!important}
+
+  /* Full-screen tasks really fill the app viewport. 100dvh already tracks
+     the dynamic Safari viewport; safe-area padding protects system UI. */
+  .overlay-layer.sheet-layer:has(.mobile-fullscreen-sheet),
+  .overlay-layer.sheet-layer:has(.document-editor),
+  .overlay-layer.sheet-layer:has(.policy-editor),
+  .overlay-layer.sheet-layer:has(.invoice-builder-sheet){
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    padding:0!important;
+    margin:0!important;
+    display:block!important;
+    background:var(--surface)!important;
+    overflow:hidden!important;
+  }
+
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0 var(--mobile-page-inline)!important;
+    border:0!important;
+    border-radius:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    background:var(--surface)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    box-shadow:none!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading{
+    flex:0 0 auto!important;
+    position:sticky!important;
+    top:0!important;
+    min-height:calc(58px + var(--safe-top))!important;
+    margin:0 calc(var(--mobile-page-inline) * -1) 14px!important;
+    padding:calc(8px + var(--safe-top)) var(--mobile-page-inline) 8px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:10px!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-heading>.icon-button,
+  .document-editor>.sheet-heading>.icon-button,
+  .policy-editor>.sheet-heading>.icon-button,
+  .invoice-builder-sheet>.sheet-heading>.icon-button{
+    justify-self:end!important;
+    align-self:center!important;
+    width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
+    margin:0!important;padding:0!important;display:grid!important;place-items:center!important;
+  }
+
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions{
+    flex:0 0 auto!important;
+    position:sticky!important;
+    bottom:0!important;
+    margin-top:auto!important;
+    margin-left:calc(var(--mobile-page-inline) * -1)!important;
+    margin-right:calc(var(--mobile-page-inline) * -1)!important;
+    padding:12px var(--mobile-page-inline) calc(12px + var(--safe-bottom))!important;
+    min-height:calc(70px + var(--safe-bottom))!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+    z-index:40!important;
+  }
+
+  /* Accounting supplier invoices: exactly two information lines on mobile. */
+  .operational-compact-list>.accounting-supplier-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-rows:auto auto!important;
+    gap:3px 12px!important;
+    min-height:66px!important;
+    padding:10px 0!important;
+    align-items:center!important;
+  }
+  .accounting-supplier-row>.primary-cell{grid-column:1!important;grid-row:1/3!important;min-width:0!important;align-self:center!important}
+  .accounting-supplier-row>.primary-cell strong,
+  .accounting-supplier-row>.primary-cell small{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .accounting-supplier-row>.accounting-row-amount{grid-column:2!important;grid-row:1!important;justify-self:end!important;white-space:nowrap!important;font-size:13px!important}
+  .accounting-supplier-row>.accounting-row-side{grid-column:2!important;grid-row:2!important;justify-self:end!important;display:flex!important;align-items:center!important;gap:6px!important;white-space:nowrap!important}
+  .accounting-supplier-row .status{min-height:20px!important;padding:0 7px!important}
+  .accounting-supplier-row .text-row-action{min-width:auto!important;min-height:28px!important;padding:0 4px!important;font-size:11px!important}
+
+  /* Floating nav remains clear of the final content. */
+  .app-main{padding-bottom:calc(138px + var(--safe-bottom))!important}
+}
+
+@media(max-width:420px){
+  .owner-metrics{grid-template-columns:1fr 1fr!important}
+  .owner-metrics .metric:nth-child(2){border-bottom:1px solid var(--line)!important}
+  .owner-metrics .metric:nth-child(3){grid-column:1/-1!important}
+}
+
+
+/* ===== migrated from ui-system-v18-8.css ===== */
+/* Binso Admin v18.8 — canonical reusable UI system.
+   Shared component behaviour lives here. Page-specific CSS may remain elsewhere,
+   but must not redefine these primitives. */
+
+:root{
+  --ui-page-gutter:24px;
+  --ui-page-gutter-mobile:30px;
+  --ui-control-h:46px;
+  --ui-touch:44px;
+  --ui-close-size:44px;
+  --ui-radius:12px;
+  --ui-sheet-radius:26px;
+  --ui-divider:var(--line);
+  --ui-sheet-max:720px;
+  --ui-pill-space:118px;
+  --ui-mobile-topbar:72px;
+}
+
+/* Shared close affordance: every X in the product uses this component. */
+.ui-close-button{
+  width:var(--ui-close-size)!important;
+  min-width:var(--ui-close-size)!important;
+  height:var(--ui-close-size)!important;
+  min-height:var(--ui-close-size)!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  flex:0 0 var(--ui-close-size)!important;
+  border-radius:999px!important;
+  color:var(--muted)!important;
+}
+.ui-close-button svg{width:18px!important;height:18px!important;display:block!important}
+
+/* One header geometry for sheets, fullscreen editors, navigation and dialogs. */
+.sheet-heading,.app-sheet-header{
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) var(--ui-close-size)!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:72px!important;
+  padding:12px 16px!important;
+  margin:0!important;
+  border-bottom:1px solid var(--ui-divider)!important;
+  background:var(--surface)!important;
+}
+.sheet-heading>div:first-child,.app-sheet-title{min-width:0!important;display:grid!important;gap:3px!important}
+.sheet-heading strong,.app-sheet-title strong{font-size:15px!important;line-height:1.25!important;font-weight:700!important}
+.sheet-heading span,.app-sheet-title span{font-size:12px!important;line-height:1.4!important;color:var(--muted)!important}
+.sheet-heading>.ui-close-button,.app-sheet-header>.ui-close-button{justify-self:end!important;align-self:center!important}
+
+/* One footer/action geometry. */
+.sheet-actions,.app-sheet-footer,.app-sheet-actions{
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:8px!important;
+  padding:10px 16px calc(10px + var(--safe-bottom))!important;
+  margin:0!important;
+  border-top:1px solid var(--ui-divider)!important;
+  background:var(--surface)!important;
+}
+.sheet-actions .button,.app-sheet-footer .button,.app-sheet-actions .button{width:100%!important;min-height:46px!important}
+
+/* Shared sheet mechanics. */
+.form-sheet,.action-sheet,.app-sheet,.mobile-menu-sheet{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.app-sheet-content{min-width:0;overflow:auto;-webkit-overflow-scrolling:touch}
+
+/* Shared rows. */
+.interactive-row{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.interactive-row:focus-visible{outline:2px solid color-mix(in srgb,var(--text) 35%,transparent);outline-offset:-2px}
+.row-disclosure{pointer-events:none}
+
+@media(max-width:760px){
+  :root{--ui-page-gutter:var(--ui-page-gutter-mobile)}
+
+  .app-main{padding-left:var(--ui-page-gutter)!important;padding-right:var(--ui-page-gutter)!important;padding-bottom:calc(var(--ui-pill-space) + var(--safe-bottom))!important}
+
+  /* Global creation belongs to the bottom pill on mobile.
+     The topbar create control is removed structurally; page-level create actions
+     are hidden here so there is only one + affordance on mobile/PWA. */
+  .topbar-create,.page-primary-action,
+  .page-actions>.page-primary-action,
+  .page-action-group>.page-primary-action{display:none!important}
+
+  /* Canonical bottom sheet. */
+  .sheet-layer,.app-sheet-backdrop{align-items:flex-end!important;padding:0!important}
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet),
+  .app-sheet-bottom,
+  .mobile-menu-sheet{
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(82dvh,var(--ui-sheet-max))!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    border-radius:var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0!important;
+    background:var(--surface)!important;
+  }
+  .form-sheet.bottom-sheet>.sheet-heading,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading,
+  .app-sheet-bottom>.app-sheet-header,
+  .mobile-menu-sheet>.sheet-heading{position:relative!important;top:auto!important;flex:0 0 auto!important}
+  .form-sheet.bottom-sheet>.form-grid,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.form-grid,
+  .app-sheet-bottom>.app-sheet-content{overflow:auto!important;min-height:0!important}
+  .form-sheet.bottom-sheet>.sheet-actions,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions,
+  .app-sheet-bottom>.app-sheet-footer{position:relative!important;bottom:auto!important;flex:0 0 auto!important}
+
+  /* Canonical fullscreen task. */
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet,
+  .app-sheet-fullscreen{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    height:var(--app-vh,100dvh)!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    background:var(--surface)!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-heading,
+  .document-editor>.sheet-heading,
+  .policy-editor>.sheet-heading,
+  .invoice-builder-sheet>.sheet-heading,
+  .app-sheet-fullscreen>.app-sheet-header{
+    position:relative!important;
+    top:auto!important;
+    flex:0 0 auto!important;
+    padding-top:calc(12px + var(--safe-top))!important;
+    min-height:calc(72px + var(--safe-top))!important;
+  }
+  .mobile-fullscreen-sheet>.sheet-actions,
+  .document-editor>.sheet-actions,
+  .policy-editor>.sheet-actions,
+  .invoice-builder-sheet>.sheet-actions,
+  .app-sheet-fullscreen>.app-sheet-footer{
+    position:relative!important;
+    bottom:auto!important;
+    flex:0 0 auto!important;
+  }
+  .mobile-fullscreen-sheet>.form-grid,
+  .document-editor>.form-grid,
+  .policy-editor>.form-grid,
+  .invoice-builder-sheet>.form-grid,
+  .app-sheet-fullscreen>.app-sheet-content{
+    overflow:auto!important;
+    min-height:0!important;
+  }
+
+  /* No app chrome may cover an active task. */
+  body:has(.sheet-layer) .mobile-pill,
+  body:has(.app-sheet-backdrop) .mobile-pill,
+  body:has(.mobile-menu-layer) .mobile-pill{display:none!important}
+
+  .ui-close-button{width:44px!important;height:44px!important}
+  .sheet-heading,.app-sheet-header{padding-left:30px!important;padding-right:30px!important}
+  .sheet-actions,.app-sheet-footer,.app-sheet-actions{padding-left:30px!important;padding-right:30px!important}
+}
+
+@media(max-width:420px){
+  .sheet-actions,.app-sheet-footer,.app-sheet-actions{grid-template-columns:1fr!important}
+}
+
+/* v18.8.2 — canonical mobile header behavior.
+   Flat page-colored chrome, no glass/shadow, hides on scroll down and returns on scroll up. */
+@media(max-width:760px){
+  :root{
+    --ui-mobile-topbar-content:48px;
+  }
+
+  .app-frame{
+    padding-top:calc(var(--safe-top) + var(--ui-mobile-topbar-content))!important;
+  }
+
+  .topbar{
+    height:calc(var(--safe-top) + var(--ui-mobile-topbar-content))!important;
+    min-height:0!important;
+    padding:var(--safe-top) var(--ui-page-gutter-mobile) 0!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    background:var(--bg)!important;
+    border:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    transform:translateY(0)!important;
+    transition:transform 150ms ease-out!important;
+    will-change:transform;
+  }
+
+  .topbar.is-hidden{
+    transform:translateY(calc(-1 * (var(--safe-top) + var(--ui-mobile-topbar-content))))!important;
+    pointer-events:none!important;
+  }
+
+  .topbar-actions,
+  .global-search,
+  .topbar-create,
+  .topbar-icon,
+  .avatar-button{
+    display:none!important;
+  }
+
+  .topbar-brand{
+    min-width:0!important;
+    display:flex!important;
+    align-items:center!important;
+  }
+
+  .topbar .binso-logo{
+    height:28px!important;
+    min-height:28px!important;
+    overflow:visible!important;
+  }
+  .topbar .binso-logo img{
+    width:auto!important;
+    height:28px!important;
+    max-height:28px!important;
+    display:block!important;
+  }
+
+  /* On mobile the page-specific create action is represented by the single
+     centre + in the pill. Secondary page actions (e.g. Export) stay visible. */
+  .page-primary-action{display:none!important}
+  .page-action-group:has(.page-primary-action) .page-primary-action{display:none!important}
+
+  .mobile-pill .pill-add{display:grid!important}
+}
+
+@media(max-width:760px) and (prefers-reduced-motion:reduce){
+  .topbar{transition:none!important}
+}
+
+/* v18.9 — one reusable compact information row for non-navigating business lists. */
+.compact-info-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"main amount" "main trailing";
+  gap:3px 12px;
+  min-width:0;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.compact-info-main{grid-area:main;display:grid;gap:3px;min-width:0}
+.compact-info-main strong,.compact-info-main small{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-info-main strong{font-size:13px;line-height:1.3}
+.compact-info-main small{font-size:11px;line-height:1.35;color:var(--muted)}
+.compact-info-amount{grid-area:amount;justify-self:end;white-space:nowrap;font-size:13px;line-height:1.3;font-variant-numeric:tabular-nums}
+.compact-info-trailing{grid-area:trailing;justify-self:end;display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.compact-info-trailing .status{min-height:20px;padding:0 7px}
+.compact-info-trailing .text-row-action{min-width:auto!important;min-height:28px!important;padding:0 4px!important;font-size:11px!important}
+
+@media(max-width:760px){
+  .compact-info-row{min-height:64px;padding:9px 0}
+  .compact-info-main strong{font-size:13px!important}
+  .compact-info-main small{font-size:11.5px!important}
+  .compact-info-amount{font-size:13px!important}
+}
+
+
+/* ===== migrated from progressive-settings-v18-10.css ===== */
+/* v18.10 – progressive disclosure for settings and editable configuration */
+.settings-progressive-section{border-top:1px solid var(--line);margin-top:22px}
+.settings-progressive-head{padding:18px 0 10px}
+.settings-progressive-head h2{margin:0;font-size:15px;line-height:1.3}
+.settings-progressive-head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+.settings-progressive-list{border-bottom:1px solid var(--line)}
+.settings-value-row,.settings-toggle-row{width:100%;min-height:62px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px 0;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);text-align:left}
+.settings-value-row:first-child,.settings-toggle-row:first-child{border-top:0}
+.settings-value-row{cursor:pointer}
+.settings-value-row:active{background:var(--surface-2)}
+.settings-value-copy{min-width:0;display:grid;gap:4px}
+.settings-value-copy strong{font-size:13.5px;line-height:1.3;font-weight:650;color:var(--text)}
+.settings-value-copy small{font-size:11.5px;line-height:1.4;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.settings-value-trailing{min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:8px;max-width:52%}
+.settings-current-value{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.settings-chevron{font-size:21px;line-height:1;color:var(--muted);flex:0 0 auto}
+.settings-toggle-row>.toggle{flex:0 0 auto}
+.settings-edit-field,.settings-template-fields label{display:grid;gap:7px;font-size:12px;font-weight:650;color:var(--muted)}
+.settings-edit-field input,.settings-edit-field textarea,.settings-template-fields input,.settings-template-fields textarea,.settings-editor-grid input,.settings-editor-grid select{width:100%;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--text);padding:0 14px;font:inherit}
+.settings-edit-field input,.settings-template-fields input,.settings-editor-grid input,.settings-editor-grid select{min-height:48px}
+.settings-edit-field textarea,.settings-template-fields textarea{padding-top:12px;padding-bottom:12px;resize:vertical;line-height:1.5}
+.settings-template-fields{display:grid;gap:16px}
+.settings-editor-grid{padding-bottom:12px}
+
+@media(max-width:760px){
+  .settings-progressive-section{margin-top:16px}
+  .settings-progressive-head{padding:14px 0 8px}
+  .settings-progressive-head h2{font-size:14px}
+  .settings-progressive-head p{font-size:11.5px}
+  .settings-value-row,.settings-toggle-row{min-height:60px;padding:11px 0}
+  .settings-value-copy strong{font-size:14px}
+  .settings-value-copy small{font-size:12px}
+  .settings-value-trailing{max-width:48%}
+  .settings-current-value{font-size:12px}
+  .settings-page .settings-content{min-width:0}
+  .settings-page .settings-progressive-list{margin:0}
+  .settings-page .settings-mobile-back{margin-bottom:4px}
+}
+
+
+/* ===== migrated from visual-cleanup-v18-10-1.css ===== */
+/* v18.10.1 – final visual cleanup: one separator, never browser-style underlines */
+
+/* UI navigation/actions must never look like web links. */
+.app-frame a,
+.app-frame a:visited,
+.app-frame a:hover,
+.app-frame a:active,
+.app-frame button,
+.app-frame summary,
+.app-frame .text-button,
+.app-frame .row-link,
+.app-frame .focus-item,
+.app-frame .linked-row{
+  text-decoration:none!important;
+}
+
+/* One separator system: containers do not draw their own top/bottom rule. */
+.data-list,
+.compact-list,
+.compact-overview-list,
+.operational-mobile-list,
+.settings-progressive-list,
+.object-hub-nav,
+.mobile-dashboard-summary,
+.notification-list,
+.template-editor-list{
+  border-top:0!important;
+  border-bottom:0!important;
+}
+
+/* Rows own the single divider between siblings. */
+.data-list > .data-row:not(.data-head),
+.compact-list > a,
+.compact-list > div,
+.compact-overview-list > *,
+.operational-mobile-list > *,
+.settings-progressive-list > .settings-value-row,
+.settings-progressive-list > .settings-toggle-row,
+.object-hub-nav > *,
+.mobile-dashboard-summary > *,
+.notification-list > a,
+.template-editor-list > .template-editor{
+  border-top:0!important;
+  border-bottom:1px solid var(--line)!important;
+}
+
+.data-list > .data-row:not(.data-head):last-child,
+.compact-list > a:last-child,
+.compact-list > div:last-child,
+.compact-overview-list > *:last-child,
+.operational-mobile-list > *:last-child,
+.settings-progressive-list > :last-child,
+.object-hub-nav > :last-child,
+.mobile-dashboard-summary > :last-child,
+.notification-list > a:last-child,
+.template-editor-list > .template-editor:last-child{
+  border-bottom:0!important;
+}
+
+/* Section boundaries: exactly one subtle line, never stacked with a child line. */
+.settings-progressive-section,
+.section-block,
+.hub-panel,
+.dashboard-section,
+.accounting-section{
+  box-shadow:none!important;
+}
+
+.settings-progressive-section + .settings-progressive-section,
+.section-block + .section-block{
+  border-top:1px solid var(--line)!important;
+}
+
+/* Tabs can use an active indicator, but never text underlines. */
+.detail-tabs a,
+.settings-toolbar button,
+.settings-mobile-hub a,
+.settings-mobile-hub button{
+  text-decoration:none!important;
+}
+
+/* Keep focus visible without turning text into a link. */
+.app-frame a:focus-visible,
+.app-frame button:focus-visible,
+.app-frame summary:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--text) 28%,transparent);
+  outline-offset:2px;
+  text-decoration:none!important;
+}
+
+@media(max-width:760px){
+  /* Mobile rows stay visually flat: no accidental second rule from legacy layers. */
+  .data-row,
+  .compact-list > *,
+  .compact-overview-list > *,
+  .operational-mobile-list > *,
+  .settings-value-row,
+  .settings-toggle-row{
+    box-shadow:none!important;
+  }
+}
+
+
+/* ===== migrated from ui-polish-v18-11.css ===== */
+/* Binso Admin v18.11 — canonical visual primitives.
+   This file is intentionally loaded last. It owns the final geometry for
+   page gutters, brand rendering, toggles and mobile navigation. */
+
+:root{
+  --ui-page-gutter-mobile:20px;
+  --ui-nav-gutter-mobile:24px;
+  --ui-toggle-w:50px;
+  --ui-toggle-h:30px;
+  --ui-toggle-thumb:24px;
+}
+
+/* ---------- Brand: exactly one theme asset is visible ---------- */
+.binso-logo{
+  position:relative!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  overflow:visible!important;
+}
+.binso-logo .binso-logo-light,
+.binso-logo .binso-logo-dark{
+  position:static!important;
+  margin:0!important;
+  padding:0!important;
+}
+.binso-logo .binso-logo-light{display:block!important}
+.binso-logo .binso-logo-dark{display:none!important}
+html[data-theme='dark'] .binso-logo .binso-logo-light{display:none!important}
+html[data-theme='dark'] .binso-logo .binso-logo-dark{display:block!important}
+
+/* ---------- Toggle: one exact native-like geometry everywhere ---------- */
+.toggle-control{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:block!important;
+  width:var(--ui-toggle-w)!important;
+  min-width:var(--ui-toggle-w)!important;
+  max-width:var(--ui-toggle-w)!important;
+  height:var(--ui-toggle-h)!important;
+  min-height:var(--ui-toggle-h)!important;
+  max-height:var(--ui-toggle-h)!important;
+  padding:0!important;
+  margin:0!important;
+  border:1px solid var(--line-strong)!important;
+  border-radius:999px!important;
+  background:var(--surface-3)!important;
+  overflow:hidden!important;
+  flex:0 0 var(--ui-toggle-w)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  line-height:0!important;
+}
+.toggle-control .toggle-thumb{
+  box-sizing:border-box!important;
+  position:absolute!important;
+  top:2px!important;
+  left:2px!important;
+  width:var(--ui-toggle-thumb)!important;
+  min-width:var(--ui-toggle-thumb)!important;
+  max-width:var(--ui-toggle-thumb)!important;
+  height:var(--ui-toggle-thumb)!important;
+  min-height:var(--ui-toggle-thumb)!important;
+  max-height:var(--ui-toggle-thumb)!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:var(--surface)!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.24)!important;
+  transform:translateX(0)!important;
+  transition:transform 150ms cubic-bezier(.2,.8,.2,1)!important;
+  pointer-events:none!important;
+}
+.toggle-control[aria-checked='true']{
+  background:var(--text)!important;
+  border-color:var(--text)!important;
+}
+.toggle-control[aria-checked='true'] .toggle-thumb{
+  transform:translateX(20px)!important;
+  background:var(--bg)!important;
+}
+.toggle-control:disabled{opacity:.45!important}
+.settings-toggle-row,
+.setting-line:has(.toggle-control),
+.form-toggle-field,
+.policy-toggle-row{
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  column-gap:16px!important;
+}
+.settings-toggle-row .toggle-control,
+.setting-line .toggle-control,
+.form-toggle-field .toggle-control,
+.policy-toggle-row .toggle-control{
+  justify-self:end!important;
+  align-self:center!important;
+}
+
+@media(max-width:760px){
+  /* ---------- Page density ---------- */
+  .app-main{
+    padding-left:var(--ui-page-gutter-mobile)!important;
+    padding-right:var(--ui-page-gutter-mobile)!important;
+  }
+  .page{max-width:none!important}
+
+  /* ---------- Flat mobile header + correctly sized single logo ---------- */
+  .topbar{
+    padding-left:var(--ui-page-gutter-mobile)!important;
+    padding-right:var(--ui-page-gutter-mobile)!important;
+    background:var(--bg)!important;
+    border:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .topbar-brand{height:26px!important;display:flex!important;align-items:center!important}
+  .topbar .binso-logo{
+    width:96px!important;
+    min-width:96px!important;
+    height:26px!important;
+    min-height:26px!important;
+  }
+  .topbar .binso-logo img{
+    width:96px!important;
+    max-width:96px!important;
+    height:auto!important;
+    max-height:26px!important;
+    object-fit:contain!important;
+    object-position:left center!important;
+  }
+  .topbar .binso-logo .binso-logo-light{display:block!important}
+  .topbar .binso-logo .binso-logo-dark{display:none!important}
+  html[data-theme='dark'] .topbar .binso-logo .binso-logo-light{display:none!important}
+  html[data-theme='dark'] .topbar .binso-logo .binso-logo-dark{display:block!important}
+
+  /* ---------- Mobile navigation sheet ---------- */
+  .mobile-menu-layer{
+    padding:0!important;
+    place-items:end center!important;
+  }
+  .mobile-menu-sheet{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 0 calc(18px + var(--safe-bottom))!important;
+    overflow:hidden!important;
+  }
+  .mobile-menu-sheet>.sheet-grabber{
+    margin:12px auto 6px!important;
+  }
+  .mobile-menu-sheet>.sheet-heading{
+    min-height:70px!important;
+    grid-template-columns:minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:12px!important;
+    padding:10px 12px 12px var(--ui-nav-gutter-mobile)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  .mobile-menu-sheet>.sheet-heading>.ui-close-button{
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    justify-self:end!important;
+    align-self:center!important;
+  }
+  .mobile-menu-sheet>.sheet-heading>.ui-close-button svg{
+    width:18px!important;
+    height:18px!important;
+  }
+  .mobile-menu-nav{
+    display:grid!important;
+    margin:0 var(--ui-nav-gutter-mobile)!important;
+    padding:0!important;
+    overflow:auto!important;
+    min-height:0!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .mobile-menu-nav>a{
+    box-sizing:border-box!important;
+    min-height:60px!important;
+    display:grid!important;
+    grid-template-columns:28px minmax(0,1fr) 20px!important;
+    align-items:center!important;
+    column-gap:14px!important;
+    margin:0!important;
+    padding:0!important;
+    border-top:0!important;
+    border-bottom:1px solid var(--line)!important;
+    text-decoration:none!important;
+  }
+  .mobile-menu-nav>a:last-child{border-bottom:0!important}
+  .mobile-menu-nav>a>svg:last-child{
+    width:16px!important;
+    height:16px!important;
+    justify-self:end!important;
+    color:var(--muted)!important;
+  }
+  .mobile-menu-icon{
+    width:28px!important;
+    height:44px!important;
+    display:grid!important;
+    place-items:center!important;
+    color:var(--muted)!important;
+  }
+  .mobile-menu-label{
+    min-width:0!important;
+    font-size:14px!important;
+    line-height:1.25!important;
+  }
+
+  /* ---------- Generic sheet geometry: title aligns with content; close glyph aligns with trailing content ---------- */
+  .form-sheet>.sheet-heading,
+  .action-sheet>.sheet-heading,
+  .app-sheet-header{
+    padding-left:var(--ui-page-gutter-mobile)!important;
+    padding-right:8px!important;
+  }
+  .form-sheet>.sheet-heading>.ui-close-button,
+  .action-sheet>.sheet-heading>.ui-close-button,
+  .app-sheet-header>.ui-close-button{
+    justify-self:end!important;
+    align-self:center!important;
+  }
+  .form-sheet>.sheet-actions,
+  .action-sheet>.sheet-actions,
+  .app-sheet-footer,
+  .app-sheet-actions{
+    padding-left:var(--ui-page-gutter-mobile)!important;
+    padding-right:var(--ui-page-gutter-mobile)!important;
+  }
+
+  /* Toggle stays compact even inside legacy button/row rules. */
+  .toggle-control{
+    width:50px!important;
+    min-width:50px!important;
+    max-width:50px!important;
+    height:30px!important;
+    min-height:30px!important;
+    max-height:30px!important;
+  }
+}
+
+
+
+/* ===== Binso Admin v19 canonical UI foundation ===== */
+:root {
+  --app-mobile-gutter: 16px;
+  --app-mobile-sheet-gutter: 16px;
+  --app-mobile-header-height: 56px;
+  --app-tap-size: 44px;
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* One logo node only. Theme is handled by filter, never by two stacked images. */
+.binso-logo { display:inline-flex; align-items:center; line-height:0; flex:0 0 auto; }
+.binso-logo-image { display:block; width:auto; height:24px; max-width:100%; object-fit:contain; filter:none; }
+html[data-theme='dark'] .binso-logo-image { filter:invert(1); }
+
+/* Canonical switch. No inherited button sizing may change its geometry. */
+.toggle-control {
+  appearance:none; -webkit-appearance:none;
+  position:relative; display:inline-flex; align-items:center; flex:0 0 auto;
+  width:48px; min-width:48px; max-width:48px;
+  height:28px; min-height:28px; max-height:28px;
+  margin:0; padding:0; border:0; border-radius:999px;
+  background:var(--surface-3); box-shadow:inset 0 0 0 1px var(--line-strong);
+  cursor:pointer; vertical-align:middle; overflow:hidden;
+  transition:background-color 140ms ease, box-shadow 140ms ease;
+}
+.toggle-control[aria-checked='true'] { background:var(--text); box-shadow:none; }
+.toggle-control:disabled { opacity:.45; cursor:not-allowed; }
+.toggle-thumb {
+  position:absolute; left:2px; top:2px; width:24px; height:24px;
+  border-radius:50%; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.28);
+  transform:translateX(0); transition:transform 140ms ease;
+}
+.toggle-control[aria-checked='true'] .toggle-thumb { transform:translateX(20px); }
+
+/* Shared close target. Visible glyph centered inside a 44px touch target. */
+.ui-close-button {
+  width:var(--app-tap-size); min-width:var(--app-tap-size); max-width:var(--app-tap-size);
+  height:var(--app-tap-size); min-height:var(--app-tap-size); max-height:var(--app-tap-size);
+  padding:0; margin:0; display:grid; place-items:center; border:0; border-radius:999px;
+  background:transparent; color:var(--muted); box-shadow:none;
+}
+.ui-close-button svg { display:block; margin:auto; }
+
+/* Canonical sheets. */
+.app-sheet-backdrop {
+  position:fixed; inset:0; z-index:500; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(0,0,0,.42); overscroll-behavior:contain;
+}
+.app-sheet {
+  width:min(720px,100%); max-width:100%; background:var(--surface); color:var(--text);
+  display:flex; flex-direction:column; overflow:hidden; box-shadow:0 -18px 52px rgba(0,0,0,.22);
+}
+.app-sheet-bottom { max-height:min(82dvh,760px); border-radius:22px 22px 0 0; }
+.app-sheet-fullscreen { position:fixed; inset:0; width:100%; height:var(--app-vh,100dvh); max-height:var(--app-vh,100dvh); border-radius:0; box-shadow:none; }
+.app-sheet-dialog { align-self:center; border-radius:18px; max-height:min(82dvh,760px); }
+.app-sheet-grabber { width:38px; height:4px; border-radius:99px; background:var(--line-strong); margin:8px auto 4px; flex:0 0 auto; }
+.app-sheet-header {
+  display:grid; grid-template-columns:minmax(0,1fr) var(--app-tap-size); align-items:center; gap:12px;
+  min-height:64px; padding:10px var(--app-mobile-sheet-gutter); border-bottom:1px solid var(--line);
+  background:var(--surface); flex:0 0 auto;
+}
+.app-sheet-title { min-width:0; display:grid; gap:2px; }
+.app-sheet-title strong { font-size:15px; line-height:1.25; font-weight:700; }
+.app-sheet-title span { font-size:12px; line-height:1.35; color:var(--muted); }
+.app-sheet-content { min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; padding:16px var(--app-mobile-sheet-gutter); }
+.app-sheet-footer { flex:0 0 auto; padding:10px var(--app-mobile-sheet-gutter) calc(10px + var(--app-safe-bottom)); border-top:1px solid var(--line); background:var(--surface); }
+.app-sheet-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+/* Navigation list inside the shared sheet. */
+.mobile-menu-nav { display:grid; margin:0; padding:0; }
+.mobile-menu-nav a {
+  min-height:56px; display:grid; grid-template-columns:28px minmax(0,1fr) 24px; align-items:center; gap:10px;
+  padding:0; border:0; border-bottom:1px solid var(--line); color:var(--text); text-decoration:none;
+}
+.mobile-menu-nav a:last-child { border-bottom:0; }
+.mobile-menu-nav a.active { font-weight:700; }
+.mobile-menu-icon { width:28px; display:grid; place-items:center; color:var(--muted); }
+.mobile-menu-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mobile-menu-nav a > svg:last-child { justify-self:center; color:var(--muted); }
+
+/* Prevent decorative underlines and double separators globally. */
+a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row { text-decoration:none; }
+.data-list, .compact-list, .summary-list, .settings-progressive-list, .mobile-menu-nav { border-top:0; border-bottom:0; }
+
+@media (max-width:760px) {
+  html, body { overflow-x:hidden; }
+  .topbar {
+    height:calc(var(--app-mobile-header-height) + var(--app-safe-top)); min-height:calc(var(--app-mobile-header-height) + var(--app-safe-top));
+    padding:var(--app-safe-top) var(--app-mobile-gutter) 0;
+    background:var(--bg); border:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+  }
+  .topbar-brand { min-width:0; display:flex; align-items:center; }
+  .topbar-brand .binso-logo-image { height:28px; }
+  .global-search, .topbar-actions { display:none; }
+  .topbar.is-hidden { transform:translateY(-100%); }
+
+  .app-main {
+    width:100%; max-width:100%; min-width:0;
+    padding-left:var(--app-mobile-gutter); padding-right:var(--app-mobile-gutter);
+    padding-top:18px;
+    padding-bottom:calc(96px + var(--app-safe-bottom));
+  }
+  .page { width:100%; max-width:none; margin:0; padding-left:0; padding-right:0; }
+  .page-header, .module-toolbar, .section-block, .surface { margin-left:0; margin-right:0; }
+
+  .app-sheet-bottom { width:100%; max-width:100%; }
+  .app-sheet-header { padding-left:var(--app-mobile-sheet-gutter); padding-right:var(--app-mobile-sheet-gutter); }
+  .app-sheet-content { padding-left:var(--app-mobile-sheet-gutter); padding-right:var(--app-mobile-sheet-gutter); }
+  .app-sheet-footer { padding-left:var(--app-mobile-sheet-gutter); padding-right:var(--app-mobile-sheet-gutter); }
+  .app-sheet-actions { grid-template-columns:1fr 1fr; }
+
+  body:has(.app-sheet-backdrop) .mobile-pill { display:none; }
+
+  .setting-line, .settings-toggle-row { min-height:52px; grid-template-columns:minmax(0,1fr) auto; align-items:center; column-gap:12px; }
+  .toggle-control { justify-self:end; }
+}
+
+@media (max-width:420px) {
+  .app-sheet-actions { grid-template-columns:1fr; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .toggle-control, .toggle-thumb, .topbar { transition:none; }
+}
