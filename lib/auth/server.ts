@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
 import type { Role } from '@/types/domain'
-import { roleAllowed } from './permissions'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -16,10 +15,10 @@ type AzureClientPrincipal = {
 
 function roleFromClaims(roles: string[]): Role {
   const normalized = roles.map((role) => role.toLowerCase())
-  if (normalized.includes('owner')) return 'owner'
-  if (normalized.includes('admin')) return 'admin'
-  if (normalized.includes('finance') || normalized.includes('accounting')) return 'finance'
-  return 'employee'
+  if (normalized.some((role) => role === 'owner' || role.endsWith('.owner') || role.endsWith('-owner'))) return 'owner'
+  if (normalized.some((role) => role === 'admin' || role.endsWith('.admin') || role.endsWith('-admin'))) return 'admin'
+  if (normalized.some((role) => role === 'finance' || role === 'accounting' || role.endsWith('.finance') || role.endsWith('-finance'))) return 'finance'
+  return env.authDefaultRole as Role
 }
 
 function parseAzurePrincipal(raw: string | null): Session {
@@ -61,9 +60,9 @@ export async function getSession(): Promise<Session> {
   if (env.authMode === 'local') {
     return {
       user: {
-        id: 'local-user',
-        name: 'Lokaler Admin',
-        email: 'local@binso.ch',
+        id: 'local-demo',
+        name: 'Demo Admin',
+        email: 'demo@binso.ch',
         role: 'owner',
       },
     }
@@ -73,9 +72,15 @@ export async function getSession(): Promise<Session> {
   return parseAzurePrincipal(requestHeaders.get('x-ms-client-principal'))
 }
 
-export async function requireRole(allowedRoles: readonly Role[]) {
+
+export async function requireRole(...allowed: Array<Role | readonly Role[]>): Promise<NonNullable<Session>> {
   const session = await getSession()
   if (!session) redirect('/sign-in')
-  if (!roleAllowed(session.user.role, allowedRoles)) redirect('/access-denied')
+
+  const roles = allowed.flatMap((entry): Role[] =>
+    typeof entry === 'string' ? [entry] : Array.from(entry)
+  )
+  if (roles.length > 0 && !roles.includes(session.user.role)) redirect('/access-denied')
+
   return session
 }

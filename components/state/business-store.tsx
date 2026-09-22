@@ -5,12 +5,16 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react'
 import {
+  contracts as seedContracts,
+  creditNotes as seedCreditNotes,
+  customerActivities as seedCustomerActivities,
+  customerContacts as seedCustomerContacts,
   customers as seedCustomers,
+  expenses as seedExpenses,
   employees as seedEmployees,
   invoices as seedInvoices,
   orders as seedOrders,
@@ -19,7 +23,7 @@ import {
   supplierInvoices as seedSupplierInvoices,
   suppliers as seedSuppliers,
   timeEntries as seedTimeEntries,
-} from '@/lib/data/local-reference-data'
+} from '@/lib/data/demo'
 import {
   orderAssignmentRules as seedOrderAssignmentRules,
   orderPolicies as seedOrderPolicies,
@@ -31,9 +35,14 @@ import type {
   AppSettings,
   AppUser,
   CompanyProfile,
+  Contract,
+  CreditNote,
+  CustomerActivity,
   Customer,
+  CustomerContact,
   DocumentTemplates,
   Employee,
+  Expense,
   Invoice,
   InvoiceLine,
   Order,
@@ -50,13 +59,14 @@ import type { TimeEvidence } from '@/modules/time/types'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { createDefaultOrderPolicy } from '@/modules/orders/defaults'
 import { readStorage, removeStorage, writeStorage } from '@/lib/browser/storage'
-import { addDaysIso, formatDate, todayIso } from '@/lib/format/locale'
-import { calculateInvoiceTotals, recalculateInvoice, roundMoney } from '@/modules/invoices/calculations'
-import { recalculateQuote } from '@/modules/quotes/calculations'
-import { nextInvoiceNumber, nextQuoteNumber } from '@/modules/documents/numbering'
 
 type BusinessState = {
   customers: Customer[]
+  contracts: Contract[]
+  expenses: Expense[]
+  creditNotes: CreditNote[]
+  customerActivities: CustomerActivity[]
+  customerContacts: CustomerContact[]
   suppliers: Supplier[]
   quotes: Quote[]
   orders: Order[]
@@ -77,8 +87,10 @@ type CreateInvoiceInput = {
   customerId: string
   orderId?: string
   timeEntryIds: string[]
+  expenseIds?: string[]
   extraLines?: InvoiceLine[]
   period: string
+  kind?: Invoice['kind']
 }
 
 type CreateQuoteInput = {
@@ -91,9 +103,20 @@ type CreateQuoteInput = {
 
 type CreateOrderInput = Omit<Order, 'id' | 'usedHours'>
 
+type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { customerId: string }
+
 type BusinessStore = BusinessState & {
   addCustomer: (customer: Customer) => void
   updateCustomer: (id: string, changes: Partial<Customer>) => Customer | null
+  createContract: (input: CreateContractInput) => Contract | null
+  updateContract: (id: string, changes: Partial<Contract>) => Contract | null
+  addExpense: (expense: Expense) => void
+  createOrderFromContract: (contractId: string) => Order | null
+  createInvoiceFromContract: (contractId: string, period?: string) => Invoice | null
+  createCreditNote: (invoiceId: string, amount: number, reason: string) => CreditNote | null
+  addActivityNote: (customerId: string, note: string) => void
+  addCustomerContact: (contact: CustomerContact) => void
+  updateCustomerContact: (id: string, changes: Partial<CustomerContact>) => CustomerContact | null
   createOrder: (input: CreateOrderInput) => Order
   updateOrder: (id: string, changes: Partial<Order>) => Order | null
   addEmployee: (employee: Employee) => void
@@ -109,37 +132,31 @@ type BusinessStore = BusinessState & {
   updateQuote: (id: string, changes: Partial<Quote>) => void
   createQuote: (input: CreateQuoteInput) => Quote | null
   createQuoteRevision: (quoteId: string) => Quote | null
-  markQuoteSent: (id: string, to: string) => Quote | null
+  sendQuote: (id: string, to: string) => Quote | null
   createOrderFromQuote: (quoteId: string) => Order | null
+  createInvoiceFromQuote: (quoteId: string) => Invoice | null
   createInvoiceFromTimes: (input: CreateInvoiceInput) => Invoice | null
   updateInvoiceDraft: (id: string, changes: Partial<Invoice>) => Invoice | null
-  markInvoiceSent: (id: string, to: string, mode?: 'invoice' | 'reminder') => Invoice | null
+  sendInvoice: (id: string, to: string, mode?: 'invoice' | 'reminder') => Invoice | null
   cancelInvoice: (id: string) => Invoice | null
-  recordPayment: (invoiceId: string, amount: number, method: Payment['method'], date: string) => void
+  recordPayment: (invoiceId: string, amount: number, method: Payment['method'], date: string, reference?: string) => void
   updateCompanyProfile: (changes: Partial<CompanyProfile>) => void
   updateDocumentTemplates: (changes: Partial<DocumentTemplates>) => void
   updateAppSettings: (changes: Partial<AppSettings>) => void
-  resetLocalData: () => void
+  resetDemo: () => void
 }
 
-const STORAGE_VERSION = 14
-const STORAGE_KEY = `binso-admin-local-v${STORAGE_VERSION}`
-const LEGACY_STORAGE_KEYS = ['binso-admin-local-v13', 'binso-admin-demo-v12-responsive', 'binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
-
-type PersistedBusinessState = {
-  version: number
-  state: Partial<BusinessState>
-}
-
-function parsePersistedState(raw: string): Partial<BusinessState> {
-  const parsed = JSON.parse(raw) as Partial<BusinessState> | PersistedBusinessState
-  if ('state' in parsed && parsed.state && typeof parsed.state === 'object') return parsed.state
-  return parsed as Partial<BusinessState>
-}
+const STORAGE_KEY = 'binso-admin-demo-v12-responsive'
+const LEGACY_STORAGE_KEYS = ['binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
 
 function freshState(): BusinessState {
   return {
     customers: seedCustomers,
+    contracts: seedContracts,
+    expenses: seedExpenses,
+    creditNotes: seedCreditNotes,
+    customerActivities: seedCustomerActivities,
+    customerContacts: seedCustomerContacts,
     suppliers: seedSuppliers,
     quotes: seedQuotes,
     orders: seedOrders,
@@ -157,47 +174,10 @@ function freshState(): BusinessState {
   }
 }
 
-
-function scopeStateForUser(state: BusinessState, user: AppUser): BusinessState {
-  if (user.role !== 'employee') return state
-
-  const employee = state.employees.find((item) => item.email.toLowerCase() === user.email.toLowerCase())
-  if (!employee) {
-    return {
-      ...state,
-      customers: [], suppliers: [], quotes: [], orders: [], timeEntries: [], invoices: [], payments: [], supplierInvoices: [], employees: [], timeEvidence: [], orderPolicies: [], orderAssignmentRules: [],
-    }
-  }
-
-  const assignments = state.orderAssignmentRules.filter((rule) => rule.active && rule.personId === employee.id)
-  const orderIds = new Set(assignments.map((rule) => rule.orderId))
-  return {
-    ...state,
-    customers: [],
-    suppliers: [],
-    quotes: [],
-    orders: state.orders.filter((order) => orderIds.has(order.id)),
-    timeEntries: state.timeEntries.filter((entry) => entry.personId === employee.id && orderIds.has(entry.orderId)),
-    invoices: [],
-    payments: [],
-    supplierInvoices: [],
-    employees: [employee],
-    timeEvidence: state.timeEvidence.filter((evidence) => evidence.personId === employee.id && orderIds.has(evidence.orderId)),
-    orderPolicies: state.orderPolicies.filter((policy) => orderIds.has(policy.orderId)),
-    orderAssignmentRules: assignments,
-  }
-}
-
-function storageKeyForUser(user: AppUser) {
-  const safeId = (user.id || user.email).replace(/[^a-zA-Z0-9._-]+/g, '_')
-  return `${STORAGE_KEY}:${safeId}`
-}
-
 const BusinessContext = createContext<BusinessStore | null>(null)
 
-export function BusinessStoreProvider({ user, children }: { user: AppUser; children: ReactNode }) {
-  const userStorageKey = storageKeyForUser(user)
-  const [state, setState] = useState<BusinessState>(() => scopeStateForUser(freshState(), user))
+export function BusinessStoreProvider({ children }: { children: ReactNode; user?: AppUser }) {
+  const [state, setState] = useState<BusinessState>(freshState)
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
@@ -205,7 +185,7 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
     queueMicrotask(() => {
       if (cancelled) return
       try {
-        let raw = readStorage(userStorageKey)
+        let raw = readStorage(STORAGE_KEY)
 
         if (!raw) {
           for (const key of LEGACY_STORAGE_KEYS) {
@@ -218,15 +198,21 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         }
 
         if (raw) {
-          const parsed = parsePersistedState(raw)
-          const seeded = scopeStateForUser(freshState(), user)
+          const parsed = JSON.parse(raw) as Partial<BusinessState>
+          const seeded = freshState()
 
-          // Local reference data remains usable across compatible development snapshots.
-          // Empty legacy arrays fall back to the current seed set so modules do not disappear.
-          setState(scopeStateForUser({
+          // Demo releases must always contain usable reference data. Older browser
+          // snapshots could contain empty arrays from previous UI-only versions and
+          // would otherwise make whole modules appear blank after an upgrade.
+          setState({
             ...seeded,
             ...parsed,
             customers: parsed.customers?.length ? parsed.customers : seeded.customers,
+            contracts: parsed.contracts ?? seeded.contracts,
+            expenses: parsed.expenses ?? seeded.expenses,
+            creditNotes: parsed.creditNotes ?? seeded.creditNotes,
+            customerActivities: parsed.customerActivities ?? seeded.customerActivities,
+            customerContacts: parsed.customerContacts ?? seeded.customerContacts,
             suppliers: parsed.suppliers?.length ? parsed.suppliers : seeded.suppliers,
             quotes: parsed.quotes?.length ? parsed.quotes : seeded.quotes,
             orders: parsed.orders?.length ? parsed.orders : seeded.orders,
@@ -241,67 +227,21 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
             companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}) },
             documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
             appSettings: mergeAppSettings(parsed.appSettings),
-          }, user))
+          })
         }
       } catch {
-        // Ungültige lokale Daten werden ignoriert; Referenzdaten bleiben verfügbar.
+        // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
       } finally {
         if (!cancelled) setHydrated(true)
       }
     })
     return () => { cancelled = true }
-  }, [user, userStorageKey])
-
-  const pendingPersistence = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const latestState = useRef(state)
-
-  useEffect(() => {
-    latestState.current = state
-  }, [state])
+  }, [])
 
   useEffect(() => {
     if (!hydrated) return
-
-    const persist = () => {
-      pendingPersistence.current = null
-      writeStorage(userStorageKey, JSON.stringify({
-        version: STORAGE_VERSION,
-        state: latestState.current,
-      } satisfies PersistedBusinessState))
-    }
-
-    if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
-    pendingPersistence.current = setTimeout(persist, 250)
-
-    return () => {
-      if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
-      pendingPersistence.current = null
-    }
-  }, [state, hydrated, userStorageKey])
-
-  useEffect(() => {
-    if (!hydrated) return
-
-    const persistNow = () => {
-      if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
-      pendingPersistence.current = null
-      writeStorage(userStorageKey, JSON.stringify({
-        version: STORAGE_VERSION,
-        state: latestState.current,
-      } satisfies PersistedBusinessState))
-    }
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') persistNow()
-    }
-
-    window.addEventListener('pagehide', persistNow)
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    return () => {
-      window.removeEventListener('pagehide', persistNow)
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-    }
-  }, [hydrated, userStorageKey])
+    writeStorage(STORAGE_KEY, JSON.stringify(state))
+  }, [state, hydrated])
 
   const store = useMemo<BusinessStore>(() => ({
     ...state,
@@ -315,6 +255,105 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
       setState((current) => ({ ...current, customers: current.customers.map((item) => item.id === id ? updated : item) }))
       return updated
     },
+    createContract(input) {
+      const customer = state.customers.find((item) => item.id === input.customerId)
+      if (!customer || !input.name.trim() || !input.lines.length) return null
+      const contract: Contract = {
+        ...input,
+        id: `con-${Date.now()}`,
+        number: nextContractNumber(state.contracts),
+        customerName: customer.name,
+      }
+      setState((current) => ({
+        ...current,
+        contracts: [contract, ...current.contracts],
+        customerActivities: [makeActivity(customer.id, 'contract', `Vertrag ${contract.number} erstellt`, contract.name), ...current.customerActivities],
+      }))
+      return contract
+    },
+    updateContract(id, changes) {
+      const existing = state.contracts.find((item) => item.id === id)
+      if (!existing) return null
+      const updated = { ...existing, ...changes }
+      setState((current) => ({ ...current, contracts: current.contracts.map((item) => item.id === id ? updated : item) }))
+      return updated
+    },
+    addExpense(expense) {
+      setState((current) => ({ ...current, expenses: [expense, ...current.expenses] }))
+    },
+    createOrderFromContract(contractId) {
+      const contract = state.contracts.find((item) => item.id === contractId)
+      if (!contract) return null
+      const existing = state.orders.find((item) => item.contractId === contract.id)
+      if (existing) return existing
+      const hours = contract.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity, 0)
+      const hourlyRevenue = contract.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
+      const order: Order = { id: `ord-${Date.now()}`, customerId: contract.customerId, customerName: contract.customerName, name: contract.name, mandateRef: contract.reference || contract.number, budgetHours: hours || 160, usedHours: 0, salesRate: hours ? Math.round(hourlyRevenue / hours) : 165, costRate: 105, billingModel: contract.billingInterval === 'none' ? 'mixed' : 'retainer', contractId: contract.id, status: 'active' }
+      const policy = createDefaultOrderPolicy(order.id, order.billingModel)
+      setState((current) => ({ ...current, orders: [order, ...current.orders], orderPolicies: [policy, ...current.orderPolicies], customerActivities: [makeActivity(contract.customerId, 'order', `Auftrag aus ${contract.number} erstellt`, contract.name), ...current.customerActivities] }))
+      return order
+    },
+    createInvoiceFromContract(contractId, period) {
+      const contract = state.contracts.find((item) => item.id === contractId)
+      if (!contract || contract.status !== 'active') return null
+      const customer = state.customers.find((item) => item.id === contract.customerId)
+      if (!customer || !contract.lines.length) return null
+      const lines: InvoiceLine[] = contract.lines.map((line, index) => ({
+        id: `il-${Date.now()}-${index}`, description: line.description, quantity: line.quantity, unit: line.unit, unitPrice: line.unitPrice, vatRate: line.vatRate, sourceTimeEntryIds: [],
+      }))
+      const issueDate = today()
+      const invoice: Invoice = {
+        id: `inv-${Date.now()}`, number: nextInvoiceNumber(state.invoices), customerId: customer.id, customerName: customer.name,
+        contractId: contract.id, contractName: contract.name, kind: 'recurring', period: period || monthLabel(issueDate), issueDate,
+        due: addDays(issueDate, customer.paymentDays), status: 'draft', lines, ...invoiceTotals(lines), paidAmount: 0,
+        recipientName: customer.legalName || customer.name, recipientAddress: customer.address, recipientZip: customer.zip, recipientCity: customer.city,
+        recipientCountry: customer.country, recipientEmail: customer.email, introText: state.documentTemplates.invoiceIntro, outroText: state.documentTemplates.invoiceOutro, reference: contract.reference,
+      }
+      const nextInvoiceDate = advanceBillingDate(contract.nextInvoiceDate || issueDate, contract.billingInterval)
+      setState((current) => ({
+        ...current,
+        invoices: [invoice, ...current.invoices],
+        contracts: current.contracts.map((item) => item.id === contract.id ? { ...item, nextInvoiceDate } : item),
+        customerActivities: [makeActivity(customer.id, 'invoice', `Rechnung ${invoice.number} aus Vertrag erstellt`, contract.name), ...current.customerActivities],
+      }))
+      return invoice
+    },
+    createCreditNote(invoiceId, amount, reason) {
+      const invoice = state.invoices.find((item) => item.id === invoiceId)
+      if (!invoice || invoice.status === 'cancelled' || !Number.isFinite(amount) || amount <= 0) return null
+      const maximum = Math.max(0, invoice.amount - (invoice.creditedAmount ?? 0))
+      const booked = round2(Math.min(maximum, amount))
+      if (!booked) return null
+      const credit: CreditNote = { id: `credit-${Date.now()}`, number: nextCreditNumber(state.creditNotes), invoiceId, invoiceNumber: invoice.number, customerId: invoice.customerId, customerName: invoice.customerName, date: today(), amount: booked, reason: reason.trim() || 'Korrektur' }
+      setState((current) => ({
+        ...current,
+        creditNotes: [credit, ...current.creditNotes],
+        invoices: current.invoices.map((item) => item.id === invoiceId ? { ...item, creditedAmount: round2((item.creditedAmount ?? 0) + booked) } : item),
+        customerActivities: [makeActivity(invoice.customerId, 'credit', `Gutschrift ${credit.number} erstellt`, `${invoice.number} · CHF ${booked.toFixed(2)}`), ...current.customerActivities],
+      }))
+      return credit
+    },
+    addActivityNote(customerId, note) {
+      const cleaned = note.trim()
+      if (!cleaned) return
+      setState((current) => ({ ...current, customerActivities: [makeActivity(customerId, 'note', 'Notiz', cleaned), ...current.customerActivities] }))
+    },
+    addCustomerContact(contact) {
+      setState((current) => ({
+        ...current,
+        customerContacts: [contact, ...current.customerContacts.map((item) => contact.primary && item.customerId === contact.customerId ? { ...item, primary: false } : item)],
+      }))
+    },
+    updateCustomerContact(id, changes) {
+      const existing = state.customerContacts.find((item) => item.id === id)
+      if (!existing) return null
+      const updated = { ...existing, ...changes }
+      setState((current) => ({
+        ...current,
+        customerContacts: current.customerContacts.map((item) => item.id === id ? updated : (changes.primary && item.customerId === existing.customerId ? { ...item, primary: false } : item)),
+      }))
+      return updated
+    },
     createOrder(input) {
       const order: Order = { ...input, id: `ord-${Date.now()}`, usedHours: 0 }
       const policy = createDefaultOrderPolicy(order.id, order.billingModel)
@@ -322,6 +361,7 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         ...current,
         orders: [order, ...current.orders],
         orderPolicies: [policy, ...current.orderPolicies],
+        customerActivities: [makeActivity(order.customerId, 'order', 'Auftrag erstellt', order.name), ...current.customerActivities],
       }))
       return order
     },
@@ -393,14 +433,24 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
       })
     },
     updateQuote(id, changes) {
-      setState((current) => ({ ...current, quotes: current.quotes.map((quote) => quote.id === id ? recalculateQuote({ ...quote, ...changes }) : quote) }))
+      const existing = state.quotes.find((quote) => quote.id === id)
+      if (!existing) return
+      const statusChanged = changes.status && changes.status !== existing.status
+      const statusLabels: Partial<Record<Quote['status'], string>> = { accepted: 'angenommen', declined: 'abgelehnt', expired: 'abgelaufen', revised: 'ersetzt' }
+      setState((current) => ({
+        ...current,
+        quotes: current.quotes.map((quote) => quote.id === id ? recalcQuote({ ...quote, ...changes }) : quote),
+        customerActivities: statusChanged && statusLabels[changes.status!]
+          ? [makeActivity(existing.customerId, 'quote', `Angebot ${existing.number} ${statusLabels[changes.status!]}`, existing.title), ...current.customerActivities]
+          : current.customerActivities,
+      }))
     },
     createQuote(input) {
       const customer = state.customers.find((item) => item.id === input.customerId)
       if (!customer || !input.lines.length) return null
-      const quote: Quote = recalculateQuote({
+      const quote: Quote = recalcQuote({
         id: `quo-${Date.now()}`,
-        number: nextQuoteNumber(state.quotes.map((item) => item.number)),
+        number: nextQuoteNumber(state.quotes),
         customerId: customer.id,
         customerName: customer.name,
         title: input.title,
@@ -420,13 +470,13 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         outroText: state.documentTemplates.quoteOutro,
         reference: input.reference,
       })
-      setState((current) => ({ ...current, quotes: [quote, ...current.quotes] }))
+      setState((current) => ({ ...current, quotes: [quote, ...current.quotes], customerActivities: [makeActivity(customer.id, 'quote', `Angebot ${quote.number} erstellt`, quote.title), ...current.customerActivities] }))
       return quote
     },
     createQuoteRevision(quoteId) {
       const source = state.quotes.find((item) => item.id === quoteId)
       if (!source) return null
-      const revision: Quote = recalculateQuote({
+      const revision: Quote = recalcQuote({
         ...source,
         id: `quo-${Date.now()}`,
         version: source.version + 1,
@@ -436,21 +486,21 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         sentTo: undefined,
         lines: source.lines.map((line, index) => ({ ...line, id: `ql-${Date.now()}-${index}` })),
       })
-      setState((current) => ({ ...current, quotes: [revision, ...current.quotes] }))
+      setState((current) => ({ ...current, quotes: [revision, ...current.quotes.map((item) => item.id === source.id ? { ...item, status: 'revised' as const } : item)] }))
       return revision
     },
-    markQuoteSent(id, to) {
+    sendQuote(id, to) {
       const quote = state.quotes.find((item) => item.id === id)
       if (!quote || !to.trim()) return null
       const updated: Quote = { ...quote, status: 'sent', sentAt: new Date().toISOString(), sentTo: to.trim(), recipientEmail: to.trim() }
-      setState((current) => ({ ...current, quotes: current.quotes.map((item) => item.id === id ? updated : item) }))
+      setState((current) => ({ ...current, quotes: current.quotes.map((item) => item.id === id ? updated : item), customerActivities: [makeActivity(quote.customerId, 'quote', `Angebot ${quote.number} versendet`, to.trim()), ...current.customerActivities] }))
       return updated
     },
     createOrderFromQuote(quoteId) {
       const quote = state.quotes.find((item) => item.id === quoteId)
       if (!quote) return null
       if (state.appSettings.workflow.requireQuoteAcceptanceBeforeOrder && quote.status !== 'accepted') return null
-      const existing = state.orders.find((order) => order.sourceQuoteId === quote.id)
+      const existing = state.orders.find((order) => order.name === quote.title && order.customerId === quote.customerId)
       if (existing) return existing
       const hours = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity, 0)
       const weightedRevenue = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
@@ -458,7 +508,6 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         id: `ord-${Date.now()}`,
         customerId: quote.customerId,
         customerName: quote.customerName,
-        sourceQuoteId: quote.id,
         name: quote.title,
         mandateRef: quote.number,
         budgetHours: hours || 40,
@@ -466,24 +515,38 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         salesRate: hours ? Math.round(weightedRevenue / hours) : 165,
         costRate: 105,
         billingModel: 'mixed',
+        sourceQuoteId: quote.id,
         status: 'active',
       }
       const policy = createDefaultOrderPolicy(order.id, order.billingModel)
       setState((current) => ({
         ...current,
-        customers: current.customers.map((customer) => customer.id === quote.customerId && customer.status === 'prospect' ? { ...customer, status: 'active' as const } : customer),
         orders: [order, ...current.orders],
         orderPolicies: [policy, ...current.orderPolicies],
+        customerActivities: [makeActivity(order.customerId, 'order', `Auftrag aus ${quote.number} erstellt`, order.name), ...current.customerActivities],
       }))
       return order
+    },
+    createInvoiceFromQuote(quoteId) {
+      const quote = state.quotes.find((item) => item.id === quoteId)
+      if (!quote || quote.status !== 'accepted') return null
+      const customer = state.customers.find((item) => item.id === quote.customerId)
+      if (!customer || !quote.lines.length) return null
+      const lines: InvoiceLine[] = quote.lines.map((line, index) => ({ id: `il-q-${Date.now()}-${index}`, description: line.description, quantity: line.quantity, unit: line.unit === 'Tag' ? 'Stk.' : line.unit, unitPrice: line.unitPrice, vatRate: line.vatRate ?? 8.1, sourceTimeEntryIds: [] }))
+      const issueDate = today()
+      const invoice: Invoice = { id: `inv-${Date.now()}`, number: nextInvoiceNumber(state.invoices), customerId: customer.id, customerName: customer.name, kind: 'standard', period: monthLabel(issueDate), issueDate, due: addDays(issueDate, customer.paymentDays), status: 'draft', lines, ...invoiceTotals(lines), paidAmount: 0, recipientName: customer.legalName || customer.name, recipientAddress: customer.address, recipientZip: customer.zip, recipientCity: customer.city, recipientCountry: customer.country, recipientEmail: customer.email, introText: state.documentTemplates.invoiceIntro, outroText: state.documentTemplates.invoiceOutro, reference: quote.number }
+      setState((current) => ({ ...current, invoices: [invoice, ...current.invoices], customerActivities: [makeActivity(customer.id, 'invoice', `Rechnung ${invoice.number} aus ${quote.number} erstellt`, quote.title), ...current.customerActivities] }))
+      return invoice
     },
     createInvoiceFromTimes(input) {
       const customer = state.customers.find((item) => item.id === input.customerId)
       if (!customer) return null
       const selected = state.timeEntries.filter((entry) => input.timeEntryIds.includes(entry.id) && getTimeEntryBillingEligibility(entry, state.timeEvidence, state.orderPolicies, state.orderAssignmentRules).eligible)
       const order = input.orderId ? state.orders.find((item) => item.id === input.orderId) : undefined
+      const selectedExpenses = state.expenses.filter((expense) => input.expenseIds?.includes(expense.id) && expense.billable && !expense.invoicedInvoiceId)
+      const expenseLines: InvoiceLine[] = selectedExpenses.map((expense, index) => ({ id: `il-exp-${Date.now()}-${index}`, description: `${formatDate(expense.date)} – ${expense.description}`, quantity: expense.quantity, unit: 'Stk.', unitPrice: expense.unitPrice, vatRate: 8.1, sourceTimeEntryIds: [], sourceExpenseIds: [expense.id] }))
       const extraLines = input.extraLines?.filter((line) => line.description.trim() && line.quantity > 0) ?? []
-      if (!selected.length && !extraLines.length) return null
+      if (!selected.length && !selectedExpenses.length && !extraLines.length) return null
       const timeLines: InvoiceLine[] = selected.map((entry, index) => ({
         id: `il-${Date.now()}-${index}`,
         description: `${formatDate(entry.date)} – ${entry.description || 'Dienstleistung'} – ${entry.personName}`,
@@ -493,16 +556,17 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         vatRate: 8.1,
         sourceTimeEntryIds: [entry.id],
       }))
-      const lines = [...timeLines, ...extraLines]
-      const totals = calculateInvoiceTotals(lines)
+      const lines = [...timeLines, ...expenseLines, ...extraLines]
+      const totals = invoiceTotals(lines)
       const issueDate = today()
       const invoice: Invoice = {
         id: `inv-${Date.now()}`,
-        number: nextInvoiceNumber(state.invoices.map((item) => item.number)),
+        number: nextInvoiceNumber(state.invoices),
         customerId: customer.id,
         customerName: customer.name,
         orderId: order?.id,
         orderName: order?.name,
+        kind: input.kind ?? 'standard',
         period: input.period,
         issueDate,
         due: addDays(issueDate, customer.paymentDays),
@@ -524,17 +588,19 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         ...current,
         invoices: [invoice, ...current.invoices],
         timeEntries: current.timeEntries.map((entry) => selected.some((selectedEntry) => selectedEntry.id === entry.id) ? { ...entry, invoicedInvoiceId: invoice.id } : entry),
+        expenses: current.expenses.map((expense) => selectedExpenses.some((selectedExpense) => selectedExpense.id === expense.id) ? { ...expense, invoicedInvoiceId: invoice.id } : expense),
+        customerActivities: [makeActivity(customer.id, 'invoice', `Rechnung ${invoice.number} erstellt`, input.period), ...current.customerActivities],
       }))
       return invoice
     },
     updateInvoiceDraft(id, changes) {
       const existing = state.invoices.find((item) => item.id === id)
       if (!existing || existing.status !== 'draft') return null
-      const updated = recalculateInvoice({ ...existing, ...changes })
+      const updated = recalcInvoice({ ...existing, ...changes })
       setState((current) => ({ ...current, invoices: current.invoices.map((item) => item.id === id ? updated : item) }))
       return updated
     },
-    markInvoiceSent(id, to, mode = 'invoice') {
+    sendInvoice(id, to, mode = 'invoice') {
       const invoice = state.invoices.find((item) => item.id === id)
       if (!invoice || !to.trim()) return null
       const now = new Date().toISOString()
@@ -542,38 +608,43 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
         ...invoice,
         recipientEmail: to.trim(),
         sentTo: to.trim(),
-        ...(mode === 'reminder' ? { lastReminderAt: now } : { sentAt: now, status: invoice.status === 'draft' ? 'sent' : invoice.status }),
+        ...(mode === 'reminder' ? { lastReminderAt: now, reminderLevel: Math.min(3, (invoice.reminderLevel ?? 0) + 1) as 1 | 2 | 3 } : { sentAt: now, status: invoice.status === 'draft' ? 'sent' : invoice.status }),
       }
-      setState((current) => ({ ...current, invoices: current.invoices.map((item) => item.id === id ? updated : item) }))
+      setState((current) => ({ ...current, invoices: current.invoices.map((item) => item.id === id ? updated : item), customerActivities: [makeActivity(invoice.customerId, mode === 'reminder' ? 'reminder' : 'invoice', mode === 'reminder' ? `Mahnung ${updated.reminderLevel ?? 1} zu ${invoice.number}` : `Rechnung ${invoice.number} versendet`, to.trim()), ...current.customerActivities] }))
       return updated
     },
     cancelInvoice(id) {
       const invoice = state.invoices.find((item) => item.id === id)
       if (!invoice || invoice.status === 'paid' || invoice.status === 'cancelled') return null
       const sourceIds = new Set(invoice.lines.flatMap((line) => line.sourceTimeEntryIds))
+      const expenseIds = new Set(invoice.lines.flatMap((line) => line.sourceExpenseIds ?? []))
       const updated: Invoice = { ...invoice, status: 'cancelled' }
       setState((current) => ({
         ...current,
         invoices: current.invoices.map((item) => item.id === id ? updated : item),
         timeEntries: current.timeEntries.map((entry) => sourceIds.has(entry.id) && entry.invoicedInvoiceId === id ? { ...entry, invoicedInvoiceId: undefined } : entry),
+        expenses: current.expenses.map((expense) => expenseIds.has(expense.id) && expense.invoicedInvoiceId === id ? { ...expense, invoicedInvoiceId: undefined } : expense),
       }))
       return updated
     },
-    recordPayment(invoiceId, amount, method, date) {
+    recordPayment(invoiceId, amount, method, date, reference) {
       if (!Number.isFinite(amount) || amount <= 0) return
       const invoice = state.invoices.find((item) => item.id === invoiceId)
       if (!invoice) return
-      const remaining = Math.max(0, invoice.amount - invoice.paidAmount)
+      const netAmount = Math.max(0, invoice.amount - (invoice.creditedAmount ?? 0))
+      const remaining = Math.max(0, netAmount - invoice.paidAmount)
       const booked = Math.min(remaining, amount)
       if (!booked) return
-      const payment: Payment = { id: `pay-${Date.now()}`, invoiceId, date, amount: booked, method }
+      const payment: Payment = { id: `pay-${Date.now()}`, invoiceId, date, amount: booked, method, reference: reference?.trim() || undefined }
       setState((current) => ({
         ...current,
         payments: [payment, ...current.payments],
+        customerActivities: [makeActivity(invoice.customerId, 'payment', `Zahlung zu ${invoice.number} erfasst`, `CHF ${booked.toFixed(2)}`), ...current.customerActivities],
         invoices: current.invoices.map((item) => {
           if (item.id !== invoiceId) return item
-          const paidAmount = roundMoney(Math.min(item.amount, item.paidAmount + booked))
-          return { ...item, paidAmount, status: paidAmount >= item.amount ? 'paid' : 'partial' }
+          const netAmount = Math.max(0, item.amount - (item.creditedAmount ?? 0))
+          const paidAmount = round2(Math.min(netAmount, item.paidAmount + booked))
+          return { ...item, paidAmount, status: paidAmount >= netAmount ? 'paid' : 'partial' }
         }),
       }))
     },
@@ -586,11 +657,11 @@ export function BusinessStoreProvider({ user, children }: { user: AppUser; child
     updateAppSettings(changes) {
       setState((current) => ({ ...current, appSettings: mergeAppSettings(changes, current.appSettings) }))
     },
-    resetLocalData() {
-      removeStorage(userStorageKey)
-      setState(scopeStateForUser(freshState(), user))
+    resetDemo() {
+      removeStorage(STORAGE_KEY)
+      setState(freshState())
     },
-  }), [state, user, userStorageKey])
+  }), [state])
 
   return <BusinessContext.Provider value={store}>{children}</BusinessContext.Provider>
 }
@@ -601,14 +672,31 @@ export function useBusinessStore() {
   return value
 }
 
-function addDays(date: string, days: number) { return addDaysIso(date, days) }
-function today() { return todayIso() }
-
+function recalcInvoice(invoice: Invoice): Invoice { return { ...invoice, ...invoiceTotals(invoice.lines) } }
+function recalcQuote(quote: Quote): Quote { return { ...quote, amount: round2(quote.lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)) } }
+function invoiceTotals(lines: InvoiceLine[]) {
+  const subtotal = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0))
+  const vatAmount = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice * (line.vatRate / 100), 0))
+  return { subtotal, vatAmount, amount: round2(subtotal + vatAmount) }
+}
+function round2(value: number) { return Math.round((value + Number.EPSILON) * 100) / 100 }
+function nextInvoiceNumber(invoices: Invoice[]) { const current = invoices.reduce((max, invoice) => { const match = invoice.number.match(/RE-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `RE-2026-${String(current + 1).padStart(3, '0')}` }
+function nextContractNumber(contracts: Contract[]) { const current = contracts.reduce((max, contract) => { const match = contract.number.match(/VR-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `VR-2026-${String(current + 1).padStart(3, '0')}` }
+function nextCreditNumber(credits: CreditNote[]) { const current = credits.reduce((max, credit) => { const match = credit.number.match(/GS-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `GS-2026-${String(current + 1).padStart(3, '0')}` }
+function nextQuoteNumber(quotes: Quote[]) { const current = quotes.reduce((max, quote) => { const match = quote.number.match(/AN-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `AN-2026-${String(current + 1).padStart(3, '0')}` }
+function addDays(date: string, days: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return value.toISOString().slice(0, 10) }
+function today() { return new Date().toISOString().slice(0, 10) }
+function monthLabel(date: string) { return new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
+function advanceBillingDate(date: string, interval: Contract['billingInterval']) { const value = new Date(`${date}T12:00:00`); if (interval === 'monthly') value.setMonth(value.getMonth() + 1); else if (interval === 'quarterly') value.setMonth(value.getMonth() + 3); else if (interval === 'yearly') value.setFullYear(value.getFullYear() + 1); return value.toISOString().slice(0, 10) }
+function makeActivity(customerId: string, type: CustomerActivity['type'], title: string, detail?: string): CustomerActivity { return { id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, customerId, type, title, detail, createdAt: new Date().toISOString() } }
+function formatDate(date: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${date}T12:00:00`)) }
 function mergeAppSettings(changes?: Partial<AppSettings>, base: AppSettings = defaultAppSettings): AppSettings {
   return {
     ...base,
     ...(changes ?? {}),
     mail: { ...base.mail, ...(changes?.mail ?? {}) },
+    reminders: { ...base.reminders, ...(changes?.reminders ?? {}) },
+    payroll: { ...base.payroll, ...(changes?.payroll ?? {}) },
     workflow: { ...base.workflow, ...(changes?.workflow ?? {}) },
     notifications: { ...base.notifications, ...(changes?.notifications ?? {}) },
   }

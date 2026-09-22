@@ -21,8 +21,19 @@ export type Customer = {
   country: string
   uid?: string
   paymentDays: number
-  status: 'prospect' | 'active' | 'inactive'
+  status: 'active' | 'inactive'
   notes?: string
+}
+
+
+export type CustomerContact = {
+  id: string
+  customerId: string
+  name: string
+  email?: string
+  phone?: string
+  role?: string
+  primary: boolean
 }
 
 export type Supplier = {
@@ -66,7 +77,7 @@ export type DocumentTemplates = {
   reminderEmailBody: string
 }
 
-export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'declined' | 'expired'
+export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'declined' | 'expired' | 'revised'
 
 export type QuoteLine = {
   id: string
@@ -103,13 +114,12 @@ export type Quote = {
 }
 
 export type OrderStatus = 'active' | 'paused' | 'completed'
-export type BillingModel = 'time' | 'fixed' | 'mixed'
+export type BillingModel = 'time' | 'fixed' | 'retainer' | 'milestone' | 'mixed'
 
 export type Order = {
   id: string
   customerId: string
   customerName: string
-  sourceQuoteId?: string
   endCustomerName?: string
   primeContractorName?: string
   name: string
@@ -120,6 +130,8 @@ export type Order = {
   salesRate: number
   costRate: number
   billingModel: BillingModel
+  sourceQuoteId?: string
+  contractId?: string
   status: OrderStatus
 }
 
@@ -154,6 +166,7 @@ export type InvoiceLine = {
   unitPrice: number
   vatRate: number
   sourceTimeEntryIds: string[]
+  sourceExpenseIds?: string[]
 }
 
 export type Payment = {
@@ -172,6 +185,9 @@ export type Invoice = {
   customerName: string
   orderId?: string
   orderName?: string
+  contractId?: string
+  contractName?: string
+  kind?: 'standard' | 'deposit' | 'partial' | 'final' | 'recurring'
   period: string
   issueDate: string
   due: string
@@ -193,6 +209,77 @@ export type Invoice = {
   sentAt?: string
   sentTo?: string
   lastReminderAt?: string
+  reminderLevel?: 0 | 1 | 2 | 3
+  creditedAmount?: number
+}
+
+
+export type ContractStatus = 'draft' | 'active' | 'paused' | 'ended' | 'cancelled'
+export type BillingInterval = 'none' | 'monthly' | 'quarterly' | 'yearly'
+
+export type ContractLine = {
+  id: string
+  description: string
+  quantity: number
+  unit: 'h' | 'Stk.' | 'pauschal'
+  unitPrice: number
+  vatRate: number
+}
+
+export type Contract = {
+  id: string
+  number: string
+  customerId: string
+  customerName: string
+  name: string
+  startDate: string
+  endDate?: string
+  status: ContractStatus
+  autoRenew: boolean
+  noticeDays: number
+  billingInterval: BillingInterval
+  nextInvoiceDate?: string
+  billingDay?: number
+  lines: ContractLine[]
+  reference?: string
+  notes?: string
+}
+
+export type Expense = {
+  id: string
+  customerId: string
+  customerName: string
+  orderId?: string
+  orderName?: string
+  contractId?: string
+  date: string
+  description: string
+  category: 'expense' | 'material' | 'travel' | 'other'
+  quantity: number
+  unitPrice: number
+  billable: boolean
+  invoicedInvoiceId?: string
+}
+
+export type CreditNote = {
+  id: string
+  number: string
+  invoiceId: string
+  invoiceNumber: string
+  customerId: string
+  customerName: string
+  date: string
+  amount: number
+  reason: string
+}
+
+export type CustomerActivity = {
+  id: string
+  customerId: string
+  type: 'note' | 'quote' | 'order' | 'contract' | 'invoice' | 'payment' | 'reminder' | 'credit'
+  title: string
+  detail?: string
+  createdAt: string
 }
 
 export type SupplierInvoice = {
@@ -226,14 +313,40 @@ export type Employee = {
 }
 
 
+export type MailProvider = 'microsoft365' | 'smtp'
+
 export type AppSettings = {
   mail: {
+    provider: MailProvider
     senderName: string
     invoiceSender: string
     quoteSender: string
     reminderSender: string
+    payrollSender: string
     replyTo: string
     financeCc: string
+    attachPdf: boolean
+    deliveryTracking: boolean
+    copySender: boolean
+  }
+  reminders: {
+    enabled: boolean
+    automaticSend: boolean
+    firstAfterDays: number
+    secondAfterDays: number
+    thirdAfterDays: number
+    onlyBusinessDays: boolean
+    stopWhenPaid: boolean
+  }
+  payroll: {
+    enabled: boolean
+    generateAfterApprovedTimesheet: boolean
+    autoSend: boolean
+    requireFinanceApproval: boolean
+    hourlyEmployeesOnly: boolean
+    period: 'monthly'
+    subject: string
+    emailBody: string
   }
   workflow: {
     requireTimeApproval: boolean
@@ -243,6 +356,9 @@ export type AppSettings = {
   }
   notifications: {
     overdueInvoice: boolean
+    budgetWarning: boolean
     expiringQuote: boolean
+    paymentReceived: boolean
+    timesheetReady: boolean
   }
 }

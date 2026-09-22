@@ -7,31 +7,39 @@ import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { NavigationItem } from './navigation-item'
 import { navForRole } from './nav-items'
 import type { AppUser } from '@/types/domain'
-import { createActionForPath } from './action-items'
 
 export function MobilePillNav({
   user,
   onSearch,
   onQuick,
-  searchOpen,
 }: {
   user: AppUser
   onSearch: () => void
   onQuick: () => void
-  searchOpen: boolean
+  searchOpen?: boolean
 }) {
   const pathname = usePathname()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const items = navForRole(user.role)
 
-  const createAction = createActionForPath(pathname, user.role)
+  const createLabels: Record<string, string> = {
+    '/customers': 'Kunde erfassen',
+    '/orders': 'Auftrag erstellen',
+    '/contracts': 'Vertrag erfassen',
+    '/quotes': 'Angebot erstellen',
+    '/invoices': 'Rechnung erstellen',
+    '/employees': 'Mitarbeitende erfassen',
+    '/time': 'Zeit erfassen',
+    '/accounting': 'Lieferantenrechnung erfassen',
+  }
 
   function handleCreate() {
-    if (createAction) {
-      router.push(createAction.href, { scroll: false })
+    if (createLabels[pathname]) {
+      router.push(`${pathname}?new=1`, { scroll: false })
       return
     }
+
     onQuick()
   }
 
@@ -67,10 +75,9 @@ export function MobilePillNav({
       >
         <button
           type="button"
-          className={searchOpen ? 'pill-search active' : 'pill-search'}
+          className="pill-search"
           onClick={onSearch}
           aria-label="Suche öffnen"
-          aria-pressed={searchOpen}
         >
           <Icon name="search" size={17} />
           <span>Suche</span>
@@ -81,9 +88,9 @@ export function MobilePillNav({
           type="button"
           className="pill-add"
           onClick={handleCreate}
-          aria-label={createAction?.label ?? 'Neu erstellen'}
+          aria-label={createLabels[pathname] ?? 'Neu erstellen'}
         >
-          <Icon name="plus" size={20} />
+          <Icon name="plus" size={18} />
         </button>
 
 
@@ -92,8 +99,6 @@ export function MobilePillNav({
           className="pill-menu"
           onClick={() => setMenuOpen(true)}
           aria-label="Menü öffnen"
-          aria-haspopup="dialog"
-          aria-expanded={menuOpen}
         >
           <span>Menü</span>
           <Icon name="menu" size={17} />

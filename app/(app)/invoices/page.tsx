@@ -1,6 +1,6 @@
 'use client'
 
-import { Checkbox, DatePicker, SearchField, Select, Textarea, Input } from '@/components/ui/form-controls'
+import { Select, Textarea, Input } from '@/components/ui/form-controls'
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -19,11 +19,9 @@ import { useBusinessStore } from '@/components/state/business-store'
 import type { Invoice, InvoiceLine, Payment } from '@/types/domain'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
-import { StatusBadge, statusPresentation } from '@/components/ui/status-badge'
-import { EmptyState } from '@/components/ui/empty-state'
-import { formatChf, formatDate, formatMonthYear, normalizeSearch, todayIso } from '@/lib/format/locale'
 import { printCurrentDocument } from '@/lib/browser/actions'
 
+const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 })
 
 export default function InvoicesPage() {
   const store = useBusinessStore()
@@ -35,39 +33,41 @@ export default function InvoicesPage() {
   const [sending, setSending] = useState<{ invoice: Invoice; mode: 'invoice' | 'reminder' } | null>(null)
   const [payment, setPayment] = useState<Invoice | null>(null)
   const [builderOpen, setBuilderOpen] = useState(false)
-  const [customerId, setCustomerId] = useState(store.customers.find((item) => item.status === 'active')?.id ?? '')
-  const [orderId, setOrderId] = useState('')
+  const requestedCustomer = searchParams.get('customer')
+  const requestedOrder = searchParams.get('order')
+  const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? '')
+  const [orderId, setOrderId] = useState(requestedOrder && store.orders.some((item) => item.id === requestedOrder) ? requestedOrder : '')
+  const [invoiceKind, setInvoiceKind] = useState<NonNullable<Invoice['kind']>>('standard')
   const [selected, setSelected] = useState<string[]>([])
+  const [selectedExpenses, setSelectedExpenses] = useState<string[]>([])
   const [extraLines, setExtraLines] = useState<InvoiceLine[]>([])
   const feedback = useFeedback()
   const [cancelInvoiceTarget, setCancelInvoiceTarget] = useState<Invoice | null>(null)
-  const [query, setQuery] = useState('')
+  const [creditInvoice, setCreditInvoice] = useState<Invoice | null>(null)
 
   const [paymentPicker, setPaymentPicker] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
-    let consumed = false
-    if (params.get('new') === '1') {
-      const requestedOrder = params.get('order')
-      if (requestedOrder) {
-        const order = store.orders.find((item) => item.id === requestedOrder)
-        if (order) { setOrderId(order.id); setCustomerId(order.customerId) }
-        params.delete('order')
-      }
-      setBuilderOpen(true); params.delete('new'); consumed = true
-    }
-    if (params.get('payment') === '1') { setPaymentPicker(true); params.delete('payment'); consumed = true }
+    const createRequested = params.get('new') === '1'
+    const paymentRequested = params.get('payment') === '1'
     const viewId = params.get('view')
-    if (viewId) {
-      const invoice = store.invoices.find((item) => item.id === viewId)
-      if (invoice) { setPreview(invoice); params.delete('view'); consumed = true }
-    }
-    if (consumed) {
-      const suffix = params.toString() ? `?${params.toString()}` : ''
-      router.replace(`${pathname}${suffix}`, { scroll: false })
-    }
-  }, [pathname, router, searchParams, store.invoices, store.orders])
+    const viewInvoice = viewId ? store.invoices.find((item) => item.id === viewId) : undefined
+    if (!createRequested && !paymentRequested && !viewInvoice) return
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      if (createRequested) setBuilderOpen(true)
+      if (paymentRequested) setPaymentPicker(true)
+      if (viewInvoice) setPreview(viewInvoice)
+    })
+    if (createRequested) params.delete('new')
+    if (paymentRequested) params.delete('payment')
+    if (viewInvoice) params.delete('view')
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+    router.replace(`${pathname}${suffix}`, { scroll: false })
+    return () => { cancelled = true }
+  }, [pathname, router, searchParams, store.invoices])
 
   const selectedOrder = store.orders.find((order) => order.id === orderId)
   const selectedCustomer = store.customers.find((customer) => customer.id === customerId)
@@ -76,24 +76,24 @@ export default function InvoicesPage() {
     [store.timeEntries, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules, orderId],
   )
   const selectedTimes = eligibleTimes.filter((entry) => selected.includes(entry.id))
-
-  const filteredInvoices = useMemo(() => {
-    const q = normalizeSearch(query)
-    return q ? store.invoices.filter((invoice) => normalizeSearch(`${invoice.number} ${invoice.customerName} ${invoice.orderName ?? ''}`).includes(q)) : store.invoices
-  }, [query, store.invoices])
+  const eligibleExpenses = store.expenses.filter((expense) => expense.customerId === customerId && (!orderId || expense.orderId === orderId) && expense.billable && !expense.invoicedInvoiceId)
+  const chosenExpenses = eligibleExpenses.filter((expense) => selectedExpenses.includes(expense.id))
 
   function createInvoice() {
-    if (!selectedCustomer || (!selectedTimes.length && !extraLines.some((line) => line.description.trim() && line.quantity > 0))) return
+    if (!selectedCustomer || (!selectedTimes.length && !chosenExpenses.length && !extraLines.some((line) => line.description.trim() && line.quantity > 0))) return
     const invoice = store.createInvoiceFromTimes({
       customerId: selectedCustomer.id,
       orderId: selectedOrder?.id,
       timeEntryIds: selectedTimes.map((entry) => entry.id),
-      period: selectedTimes[0] ? formatMonthYear(selectedTimes[0].date) : formatMonthYear(new Date()),
+      expenseIds: chosenExpenses.map((expense) => expense.id),
+      kind: invoiceKind,
+      period: selectedTimes[0] ? new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date(`${selectedTimes[0].date}T12:00:00`)) : new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date()),
       extraLines,
     })
     if (invoice) {
       setBuilderOpen(false)
       setSelected([])
+      setSelectedExpenses([])
       setExtraLines([])
       setPreview(invoice)
     }
@@ -122,25 +122,26 @@ export default function InvoicesPage() {
 
   return (
     <section className="page">
-      <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Rechnungen erstellen, Versandstatus und Zahlungen verwalten." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
+      <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Zeiten, Spesen und freie Positionen abrechnen, Rechnungen versenden, Zahlungen und Korrekturen verwalten." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
 
 
-      <div className="module-toolbar"><SearchField value={query} onValueChange={setQuery} placeholder="Rechnungen durchsuchen" aria-label="Rechnungen durchsuchen"/><span className="toolbar-meta">{filteredInvoices.length} Rechnungen</span></div><div className="data-list compact-overview-list">
+      <div className="data-list compact-overview-list">
         <div className="data-row invoice-grid data-head"><span>Rechnung</span><span>Kunde</span><span>Fällig</span><span>Betrag</span><span>Status</span><span /></div>
-        {filteredInvoices.map((invoice) => (
+        {store.invoices.map((invoice) => (
           <InteractiveRow className="data-row invoice-grid compact-overview-row" key={invoice.id} onActivate={() => setPreview(invoice)} ariaLabel={`${invoice.number} öffnen`}>
-            <span className="primary-cell"><strong>{invoice.number} · {invoice.customerName}</strong><small className="desktop-row-detail">{invoice.orderName || invoice.period}</small><small className="mobile-row-summary">{formatChf(invoice.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · Fällig {formatDate(invoice.due)} · {statusPresentation(effectiveInvoiceStatus(invoice)).label}</small></span>
-            <span className="overview-desktop-cell">{invoice.customerName}</span><span className="overview-desktop-cell">{formatDate(invoice.due)}</span><span className="overview-desktop-cell"><strong>{formatChf(invoice.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small>{invoice.lines.length} Positionen</small></span><StatusBadge status={effectiveInvoiceStatus(invoice)} label={statusPresentation(effectiveInvoiceStatus(invoice)).label} className="overview-desktop-cell" />
+            <span className="primary-cell"><strong>{invoice.number} · {invoice.customerName}</strong><small className="desktop-row-detail">{invoice.orderName || invoice.period}</small><small className="mobile-row-summary">{chf.format(invoice.amount)} · Fällig {fmt(invoice.due)} · {invoiceStatusLabel(effectiveInvoiceStatus(invoice))}</small></span>
+            <span className="overview-desktop-cell">{invoice.customerName}</span><span className="overview-desktop-cell">{fmt(invoice.due)}</span><span className="overview-desktop-cell"><strong>{chf.format(invoice.amount)}</strong><small>{invoice.lines.length} Positionen</small></span><span className={`status ${effectiveInvoiceStatus(invoice)} overview-desktop-cell`}>{invoiceStatusLabel(effectiveInvoiceStatus(invoice))}</span>
             <span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span>
           </InteractiveRow>
         ))}
       </div>
 
       {builderOpen && (
-        <ResponsiveOverlay open={builderOpen} mobile="fullscreen" desktop="dialog" title="Rechnung erstellen" description="Zeiten übernehmen oder freie Rechnungspositionen erfassen." onClose={() => setBuilderOpen(false)} footer={<SheetActions><button type="button" className="button secondary" onClick={() => setBuilderOpen(false)}>Abbrechen</button><button type="button" className="button primary" disabled={!selected.length && !extraLines.some((line) => line.description.trim())} onClick={createInvoice}>Entwurf erstellen</button></SheetActions>}>
-            <details className="edit-step" open><summary><span><strong>1 · Quelle</strong><small>Kunde und Auftrag auswählen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid"><label className="full"><span>Kunde *</span><Select aria-label="Kunde" searchable searchPlaceholder="Kunden durchsuchen" value={customerId} onChange={(e) => { setCustomerId(e.target.value); setOrderId(''); setSelected([]) }} required>{store.customers.filter((customer) => customer.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label><label className="full"><span>Auftrag</span><Select aria-label="Auftrag" searchable searchPlaceholder="Aufträge durchsuchen" value={orderId} onChange={(e) => { const next = e.target.value; setOrderId(next); setSelected([]); const order = store.orders.find((item) => item.id === next); if (order) setCustomerId(order.customerId) }}><option value="">Freie Rechnung ohne Auftrag</option>{store.orders.filter((order) => order.customerId === customerId).map((order) => <option key={order.id} value={order.id}>{order.name}</option>)}</Select></label></div></div></details>
-            {orderId && <details className="edit-step"><summary><span><strong>2 · Zeiten übernehmen</strong><small>{eligibleTimes.length} verfügbare Einträge</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="invoice-source-list">{eligibleTimes.length ? eligibleTimes.map((entry) => <label className="invoice-source-row" key={entry.id}><Checkbox checked={selected.includes(entry.id)} onChange={(e) => setSelected((cur) => e.target.checked ? [...cur, entry.id] : cur.filter((id) => id !== entry.id))}/><span><strong>{formatDate(entry.date)} · {entry.personName}</strong><small>{entry.description || 'Keine Beschreibung'}</small></span><span>{entry.hours} h · {formatChf(entry.salesRate, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/h</span><strong>{formatChf(entry.hours * entry.salesRate, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></label>) : <EmptyState description="Keine freigegebenen, noch nicht verrechneten Zeiten vorhanden." />}</div></div></details>}
-            <details className="edit-step"><summary><span><strong>{orderId ? '3' : '2'} · Zusätzliche Positionen</strong><small>{extraLines.length ? `${extraLines.length} erfasst` : 'Optional'}</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="line-editor"><div className="line-editor-head"><strong>Zusätzliche Positionen</strong><button type="button" className="text-button" onClick={() => setExtraLines((current) => [...current, { id: `il-extra-${Date.now()}`, description: '', quantity: 1, unit: 'Stk.', unitPrice: 0, vatRate: 8.1, sourceTimeEntryIds: [] }])}><Icon name="plus" size={14}/> Position</button></div>{extraLines.map((line) => <div className="line-editor-row" key={line.id}><label><span>Beschreibung</span><Input value={line.description} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, description: e.target.value } : item))}/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, quantity: Number(e.target.value) } : item))}/></label><label><span>Einheit</span><Select aria-label="Einheit" value={line.unit} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, unit: e.target.value as InvoiceLine['unit'] } : item))}><option value="h">h</option><option value="Stk.">Stk.</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, unitPrice: Number(e.target.value) } : item))}/></label><label><span>MWST %</span><Input type="number" min="0" step="0.1" value={line.vatRate} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, vatRate: Number(e.target.value) } : item))}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" onClick={() => setExtraLines((current) => current.filter((item) => item.id !== line.id))} /></div>)}</div></div></details>
+        <ResponsiveOverlay open={builderOpen} mobile="fullscreen" desktop="dialog" title="Rechnung erstellen" description="Zeiten, Spesen oder freie Positionen in einem verständlichen Ablauf übernehmen." onClose={() => setBuilderOpen(false)} footer={<SheetActions><button type="button" className="button secondary" onClick={() => setBuilderOpen(false)}>Abbrechen</button><button type="button" className="button primary" disabled={!selected.length && !selectedExpenses.length && !extraLines.some((line) => line.description.trim())} onClick={createInvoice}>Entwurf erstellen</button></SheetActions>}>
+            <details className="edit-step" open><summary><span><strong>1 · Quelle</strong><small>Kunde und Auftrag auswählen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid"><label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => { setCustomerId(e.target.value); setOrderId(''); setSelected([]); setSelectedExpenses([]) }} required>{store.customers.filter((customer) => customer.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label><label><span>Rechnungsart</span><Select value={invoiceKind} onChange={(e) => setInvoiceKind(e.target.value as NonNullable<Invoice['kind']>)}><option value="standard">Standardrechnung</option><option value="deposit">Akontorechnung</option><option value="partial">Teilrechnung</option><option value="final">Schlussrechnung</option></Select></label><label><span>Auftrag</span><Select value={orderId} onChange={(e) => { const next = e.target.value; setOrderId(next); setSelected([]); setSelectedExpenses([]); const order = store.orders.find((item) => item.id === next); if (order) setCustomerId(order.customerId) }}><option value="">Freie Rechnung ohne Auftrag</option>{store.orders.filter((order) => order.customerId === customerId).map((order) => <option key={order.id} value={order.id}>{order.name}</option>)}</Select></label></div></div></details>
+            {orderId && <details className="edit-step"><summary><span><strong>2 · Zeiten übernehmen</strong><small>{eligibleTimes.length} verfügbare Einträge</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="invoice-source-list">{eligibleTimes.length ? eligibleTimes.map((entry) => <label className="invoice-source-row" key={entry.id}><Input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((cur) => e.target.checked ? [...cur, entry.id] : cur.filter((id) => id !== entry.id))}/><span><strong>{fmt(entry.date)} · {entry.personName}</strong><small>{entry.description || 'Keine Beschreibung'}</small></span><span>{entry.hours} h · {chf.format(entry.salesRate)}/h</span><strong>{chf.format(entry.hours * entry.salesRate)}</strong></label>) : <div className="empty-state"><span>Keine freigegebenen, noch nicht verrechneten Zeiten vorhanden.</span></div>}</div></div></details>}
+            {eligibleExpenses.length > 0 && <details className="edit-step"><summary><span><strong>{orderId ? '3' : '2'} · Spesen und Material</strong><small>{eligibleExpenses.length} offene Positionen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="invoice-source-list">{eligibleExpenses.map((expense) => <label className="invoice-source-row" key={expense.id}><Input type="checkbox" checked={selectedExpenses.includes(expense.id)} onChange={(e) => setSelectedExpenses((current) => e.target.checked ? [...current, expense.id] : current.filter((id) => id !== expense.id))}/><span><strong>{fmt(expense.date)} · {expense.description}</strong><small>{expense.category === 'material' ? 'Material' : expense.category === 'travel' ? 'Reisekosten' : expense.category === 'expense' ? 'Spesen' : 'Sonstiges'}</small></span><span>{expense.quantity} × {chf.format(expense.unitPrice)}</span><strong>{chf.format(expense.quantity * expense.unitPrice)}</strong></label>)}</div></div></details>}
+            <details className="edit-step"><summary><span><strong>{orderId ? (eligibleExpenses.length ? '4' : '3') : (eligibleExpenses.length ? '3' : '2')} · Zusätzliche Positionen</strong><small>{extraLines.length ? `${extraLines.length} erfasst` : 'Optional'}</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="line-editor"><div className="line-editor-head"><strong>Zusätzliche Positionen</strong><button type="button" className="text-button" onClick={() => setExtraLines((current) => [...current, { id: `il-extra-${Date.now()}`, description: '', quantity: 1, unit: 'Stk.', unitPrice: 0, vatRate: 8.1, sourceTimeEntryIds: [] }])}><Icon name="plus" size={14}/> Position</button></div>{extraLines.map((line) => <div className="line-editor-row" key={line.id}><label><span>Beschreibung</span><Input value={line.description} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, description: e.target.value } : item))}/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, quantity: Number(e.target.value) } : item))}/></label><label><span>Einheit</span><Select value={line.unit} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, unit: e.target.value as InvoiceLine['unit'] } : item))}><option value="h">h</option><option value="Stk.">Stk.</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, unitPrice: Number(e.target.value) } : item))}/></label><label><span>MWST %</span><Input type="number" min="0" step="0.1" value={line.vatRate} onChange={(e) => setExtraLines((current) => current.map((item) => item.id === line.id ? { ...item, vatRate: Number(e.target.value) } : item))}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" onClick={() => setExtraLines((current) => current.filter((item) => item.id !== line.id))} /></div>)}</div></div></details>
         </ResponsiveOverlay>
       )}
 
@@ -151,15 +152,16 @@ export default function InvoicesPage() {
         onClose={() => setPreview(null)}
         headerActions={preview ? <button className="icon-button" onClick={() => printCurrentDocument()} title="PDF / Drucken"><Icon name="download" size={16}/></button> : null}
         warning={preview && readiness(preview).length > 0 ? <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {readiness(preview).join(', ')}</span></div> : null}
-        actions={preview ? <><button className="button secondary" disabled={preview.status !== 'draft'} onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {preview.status === 'draft' ? 'Als versendet markieren' : 'Erneut als versendet markieren'}</button>{effectiveInvoiceStatus(preview) === 'overdue' && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung erfassen</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button secondary" onClick={() => setCancelInvoiceTarget(preview)}>Stornieren</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button primary" onClick={() => setPayment(preview)}><Icon name="credit-card" size={15}/> Zahlung erfassen</button>}</> : null}
+        actions={preview ? <><button className="button secondary" disabled={preview.status !== 'draft'} onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {preview.status === 'draft' ? 'Senden' : 'Erneut senden'}</button>{effectiveInvoiceStatus(preview) === 'overdue' && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung</button>}{preview.status !== 'cancelled' && <button className="button secondary" onClick={() => setCreditInvoice(preview)}>Gutschrift</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button secondary" onClick={() => setCancelInvoiceTarget(preview)}>Stornieren</button>}{!['paid', 'cancelled'].includes(preview.status) && <button className="button primary" onClick={() => setPayment(preview)}><Icon name="credit-card" size={15}/> Zahlung erfassen</button>}</> : null}
       >
         {preview ? <DocumentPreviewFrame><BusinessDocument type="invoice" company={store.companyProfile} customer={documentCustomer(preview)} invoice={preview}/></DocumentPreviewFrame> : null}
       </ResponsivePreview>
 
       {editing && <InvoiceEditor invoice={editing} onClose={() => setEditing(null)} onSave={(updated) => { setEditing(null); setPreview(updated) }} />}
-      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnung erfasst.' : 'Rechnung als versendet markiert.') }} />}
+      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnung im Demo-Versand erfasst.' : 'Rechnung im Demo-Versand als versendet markiert.') }} />}
       {payment && <PaymentDialog invoice={payment} onClose={() => setPayment(null)} />}
-      {paymentPicker && <ResponsiveOverlay open={paymentPicker} title="Zahlung erfassen" description="Offene Rechnung auswählen" onClose={() => setPaymentPicker(false)}><div className="compact-list">{store.invoices.filter((item) => !['paid', 'cancelled'].includes(effectiveInvoiceStatus(item))).map((item) => <button type="button" className="payment-pick-row" key={item.id} onClick={() => { setPaymentPicker(false); setPayment(item) }}><span className="primary-cell"><strong>{item.number} · {item.customerName}</strong><small>{formatChf(item.amount - item.paidAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} offen</small></span><Icon name="chevron" size={15}/></button>)}</div></ResponsiveOverlay>}
+      {creditInvoice && <CreditDialog invoice={creditInvoice} onClose={() => setCreditInvoice(null)} />}
+      {paymentPicker && <ResponsiveOverlay open={paymentPicker} title="Zahlung erfassen" description="Offene Rechnung auswählen" onClose={() => setPaymentPicker(false)}><div className="compact-list">{store.invoices.filter((item) => !['paid', 'cancelled'].includes(effectiveInvoiceStatus(item))).map((item) => <button type="button" className="payment-pick-row" key={item.id} onClick={() => { setPaymentPicker(false); setPayment(item) }}><span className="primary-cell"><strong>{item.number} · {item.customerName}</strong><small>{chf.format(item.amount - item.paidAmount)} offen</small></span><Icon name="chevron" size={15}/></button>)}</div></ResponsiveOverlay>}
       <ConfirmationDialog
         open={Boolean(cancelInvoiceTarget)}
         title="Rechnung stornieren?"
@@ -193,7 +195,7 @@ export default function InvoicesPage() {
     }
     function updateLine(id: string, changes: Partial<InvoiceLine>) { setDraft((cur) => ({ ...cur, lines: cur.lines.map((line) => line.id === id ? { ...line, ...changes } : line) })) }
     return <StandardFormSheet open title={<>Rechnung bearbeiten</>} description={<>{invoice.number} · nur Entwürfe sind änderbar</>} onClose={onClose} onSubmit={save} formId="invoices-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-1" className="button primary">Speichern</button></>} mode="fullscreen">{error && <div className="field-error">{error}</div>}<details className="edit-step" open><summary><span><strong>1 · Empfänger und Daten</strong><small>Adresse, Datum und Zahlungsziel</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid">
-      <label><span>Empfänger *</span><Input value={draft.recipientName ?? ''} onChange={(e) => setDraft({ ...draft, recipientName: e.target.value })} required/></label><label><span>E-Mail *</span><Input type="email" value={draft.recipientEmail ?? ''} onChange={(e) => setDraft({ ...draft, recipientEmail: e.target.value })} required/></label><label className="full"><span>Adresse *</span><Input value={draft.recipientAddress ?? ''} onChange={(e) => setDraft({ ...draft, recipientAddress: e.target.value })} required/></label><label><span>PLZ *</span><Input value={draft.recipientZip ?? ''} onChange={(e) => setDraft({ ...draft, recipientZip: e.target.value })} required/></label><label><span>Ort *</span><Input value={draft.recipientCity ?? ''} onChange={(e) => setDraft({ ...draft, recipientCity: e.target.value })} required/></label><label><span>Rechnungsdatum *</span><DatePicker value={draft.issueDate} onChange={(e) => setDraft({ ...draft, issueDate: e.target.value })} required aria-label="Rechnungsdatum"/></label><label><span>Fällig *</span><DatePicker value={draft.due} onChange={(e) => setDraft({ ...draft, due: e.target.value })} required aria-label="Fällig"/></label></div></div></details><details className="edit-step"><summary><span><strong>2 · Positionen</strong><small>{draft.lines.length} Positionen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="line-editor"><div className="line-editor-head"><strong>Positionen</strong><button type="button" className="text-button" onClick={() => setDraft((cur) => ({ ...cur, lines: [...cur.lines, { id: `il-${Date.now()}`, description: '', quantity: 1, unit: 'Stk.', unitPrice: 0, vatRate: 8.1, sourceTimeEntryIds: [] }] }))}><Icon name="plus" size={14}/> Position</button></div>{draft.lines.map((line) => <div className="line-editor-row" key={line.id}><label><span>Beschreibung *</span><Input value={line.description} onChange={(e) => updateLine(line.id, { description: e.target.value })} required/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => updateLine(line.id, { quantity: Number(e.target.value) })}/></label><label><span>Einheit</span><Select aria-label="Einheit" value={line.unit} onChange={(e) => updateLine(line.id, { unit: e.target.value as InvoiceLine['unit'] })}><option value="h">h</option><option value="Stk.">Stk.</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => updateLine(line.id, { unitPrice: Number(e.target.value) })}/></label><label><span>MWST %</span><Input type="number" min="0" step="0.1" value={line.vatRate} onChange={(e) => updateLine(line.id, { vatRate: Number(e.target.value) })}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" disabled={draft.lines.length === 1} onClick={() => setDraft((cur) => ({ ...cur, lines: cur.lines.filter((item) => item.id !== line.id) }))} /></div>)}</div></div></details><details className="edit-step"><summary><span><strong>3 · Texte</strong><small>Einleitung und Schlusstext</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><label className="block-field"><span>Einleitungstext</span><Textarea rows={4} value={draft.introText ?? store.documentTemplates.invoiceIntro} onChange={(e) => setDraft({ ...draft, introText: e.target.value })}/></label><label className="block-field"><span>Schlusstext</span><Textarea rows={4} value={draft.outroText ?? store.documentTemplates.invoiceOutro} onChange={(e) => setDraft({ ...draft, outroText: e.target.value })}/></label></div></details></StandardFormSheet>
+      <label><span>Empfänger *</span><Input value={draft.recipientName ?? ''} onChange={(e) => setDraft({ ...draft, recipientName: e.target.value })} required/></label><label><span>E-Mail *</span><Input type="email" value={draft.recipientEmail ?? ''} onChange={(e) => setDraft({ ...draft, recipientEmail: e.target.value })} required/></label><label className="full"><span>Adresse *</span><Input value={draft.recipientAddress ?? ''} onChange={(e) => setDraft({ ...draft, recipientAddress: e.target.value })} required/></label><label><span>PLZ *</span><Input value={draft.recipientZip ?? ''} onChange={(e) => setDraft({ ...draft, recipientZip: e.target.value })} required/></label><label><span>Ort *</span><Input value={draft.recipientCity ?? ''} onChange={(e) => setDraft({ ...draft, recipientCity: e.target.value })} required/></label><label><span>Rechnungsdatum *</span><Input type="date" value={draft.issueDate} onChange={(e) => setDraft({ ...draft, issueDate: e.target.value })} required/></label><label><span>Fällig *</span><Input type="date" value={draft.due} onChange={(e) => setDraft({ ...draft, due: e.target.value })} required/></label></div></div></details><details className="edit-step"><summary><span><strong>2 · Positionen</strong><small>{draft.lines.length} Positionen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="line-editor"><div className="line-editor-head"><strong>Positionen</strong><button type="button" className="text-button" onClick={() => setDraft((cur) => ({ ...cur, lines: [...cur.lines, { id: `il-${Date.now()}`, description: '', quantity: 1, unit: 'Stk.', unitPrice: 0, vatRate: 8.1, sourceTimeEntryIds: [] }] }))}><Icon name="plus" size={14}/> Position</button></div>{draft.lines.map((line) => <div className="line-editor-row" key={line.id}><label><span>Beschreibung *</span><Input value={line.description} onChange={(e) => updateLine(line.id, { description: e.target.value })} required/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => updateLine(line.id, { quantity: Number(e.target.value) })}/></label><label><span>Einheit</span><Select value={line.unit} onChange={(e) => updateLine(line.id, { unit: e.target.value as InvoiceLine['unit'] })}><option value="h">h</option><option value="Stk.">Stk.</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => updateLine(line.id, { unitPrice: Number(e.target.value) })}/></label><label><span>MWST %</span><Input type="number" min="0" step="0.1" value={line.vatRate} onChange={(e) => updateLine(line.id, { vatRate: Number(e.target.value) })}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" disabled={draft.lines.length === 1} onClick={() => setDraft((cur) => ({ ...cur, lines: cur.lines.filter((item) => item.id !== line.id) }))} /></div>)}</div></div></details><details className="edit-step"><summary><span><strong>3 · Texte</strong><small>Einleitung und Schlusstext</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><label className="block-field"><span>Einleitungstext</span><Textarea rows={4} value={draft.introText ?? store.documentTemplates.invoiceIntro} onChange={(e) => setDraft({ ...draft, introText: e.target.value })}/></label><label className="block-field"><span>Schlusstext</span><Textarea rows={4} value={draft.outroText ?? store.documentTemplates.invoiceOutro} onChange={(e) => setDraft({ ...draft, outroText: e.target.value })}/></label></div></details></StandardFormSheet>
   }
 
   function SendDialog({ invoice, mode, onClose, onSent }: { invoice: Invoice; mode: 'invoice' | 'reminder'; onClose: () => void; onSent: (invoice: Invoice) => void }) {
@@ -203,18 +205,39 @@ export default function InvoicesPage() {
     const bodyTemplate = mode === 'reminder' ? store.documentTemplates.reminderEmailBody : store.documentTemplates.invoiceEmailBody
     const [subject, setSubject] = useState(fillTemplate(subjectTemplate, invoice))
     const [body, setBody] = useState(fillTemplate(bodyTemplate, invoice))
-    function send(e: React.FormEvent) { e.preventDefault(); const updated = store.markInvoiceSent(invoice.id, to, mode); if (updated) onSent(updated) }
+    function send(e: React.FormEvent) { e.preventDefault(); const updated = store.sendInvoice(invoice.id, to, mode); if (updated) onSent(updated) }
     const from = mode === 'reminder' ? store.appSettings.mail.reminderSender : store.appSettings.mail.invoiceSender
-    return <StandardFormSheet open title={<>{mode === 'reminder' ? 'Mahnung erfassen' : 'Rechnung als versendet markieren'}</>} description={<>E-Mail-Versand ist noch nicht angebunden. Empfänger und Versandstatus werden dokumentiert.</>} onClose={onClose} onSubmit={send} formId="invoices-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-2" className="button primary" disabled={!from}><Icon name="send" size={15}/> {mode === 'reminder' ? 'Mahnung erfassen' : 'Als versendet markieren'}</button></>}><div className="send-meta"><span><small>Von</small><strong>{from || 'Nicht konfiguriert'}</strong></span>{store.appSettings.mail.financeCc && <span><small>CC</small><strong>{store.appSettings.mail.financeCc}</strong></span>}</div><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label><label className="full"><span>Betreff *</span><Input value={subject} onChange={(e) => setSubject(e.target.value)} required/></label><label className="full"><span>Nachricht *</span><Textarea rows={8} value={body} onChange={(e) => setBody(e.target.value)} required/></label></div></StandardFormSheet>
+    return <StandardFormSheet open title={<>{mode === 'reminder' ? 'Mahnung versenden' : 'Rechnung versenden'}</>} description={<>PDF-Vorschau entspricht dem Dokument im Anhang.</>} onClose={onClose} onSubmit={send} formId="invoices-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-2" className="button primary" disabled={!from}><Icon name="send" size={15}/> Senden</button></>}><div className="send-meta"><span><small>Von</small><strong>{from || 'Nicht konfiguriert'}</strong></span>{store.appSettings.mail.financeCc && <span><small>CC</small><strong>{store.appSettings.mail.financeCc}</strong></span>}</div><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label><label className="full"><span>Betreff *</span><Input value={subject} onChange={(e) => setSubject(e.target.value)} required/></label><label className="full"><span>Nachricht *</span><Textarea rows={8} value={body} onChange={(e) => setBody(e.target.value)} required/></label></div><div className="demo-hint">Demo: Status, Empfänger und Versandzeitpunkt werden gespeichert. Der echte Versand über {from || 'die konfigurierte Absenderadresse'} benötigt noch Microsoft Graph und serverseitige PDF-Erzeugung.</div></StandardFormSheet>
+  }
+
+  function CreditDialog({ invoice, onClose }: { invoice: Invoice; onClose: () => void }) {
+    const remaining = Math.max(0, invoice.amount - (invoice.creditedAmount ?? 0))
+    const [amount, setAmount] = useState(String(remaining))
+    const [reason, setReason] = useState('')
+    function save(event: React.FormEvent) {
+      event.preventDefault()
+      const credit = store.createCreditNote(invoice.id, Number(amount), reason)
+      if (!credit) { feedback.error('Gutschrift konnte nicht erstellt werden.'); return }
+      const updated = store.invoices.find((item) => item.id === invoice.id)
+      if (updated) setPreview(updated)
+      feedback.success(`Gutschrift ${credit.number} wurde erstellt.`)
+      onClose()
+    }
+    return <StandardFormSheet open title={<>Gutschrift erstellen</>} description={<>{invoice.number} · maximal {chf.format(remaining)}</>} onClose={onClose} onSubmit={save} formId="credit-form" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="credit-form" className="button primary">Gutschrift erstellen</button></>}><div className="form-grid"><label><span>Betrag *</span><Input type="number" min="0.01" max={remaining} step="0.05" value={amount} onChange={(e) => setAmount(e.target.value)} required/></label><label className="full"><span>Grund *</span><Textarea rows={4} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Grund der Korrektur" required/></label></div></StandardFormSheet>
   }
 
   function PaymentDialog({ invoice, onClose }: { invoice: Invoice; onClose: () => void }) {
-    const [amount, setAmount] = useState(String(Math.round((invoice.amount - invoice.paidAmount) * 100) / 100))
+    const openAmount = Math.max(0, invoice.amount - (invoice.creditedAmount ?? 0) - invoice.paidAmount)
+    const [amount, setAmount] = useState(String(Math.round(openAmount * 100) / 100))
     const [method, setMethod] = useState<Payment['method']>('Bank')
-    function save(e: React.FormEvent) { e.preventDefault(); store.recordPayment(invoice.id, Number(amount), method, todayIso()); onClose(); setPreview(null) }
-    return <StandardFormSheet open title={<>Zahlung erfassen</>} description={<>{invoice.number}</>} onClose={onClose} onSubmit={save} formId="invoices-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-3" className="button primary">Zahlung speichern</button></>}><div className="form-grid"><label><span>Betrag *</span><Input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required/></label><label><span>Zahlungsart *</span><Select aria-label="Zahlungsart" value={method} onChange={(e) => setMethod(e.target.value as Payment['method'])}><option>Bank</option><option>Bar</option><option>Kreditkarte</option><option>Sonstige</option></Select></label></div></StandardFormSheet>
+    const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+    const [reference, setReference] = useState('')
+    function save(e: React.FormEvent) { e.preventDefault(); store.recordPayment(invoice.id, Number(amount), method, date, reference); onClose(); setPreview(null) }
+    return <StandardFormSheet open title={<>Zahlung erfassen</>} description={<>{invoice.number} · offen {chf.format(openAmount)}</>} onClose={onClose} onSubmit={save} formId="invoices-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-3" className="button primary">Zahlung speichern</button></>}><div className="form-grid"><label><span>Betrag *</span><Input type="number" min="0.01" max={openAmount} step="0.05" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required/></label><label><span>Zahlungsdatum *</span><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required/></label><label><span>Zahlungsart *</span><Select value={method} onChange={(e) => setMethod(e.target.value as Payment['method'])}><option>Bank</option><option>Bar</option><option>Kreditkarte</option><option>Sonstige</option></Select></label><label><span>Referenz</span><Input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="z. B. ESR-/Bankreferenz"/></label></div></StandardFormSheet>
   }
 }
 
-function fillTemplate(template: string, invoice: Invoice) { return template.replaceAll('{{number}}', invoice.number).replaceAll('{{amount}}', formatChf(invoice.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).replaceAll('{{customer}}', invoice.customerName) }
+function fmt(value?: string) { if (!value) return '–'; return new Intl.DateTimeFormat('de-CH').format(new Date(`${value}T12:00:00`)) }
+function fillTemplate(template: string, invoice: Invoice) { return template.replaceAll('{{number}}', invoice.number).replaceAll('{{amount}}', chf.format(invoice.amount)).replaceAll('{{customer}}', invoice.customerName) }
 
+function invoiceStatusLabel(value: string) { const labels: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', partial: 'Teilbezahlt', paid: 'Bezahlt', overdue: 'Überfällig', cancelled: 'Storniert' }; return labels[value] ?? value }

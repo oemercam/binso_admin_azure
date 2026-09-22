@@ -1,5 +1,10 @@
 import type {
+  Contract,
+  CreditNote,
   Customer,
+  CustomerContact,
+  CustomerActivity,
+  Expense,
   Employee,
   Invoice,
   Order,
@@ -27,7 +32,7 @@ export const customers: Customer[] = [
     uid: 'CHE-111.222.333 MWST',
     paymentDays: 30,
     status: 'active',
-    notes: 'Vertragspartner für das Auftrag Digital Workplace. Leistungserbringung für Bundesstelle Digital Services (Demo).',
+    notes: 'Demo-Kunde für laufende IT-Dienstleistungen und wiederkehrende Betreuung.',
   },
   {
     id: 'cus-002',
@@ -114,9 +119,9 @@ export const orders: Order[] = [
     customerName: 'Alpine Public IT AG',
     endCustomerName: 'Bundesstelle Digital Services (Demo)',
     primeContractorName: 'Alpine Public IT AG',
-    name: 'Digital Workplace',
+    name: 'Digital Workplace Betreuung',
     mandateRef: 'MV-BIN-2026-017',
-    procurementRef: 'DWP-2026-04',
+    procurementRef: 'REF-2026-04',
     budgetHours: 1600,
     usedHours: 334.5,
     salesRate: 165,
@@ -154,32 +159,32 @@ export const orders: Order[] = [
 
 export const timeEntries: TimeEntry[] = [
   {
-    id: 'time-001', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-001', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-01', hours: 8,
     description: 'Workplace Architektur, Abstimmung und technische Führung', billable: true, approved: true, salesRate: 165, internalCostRate: 105, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-002', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-002', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-02', hours: 7.5,
     description: 'Client Engineering und Pakettests', billable: true, approved: true, salesRate: 145, internalCostRate: 72, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-003', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-003', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-03', hours: 8,
     description: 'M365 Engineering und technische Analyse', billable: true, approved: true, salesRate: 165, internalCostRate: 125, invoicedInvoiceId: 'inv-001',
   },
   {
-    id: 'time-004', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-004', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-08', hours: 8,
     description: 'Security Hardening und Review', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
-    id: 'time-005', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-005', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-09', hours: 8,
     description: 'Treiber- und Hardwarevalidierung', billable: true, approved: true, salesRate: 145, internalCostRate: 72,
   },
   {
-    id: 'time-006', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
+    id: 'time-006', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-10', hours: 6,
     description: 'Intune Policy Review', billable: true, approved: true, salesRate: 165, internalCostRate: 125,
   },
@@ -197,7 +202,7 @@ export const timeEntries: TimeEntry[] = [
 
 export const invoices: Invoice[] = [
   {
-    id: 'inv-001', number: 'RE-2026-009', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'Digital Workplace',
+    id: 'inv-001', number: 'RE-2026-009', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung',
     period: 'September 2026', issueDate: '2026-09-18', due: '2026-10-18', status: 'sent',
     lines: [
       { id: 'il-001', description: '01.09.2026 – Workplace Architektur, Abstimmung und technische Führung – Ömer Cam', quantity: 8, unit: 'h', unitPrice: 165, vatRate: 8.1, sourceTimeEntryIds: ['time-001'] },
@@ -241,9 +246,9 @@ export const payments: Payment[] = [
 export const supplierInvoices: SupplierInvoice[] = [
   {
     id: 'sinv-001', number: 'MCC-2026-091', supplierId: 'sup-001', supplierName: 'Meier Cloud Consulting GmbH',
-    orderId: 'ord-001', orderName: 'Digital Workplace', invoiceDate: '2026-09-15', due: '2026-10-05',
+    orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', invoiceDate: '2026-09-15', due: '2026-10-05',
     netAmount: 1750, vatAmount: 141.75, amount: 1891.75, status: 'open',
-    note: '14 h externe Engineering-Leistung à CHF 125.00 für das Auftrag.',
+    note: '14 h externe Engineering-Leistung à CHF 125.00 für den Auftrag.',
   },
 ]
 
@@ -272,8 +277,40 @@ export const revenueSeries = [
 ]
 
 export const activity = [
-  { time: 'Heute, 09:12', title: '8.0 h erfasst', meta: 'Digital Workplace' },
+  { time: 'Heute, 09:12', title: '8.0 h erfasst', meta: 'Digital Workplace Betreuung' },
   { time: 'Gestern, 16:40', title: 'Lieferantenrechnung erfasst', meta: 'MCC-2026-091 · CHF 1’891.75' },
   { time: '18.09, 14:08', title: 'Zahlung verbucht', meta: 'RE-2026-007 · CHF 8’383.16' },
   { time: '17.09, 11:32', title: 'Angebot versendet', meta: 'AN-2026-014 · Muster Industrie AG' },
+]
+
+
+export const contracts: Contract[] = [
+  {
+    id: 'con-001', number: 'VR-2026-003', customerId: 'cus-002', customerName: 'Muster Industrie AG',
+    name: 'Managed Workplace Support', startDate: '2026-07-01', status: 'active', autoRenew: true, noticeDays: 90,
+    billingInterval: 'monthly', nextInvoiceDate: '2026-10-01', billingDay: 1, reference: 'MSA-2026-07',
+    lines: [
+      { id: 'cl-001', description: 'Managed Workplace Support', quantity: 1, unit: 'pauschal', unitPrice: 2450, vatRate: 8.1 },
+    ],
+    notes: 'Monatliche Betreuung inkl. Basis-Support und Betriebskoordination.',
+  },
+]
+
+export const expenses: Expense[] = [
+  { id: 'exp-001', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'Digital Workplace Betreuung', date: '2026-09-10', description: 'Fahrt- und Parkkosten Kundentermin', category: 'travel', quantity: 1, unitPrice: 42, billable: true },
+  { id: 'exp-002', customerId: 'cus-002', customerName: 'Muster Industrie AG', orderId: 'ord-002', orderName: 'Client Migration Phase 2', date: '2026-09-15', description: 'Adapter und Verbrauchsmaterial', category: 'material', quantity: 1, unitPrice: 180, billable: true },
+]
+
+export const creditNotes: CreditNote[] = []
+
+export const customerActivities: CustomerActivity[] = [
+  { id: 'act-001', customerId: 'cus-002', type: 'quote', title: 'Angebot AN-2026-014 versendet', detail: 'Workplace Engineering Erweiterung', createdAt: '2026-09-17T11:32:00.000Z' },
+  { id: 'act-002', customerId: 'cus-003', type: 'invoice', title: 'Rechnung RE-2026-008 erstellt', detail: 'M365 Security Assessment', createdAt: '2026-08-31T09:00:00.000Z' },
+]
+
+
+export const customerContacts: CustomerContact[] = [
+  { id: 'cc-001', customerId: 'cus-001', name: 'Marco Frei', email: 'marco.frei@demo-alpine.ch', phone: '+41 31 555 21 40', role: 'Projektleitung', primary: true },
+  { id: 'cc-002', customerId: 'cus-002', name: 'Anna Keller', email: 'anna.keller@demo-muster.ch', phone: '+41 44 555 18 20', role: 'IT-Leitung', primary: true },
+  { id: 'cc-003', customerId: 'cus-003', name: 'Luca Meier', email: 'luca.meier@demo-helvetic.ch', phone: '+41 71 555 10 80', role: 'Security Lead', primary: true },
 ]

@@ -1,5 +1,5 @@
 -- Binso Admin - PostgreSQL target schema (production design draft)
--- The current application uses a browser reference store. This schema documents the production data model for the Azure PostgreSQL migration.
+-- The v5 demo still uses browser localStorage. This schema is for the next Azure PostgreSQL step.
 
 create extension if not exists pgcrypto;
 
@@ -17,7 +17,7 @@ create table if not exists customers (
   country text not null default 'Schweiz',
   uid text,
   payment_days integer not null default 30 check (payment_days between 0 and 180),
-  status text not null default 'active' check (status in ('prospect','active','inactive')),
+  status text not null default 'active' check (status in ('active','inactive')),
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -216,66 +216,102 @@ create table if not exists document_templates (
   updated_at timestamptz not null default now()
 );
 
+-- v20.8 customer lifecycle: contracts, billable expenses, credit notes and customer activity
+alter table quotes drop constraint if exists quotes_status_check;
+alter table quotes add constraint quotes_status_check check (status in ('draft','sent','accepted','declined','expired','revised'));
 
--- Current application model alignment -------------------------------------------------
--- These additions keep the production draft aligned with the fields already used by
--- the TypeScript domain model. They are intentionally migration-safe.
+alter table orders drop constraint if exists orders_billing_model_check;
+alter table orders add constraint orders_billing_model_check check (billing_model in ('time','fixed','retainer','milestone','mixed'));
 
-alter table quotes add column if not exists issue_date date;
-alter table quotes add column if not exists recipient_name text;
-alter table quotes add column if not exists recipient_address text;
-alter table quotes add column if not exists recipient_zip text;
-alter table quotes add column if not exists recipient_city text;
-alter table quotes add column if not exists recipient_country text;
-alter table quotes add column if not exists recipient_email text;
-alter table quotes add column if not exists reference text;
-alter table quotes add column if not exists sent_to text;
-
-alter table invoices add column if not exists recipient_name text;
-alter table invoices add column if not exists recipient_address text;
-alter table invoices add column if not exists recipient_zip text;
-alter table invoices add column if not exists recipient_city text;
-alter table invoices add column if not exists recipient_country text;
-alter table invoices add column if not exists recipient_email text;
-alter table invoices add column if not exists reference text;
-alter table invoices add column if not exists sent_to text;
-alter table invoices add column if not exists last_reminder_at timestamptz;
-
-create table if not exists order_policies (
-  order_id uuid primary key references orders(id) on delete cascade,
-  contract_chain jsonb,
-  time_tracking jsonb not null,
-  approval jsonb not null,
-  billing jsonb not null,
-  budget_warnings numeric[] not null default '{}',
+create table if not exists contracts (
+  id uuid primary key default gen_random_uuid(),
+  contract_no text not null unique,
+  customer_id uuid not null references customers(id),
+  name text not null,
+  start_date date not null,
+  end_date date,
+  status text not null default 'draft' check (status in ('draft','active','paused','ended','cancelled')),
+  auto_renew boolean not null default false,
+  notice_days integer not null default 0,
+  billing_interval text not null default 'none' check (billing_interval in ('none','monthly','quarterly','yearly')),
+  next_invoice_date date,
+  billing_day integer check (billing_day between 1 and 31),
+  reference text,
+  notes text,
+  created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create table if not exists order_assignment_rules (
-  order_id uuid not null references orders(id) on delete cascade,
-  person_id text not null,
-  provider_type text not null check (provider_type in ('employee_salary','employee_hourly','external_individual','external_company')),
-  time_policy_override jsonb,
-  sales_rate numeric(12,2),
-  internal_cost_rate numeric(12,2),
-  active boolean not null default true,
-  updated_at timestamptz not null default now(),
-  primary key (order_id, person_id)
-);
-
-create table if not exists time_evidence (
+create table if not exists contract_lines (
   id uuid primary key default gen_random_uuid(),
-  time_entry_id uuid references time_entries(id) on delete cascade,
-  order_id uuid not null references orders(id) on delete cascade,
-  person_id text not null,
-  period_date date not null,
-  file_name text not null,
-  mime_type text not null,
-  status text not null check (status in ('not_required','missing','uploaded','verified','rejected')),
-  signed boolean not null default false,
-  customer_approved boolean not null default false,
-  uploaded_at timestamptz not null default now(),
-  verified_at timestamptz
+  contract_id uuid not null references contracts(id) on delete cascade,
+  sort_order integer not null default 0,
+  description text not null,
+  quantity numeric(12,2) not null,
+  unit text not null,
+  unit_price numeric(12,2) not null,
+  vat_rate numeric(5,2) not null default 8.1
 );
 
-create index if not exists idx_time_evidence_order_person on time_evidence(order_id, person_id, period_date);
+alter table orders add column if not exists contract_id uuid references contracts(id);
+alter table invoices add column if not exists contract_id uuid references contracts(id);
+alter table invoices add column if not exists invoice_kind text not null default 'standard' check (invoice_kind in ('standard','deposit','partial','final','recurring'));
+alter table invoices add column if not exists credited_amount numeric(14,2) not null default 0;
+
+create table if not exists expenses (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references customers(id),
+  order_id uuid references orders(id),
+  contract_id uuid references contracts(id),
+  expense_date date not null,
+  description text not null,
+  category text not null check (category in ('expense','material','travel','other')),
+  quantity numeric(12,2) not null default 1,
+  unit_price numeric(12,2) not null default 0,
+  billable boolean not null default true,
+  invoiced_invoice_id uuid references invoices(id),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists invoice_line_expenses (
+  invoice_line_id uuid not null references invoice_lines(id) on delete cascade,
+  expense_id uuid not null references expenses(id),
+  primary key (invoice_line_id, expense_id)
+);
+
+create table if not exists credit_notes (
+  id uuid primary key default gen_random_uuid(),
+  credit_no text not null unique,
+  invoice_id uuid not null references invoices(id),
+  customer_id uuid not null references customers(id),
+  credit_date date not null,
+  amount numeric(14,2) not null check (amount > 0),
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists customer_activities (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references customers(id) on delete cascade,
+  activity_type text not null check (activity_type in ('note','quote','order','contract','invoice','payment','reminder','credit')),
+  title text not null,
+  detail text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_contracts_customer_status on contracts(customer_id, status);
+create index if not exists idx_contracts_next_invoice on contracts(next_invoice_date) where status = 'active';
+create index if not exists idx_expenses_order_unbilled on expenses(order_id, invoiced_invoice_id) where billable = true;
+create index if not exists idx_customer_activities_customer_created on customer_activities(customer_id, created_at desc);
+
+create table if not exists customer_contacts (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references customers(id) on delete cascade,
+  name text not null,
+  email text,
+  phone text,
+  role_label text,
+  is_primary boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_customer_contacts_customer on customer_contacts(customer_id);

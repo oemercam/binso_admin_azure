@@ -5,6 +5,7 @@ export type IconName =
   | 'customers'
   | 'quotes'
   | 'orders'
+  | 'contracts'
   | 'time'
   | 'invoices'
   | 'finance'
@@ -63,6 +64,7 @@ export function Icon({
     customers: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></>,
     quotes: <><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></>,
     orders: <><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></>,
+    contracts: <><path d="M6 3h10l3 3v15H6z"/><path d="M16 3v4h4M9 11h7M9 15h7M9 19h4"/><path d="M4 7h2"/></>,
     time: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
     invoices: <><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></>,
     finance: <><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></>,

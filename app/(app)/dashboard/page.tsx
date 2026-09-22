@@ -8,11 +8,8 @@ import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
 import { effectiveInvoiceStatus, invoiceOpenAmount } from '@/modules/invoices/status'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
-import { StatusBadge } from '@/components/ui/status-badge'
-import { formatChf, formatDate, formatMonth, isSameMonthIso, todayIso } from '@/lib/format/locale'
-import { buildFinancialTrend } from '@/modules/dashboard/financial-trend'
-import { calculateOrderMetrics } from '@/modules/orders/metrics'
 
+const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 })
 
 export default function DashboardPage() {
   const user = useCurrentUser()
@@ -32,31 +29,19 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
   const deliveredCost = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0) + store.supplierInvoices.reduce((sum, invoice) => sum + invoice.netAmount, 0)
   const contribution = deliveredRevenue - deliveredCost
   const margin = deliveredRevenue ? Math.round((contribution / deliveredRevenue) * 100) : 0
-  const financialTrend = buildFinancialTrend(store.timeEntries, store.supplierInvoices)
 
   return (
     <section className="page">
       <PageHeader eyebrow={role === 'owner' ? 'INHABER' : 'ADMINISTRATION'} title="Dashboard" description="Geschäft, Aufträge und Liquidität auf einen Blick." />
       <div className="metric-strip owner-metrics">
-        <Metric label="Geleisteter Umsatz" value={formatChf(deliveredRevenue)} detail="aus erfassten Zeiten" />
-        <Metric label="Noch nicht verrechnet" value={formatChf(billableValue)} detail={`${billableHours} h abrechenbar`} />
-        <Metric label="Offene Rechnungen" value={formatChf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
-        <Metric label="Deckungsbeitrag" value={formatChf(contribution)} detail={`Marge ${margin} %`} />
-      </div>
-
-      <nav className="dashboard-quick-actions" aria-label="Schnellaktionen">
-        <Link href="/quotes?new=1"><Icon name="quotes" size={16}/><span>Angebot</span></Link>
-        <Link href="/orders?new=1"><Icon name="orders" size={16}/><span>Auftrag</span></Link>
-        <Link href="/invoices?new=1"><Icon name="invoices" size={16}/><span>Rechnung</span></Link>
-        <Link href="/time?new=1"><Icon name="time" size={16}/><span>Zeit</span></Link>
-      </nav>
-      <div className="mobile-trend-summary" aria-label="Geschäftsentwicklung">
-        <span><small>Geleisteter Umsatz</small><strong>{formatChf(deliveredRevenue)}</strong></span>
-        <span><small>Offene Forderungen</small><strong>{formatChf(openAmount)}</strong></span>
+        <Metric label="Geleisteter Umsatz" value={chf.format(deliveredRevenue)} detail="aus erfassten Zeiten" />
+        <Metric label="Noch nicht verrechnet" value={chf.format(billableValue)} detail={`${billableHours} h abrechenbar`} />
+        <Metric label="Offene Rechnungen" value={chf.format(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
+        <Metric label="Deckungsbeitrag" value={chf.format(contribution)} detail={`Marge ${margin} %`} />
       </div>
 
       <div className="dashboard-layout">
-        <section className="surface chart-surface"><SectionTitle title="Geschäftsentwicklung" subtitle="Entwicklung der wichtigsten Kennzahlen"/><RevenueChart series={financialTrend} /></section>
+        <section className="surface chart-surface"><SectionTitle title="Geschäftsentwicklung" subtitle="Demo-Historie · aktuelle KPIs sind live"/><RevenueChart /></section>
         <section className="surface focus-surface">
           <SectionTitle title="Heute wichtig" subtitle="Priorisierte Aufgaben" />
           <div className="focus-list">
@@ -68,9 +53,9 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       </div>
 
       <nav className="mobile-dashboard-summary" aria-label="Dashboard Bereiche">
-        <Link href="/orders" className="hub-row"><span><strong>Aufträge</strong><small>{store.orders.filter((order) => order.status === 'active').length} aktive Aufträge</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/orders" className="hub-row"><span><strong>Aufträge</strong><small>{store.orders.filter((order) => order.status === 'active').length} aktive Mandate</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/quotes" className="hub-row"><span><strong>Pipeline</strong><small>{store.quotes.filter((quote) => ['draft','sent'].includes(quote.status)).length} offene Angebote</small></span><Icon name="chevron" size={15}/></Link>
-        <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{formatChf(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{chf.format(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/finance" className="hub-row"><span><strong>Finanzen</strong><small>Marge, Kosten und Liquidität</small></span><Icon name="chevron" size={15}/></Link>
       </nav>
 
@@ -80,10 +65,15 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
         <div className="data-list desktop-wide">
           <div className="data-row data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Auslastung</span><span>Marge</span></div>
           {store.orders.filter((order) => order.status === 'active').map((order) => {
-            const metrics = calculateOrderMetrics(order, store.timeEntries)
+            const times = store.timeEntries.filter((entry) => entry.orderId === order.id)
+            const used = times.reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
+            const revenue = times.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0) || used * order.salesRate
+            const cost = times.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0) || used * order.costRate
+            const percentage = order.budgetHours ? Math.round((used / order.budgetHours) * 100) : 0
+            const orderMargin = revenue ? Math.round(((revenue - cost) / revenue) * 100) : 0
             return (
               <Link className="data-row linked-row" href={`/orders/${order.id}`} key={order.id}>
-                <span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{order.budgetHours} h</span><span>{metrics.usedHours} h</span><span><strong>{metrics.remainingHours} h</strong></span><span className="progress-cell"><span className="mini-progress"><i style={{ width: `${Math.min(100, metrics.budgetUsagePercent)}%` }}/></span><small>{metrics.budgetUsagePercent} %</small></span><span>{metrics.marginPercent} %</span>
+                <span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{order.budgetHours} h</span><span>{used} h</span><span><strong>{Math.max(0, order.budgetHours - used)} h</strong></span><span className="progress-cell"><span className="mini-progress"><i style={{ width: `${Math.min(100, percentage)}%` }}/></span><small>{percentage} %</small></span><span>{orderMargin} %</span>
               </Link>
             )
           })}
@@ -91,8 +81,8 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       </section>
 
       <div className="dashboard-bottom-grid">
-        <section className="section-block"><SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte"/><div className="compact-list">{store.quotes.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span><span>{formatChf(quote.amount)}</span><StatusBadge status={quote.status} /></Link>)}</div></section>
-        <section className="section-block"><SectionTitle title="Zahlungen" subtitle="Zuletzt verbucht"/><div className="compact-list">{store.payments.slice(0, 5).map((payment) => { const invoice = store.invoices.find((item) => item.id === payment.invoiceId); return <Link href={`/invoices?view=${payment.invoiceId}`} key={payment.id}><span className="primary-cell"><strong>{invoice?.number ?? payment.invoiceId}</strong><small>{formatDate(payment.date)} · {payment.method}</small></span><strong>{formatChf(payment.amount)}</strong></Link> })}</div></section>
+        <section className="section-block"><SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte"/><div className="compact-list">{store.quotes.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span><span>{chf.format(quote.amount)}</span><Status value={quote.status}/></Link>)}</div></section>
+        <section className="section-block"><SectionTitle title="Zahlungen" subtitle="Zuletzt verbucht"/><div className="compact-list">{store.payments.slice(0, 5).map((payment) => { const invoice = store.invoices.find((item) => item.id === payment.invoiceId); return <Link href={`/invoices?view=${payment.invoiceId}`} key={payment.id}><span className="primary-cell"><strong>{invoice?.number ?? payment.invoiceId}</strong><small>{payment.date} · {payment.method}</small></span><strong>{chf.format(payment.amount)}</strong></Link> })}</div></section>
       </div>
       </div>
     </section>
@@ -101,7 +91,6 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
 
 function FinanceDashboard() {
   const store = useBusinessStore()
-  const financialTrend = buildFinancialTrend(store.timeEntries, store.supplierInvoices)
   const open = store.invoices.filter((invoice) => !['paid', 'cancelled'].includes(effectiveInvoiceStatus(invoice)))
   const openAmount = open.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0)
   const overdue = open.filter((invoice) => effectiveInvoiceStatus(invoice) === 'overdue')
@@ -112,8 +101,8 @@ function FinanceDashboard() {
   return (
     <section className="page">
       <PageHeader eyebrow="BUCHHALTUNG" title="Finanzübersicht" description="Forderungen, Zahlungen und anstehende Aufgaben." />
-      <div className="metric-strip"><Metric label="Offene Forderungen" value={formatChf(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={formatChf(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={formatChf(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={formatChf(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
-      <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Entwicklung der wichtigsten Kennzahlen"/><RevenueChart series={financialTrend}/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
+      <div className="metric-strip"><Metric label="Offene Forderungen" value={chf.format(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf.format(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf.format(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf.format(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
+      <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Demo-Verlauf"/><RevenueChart/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
     </section>
   )
 }
@@ -123,17 +112,16 @@ function EmployeeDashboard() {
   const user = useCurrentUser()
   const employee = store.employees.find((item) => item.email.toLowerCase() === user.email.toLowerCase())
   const ownTimes = employee ? store.timeEntries.filter((entry) => entry.personId === employee.id) : []
-  const currentMonthTimes = ownTimes.filter((entry) => isSameMonthIso(entry.date))
-  const total = currentMonthTimes.reduce((sum, entry) => sum + entry.hours, 0)
-  const billable = currentMonthTimes.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
+  const total = ownTimes.reduce((sum, entry) => sum + entry.hours, 0)
+  const billable = ownTimes.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
   const assignedOrderIds = new Set(store.orderAssignmentRules.filter((item) => item.personId === employee?.id && item.active).map((item) => item.orderId))
   const assignedOrders = store.orders.filter((order) => assignedOrderIds.has(order.id))
 
   return (
     <section className="page">
       <PageHeader eyebrow="MEIN ARBEITSTAG" title={`Hallo ${user.name.split(' ')[0]}`} description="Deine Aufträge, Zeiten und heutige Aufgaben." />
-      <div className="metric-strip employee-metrics"><Metric label={formatMonth(todayIso())} value={`${total} h`} detail={employee ? `${Math.max(0, employee.targetHours - total)} h offen` : 'Zeitübersicht'} /><Metric label="Verrechenbar" value={`${billable} h`} detail={total ? `${Math.round((billable / total) * 100)} % deiner Zeiten` : 'Noch keine Zeiten'} /><Metric label="Offene Nachweise" value={String(ownTimes.filter((entry) => store.orderPolicies.find((policy) => policy.orderId === entry.orderId)?.timeTracking.evidence.required && !store.timeEvidence.some((evidence) => evidence.timeEntryId === entry.id)).length)} detail="Zeitnachweise" /></div>
-      <div className="dashboard-layout"><section className="surface"><SectionTitle title="Meine Aufträge" subtitle="Aktuell zugewiesen"/><div className="compact-list">{assignedOrders.length ? assignedOrders.map((order) => <Link href={`/orders/${order.id}`} key={order.id}><span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{calculateOrderMetrics(order, store.timeEntries).remainingHours} h Rest</span><StatusBadge status="active" /></Link>) : <p className="muted">Keine Aufträge zugewiesen.</p>}</div></section><section className="surface"><SectionTitle title="Schnellerfassung" subtitle="Heute"/><Link href="/time?new=1" className="big-action"><Icon name="time" size={20}/><span><strong>Zeit erfassen</strong><small>Auf Auftrag oder Tätigkeit buchen</small></span><Icon name="chevron" size={16}/></Link></section></div>
+      <div className="metric-strip employee-metrics"><Metric label="September" value={`${total} h`} detail={employee ? `${Math.max(0, employee.targetHours - total)} h offen` : 'Zeitübersicht'} /><Metric label="Verrechenbar" value={`${billable} h`} detail={total ? `${Math.round((billable / total) * 100)} % deiner Zeiten` : 'Noch keine Zeiten'} /><Metric label="Offene Nachweise" value={String(ownTimes.filter((entry) => store.orderPolicies.find((policy) => policy.orderId === entry.orderId)?.timeTracking.evidence.required && !store.timeEvidence.some((evidence) => evidence.timeEntryId === entry.id)).length)} detail="Zeitnachweise" /></div>
+      <div className="dashboard-layout"><section className="surface"><SectionTitle title="Meine Aufträge" subtitle="Aktuell zugewiesen"/><div className="compact-list">{assignedOrders.length ? assignedOrders.map((order) => <Link href={`/orders/${order.id}`} key={order.id}><span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{Math.max(0, order.budgetHours - store.timeEntries.filter((entry) => entry.orderId === order.id).reduce((sum, entry) => sum + entry.hours, 0))} h Rest</span><span className="status neutral">Aktiv</span></Link>) : <p className="muted">Keine Aufträge zugewiesen.</p>}</div></section><section className="surface"><SectionTitle title="Schnellerfassung" subtitle="Heute"/><Link href="/time?new=1" className="big-action"><Icon name="time" size={20}/><span><strong>Zeit erfassen</strong><small>Auf Auftrag oder Tätigkeit buchen</small></span><Icon name="chevron" size={16}/></Link></section></div>
     </section>
   )
 }
@@ -141,3 +129,4 @@ function EmployeeDashboard() {
 function Metric({ label, value, detail, tone }: { label: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) { return <div className="metric"><span>{label}</span><strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div> }
 function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) { return <div className="section-title"><div><h2>{title}</h2><p>{subtitle}</p></div></div> }
 function Focus({ href, icon, label, meta, tone }: { href: string; icon: IconName; label: string; meta: string; tone?: 'danger' }) { return <Link className="focus-item" href={href}><span className={tone ? `focus-icon ${tone}` : 'focus-icon'}><Icon name={icon} size={17}/></span><span><strong>{label}</strong><small>{meta}</small></span><Icon name="chevron" size={15}/></Link> }
+function Status({ value }: { value: string }) { const map: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', accepted: 'Angenommen', declined: 'Abgelehnt', expired: 'Abgelaufen', revised: 'Ersetzt' }; return <span className={`status ${value}`}>{map[value] ?? value}</span> }

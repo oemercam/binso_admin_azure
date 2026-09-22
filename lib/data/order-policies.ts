@@ -7,11 +7,11 @@ export const orderPolicies: OrderPolicy[] = [
     orderId: 'ord-001',
     contractChain: {
       id: 'chain-001',
-      label: 'Digital Workplace',
+      label: 'Digital Workplace Betreuung',
       mandateReference: 'MV-BIN-2026-017',
-      procurementReference: 'DWP-2026-04',
+      procurementReference: 'REF-2026-04',
       parties: [
-        { id: 'party-end', name: 'Bundesstelle Digital Services', role: 'end_customer' },
+        { id: 'party-end', name: 'Bundesstelle Digital Services (Demo)', role: 'end_customer' },
         { id: 'party-prime', name: 'Alpine Public IT AG', role: 'prime_contractor' },
         { id: 'party-binso', name: 'Binso GmbH', role: 'service_provider' },
         { id: 'party-sub', name: 'Meier Cloud Consulting GmbH', role: 'subcontractor' },

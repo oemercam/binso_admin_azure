@@ -18,6 +18,7 @@ export const navItems: NavItem[] = [
   { href: '/customers', label: 'Kunden', icon: 'customers', roles: management, group: 'work' },
   { href: '/quotes', label: 'Angebote', icon: 'quotes', roles: management, group: 'work' },
   { href: '/orders', label: 'Aufträge', icon: 'orders', roles: all, group: 'work' },
+  { href: '/contracts', label: 'Verträge', icon: 'contracts', roles: management, group: 'work' },
   { href: '/time', label: 'Zeiterfassung', icon: 'time', roles: all, group: 'work' },
   { href: '/invoices', label: 'Rechnungen', icon: 'invoices', roles: management, group: 'work' },
   { href: '/finance', label: 'Finanzen', icon: 'finance', roles: management, group: 'management' },
