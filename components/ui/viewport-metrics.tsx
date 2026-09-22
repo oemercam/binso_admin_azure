@@ -17,9 +17,16 @@ export function ViewportMetrics() {
       const offsetTop = viewport?.offsetTop ?? 0
       const coveredBottom = Math.max(0, window.innerHeight - height - offsetTop)
 
+      const width = viewport?.width ?? window.innerWidth
+
       root.style.setProperty('--visible-viewport-height', `${Math.round(height)}px`)
+      root.style.setProperty('--visible-viewport-width', `${Math.round(width)}px`)
       root.style.setProperty('--visible-viewport-top', `${Math.round(offsetTop)}px`)
       root.style.setProperty('--visible-viewport-bottom', `${Math.round(coveredBottom)}px`)
+
+      // Canonical dimensions used by the UI foundation.
+      root.style.setProperty('--app-vh', `${Math.round(height)}px`)
+      root.style.setProperty('--app-vw', `${Math.round(width)}px`)
     }
 
     update()

@@ -5734,3 +5734,116 @@ a, .linked-row, .text-row-action, .hub-row-button, .settings-value-row { text-de
     grid-template-columns:1fr !important;
   }
 }
+
+
+/* ===== v19.2 responsive viewport + adaptive gutters =====
+   One canonical sizing layer for Mobile/PWA. */
+:root {
+  --app-vh: 100dvh;
+  --app-vw: 100vw;
+
+  /* Maximise usable width while preserving comfortable edge spacing. */
+  --app-mobile-gutter: clamp(12px, 4.1vw, 18px);
+  --app-mobile-sheet-gutter: clamp(14px, 4.1vw, 18px);
+  --app-tablet-gutter: clamp(18px, 3vw, 24px);
+}
+
+@media (max-width:760px) {
+  html, body, .app-frame {
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:hidden;
+  }
+
+  .topbar {
+    width:100%;
+    max-width:100%;
+    padding-left:max(var(--app-mobile-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(var(--app-mobile-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .app-main {
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    padding-left:max(var(--app-mobile-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(var(--app-mobile-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .page,
+  .page > *,
+  .module-toolbar,
+  .data-list,
+  .compact-list,
+  .summary-list,
+  .section-block,
+  .surface {
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  .app-sheet-fullscreen,
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet {
+    width:var(--app-vw, 100vw) !important;
+    max-width:var(--app-vw, 100vw) !important;
+    height:var(--app-vh, 100dvh) !important;
+    max-height:var(--app-vh, 100dvh) !important;
+  }
+
+  .app-sheet-header,
+  .app-sheet-content,
+  .app-sheet-footer {
+    padding-left:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .mobile-fullscreen-sheet > .sheet-heading,
+  .document-editor > .sheet-heading,
+  .policy-editor > .sheet-heading,
+  .invoice-builder-sheet > .sheet-heading {
+    padding-left:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .mobile-fullscreen-sheet > .sheet-actions,
+  .document-editor > .sheet-actions,
+  .policy-editor > .sheet-actions,
+  .invoice-builder-sheet > .sheet-actions {
+    padding-left:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-left, 0px)) !important;
+    padding-right:max(var(--app-mobile-sheet-gutter), env(safe-area-inset-right, 0px)) !important;
+  }
+
+  input, select, textarea, button {
+    max-width:100%;
+    box-sizing:border-box;
+  }
+}
+
+@media (min-width:761px) and (max-width:1100px) {
+  .app-main {
+    padding-left:var(--app-tablet-gutter) !important;
+    padding-right:var(--app-tablet-gutter) !important;
+  }
+}
+
+/* Extremely narrow phones: preserve usable content width. */
+@media (max-width:340px) {
+  :root {
+    --app-mobile-gutter: 10px;
+    --app-mobile-sheet-gutter: 12px;
+  }
+}
+
+/* Larger phones: a little more breathing room without wasting width. */
+@media (min-width:430px) and (max-width:760px) {
+  :root {
+    --app-mobile-gutter: 18px;
+    --app-mobile-sheet-gutter: 18px;
+  }
+}
