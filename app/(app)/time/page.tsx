@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, Textarea, Input } from '@/components/ui/form-controls'
+import { Checkbox, DatePicker, Select, Textarea, Input } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,6 +15,7 @@ import { useCurrentUser } from '@/components/state/current-user'
 import type { WorkerType } from '@/types/domain'
 import { getTimeEntryApprovalEligibility, getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { resolveTimeTrackingPolicy } from '@/modules/orders/policies'
+import { formatDate, formatMonthYear, todayIso } from '@/lib/format/locale'
 
 export default function TimePage() {
   const router = useRouter()
@@ -179,7 +180,7 @@ export default function TimePage() {
           const approval = getTimeEntryApprovalEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           return (
             <div className="data-row time-grid-v5" key={entry.id}>
-              <span>{user.role !== 'employee' && user.role !== 'finance' && <Input type="checkbox" disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
+              <span>{user.role !== 'employee' && user.role !== 'finance' && <Checkbox disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
               <span>{formatDate(entry.date)}</span>
               <span className="primary-cell"><strong>{entry.orderName}</strong><small>{entry.personName} · {workerLabel(entry.workerType)}</small></span>
               <span>{entry.description || '–'}</span>
@@ -198,7 +199,7 @@ export default function TimePage() {
       <div className="mobile-record-list operational-mobile-list">
         {visibleEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Input type="checkbox" checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
+          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Checkbox checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
         })}
       </div>
 
@@ -207,7 +208,7 @@ export default function TimePage() {
             <div className="form-grid">
               <label className="full"><span>Auftrag *</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
               <label className="full"><span>Leistungserbringer *</span><Select value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
-              <label><span>Datum *</span><Input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required/></label>
+              <label><span>Datum *</span><DatePicker value={date} max={todayIso()} onChange={(e) => setDate(e.target.value)} required/></label>
               <label><span>Stunden *</span><Input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>
               <label className="full"><span>Beschreibung</span><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Kurze Beschreibung der ausgeführten Arbeiten"/></label>
@@ -231,7 +232,7 @@ function availablePeople(orderId: string, store: ReturnType<typeof useBusinessSt
 }
 
 function roundHours(hours: number, intervalMinutes: number) { const minutes = hours * 60; return Math.round(minutes / intervalMinutes) * intervalMinutes / 60 }
-function periodLabel(date: string) { return new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
+function periodLabel(date: string) { return formatMonthYear(date) }
 function frequencyLabel(value: string) { return value === 'daily' ? 'Täglich' : value === 'weekly' ? 'Wöchentlich' : value === 'monthly' ? 'Monatlich' : 'Kein' }
 function workerLabel(value: WorkerType) { if (value === 'hourly_employee') return 'Stundenlohn'; if (value === 'external') return 'Externe Firma'; return 'Intern' }
-function formatDate(value: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${value}T12:00:00`)) }
+

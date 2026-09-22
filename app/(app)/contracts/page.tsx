@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Input, Select, Textarea } from '@/components/ui/form-controls'
+import { DatePicker, Input, Select, Textarea } from '@/components/ui/form-controls'
 import { Icon } from '@/components/ui/icon'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { PageHeader } from '@/components/ui/page-header'
@@ -10,8 +10,8 @@ import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useFeedback } from '@/components/ui/feedback'
 import type { BillingInterval, Contract, ContractLine, ContractStatus } from '@/types/domain'
-
-const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 })
+import { formatChf, formatDate } from '@/lib/format/locale'
+const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const statusLabel: Record<ContractStatus, string> = { draft: 'Entwurf', active: 'Aktiv', paused: 'Pausiert', ended: 'Beendet', cancelled: 'Storniert' }
 const intervalLabel: Record<BillingInterval, string> = { none: 'Keine', monthly: 'Monatlich', quarterly: 'Quartalsweise', yearly: 'Jährlich' }
 const newLine = (): ContractLine => ({ id: `cl-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, description: '', quantity: 1, unit: 'pauschal', unitPrice: 0, vatRate: 8.1 })
@@ -57,7 +57,7 @@ export default function ContractsPage() {
 
     <div className="metric-grid compact-metrics">
       <div className="metric"><span>Aktive Verträge</span><strong>{store.contracts.filter((item) => item.status === 'active').length}</strong><small>Laufende Kundenvereinbarungen</small></div>
-      <div className="metric"><span>Wiederkehrender Wert</span><strong>{chf.format(activeValue)}</strong><small>Summe pro jeweiligem Abrechnungsintervall</small></div>
+      <div className="metric"><span>Wiederkehrender Wert</span><strong>{chf(activeValue)}</strong><small>Summe pro jeweiligem Abrechnungsintervall</small></div>
       <div className="metric"><span>Nächste Abrechnung</span><strong>{nextBillingDate(store.contracts)}</strong><small>Frühester geplanter Rechnungstermin</small></div>
     </div>
 
@@ -100,14 +100,14 @@ export default function ContractsPage() {
       <details className="edit-step" open><summary><span><strong>1 · Vertrag</strong><small>Kunde, Laufzeit und Referenz</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid">
         <label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((item) => item.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label>
         <label className="full"><span>Vertragsname *</span><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="z. B. Managed Workplace Support" required/></label>
-        <label><span>Beginn *</span><Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required/></label>
-        <label><span>Ende</span><Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}/></label>
+        <label><span>Beginn *</span><DatePicker value={startDate} onChange={(e) => setStartDate(e.target.value)} required/></label>
+        <label><span>Ende</span><DatePicker value={endDate} onChange={(e) => setEndDate(e.target.value)}/></label>
         <label><span>Kündigungsfrist Tage</span><Input type="number" min="0" value={noticeDays} onChange={(e) => setNoticeDays(Number(e.target.value))}/></label>
         <label><span>Referenz</span><Input value={reference} onChange={(e) => setReference(e.target.value)}/></label>
       </div></div></details>
       <details className="edit-step" open><summary><span><strong>2 · Abrechnung</strong><small>Wiederkehrende Rechnung und Positionen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid">
         <label><span>Intervall *</span><Select value={billingInterval} onChange={(e) => setBillingInterval(e.target.value as BillingInterval)}><option value="none">Keine automatische Abrechnung</option><option value="monthly">Monatlich</option><option value="quarterly">Quartalsweise</option><option value="yearly">Jährlich</option></Select></label>
-        <label><span>Nächste Rechnung</span><Input type="date" value={nextInvoiceDate} onChange={(e) => setNextInvoiceDate(e.target.value)} disabled={billingInterval === 'none'}/></label>
+        <label><span>Nächste Rechnung</span><DatePicker value={nextInvoiceDate} onChange={(e) => setNextInvoiceDate(e.target.value)} disabled={billingInterval === 'none'}/></label>
       </div><div className="line-editor"><div className="line-editor-head"><strong>Vertragspositionen</strong><button type="button" className="text-button" onClick={() => setLines((current) => [...current, newLine()])}><Icon name="plus" size={14}/> Position</button></div>{lines.map((line) => <div className="line-editor-row quote-line-editor" key={line.id}><label><span>Beschreibung</span><Input value={line.description} onChange={(e) => setLines((current) => current.map((item) => item.id === line.id ? { ...item, description: e.target.value } : item))} required/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => setLines((current) => current.map((item) => item.id === line.id ? { ...item, quantity: Number(e.target.value) } : item))}/></label><label><span>Einheit</span><Select value={line.unit} onChange={(e) => setLines((current) => current.map((item) => item.id === line.id ? { ...item, unit: e.target.value as ContractLine['unit'] } : item))}><option value="h">h</option><option value="Stk.">Stk.</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => setLines((current) => current.map((item) => item.id === line.id ? { ...item, unitPrice: Number(e.target.value) } : item))}/></label></div>)}</div></div></details>
       <details className="edit-step"><summary><span><strong>3 · Notizen</strong><small>Interne Zusatzinformationen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><label className="block-field"><span>Notiz</span><Textarea rows={5} value={notes} onChange={(e) => setNotes(e.target.value)}/></label></div></details>
     </StandardFormSheet>
@@ -120,14 +120,14 @@ export default function ContractsPage() {
       <label className="full"><span>Vertragsname *</span><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required/></label>
       <label><span>Status</span><Select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as ContractStatus })}><option value="draft">Entwurf</option><option value="active">Aktiv</option><option value="paused">Pausiert</option><option value="ended">Beendet</option><option value="cancelled">Storniert</option></Select></label>
       <label><span>Abrechnung</span><Select value={draft.billingInterval} onChange={(e) => setDraft({ ...draft, billingInterval: e.target.value as BillingInterval })}><option value="none">Keine</option><option value="monthly">Monatlich</option><option value="quarterly">Quartalsweise</option><option value="yearly">Jährlich</option></Select></label>
-      <label><span>Beginn</span><Input type="date" value={draft.startDate} onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}/></label>
-      <label><span>Ende</span><Input type="date" value={draft.endDate ?? ''} onChange={(e) => setDraft({ ...draft, endDate: e.target.value || undefined })}/></label>
-      <label><span>Nächste Rechnung</span><Input type="date" value={draft.nextInvoiceDate ?? ''} onChange={(e) => setDraft({ ...draft, nextInvoiceDate: e.target.value || undefined })}/></label>
+      <label><span>Beginn</span><DatePicker value={draft.startDate} onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}/></label>
+      <label><span>Ende</span><DatePicker value={draft.endDate ?? ''} onChange={(e) => setDraft({ ...draft, endDate: e.target.value || undefined })}/></label>
+      <label><span>Nächste Rechnung</span><DatePicker value={draft.nextInvoiceDate ?? ''} onChange={(e) => setDraft({ ...draft, nextInvoiceDate: e.target.value || undefined })}/></label>
       <label><span>Kündigungsfrist Tage</span><Input type="number" min="0" value={draft.noticeDays} onChange={(e) => setDraft({ ...draft, noticeDays: Number(e.target.value) })}/></label>
       <label className="full"><span>Notizen</span><Textarea rows={5} value={draft.notes ?? ''} onChange={(e) => setDraft({ ...draft, notes: e.target.value })}/></label>
     </div></StandardFormSheet>
   }
 }
 
-function fmt(value: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${value}T12:00:00`)) }
+function fmt(value: string) { return formatDate(value) }
 function nextBillingDate(contracts: Contract[]) { const values = contracts.filter((item) => item.status === 'active' && item.nextInvoiceDate).map((item) => item.nextInvoiceDate as string).sort(); return values[0] ? fmt(values[0]) : '–' }

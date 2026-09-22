@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, Textarea, Input } from '@/components/ui/form-controls'
+import { DatePicker, Select, Textarea, Input } from '@/components/ui/form-controls'
 
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -10,8 +10,9 @@ import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { CompactInfoRow } from '@/components/ui/compact-info-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import { downloadTextFile } from '@/lib/browser/actions'
+import { formatChf } from '@/lib/format/locale'
 
-const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 export default function AccountingPage() {
   const store = useBusinessStore()
@@ -59,8 +60,8 @@ export default function AccountingPage() {
       </section>
 
       <div className="metric-strip accounting-metrics">
-        <div className="metric"><span>Offene Debitoren</span><strong>{chf.format(openCustomer)}</strong><small>Kundenrechnungen</small></div>
-        <div className="metric"><span>Offene Kreditoren</span><strong>{chf.format(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
+        <div className="metric"><span>Offene Debitoren</span><strong>{chf(openCustomer)}</strong><small>Kundenrechnungen</small></div>
+        <div className="metric"><span>Offene Kreditoren</span><strong>{chf(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
         <div className="metric"><span>Zahlungen</span><strong>{store.payments.length}</strong><small>verbucht</small></div>
         <div className="metric"><span>Externe Firmen</span><strong>{store.suppliers.length}</strong><small>aktive Lieferanten</small></div>
       </div>
@@ -73,7 +74,7 @@ export default function AccountingPage() {
               key={invoice.id}
               title={`${invoice.number} · ${invoice.supplierName}`}
               meta={`${invoice.orderName || 'Ohne Auftrag'} · ${invoice.note || 'Keine Beschreibung'}`}
-              amount={chf.format(invoice.amount)}
+              amount={chf(invoice.amount)}
               trailing={<><span className={`status ${invoice.status === 'paid' ? 'paid' : invoice.status === 'review' ? 'neutral' : 'active'}`}>{invoice.status === 'paid' ? 'Bezahlt' : invoice.status === 'review' ? 'In Prüfung' : 'Freigegeben'}</span>{invoice.status === 'review' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'open' })}>Freigeben</button>}{invoice.status === 'open' && <button className="row-link text-row-action" onClick={() => store.updateSupplierInvoice(invoice.id, { status: 'paid' })}>Bezahlt</button>}</>}
             />)}
           </div>
@@ -82,9 +83,9 @@ export default function AccountingPage() {
         <section className="section-block">
           <div className="section-title"><div><h2>Mandatskosten</h2><p>Kosten nach Auftrag und Leistung</p></div></div>
           <div className="compact-list operational-compact-list">
-            <CompactInfoRow title="Nina Keller" meta="Mitarbeiterin im Stundenlohn · 15.5 h" amount={chf.format(15.5 * 72)} />
-            <CompactInfoRow title="Meier Cloud Consulting GmbH" meta="Externe Firma · 14 h · MCC-2026-091" amount={chf.format(1750)} />
-            <CompactInfoRow title="Ömer Cam" meta="Interne Leistung · 16 h" amount={chf.format(16 * 105)} />
+            <CompactInfoRow title="Nina Keller" meta="Mitarbeiterin im Stundenlohn · 15.5 h" amount={chf(15.5 * 72)} />
+            <CompactInfoRow title="Meier Cloud Consulting GmbH" meta="Externe Firma · 14 h · MCC-2026-091" amount={chf(1750)} />
+            <CompactInfoRow title="Ömer Cam" meta="Interne Leistung · 16 h" amount={chf(16 * 105)} />
           </div>
         </section>
       </div>
@@ -118,6 +119,6 @@ export default function AccountingPage() {
       onClose()
     }
 
-    return <StandardFormSheet open title={<>Lieferantenrechnung erfassen</>} description={<>Externe Leistung einem Auftrag zuordnen.</>} onClose={onClose} onSubmit={save} formId="accounting-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="accounting-page-sheet-1" className="button primary">Speichern</button></>}><div className="form-grid"><label><span>Lieferant *</span><Select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</Select></label><label><span>Auftrag</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</Select></label><label><span>Rechnungsnummer *</span><Input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required/></label><label><span>Fällig *</span><Input type="date" value={due} onChange={(e) => setDue(e.target.value)} required/></label><label><span>Netto CHF *</span><Input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><Input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><Textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div></StandardFormSheet>
+    return <StandardFormSheet open title={<>Lieferantenrechnung erfassen</>} description={<>Externe Leistung einem Auftrag zuordnen.</>} onClose={onClose} onSubmit={save} formId="accounting-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="accounting-page-sheet-1" className="button primary">Speichern</button></>}><div className="form-grid"><label><span>Lieferant *</span><Select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} required>{store.suppliers.map((supplier) => <option value={supplier.id} key={supplier.id}>{supplier.name}</option>)}</Select></label><label><span>Auftrag</span><Select value={orderId} onChange={(e) => setOrderId(e.target.value)}><option value="">Ohne Auftrag</option>{store.orders.map((order) => <option value={order.id} key={order.id}>{order.name}</option>)}</Select></label><label><span>Rechnungsnummer *</span><Input value={number} onChange={(e) => setNumber(e.target.value)} required/></label><label><span>Rechnungsdatum *</span><DatePicker value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} required/></label><label><span>Fällig *</span><DatePicker value={due} onChange={(e) => setDue(e.target.value)} required/></label><label><span>Netto CHF *</span><Input inputMode="decimal" value={netAmount} onChange={(e) => setNetAmount(e.target.value)} required/></label><label><span>MWST %</span><Input inputMode="decimal" value={vatRate} onChange={(e) => setVatRate(e.target.value)}/></label><label className="full"><span>Beschreibung</span><Textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)}/></label></div></StandardFormSheet>
   }
 }

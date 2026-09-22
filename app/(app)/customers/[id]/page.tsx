@@ -8,8 +8,8 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { Input, Textarea } from '@/components/ui/form-controls'
-
-const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 })
+import { formatChf, formatDateTime } from '@/lib/format/locale'
+const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -52,7 +52,7 @@ export default function CustomerDetailPage() {
       <div className="metric"><span>Angebote</span><strong>{related.quotes.length}</strong><small>{related.quotes.filter((item) => item.status === 'sent').length} offen</small></div>
       <div className="metric"><span>Aufträge</span><strong>{related.orders.length}</strong><small>{related.orders.filter((item) => item.status === 'active').length} aktiv</small></div>
       <div className="metric"><span>Verträge</span><strong>{related.contracts.length}</strong><small>{related.contracts.filter((item) => item.status === 'active').length} aktiv</small></div>
-      <div className="metric"><span>Offener Betrag</span><strong>{chf.format(openAmount)}</strong><small>Rechnungen abzüglich Zahlungen/Gutschriften</small></div>
+      <div className="metric"><span>Offener Betrag</span><strong>{chf(openAmount)}</strong><small>Rechnungen abzüglich Zahlungen/Gutschriften</small></div>
     </div>
 
     <div className="customer-file-grid">
@@ -62,12 +62,12 @@ export default function CustomerDetailPage() {
         {related.quotes.slice(0, 4).map((quote) => <Link key={quote.id} href={`/quotes?view=${quote.id}`}><span><strong>{quote.number}</strong><small>Angebot · {quote.title}</small></span><span>{quote.status === 'accepted' ? 'Angenommen' : quote.status === 'declined' ? 'Abgelehnt' : quote.status === 'sent' ? 'Versendet' : quote.status === 'revised' ? 'Ersetzt' : 'Entwurf'}</span></Link>)}
         {related.orders.slice(0, 4).map((order) => <Link key={order.id} href={`/orders/${order.id}`}><span><strong>{order.name}</strong><small>Auftrag</small></span><span>{order.status === 'active' ? 'Aktiv' : order.status === 'completed' ? 'Abgeschlossen' : 'Pausiert'}</span></Link>)}
         {related.contracts.slice(0, 4).map((contract) => <Link key={contract.id} href="/contracts"><span><strong>{contract.number}</strong><small>Vertrag · {contract.name}</small></span><span>{contract.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span></Link>)}
-        {related.invoices.slice(0, 4).map((invoice) => <Link key={invoice.id} href={`/invoices?view=${invoice.id}`}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><span>{chf.format(invoice.amount)}</span></Link>)}
+        {related.invoices.slice(0, 4).map((invoice) => <Link key={invoice.id} href={`/invoices?view=${invoice.id}`}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><span>{chf(invoice.amount)}</span></Link>)}
         {!related.quotes.length && !related.orders.length && !related.contracts.length && !related.invoices.length && <div className="search-empty">Noch keine Vorgänge.</div>}
       </div></section>
 
       <section className="panel"><div className="section-title"><div><h2>Aktivität</h2><p>Chronologische Kundenhistorie</p></div></div><div className="customer-activity-list">
-        {related.activities.slice(0, 10).map((activity) => <div key={activity.id}><span className="activity-dot"/><span><strong>{activity.title}</strong><small>{activity.detail || activity.type} · {new Intl.DateTimeFormat('de-CH', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(activity.createdAt))}</small></span></div>)}
+        {related.activities.slice(0, 10).map((activity) => <div key={activity.id}><span className="activity-dot"/><span><strong>{activity.title}</strong><small>{activity.detail || activity.type} · {formatDateTime(activity.createdAt)}</small></span></div>)}
         {!related.activities.length && <div className="search-empty">Noch keine Aktivitäten.</div>}
       </div></section>
     </div>

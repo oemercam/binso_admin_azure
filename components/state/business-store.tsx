@@ -31,6 +31,7 @@ import {
 } from '@/lib/data/order-policies'
 import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/document-defaults'
 import { defaultAppSettings } from '@/lib/data/app-settings'
+import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
   AppSettings,
   AppUser,
@@ -686,10 +687,10 @@ function nextCreditNumber(credits: CreditNote[]) { const current = credits.reduc
 function nextQuoteNumber(quotes: Quote[]) { const current = quotes.reduce((max, quote) => { const match = quote.number.match(/AN-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `AN-2026-${String(current + 1).padStart(3, '0')}` }
 function addDays(date: string, days: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return value.toISOString().slice(0, 10) }
 function today() { return new Date().toISOString().slice(0, 10) }
-function monthLabel(date: string) { return new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
+function monthLabel(date: string) { return formatMonthYear(date) }
 function advanceBillingDate(date: string, interval: Contract['billingInterval']) { const value = new Date(`${date}T12:00:00`); if (interval === 'monthly') value.setMonth(value.getMonth() + 1); else if (interval === 'quarterly') value.setMonth(value.getMonth() + 3); else if (interval === 'yearly') value.setFullYear(value.getFullYear() + 1); return value.toISOString().slice(0, 10) }
 function makeActivity(customerId: string, type: CustomerActivity['type'], title: string, detail?: string): CustomerActivity { return { id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, customerId, type, title, detail, createdAt: new Date().toISOString() } }
-function formatDate(date: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${date}T12:00:00`)) }
+function formatDate(date: string) { return formatLocaleDate(date) }
 function mergeAppSettings(changes?: Partial<AppSettings>, base: AppSettings = defaultAppSettings): AppSettings {
   return {
     ...base,

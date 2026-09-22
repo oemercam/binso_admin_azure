@@ -1,5 +1,6 @@
 const CHF_FORMATTERS = new Map<string, Intl.NumberFormat>()
 const DATE_FORMATTER = new Intl.DateTimeFormat('de-CH')
+const DATE_TIME_FORMATTER = new Intl.DateTimeFormat('de-CH', { dateStyle: 'short', timeStyle: 'short' })
 const MONTH_YEAR_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' })
 const MONTH_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'long' })
 const MONTH_SHORT_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'short' })
@@ -39,6 +40,12 @@ export function isoFromDate(value: Date) {
 export function formatDate(value?: string | null, fallback = '–') {
   const date = dateFromIso(value)
   return date ? DATE_FORMATTER.format(date) : fallback
+}
+
+export function formatDateTime(value?: string | null, fallback = '–') {
+  if (!value) return fallback
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? fallback : DATE_TIME_FORMATTER.format(date)
 }
 
 export function formatMonthYear(value: string | Date) {

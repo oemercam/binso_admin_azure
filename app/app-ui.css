@@ -1,7 +1,6 @@
 /* Binso Admin canonical application UI ownership.
    Historical version-specific geometry was consolidated here. */
 :root{
-  --app-mobile-gutter: clamp(14px, 4vw, 18px);
   --app-mobile-header-height: 56px;
   --header-background: var(--bg);
   --nav-row-height: 48px;

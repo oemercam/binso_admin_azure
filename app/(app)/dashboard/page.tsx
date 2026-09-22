@@ -8,8 +8,8 @@ import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
 import { effectiveInvoiceStatus, invoiceOpenAmount } from '@/modules/invoices/status'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
-
-const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 })
+import { formatChf } from '@/lib/format/locale'
+const chf = (value: number) => formatChf(value, { maximumFractionDigits: 0 })
 
 export default function DashboardPage() {
   const user = useCurrentUser()
@@ -34,10 +34,10 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
     <section className="page">
       <PageHeader eyebrow={role === 'owner' ? 'INHABER' : 'ADMINISTRATION'} title="Dashboard" description="Geschäft, Aufträge und Liquidität auf einen Blick." />
       <div className="metric-strip owner-metrics">
-        <Metric label="Geleisteter Umsatz" value={chf.format(deliveredRevenue)} detail="aus erfassten Zeiten" />
-        <Metric label="Noch nicht verrechnet" value={chf.format(billableValue)} detail={`${billableHours} h abrechenbar`} />
-        <Metric label="Offene Rechnungen" value={chf.format(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
-        <Metric label="Deckungsbeitrag" value={chf.format(contribution)} detail={`Marge ${margin} %`} />
+        <Metric label="Geleisteter Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
+        <Metric label="Noch nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
+        <Metric label="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
+        <Metric label="Deckungsbeitrag" value={chf(contribution)} detail={`Marge ${margin} %`} />
       </div>
 
       <div className="dashboard-layout">
@@ -55,7 +55,7 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       <nav className="mobile-dashboard-summary" aria-label="Dashboard Bereiche">
         <Link href="/orders" className="hub-row"><span><strong>Aufträge</strong><small>{store.orders.filter((order) => order.status === 'active').length} aktive Mandate</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/quotes" className="hub-row"><span><strong>Pipeline</strong><small>{store.quotes.filter((quote) => ['draft','sent'].includes(quote.status)).length} offene Angebote</small></span><Icon name="chevron" size={15}/></Link>
-        <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{chf.format(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{chf(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/finance" className="hub-row"><span><strong>Finanzen</strong><small>Marge, Kosten und Liquidität</small></span><Icon name="chevron" size={15}/></Link>
       </nav>
 
@@ -81,8 +81,8 @@ function OwnerDashboard({ role }: { role: 'owner' | 'admin' }) {
       </section>
 
       <div className="dashboard-bottom-grid">
-        <section className="section-block"><SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte"/><div className="compact-list">{store.quotes.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span><span>{chf.format(quote.amount)}</span><Status value={quote.status}/></Link>)}</div></section>
-        <section className="section-block"><SectionTitle title="Zahlungen" subtitle="Zuletzt verbucht"/><div className="compact-list">{store.payments.slice(0, 5).map((payment) => { const invoice = store.invoices.find((item) => item.id === payment.invoiceId); return <Link href={`/invoices?view=${payment.invoiceId}`} key={payment.id}><span className="primary-cell"><strong>{invoice?.number ?? payment.invoiceId}</strong><small>{payment.date} · {payment.method}</small></span><strong>{chf.format(payment.amount)}</strong></Link> })}</div></section>
+        <section className="section-block"><SectionTitle title="Sales Pipeline" subtitle="Angebote und nächste Schritte"/><div className="compact-list">{store.quotes.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small>{quote.customerName}</small></span><span>{chf(quote.amount)}</span><Status value={quote.status}/></Link>)}</div></section>
+        <section className="section-block"><SectionTitle title="Zahlungen" subtitle="Zuletzt verbucht"/><div className="compact-list">{store.payments.slice(0, 5).map((payment) => { const invoice = store.invoices.find((item) => item.id === payment.invoiceId); return <Link href={`/invoices?view=${payment.invoiceId}`} key={payment.id}><span className="primary-cell"><strong>{invoice?.number ?? payment.invoiceId}</strong><small>{payment.date} · {payment.method}</small></span><strong>{chf(payment.amount)}</strong></Link> })}</div></section>
       </div>
       </div>
     </section>
@@ -101,7 +101,7 @@ function FinanceDashboard() {
   return (
     <section className="page">
       <PageHeader eyebrow="BUCHHALTUNG" title="Finanzübersicht" description="Forderungen, Zahlungen und anstehende Aufgaben." />
-      <div className="metric-strip"><Metric label="Offene Forderungen" value={chf.format(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf.format(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf.format(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf.format(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
+      <div className="metric-strip"><Metric label="Offene Forderungen" value={chf(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
       <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Demo-Verlauf"/><RevenueChart/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
     </section>
   )
