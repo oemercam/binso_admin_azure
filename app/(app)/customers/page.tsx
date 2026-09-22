@@ -102,7 +102,7 @@ export default function CustomersPage() {
 
       {open && (
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet mobile-fullscreen-sheet" onSubmit={createCustomer} onMouseDown={(e) => e.stopPropagation()}>
+          <form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={createCustomer} onMouseDown={(e) => e.stopPropagation()}>
             <div className="sheet-grabber"/>
             <div className="sheet-heading"><div><strong>Kunde erfassen</strong><span>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
             <CustomerFields form={form} setForm={setForm}/>
@@ -124,7 +124,7 @@ export default function CustomersPage() {
     }
     return (
       <div className="overlay-layer sheet-layer" onMouseDown={onClose}>
-        <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
+        <form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
           <div className="sheet-grabber"/>
           <div className="sheet-heading"><div><strong>{customer.name}</strong><span>{customer.customerNo} · Kundendaten bearbeiten</span></div><CloseButton onClick={onClose} /></div>
           <div className="form-grid">

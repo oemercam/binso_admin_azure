@@ -81,7 +81,7 @@ export default function OrdersPage() {
 
       {open && (
         <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet mobile-fullscreen-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
+          <form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={save} onMouseDown={(e) => e.stopPropagation()}>
             <div className="sheet-grabber"/>
             <div className="sheet-heading"><div><strong>Auftrag erstellen</strong><span>Neues Mandat oder Projekt eröffnen.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
             <div className="form-grid">
