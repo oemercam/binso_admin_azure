@@ -5,7 +5,6 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
       .then(cache => cache.add(OFFLINE_URL))
-      .then(() => self.skipWaiting())
   )
 })
 
@@ -59,20 +58,46 @@ self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
+function safeAppPath(value) {
+  try {
+    const target = new URL(typeof value === 'string' ? value : '/', self.location.origin)
+    if (target.origin !== self.location.origin) return '/'
+    return `${target.pathname}${target.search}${target.hash}`
+  } catch {
+    return '/'
+  }
+}
+
+function readPushPayload(event) {
+  const fallback = { title: 'Binso Admin', body: 'Neue Benachrichtigung', url: '/', tag: 'binso-admin' }
+  if (!event.data) return fallback
+  try {
+    const value = event.data.json()
+    return {
+      title: typeof value?.title === 'string' && value.title.trim() ? value.title.slice(0, 120) : fallback.title,
+      body: typeof value?.body === 'string' ? value.body.slice(0, 500) : fallback.body,
+      url: safeAppPath(value?.url),
+      tag: typeof value?.tag === 'string' && value.tag.trim() ? value.tag.slice(0, 120) : fallback.tag,
+    }
+  } catch {
+    return fallback
+  }
+}
+
 self.addEventListener('push', event => {
-  const data = event.data?.json() ?? { title: 'Binso Admin', body: 'Neue Benachrichtigung' }
+  const data = readPushPayload(event)
   event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
     icon: '/icons/app-192.png',
     badge: '/icons/app-192.png',
-    data: { url: data.url || '/' },
-    tag: data.tag || 'binso-admin'
+    data: { url: data.url },
+    tag: data.tag
   }))
 })
 
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  const target = event.notification.data?.url || '/'
+  const target = safeAppPath(event.notification.data?.url)
   event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
     const existing = clients.find(client => 'focus' in client)
     if (existing) { existing.navigate(target); return existing.focus() }

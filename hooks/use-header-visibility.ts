@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useDeviceEnvironment } from '@/components/providers/device-environment-provider'
+import { subscribeWindowScroll } from '@/lib/browser/window-scroll'
 
 export function useHeaderVisibility() {
   const pathname = usePathname()
@@ -38,26 +39,19 @@ export function useHeaderVisibility() {
     const reset = window.setTimeout(() => commitHidden(false), 0)
     if (!isMobileLayout) return () => window.clearTimeout(reset)
 
-    let frame = 0
-    const evaluate = () => {
-      frame = 0
-      const currentY = Math.max(0, window.scrollY)
+    const onScroll = (currentY: number) => {
       const delta = currentY - lastScrollY.current
       if (currentY < 24) commitHidden(false)
       else if (delta > 8) commitHidden(true)
       else if (delta < -6) commitHidden(false)
       lastScrollY.current = currentY
     }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(evaluate)
-    }
 
     lastScrollY.current = Math.max(0, window.scrollY)
-    window.addEventListener('scroll', onScroll, { passive: true })
+    const unsubscribe = subscribeWindowScroll(onScroll)
     return () => {
       window.clearTimeout(reset)
-      if (frame) cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', onScroll)
+      unsubscribe()
     }
   }, [isMobileLayout])
 

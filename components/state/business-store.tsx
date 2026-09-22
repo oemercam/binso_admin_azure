@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -18,7 +19,7 @@ import {
   supplierInvoices as seedSupplierInvoices,
   suppliers as seedSuppliers,
   timeEntries as seedTimeEntries,
-} from '@/lib/data/demo'
+} from '@/lib/data/local-reference-data'
 import {
   orderAssignmentRules as seedOrderAssignmentRules,
   orderPolicies as seedOrderPolicies,
@@ -28,6 +29,7 @@ import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/docu
 import { defaultAppSettings } from '@/lib/data/app-settings'
 import type {
   AppSettings,
+  AppUser,
   CompanyProfile,
   Customer,
   DocumentTemplates,
@@ -48,6 +50,10 @@ import type { TimeEvidence } from '@/modules/time/types'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { createDefaultOrderPolicy } from '@/modules/orders/defaults'
 import { readStorage, removeStorage, writeStorage } from '@/lib/browser/storage'
+import { addDaysIso, formatDate, todayIso } from '@/lib/format/locale'
+import { calculateInvoiceTotals, recalculateInvoice, roundMoney } from '@/modules/invoices/calculations'
+import { recalculateQuote } from '@/modules/quotes/calculations'
+import { nextInvoiceNumber, nextQuoteNumber } from '@/modules/documents/numbering'
 
 type BusinessState = {
   customers: Customer[]
@@ -103,21 +109,33 @@ type BusinessStore = BusinessState & {
   updateQuote: (id: string, changes: Partial<Quote>) => void
   createQuote: (input: CreateQuoteInput) => Quote | null
   createQuoteRevision: (quoteId: string) => Quote | null
-  sendQuote: (id: string, to: string) => Quote | null
+  markQuoteSent: (id: string, to: string) => Quote | null
   createOrderFromQuote: (quoteId: string) => Order | null
   createInvoiceFromTimes: (input: CreateInvoiceInput) => Invoice | null
   updateInvoiceDraft: (id: string, changes: Partial<Invoice>) => Invoice | null
-  sendInvoice: (id: string, to: string, mode?: 'invoice' | 'reminder') => Invoice | null
+  markInvoiceSent: (id: string, to: string, mode?: 'invoice' | 'reminder') => Invoice | null
   cancelInvoice: (id: string) => Invoice | null
   recordPayment: (invoiceId: string, amount: number, method: Payment['method'], date: string) => void
   updateCompanyProfile: (changes: Partial<CompanyProfile>) => void
   updateDocumentTemplates: (changes: Partial<DocumentTemplates>) => void
   updateAppSettings: (changes: Partial<AppSettings>) => void
-  resetDemo: () => void
+  resetLocalData: () => void
 }
 
-const STORAGE_KEY = 'binso-admin-demo-v12-responsive'
-const LEGACY_STORAGE_KEYS = ['binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
+const STORAGE_VERSION = 14
+const STORAGE_KEY = `binso-admin-local-v${STORAGE_VERSION}`
+const LEGACY_STORAGE_KEYS = ['binso-admin-local-v13', 'binso-admin-demo-v12-responsive', 'binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
+
+type PersistedBusinessState = {
+  version: number
+  state: Partial<BusinessState>
+}
+
+function parsePersistedState(raw: string): Partial<BusinessState> {
+  const parsed = JSON.parse(raw) as Partial<BusinessState> | PersistedBusinessState
+  if ('state' in parsed && parsed.state && typeof parsed.state === 'object') return parsed.state
+  return parsed as Partial<BusinessState>
+}
 
 function freshState(): BusinessState {
   return {
@@ -139,10 +157,47 @@ function freshState(): BusinessState {
   }
 }
 
+
+function scopeStateForUser(state: BusinessState, user: AppUser): BusinessState {
+  if (user.role !== 'employee') return state
+
+  const employee = state.employees.find((item) => item.email.toLowerCase() === user.email.toLowerCase())
+  if (!employee) {
+    return {
+      ...state,
+      customers: [], suppliers: [], quotes: [], orders: [], timeEntries: [], invoices: [], payments: [], supplierInvoices: [], employees: [], timeEvidence: [], orderPolicies: [], orderAssignmentRules: [],
+    }
+  }
+
+  const assignments = state.orderAssignmentRules.filter((rule) => rule.active && rule.personId === employee.id)
+  const orderIds = new Set(assignments.map((rule) => rule.orderId))
+  return {
+    ...state,
+    customers: [],
+    suppliers: [],
+    quotes: [],
+    orders: state.orders.filter((order) => orderIds.has(order.id)),
+    timeEntries: state.timeEntries.filter((entry) => entry.personId === employee.id && orderIds.has(entry.orderId)),
+    invoices: [],
+    payments: [],
+    supplierInvoices: [],
+    employees: [employee],
+    timeEvidence: state.timeEvidence.filter((evidence) => evidence.personId === employee.id && orderIds.has(evidence.orderId)),
+    orderPolicies: state.orderPolicies.filter((policy) => orderIds.has(policy.orderId)),
+    orderAssignmentRules: assignments,
+  }
+}
+
+function storageKeyForUser(user: AppUser) {
+  const safeId = (user.id || user.email).replace(/[^a-zA-Z0-9._-]+/g, '_')
+  return `${STORAGE_KEY}:${safeId}`
+}
+
 const BusinessContext = createContext<BusinessStore | null>(null)
 
-export function BusinessStoreProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<BusinessState>(freshState)
+export function BusinessStoreProvider({ user, children }: { user: AppUser; children: ReactNode }) {
+  const userStorageKey = storageKeyForUser(user)
+  const [state, setState] = useState<BusinessState>(() => scopeStateForUser(freshState(), user))
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
@@ -150,7 +205,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
     queueMicrotask(() => {
       if (cancelled) return
       try {
-        let raw = readStorage(STORAGE_KEY)
+        let raw = readStorage(userStorageKey)
 
         if (!raw) {
           for (const key of LEGACY_STORAGE_KEYS) {
@@ -163,13 +218,12 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
         }
 
         if (raw) {
-          const parsed = JSON.parse(raw) as Partial<BusinessState>
-          const seeded = freshState()
+          const parsed = parsePersistedState(raw)
+          const seeded = scopeStateForUser(freshState(), user)
 
-          // Demo releases must always contain usable reference data. Older browser
-          // snapshots could contain empty arrays from previous UI-only versions and
-          // would otherwise make whole modules appear blank after an upgrade.
-          setState({
+          // Local reference data remains usable across compatible development snapshots.
+          // Empty legacy arrays fall back to the current seed set so modules do not disappear.
+          setState(scopeStateForUser({
             ...seeded,
             ...parsed,
             customers: parsed.customers?.length ? parsed.customers : seeded.customers,
@@ -187,21 +241,67 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
             companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}) },
             documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
             appSettings: mergeAppSettings(parsed.appSettings),
-          })
+          }, user))
         }
       } catch {
-        // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
+        // Ungültige lokale Daten werden ignoriert; Referenzdaten bleiben verfügbar.
       } finally {
         if (!cancelled) setHydrated(true)
       }
     })
     return () => { cancelled = true }
-  }, [])
+  }, [user, userStorageKey])
+
+  const pendingPersistence = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const latestState = useRef(state)
+
+  useEffect(() => {
+    latestState.current = state
+  }, [state])
 
   useEffect(() => {
     if (!hydrated) return
-    writeStorage(STORAGE_KEY, JSON.stringify(state))
-  }, [state, hydrated])
+
+    const persist = () => {
+      pendingPersistence.current = null
+      writeStorage(userStorageKey, JSON.stringify({
+        version: STORAGE_VERSION,
+        state: latestState.current,
+      } satisfies PersistedBusinessState))
+    }
+
+    if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
+    pendingPersistence.current = setTimeout(persist, 250)
+
+    return () => {
+      if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
+      pendingPersistence.current = null
+    }
+  }, [state, hydrated, userStorageKey])
+
+  useEffect(() => {
+    if (!hydrated) return
+
+    const persistNow = () => {
+      if (pendingPersistence.current) clearTimeout(pendingPersistence.current)
+      pendingPersistence.current = null
+      writeStorage(userStorageKey, JSON.stringify({
+        version: STORAGE_VERSION,
+        state: latestState.current,
+      } satisfies PersistedBusinessState))
+    }
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') persistNow()
+    }
+
+    window.addEventListener('pagehide', persistNow)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.removeEventListener('pagehide', persistNow)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [hydrated, userStorageKey])
 
   const store = useMemo<BusinessStore>(() => ({
     ...state,
@@ -293,14 +393,14 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       })
     },
     updateQuote(id, changes) {
-      setState((current) => ({ ...current, quotes: current.quotes.map((quote) => quote.id === id ? recalcQuote({ ...quote, ...changes }) : quote) }))
+      setState((current) => ({ ...current, quotes: current.quotes.map((quote) => quote.id === id ? recalculateQuote({ ...quote, ...changes }) : quote) }))
     },
     createQuote(input) {
       const customer = state.customers.find((item) => item.id === input.customerId)
       if (!customer || !input.lines.length) return null
-      const quote: Quote = recalcQuote({
+      const quote: Quote = recalculateQuote({
         id: `quo-${Date.now()}`,
-        number: nextQuoteNumber(state.quotes),
+        number: nextQuoteNumber(state.quotes.map((item) => item.number)),
         customerId: customer.id,
         customerName: customer.name,
         title: input.title,
@@ -326,7 +426,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
     createQuoteRevision(quoteId) {
       const source = state.quotes.find((item) => item.id === quoteId)
       if (!source) return null
-      const revision: Quote = recalcQuote({
+      const revision: Quote = recalculateQuote({
         ...source,
         id: `quo-${Date.now()}`,
         version: source.version + 1,
@@ -339,7 +439,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       setState((current) => ({ ...current, quotes: [revision, ...current.quotes] }))
       return revision
     },
-    sendQuote(id, to) {
+    markQuoteSent(id, to) {
       const quote = state.quotes.find((item) => item.id === id)
       if (!quote || !to.trim()) return null
       const updated: Quote = { ...quote, status: 'sent', sentAt: new Date().toISOString(), sentTo: to.trim(), recipientEmail: to.trim() }
@@ -350,7 +450,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
       const quote = state.quotes.find((item) => item.id === quoteId)
       if (!quote) return null
       if (state.appSettings.workflow.requireQuoteAcceptanceBeforeOrder && quote.status !== 'accepted') return null
-      const existing = state.orders.find((order) => order.name === quote.title && order.customerId === quote.customerId)
+      const existing = state.orders.find((order) => order.sourceQuoteId === quote.id)
       if (existing) return existing
       const hours = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity, 0)
       const weightedRevenue = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
@@ -358,6 +458,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
         id: `ord-${Date.now()}`,
         customerId: quote.customerId,
         customerName: quote.customerName,
+        sourceQuoteId: quote.id,
         name: quote.title,
         mandateRef: quote.number,
         budgetHours: hours || 40,
@@ -393,11 +494,11 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
         sourceTimeEntryIds: [entry.id],
       }))
       const lines = [...timeLines, ...extraLines]
-      const totals = invoiceTotals(lines)
+      const totals = calculateInvoiceTotals(lines)
       const issueDate = today()
       const invoice: Invoice = {
         id: `inv-${Date.now()}`,
-        number: nextInvoiceNumber(state.invoices),
+        number: nextInvoiceNumber(state.invoices.map((item) => item.number)),
         customerId: customer.id,
         customerName: customer.name,
         orderId: order?.id,
@@ -429,11 +530,11 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
     updateInvoiceDraft(id, changes) {
       const existing = state.invoices.find((item) => item.id === id)
       if (!existing || existing.status !== 'draft') return null
-      const updated = recalcInvoice({ ...existing, ...changes })
+      const updated = recalculateInvoice({ ...existing, ...changes })
       setState((current) => ({ ...current, invoices: current.invoices.map((item) => item.id === id ? updated : item) }))
       return updated
     },
-    sendInvoice(id, to, mode = 'invoice') {
+    markInvoiceSent(id, to, mode = 'invoice') {
       const invoice = state.invoices.find((item) => item.id === id)
       if (!invoice || !to.trim()) return null
       const now = new Date().toISOString()
@@ -471,7 +572,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
         payments: [payment, ...current.payments],
         invoices: current.invoices.map((item) => {
           if (item.id !== invoiceId) return item
-          const paidAmount = round2(Math.min(item.amount, item.paidAmount + booked))
+          const paidAmount = roundMoney(Math.min(item.amount, item.paidAmount + booked))
           return { ...item, paidAmount, status: paidAmount >= item.amount ? 'paid' : 'partial' }
         }),
       }))
@@ -485,11 +586,11 @@ export function BusinessStoreProvider({ children }: { children: ReactNode }) {
     updateAppSettings(changes) {
       setState((current) => ({ ...current, appSettings: mergeAppSettings(changes, current.appSettings) }))
     },
-    resetDemo() {
-      removeStorage(STORAGE_KEY)
-      setState(freshState())
+    resetLocalData() {
+      removeStorage(userStorageKey)
+      setState(scopeStateForUser(freshState(), user))
     },
-  }), [state])
+  }), [state, user, userStorageKey])
 
   return <BusinessContext.Provider value={store}>{children}</BusinessContext.Provider>
 }
@@ -500,26 +601,14 @@ export function useBusinessStore() {
   return value
 }
 
-function recalcInvoice(invoice: Invoice): Invoice { return { ...invoice, ...invoiceTotals(invoice.lines) } }
-function recalcQuote(quote: Quote): Quote { return { ...quote, amount: round2(quote.lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)) } }
-function invoiceTotals(lines: InvoiceLine[]) {
-  const subtotal = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0))
-  const vatAmount = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice * (line.vatRate / 100), 0))
-  return { subtotal, vatAmount, amount: round2(subtotal + vatAmount) }
-}
-function round2(value: number) { return Math.round((value + Number.EPSILON) * 100) / 100 }
-function nextInvoiceNumber(invoices: Invoice[]) { const current = invoices.reduce((max, invoice) => { const match = invoice.number.match(/RE-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `RE-2026-${String(current + 1).padStart(3, '0')}` }
-function nextQuoteNumber(quotes: Quote[]) { const current = quotes.reduce((max, quote) => { const match = quote.number.match(/AN-2026-(\d+)/); return match ? Math.max(max, Number(match[1])) : max }, 0); return `AN-2026-${String(current + 1).padStart(3, '0')}` }
-function addDays(date: string, days: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return value.toISOString().slice(0, 10) }
-function today() { return new Date().toISOString().slice(0, 10) }
-function formatDate(date: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${date}T12:00:00`)) }
+function addDays(date: string, days: number) { return addDaysIso(date, days) }
+function today() { return todayIso() }
+
 function mergeAppSettings(changes?: Partial<AppSettings>, base: AppSettings = defaultAppSettings): AppSettings {
   return {
     ...base,
     ...(changes ?? {}),
     mail: { ...base.mail, ...(changes?.mail ?? {}) },
-    reminders: { ...base.reminders, ...(changes?.reminders ?? {}) },
-    payroll: { ...base.payroll, ...(changes?.payroll ?? {}) },
     workflow: { ...base.workflow, ...(changes?.workflow ?? {}) },
     notifications: { ...base.notifications, ...(changes?.notifications ?? {}) },
   }

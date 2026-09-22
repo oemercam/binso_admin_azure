@@ -16,6 +16,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
+    let reconnectTimer = 0
     queueMicrotask(() => {
       if (!cancelled) setState(navigator.onLine ? 'online' : 'offline')
     })
@@ -23,13 +24,15 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     const onOffline = () => setState('offline')
     const onOnline = () => {
       setState('reconnecting')
-      window.setTimeout(() => setState('online'), 800)
+      window.clearTimeout(reconnectTimer)
+      reconnectTimer = window.setTimeout(() => { if (!cancelled) setState('online') }, 800)
     }
 
     window.addEventListener('offline', onOffline)
     window.addEventListener('online', onOnline)
     return () => {
       cancelled = true
+      window.clearTimeout(reconnectTimer)
       window.removeEventListener('offline', onOffline)
       window.removeEventListener('online', onOnline)
     }

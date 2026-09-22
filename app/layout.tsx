@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import './globals.css'
-import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
 import './app-ui.css'
 import { appIdentity } from '@/lib/config/app-identity'

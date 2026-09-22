@@ -10,10 +10,13 @@ import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { useFeedback } from '@/components/ui/feedback'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { formatDate, formatMonth, formatMonthYear, isSameMonthIso, normalizeSearch, todayIso } from '@/lib/format/locale'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
+import { canApproveTime as roleCanApproveTime, canInvoiceTime, canWriteTime } from '@/lib/auth/capabilities'
 import type { WorkerType } from '@/types/domain'
+import { evidenceFrequencyLabel, workerTypeLabel } from '@/modules/orders/labels'
 import { getTimeEntryApprovalEligibility, getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { resolveTimeTrackingPolicy } from '@/modules/orders/policies'
 
@@ -24,8 +27,8 @@ export default function TimePage() {
   const store = useBusinessStore()
   const user = useCurrentUser()
   const currentEmployee = store.employees.find((item) => item.email.toLowerCase() === user.email.toLowerCase())
-  const canWrite = user.role !== 'finance'
-  const canApprove = user.role === 'owner' || user.role === 'admin' || (user.role === 'employee' && store.appSettings.workflow.allowSelfApproval)
+  const canWrite = canWriteTime(user.role)
+  const canApprove = roleCanApproveTime(user.role, store.appSettings.workflow.allowSelfApproval)
 
   const assignedOrderIds = new Set(
     store.orderAssignmentRules
@@ -40,7 +43,7 @@ export default function TimePage() {
   const [orderId, setOrderId] = useState(availableOrders[0]?.id ?? '')
   const [hours, setHours] = useState('8')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(todayIso())
   const [personId, setPersonId] = useState(currentEmployee?.id ?? '')
   const [selected, setSelected] = useState<string[]>([])
   const [billableEntry, setBillableEntry] = useState(true)
@@ -79,14 +82,16 @@ export default function TimePage() {
       : store.timeEntries,
     [currentEmployee, store.timeEntries, user.role],
   )
-  const filteredEntries = useMemo(() => { const q = query.trim().toLocaleLowerCase('de-CH'); return q ? visibleEntries.filter((entry) => `${entry.orderName} ${entry.personName} ${entry.description ?? ''} ${entry.customerName}`.toLocaleLowerCase('de-CH').includes(q)) : visibleEntries }, [query, visibleEntries])
-  const total = visibleEntries.reduce((sum, entry) => sum + entry.hours, 0)
-  const billable = visibleEntries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
+  const filteredEntries = useMemo(() => { const q = normalizeSearch(query); return q ? visibleEntries.filter((entry) => normalizeSearch(`${entry.orderName} ${entry.personName} ${entry.description ?? ''} ${entry.customerName}`).includes(q)) : visibleEntries }, [query, visibleEntries])
+  const currentMonthEntries = visibleEntries.filter((entry) => isSameMonthIso(entry.date))
+  const total = currentMonthEntries.reduce((sum, entry) => sum + entry.hours, 0)
+  const billable = currentMonthEntries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)
   const unbilled = visibleEntries.filter((entry) => getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules).eligible)
-  const selectedEntries = useMemo(() => unbilled.filter((entry) => selected.includes(entry.id)), [selected, unbilled])
+  const currentMonthUnbilled = unbilled.filter((entry) => isSameMonthIso(entry.date))
+  const selectedEntries = unbilled.filter((entry) => selected.includes(entry.id))
   const selectedCustomerIds = new Set(selectedEntries.map((entry) => entry.customerId))
   const selectedOrderIds = new Set(selectedEntries.map((entry) => entry.orderId))
-  const canInvoice = user.role !== 'employee' && user.role !== 'finance' && selectedEntries.length > 0 && selectedCustomerIds.size === 1 && selectedOrderIds.size === 1
+  const canInvoice = canInvoiceTime(user.role) && selectedEntries.length > 0 && selectedCustomerIds.size === 1 && selectedOrderIds.size === 1
 
   function save(event: React.FormEvent) {
     event.preventDefault()
@@ -141,7 +146,7 @@ export default function TimePage() {
     })
     setDescription('')
     setOpen(false)
-    if (effective?.evidence.required) feedback.info(`Zeit gespeichert. Für ${person.name} ist ein ${frequencyLabel(effective.evidence.frequency).toLowerCase()}er Nachweis erforderlich.`)
+    if (effective?.evidence.required) feedback.info(`Zeit gespeichert. Für ${person.name} ist ein ${evidenceFrequencyLabel(effective.evidence.frequency).toLowerCase()}er Nachweis erforderlich.`)
     else feedback.success('Zeit gespeichert.')
   }
 
@@ -167,26 +172,26 @@ export default function TimePage() {
       <PageHeader
         eyebrow="ZEIT"
         title="Zeiterfassung"
-        description="Zeiten erfassen, Nachweise prüfen, freigeben und direkt fakturieren."
+        description="Zeiten erfassen, prüfen und verrechnen."
         action={canWrite ? <button className="button primary page-primary-action" onClick={() => setOpen(true)}><Icon name="plus" size={16}/><span>Zeit erfassen</span></button> : undefined}
       />
 
-      <div className="module-toolbar"><SearchField value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Zeiten durchsuchen" aria-label="Zeiten durchsuchen"/><span className="toolbar-meta">{filteredEntries.length} Einträge</span></div><div className="time-hero"><div><span>September</span><strong>{total} h</strong><small>erfasst</small></div><div className="time-hero-progress"><i style={{ width: `${Math.min(100, (total / 168) * 100)}%` }}/></div><div><span>Verrechenbar</span><strong>{billable} h</strong><small>{unbilled.reduce((sum, entry) => sum + entry.hours, 0)} h bereit</small></div></div>
+      <div className="module-toolbar"><SearchField value={query} onValueChange={setQuery} placeholder="Zeiten durchsuchen" aria-label="Zeiten durchsuchen"/><span className="toolbar-meta">{filteredEntries.length} Einträge</span></div><div className="time-hero"><div><span>{formatMonth(todayIso())}</span><strong>{total} h</strong><small>erfasst</small></div><div className="time-hero-progress"><i style={{ width: `${Math.min(100, (total / 168) * 100)}%` }}/></div><div><span>Verrechenbar</span><strong>{billable} h</strong><small>{currentMonthUnbilled.reduce((sum, entry) => sum + entry.hours, 0)} h bereit</small></div></div>
 
-      {user.role !== 'employee' && user.role !== 'finance' && (
+      {canInvoiceTime(user.role) && (
         <div className="selection-bar"><div><strong>{selectedEntries.length} Zeiten ausgewählt</strong><span>{canInvoice ? 'Bereit für Rechnung' : selectedEntries.length ? 'Für eine Rechnung nur Zeiten desselben Auftrags auswählen' : 'Freigegebene und vollständige Zeiten markieren'}</span></div><button className="button primary" disabled={!canInvoice} onClick={createInvoiceFromSelected}><Icon name="invoices" size={15}/> Rechnung aus Zeiten</button></div>
       )}
 
       <div className="data-list operational-desktop-list">
-        <div className="data-row time-grid-v5 data-head"><span/><span>Datum</span><span>Auftrag / Person</span><span>Tätigkeit</span><span>Stunden</span><span>Abrechnung</span></div>
+        <div className="data-row time-grid data-head"><span/><span>Datum</span><span>Auftrag / Person</span><span>Tätigkeit</span><span>Stunden</span><span>Abrechnung</span></div>
         {filteredEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           const approval = getTimeEntryApprovalEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
           return (
-            <div className="data-row time-grid-v5" key={entry.id}>
-              <span>{user.role !== 'employee' && user.role !== 'finance' && <Checkbox disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
+            <div className="data-row time-grid" key={entry.id}>
+              <span>{canInvoiceTime(user.role) && <Checkbox disabled={!billing.eligible} checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</span>
               <span>{formatDate(entry.date)}</span>
-              <span className="primary-cell"><strong>{entry.orderName}</strong><small>{entry.personName} · {workerLabel(entry.workerType)}</small></span>
+              <span className="primary-cell"><strong>{entry.orderName}</strong><small>{entry.personName} · {workerTypeLabel(entry.workerType)}</small></span>
               <span>{entry.description || '–'}</span>
               <span><strong>{entry.hours} h</strong></span>
               <span className="time-status-actions">
@@ -203,16 +208,16 @@ export default function TimePage() {
       <div className="mobile-record-list operational-mobile-list">
         {filteredEntries.map((entry) => {
           const billing = getTimeEntryBillingEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{user.role !== 'employee' && user.role !== 'finance' && billing.eligible && <Checkbox checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
+          return <article className="mobile-record operational-row" key={entry.id}><div className="record-top"><span><strong>{entry.hours} h · {entry.description || 'Zeiteintrag'}</strong><small>{entry.orderName} · {entry.personName}</small></span>{canInvoiceTime(user.role) && billing.eligible && <Checkbox checked={selected.includes(entry.id)} onChange={(e) => setSelected((current) => e.target.checked ? [...current, entry.id] : current.filter((id) => id !== entry.id))}/>}</div><div className="record-meta operational-status-line"><span>{formatDate(entry.date)}</span><span>{entry.invoicedInvoiceId ? 'Verrechnet' : billing.reason}</span></div></article>
         })}
       </div>
 
       {open && canWrite && (
         <StandardFormSheet open title={<>Zeit erfassen</>} description={<>Direkt einem Auftrag und Leistungserbringer zuordnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="time-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="time-page-sheet-1" className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></>}>{formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
-              <label className="full"><span>Auftrag *</span><Select searchable searchPlaceholder="Aufträge durchsuchen" value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
-              <label className="full"><span>Leistungserbringer *</span><Select searchable searchPlaceholder="Leistungserbringer durchsuchen" value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</Select></label>
-              <label><span>Datum *</span><DatePicker value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required aria-label="Datum"/></label>
+              <label className="full"><span>Auftrag *</span><Select aria-label="Auftrag" searchable searchPlaceholder="Aufträge durchsuchen" value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</Select></label>
+              <label className="full"><span>Leistungserbringer *</span><Select aria-label="Leistungserbringer" searchable searchPlaceholder="Leistungserbringer durchsuchen" value={effectivePersonId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerTypeLabel(person.workerType)}</option>)}</Select></label>
+              <label><span>Datum *</span><DatePicker value={date} max={todayIso()} onChange={(e) => setDate(e.target.value)} required aria-label="Datum"/></label>
               <label><span>Stunden *</span><Input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} required/></label>
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>
               <label className="full"><span>Beschreibung</span><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Kurze Beschreibung der ausgeführten Arbeiten"/></label>
@@ -236,7 +241,5 @@ function availablePeople(orderId: string, store: ReturnType<typeof useBusinessSt
 }
 
 function roundHours(hours: number, intervalMinutes: number) { const minutes = hours * 60; return Math.round(minutes / intervalMinutes) * intervalMinutes / 60 }
-function periodLabel(date: string) { return new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
-function frequencyLabel(value: string) { return value === 'daily' ? 'Täglich' : value === 'weekly' ? 'Wöchentlich' : value === 'monthly' ? 'Monatlich' : 'Kein' }
-function workerLabel(value: WorkerType) { if (value === 'hourly_employee') return 'Stundenlohn'; if (value === 'external') return 'Externe Firma'; return 'Intern' }
-function formatDate(value: string) { return new Intl.DateTimeFormat('de-CH').format(new Date(`${value}T12:00:00`)) }
+function periodLabel(date: string) { return formatMonthYear(date) }
+

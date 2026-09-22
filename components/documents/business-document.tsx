@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import type { CompanyProfile, Customer, Invoice, Quote } from '@/types/domain'
+import { formatChf, formatDate } from '@/lib/format/locale'
 
 type Props = {
   type: 'invoice' | 'quote' | 'reminder'
@@ -11,12 +12,6 @@ type Props = {
   quote?: Quote
 }
 
-const chf = new Intl.NumberFormat('de-CH', {
-  style: 'currency',
-  currency: 'CHF',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
 
 export function BusinessDocument({ type, company, customer, invoice, quote }: Props) {
   const isQuote = type === 'quote'
@@ -60,10 +55,10 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
 
         <dl className="document-meta">
           <div><dt>Nummer</dt><dd>{number}</dd></div>
-          {!isQuote && <div><dt>Rechnungsdatum</dt><dd>{fmt(invoice?.issueDate)}</dd></div>}
-          {!isQuote && <div><dt>Fällig</dt><dd>{fmt(invoice?.due)}</dd></div>}
-          {isQuote && <div><dt>Angebotsdatum</dt><dd>{fmt(quote?.issueDate)}</dd></div>}
-          {isQuote && <div><dt>Gültig bis</dt><dd>{fmt(quote?.validUntil)}</dd></div>}
+          {!isQuote && <div><dt>Rechnungsdatum</dt><dd>{formatDate(invoice?.issueDate)}</dd></div>}
+          {!isQuote && <div><dt>Fällig</dt><dd>{formatDate(invoice?.due)}</dd></div>}
+          {isQuote && <div><dt>Angebotsdatum</dt><dd>{formatDate(quote?.issueDate)}</dd></div>}
+          {isQuote && <div><dt>Gültig bis</dt><dd>{formatDate(quote?.validUntil)}</dd></div>}
           {(isQuote ? quote?.reference : invoice?.reference) && (
             <div><dt>Referenz</dt><dd>{isQuote ? quote?.reference : invoice?.reference}</dd></div>
           )}
@@ -85,16 +80,16 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
             <span>{String(index + 1).padStart(2, '0')}</span>
             <span>{line.description}</span>
             <span>{line.quantity} {line.unit}</span>
-            <span>{chf.format(line.unitPrice)}</span>
-            <strong>{chf.format(line.quantity * line.unitPrice)}</strong>
+            <span>{formatChf(line.unitPrice, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <strong>{formatChf(line.quantity * line.unitPrice, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           </div>
         ))}
       </div>
 
       <div className="document-total-block">
-        <div><span>Zwischentotal</span><strong>{chf.format(subtotal)}</strong></div>
-        <div><span>MWST</span><strong>{chf.format(vat)}</strong></div>
-        <div className="document-grand-total"><span>Total</span><strong>{chf.format(total)}</strong></div>
+        <div><span>Zwischentotal</span><strong>{formatChf(subtotal, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
+        <div><span>MWST</span><strong>{formatChf(vat, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
+        <div className="document-grand-total"><span>Total</span><strong>{formatChf(total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
       </div>
 
       {outro && <p className="document-outro">{outro}</p>}
@@ -115,9 +110,4 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
       </footer>
     </article>
   )
-}
-
-function fmt(value?: string) {
-  if (!value) return '–'
-  return new Intl.DateTimeFormat('de-CH').format(new Date(`${value}T12:00:00`))
 }

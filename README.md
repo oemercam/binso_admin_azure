@@ -1,6 +1,6 @@
 # Binso Admin
 
-Binso Admin is the internal administration application for Binso GmbH. It combines customers, offers, orders, time tracking, invoicing, finance, accounting, employees and application settings in one responsive Next.js application for desktop, mobile browser and installed PWA use.
+Binso Admin is the internal administration application for Binso GmbH. It combines customers/prospects, quotes, orders, time tracking, invoicing, finance, accounting, employees and application settings in one responsive Next.js application for desktop, mobile browser and installed PWA use.
 
 ## Stack
 
@@ -19,33 +19,35 @@ npm ci
 npm run dev
 ```
 
-Quality gates:
+Release gates:
 
 ```bash
 npm run typecheck
 npm run lint
 npm run architecture:check
+npm run test:core
 npm run build
 ```
 
-`npm run verify` runs the complete local release gate.
+`npm run verify` runs the repository verification sequence.
 
-## Project structure
+## Structure
 
-- `app/` routes, metadata, manifest and application styles
+- `app/` routes, layouts, metadata, manifest and application styles
 - `components/` shared application and design-system components
 - `hooks/` centralized interaction hooks
-- `lib/` auth, configuration, browser and HTTP infrastructure
-- `modules/` domain-specific rules and types
-- `database/` target database schema
-- `public/` canonical brand assets, generated PWA icons and service worker
-- `scripts/` architecture guardrails
+- `lib/` auth, configuration, formatting, browser and HTTP infrastructure
+- `modules/` reusable domain/business rules
+- `types/` shared domain types
+- `database/` PostgreSQL target schema
+- `public/` brand assets, PWA icons and service worker
+- `scripts/` architecture guardrails and lightweight core regression tests
 - `docs/` current architecture, design system and deployment notes
 
-## Deployment
+## Important data-layer note
 
-Production deploys from `main` and can also be started manually. GitHub Actions uses `ubuntu-24.04`, Node.js 24, deterministic `npm ci`, quality gates, a standalone deployment artifact and Azure OIDC login. See `docs/DEPLOYMENT.md`.
+The current application/reference build uses a versioned, user-scoped browser business store. Route authorization and client data minimization are implemented, but durable multi-user production persistence and authorization must ultimately be enforced by the server/database layer described in `database/schema.sql`.
 
-## Architecture
+Current external-integration boundaries are explicit: offer/invoice actions document a sent state but do not yet transmit e-mail through Microsoft Graph; time-evidence files currently persist metadata rather than file bytes; and push activation remains disabled until durable server-side subscription storage is connected.
 
-See `docs/ARCHITECTURE.md` and `docs/DESIGN_SYSTEM.md`. Historical migration reports are intentionally not kept in the production repository; Git history is the archive.
+See `docs/ARCHITECTURE.md`, `docs/DESIGN_SYSTEM.md` and `docs/DEPLOYMENT.md` for the current target architecture and release requirements.

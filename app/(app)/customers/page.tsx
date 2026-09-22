@@ -8,8 +8,12 @@ import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { useFeedback } from '@/components/ui/feedback'
+import { normalizeSearch } from '@/lib/format/locale'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { Customer } from '@/types/domain'
+import { useCurrentUser } from '@/components/state/current-user'
+import { canManageOperations } from '@/lib/auth/capabilities'
 
 const emptyCustomer = {
   name: '', contact: '', email: '', phone: '', address: '', zip: '', city: '', country: 'Schweiz', uid: '', paymentDays: 30,
@@ -17,6 +21,9 @@ const emptyCustomer = {
 
 export default function CustomersPage() {
   const store = useBusinessStore()
+  const feedback = useFeedback()
+  const user = useCurrentUser()
+  const canCreateCustomer = canManageOperations(user.role)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -30,7 +37,7 @@ export default function CustomersPage() {
     let consumed = false
     if (params.get('new') === '1') {
       setForm(emptyCustomer)
-      setOpen(true)
+      if (canCreateCustomer) setOpen(true)
       params.delete('new')
       consumed = true
     }
@@ -43,10 +50,10 @@ export default function CustomersPage() {
       const suffix = params.toString() ? `?${params.toString()}` : ''
       router.replace(`${pathname}${suffix}`, { scroll: false })
     }
-  }, [pathname, router, searchParams, store.customers])
+  }, [canCreateCustomer, pathname, router, searchParams, store.customers])
 
   const filtered = useMemo(() => {
-    const cleaned = query.trim().toLocaleLowerCase('de-CH')
+    const cleaned = normalizeSearch(query)
     if (!cleaned) return store.customers
     return store.customers.filter((customer) => `${customer.name} ${customer.customerNo} ${customer.contact ?? ''} ${customer.email ?? ''} ${customer.city ?? ''}`.toLocaleLowerCase('de-CH').includes(cleaned))
   }, [store.customers, query])
@@ -70,6 +77,7 @@ export default function CustomersPage() {
       status: 'prospect',
     }
     store.addCustomer(customer)
+    feedback.success('Interessent gespeichert.')
     setOpen(false)
     setForm(emptyCustomer)
     setEditing(customer)
@@ -81,11 +89,11 @@ export default function CustomersPage() {
         eyebrow="KUNDEN"
         title="Kunden"
         description="Kontakte und Kundendaten verwalten."
-        action={<button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kontakt erfassen</span></button>}
+        action={canCreateCustomer ? <button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kontakt erfassen</span></button> : undefined}
       />
 
       <div className="module-toolbar">
-        <SearchField value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Kunden durchsuchen" aria-label="Kunden durchsuchen" />
+        <SearchField value={query} onValueChange={setQuery} placeholder="Kunden durchsuchen" aria-label="Kunden durchsuchen" />
         <span className="toolbar-meta">{filtered.length} Einträge</span>
       </div>
 
@@ -102,7 +110,7 @@ export default function CustomersPage() {
         ))}
       </div>
 
-      {open && (
+      {canCreateCustomer && open && (
         <StandardFormSheet open title={<>Kontakt erfassen</>} description={<>Für ein erstes Angebot reichen wenige Angaben. Weitere Kundendaten können später ergänzt werden.</>} onClose={() => setOpen(false)} onSubmit={createCustomer} formId="customers-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="customers-page-sheet-1" className="button primary">Interessent speichern</button></>}>
           <div className="form-grid">
             <label className="full"><span>Firma / Name *</span><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required/></label>
@@ -123,7 +131,10 @@ export default function CustomersPage() {
     function save(event: React.FormEvent) {
       event.preventDefault()
       const updated = store.updateCustomer(customer.id, draft)
-      if (updated) onClose()
+      if (updated) {
+        feedback.success('Kundendaten gespeichert.')
+        onClose()
+      }
     }
     return (
       <StandardFormSheet open title={<>{customer.name}</>} description={<>{customer.customerNo} · Kundendaten</>} onClose={onClose} onSubmit={save} formId="customers-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="customers-page-sheet-2" className="button primary">Änderungen speichern</button></>}>
@@ -132,7 +143,7 @@ export default function CustomersPage() {
           <label><span>Ansprechperson</span><Input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
           <label><span>E-Mail</span><Input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })}/></label>
           <label><span>Telefon</span><Input value={draft.phone ?? ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })}/></label>
-          <label><span>Status</span><Select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as Customer['status'] })}><option value="prospect">Interessent</option><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></label>
+          <label><span>Status</span><Select aria-label="Status" value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as Customer['status'] })}><option value="prospect">Interessent</option><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></label>
           <label className="full"><span>Adresse</span><Input value={draft.address ?? ''} onChange={(e) => setDraft({ ...draft, address: e.target.value })}/></label>
           <label><span>PLZ</span><Input value={draft.zip ?? ''} onChange={(e) => setDraft({ ...draft, zip: e.target.value })}/></label>
           <label><span>Ort</span><Input value={draft.city ?? ''} onChange={(e) => setDraft({ ...draft, city: e.target.value })}/></label>

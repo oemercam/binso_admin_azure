@@ -1,5 +1,5 @@
 -- Binso Admin - PostgreSQL target schema (production design draft)
--- The v5 demo still uses browser localStorage. This schema is for the next Azure PostgreSQL step.
+-- The current application uses a browser reference store. This schema documents the production data model for the Azure PostgreSQL migration.
 
 create extension if not exists pgcrypto;
 
@@ -215,3 +215,67 @@ create table if not exists document_templates (
   footer_text text not null default '',
   updated_at timestamptz not null default now()
 );
+
+
+-- Current application model alignment -------------------------------------------------
+-- These additions keep the production draft aligned with the fields already used by
+-- the TypeScript domain model. They are intentionally migration-safe.
+
+alter table quotes add column if not exists issue_date date;
+alter table quotes add column if not exists recipient_name text;
+alter table quotes add column if not exists recipient_address text;
+alter table quotes add column if not exists recipient_zip text;
+alter table quotes add column if not exists recipient_city text;
+alter table quotes add column if not exists recipient_country text;
+alter table quotes add column if not exists recipient_email text;
+alter table quotes add column if not exists reference text;
+alter table quotes add column if not exists sent_to text;
+
+alter table invoices add column if not exists recipient_name text;
+alter table invoices add column if not exists recipient_address text;
+alter table invoices add column if not exists recipient_zip text;
+alter table invoices add column if not exists recipient_city text;
+alter table invoices add column if not exists recipient_country text;
+alter table invoices add column if not exists recipient_email text;
+alter table invoices add column if not exists reference text;
+alter table invoices add column if not exists sent_to text;
+alter table invoices add column if not exists last_reminder_at timestamptz;
+
+create table if not exists order_policies (
+  order_id uuid primary key references orders(id) on delete cascade,
+  contract_chain jsonb,
+  time_tracking jsonb not null,
+  approval jsonb not null,
+  billing jsonb not null,
+  budget_warnings numeric[] not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists order_assignment_rules (
+  order_id uuid not null references orders(id) on delete cascade,
+  person_id text not null,
+  provider_type text not null check (provider_type in ('employee_salary','employee_hourly','external_individual','external_company')),
+  time_policy_override jsonb,
+  sales_rate numeric(12,2),
+  internal_cost_rate numeric(12,2),
+  active boolean not null default true,
+  updated_at timestamptz not null default now(),
+  primary key (order_id, person_id)
+);
+
+create table if not exists time_evidence (
+  id uuid primary key default gen_random_uuid(),
+  time_entry_id uuid references time_entries(id) on delete cascade,
+  order_id uuid not null references orders(id) on delete cascade,
+  person_id text not null,
+  period_date date not null,
+  file_name text not null,
+  mime_type text not null,
+  status text not null check (status in ('not_required','missing','uploaded','verified','rejected')),
+  signed boolean not null default false,
+  customer_approved boolean not null default false,
+  uploaded_at timestamptz not null default now(),
+  verified_at timestamptz
+);
+
+create index if not exists idx_time_evidence_order_person on time_evidence(order_id, person_id, period_date);

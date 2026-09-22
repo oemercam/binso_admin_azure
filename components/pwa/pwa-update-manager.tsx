@@ -1,16 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function PWAUpdateManager() {
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
   const [updateReady, setUpdateReady] = useState(false)
+  const refreshRequested = useRef(false)
 
   useEffect(() => {
     if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return
 
     let disposed = false
-    const onControllerChange = () => window.location.reload()
+    const onControllerChange = () => {
+      if (refreshRequested.current) window.location.reload()
+    }
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange)
 
     navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
@@ -42,7 +45,10 @@ export function PWAUpdateManager() {
   return (
     <div className="pwa-update-banner" role="status" aria-live="polite">
       <span>Neue Version verfügbar.</span>
-      <button type="button" onClick={() => registration.waiting?.postMessage({ type: 'SKIP_WAITING' })}>Jetzt aktualisieren</button>
+      <button type="button" onClick={() => {
+        refreshRequested.current = true
+        registration.waiting?.postMessage({ type: 'SKIP_WAITING' })
+      }}>Jetzt aktualisieren</button>
     </div>
   )
 }

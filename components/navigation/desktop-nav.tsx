@@ -42,7 +42,7 @@ export function DesktopNav({ user }: { user: AppUser }) {
 
       <div className="nav-footer">
         <span className="status-dot" />
-        <span>Production</span>
+        <span>{process.env.NODE_ENV === 'production' ? 'Production' : 'Lokal'}</span>
       </div>
     </aside>
   )

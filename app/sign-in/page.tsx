@@ -11,7 +11,7 @@ export default function SignInPage() {
         <p className="muted">Mit deinem Firmenkonto anmelden.</p>
         {env.authMode === 'azure'
           ? <a className="button primary" href={signInUrl('/dashboard')}>Mit Microsoft anmelden</a>
-          : <a className="button primary" href="/dashboard">Lokale Demo öffnen</a>}
+          : <a className="button primary" href="/dashboard">Lokal öffnen</a>}
       </div>
     </main>
   )

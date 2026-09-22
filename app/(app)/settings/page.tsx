@@ -11,20 +11,18 @@ import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
 import { useFeedback } from '@/components/ui/feedback'
 import { useBusinessStore } from '@/components/state/business-store'
+import { useCurrentUser } from '@/components/state/current-user'
+import { canManageSettings as roleCanManageSettings } from '@/lib/auth/capabilities'
 import type { DocumentTemplates } from '@/types/domain'
 import { appIdentity } from '@/lib/config/app-identity'
 
 type Tab = 'general' | 'mail' | 'automation' | 'documents' | 'appearance'
 type CompanyEditor = 'company' | 'address' | 'contact' | 'bank'
-type MailKey = 'senderName' | 'replyTo' | 'invoiceSender' | 'quoteSender' | 'reminderSender' | 'payrollSender' | 'financeCc'
-type ReminderKey = 'firstAfterDays' | 'secondAfterDays' | 'thirdAfterDays'
-type PayrollTextKey = 'subject' | 'emailBody'
+type MailKey = 'senderName' | 'replyTo' | 'invoiceSender' | 'quoteSender' | 'reminderSender' | 'financeCc'
 type TemplateKind = 'invoice' | 'quote' | 'reminder'
 type Editor =
   | { kind: 'company'; section: CompanyEditor }
   | { kind: 'mail'; key: MailKey; title: string; inputType?: string }
-  | { kind: 'reminder'; key: ReminderKey; title: string }
-  | { kind: 'payroll'; key: PayrollTextKey; title: string; multiline?: boolean }
   | { kind: 'template'; template: TemplateKind; title: string }
   | { kind: 'theme' }
   | { kind: 'push' }
@@ -32,7 +30,9 @@ type Editor =
 
 export default function SettingsPage() {
   const store = useBusinessStore()
-  const [tab, setTab] = useState<Tab>('general')
+  const user = useCurrentUser()
+  const canManageSettings = roleCanManageSettings(user.role)
+  const [tab, setTab] = useState<Tab>(canManageSettings ? 'general' : 'appearance')
   const [company, setCompany] = useState(store.companyProfile)
   const [templates, setTemplates] = useState(store.documentTemplates)
   const feedback = useFeedback()
@@ -59,15 +59,7 @@ export default function SettingsPage() {
     setEditor({ kind: 'mail', key, title, inputType })
   }
 
-  function openReminder(key: ReminderKey, title: string) {
-    setEditValue(String(store.appSettings.reminders[key]))
-    setEditor({ kind: 'reminder', key, title })
-  }
 
-  function openPayroll(key: PayrollTextKey, title: string, multiline = false) {
-    setEditValue(String(store.appSettings.payroll[key] ?? ''))
-    setEditor({ kind: 'payroll', key, title, multiline })
-  }
 
   function openCompany(section: CompanyEditor) {
     setCompany(store.companyProfile)
@@ -91,14 +83,6 @@ export default function SettingsPage() {
       store.updateAppSettings({ mail: { ...store.appSettings.mail, [editor.key]: editValue } })
       flash(`${editor.title} gespeichert.`)
     }
-    if (editor.kind === 'reminder') {
-      store.updateAppSettings({ reminders: { ...store.appSettings.reminders, [editor.key]: Number(editValue) } })
-      flash(`${editor.title} gespeichert.`)
-    }
-    if (editor.kind === 'payroll') {
-      store.updateAppSettings({ payroll: { ...store.appSettings.payroll, [editor.key]: editValue } })
-      flash(`${editor.title} gespeichert.`)
-    }
     closeEditor()
   }
 
@@ -118,29 +102,23 @@ export default function SettingsPage() {
 
   return (
     <section className="page settings-page">
-      <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern." />
+      <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description={canManageSettings ? 'Unternehmen, Versand, Benachrichtigungen und Darstellung verwalten.' : 'Darstellung und Benachrichtigungen verwalten.'} />
 
 
       <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">
-        <TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton>
-        <TabButton active={tab === 'mail'} onClick={() => setTab('mail')}>E-Mail und Versand</TabButton>
-        <TabButton active={tab === 'automation'} onClick={() => setTab('automation')}>Automationen</TabButton>
-        <TabButton active={tab === 'documents'} onClick={() => setTab('documents')}>Dokumente</TabButton>
+        {canManageSettings && <><TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton><TabButton active={tab === 'mail'} onClick={() => setTab('mail')}>E-Mail und Versand</TabButton><TabButton active={tab === 'automation'} onClick={() => setTab('automation')}>Benachrichtigungen</TabButton><TabButton active={tab === 'documents'} onClick={() => setTab('documents')}>Dokumente</TabButton></>}
         <TabButton active={tab === 'appearance'} onClick={() => setTab('appearance')}>Darstellung</TabButton>
       </div>
 
       <nav className={mobileDetail ? 'settings-mobile-hub detail-open' : 'settings-mobile-hub'} aria-label="Einstellungsbereiche">
-        <SettingsHubRow title="Allgemein" meta="Unternehmensdaten und Workflow" onClick={() => { setTab('general'); setMobileDetail(true) }} />
-        <SettingsHubRow title="E-Mail und Versand" meta={mailReady ? 'Absender vollständig' : 'Konfiguration unvollständig'} onClick={() => { setTab('mail'); setMobileDetail(true) }} />
-        <SettingsHubRow title="Automationen" meta="Mahnungen, Lohn und Benachrichtigungen" onClick={() => { setTab('automation'); setMobileDetail(true) }} />
-        <SettingsHubRow title="Dokumente" meta="Rechnung, Angebot und Mahnung" onClick={() => { setTab('documents'); setMobileDetail(true) }} />
+        {canManageSettings && <><SettingsHubRow title="Allgemein" meta="Unternehmensdaten und Workflow" onClick={() => { setTab('general'); setMobileDetail(true) }} /><SettingsHubRow title="E-Mail und Versand" meta={mailReady ? 'Absender vollständig' : 'Konfiguration unvollständig'} onClick={() => { setTab('mail'); setMobileDetail(true) }} /><SettingsHubRow title="Benachrichtigungen" meta="Rechnungen und Angebote" onClick={() => { setTab('automation'); setMobileDetail(true) }} /><SettingsHubRow title="Dokumente" meta="Rechnung, Angebot und Mahnung" onClick={() => { setTab('documents'); setMobileDetail(true) }} /></>}
         <SettingsHubRow title="Darstellung" meta="Theme und Push" onClick={() => { setTab('appearance'); setMobileDetail(true) }} />
       </nav>
 
       <div className={mobileDetail ? 'settings-content mobile-detail-open' : 'settings-content'}>
         <button type="button" className="settings-mobile-back" onClick={() => setMobileDetail(false)}>← Einstellungen</button>
 
-        {tab === 'general' && (
+        {canManageSettings && tab === 'general' && (
           <>
             <SettingsSection title="Unternehmensdaten" description="Aktueller Stand. Zum Bearbeiten einen Bereich öffnen.">
               <SettingsValueRow title="Unternehmen" value={store.companyProfile.name} description={store.companyProfile.uid || 'UID / MWST nicht gesetzt'} onClick={() => openCompany('company')} />
@@ -167,7 +145,7 @@ export default function SettingsPage() {
           </>
         )}
 
-        {tab === 'mail' && (
+        {canManageSettings && tab === 'mail' && (
           <>
             <SettingsSection title="Microsoft 365 Versand" description={mailReady ? 'Absender vollständig · Verbindung noch nicht aktiviert' : 'Versandkonfiguration unvollständig'}>
               <SettingsValueRow title="Absendername" value={store.appSettings.mail.senderName || 'Nicht gesetzt'} onClick={() => openMail('senderName', 'Absendername')} />
@@ -175,53 +153,23 @@ export default function SettingsPage() {
               <SettingsValueRow title="Rechnungen" value={store.appSettings.mail.invoiceSender || 'Nicht gesetzt'} onClick={() => openMail('invoiceSender', 'Rechnungsabsender', 'email')} />
               <SettingsValueRow title="Angebote" value={store.appSettings.mail.quoteSender || 'Nicht gesetzt'} onClick={() => openMail('quoteSender', 'Angebotsabsender', 'email')} />
               <SettingsValueRow title="Mahnungen" value={store.appSettings.mail.reminderSender || 'Nicht gesetzt'} onClick={() => openMail('reminderSender', 'Mahnungsabsender', 'email')} />
-              <SettingsValueRow title="Lohnabrechnungen" value={store.appSettings.mail.payrollSender || 'Nicht gesetzt'} onClick={() => openMail('payrollSender', 'Lohnabrechnungsabsender', 'email')} />
               <SettingsValueRow title="CC Buchhaltung" value={store.appSettings.mail.financeCc || 'Nicht gesetzt'} onClick={() => openMail('financeCc', 'CC Buchhaltung', 'email')} />
             </SettingsSection>
 
-            <SettingsSection title="Versandoptionen" description="Standardverhalten für geschäftliche E-Mails.">
-              <SettingsToggleRow title="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen als PDF anhängen." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
-              <SettingsToggleRow title="Versand protokollieren" description="Versandstatus für die spätere revisionssichere Protokollierung speichern." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
-              <SettingsToggleRow title="Kopie an Absender" description="Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
-            </SettingsSection>
           </>
         )}
 
-        {tab === 'automation' && (
+        {canManageSettings && tab === 'automation' && (
           <>
-            <div className="integration-banner"><strong>Automationen sind konfiguriert, aber noch nicht serverseitig aktiv.</strong><span>Ausführung benötigt Azure-Datenbank, Microsoft Graph und Scheduler/Worker.</span></div>
-
-            <SettingsSection title="Mahnwesen" description="Status direkt ändern, Zeitabstände gezielt öffnen.">
-              <SettingsToggleRow title="Mahnwesen aktiv" checked={store.appSettings.reminders.enabled} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, enabled: value } })} />
-              <SettingsToggleRow title="Mahnungen automatisch senden" checked={store.appSettings.reminders.automaticSend} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, automaticSend: value } })} disabled={!store.appSettings.reminders.enabled} />
-              <SettingsValueRow title="1. Erinnerung" value={`${store.appSettings.reminders.firstAfterDays} Tage`} onClick={() => openReminder('firstAfterDays', '1. Erinnerung')} />
-              <SettingsValueRow title="2. Mahnung" value={`${store.appSettings.reminders.secondAfterDays} Tage`} onClick={() => openReminder('secondAfterDays', '2. Mahnung')} />
-              <SettingsValueRow title="3. Mahnung" value={`${store.appSettings.reminders.thirdAfterDays} Tage`} onClick={() => openReminder('thirdAfterDays', '3. Mahnung')} />
-              <SettingsToggleRow title="Nur Werktage" checked={store.appSettings.reminders.onlyBusinessDays} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, onlyBusinessDays: value } })} />
-              <SettingsToggleRow title="Nach Zahlung sofort stoppen" checked={store.appSettings.reminders.stopWhenPaid} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, stopWhenPaid: value } })} />
-            </SettingsSection>
-
-            <SettingsSection title="Stundenlohn und Lohnabrechnung" description="Workflow und Versand der monatlichen Lohnvorbereitung.">
-              <SettingsToggleRow title="Lohnprozess aktiv" checked={store.appSettings.payroll.enabled} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, enabled: value } })} />
-              <SettingsToggleRow title="Lohnabrechnung nach Freigabe vorbereiten" checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Nur Stundenlohn-Mitarbeitende" checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Freigabe durch Buchhaltung erforderlich" checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Nach Freigabe automatisch versenden" checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsValueRow title="E-Mail-Betreff" value={store.appSettings.payroll.subject || 'Nicht gesetzt'} onClick={() => openPayroll('subject', 'E-Mail-Betreff')} />
-              <SettingsValueRow title="E-Mail-Text" value="Text bearbeiten" onClick={() => openPayroll('emailBody', 'E-Mail-Text', true)} />
-            </SettingsSection>
 
             <SettingsSection title="Benachrichtigungen" description="Ereignisse, die im Portal und später per Push erscheinen.">
               <SettingsToggleRow title="Rechnung überfällig" checked={store.appSettings.notifications.overdueInvoice} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, overdueInvoice: value } })} />
-              <SettingsToggleRow title="Auftragsbudget ab 80 %" checked={store.appSettings.notifications.budgetWarning} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, budgetWarning: value } })} />
               <SettingsToggleRow title="Angebot läuft aus" checked={store.appSettings.notifications.expiringQuote} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, expiringQuote: value } })} />
-              <SettingsToggleRow title="Zahlung eingegangen" checked={store.appSettings.notifications.paymentReceived} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, paymentReceived: value } })} />
-              <SettingsToggleRow title="Monatszeiten bereit zur Freigabe" checked={store.appSettings.notifications.timesheetReady} onChange={(value) => store.updateAppSettings({ notifications: { ...store.appSettings.notifications, timesheetReady: value } })} />
             </SettingsSection>
           </>
         )}
 
-        {tab === 'documents' && (
+        {canManageSettings && tab === 'documents' && (
           <SettingsSection title="Dokumentvorlagen" description="Vorlage auswählen. Die Texte werden erst im Editor angezeigt.">
             <SettingsValueRow title="Rechnung" value="Texte und E-Mail-Vorlage" onClick={() => openTemplate('invoice', 'Rechnung')} />
             <SettingsValueRow title="Angebot" value="Texte und E-Mail-Vorlage" onClick={() => openTemplate('quote', 'Angebot')} />
@@ -287,9 +235,9 @@ function EditorSheets({
   if (editor.kind === 'push') {
     return <ResponsiveOverlay open title="Push-Benachrichtigungen" description="Einstellung für dieses Gerät." onClose={onClose}><PushSettings /></ResponsiveOverlay>
   }
-  if (editor.kind === 'mail' || editor.kind === 'reminder' || editor.kind === 'payroll') {
-    const multiline = editor.kind === 'payroll' && editor.multiline
-    const inputType = editor.kind === 'mail' ? editor.inputType ?? 'text' : editor.kind === 'reminder' ? 'number' : 'text'
+  if (editor.kind === 'mail') {
+    const multiline = false
+    const inputType = editor.inputType ?? 'text'
     return (
       <StandardFormSheet
         open

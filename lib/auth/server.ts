@@ -1,8 +1,10 @@
 import 'server-only'
 import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
 import type { Role } from '@/types/domain'
+import { roleAllowed } from './permissions'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -59,9 +61,9 @@ export async function getSession(): Promise<Session> {
   if (env.authMode === 'local') {
     return {
       user: {
-        id: 'local-demo',
-        name: 'Demo Admin',
-        email: 'demo@binso.ch',
+        id: 'local-user',
+        name: 'Lokaler Admin',
+        email: 'local@binso.ch',
         role: 'owner',
       },
     }
@@ -69,4 +71,11 @@ export async function getSession(): Promise<Session> {
 
   const requestHeaders = await headers()
   return parseAzurePrincipal(requestHeaders.get('x-ms-client-principal'))
+}
+
+export async function requireRole(allowedRoles: readonly Role[]) {
+  const session = await getSession()
+  if (!session) redirect('/sign-in')
+  if (!roleAllowed(session.user.role, allowedRoles)) redirect('/access-denied')
+  return session
 }

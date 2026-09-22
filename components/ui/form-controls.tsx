@@ -18,6 +18,7 @@ import {
 import { Icon } from '@/components/ui/icon'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { useDeviceEnvironment } from '@/components/providers/device-environment-provider'
+import { dateFromIso, formatDate, formatMonthYear, isoFromDate, normalizeSearch } from '@/lib/format/locale'
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input(props, ref) {
   const { className = '', ...rest } = props
@@ -29,20 +30,21 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
   return <textarea ref={ref} className={`ui-textarea ${className}`.trim()} {...rest} />
 })
 
-export const SearchField = forwardRef<HTMLInputElement, Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & { loading?: boolean }>(function SearchField({ className = '', value, onChange, loading = false, ...rest }, ref) {
-  const hasValue = String(value ?? '').length > 0
+type SearchFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'defaultValue' | 'onChange'> & {
+  value: string
+  onValueChange: (value: string) => void
+  loading?: boolean
+}
+
+export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(function SearchField({ className = '', value, onValueChange, loading = false, ...rest }, ref) {
+  const hasValue = value.length > 0
   return (
     <div className={`ui-search-field ${className}`.trim()}>
       <Icon name="search" size={16} />
-      <input ref={ref} type="search" value={value} onChange={onChange} {...rest} />
-      {loading ? <span className="ui-search-loading" aria-label="Suche läuft" /> : null}
-      {hasValue && onChange ? (
-        <button
-          type="button"
-          className="ui-search-clear"
-          aria-label="Suche löschen"
-          onClick={() => onChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>)}
-        >
+      <input ref={ref} type="search" value={value} onChange={(event) => onValueChange(event.target.value)} {...rest} />
+      {loading ? <span className="ui-search-loading" role="status" aria-label="Suche läuft" /> : null}
+      {hasValue ? (
+        <button type="button" className="ui-search-clear" aria-label="Suche löschen" onClick={() => onValueChange('')}>
           <Icon name="close" size={14} />
         </button>
       ) : null}
@@ -121,14 +123,16 @@ export function Select({
   const [search, setSearch] = useState('')
   const rootRef = useRef<HTMLDivElement | null>(null)
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const listboxRef = useRef<HTMLDivElement | null>(null)
+  const searchRef = useRef<HTMLInputElement | null>(null)
   const { isMobileLayout } = useDeviceEnvironment()
   const triggerId = useId()
   const listboxId = useId()
 
   const visibleOptions = useMemo(() => {
-    const cleaned = search.trim().toLocaleLowerCase('de-CH')
+    const cleaned = normalizeSearch(search)
     if (!searchable || !cleaned) return options
-    return options.filter((option) => option.label.toLocaleLowerCase('de-CH').includes(cleaned))
+    return options.filter((option) => normalizeSearch(option.label).includes(cleaned))
   }, [options, search, searchable])
 
   useEffect(() => {
@@ -139,6 +143,15 @@ export function Select({
     document.addEventListener('mousedown', close)
     return () => document.removeEventListener('mousedown', close)
   }, [isMobileLayout, open])
+
+  useEffect(() => {
+    if (!open) return
+    const frame = requestAnimationFrame(() => {
+      if (searchable && options.length > 7) searchRef.current?.focus({ preventScroll: true })
+      else listboxRef.current?.focus({ preventScroll: true })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [open, options.length, searchable])
 
   useEffect(() => {
     if (!open || activeIndex < 0) return
@@ -198,7 +211,7 @@ export function Select({
     if (event.key === 'End' && open) { event.preventDefault(); setBoundary('end') }
   }
 
-  function onListKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function onListKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (event.key === 'ArrowDown') { event.preventDefault(); moveActive(1) }
     else if (event.key === 'ArrowUp') { event.preventDefault(); moveActive(-1) }
     else if (event.key === 'Home') { event.preventDefault(); setBoundary('start') }
@@ -207,13 +220,30 @@ export function Select({
     else if (event.key === 'Escape') { event.preventDefault(); closeList() }
   }
 
+
+  function onSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown') { event.preventDefault(); moveActive(1) }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); moveActive(-1) }
+    else if (event.key === 'Home') { event.preventDefault(); setBoundary('start') }
+    else if (event.key === 'End') { event.preventDefault(); setBoundary('end') }
+    else if (event.key === 'Enter') { event.preventDefault(); if (activeIndex >= 0) choose(visibleOptions[activeIndex]?.value ?? '') }
+    else if (event.key === 'Escape') { event.preventDefault(); closeList() }
+  }
+
   const list = (
     <>
-      {searchable && options.length > 7 ? <SearchField value={search} onChange={(event) => { setSearch(event.target.value); setActiveIndex(0) }} placeholder={searchPlaceholder} aria-label={searchPlaceholder} className="ui-select-search" /> : null}
-      <div id={listboxId} className="ui-select-options" role="listbox" aria-labelledby={triggerId} tabIndex={-1} onKeyDown={onListKeyDown}>
+      {searchable && options.length > 7 ? <SearchField ref={searchRef} value={search} onValueChange={(value) => {
+        setSearch(value)
+        const query = normalizeSearch(value)
+        const nextVisible = query ? options.filter((option) => normalizeSearch(option.label).includes(query)) : options
+        const first = nextVisible.findIndex((option) => !option.disabled)
+        setActiveIndex(first)
+      }} onKeyDown={onSearchKeyDown} placeholder={searchPlaceholder} aria-label={searchPlaceholder} className="ui-select-search" /> : null}
+      <div ref={listboxRef} id={listboxId} className="ui-select-options" role="listbox" aria-labelledby={triggerId} aria-activedescendant={activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined} tabIndex={-1} onKeyDown={onListKeyDown}>
         {visibleOptions.map((option, index) => (
           <button
             ref={(node) => { optionRefs.current[index] = node }}
+            id={`${listboxId}-option-${index}`}
             type="button"
             role="option"
             aria-selected={option.value === currentValue}
@@ -281,25 +311,15 @@ type DatePickerProps = {
   title?: string
 }
 
-function dateFromIso(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(year, month - 1, day, 12)
-}
-function isoFromDate(value: Date) {
-  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`
-}
-function formatSwissDate(value: string) {
-  const date = dateFromIso(value)
-  return date ? new Intl.DateTimeFormat('de-CH').format(date) : 'Datum auswählen'
-}
 
 export function DatePicker({ value, onChange, min, max, disabled = false, required = false, className = '', 'aria-label': ariaLabel = 'Datum auswählen', title }: DatePickerProps) {
   const { isMobileLayout } = useDeviceEnvironment()
   const [open, setOpen] = useState(false)
   const current = dateFromIso(value) ?? new Date()
   const [viewDate, setViewDate] = useState(new Date(current.getFullYear(), current.getMonth(), 1, 12))
+  const [focusedDate, setFocusedDate] = useState(isoFromDate(current))
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const calendarRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (isMobileLayout || !open) return
@@ -319,6 +339,7 @@ export function DatePicker({ value, onChange, min, max, disabled = false, requir
   function openCalendar() {
     const selected = dateFromIso(value) ?? new Date()
     setViewDate(new Date(selected.getFullYear(), selected.getMonth(), 1, 12))
+    setFocusedDate(isoFromDate(selected))
     setOpen(true)
   }
 
@@ -333,11 +354,45 @@ export function DatePicker({ value, onChange, min, max, disabled = false, requir
     closeCalendar()
   }
 
+  function focusCalendarDate(next: Date) {
+    const iso = isoFromDate(next)
+    if ((min && iso < min) || (max && iso > max)) return
+    setFocusedDate(iso)
+    if (next.getFullYear() !== viewDate.getFullYear() || next.getMonth() !== viewDate.getMonth()) {
+      setViewDate(new Date(next.getFullYear(), next.getMonth(), 1, 12))
+    }
+    requestAnimationFrame(() => calendarRef.current?.querySelector<HTMLButtonElement>(`[data-date="${iso}"]`)?.focus({ preventScroll: true }))
+  }
+
+  function onDayKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, day: Date) {
+    let delta = 0
+    if (event.key === 'ArrowRight') delta = 1
+    else if (event.key === 'ArrowLeft') delta = -1
+    else if (event.key === 'ArrowDown') delta = 7
+    else if (event.key === 'ArrowUp') delta = -7
+    else if (event.key === 'Home') delta = -((day.getDay() + 6) % 7)
+    else if (event.key === 'End') delta = 6 - ((day.getDay() + 6) % 7)
+    else if (event.key === 'PageUp' || event.key === 'PageDown') {
+      event.preventDefault()
+      const direction = event.key === 'PageUp' ? -1 : 1
+      focusCalendarDate(new Date(day.getFullYear(), day.getMonth() + direction, day.getDate(), 12))
+      return
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      closeCalendar()
+      return
+    } else return
+    event.preventDefault()
+    const next = new Date(day)
+    next.setDate(next.getDate() + delta)
+    focusCalendarDate(next)
+  }
+
   const calendar = (
-    <div className="ui-calendar">
+    <div ref={calendarRef} className="ui-calendar">
       <div className="ui-calendar-head">
         <button type="button" className="ui-calendar-nav" aria-label="Vorheriger Monat" onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1, 12))}><Icon name="back" size={15} /></button>
-        <strong>{new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' }).format(viewDate)}</strong>
+        <strong>{formatMonthYear(isoFromDate(viewDate))}</strong>
         <button type="button" className="ui-calendar-nav next" aria-label="Nächster Monat" onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1, 12))}><Icon name="chevron" size={15} /></button>
       </div>
       <div className="ui-calendar-weekdays">{['Mo','Di','Mi','Do','Fr','Sa','So'].map((day) => <span key={day}>{day}</span>)}</div>
@@ -347,7 +402,7 @@ export function DatePicker({ value, onChange, min, max, disabled = false, requir
           const selected = iso === value
           const today = iso === isoFromDate(new Date())
           const unavailable = Boolean((min && iso < min) || (max && iso > max))
-          return <button key={iso} type="button" className={`ui-calendar-day${selected ? ' selected' : ''}${today ? ' today' : ''}`} disabled={unavailable} aria-current={today ? 'date' : undefined} aria-pressed={selected} onClick={() => choose(day)}>{day.getDate()}</button>
+          return <button key={iso} type="button" data-date={iso} tabIndex={iso === focusedDate ? 0 : -1} className={`ui-calendar-day${selected ? ' selected' : ''}${today ? ' today' : ''}`} disabled={unavailable} aria-label={formatDate(iso)} aria-current={today ? 'date' : undefined} aria-pressed={selected} onFocus={() => setFocusedDate(iso)} onKeyDown={(event) => onDayKeyDown(event, day)} onClick={() => choose(day)}>{day.getDate()}</button>
         })() : <span key={`blank-${index}`} className="ui-calendar-blank" />)}
       </div>
     </div>
@@ -355,8 +410,8 @@ export function DatePicker({ value, onChange, min, max, disabled = false, requir
 
   return (
     <div ref={rootRef} className={`ui-date-picker ${className}`.trim()}>
-      <button type="button" className="ui-date-trigger" aria-haspopup="dialog" aria-expanded={open} aria-label={ariaLabel} title={title ?? formatSwissDate(value)} disabled={disabled} data-required={required || undefined} onClick={() => open ? closeCalendar() : openCalendar()}>
-        <span>{formatSwissDate(value)}</span><Icon name="calendar" size={15} />
+      <button type="button" className="ui-date-trigger" aria-haspopup="dialog" aria-expanded={open} aria-label={ariaLabel} title={title ?? formatDate(value, 'Datum auswählen')} disabled={disabled} data-required={required || undefined} onClick={() => open ? closeCalendar() : openCalendar()}>
+        <span>{formatDate(value, 'Datum auswählen')}</span><Icon name="calendar" size={15} />
       </button>
       {!isMobileLayout && open ? <div className="ui-date-popover">{calendar}</div> : null}
       {isMobileLayout ? <ResponsiveOverlay open={open} title={ariaLabel} onClose={closeCalendar} showGrabber panelClassName="ui-date-sheet">{calendar}</ResponsiveOverlay> : null}

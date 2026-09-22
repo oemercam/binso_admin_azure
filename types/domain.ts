@@ -109,6 +109,7 @@ export type Order = {
   id: string
   customerId: string
   customerName: string
+  sourceQuoteId?: string
   endCustomerName?: string
   primeContractorName?: string
   name: string
@@ -225,40 +226,14 @@ export type Employee = {
 }
 
 
-export type MailProvider = 'microsoft365' | 'smtp'
-
 export type AppSettings = {
   mail: {
-    provider: MailProvider
     senderName: string
     invoiceSender: string
     quoteSender: string
     reminderSender: string
-    payrollSender: string
     replyTo: string
     financeCc: string
-    attachPdf: boolean
-    deliveryTracking: boolean
-    copySender: boolean
-  }
-  reminders: {
-    enabled: boolean
-    automaticSend: boolean
-    firstAfterDays: number
-    secondAfterDays: number
-    thirdAfterDays: number
-    onlyBusinessDays: boolean
-    stopWhenPaid: boolean
-  }
-  payroll: {
-    enabled: boolean
-    generateAfterApprovedTimesheet: boolean
-    autoSend: boolean
-    requireFinanceApproval: boolean
-    hourlyEmployeesOnly: boolean
-    period: 'monthly'
-    subject: string
-    emailBody: string
   }
   workflow: {
     requireTimeApproval: boolean
@@ -268,9 +243,6 @@ export type AppSettings = {
   }
   notifications: {
     overdueInvoice: boolean
-    budgetWarning: boolean
     expiringQuote: boolean
-    paymentReceived: boolean
-    timesheetReady: boolean
   }
 }

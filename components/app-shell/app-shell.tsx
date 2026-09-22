@@ -25,25 +25,29 @@ export function AppShell({
 
   return (
     <div className="app-frame">
+      <a className="skip-link" href="#main-content">Zum Inhalt</a>
       <header className={mobileHeaderHidden ? 'topbar is-hidden' : 'topbar'}>
         <div className="topbar-brand">
           <AppLogo />
         </div>
 
-        <button className="global-search" onClick={() => setSearchOpen(true)}>
+        <button type="button" className="global-search" onClick={() => { setSearchOpen(true); setQuickOpen(false); setProfileOpen(false); setNotificationsOpen(false) }} aria-haspopup="dialog" aria-expanded={searchOpen}>
           <Icon name="search" size={16} />
           <span>Suchen</span>
           <kbd>Ctrl K</kbd>
         </button>
 
         <div className="topbar-actions">
-          <button className="topbar-icon" aria-label="Benachrichtigungen" onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
+          <button type="button" className="topbar-icon" aria-label="Benachrichtigungen" aria-haspopup="dialog" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="bell" size={17} />
             <i />
           </button>
 
           <button
+            type="button"
             className="avatar-button"
+            aria-haspopup="dialog"
+            aria-expanded={profileOpen}
             onClick={() => { setProfileOpen((current) => !current); setNotificationsOpen(false); setQuickOpen(false) }}
             aria-label="Profil öffnen"
           >
@@ -54,13 +58,14 @@ export function AppShell({
 
       <div className="app-shell">
         <DesktopNav user={user} />
-        <main className="app-main">{children}</main>
+        <main id="main-content" className="app-main">{children}</main>
       </div>
 
       <MobilePillNav
         user={user}
         onSearch={() => setSearchOpen(true)}
-        onQuick={() => setQuickOpen(true)}
+        onQuick={() => { setQuickOpen(true); setSearchOpen(false); setProfileOpen(false); setNotificationsOpen(false) }}
+        searchOpen={searchOpen}
       />
 
       <AppOverlays

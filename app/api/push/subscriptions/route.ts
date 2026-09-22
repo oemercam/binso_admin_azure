@@ -7,6 +7,12 @@ type PushSubscriptionBody = {
   keys?: { p256dh?: string; auth?: string }
 }
 
+export async function GET() {
+  const session = await getSession()
+  if (!session) return apiError(401, 'unauthorized', 'Anmeldung erforderlich.')
+  return apiJson({ configured: false })
+}
+
 export async function POST(request: Request) {
   const session = await getSession()
   if (!session) return apiError(401, 'unauthorized', 'Anmeldung erforderlich.')
@@ -17,8 +23,9 @@ export async function POST(request: Request) {
       return apiError(422, 'validation', 'Ungültiges Push-Abonnement.')
     }
 
-    // TODO production: persist encrypted subscription in the database, scoped to session.user.id.
-    return apiJson({ ok: true, stored: true })
+    // Push delivery is intentionally unavailable until a durable server-side subscription store is connected.
+    // Never acknowledge persistence when no subscription was stored.
+    return apiError(503, 'push_not_configured', 'Push ist serverseitig noch nicht konfiguriert.')
   } catch (error) {
     if (error instanceof Error && error.message === 'payload_too_large') return apiError(413, 'payload_too_large', 'Anfrage ist zu gross.')
     return apiError(400, 'invalid_json', 'Ungültige Anfrage.')
@@ -35,6 +42,6 @@ export async function DELETE(request: Request) {
     return apiError(400, 'invalid_json', 'Ungültige Anfrage.')
   }
 
-  // TODO production: delete subscription belonging to session.user.id.
-  return apiJson({ ok: true })
+  // No durable subscription store is connected yet. Local browser unsubscribe may still proceed.
+  return apiJson({ ok: true, configured: false })
 }
