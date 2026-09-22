@@ -24,8 +24,8 @@ export function ViewportMetrics() {
       root.style.setProperty('--visible-viewport-top', `${Math.round(offsetTop)}px`)
       root.style.setProperty('--visible-viewport-bottom', `${Math.round(coveredBottom)}px`)
 
-      // Canonical dimensions used by the UI foundation.
-      root.style.setProperty('--app-vh', `${Math.round(height)}px`)
+      // Keep viewport measurements informational only. Layout positioning uses CSS
+      // dynamic viewport units (100dvh/100dvw), which are stable in Safari and PWA.
       root.style.setProperty('--app-vw', `${Math.round(width)}px`)
     }
 

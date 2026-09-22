@@ -6183,3 +6183,194 @@ body:has(.app-sheet-backdrop) {
 
   .quick-create-sheet { width: min(620px, calc(100vw - 48px)) !important; }
 }
+
+
+/* ===== V19.4 canonical Mobile/PWA Bottom Sheet system =====
+   FINAL AUTHORITY. Do not add per-page mobile sheet positioning below this block.
+   iOS/PWA positioning intentionally does NOT use --app-vh/visualViewport height. */
+
+:root{
+  --sheet-mobile-radius:22px;
+  --sheet-mobile-gutter:clamp(14px,4vw,18px);
+  --sheet-mobile-top-gap:max(8px,env(safe-area-inset-top,0px));
+  --sheet-mobile-bottom-safe:env(safe-area-inset-bottom,0px);
+}
+
+/* The viewport itself is the anchor. No calculated height variable. */
+.app-sheet-backdrop,
+.overlay-layer.sheet-layer{
+  position:fixed!important;
+  inset:0!important;
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  left:0!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+
+@media(max-width:760px){
+  /* One and only one mobile/PWA geometry for every ordinary sheet. */
+  .app-sheet-backdrop,
+  .overlay-layer.sheet-layer{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-end!important;
+    padding:0!important;
+  }
+
+  .app-sheet-bottom,
+  .app-sheet-bottom.quick-create-sheet,
+  .mobile-menu-sheet,
+  .form-sheet.bottom-sheet,
+  .form-sheet.compact-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet),
+  .action-sheet,
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet){
+    position:relative!important;
+    inset:auto!important;
+    align-self:stretch!important;
+    flex:0 1 auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:calc(100dvh - var(--sheet-mobile-top-gap))!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border-radius:var(--sheet-mobile-radius) var(--sheet-mobile-radius) 0 0!important;
+    box-shadow:0 -18px 56px rgba(0,0,0,.22)!important;
+    transform:none!important;
+  }
+
+  /* Header stays visible; content is the only scrolling region. */
+  .app-sheet-bottom>.app-sheet-grabber,
+  .mobile-menu-sheet>.sheet-grabber,
+  .form-sheet>.sheet-grabber,
+  .action-sheet>.sheet-grabber{
+    flex:0 0 auto!important;
+  }
+
+  .app-sheet-bottom>.app-sheet-header,
+  .mobile-menu-sheet>.sheet-heading,
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading,
+  .action-sheet>.sheet-heading{
+    position:relative!important;
+    top:auto!important;
+    bottom:auto!important;
+    flex:0 0 auto!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:14px max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px)) 13px max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px))!important;
+    box-sizing:border-box!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+
+  .app-sheet-bottom>.app-sheet-content{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:0 max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px)) 18px max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px))!important;
+  }
+
+  /* Legacy forms do not have a content wrapper; make the form itself scroll while
+     keeping header/actions stable through sticky regions. */
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet),
+  .action-sheet{
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-left:max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px))!important;
+    padding-right:max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px))!important;
+    padding-bottom:0!important;
+  }
+
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-heading,
+  .action-sheet>.sheet-heading{
+    position:sticky!important;
+    top:0!important;
+    z-index:40!important;
+    margin-left:calc(-1 * max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px)))!important;
+    margin-right:calc(-1 * max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px)))!important;
+  }
+
+  .app-sheet-bottom>.app-sheet-footer,
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet)>.sheet-actions,
+  .action-sheet>.sheet-actions{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:40!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    margin:18px calc(-1 * max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px))) 0 calc(-1 * max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px)))!important;
+    padding:10px max(var(--sheet-mobile-gutter),env(safe-area-inset-right,0px)) calc(10px + var(--sheet-mobile-bottom-safe)) max(var(--sheet-mobile-gutter),env(safe-area-inset-left,0px))!important;
+    box-sizing:border-box!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--line)!important;
+  }
+
+  .app-sheet-bottom>.app-sheet-footer{
+    margin:0!important;
+  }
+
+  /* Large editing forms should use the available screen rather than looking like a
+     floating desktop dialog. They still remain bottom sheets and scroll internally. */
+  .form-sheet:not(.mobile-fullscreen-sheet):not(.document-editor):not(.policy-editor):not(.invoice-builder-sheet):has(.form-grid){
+    max-height:calc(100dvh - var(--sheet-mobile-top-gap))!important;
+  }
+
+  /* Fullscreen editors remain fullscreen by design. */
+  .app-sheet-fullscreen,
+  .form-sheet.mobile-fullscreen-sheet,
+  .form-sheet.document-editor,
+  .form-sheet.policy-editor,
+  .form-sheet.invoice-builder-sheet{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:100vw!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    border-radius:0!important;
+  }
+
+  /* Navigation is also a bottom sheet, never a centred/floating panel. */
+  .mobile-menu-sheet{
+    padding-bottom:calc(10px + var(--sheet-mobile-bottom-safe))!important;
+  }
+
+  /* Keep floating pill out of the way whenever any sheet is open. */
+  body:has(.app-sheet-backdrop) .mobile-pill,
+  body:has(.overlay-layer.sheet-layer) .mobile-pill{
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+}
+
+/* Desktop stays a dialog experience. */
+@media(min-width:761px){
+  .app-sheet-backdrop,
+  .overlay-layer.sheet-layer{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:24px!important;
+  }
+}
