@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { AppUser } from '@/types/domain'
 import { DesktopNav } from '@/components/navigation/desktop-nav'
 import { MobilePillNav } from '@/components/navigation/mobile-pill-nav'
-import { AppLogo } from '@/components/ui/binso-logo'
+import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Icon } from '@/components/ui/icon'
 import { AppOverlays } from '@/components/shared/app-overlays'
 import { useHeaderVisibility } from '@/hooks/use-header-visibility'
@@ -25,29 +25,25 @@ export function AppShell({
 
   return (
     <div className="app-frame">
-      <a className="skip-link" href="#main-content">Zum Inhalt</a>
       <header className={mobileHeaderHidden ? 'topbar is-hidden' : 'topbar'}>
         <div className="topbar-brand">
-          <AppLogo />
+          <BinsoLogo />
         </div>
 
-        <button type="button" className="global-search" onClick={() => { setSearchOpen(true); setQuickOpen(false); setProfileOpen(false); setNotificationsOpen(false) }} aria-haspopup="dialog" aria-expanded={searchOpen}>
+        <button className="global-search" onClick={() => setSearchOpen(true)}>
           <Icon name="search" size={16} />
           <span>Suchen</span>
           <kbd>Ctrl K</kbd>
         </button>
 
         <div className="topbar-actions">
-          <button type="button" className="topbar-icon" aria-label="Benachrichtigungen" aria-haspopup="dialog" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
+          <button className="topbar-icon" aria-label="Benachrichtigungen" onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="bell" size={17} />
             <i />
           </button>
 
           <button
-            type="button"
             className="avatar-button"
-            aria-haspopup="dialog"
-            aria-expanded={profileOpen}
             onClick={() => { setProfileOpen((current) => !current); setNotificationsOpen(false); setQuickOpen(false) }}
             aria-label="Profil öffnen"
           >
@@ -58,14 +54,13 @@ export function AppShell({
 
       <div className="app-shell">
         <DesktopNav user={user} />
-        <main id="main-content" className="app-main">{children}</main>
+        <main className="app-main">{children}</main>
       </div>
 
       <MobilePillNav
         user={user}
         onSearch={() => setSearchOpen(true)}
-        onQuick={() => { setQuickOpen(true); setSearchOpen(false); setProfileOpen(false); setNotificationsOpen(false) }}
-        searchOpen={searchOpen}
+        onQuick={() => setQuickOpen(true)}
       />
 
       <AppOverlays

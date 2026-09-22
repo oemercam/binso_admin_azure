@@ -14,7 +14,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
 
   return (
     <CurrentUserProvider user={session.user}>
-      <BusinessStoreProvider user={session.user}>
+      <BusinessStoreProvider>
         <AppShell user={session.user}>
           <RouteTransition>{children}</RouteTransition>
         </AppShell>

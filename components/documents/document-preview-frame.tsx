@@ -35,10 +35,12 @@ export function DocumentPreviewFrame({ children }: { children: ReactNode }) {
     const observer = new ResizeObserver(measure)
     if (stageRef.current) observer.observe(stageRef.current)
     if (pageRef.current) observer.observe(pageRef.current)
+    window.addEventListener('resize', measure)
 
     return () => {
       cancelAnimationFrame(frame)
       observer.disconnect()
+      window.removeEventListener('resize', measure)
     }
   }, [])
 

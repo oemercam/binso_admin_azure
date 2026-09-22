@@ -15,7 +15,6 @@ export function PushSettings() {
   const [supported, setSupported] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [serverConfigured, setServerConfigured] = useState<boolean | null>(null)
   const feedback = useFeedback()
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
@@ -27,14 +26,10 @@ export function PushSettings() {
     })
     if (!isSupported) return () => { cancelled = true }
 
-    Promise.all([
-      navigator.serviceWorker.ready.then((registration) => registration.pushManager.getSubscription()),
-      apiRequest<{ configured: boolean }>('/api/push/subscriptions').catch(() => ({ configured: false })),
-    ])
-      .then(([subscription, server]) => {
-        if (cancelled) return
-        setEnabled(Boolean(subscription))
-        setServerConfigured(server.configured)
+    navigator.serviceWorker.ready
+      .then((registration) => registration.pushManager.getSubscription())
+      .then((subscription) => {
+        if (!cancelled) setEnabled(Boolean(subscription))
       })
       .catch(() => {
         if (!cancelled) feedback.warning('Push-Status konnte nicht gelesen werden.')
@@ -43,8 +38,8 @@ export function PushSettings() {
   }, [feedback])
 
   async function toggle() {
-    if (!enabled && (!publicKey || serverConfigured !== true)) {
-      feedback.warning('Push ist vorbereitet, aber serverseitig noch nicht vollständig konfiguriert.')
+    if (!publicKey && !enabled) {
+      feedback.warning('Push ist vorbereitet, aber noch nicht produktiv konfiguriert. Es fehlt NEXT_PUBLIC_VAPID_PUBLIC_KEY.')
       return
     }
 
@@ -84,7 +79,7 @@ export function PushSettings() {
         throw error
       }
       setEnabled(true)
-      feedback.success('Push wurde auf diesem Gerät aktiviert.')
+      feedback.success('Push wurde auf diesem Gerät aktiviert. Die serverseitige Zustellung bleibt bis zur Datenbank-/Worker-Anbindung im Demo-Modus.')
     } catch (error) {
       feedback.error(error instanceof ApiError || error instanceof Error ? error.message : 'Push konnte nicht geändert werden.')
     } finally {
@@ -94,14 +89,9 @@ export function PushSettings() {
 
   if (!supported) return <p className="muted">Push wird auf diesem Gerät oder Browser nicht unterstützt.</p>
 
-  const canEnable = Boolean(publicKey) && serverConfigured === true
-
   return (
     <div className="settings-action-stack">
-      {!enabled && serverConfigured === false ? (
-        <p className="muted">Push ist vorbereitet, aber serverseitig noch nicht aktiviert.</p>
-      ) : null}
-      <button className="button secondary" onClick={toggle} disabled={busy || (!enabled && !canEnable)} aria-busy={busy || undefined}>
+      <button className="button secondary" onClick={toggle} disabled={busy} aria-busy={busy || undefined}>
         <span>{busy ? 'Bitte warten…' : enabled ? 'Push deaktivieren' : 'Push aktivieren'}</span>
       </button>
     </div>

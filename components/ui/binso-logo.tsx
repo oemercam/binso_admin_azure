@@ -16,3 +16,6 @@ export function AppLogo({ compact = false }: { compact?: boolean }) {
     </span>
   )
 }
+
+/** Backwards-compatible name; AppLogo is the canonical identity component. */
+export const BinsoLogo = AppLogo

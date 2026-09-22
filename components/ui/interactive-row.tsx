@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import Link from 'next/link'
 
 type InteractiveRowProps = {
@@ -22,15 +22,23 @@ export function InteractiveRow({ children, className = '', href, onActivate, ari
     )
   }
 
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (!onActivate) return
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    onActivate()
+  }
+
   return (
-    <button
-      type="button"
+    <div
       className={classes}
+      role="button"
+      tabIndex={0}
       aria-label={ariaLabel}
       onClick={onActivate}
-      disabled={!onActivate}
+      onKeyDown={onKeyDown}
     >
       {children}
-    </button>
+    </div>
   )
 }

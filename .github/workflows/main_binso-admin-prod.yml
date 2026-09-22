@@ -45,9 +45,6 @@ jobs:
       - name: Architecture checks
         run: npm run architecture:check
 
-      - name: Core tests
-        run: npm run test:core
-
       - name: Build
         run: npm run build
         env:

@@ -1,16 +1,14 @@
 'use client'
 
 import { PageHeader } from '@/components/ui/page-header'
-import { formatChf } from '@/lib/format/locale'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { useBusinessStore } from '@/components/state/business-store'
 import { effectiveInvoiceStatus, invoiceOpenAmount } from '@/modules/invoices/status'
-import { buildFinancialTrend } from '@/modules/dashboard/financial-trend'
 
+const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 })
 
 export default function FinancePage() {
   const store = useBusinessStore()
-  const financialTrend = buildFinancialTrend(store.timeEntries, store.supplierInvoices)
   const deliveredRevenue = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0)
   const internalCost = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0)
   const supplierCost = store.supplierInvoices.reduce((sum, invoice) => sum + invoice.netAmount, 0)
@@ -23,16 +21,16 @@ export default function FinancePage() {
 
   return (
     <section className="page">
-      <PageHeader eyebrow="CONTROLLING" title="Finanzen" description="Umsatz, Kosten, Marge und offene Forderungen." />
+      <PageHeader eyebrow="CONTROLLING" title="Finanzen" description="Umsatz, Kosten, Marge und Forderungen aus dem aktuellen Demo-Datenbestand." />
       <div className="metric-strip">
-        <div className="metric"><span>Geleisteter Umsatz</span><strong>{formatChf(deliveredRevenue)}</strong><small>aus erfassten Zeiten</small></div>
-        <div className="metric"><span>Offene Forderungen</span><strong>{formatChf(open)}</strong><small className="tone-warning">noch nicht bezahlt</small></div>
-        <div className="metric"><span>Deckungsbeitrag</span><strong>{formatChf(contribution)}</strong><small>Marge {margin} %</small></div>
-        <div className="metric"><span>Offene Kreditoren</span><strong>{formatChf(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
+        <div className="metric"><span>Geleisteter Umsatz</span><strong>{chf.format(deliveredRevenue)}</strong><small>aus erfassten Zeiten</small></div>
+        <div className="metric"><span>Offene Forderungen</span><strong>{chf.format(open)}</strong><small className="tone-warning">noch nicht bezahlt</small></div>
+        <div className="metric"><span>Deckungsbeitrag</span><strong>{chf.format(contribution)}</strong><small>Marge {margin} %</small></div>
+        <div className="metric"><span>Offene Kreditoren</span><strong>{chf.format(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
       </div>
       <div className="dashboard-layout">
-        <section className="surface chart-surface"><div className="section-title"><div><h2>Umsatz und Kosten</h2><p>Entwicklung der wichtigsten Kennzahlen</p></div></div><RevenueChart series={financialTrend}/></section>
-        <section className="surface"><div className="section-title"><div><h2>Cash-Bewegung</h2><p>Zahlungseingänge und offene Positionen</p></div></div><div className="finance-ledger"><div><span>Zahlungseingänge</span><strong className="tone-positive">+ {formatChf(paidIn)}</strong></div><div><span>Offene Debitoren</span><strong>{formatChf(open)}</strong></div><div><span>Offene Kreditoren</span><strong>- {formatChf(openSupplier)}</strong></div><div className="total"><span>Netto offene Positionen</span><strong>{formatChf(open - openSupplier)}</strong></div></div></section>
+        <section className="surface chart-surface"><div className="section-title"><div><h2>Umsatz und Kosten</h2><p>Demo-Historie · aktuelle Kennzahlen oben sind live</p></div></div><RevenueChart/></section>
+        <section className="surface"><div className="section-title"><div><h2>Cash-Bewegung</h2><p>Aus erfassten Demo-Transaktionen</p></div></div><div className="finance-ledger"><div><span>Zahlungseingänge</span><strong className="tone-positive">+ {chf.format(paidIn)}</strong></div><div><span>Offene Debitoren</span><strong>{chf.format(open)}</strong></div><div><span>Offene Kreditoren</span><strong>- {chf.format(openSupplier)}</strong></div><div className="total"><span>Netto offene Positionen</span><strong>{chf.format(open - openSupplier)}</strong></div></div></section>
       </div>
     </section>
   )
