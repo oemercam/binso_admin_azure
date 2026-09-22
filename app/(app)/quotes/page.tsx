@@ -12,6 +12,7 @@ import { ResponsivePreview } from '@/components/documents/responsive-preview'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { Quote, QuoteLine, QuoteStatus } from '@/types/domain'
 import { printCurrentDocument } from '@/lib/browser/actions'
+import { useFeedback } from '@/components/ui/feedback'
 
 const chf = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 })
 const labels: Record<QuoteStatus, string> = { draft: 'Entwurf', sent: 'Versendet', accepted: 'Angenommen', declined: 'Abgelehnt', expired: 'Abgelaufen' }
@@ -26,7 +27,7 @@ export default function QuotesPage() {
   const [editing, setEditing] = useState<Quote | null>(null)
   const [sending, setSending] = useState<Quote | null>(null)
   const [creating, setCreating] = useState(false)
-  const [notice, setNotice] = useState('')
+  const feedback = useFeedback()
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
@@ -61,19 +62,20 @@ export default function QuotesPage() {
     if (!preview) return
     store.updateQuote(preview.id, { status })
     setPreview({ ...preview, status })
-    setNotice(status === 'accepted' ? 'Angebot als angenommen markiert.' : status === 'declined' ? 'Angebot als abgelehnt markiert.' : '')
+    if (status === 'accepted') feedback.success('Angebot als angenommen markiert.')
+    if (status === 'declined') feedback.info('Angebot als abgelehnt markiert.')
   }
 
   function orderFromQuote() {
     if (!preview) return
     const order = store.createOrderFromQuote(preview.id)
     if (order) {
-      setNotice(`Auftrag «${order.name}» wurde erstellt.`)
+      feedback.success(`Auftrag «${order.name}» wurde erstellt.`)
       setPreview(null)
       router.push(`/orders/${order.id}`)
       return
     }
-    setNotice('Das Angebot muss zuerst angenommen werden.')
+    feedback.warning('Das Angebot muss zuerst angenommen werden.')
   }
 
   function createRevision() {
@@ -82,12 +84,11 @@ export default function QuotesPage() {
     if (!revision) return
     setPreview(revision)
     setEditing(revision)
-    setNotice(`Neue Version ${revision.version} als Entwurf erstellt.`)
+    feedback.success(`Neue Version ${revision.version} als Entwurf erstellt.`)
   }
 
   return <section className="page">
     <PageHeader eyebrow="VERKAUF" title="Angebote" description="Erstellen, bearbeiten, als PDF prüfen, versenden und in Aufträge überführen." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Angebot erstellen" title="Angebot erstellen"><Icon name="plus" size={16}/><span>Angebot erstellen</span></button>} />
-    {notice && <div className="inline-notice"><Icon name="check" size={15}/><span>{notice}</span></div>}
 
     <div className="data-list compact-overview-list">
       <div className="data-row quote-grid data-head"><span>Angebot</span><span>Kunde</span><span>Gültig bis</span><span>Betrag</span><span>Status</span><span /></div>
@@ -108,7 +109,7 @@ export default function QuotesPage() {
 
     {creating && <QuoteForm onClose={() => setCreating(false)} onSave={(quote) => { setCreating(false); setPreview(quote) }} />}
     {editing && <QuoteEdit quote={editing} onClose={() => setEditing(null)} onSave={(quote) => { setEditing(null); setPreview(quote) }} />}
-    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); setNotice('Angebot im Demo-Versand als versendet markiert.') }} />}
+    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); feedback.success('Angebot im Demo-Versand als versendet markiert.') }} />}
   </section>
 
   function QuoteForm({ onClose, onSave }: { onClose: () => void; onSave: (q: Quote) => void }) {

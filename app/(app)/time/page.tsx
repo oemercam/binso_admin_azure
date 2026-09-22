@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
+import { useFeedback } from '@/components/ui/feedback'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
@@ -41,7 +42,7 @@ export default function TimePage() {
   const [selected, setSelected] = useState<string[]>([])
   const [billableEntry, setBillableEntry] = useState(true)
   const [formError, setFormError] = useState('')
-  const [notice, setNotice] = useState('')
+  const feedback = useFeedback()
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return
@@ -129,17 +130,18 @@ export default function TimePage() {
     })
     setNote('')
     setOpen(false)
-    if (effective?.evidence.required) setNotice(`Zeit gespeichert. Für ${person.name} ist ein ${frequencyLabel(effective.evidence.frequency).toLowerCase()}er Nachweis erforderlich.`)
-    else setNotice('Zeit gespeichert.')
+    if (effective?.evidence.required) feedback.info(`Zeit gespeichert. Für ${person.name} ist ein ${frequencyLabel(effective.evidence.frequency).toLowerCase()}er Nachweis erforderlich.`)
+    else feedback.success('Zeit gespeichert.')
   }
 
   function approveEntry(entryId: string) {
     const entry = store.timeEntries.find((item) => item.id === entryId)
     if (!entry || !canApprove) return
     const eligibility = getTimeEntryApprovalEligibility(entry, store.timeEvidence, store.orderPolicies, store.orderAssignmentRules)
-    if (!eligibility.eligible) { setNotice(eligibility.reason); return }
+    if (!eligibility.eligible) { feedback.warning(eligibility.reason); return }
     const updated = store.updateTimeEntry(entry.id, { approved: true })
-    setNotice(updated ? 'Zeit freigegeben.' : 'Die Zeit kann nicht mehr geändert werden.')
+    if (updated) feedback.success('Zeit freigegeben.')
+    else feedback.warning('Die Zeit kann nicht mehr geändert werden.')
   }
 
   function createInvoiceFromSelected() {
@@ -157,7 +159,6 @@ export default function TimePage() {
         description="Zeiten erfassen, Nachweise prüfen, freigeben und direkt fakturieren."
         action={canWrite ? <button className="button primary page-primary-action" onClick={() => setOpen(true)}><Icon name="plus" size={16}/><span>Zeit erfassen</span></button> : undefined}
       />
-      {notice && <div className="inline-notice"><Icon name="check" size={15}/><span>{notice}</span></div>}
 
       <div className="time-hero"><div><span>September</span><strong>{total} h</strong><small>erfasst</small></div><div className="time-hero-progress"><i style={{ width: `${Math.min(100, (total / 168) * 100)}%` }}/></div><div><span>Verrechenbar</span><strong>{billable} h</strong><small>{unbilled.reduce((sum, entry) => sum + entry.hours, 0)} h bereit</small></div></div>
 

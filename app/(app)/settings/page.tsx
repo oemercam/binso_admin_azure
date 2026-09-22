@@ -7,6 +7,7 @@ import { PushSettings } from '@/components/pwa/push-settings'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
+import { useFeedback } from '@/components/ui/feedback'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { DocumentTemplates } from '@/types/domain'
 
@@ -31,7 +32,7 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('general')
   const [company, setCompany] = useState(store.companyProfile)
   const [templates, setTemplates] = useState(store.documentTemplates)
-  const [saved, setSaved] = useState('')
+  const feedback = useFeedback()
   const [mobileDetail, setMobileDetail] = useState(false)
   const [editor, setEditor] = useState<Editor>(null)
   const [editValue, setEditValue] = useState('')
@@ -47,8 +48,7 @@ export default function SettingsPage() {
   )
 
   function flash(message: string) {
-    setSaved(message)
-    setTimeout(() => setSaved(''), 2600)
+    feedback.success(message)
   }
 
   function openMail(key: MailKey, title: string, inputType = 'text') {
@@ -117,7 +117,6 @@ export default function SettingsPage() {
     <section className="page settings-page">
       <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern." />
 
-      {saved ? <div className="inline-notice"><span>{saved}</span></div> : null}
 
       <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">
         <TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton>
