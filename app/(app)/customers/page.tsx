@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
-import { CloseButton } from '@/components/ui/close-button'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { Toggle } from '@/components/ui/toggle'
 import { InteractiveRow } from '@/components/ui/interactive-row'
@@ -102,12 +101,7 @@ export default function CustomersPage() {
       </div>
 
       {open && (
-        <StandardFormSheet onClose={() => setOpen(false)} onSubmit={createCustomer} panelClassName="form-sheet bottom-sheet standard-mobile-sheet">
-            <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Kunde erfassen</strong><span>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
-            <CustomerFields form={form} setForm={setForm}/>
-            <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button className="button primary">Kunde speichern</button></div>
-          </StandardFormSheet>
+        <StandardFormSheet open title={<>Kunde erfassen</>} description={<>Pflichtfelder stellen sicher, dass Angebote und Rechnungen versandbereit sind.</>} onClose={() => setOpen(false)} onSubmit={createCustomer} formId="customers-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="customers-page-sheet-1" className="button primary">Kunde speichern</button></>}><CustomerFields form={form} setForm={setForm}/></StandardFormSheet>
       )}
 
       {editing && <CustomerEdit customer={editing} onClose={() => setEditing(null)} />}
@@ -122,10 +116,7 @@ export default function CustomersPage() {
       if (updated) onClose()
     }
     return (
-      <StandardFormSheet onClose={onClose} onSubmit={save} panelClassName="form-sheet bottom-sheet standard-mobile-sheet">
-          <div className="sheet-grabber"/>
-          <div className="sheet-heading"><div><strong>{customer.name}</strong><span>{customer.customerNo} · Kundendaten bearbeiten</span></div><CloseButton onClick={onClose} /></div>
-          <div className="form-grid">
+      <StandardFormSheet open title={<>{customer.name}</>} description={<>{customer.customerNo} · Kundendaten bearbeiten</>} onClose={onClose} onSubmit={save} formId="customers-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="customers-page-sheet-2" className="button primary">Änderungen speichern</button></>}><div className="form-grid">
             <label><span>Firma *</span><input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value, legalName: e.target.value })} required/></label>
             <label><span>Ansprechperson</span><input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
             <label><span>E-Mail *</span><input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })} required/></label>
@@ -137,9 +128,7 @@ export default function CustomersPage() {
             <label><span>UID / MWST</span><input value={draft.uid ?? ''} onChange={(e) => setDraft({ ...draft, uid: e.target.value })}/></label>
             <label><span>Zahlungsziel *</span><input type="number" min="1" value={draft.paymentDays} onChange={(e) => setDraft({ ...draft, paymentDays: Number(e.target.value) })} required/></label>
             <div className="form-toggle-field full"><span>Kunde aktiv</span><Toggle label="Kunde aktiv" checked={draft.status === 'active'} onChange={(value) => setDraft({ ...draft, status: value ? 'active' : 'inactive' })}/></div>
-          </div>
-          <div className="sheet-actions"><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Änderungen speichern</button></div>
-        </StandardFormSheet>
+          </div></StandardFormSheet>
     )
   }
 }

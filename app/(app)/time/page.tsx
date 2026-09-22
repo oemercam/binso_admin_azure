@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
-import { CloseButton } from '@/components/ui/close-button'
+import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
@@ -196,11 +196,7 @@ export default function TimePage() {
       </div>
 
       {open && canWrite && (
-        <div className="overlay-layer sheet-layer" onMouseDown={() => setOpen(false)}>
-          <form className="form-sheet bottom-sheet standard-mobile-sheet" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
-            <div className="sheet-grabber"/>
-            <div className="sheet-heading"><div><strong>Zeit erfassen</strong><span>Direkt einem Auftrag und Leistungserbringer zuordnen.</span></div><CloseButton onClick={() => setOpen(false)} /></div>
-            {formError && <div className="field-error">{formError}</div>}
+        <StandardFormSheet open title={<>Zeit erfassen</>} description={<>Direkt einem Auftrag und Leistungserbringer zuordnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="time-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="time-page-sheet-1" className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></>}>{formError && <div className="field-error">{formError}</div>}
             <div className="form-grid">
               <label className="full"><span>Auftrag *</span><select value={orderId} onChange={(e) => setOrderId(e.target.value)} required>{availableOrders.map((order) => <option key={order.id} value={order.id}>{order.name} · {order.customerName}</option>)}</select></label>
               <label className="full"><span>Leistungserbringer *</span><select value={personId} onChange={(e) => setPersonId(e.target.value)} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name} · {workerLabel(person.workerType)}</option>)}</select></label>
@@ -209,10 +205,7 @@ export default function TimePage() {
               <div className="form-toggle-field"><span>Verrechenbar</span><Toggle label="Verrechenbar" checked={billableEntry} onChange={setBillableEntry}/></div>
               <label className="full"><span>Beschreibung</span><textarea rows={4} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Was wurde gemacht?"/></label>
             </div>
-            {!availableOrders.length && <div className="field-error">Für dieses Profil ist aktuell kein aktiver Auftrag zur Zeiterfassung zugewiesen.</div>}
-            <div className="sheet-actions"><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button className="button primary" disabled={!availableOrders.length || !people.length}>Speichern</button></div>
-          </form>
-        </div>
+            {!availableOrders.length && <div className="field-error">Für dieses Profil ist aktuell kein aktiver Auftrag zur Zeiterfassung zugewiesen.</div>}</StandardFormSheet>
       )}
     </section>
   )

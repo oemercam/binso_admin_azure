@@ -93,3 +93,35 @@ Diesen Ablauf nach jedem grossen Merge auf Azure Production durchführen.
 Ein Release gilt im Demo-Umfang als funktionsfähig, wenn alle obigen Schritte ohne leere Zielseite, tote Buttons, verlorene Demo-Daten oder doppelte Fakturierung durchlaufen.
 
 Echte E-Mail, DB, Blob, Scheduler, serverseitiges PDF/Audit und Push-Zustellung werden separat als Produktionsintegration getestet.
+
+## Overlay and Bottom-Sheet Migration Tests
+
+### Behaviour
+
+1. Open and close a standard create/edit form.
+2. Close with Escape on desktop.
+3. Close with the visible close control.
+4. Verify backdrop dismissal where allowed.
+5. Submit via the footer button that targets the form by form ID.
+6. Trigger a validation error and verify the invalid field remains reachable.
+7. Use a long form and scroll from first to last field; header/footer must not scroll away.
+8. Verify no second body/page scrollbar exists while an overlay is open.
+9. Open a second overlay from an existing overlay where supported and verify the scroll-lock depth is restored correctly.
+10. Close the overlay and verify focus returns to the original trigger.
+
+### Viewport / keyboard
+
+- 320x568
+- 375x667
+- 390x844
+- 430x932
+- 768x1024
+- 820x1180
+- 1366x768
+- 1920x1080
+
+On mobile browser and installed PWA test text, numeric and multiline keyboards near the bottom of long forms. The focused control must remain reachable, footer behaviour must stay predictable, and closing the keyboard must not leave a stale viewport height.
+
+### Document preview
+
+Invoice/PDF/image/attachment/report previews use ResponsivePreview, not StandardFormSheet. On mobile/PWA the preview is fullscreen or near-fullscreen; on desktop it is a large controlled presentation. Preview header/actions remain outside the document scroll region.

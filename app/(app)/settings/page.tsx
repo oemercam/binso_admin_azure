@@ -4,7 +4,8 @@ import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { ThemeControl } from '@/components/settings/theme-control'
 import { PushSettings } from '@/components/pwa/push-settings'
-import { AppSheet, SheetActions } from '@/components/ui/sheet-system'
+import { StandardFormSheet } from '@/components/ui/sheet-system'
+import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { DocumentTemplates } from '@/types/domain'
@@ -47,7 +48,7 @@ export default function SettingsPage() {
 
   function flash(message: string) {
     setSaved(message)
-    window.setTimeout(() => setSaved(''), 2600)
+    setTimeout(() => setSaved(''), 2600)
   }
 
   function openMail(key: MailKey, title: string, inputType = 'text') {
@@ -270,41 +271,43 @@ function EditorSheets({
   if (!editor) return null
 
   if (editor.kind === 'theme') {
-    return <AppSheet open mode="bottom" title="Darstellung" subtitle="Systemdarstellung oder manuell wählen." onClose={onClose}><ThemeControl /></AppSheet>
+    return <ResponsiveOverlay open title="Darstellung" description="Systemdarstellung oder manuell wählen." onClose={onClose}><ThemeControl /></ResponsiveOverlay>
   }
   if (editor.kind === 'push') {
-    return <AppSheet open mode="bottom" title="Push-Benachrichtigungen" subtitle="Einstellung für dieses Gerät." onClose={onClose}><PushSettings /></AppSheet>
+    return <ResponsiveOverlay open title="Push-Benachrichtigungen" description="Einstellung für dieses Gerät." onClose={onClose}><PushSettings /></ResponsiveOverlay>
   }
   if (editor.kind === 'mail' || editor.kind === 'reminder' || editor.kind === 'payroll') {
     const multiline = editor.kind === 'payroll' && editor.multiline
     const inputType = editor.kind === 'mail' ? editor.inputType ?? 'text' : editor.kind === 'reminder' ? 'number' : 'text'
     return (
-      <AppSheet
+      <StandardFormSheet
         open
-        mode={multiline ? 'fullscreen' : 'bottom'}
+        mode={multiline ? 'fullscreen' : 'auto'}
         title={editor.title}
-        subtitle="Aktuellen Wert bearbeiten."
+        description="Aktuellen Wert bearbeiten."
         onClose={onClose}
         onSubmit={onSaveScalar}
-        footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+        formId="settings-scalar-form"
+        footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="settings-scalar-form" className="button primary">Speichern</button></>}
       >
         <label className="settings-edit-field">
           <span>{editor.title}</span>
           {multiline ? <textarea rows={10} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus /> : <input type={inputType} min={inputType === 'number' ? 0 : undefined} max={inputType === 'number' ? 90 : undefined} value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />}
         </label>
-      </AppSheet>
+      </StandardFormSheet>
     )
   }
   if (editor.kind === 'company') {
     return (
-      <AppSheet
+      <StandardFormSheet
         open
         mode="fullscreen"
         title={companyTitle(editor.section)}
-        subtitle="Unternehmensdaten bearbeiten."
+        description="Unternehmensdaten bearbeiten."
         onClose={onClose}
         onSubmit={onSaveCompany}
-        footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+        formId="settings-company-form"
+        footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="settings-company-form" className="button primary">Speichern</button></>}
       >
         <div className="form-grid settings-editor-grid">
           {editor.section === 'company' && <><Field label="Firma *"><input value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} required /></Field><Field label="UID / MWST *"><input value={company.uid} onChange={(e) => setCompany({ ...company, uid: e.target.value })} required /></Field></>}
@@ -312,20 +315,21 @@ function EditorSheets({
           {editor.section === 'contact' && <><Field label="E-Mail *"><input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} required /></Field><Field label="Telefon"><input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} /></Field><Field label="Website" full><input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} /></Field></>}
           {editor.section === 'bank' && <><Field label="IBAN *" full><input value={company.iban} onChange={(e) => setCompany({ ...company, iban: e.target.value })} required /></Field><Field label="Bank"><input value={company.bankName} onChange={(e) => setCompany({ ...company, bankName: e.target.value })} /></Field><Field label="Standard-Zahlungsziel"><input type="number" min="1" max="120" value={company.defaultPaymentDays} onChange={(e) => setCompany({ ...company, defaultPaymentDays: Number(e.target.value) })} /></Field></>}
         </div>
-      </AppSheet>
+      </StandardFormSheet>
     )
   }
 
   const fields = templateFields(editor.template, templates)
   return (
-    <AppSheet
+    <StandardFormSheet
       open
       mode="fullscreen"
       title={`${editor.title} · Vorlage`}
-      subtitle="Texte und E-Mail-Vorlage bearbeiten."
+      description="Texte und E-Mail-Vorlage bearbeiten."
       onClose={onClose}
       onSubmit={onSaveTemplate}
-      footer={<SheetActions><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button className="button primary">Speichern</button></SheetActions>}
+      formId="settings-template-form"
+      footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="settings-template-form" className="button primary">Speichern</button></>}
     >
       <div className="settings-template-fields">
         <label><span>Einleitungstext</span><textarea rows={5} value={fields.intro} onChange={(e) => setTemplates({ ...templates, [fields.introKey]: e.target.value })} /></label>
@@ -334,7 +338,7 @@ function EditorSheets({
         <label><span>E-Mail-Text</span><textarea rows={8} value={fields.body} onChange={(e) => setTemplates({ ...templates, [fields.bodyKey]: e.target.value })} /></label>
         <div className="settings-note">Platzhalter: <code>{'{{number}}'}</code>, <code>{'{{amount}}'}</code>, <code>{'{{customer}}'}</code>, <code>{'{{period}}'}</code>, <code>{'{{name}}'}</code>.</div>
       </div>
-    </AppSheet>
+    </StandardFormSheet>
   )
 }
 
