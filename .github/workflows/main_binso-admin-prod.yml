@@ -74,17 +74,35 @@ jobs:
           test -f .next/standalone/node_modules/@swc/helpers/esm/_interop_require_default.js
           test -f .next/standalone/node_modules/@swc/helpers/cjs/_interop_require_default.cjs
 
+      - name: Materialize standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf deploy-root
+          mkdir -p deploy-root
+
+          # Azure ZipDeploy/OneDeploy does not reliably preserve pnpm symlinks.
+          # Dereference every symlink so node_modules contains physical files/directories.
+          cp -aL .next/standalone/. deploy-root/
+
+          test -f deploy-root/server.js
+          test -d deploy-root/node_modules/next
+          test ! -L deploy-root/node_modules/next
+          test -f deploy-root/node_modules/next/package.json
+          test -d deploy-root/node_modules/@swc/helpers
+          test ! -L deploy-root/node_modules/@swc/helpers
+          test -f deploy-root/node_modules/@swc/helpers/esm/_interop_require_default.js
+          test -f deploy-root/node_modules/@swc/helpers/cjs/_interop_require_default.cjs
+
       - name: Verify isolated standalone runtime dependencies
         shell: bash
         run: |
           set -euo pipefail
-          TEST_DIR="$(mktemp -d)"
-          trap 'rm -rf "$TEST_DIR"' EXIT
-          cp -a .next/standalone/. "$TEST_DIR/"
           (
-            cd "$TEST_DIR"
+            cd deploy-root
             node -e "console.log(require.resolve('@swc/helpers/_/_interop_require_default'))"
             node -e "require('next/dist/shared/lib/constants'); console.log('Next runtime dependency check passed')"
+            node -e "const fs=require('fs'); const s=fs.lstatSync('node_modules/next'); if (!s.isDirectory() || s.isSymbolicLink()) process.exit(1); console.log('Next package is materialized')"
           )
 
       - name: Create immutable deployment ZIP
@@ -93,9 +111,10 @@ jobs:
           set -euo pipefail
           rm -f binso-one.zip
           (
-            cd .next/standalone
+            cd deploy-root
             zip -qry "$GITHUB_WORKSPACE/binso-one.zip" .
           )
+          unzip -l binso-one.zip | grep -F 'node_modules/next/package.json'
           unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
           unzip -l binso-one.zip | grep -F 'server.js'
 
@@ -182,6 +201,7 @@ jobs:
             --settings \
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
+              BUILD_FLAGS=Off \
             --output none
 
       - name: Set explicit standalone startup command
