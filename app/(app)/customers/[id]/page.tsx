@@ -45,7 +45,7 @@ export default function CustomerDetailPage() {
       <Link className="button secondary" href={`/contracts?new=1&customer=${customer.id}`}><Icon name="contracts" size={15}/> Vertrag</Link>
       <Link className="button secondary" href={`/invoices?new=1&customer=${customer.id}`}><Icon name="invoices" size={15}/> Rechnung</Link>
       <Link className="button secondary" href={`/time?new=1&customer=${customer.id}`}><Icon name="time" size={15}/> Zeit</Link>
-      <button className="button secondary" onClick={() => setContactOpen(true)}><Icon name="user" size={15}/> Kontakt</button><button className="button secondary" onClick={() => setNoteOpen(true)}><Icon name="edit" size={15}/> Notiz</button>
+      <button className="button secondary" onClick={() => setNoteOpen(true)}><Icon name="edit" size={15}/> Notiz</button>
     </div>
 
     <div className="metric-grid compact-metrics">
@@ -61,7 +61,7 @@ export default function CustomerDetailPage() {
       <section className="panel"><div className="section-title"><div><h2>Geschäftsvorgänge</h2><p>Vom Angebot bis zur Rechnung</p></div></div><div className="customer-linked-list">
         {related.quotes.slice(0, 4).map((quote) => <Link key={quote.id} href={`/quotes?view=${quote.id}`}><span><strong>{quote.number}</strong><small>Angebot · {quote.title}</small></span><span>{quote.status === 'accepted' ? 'Angenommen' : quote.status === 'declined' ? 'Abgelehnt' : quote.status === 'sent' ? 'Versendet' : quote.status === 'revised' ? 'Ersetzt' : 'Entwurf'}</span></Link>)}
         {related.orders.slice(0, 4).map((order) => <Link key={order.id} href={`/orders/${order.id}`}><span><strong>{order.name}</strong><small>Auftrag</small></span><span>{order.status === 'active' ? 'Aktiv' : order.status === 'completed' ? 'Abgeschlossen' : 'Pausiert'}</span></Link>)}
-        {related.contracts.slice(0, 4).map((contract) => <Link key={contract.id} href="/contracts"><span><strong>{contract.number}</strong><small>Vertrag · {contract.name}</small></span><span>{contract.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span></Link>)}
+        {related.contracts.slice(0, 4).map((contract) => <Link key={contract.id} href={`/contracts?view=${contract.id}`}><span><strong>{contract.number}</strong><small>Vertrag · {contract.name}</small></span><span>{contract.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span></Link>)}
         {related.invoices.slice(0, 4).map((invoice) => <Link key={invoice.id} href={`/invoices?view=${invoice.id}`}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><span>{chf(invoice.amount)}</span></Link>)}
         {!related.quotes.length && !related.orders.length && !related.contracts.length && !related.invoices.length && <div className="search-empty">Noch keine Vorgänge.</div>}
       </div></section>

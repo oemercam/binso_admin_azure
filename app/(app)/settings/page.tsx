@@ -8,7 +8,7 @@ import { ThemeControl } from '@/components/settings/theme-control'
 import { PushSettings } from '@/components/pwa/push-settings'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
-import { SettingsSection, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
+import { SettingsSection, SettingsSelectRow, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
 import { useFeedback } from '@/components/ui/feedback'
 import { useBusinessStore } from '@/components/state/business-store'
 import type { DocumentTemplates } from '@/types/domain'
@@ -163,6 +163,27 @@ export default function SettingsPage() {
               <SettingsToggleRow title="Eigene Zeiten selbst freigeben" description="Freigabe durch die erfassende Person erlauben." checked={store.appSettings.workflow.allowSelfApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, allowSelfApproval: value } })} />
               <SettingsToggleRow title="Verrechnete Zeiten sperren" description="Nach Übernahme in eine Rechnung nicht mehr verändern." checked={store.appSettings.workflow.lockInvoicedTimes} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, lockInvoicedTimes: value } })} />
               <SettingsToggleRow title="Auftrag erst nach Angebotsannahme" description="Verhindert Aufträge aus offenen oder abgelehnten Angeboten." checked={store.appSettings.workflow.requireQuoteAcceptanceBeforeOrder} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, requireQuoteAcceptanceBeforeOrder: value } })} />
+            </SettingsSection>
+
+            <SettingsSection title="Standardprozess Zeit und Monatsrapport" description="Gilt für neue Aufträge. Kunde und Leistungserbringer können davon abweichen.">
+              <SettingsSelectRow title="Führende Zeiterfassung" description="Wo die tägliche Leistung primär erfasst wird." value={store.appSettings.workflow.customerProcess.timeTrackingMode} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, timeTrackingMode: value as 'internal' | 'external_customer_system' | 'both' } } })}>
+                <option value="external_customer_system">Kundensystem</option>
+                <option value="internal">Binso Admin</option>
+                <option value="both">Kundensystem und Binso</option>
+              </SettingsSelectRow>
+              <SettingsToggleRow title="Monatsrapport erforderlich" description="Ende Monat muss ein Rapport für die Leistung vorliegen." checked={store.appSettings.workflow.customerProcess.monthlyReportRequired} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, monthlyReportRequired: value } } })} />
+              <SettingsToggleRow title="Unterschrift des Kunden erforderlich" checked={store.appSettings.workflow.customerProcess.customerSignatureRequired} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, customerSignatureRequired: value } } })} disabled={!store.appSettings.workflow.customerProcess.monthlyReportRequired} />
+              <SettingsToggleRow title="Kundenfreigabe erforderlich" checked={store.appSettings.workflow.customerProcess.customerApprovalRequired} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, customerApprovalRequired: value } } })} disabled={!store.appSettings.workflow.customerProcess.monthlyReportRequired} />
+              <SettingsToggleRow title="Rechnung bis Rapportfreigabe sperren" description="Verhindert die Fakturierung der Stunden, solange der Monatsrapport nicht vollständig freigegeben ist." checked={store.appSettings.workflow.customerProcess.blockBillingUntilReportApproved} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, blockBillingUntilReportApproved: value } } })} disabled={!store.appSettings.workflow.customerProcess.monthlyReportRequired} />
+              <SettingsToggleRow title="Auszahlung bis Rapportfreigabe sperren" description="Gilt als Standard für Stundenlohn und externe Leistungserbringer." checked={store.appSettings.workflow.customerProcess.blockPayoutUntilReportApproved} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, blockPayoutUntilReportApproved: value } } })} disabled={!store.appSettings.workflow.customerProcess.monthlyReportRequired} />
+            </SettingsSection>
+
+            <SettingsSection title="Standard Auszahlung" description="Standard für eigene Mitarbeitende und externe Firmen. Pro Zuweisung anpassbar.">
+              <SettingsToggleRow title="Stundenlohn: Monatsrapport vor Auszahlung" checked={store.appSettings.workflow.employeeSettlement.requireApprovedMonthlyReport} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, employeeSettlement: { ...store.appSettings.workflow.employeeSettlement, requireApprovedMonthlyReport: value } } })} />
+              <SettingsToggleRow title="Stundenlohn: Buchhaltungsfreigabe" checked={store.appSettings.workflow.employeeSettlement.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, employeeSettlement: { ...store.appSettings.workflow.employeeSettlement, requireFinanceApproval: value } } })} />
+              <SettingsToggleRow title="Externe: Monatsrapport vor Zahlung" checked={store.appSettings.workflow.supplierSettlement.requireApprovedMonthlyReport} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, supplierSettlement: { ...store.appSettings.workflow.supplierSettlement, requireApprovedMonthlyReport: value } } })} />
+              <SettingsToggleRow title="Externe: Lieferantenrechnung erforderlich" description="Zahlung an externe Firmen erst nach Eingang einer Lieferantenrechnung." checked={store.appSettings.workflow.supplierSettlement.requireSupplierInvoice} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, supplierSettlement: { ...store.appSettings.workflow.supplierSettlement, requireSupplierInvoice: value } } })} />
+              <SettingsToggleRow title="Externe: Buchhaltungsfreigabe" checked={store.appSettings.workflow.supplierSettlement.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, supplierSettlement: { ...store.appSettings.workflow.supplierSettlement, requireFinanceApproval: value } } })} />
             </SettingsSection>
           </>
         )}

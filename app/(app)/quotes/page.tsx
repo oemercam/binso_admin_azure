@@ -75,6 +75,12 @@ export default function QuotesPage() {
 
   function orderFromQuote() {
     if (!preview) return
+    const existing = store.orders.find((order) => order.sourceQuoteId === preview.id || (order.customerId === preview.customerId && order.name === preview.title))
+    if (existing) {
+      setPreview(null)
+      router.push(`/orders/${existing.id}`)
+      return
+    }
     const order = store.createOrderFromQuote(preview.id)
     if (order) {
       feedback.success(`Auftrag «${order.name}» wurde erstellt.`)
@@ -85,9 +91,14 @@ export default function QuotesPage() {
     feedback.warning('Das Angebot muss zuerst angenommen werden.')
   }
 
-
   function invoiceFromQuote() {
     if (!preview) return
+    const existing = store.invoices.find((invoice) => invoice.customerId === preview.customerId && invoice.reference === preview.number && invoice.status !== 'cancelled')
+    if (existing) {
+      setPreview(null)
+      router.push(`/invoices?view=${existing.id}`)
+      return
+    }
     const invoice = store.createInvoiceFromQuote(preview.id)
     if (!invoice) { feedback.warning('Das Angebot muss zuerst angenommen werden.'); return }
     feedback.success(`Rechnung ${invoice.number} wurde als Entwurf erstellt.`)
@@ -104,8 +115,18 @@ export default function QuotesPage() {
     feedback.success(`Neue Version ${revision.version} als Entwurf erstellt.`)
   }
 
+  const previewIsDraft = preview?.status === 'draft'
+  const previewIsSent = preview?.status === 'sent'
+  const previewIsAccepted = preview?.status === 'accepted'
+  const previewCanRecordDispatch = Boolean(preview && ['draft', 'sent'].includes(preview.status))
+  const previewCanDecide = previewIsSent
+  const previewCanRevise = Boolean(preview && ['sent', 'declined', 'expired'].includes(preview.status))
+  const previewExistingOrder = preview ? store.orders.find((order) => order.sourceQuoteId === preview.id || order.mandateRef === preview.number) : undefined
+  const previewExistingInvoice = preview ? store.invoices.find((invoice) => invoice.status !== 'cancelled' && (invoice.sourceQuoteId === preview.id || invoice.reference === preview.number)) : undefined
+  const previewHasMoreActions = Boolean(preview && (previewCanDecide || previewCanRevise || previewIsAccepted))
+
   return <section className="page apple-page">
-    <PageHeader eyebrow="VERKAUF" title="Angebote" description="Erstellen, bearbeiten, als PDF prüfen, versenden und in Aufträge überführen." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Angebot erstellen" title="Angebot erstellen"><Icon name="plus" size={16}/><span>Angebot erstellen</span></button>} />
+    <PageHeader eyebrow="VERKAUF" title="Angebote" description="Entwürfe erstellen, Versandstatus erfassen, Kundenentscheid dokumentieren und Folgeprozesse starten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Angebot erstellen" title="Angebot erstellen"><Icon name="plus" size={16}/><span>Angebot erstellen</span></button>} />
 
     <div className="data-list compact-overview-list">
       <div className="data-row quote-grid data-head"><span>Angebot</span><span>Kunde</span><span>Gültig bis</span><span>Betrag</span><span>Status</span><span /></div>
@@ -119,16 +140,33 @@ export default function QuotesPage() {
       onClose={() => setPreview(null)}
       headerActions={preview ? <button className="icon-button" onClick={() => printCurrentDocument()} title="PDF / Drucken"><Icon name="download" size={16}/></button> : null}
       warning={preview && missing(preview).length > 0 ? <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {missing(preview).join(', ')}</span></div> : null}
-      actions={preview ? <><button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button><button className="button secondary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {preview.status === 'sent' ? 'Erneut senden' : 'Senden'}</button>{preview.status !== 'accepted' && <button className="button secondary" onClick={() => setStatus('accepted')}><Icon name="check" size={15}/> Annehmen</button>}{preview.status !== 'declined' && preview.status !== 'accepted' && <button className="button secondary" onClick={() => setStatus('declined')}>Ablehnen</button>}{preview.status === 'accepted' && <button className="button secondary" onClick={orderFromQuote}><Icon name="orders" size={15}/> Auftrag erstellen</button>}{preview.status === 'accepted' && <button className="button primary" onClick={invoiceFromQuote}><Icon name="invoices" size={15}/> Rechnung erstellen</button>}<button className="button secondary" onClick={createRevision}>Neue Version</button></> : null}
-      mobileActions={preview ? <button className="button primary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {preview.status === 'sent' ? 'Erneut senden' : 'Senden'}</button> : null}
-      mobileMoreActions={preview ? <><button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>{preview.status !== 'accepted' && <button className="button secondary" onClick={() => setStatus('accepted')}><Icon name="check" size={15}/> Annehmen</button>}{preview.status !== 'declined' && preview.status !== 'accepted' && <button className="button secondary" onClick={() => setStatus('declined')}>Ablehnen</button>}{preview.status === 'accepted' && <button className="button secondary" onClick={orderFromQuote}><Icon name="orders" size={15}/> Auftrag erstellen</button>}{preview.status === 'accepted' && <button className="button secondary" onClick={invoiceFromQuote}><Icon name="invoices" size={15}/> Rechnung erstellen</button>}<button className="button secondary" onClick={createRevision}>Neue Version</button></> : null}
+      actions={preview ? <>
+        {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
+        {previewCanRecordDispatch && <button className="button secondary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Versand erneut erfassen' : 'Als versendet markieren'}</button>}
+        {previewCanDecide && <button className="button secondary" onClick={() => setStatus('accepted')}><Icon name="check" size={15}/> Als angenommen markieren</button>}
+        {previewCanDecide && <button className="button secondary" onClick={() => setStatus('declined')}>Als abgelehnt markieren</button>}
+        {previewIsAccepted && <button className="button primary" onClick={orderFromQuote}><Icon name="orders" size={15}/> {previewExistingOrder ? 'Auftrag öffnen' : 'Auftrag erstellen'}</button>}
+        {previewIsAccepted && <button className="button secondary" onClick={invoiceFromQuote}><Icon name="invoices" size={15}/> {previewExistingInvoice ? 'Direktrechnung öffnen' : 'Direktrechnung erstellen'}</button>}
+        {previewCanRevise && <button className="button secondary" onClick={createRevision}>Neue Version erstellen</button>}
+      </> : null}
+      mobileActions={preview ? <>
+        {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
+        {previewCanRecordDispatch && <button className="button primary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Versand erfassen' : 'Als versendet markieren'}</button>}
+        {previewIsAccepted && <button className="button primary" onClick={orderFromQuote}><Icon name="orders" size={15}/> {previewExistingOrder ? 'Auftrag öffnen' : 'Auftrag erstellen'}</button>}
+      </> : null}
+      mobileMoreActions={preview && previewHasMoreActions ? <>
+        {previewCanDecide && <button className="button secondary" onClick={() => setStatus('accepted')}><Icon name="check" size={15}/> Als angenommen markieren</button>}
+        {previewCanDecide && <button className="button secondary" onClick={() => setStatus('declined')}>Als abgelehnt markieren</button>}
+        {previewIsAccepted && <button className="button secondary" onClick={invoiceFromQuote}><Icon name="invoices" size={15}/> {previewExistingInvoice ? 'Direktrechnung öffnen' : 'Direktrechnung erstellen'}</button>}
+        {previewCanRevise && <button className="button secondary" onClick={createRevision}>Neue Version erstellen</button>}
+      </> : null}
     >
       {preview ? <DocumentPreviewFrame><BusinessDocument type="quote" company={store.companyProfile} customer={customerFor(preview)} quote={preview}/></DocumentPreviewFrame> : null}
     </ResponsivePreview>
 
     {creating && <QuoteForm onClose={() => setCreating(false)} onSave={(quote) => { setCreating(false); setPreview(quote) }} />}
     {editing && <QuoteEdit quote={editing} onClose={() => setEditing(null)} onSave={(quote) => { setEditing(null); setPreview(quote) }} />}
-    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); feedback.success('Angebot im Demo-Versand als versendet markiert.') }} />}
+    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); feedback.success('Versandstatus des Angebots wurde gespeichert.') }} />}
   </section>
 
   function QuoteForm({ onClose, onSave }: { onClose: () => void; onSave: (q: Quote) => void }) {
@@ -161,10 +199,11 @@ export default function QuotesPage() {
   function QuoteSend({ quote, onClose, onSent }: { quote: Quote; onClose: () => void; onSent: (q: Quote) => void }) {
     const customer = customerFor(quote)
     const [to, setTo] = useState(quote.recipientEmail || customer?.email || '')
-    const [subject, setSubject] = useState(store.documentTemplates.quoteEmailSubject.replaceAll('{{number}}', quote.number))
-    const [body, setBody] = useState(store.documentTemplates.quoteEmailBody.replaceAll('{{number}}', quote.number).replaceAll('{{customer}}', quote.customerName))
-    function send(e: React.FormEvent) { e.preventDefault(); const q = store.sendQuote(quote.id, to); if (q) onSent(q) }
-    const from = store.appSettings.mail.quoteSender
-    return <StandardFormSheet open title={<>Angebot versenden</>} description={<>PDF-Vorschau entspricht dem Dokument im Anhang.</>} onClose={onClose} onSubmit={send} formId="quotes-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-3" className="button primary" disabled={!from}><Icon name="send" size={15}/> Senden</button></>}><div className="send-meta"><span><small>Von</small><strong>{from || 'Nicht konfiguriert'}</strong></span>{store.appSettings.mail.financeCc && <span><small>CC</small><strong>{store.appSettings.mail.financeCc}</strong></span>}</div><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label><label className="full"><span>Betreff *</span><Input value={subject} onChange={(e) => setSubject(e.target.value)} required/></label><label className="full"><span>Nachricht *</span><Textarea rows={8} value={body} onChange={(e) => setBody(e.target.value)} required/></label></div><div className="demo-hint">Demo-Versand: Status und Empfänger werden gespeichert. Der echte Versand über {from || 'die konfigurierte Absenderadresse'} benötigt noch Microsoft Graph und serverseitige PDF-Erzeugung.</div></StandardFormSheet>
+    function save(event: React.FormEvent) {
+      event.preventDefault()
+      const updated = store.sendQuote(quote.id, to)
+      if (updated) onSent(updated)
+    }
+    return <StandardFormSheet open title={<>Versand erfassen</>} description={<>Speichert Empfänger, Versandzeitpunkt und Status. Es wird aktuell keine E-Mail verschickt.</>} onClose={onClose} onSubmit={save} formId="quotes-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-3" className="button primary"><Icon name="check" size={15}/> Als versendet markieren</button></>}><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label></div></StandardFormSheet>
   }
 }

@@ -7,10 +7,11 @@ import { Icon } from '@/components/ui/icon'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { PageHeader } from '@/components/ui/page-header'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
+import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useFeedback } from '@/components/ui/feedback'
 import type { BillingInterval, Contract, ContractLine, ContractStatus } from '@/types/domain'
-import { formatChf, formatDate } from '@/lib/format/locale'
+import { formatChf, formatDate, formatMonthYear } from '@/lib/format/locale'
 const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const statusLabel: Record<ContractStatus, string> = { draft: 'Entwurf', active: 'Aktiv', paused: 'Pausiert', ended: 'Beendet', cancelled: 'Storniert' }
 const intervalLabel: Record<BillingInterval, string> = { none: 'Keine', monthly: 'Monatlich', quarterly: 'Quartalsweise', yearly: 'Jährlich' }
@@ -26,15 +27,23 @@ export default function ContractsPage() {
   const [editing, setEditing] = useState<Contract | null>(null)
 
   useEffect(() => {
-    if (searchParams.get('new') !== '1') return
-    let cancelled = false
-    queueMicrotask(() => { if (!cancelled) setCreating(true) })
     const params = new URLSearchParams(searchParams.toString())
-    params.delete('new')
+    const createRequested = params.get('new') === '1'
+    const viewId = params.get('view')
+    const viewContract = viewId ? store.contracts.find((item) => item.id === viewId) : undefined
+    if (!createRequested && !viewContract) return
+    let cancelled = false
+    queueMicrotask(() => {
+      if (cancelled) return
+      if (createRequested) setCreating(true)
+      if (viewContract) setEditing(viewContract)
+    })
+    if (createRequested) params.delete('new')
+    if (viewContract) params.delete('view')
     const suffix = params.toString() ? `?${params.toString()}` : ''
     router.replace(`${pathname}${suffix}`, { scroll: false })
     return () => { cancelled = true }
-  }, [pathname, router, searchParams])
+  }, [pathname, router, searchParams, store.contracts])
 
   const activeValue = useMemo(() => store.contracts.filter((item) => item.status === 'active').reduce((sum, contract) => sum + contract.lines.reduce((lineSum, line) => lineSum + line.quantity * line.unitPrice, 0), 0), [store.contracts])
 
@@ -46,9 +55,17 @@ export default function ContractsPage() {
   }
 
   function createInvoice(contract: Contract) {
+    const billingDate = contract.nextInvoiceDate || new Date().toISOString().slice(0, 10)
+    const billingPeriod = formatMonthYear(billingDate)
+    const existing = store.invoices.find((item) => item.contractId === contract.id && item.period === billingPeriod && item.status !== 'cancelled')
+    if (existing) {
+      feedback.info(`Rechnung ${existing.number} für ${billingPeriod} ist bereits vorhanden.`)
+      router.push(`/invoices?view=${existing.id}`)
+      return
+    }
     const invoice = store.createInvoiceFromContract(contract.id)
     if (!invoice) { feedback.warning('Für diesen Vertrag konnte keine Rechnung erstellt werden.'); return }
-    feedback.success(`Rechnung ${invoice.number} wurde als Entwurf erstellt.`)
+    feedback.success(`Rechnung ${invoice.number} für ${billingPeriod} wurde als Entwurf erstellt.`)
     router.push(`/invoices?view=${invoice.id}`)
   }
 
@@ -115,8 +132,9 @@ export default function ContractsPage() {
 
   function ContractEditor({ contract, onClose, onOrder, onInvoice }: { contract: Contract; onClose: () => void; onOrder: () => void; onInvoice: () => void }) {
     const [draft, setDraft] = useState(contract)
+    const existingOrder = store.orders.find((order) => order.contractId === contract.id)
     function save(event: React.FormEvent) { event.preventDefault(); store.updateContract(contract.id, draft); onClose(); feedback.success('Vertrag wurde aktualisiert.') }
-    return <StandardFormSheet open title={<>{contract.number}</>} description={<>{contract.customerName} · {contract.name}</>} onClose={onClose} onSubmit={save} formId="contract-edit" footer={<><button type="button" className="button secondary" onClick={onOrder}>Auftrag öffnen/erstellen</button><button type="button" className="button secondary" onClick={onInvoice} disabled={draft.status !== 'active' || draft.billingInterval === 'none'}>Rechnung erstellen</button><button type="submit" form="contract-edit" className="button primary">Speichern</button></>} mode="fullscreen"><div className="form-grid">
+    return <StandardFormSheet open title={<>{contract.number}</>} description={<>{contract.customerName} · {contract.name}</>} onClose={onClose} onSubmit={save} formId="contract-edit" footer={<><button type="button" className="button secondary" onClick={onOrder}>{existingOrder ? 'Auftrag öffnen' : 'Auftrag erstellen'}</button><button type="button" className="button secondary" onClick={onInvoice} disabled={draft.status !== 'active' || draft.billingInterval === 'none'}>Nächste Rechnung erstellen</button><button type="submit" form="contract-edit" className="button primary">Speichern</button></>} mode="fullscreen"><div className="form-grid">
       <label className="full"><span>Vertragsname *</span><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required/></label>
       <label><span>Status</span><Select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as ContractStatus })}><option value="draft">Entwurf</option><option value="active">Aktiv</option><option value="paused">Pausiert</option><option value="ended">Beendet</option><option value="cancelled">Storniert</option></Select></label>
       <label><span>Abrechnung</span><Select value={draft.billingInterval} onChange={(e) => setDraft({ ...draft, billingInterval: e.target.value as BillingInterval })}><option value="none">Keine</option><option value="monthly">Monatlich</option><option value="quarterly">Quartalsweise</option><option value="yearly">Jährlich</option></Select></label>
@@ -124,6 +142,19 @@ export default function ContractsPage() {
       <label><span>Ende</span><DatePicker value={draft.endDate ?? ''} onChange={(e) => setDraft({ ...draft, endDate: e.target.value || undefined })}/></label>
       <label><span>Nächste Rechnung</span><DatePicker value={draft.nextInvoiceDate ?? ''} onChange={(e) => setDraft({ ...draft, nextInvoiceDate: e.target.value || undefined })}/></label>
       <label><span>Kündigungsfrist Tage</span><Input type="number" min="0" value={draft.noticeDays} onChange={(e) => setDraft({ ...draft, noticeDays: Number(e.target.value) })}/></label>
+      <div className="form-toggle-field full"><span>Eigener Zeit-/Rapportprozess</span><Toggle label="Eigener Zeit- und Rapportprozess" checked={Boolean(draft.workflowOverride)} onChange={(value) => {
+        const customer = store.customers.find((item) => item.id === draft.customerId)
+        const inherited = { ...store.appSettings.workflow.customerProcess, ...(customer?.workflowOverride ?? {}) }
+        setDraft({ ...draft, workflowOverride: value ? inherited : undefined })
+      }}/></div>
+      {draft.workflowOverride && <>
+        <label className="full"><span>Führende Zeiterfassung</span><Select value={draft.workflowOverride.timeTrackingMode ?? store.appSettings.workflow.customerProcess.timeTrackingMode} onChange={(e) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, timeTrackingMode: e.target.value as 'internal' | 'external_customer_system' | 'both' } })}><option value="external_customer_system">Kundensystem</option><option value="internal">Binso Admin</option><option value="both">Kundensystem und Binso</option></Select></label>
+        <div className="form-toggle-field full"><span>Monatsrapport erforderlich</span><Toggle label="Monatsrapport erforderlich" checked={draft.workflowOverride.monthlyReportRequired ?? true} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, monthlyReportRequired: value } })}/></div>
+        <div className="form-toggle-field full"><span>Unterschrift erforderlich</span><Toggle label="Unterschrift erforderlich" checked={draft.workflowOverride.customerSignatureRequired ?? true} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, customerSignatureRequired: value } })}/></div>
+        <div className="form-toggle-field full"><span>Kundenfreigabe erforderlich</span><Toggle label="Kundenfreigabe erforderlich" checked={draft.workflowOverride.customerApprovalRequired ?? true} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, customerApprovalRequired: value } })}/></div>
+        <div className="form-toggle-field full"><span>Fakturierung bis Rapportfreigabe sperren</span><Toggle label="Fakturierung bis Rapportfreigabe sperren" checked={draft.workflowOverride.blockBillingUntilReportApproved ?? true} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, blockBillingUntilReportApproved: value } })}/></div>
+        <div className="form-toggle-field full"><span>Auszahlung bis Rapportfreigabe sperren</span><Toggle label="Auszahlung bis Rapportfreigabe sperren" checked={draft.workflowOverride.blockPayoutUntilReportApproved ?? true} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, blockPayoutUntilReportApproved: value } })}/></div>
+      </>}
       <label className="full"><span>Notizen</span><Textarea rows={5} value={draft.notes ?? ''} onChange={(e) => setDraft({ ...draft, notes: e.target.value })}/></label>
     </div></StandardFormSheet>
   }

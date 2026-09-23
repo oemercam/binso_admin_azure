@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { Toggle } from '@/components/ui/toggle'
+import { Select } from '@/components/ui/form-controls'
 
 type BaseProps = {
   title: string
@@ -73,5 +74,26 @@ export function SettingsSection({
       </div>
       <div className="settings-progressive-list">{children}</div>
     </section>
+  )
+}
+
+
+export function SettingsSelectRow({
+  title,
+  description,
+  value,
+  onChange,
+  children,
+}: BaseProps & { value: string; onChange: (value: string) => void; children: ReactNode }) {
+  return (
+    <div className="settings-toggle-row is-interactive">
+      <span className="settings-value-copy">
+        <strong>{title}</strong>
+        {description ? <small>{description}</small> : null}
+      </span>
+      <Select className="settings-inline-select" aria-label={title} value={value} onChange={(event) => onChange(event.target.value)}>
+        {children}
+      </Select>
+    </div>
   )
 }

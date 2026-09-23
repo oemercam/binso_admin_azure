@@ -1,6 +1,8 @@
 const VERSION = new URL(self.location.href).searchParams.get('v') || 'legacy'
 const CACHE = `binso-shell-${VERSION}`
 const OFFLINE_URL = '/offline'
+const APP_ICON = `/icons/app-192.png?v=${encodeURIComponent(VERSION)}`
+const NOTIFICATION_BADGE = `/icons/notification-badge-96.png?v=${encodeURIComponent(VERSION)}`
 
 function safeAppPath(value) {
   try {
@@ -14,8 +16,12 @@ function safeAppPath(value) {
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.add(OFFLINE_URL))
+    fetch(OFFLINE_URL, { cache: 'reload' })
+      .then(response => {
+        if (!response.ok) throw new Error('offline_fallback_unavailable')
+        return caches.open(CACHE).then(cache => cache.put(OFFLINE_URL, response))
+      })
+      .catch(() => undefined)
   )
 })
 
@@ -38,6 +44,29 @@ self.addEventListener('fetch', event => {
   // Navigations must always use the current deployment. Offline is fallback only.
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)))
+    return
+  }
+
+  // Install metadata and app icons must never be pinned to an old deployment.
+  // Use network-first and keep a cache fallback for notification/offline use.
+  if (
+    url.pathname === '/manifest.webmanifest' ||
+    url.pathname.startsWith('/icons/') ||
+    url.pathname === '/icon.png' ||
+    url.pathname === '/apple-icon.png' ||
+    url.pathname === '/favicon.ico'
+  ) {
+    event.respondWith(
+      fetch(request, { cache: 'no-cache' })
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone()
+            caches.open(CACHE).then(cache => cache.put(request, copy))
+          }
+          return response
+        })
+        .catch(() => caches.match(request).then(hit => hit || Response.error()))
+    )
     return
   }
 
@@ -72,8 +101,8 @@ self.addEventListener('push', event => {
   const data = event.data?.json() ?? { title: 'Binso Admin', body: 'Neue Benachrichtigung' }
   event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
-    icon: '/icons/app-192.png',
-    badge: '/icons/app-192.png',
+    icon: APP_ICON,
+    badge: NOTIFICATION_BADGE,
     data: { url: safeAppPath(data.url) },
     tag: data.tag || 'binso-admin'
   }))

@@ -57,3 +57,26 @@ Single line:
 - KPI labels and values
 
 The rules are centralised in `app/app-ui.css` under the V10 final visual QA layer.
+
+
+## V12 flat-content rule
+
+Normal page content must not use framed card containers.
+
+Allowed:
+- whitespace
+- typography hierarchy
+- subtle row/column separators
+- buttons/inputs as controls
+- segmented control in settings
+- modal/sheet surfaces
+- mobile bottom pill
+
+Not allowed for normal page content:
+- card borders around KPI groups
+- bordered section boxes
+- rounded cards around lists
+- nested cards
+- shadowed content containers
+
+This rule applies to all authenticated routes and sub-routes through the central `.apple-page` styling layer.

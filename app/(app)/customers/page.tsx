@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@/components/ui/form-controls'
+import { Input, Select } from '@/components/ui/form-controls'
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -129,6 +129,15 @@ export default function CustomersPage() {
             <label><span>UID / MWST</span><Input value={draft.uid ?? ''} onChange={(e) => setDraft({ ...draft, uid: e.target.value })}/></label>
             <label><span>Zahlungsziel *</span><Input type="number" min="1" value={draft.paymentDays} onChange={(e) => setDraft({ ...draft, paymentDays: Number(e.target.value) })} required/></label>
             <div className="form-toggle-field full"><span>Kunde aktiv</span><Toggle label="Kunde aktiv" checked={draft.status === 'active'} onChange={(value) => setDraft({ ...draft, status: value ? 'active' : 'inactive' })}/></div>
+            <div className="form-toggle-field full"><span>Eigener Zeit-/Rapportprozess</span><Toggle label="Eigener Zeit- und Rapportprozess" checked={Boolean(draft.workflowOverride)} onChange={(value) => setDraft({ ...draft, workflowOverride: value ? { ...store.appSettings.workflow.customerProcess } : undefined })}/></div>
+            {draft.workflowOverride && <>
+              <label className="full"><span>Führende Zeiterfassung</span><Select value={draft.workflowOverride.timeTrackingMode ?? store.appSettings.workflow.customerProcess.timeTrackingMode} onChange={(e) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, timeTrackingMode: e.target.value as 'internal' | 'external_customer_system' | 'both' } })}><option value="external_customer_system">Kundensystem</option><option value="internal">Binso Admin</option><option value="both">Kundensystem und Binso</option></Select></label>
+              <div className="form-toggle-field full"><span>Monatsrapport erforderlich</span><Toggle label="Monatsrapport erforderlich" checked={draft.workflowOverride.monthlyReportRequired ?? store.appSettings.workflow.customerProcess.monthlyReportRequired} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, monthlyReportRequired: value } })}/></div>
+              <div className="form-toggle-field full"><span>Unterschrift erforderlich</span><Toggle label="Unterschrift erforderlich" checked={draft.workflowOverride.customerSignatureRequired ?? store.appSettings.workflow.customerProcess.customerSignatureRequired} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, customerSignatureRequired: value } })}/></div>
+              <div className="form-toggle-field full"><span>Kundenfreigabe erforderlich</span><Toggle label="Kundenfreigabe erforderlich" checked={draft.workflowOverride.customerApprovalRequired ?? store.appSettings.workflow.customerProcess.customerApprovalRequired} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, customerApprovalRequired: value } })}/></div>
+              <div className="form-toggle-field full"><span>Fakturierung bis Rapportfreigabe sperren</span><Toggle label="Fakturierung bis Rapportfreigabe sperren" checked={draft.workflowOverride.blockBillingUntilReportApproved ?? store.appSettings.workflow.customerProcess.blockBillingUntilReportApproved} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, blockBillingUntilReportApproved: value } })}/></div>
+              <div className="form-toggle-field full"><span>Auszahlung bis Rapportfreigabe sperren</span><Toggle label="Auszahlung bis Rapportfreigabe sperren" checked={draft.workflowOverride.blockPayoutUntilReportApproved ?? store.appSettings.workflow.customerProcess.blockPayoutUntilReportApproved} onChange={(value) => setDraft({ ...draft, workflowOverride: { ...draft.workflowOverride, blockPayoutUntilReportApproved: value } })}/></div>
+            </>}
           </div></StandardFormSheet>
     )
   }

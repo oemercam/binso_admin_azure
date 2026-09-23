@@ -17,6 +17,7 @@ export function PWAUpdateManager() {
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
   const [updateReady, setUpdateReady] = useState(false)
   const reloadAfterUpdate = useRef(false)
+  const cleanupRegistrationListeners = useRef<(() => void) | null>(null)
   const buildId = process.env.NEXT_PUBLIC_BUILD_ID?.trim()
 
   useEffect(() => {
@@ -84,11 +85,36 @@ export function PWAUpdateManager() {
         // Explicitly check the registered worker. The browser only installs a
         // new worker when the registration actually changed.
         nextRegistration.update().then(() => syncUpdateState(nextRegistration)).catch(() => undefined)
+
+        let lastCheck = 0
+        const checkForUpdate = () => {
+          if (disposed) return
+          const now = Date.now()
+          if (now - lastCheck < 60_000) return
+          lastCheck = now
+          nextRegistration.update().then(() => syncUpdateState(nextRegistration)).catch(() => undefined)
+        }
+
+        const onVisibilityChange = () => {
+          if (document.visibilityState === 'visible') checkForUpdate()
+        }
+
+        window.addEventListener('online', checkForUpdate)
+        window.addEventListener('pageshow', checkForUpdate)
+        document.addEventListener('visibilitychange', onVisibilityChange)
+
+        cleanupRegistrationListeners.current = () => {
+          window.removeEventListener('online', checkForUpdate)
+          window.removeEventListener('pageshow', checkForUpdate)
+          document.removeEventListener('visibilitychange', onVisibilityChange)
+        }
       })
       .catch(() => undefined)
 
     return () => {
       disposed = true
+      cleanupRegistrationListeners.current?.()
+      cleanupRegistrationListeners.current = null
       navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange)
     }
   }, [buildId])

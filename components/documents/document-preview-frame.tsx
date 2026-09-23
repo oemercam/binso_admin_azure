@@ -248,13 +248,13 @@ export function DocumentPreviewFrame({ children }: { children: ReactNode }) {
         <button type="button" className="preview-zoom-button" onClick={() => zoomBy(ZOOM_STEP)} aria-label="Vergrössern">+</button>
         <button
           type="button"
-          className="preview-fit-button"
+          className="preview-fit-button" aria-label="Dokument in Vorschau einpassen" title="Dokument einpassen"
           onClick={() => {
             pendingAnchorRef.current = null
             setManualScale(null)
           }}
         >
-          Anpassen
+          Einpassen
         </button>
       </div>
 

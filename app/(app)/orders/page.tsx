@@ -20,7 +20,7 @@ export default function OrdersPage() {
   const searchParams = useSearchParams()
   const [open, setOpen] = useState(false)
   const requestedCustomer = searchParams.get('customer')
-  const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers[0]?.id ?? '')
+  const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? '')
   const [name, setName] = useState('')
   const [mandateRef, setMandateRef] = useState('')
   const [endCustomerName, setEndCustomerName] = useState('')

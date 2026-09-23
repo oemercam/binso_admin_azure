@@ -43,6 +43,18 @@ const nextConfig: NextConfig = {
         ]
       },
       {
+        source: '/manifest.webmanifest',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, max-age=0, must-revalidate' }
+        ]
+      },
+      {
+        source: '/icons/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, max-age=0, must-revalidate' }
+        ]
+      },
+      {
         source: '/api/:path*',
         headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }]
       }

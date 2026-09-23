@@ -35,10 +35,14 @@ export default function OrderDetailPage() {
     return <section className="page apple-page"><div className="detail-back-row"><Link className="text-link" href="/orders">← Aufträge</Link></div><div className="empty-state"><strong>Auftrag nicht gefunden</strong><span>Der Auftrag ist nicht mehr vorhanden oder wurde noch nicht geladen.</span></div></section>
   }
 
+  const editorOrder = order
+
   const policy = store.orderPolicies.find((item) => item.orderId === order.id)
   const assignments = store.orderAssignmentRules.filter((item) => item.orderId === order.id)
   const evidence = store.timeEvidence.filter((item) => item.orderId === order.id)
   const expenses = store.expenses.filter((item) => item.orderId === order.id)
+  const sourceQuote = order.sourceQuoteId ? store.quotes.find((item) => item.id === order.sourceQuoteId) : undefined
+  const linkedInvoices = store.invoices.filter((item) => item.orderId === order.id)
 
   return (
     <section className="page apple-page">
@@ -92,7 +96,7 @@ export default function OrderDetailPage() {
 
           {activeSection === 'people' && <section className="hub-panel">
             <div className="section-title"><div><h2>Team</h2><p>Zugewiesene Mitarbeitende und externe Leistungserbringer.</p></div><button className="button secondary compact-action" onClick={() => setAssignmentOpen('new')}><Icon name="plus" size={15}/> Zuweisen</button></div>
-            {assignments.length ? <div className="hub-row-list">{assignments.map((assignment) => { const effective = policy ? resolveTimeTrackingPolicy(policy, assignment) : assignment.timePolicyOverride as TimeTrackingPolicy | undefined; return <InteractiveRow className="hub-row interactive-hub-row" key={`${assignment.orderId}-${assignment.personId}`} onActivate={() => setAssignmentOpen(assignment)} ariaLabel={`${personName(assignment.personId, store)} Regel bearbeiten`}><span><strong>{personName(assignment.personId, store)}</strong><small>{providerLabel(assignment.providerType)} · {effective?.evidence.required ? `${frequencyLabel(effective.evidence.frequency)} Nachweis` : 'Auftragsstandard'}</small></span><Icon name="chevron" size={15}/></InteractiveRow>})}</div> : <div className="empty-state"><strong>Noch niemand zugewiesen</strong><span>Füge Mitarbeitende oder externe Leistungserbringer hinzu.</span></div>}
+            {assignments.length ? <div className="hub-row-list">{assignments.map((assignment) => { const effective = policy ? resolveTimeTrackingPolicy(policy, assignment) : assignment.timePolicyOverride as TimeTrackingPolicy | undefined; const sales = assignment.salesRate ?? order.salesRate; const cost = assignment.internalCostRate ?? order.costRate; return <InteractiveRow className="hub-row interactive-hub-row" key={`${assignment.orderId}-${assignment.personId}`} onActivate={() => setAssignmentOpen(assignment)} ariaLabel={`${personName(assignment.personId, store)} Regel bearbeiten`}><span><strong>{personName(assignment.personId, store)}</strong><small>{providerLabel(assignment.providerType)} · Verkauf CHF {sales.toFixed(2)}/h · Kosten CHF {cost.toFixed(2)}/h · {effective?.evidence.required ? `${frequencyLabel(effective.evidence.frequency)} Rapport` : 'kein Rapport'}</small></span><Icon name="chevron" size={15}/></InteractiveRow>})}</div> : <div className="empty-state"><strong>Noch niemand zugewiesen</strong><span>Füge Mitarbeitende oder externe Leistungserbringer hinzu.</span></div>}
           </section>}
 
           {activeSection === 'billing' && <section className="hub-panel">
@@ -104,16 +108,16 @@ export default function OrderDetailPage() {
           </section>}
 
           {activeSection === 'evidence' && <section className="hub-panel">
-            <div className="section-title"><div><h2>Nachweise</h2><p>Rapporte und Freigaben für diesen Auftrag.</p></div><button className="button secondary compact-action" onClick={() => setUploadOpen(true)}><Icon name="plus" size={15}/> Hochladen</button></div>
+            <div className="section-title"><div><h2>Nachweise</h2><p>Rapporte und Freigaben für diesen Auftrag.</p></div><button className="button secondary compact-action" onClick={() => setUploadOpen(true)}><Icon name="plus" size={15}/> Rapport</button></div>
             <div className="hub-row-list">{evidence.length ? evidence.map((item) => <div className="hub-row evidence-hub-row" key={item.id}><span><strong>{item.fileName}</strong><small>{item.periodDate} · {personName(item.personId, store)}</small></span><span className={`status ${item.status === 'verified' ? 'active' : 'neutral'}`}>{evidenceLabel(item.status)}</span>{item.status !== 'verified' && <button className="text-button" onClick={() => store.updateEvidence(item.id, { status: 'verified', verifiedAt: new Date().toISOString() })}>Prüfen</button>}</div>) : <div className="empty-state"><strong>Keine Nachweise vorhanden</strong><span>Für diesen Auftrag wurden noch keine Rapporte hochgeladen.</span></div>}</div>
           </section>}
 
           {activeSection === 'documents' && <section className="hub-panel">
-            <div className="section-title"><div><h2>Dokumente</h2><p>Angebote, Rechnungen und Nachweise zum Auftrag.</p></div></div>
+            <div className="section-title"><div><h2>Dokumente</h2><p>Direkt mit diesem Auftrag verknüpfte Angebote und Rechnungen.</p></div></div>
             <div className="hub-row-list">
-              <Link className="hub-row" href="/quotes"><span><strong>Angebote</strong><small>Dokumente und Versionen</small></span><Icon name="chevron" size={15}/></Link>
-              <Link className="hub-row" href="/invoices"><span><strong>Rechnungen</strong><small>Fakturierte Leistungen</small></span><Icon name="chevron" size={15}/></Link>
-              <button type="button" className="hub-row hub-row-button" onClick={() => setUploadOpen(true)}><span><strong>Zeitnachweis hochladen</strong><small>PDF oder Kundenrapport</small></span><Icon name="chevron" size={15}/></button>
+              {sourceQuote && <Link className="hub-row" href={`/quotes?view=${sourceQuote.id}`}><span><strong>{sourceQuote.number}</strong><small>Angebot · Version {sourceQuote.version}</small></span><Icon name="chevron" size={15}/></Link>}
+              {linkedInvoices.map((invoice) => <Link className="hub-row" href={`/invoices?view=${invoice.id}`} key={invoice.id}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><Icon name="chevron" size={15}/></Link>)}
+              {!sourceQuote && !linkedInvoices.length && <div className="empty-state"><strong>Keine verknüpften Dokumente</strong><span>Angebote und Rechnungen erscheinen hier, sobald sie diesem Auftrag zugeordnet sind.</span></div>}
             </div>
           </section>}
         </div>
@@ -122,7 +126,7 @@ export default function OrderDetailPage() {
       {editOpen && <OrderEditor order={order} onClose={() => setEditOpen(false)} />}
       {uploadOpen && <EvidenceUpload orderId={order.id} onClose={() => setUploadOpen(false)} />}
       {expenseOpen && <ExpenseForm order={order} onClose={() => setExpenseOpen(false)} />}
-      {policyOpen && <PolicyEditor orderId={order.id} current={policy ?? createDefaultOrderPolicy(order.id, order.billingModel)} onClose={() => setPolicyOpen(false)} />}
+      {policyOpen && <PolicyEditor orderId={order.id} current={policy ?? createDefaultOrderPolicy(order.id, order.billingModel, { ...store.appSettings.workflow.customerProcess, ...(store.customers.find((customer) => customer.id === order.customerId)?.workflowOverride ?? {}) })} onClose={() => setPolicyOpen(false)} />}
       {assignmentOpen && <AssignmentEditor orderId={order.id} current={assignmentOpen === 'new' ? null : assignmentOpen} onClose={() => setAssignmentOpen(null)} />}
     </section>
   )
@@ -135,20 +139,54 @@ export default function OrderDetailPage() {
 
   function EvidenceUpload({ orderId, onClose }: { orderId: string; onClose: () => void }) {
     const orderEntries = store.timeEntries.filter((entry) => entry.orderId === orderId)
-    const [timeEntryId, setTimeEntryId] = useState(orderEntries.find((entry) => !store.timeEvidence.some((proof) => proof.timeEntryId === entry.id))?.id ?? orderEntries[0]?.id ?? '')
+    const assignmentPeople = store.orderAssignmentRules.filter((item) => item.orderId === orderId && item.active)
+    const defaultPersonId = assignmentPeople[0]?.personId ?? orderEntries[0]?.personId ?? ''
+    const [personId, setPersonId] = useState(defaultPersonId)
+    const personEntries = orderEntries.filter((entry) => entry.personId === personId)
+    const effective = policy && personId
+      ? resolveTimeTrackingPolicy(policy, assignments.find((item) => item.personId === personId))
+      : policy?.timeTracking
+    const monthly = effective?.evidence.frequency === 'monthly'
+    const [periodMonth, setPeriodMonth] = useState(new Date().toISOString().slice(0, 7))
+    const [timeEntryId, setTimeEntryId] = useState(personEntries[0]?.id ?? '')
     const [file, setFile] = useState<File | null>(null)
-    const [signed, setSigned] = useState(true)
-    const [customerApproved, setCustomerApproved] = useState(true)
-    const selectedEntry = orderEntries.find((entry) => entry.id === timeEntryId)
+    const [signed, setSigned] = useState(effective?.evidence.signatureRequired ?? true)
+    const [customerApproved, setCustomerApproved] = useState(effective?.evidence.customerApprovalRequired ?? true)
+    const selectedEntry = personEntries.find((entry) => entry.id === timeEntryId)
 
     function save(event: React.FormEvent) {
       event.preventDefault()
-      if (!file || !selectedEntry) return
-      store.addEvidence({ id: `evi-${Date.now()}`, timeEntryId: selectedEntry.id, orderId, personId: selectedEntry.personId, periodDate: selectedEntry.date, fileName: file.name, mimeType: file.type || 'application/pdf', status: 'uploaded', signed, customerApproved, uploadedAt: new Date().toISOString() })
+      if (!file || !personId) return
+      if (!monthly && !selectedEntry) return
+      const periodDate = monthly ? `${periodMonth}-01` : selectedEntry!.date
+      const duplicate = store.timeEvidence.some((item) => item.orderId === orderId && item.personId === personId && (monthly ? item.periodDate.slice(0, 7) === periodMonth : item.timeEntryId === selectedEntry!.id))
+      if (duplicate) return
+      store.addEvidence({
+        id: `evi-${Date.now()}`,
+        timeEntryId: monthly ? undefined : selectedEntry!.id,
+        orderId,
+        personId,
+        periodDate,
+        fileName: file.name,
+        mimeType: file.type || 'application/pdf',
+        status: 'uploaded',
+        signed,
+        customerApproved,
+        uploadedAt: new Date().toISOString(),
+      })
       onClose()
     }
 
-    return <StandardFormSheet open title={<>Zeitnachweis hochladen</>} description={<>Im Demo-System werden Dateiname und Prüfstatus gespeichert.</>} onClose={onClose} onSubmit={save} formId="id-page-sheet-2" footer={orderEntries.length ? <><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="id-page-sheet-2" className="button primary">Nachweis speichern</button></> : null}>{orderEntries.length ? <><div className="form-grid"><label className="full"><span>Zeiteintrag *</span><Select value={timeEntryId} onChange={(e) => setTimeEntryId(e.target.value)} required>{orderEntries.map((entry) => <option key={entry.id} value={entry.id}>{entry.date} · {entry.personName} · {entry.hours} h</option>)}</Select></label><label className="full"><span>PDF-Nachweis *</span><Input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required/></label><div className="form-toggle-field"><span>Signiert</span><Toggle label="Signiert" checked={signed} onChange={setSigned}/></div><div className="form-toggle-field"><span>Kunde bestätigt</span><Toggle label="Kunde bestätigt" checked={customerApproved} onChange={setCustomerApproved}/></div></div></> : <div className="empty-state"><strong>Noch keine Zeiten vorhanden</strong><span>Erfasse zuerst eine Zeit auf diesem Auftrag.</span><div><Link href="/time?new=1" className="button primary">Zeit erfassen</Link></div></div>}</StandardFormSheet>
+    const people = assignmentPeople.map((assignment) => ({ id: assignment.personId, name: personName(assignment.personId, store) }))
+    return <StandardFormSheet open title={<>{monthly ? 'Monatsrapport hochladen' : 'Zeitnachweis hochladen'}</>} description={<>{monthly ? 'Unterschriebenen Kundenrapport dem Leistungserbringer und Monat zuordnen.' : 'Nachweis dem Zeiteintrag zuordnen.'}</>} onClose={onClose} onSubmit={save} formId="id-page-sheet-2" footer={(people.length || orderEntries.length) ? <><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="id-page-sheet-2" className="button primary">{monthly ? 'Monatsrapport speichern' : 'Nachweis speichern'}</button></> : null}>
+      {(people.length || orderEntries.length) ? <div className="form-grid">
+        <label className="full"><span>Leistungserbringer *</span><Select value={personId} onChange={(e) => { setPersonId(e.target.value); const first = orderEntries.find((entry) => entry.personId === e.target.value); setTimeEntryId(first?.id ?? '') }} required>{people.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</Select></label>
+        {monthly ? <label><span>Monat *</span><Input type="month" value={periodMonth} onChange={(e) => setPeriodMonth(e.target.value)} required/></label> : <label className="full"><span>Zeiteintrag *</span><Select value={timeEntryId} onChange={(e) => setTimeEntryId(e.target.value)} required>{personEntries.map((entry) => <option key={entry.id} value={entry.id}>{entry.date} · {entry.hours} h</option>)}</Select></label>}
+        <label className="full"><span>PDF-Nachweis *</span><Input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required/></label>
+        <div className="form-toggle-field"><span>Unterschrieben</span><Toggle label="Unterschrieben" checked={signed} onChange={setSigned}/></div>
+        <div className="form-toggle-field"><span>Vom Kunden freigegeben</span><Toggle label="Vom Kunden freigegeben" checked={customerApproved} onChange={setCustomerApproved}/></div>
+      </div> : <div className="empty-state"><strong>Keine Zuweisung vorhanden</strong><span>Weise zuerst einen Mitarbeitenden oder externen Leistungserbringer zu.</span></div>}
+    </StandardFormSheet>
   }
 
   function ExpenseForm({ order, onClose }: { order: Order; onClose: () => void }) {
@@ -176,27 +214,82 @@ export default function OrderDetailPage() {
   }
 
   function AssignmentEditor({ orderId, current, onClose }: { orderId: string; current: OrderAssignmentRule | null; onClose: () => void }) {
-    const choices = useMemo(() => [
+    const choices = [
       ...store.employees.map((employee) => ({ id: employee.id, name: employee.name, providerType: (employee.employmentType === 'hourly' ? 'employee_hourly' : 'employee_salary') as ServiceProviderType })),
       ...store.suppliers.map((supplier) => ({ id: supplier.id, name: supplier.name, providerType: 'external_company' as ServiceProviderType })),
-    ], [])
+    ]
     const initial = current?.personId ?? choices[0]?.id ?? ''
     const [personId, setPersonId] = useState(initial)
     const selectedChoice = choices.find((item) => item.id === personId)
+    const providerType = current?.providerType ?? selectedChoice?.providerType ?? 'employee_salary'
+    const customer = store.customers.find((item) => item.id === editorOrder.customerId)
+    const customerProcess = { ...store.appSettings.workflow.customerProcess, ...(customer?.workflowOverride ?? {}) }
+    const providerSettlementDefault = providerType === 'external_company' || providerType === 'external_individual'
+      ? store.appSettings.workflow.supplierSettlement
+      : providerType === 'employee_hourly'
+        ? { ...store.appSettings.workflow.employeeSettlement, ...(store.employees.find((item) => item.id === personId)?.settlementOverride ?? {}) }
+        : { mode: 'salary' as const, requireApprovedMonthlyReport: false, requireSupplierInvoice: false, requireFinanceApproval: true }
+
     const [active, setActive] = useState(current?.active ?? true)
+    const [salesRate, setSalesRate] = useState(current?.salesRate ?? editorOrder.salesRate)
+    const [internalCostRate, setInternalCostRate] = useState(current?.internalCostRate ?? (store.employees.find((item) => item.id === personId)?.internalCostRate ?? editorOrder.costRate))
     const [overrideEnabled, setOverrideEnabled] = useState(Boolean(current?.timePolicyOverride))
-    const [evidenceRequired, setEvidenceRequired] = useState(current?.timePolicyOverride?.evidence?.required ?? false)
-    const [frequency, setFrequency] = useState<EvidenceFrequency>(current?.timePolicyOverride?.evidence?.frequency ?? 'daily')
-    const [signatureRequired, setSignatureRequired] = useState(current?.timePolicyOverride?.evidence?.signatureRequired ?? false)
-    const [customerApprovalRequired, setCustomerApprovalRequired] = useState(current?.timePolicyOverride?.evidence?.customerApprovalRequired ?? false)
+    const [evidenceRequired, setEvidenceRequired] = useState(current?.timePolicyOverride?.evidence?.required ?? customerProcess.monthlyReportRequired)
+    const [frequency, setFrequency] = useState<EvidenceFrequency>(current?.timePolicyOverride?.evidence?.frequency ?? (customerProcess.monthlyReportRequired ? 'monthly' : 'none'))
+    const [signatureRequired, setSignatureRequired] = useState(current?.timePolicyOverride?.evidence?.signatureRequired ?? customerProcess.customerSignatureRequired)
+    const [customerApprovalRequired, setCustomerApprovalRequired] = useState(current?.timePolicyOverride?.evidence?.customerApprovalRequired ?? customerProcess.customerApprovalRequired)
+    const [settlementOverrideEnabled, setSettlementOverrideEnabled] = useState(Boolean(current?.settlementOverride))
+    const [requireApprovedReportForPayout, setRequireApprovedReportForPayout] = useState(current?.settlementOverride?.requireApprovedMonthlyReport ?? providerSettlementDefault.requireApprovedMonthlyReport)
+    const [requireSupplierInvoice, setRequireSupplierInvoice] = useState(current?.settlementOverride?.requireSupplierInvoice ?? providerSettlementDefault.requireSupplierInvoice)
+    const [requireFinanceApproval, setRequireFinanceApproval] = useState(current?.settlementOverride?.requireFinanceApproval ?? providerSettlementDefault.requireFinanceApproval)
+
     function save(event: React.FormEvent) {
       event.preventDefault()
-      const providerType = current?.providerType ?? selectedChoice?.providerType ?? 'employee_salary'
-      const override: OrderAssignmentRule['timePolicyOverride'] = overrideEnabled ? { evidence: { required: evidenceRequired, frequency: evidenceRequired ? frequency : 'none', formats: ['pdf'], signatureRequired, customerApprovalRequired, blockApprovalWhenMissing: evidenceRequired, blockBillingWhenMissing: evidenceRequired, reminderEnabled: evidenceRequired } } : undefined
-      store.updateOrderAssignmentRule({ orderId, personId, providerType, active, timePolicyOverride: override })
+      const override: OrderAssignmentRule['timePolicyOverride'] = overrideEnabled ? {
+        evidence: {
+          required: evidenceRequired,
+          frequency: evidenceRequired ? frequency : 'none',
+          formats: evidenceRequired ? ['pdf'] : [],
+          signatureRequired,
+          customerApprovalRequired,
+          blockApprovalWhenMissing: false,
+          blockBillingWhenMissing: evidenceRequired && customerProcess.blockBillingUntilReportApproved,
+          reminderEnabled: evidenceRequired,
+        },
+      } : undefined
+      const settlementOverride: OrderAssignmentRule['settlementOverride'] = settlementOverrideEnabled ? {
+        mode: providerType === 'external_company' || providerType === 'external_individual' ? 'supplier_invoice' : providerType === 'employee_hourly' ? 'hourly_payroll' : 'salary',
+        requireApprovedMonthlyReport: requireApprovedReportForPayout,
+        requireSupplierInvoice: providerType === 'external_company' || providerType === 'external_individual' ? requireSupplierInvoice : false,
+        requireFinanceApproval,
+      } : undefined
+      store.updateOrderAssignmentRule({ orderId, personId, providerType, active, salesRate, internalCostRate, timePolicyOverride: override, settlementOverride })
       onClose()
     }
-    return <StandardFormSheet open title={<>{current ? 'Mitarbeiterregel bearbeiten' : 'Leistungserbringer zuweisen'}</>} description={<>Auftragsstandard übernehmen oder individuell abweichen.</>} onClose={onClose} onSubmit={save} formId="id-page-sheet-4" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="id-page-sheet-4" className="button primary">Speichern</button></>}><div className="form-grid"><label className="full"><span>Person / Firma *</span><Select value={personId} disabled={Boolean(current)} onChange={(e) => setPersonId(e.target.value)} required>{choices.map((choice) => <option key={choice.id} value={choice.id}>{choice.name}</option>)}</Select></label></div><div className="policy-toggle-list"><ToggleRow label="Zuweisung aktiv" checked={active} onChange={setActive}/><ToggleRow label="Eigene Zeitnachweis-Regel" checked={overrideEnabled} onChange={setOverrideEnabled}/>{overrideEnabled && <><ToggleRow label="Nachweis erforderlich" checked={evidenceRequired} onChange={setEvidenceRequired}/>{evidenceRequired && <div className="form-grid"><label><span>Rhythmus</span><Select value={frequency} onChange={(e) => setFrequency(e.target.value as EvidenceFrequency)}><option value="daily">Täglich</option><option value="weekly">Wöchentlich</option><option value="monthly">Monatlich</option></Select></label></div>}<ToggleRow label="Unterschrift erforderlich" checked={signatureRequired} onChange={setSignatureRequired}/><ToggleRow label="Kundenfreigabe erforderlich" checked={customerApprovalRequired} onChange={setCustomerApprovalRequired}/></>}</div></StandardFormSheet>
+
+    return <StandardFormSheet open title={<>{current ? 'Zuweisung bearbeiten' : 'Leistungserbringer zuweisen'}</>} description={<>Konditionen, Rapport und Auszahlung für diesen Auftrag festlegen.</>} onClose={onClose} onSubmit={save} formId="id-page-sheet-4" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="id-page-sheet-4" className="button primary">Speichern</button></>}>
+      <div className="form-grid">
+        <label className="full"><span>Person / Firma *</span><Select value={personId} disabled={Boolean(current)} onChange={(e) => setPersonId(e.target.value)} required>{choices.map((choice) => <option key={choice.id} value={choice.id}>{choice.name}</option>)}</Select></label>
+        <label><span>Verkaufssatz CHF/h</span><Input type="number" min="0" step="0.05" value={salesRate} onChange={(e) => setSalesRate(Number(e.target.value))}/></label>
+        <label><span>Kosten / Einkauf CHF/h</span><Input type="number" min="0" step="0.05" value={internalCostRate} onChange={(e) => setInternalCostRate(Number(e.target.value))}/></label>
+      </div>
+      <div className="policy-toggle-list">
+        <ToggleRow label="Zuweisung aktiv" checked={active} onChange={setActive}/>
+        <ToggleRow label="Eigene Rapportregel" checked={overrideEnabled} onChange={setOverrideEnabled}/>
+        {overrideEnabled && <>
+          <ToggleRow label="Nachweis erforderlich" checked={evidenceRequired} onChange={setEvidenceRequired}/>
+          {evidenceRequired && <div className="form-grid"><label><span>Rhythmus</span><Select value={frequency} onChange={(e) => setFrequency(e.target.value as EvidenceFrequency)}><option value="daily">Täglich</option><option value="weekly">Wöchentlich</option><option value="monthly">Monatlich</option></Select></label></div>}
+          <ToggleRow label="Unterschrift erforderlich" checked={signatureRequired} onChange={setSignatureRequired}/>
+          <ToggleRow label="Kundenfreigabe erforderlich" checked={customerApprovalRequired} onChange={setCustomerApprovalRequired}/>
+        </>}
+        <ToggleRow label="Eigene Auszahlungsregel" checked={settlementOverrideEnabled} onChange={setSettlementOverrideEnabled}/>
+        {settlementOverrideEnabled && <>
+          <ToggleRow label="Freigegebener Monatsrapport vor Auszahlung" checked={requireApprovedReportForPayout} onChange={setRequireApprovedReportForPayout}/>
+          {(providerType === 'external_company' || providerType === 'external_individual') && <ToggleRow label="Lieferantenrechnung erforderlich" checked={requireSupplierInvoice} onChange={setRequireSupplierInvoice}/>}
+          <ToggleRow label="Buchhaltungsfreigabe erforderlich" checked={requireFinanceApproval} onChange={setRequireFinanceApproval}/>
+        </>}
+      </div>
+    </StandardFormSheet>
   }
 }
 

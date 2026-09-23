@@ -1,4 +1,5 @@
 import type { TimeTrackingPolicy } from '@/modules/time/types'
+import type { SettlementPolicy } from '@/types/domain'
 
 export type ServiceProviderType =
   | 'employee_salary'
@@ -13,5 +14,6 @@ export type OrderAssignmentRule = {
   timePolicyOverride?: Partial<TimeTrackingPolicy>
   salesRate?: number
   internalCostRate?: number
+  settlementOverride?: Partial<SettlementPolicy>
   active: boolean
 }

@@ -38,6 +38,26 @@ export const defaultAppSettings: AppSettings = {
     allowSelfApproval: false,
     lockInvoicedTimes: true,
     requireQuoteAcceptanceBeforeOrder: true,
+    customerProcess: {
+      timeTrackingMode: 'external_customer_system',
+      monthlyReportRequired: true,
+      customerSignatureRequired: true,
+      customerApprovalRequired: true,
+      blockBillingUntilReportApproved: true,
+      blockPayoutUntilReportApproved: true,
+    },
+    employeeSettlement: {
+      mode: 'hourly_payroll',
+      requireApprovedMonthlyReport: true,
+      requireSupplierInvoice: false,
+      requireFinanceApproval: true,
+    },
+    supplierSettlement: {
+      mode: 'supplier_invoice',
+      requireApprovedMonthlyReport: true,
+      requireSupplierInvoice: true,
+      requireFinanceApproval: true,
+    },
   },
   notifications: {
     overdueInvoice: true,

@@ -7,6 +7,22 @@ export type AppUser = {
   role: Role
 }
 
+export type CustomerWorkflowPolicy = {
+  timeTrackingMode: 'internal' | 'external_customer_system' | 'both'
+  monthlyReportRequired: boolean
+  customerSignatureRequired: boolean
+  customerApprovalRequired: boolean
+  blockBillingUntilReportApproved: boolean
+  blockPayoutUntilReportApproved: boolean
+}
+
+export type SettlementPolicy = {
+  mode: 'salary' | 'hourly_payroll' | 'supplier_invoice'
+  requireApprovedMonthlyReport: boolean
+  requireSupplierInvoice: boolean
+  requireFinanceApproval: boolean
+}
+
 export type Customer = {
   id: string
   name: string
@@ -23,6 +39,7 @@ export type Customer = {
   paymentDays: number
   status: 'active' | 'inactive'
   notes?: string
+  workflowOverride?: Partial<CustomerWorkflowPolicy>
 }
 
 
@@ -45,6 +62,7 @@ export type Supplier = {
   uid?: string
   paymentDays: number
   status: 'active' | 'inactive'
+  settlementOverride?: Partial<SettlementPolicy>
 }
 
 export type CompanyProfile = {
@@ -185,6 +203,7 @@ export type Invoice = {
   customerName: string
   orderId?: string
   orderName?: string
+  sourceQuoteId?: string
   contractId?: string
   contractName?: string
   kind?: 'standard' | 'deposit' | 'partial' | 'final' | 'recurring'
@@ -243,6 +262,7 @@ export type Contract = {
   lines: ContractLine[]
   reference?: string
   notes?: string
+  workflowOverride?: Partial<CustomerWorkflowPolicy>
 }
 
 export type Expense = {
@@ -291,6 +311,8 @@ export type SupplierInvoice = {
   orderName?: string
   invoiceDate: string
   due: string
+  period?: string
+  hours?: number
   netAmount: number
   vatAmount: number
   amount: number
@@ -310,6 +332,7 @@ export type Employee = {
   billableHours: number
   utilisation: number
   internalCostRate: number
+  settlementOverride?: Partial<SettlementPolicy>
 }
 
 
@@ -353,6 +376,9 @@ export type AppSettings = {
     allowSelfApproval: boolean
     lockInvoicedTimes: boolean
     requireQuoteAcceptanceBeforeOrder: boolean
+    customerProcess: CustomerWorkflowPolicy
+    employeeSettlement: SettlementPolicy
+    supplierSettlement: SettlementPolicy
   }
   notifications: {
     overdueInvoice: boolean
