@@ -5,7 +5,6 @@ import { Suspense, useEffect, useState } from 'react'
 import { Input, Select } from '@/components/ui/form-controls'
 import { planDefinitions } from '@/lib/data/plans'
 import { signInUrl } from '@/lib/auth/urls'
-import { AuthMethods } from '@/components/auth/auth-methods'
 import type { AppUser, OrganizationMembership, SignupRequest, SubscriptionPlan } from '@/types/domain'
 
 type RegistrationState = {
@@ -103,11 +102,11 @@ function RegisterForm() {
           <div className="public-product-head">
             <span>Registrierung</span>
             <h1>Konto erstellen oder anmelden</h1>
-            <p>Registriere dich mit E-Mail und Passwort oder nutze ein bestehendes Konto. Danach wird deine Organisation eindeutig zugeordnet.</p>
+            <p>Erstelle dein Binso-Konto über den zentralen Anmeldedienst. Danach richtest du deine Organisation mit den wichtigsten Angaben ein.</p>
           </div>
-          <AuthMethods />
-          <a className="button primary" href={signInUrl(returnTo)}>Anmelden oder registrieren</a>
-          <small>E-Mail-Verifikation und Passwort-Reset erfolgen über den zentralen Anmeldedienst.</small>
+          <a className="button primary" href={signInUrl(returnTo)}>Registrierung starten</a>
+          <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Anmelden</a></p>
+          <small>E-Mail-Verifikation und Kontosicherheit werden über den zentralen Binso-Anmeldedienst verwaltet.</small>
         </section>
       </main>
     )

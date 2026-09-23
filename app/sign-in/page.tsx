@@ -1,20 +1,28 @@
+import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
-import { signInUrl } from '@/lib/auth/server'
+import { getSession, signInUrl } from '@/lib/auth/server'
+import { registerUrl } from '@/lib/auth/urls'
 import { BinsoLogo } from '@/components/ui/binso-logo'
-import { AuthMethods } from '@/components/auth/auth-methods'
 
-export default function SignInPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function SignInPage() {
+  const session = await getSession()
+  if (session) redirect('/post-login')
+
   return (
     <main className="auth-page">
       <div className="auth-card apple-auth-card">
         <BinsoLogo />
-        <h1>Anmelden</h1>
-        <p className="muted">Mit E-Mail oder einem bestehenden Konto fortfahren.</p>
+        <h1>Willkommen bei Binso</h1>
+        <p className="muted">Melde dich an, um mit deiner Organisation weiterzuarbeiten.</p>
         {env.authMode === 'azure' ? (
           <>
-            <AuthMethods />
-            <a className="button primary" href={signInUrl('/post-login')}>Anmelden oder registrieren</a>
-            <small className="auth-note">E-Mail-Verifikation und Passwort-Reset werden zentral und sicher verwaltet.</small>
+            <a className="button primary" href={signInUrl('/post-login')}>Anmelden</a>
+            <p className="auth-register-prompt">
+              Noch kein Konto? <a href={registerUrl()}>Registrieren</a>
+            </p>
+            <small className="auth-note">Anmeldung, E-Mail-Verifikation und Kontosicherheit werden über den zentralen Binso-Anmeldedienst verwaltet.</small>
           </>
         ) : (
           <a className="button primary" href="/post-login">Lokale Demo öffnen</a>
