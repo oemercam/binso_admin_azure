@@ -71,10 +71,13 @@ export default function TimePage() {
   const effectivePersonId = people.some((item) => item.id === personId) ? personId : (people[0]?.id ?? '')
 
   const visibleEntries = useMemo(
-    () => user.role === 'employee' && currentEmployee
-      ? store.timeEntries.filter((entry) => entry.personId === currentEmployee.id)
-      : store.timeEntries,
-    [currentEmployee, store.timeEntries, user.role],
+    () => {
+      const base = user.role === 'employee' && currentEmployee
+        ? store.timeEntries.filter((entry) => entry.personId === currentEmployee.id)
+        : store.timeEntries
+      return requestedCustomer ? base.filter((entry) => entry.customerId === requestedCustomer) : base
+    },
+    [currentEmployee, requestedCustomer, store.timeEntries, user.role],
   )
   const total = visibleEntries.reduce((sum, entry) => sum + entry.hours, 0)
   const billable = visibleEntries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0)

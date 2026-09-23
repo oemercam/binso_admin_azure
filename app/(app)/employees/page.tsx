@@ -2,7 +2,7 @@
 
 import { Select, Input } from '@/components/ui/form-controls'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
@@ -14,9 +14,16 @@ import type { Employee, Role } from '@/types/domain'
 
 export default function EmployeesPage() {
   const store = useBusinessStore()
+  const searchParams = useSearchParams()
+  const customerScope = searchParams.get('customer')
+  const visibleEmployees = useMemo(() => {
+    if (!customerScope) return store.employees
+    const orderIds = new Set(store.orders.filter((order) => order.customerId === customerScope).map((order) => order.id))
+    const personIds = new Set(store.orderAssignmentRules.filter((rule) => rule.active && orderIds.has(rule.orderId)).map((rule) => rule.personId))
+    return store.employees.filter((employee) => personIds.has(employee.id))
+  }, [customerScope, store.employees, store.orderAssignmentRules, store.orders])
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Employee | null>(null)
 
@@ -38,7 +45,7 @@ export default function EmployeesPage() {
       <PageHeader title="Mitarbeitende" description="Mitarbeitende, Anstellung, Kosten und Einsatzdaten verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)} aria-label="Mitarbeitende erfassen" title="Mitarbeitende erfassen"><Icon name="plus" size={16}/><span>Mitarbeitende erfassen</span></button>} />
       <div className="data-list">
         <div className="data-row employee-grid data-head"><span>Mitarbeiter</span><span>Rolle</span><span>Gebucht</span><span>Verrechenbar</span><span>Auslastung</span><span /></div>
-        {store.employees.map((employee) => (
+        {visibleEmployees.map((employee) => (
           <InteractiveRow className="data-row employee-grid employee-row-compact" key={employee.id} onActivate={() => setEditing(employee)} ariaLabel={`${employee.name} öffnen`}>
             <span className="user-cell"><span className="avatar">{initials(employee.name)}</span><span className="primary-cell"><strong>{employee.name}<i className={`employee-status-dot ${employee.status}`} aria-hidden="true"/></strong><small className="employee-email">{employee.email}</small><small className="employee-mobile-summary">{roleLabel(employee.role)}</small></span></span>
             <span className="employee-role">{roleLabel(employee.role)}</span><span className="employee-hours">{employee.bookedHours} / {employee.targetHours} h</span><span className="employee-billable">{employee.billableHours} h</span><span className="progress-cell employee-utilisation"><span className="mini-progress"><i style={{ width: `${Math.min(100, employee.utilisation)}%` }}/></span><small>{employee.utilisation}%</small></span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span>

@@ -20,6 +20,7 @@ export default function OrdersPage() {
   const searchParams = useSearchParams()
   const [open, setOpen] = useState(false)
   const requestedCustomer = searchParams.get('customer')
+  const visibleOrders = requestedCustomer ? store.orders.filter((item) => item.customerId === requestedCustomer) : store.orders
   const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? '')
   const [name, setName] = useState('')
   const [mandateRef, setMandateRef] = useState('')
@@ -68,7 +69,7 @@ export default function OrdersPage() {
       <PageHeader title="Aufträge" description="Aufträge, Leistungen, Budgets und Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
       <div className="data-list compact-overview-list">
         <div className="data-row order-grid data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Umsatz</span><span>Marge</span><span /></div>
-        {store.orders.map((order) => {
+        {visibleOrders.map((order) => {
           const linkedTimes = store.timeEntries.filter((entry) => entry.orderId === order.id)
           const used = linkedTimes.reduce((sum, entry) => sum + entry.hours, 0) || order.usedHours
           const revenue = linkedTimes.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0) || used * order.salesRate

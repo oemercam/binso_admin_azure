@@ -77,18 +77,18 @@ export default function CustomersPage() {
   return (
     <section className="page apple-page mobile-standard-page">
       <PageHeader
-        title="Kunden"
-        description="Kunden erfassen und zugehörige Angebote, Aufträge, Verträge und Rechnungen verwalten."
+        title="Firmen"
+        description="Firmen verwalten und die gesamte Geschäftsbeziehung öffnen."
         action={<button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kunde erfassen</span></button>}
       />
 
       <div className="module-toolbar">
-        <label className="search-field"><Icon name="search" size={16}/><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden durchsuchen" /></label>
-        <span className="toolbar-meta">{filtered.length} Kunden</span>
+        <label className="search-field"><Icon name="search" size={16}/><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Firmen durchsuchen" /></label>
+        <span className="toolbar-meta">{filtered.length} Firmen</span>
       </div>
 
       <div className="data-list compact-overview-list">
-        <div className="data-row customer-grid data-head"><span>Kunde</span><span>Kontakt</span><span /></div>
+        <div className="data-row customer-grid data-head"><span>Firma</span><span>Kontakt</span><span /></div>
         {filtered.map((customer) => (
           <InteractiveRow className="data-row customer-grid compact-overview-row" key={customer.id} href={`/customers/${customer.id}`} ariaLabel={`${customer.name} öffnen`}>
             <span className="primary-cell"><strong><span className="desktop-only-inline">{customer.customerNo} · </span>{customer.name}</strong><small className="desktop-row-detail">{customer.address || 'Adresse fehlt'}, {customer.zip} {customer.city}</small><small className="mobile-row-summary">{customer.contact || 'Keine Ansprechperson'}</small></span>

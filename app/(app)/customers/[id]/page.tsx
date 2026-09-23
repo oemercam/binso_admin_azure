@@ -1,19 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { useBusinessStore } from '@/components/state/business-store'
 import { PageHeader } from '@/components/ui/page-header'
 import { Icon } from '@/components/ui/icon'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { Input, Textarea } from '@/components/ui/form-controls'
-import { formatChf, formatDateTime } from '@/lib/format/locale'
-const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+import { formatDateTime } from '@/lib/format/locale'
 
 export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const store = useBusinessStore()
   const [noteOpen, setNoteOpen] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
@@ -25,18 +25,25 @@ export default function CustomerDetailPage() {
     orders: store.orders.filter((item) => item.customerId === id),
     contracts: store.contracts.filter((item) => item.customerId === id),
     invoices: store.invoices.filter((item) => item.customerId === id),
+    times: store.timeEntries.filter((item) => item.customerId === id),
     activities: store.customerActivities.filter((item) => item.customerId === id).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     contacts: store.customerContacts.filter((item) => item.customerId === id),
-  }), [id, store.contracts, store.customerActivities, store.customerContacts, store.invoices, store.orders, store.quotes])
+  }), [id, store.contracts, store.customerActivities, store.customerContacts, store.invoices, store.orders, store.quotes, store.timeEntries])
 
   if (!customer) return <section className="page apple-page"><PageHeader title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
+
+  const selectedContactId = searchParams.get('contact')
+  const selectedContact = related.contacts.find((item) => item.id === selectedContactId)
+  const totalHours = related.times.reduce((sum, entry) => sum + entry.hours, 0)
+  const relatedOrderIds = new Set(related.orders.map((order) => order.id))
+  const relatedPeople = new Set(store.orderAssignmentRules.filter((rule) => rule.active && relatedOrderIds.has(rule.orderId)).map((rule) => rule.personId))
 
   const customerId = customer.id
 
   function saveNote(event: React.FormEvent) { event.preventDefault(); store.addActivityNote(customerId, note); setNote(''); setNoteOpen(false) }
 
   return <section className="page apple-page">
-    <PageHeader title={customer.name} description="Kundendaten, Kontakte und zugehörige Vorgänge verwalten." action={<button className="button secondary page-primary-action" onClick={() => router.push(`/customers?edit=${customer.id}`)}><Icon name="edit" size={16}/><span>Bearbeiten</span></button>} />
+    <PageHeader title={customer.name} description={selectedContact ? `${selectedContact.name}${selectedContact.role ? ` · ${selectedContact.role}` : ''}` : 'Kontakte und gesamte Geschäftsbeziehung auf einen Blick.'} action={<button className="button secondary page-primary-action" onClick={() => router.push(`/customers?edit=${customer.id}`)}><Icon name="edit" size={16}/><span>Bearbeiten</span></button>} />
 
     <div className="customer-quick-actions" aria-label="Schnellaktionen">
       <Link className="button secondary" href={`/quotes?new=1&customer=${customer.id}`}><Icon name="quotes" size={15}/> Angebot</Link>
@@ -47,10 +54,10 @@ export default function CustomerDetailPage() {
       <button className="button secondary" onClick={() => setNoteOpen(true)}><Icon name="edit" size={15}/> Notiz</button>
     </div>
 
-    <div className="customer-kpi-row" aria-label="Kundenkennzahlen">
-      <div><span>Angebote</span><strong>{related.quotes.length}</strong></div>
+    <div className="customer-kpi-row" aria-label="Firmenkennzahlen">
       <div><span>Aufträge</span><strong>{related.orders.length}</strong></div>
-      <div><span>Verträge</span><strong>{related.contracts.length}</strong></div>
+      <div><span>Rechnungen</span><strong>{related.invoices.length}</strong></div>
+      <div><span>Stunden</span><strong>{totalHours} h</strong></div>
     </div>
 
     <section className="customer-overview-section">
@@ -67,12 +74,13 @@ export default function CustomerDetailPage() {
     <div className="customer-file-grid">
       <section className="panel"><div className="section-title"><div><h2>Kontakte</h2><p>Ansprechpersonen dieses Kunden</p></div><button className="button secondary compact-action" onClick={() => setContactOpen(true)}><Icon name="plus" size={14}/> Kontakt</button></div><div className="customer-contact-list">{related.contacts.length ? related.contacts.map((contact) => <div key={contact.id}><span><strong>{contact.name}{contact.primary ? ' · Hauptkontakt' : ''}</strong><small>{contact.role || 'Kontakt'} · {contact.email || 'keine E-Mail'}{contact.phone ? ` · ${contact.phone}` : ''}</small></span></div>) : <div className="list-empty">Keine Kontakte erfasst</div>}</div></section>
 
-      <section className="panel"><div className="section-title"><div><h2>Geschäftsvorgänge</h2><p>Vom Angebot bis zur Rechnung</p></div></div><div className="customer-linked-list">
-        {related.quotes.slice(0, 4).map((quote) => <Link key={quote.id} href={`/quotes?view=${quote.id}`}><span><strong>{quote.number}</strong><small>Angebot · {quote.title}</small></span><span>{quote.status === 'accepted' ? 'Angenommen' : quote.status === 'declined' ? 'Abgelehnt' : quote.status === 'sent' ? 'Versendet' : quote.status === 'revised' ? 'Ersetzt' : 'Entwurf'}</span></Link>)}
-        {related.orders.slice(0, 4).map((order) => <Link key={order.id} href={`/orders/${order.id}`}><span><strong>{order.name}</strong><small>Auftrag</small></span><span>{order.status === 'active' ? 'Aktiv' : order.status === 'completed' ? 'Abgeschlossen' : 'Pausiert'}</span></Link>)}
-        {related.contracts.slice(0, 4).map((contract) => <Link key={contract.id} href={`/contracts?view=${contract.id}`}><span><strong>{contract.number}</strong><small>Vertrag · {contract.name}</small></span><span>{contract.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span></Link>)}
-        {related.invoices.slice(0, 4).map((invoice) => <Link key={invoice.id} href={`/invoices?view=${invoice.id}`}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><span>{chf(invoice.amount)}</span></Link>)}
-        {!related.quotes.length && !related.orders.length && !related.contracts.length && !related.invoices.length && <div className="list-empty">Keine Geschäftsvorgänge vorhanden</div>}
+      <section className="panel"><div className="section-title"><div><h2>Bereiche</h2><p>Alle Informationen dieser Firma</p></div></div><div className="customer-linked-list">
+        <Link href={`/quotes?customer=${customer.id}`}><span><strong>Angebote</strong><small>{related.quotes.length} vorhanden</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href={`/orders?customer=${customer.id}`}><span><strong>Aufträge</strong><small>{related.orders.length} vorhanden</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href={`/contracts?customer=${customer.id}`}><span><strong>Verträge</strong><small>{related.contracts.length} vorhanden</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href={`/invoices?customer=${customer.id}`}><span><strong>Rechnungen</strong><small>{related.invoices.length} vorhanden</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href={`/time?customer=${customer.id}`}><span><strong>Zeiten</strong><small>{totalHours} h erfasst</small></span><Icon name="chevron" size={15}/></Link>
+        <Link href={`/employees?customer=${customer.id}`}><span><strong>Personen</strong><small>{relatedPeople.size} zugeordnet</small></span><Icon name="chevron" size={15}/></Link>
       </div></section>
 
       <section className="panel"><div className="section-title"><div><h2>Aktivität</h2><p>Chronologische Kundenhistorie</p></div></div><div className="customer-activity-list">

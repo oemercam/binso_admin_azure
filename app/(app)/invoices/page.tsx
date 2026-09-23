@@ -34,6 +34,7 @@ export default function InvoicesPage() {
   const [payment, setPayment] = useState<Invoice | null>(null)
   const [builderOpen, setBuilderOpen] = useState(false)
   const requestedCustomer = searchParams.get('customer')
+  const visibleInvoices = requestedCustomer ? store.invoices.filter((item) => item.customerId === requestedCustomer) : store.invoices
   const requestedOrder = searchParams.get('order')
   const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? '')
   const [orderId, setOrderId] = useState(requestedOrder && store.orders.some((item) => item.id === requestedOrder) ? requestedOrder : '')
@@ -136,7 +137,7 @@ export default function InvoicesPage() {
 
       <div className="data-list compact-overview-list">
         <div className="data-row invoice-grid data-head"><span>Rechnung</span><span>Kunde</span><span>Fällig</span><span>Betrag</span><span>Status</span><span /></div>
-        {store.invoices.map((invoice) => (
+        {visibleInvoices.map((invoice) => (
           <InteractiveRow className="data-row invoice-grid compact-overview-row" key={invoice.id} onActivate={() => setPreview(invoice)} ariaLabel={`${invoice.number} öffnen`}>
             <span className="primary-cell"><strong>{invoice.number} · {invoice.customerName}</strong><small className="desktop-row-detail">{invoice.orderName || invoice.period}</small><small className="mobile-row-summary">{invoice.orderName || invoice.period || 'Rechnung öffnen'}</small></span>
             <span className="overview-desktop-cell">{invoice.customerName}</span><span className="overview-desktop-cell">{fmt(invoice.due)}</span><span className="overview-desktop-cell"><strong>{chf(invoice.amount)}</strong><small>{invoice.lines.length} Positionen</small></span><span className={`status ${effectiveInvoiceStatus(invoice)} overview-desktop-cell`}>{invoiceStatusLabel(effectiveInvoiceStatus(invoice))}</span>

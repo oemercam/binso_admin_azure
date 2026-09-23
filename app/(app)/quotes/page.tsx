@@ -31,6 +31,8 @@ export default function QuotesPage() {
   const [sending, setSending] = useState<Quote | null>(null)
   const [creating, setCreating] = useState(false)
   const feedback = useFeedback()
+  const customerScope = searchParams.get('customer')
+  const visibleQuotes = customerScope ? store.quotes.filter((item) => item.customerId === customerScope) : store.quotes
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
@@ -130,7 +132,7 @@ export default function QuotesPage() {
 
     <div className="data-list compact-overview-list">
       <div className="data-row quote-grid data-head"><span>Angebot</span><span>Kunde</span><span>Gültig bis</span><span>Betrag</span><span>Status</span><span /></div>
-      {store.quotes.map((quote) => <InteractiveRow className="data-row quote-grid compact-overview-row" key={quote.id} onActivate={() => setPreview(quote)} ariaLabel={`${quote.number} öffnen`}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small className="desktop-row-detail">Version {quote.version} · {quote.lines.length} Positionen</small><small className="mobile-row-summary">{quote.customerName}</small></span><span className="overview-desktop-cell">{quote.customerName}</span><span className="overview-desktop-cell">{quote.validUntil}</span><span className="overview-desktop-cell">{chf(quote.amount)}</span><span className={`status ${quote.status} overview-desktop-cell`}>{labels[quote.status]}</span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span></InteractiveRow>)}
+      {visibleQuotes.map((quote) => <InteractiveRow className="data-row quote-grid compact-overview-row" key={quote.id} onActivate={() => setPreview(quote)} ariaLabel={`${quote.number} öffnen`}><span className="primary-cell"><strong>{quote.number} · {quote.title}</strong><small className="desktop-row-detail">Version {quote.version} · {quote.lines.length} Positionen</small><small className="mobile-row-summary">{quote.customerName}</small></span><span className="overview-desktop-cell">{quote.customerName}</span><span className="overview-desktop-cell">{quote.validUntil}</span><span className="overview-desktop-cell">{chf(quote.amount)}</span><span className={`status ${quote.status} overview-desktop-cell`}>{labels[quote.status]}</span><span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span></InteractiveRow>)}
     </div>
 
     <ResponsivePreview

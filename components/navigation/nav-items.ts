@@ -15,7 +15,8 @@ const ownersAndAdmins: Role[] = ['owner', 'admin']
 
 export const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'dashboard', roles: all, group: 'work' },
-  { href: '/customers', label: 'Kunden', icon: 'customers', roles: management, group: 'work' },
+  { href: '/contacts', label: 'Kontakte', icon: 'customers', roles: management, group: 'work' },
+  { href: '/customers', label: 'Firmen', icon: 'building', roles: management, group: 'work' },
   { href: '/quotes', label: 'Angebote', icon: 'quotes', roles: management, group: 'work' },
   { href: '/orders', label: 'Aufträge', icon: 'orders', roles: all, group: 'work' },
   { href: '/contracts', label: 'Verträge', icon: 'contracts', roles: management, group: 'work' },

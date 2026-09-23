@@ -6500,3 +6500,11 @@ button.accounting-task-row{cursor:pointer;}
   }
 }
 
+/* V44 — object-centric product model.
+   Contacts use the existing canonical master-list UX without introducing a new visual pattern. */
+@media(min-width:821px){
+  .apple-page .contact-grid{
+    grid-template-columns:minmax(240px,1.3fr) minmax(240px,1fr) 32px!important;
+  }
+}
+
