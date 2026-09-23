@@ -1,35 +1,64 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { Input, Select } from '@/components/ui/form-controls'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { SettingsSection, SettingsValueRow } from '@/components/settings/settings-row'
-import { usePlatformStore } from '@/components/state/platform-store'
 import { formatChf, formatDateTime } from '@/lib/format/locale'
-import type { PlatformTenant, SubscriptionPlan } from '@/types/domain'
+import type { PlatformTenant, SignupRequest, SubscriptionPlan } from '@/types/domain'
 import { planDefinitions } from '@/lib/data/plans'
 import { useFeedback } from '@/components/ui/feedback'
 
+type PlatformResponse = {
+  tenants: PlatformTenant[]
+  signups: SignupRequest[]
+  canManage: boolean
+  error?: string
+}
+
 export default function PlatformAdminPage() {
-  const store = usePlatformStore()
   const feedback = useFeedback()
+  const [tenants, setTenants] = useState<PlatformTenant[]>([])
+  const [signups, setSignups] = useState<SignupRequest[]>([])
+  const [canManage, setCanManage] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [editing, setEditing] = useState<PlatformTenant | null>(null)
   const [plan, setPlan] = useState<SubscriptionPlan>('business')
   const [status, setStatus] = useState<PlatformTenant['status']>('active')
+  const [saving, setSaving] = useState(false)
+
+  const loadPlatform = useCallback(async () => {
+    try {
+      const response = await fetch('/api/platform/tenants', { cache: 'no-store' })
+      const result = await response.json() as PlatformResponse
+      if (!response.ok) throw new Error(result.error || 'Plattformdaten konnten nicht geladen werden.')
+      setTenants(result.tenants)
+      setSignups(result.signups)
+      setCanManage(result.canManage)
+    } catch (cause) {
+      feedback.error(cause instanceof Error ? cause.message : 'Plattformdaten konnten nicht geladen werden.')
+    } finally {
+      setLoading(false)
+    }
+  }, [feedback])
+
+  useEffect(() => {
+    queueMicrotask(() => { void loadPlatform() })
+  }, [loadPlatform])
 
   const metrics = useMemo(() => {
-    const active = store.tenants.filter((item) => item.status === 'active')
+    const active = tenants.filter((item) => item.status === 'active')
     return {
-      tenants: store.tenants.length,
+      tenants: tenants.length,
       active: active.length,
-      trials: store.tenants.filter((item) => item.status === 'trial').length,
+      trials: tenants.filter((item) => item.status === 'trial').length,
       mrr: active.reduce((sum, item) => sum + item.monthlyRevenueChf, 0),
     }
-  }, [store.tenants])
+  }, [tenants])
 
-  const filtered = store.tenants.filter((tenant) =>
+  const filtered = tenants.filter((tenant) =>
     `${tenant.companyName} ${tenant.ownerEmail} ${tenant.plan} ${tenant.status}`.toLowerCase().includes(query.trim().toLowerCase())
   )
 
@@ -39,13 +68,26 @@ export default function PlatformAdminPage() {
     setStatus(tenant.status)
   }
 
-  function saveTenant(event: React.FormEvent) {
+  async function saveTenant(event: React.FormEvent) {
     event.preventDefault()
-    if (!editing) return
-    store.changePlan(editing.id, plan)
-    store.updateTenant(editing.id, { status })
-    setEditing(null)
-    feedback.success('Mandant wurde aktualisiert.')
+    if (!editing || saving || !canManage) return
+    setSaving(true)
+    try {
+      const response = await fetch('/api/platform/tenants', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ tenantId: editing.id, plan, status }),
+      })
+      const result = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) throw new Error(result.error || 'Mandant konnte nicht aktualisiert werden.')
+      await loadPlatform()
+      setEditing(null)
+      feedback.success('Abonnement wurde aktualisiert.')
+    } catch (cause) {
+      feedback.error(cause instanceof Error ? cause.message : 'Mandant konnte nicht aktualisiert werden.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -58,19 +100,19 @@ export default function PlatformAdminPage() {
         <div><span>MRR</span><strong>{formatChf(metrics.mrr, { maximumFractionDigits: 0 })}</strong></div>
       </div>
 
-      <SettingsSection title="Betrieb" description="Demo-Monitoring der zentralen Plattformdienste.">
+      <SettingsSection title="Betrieb" description="Status der zentralen Plattformdienste.">
         <SettingsValueRow title="Web App" value="Betriebsbereit" description="Production" />
-        <SettingsValueRow title="Datenbank" value="Vorbereitet" description="Produktive Verbindung noch nicht angeschlossen" />
+        <SettingsValueRow title="Datenbank" value="Verbunden" description="Azure Database for PostgreSQL" />
+        <SettingsValueRow title="Billing" value="Foundation aktiv" description="Manuelle Verwaltung; Stripe-Anbindung vorbereitet" />
         <SettingsValueRow title="E-Mail" value="Nicht verbunden" description="Provider-Konfiguration ausstehend" />
-        <SettingsValueRow title="Billing" value="Nicht verbunden" description="Zahlungsanbieter ausstehend" />
-        <SettingsValueRow title="Backups" value="Nicht verifiziert" description="Restore-Test vor Go-live erforderlich" />
+        <SettingsValueRow title="Backups" value="Azure Backup" description="Restore-Test vor Go-live einplanen" />
       </SettingsSection>
 
       <section>
-        <div className="section-title"><div><h2>Mandanten</h2><p>Alle SaaS-Kunden und Testkonten.</p></div></div>
+        <div className="section-title"><div><h2>Mandanten</h2><p>Produktive SaaS-Kunden und Testkonten aus PostgreSQL.</p></div></div>
         <div className="module-toolbar">
           <label className="search-field"><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Firma oder E-Mail suchen" /></label>
-          <span className="toolbar-meta">{filtered.length} Mandanten</span>
+          <span className="toolbar-meta">{loading ? 'Wird geladen…' : `${filtered.length} Mandanten`}</span>
         </div>
         <div className="data-list compact-overview-list">
           <div className="data-row data-head"><span>Firma</span><span>Abo</span><span>Status</span><span /></div>
@@ -85,18 +127,20 @@ export default function PlatformAdminPage() {
         </div>
       </section>
 
-      <SettingsSection title="Registrierungen" description="Neue Registrierungen und Trial-Starts.">
-        {store.signups.map((signup) => <SettingsValueRow key={signup.id} title={signup.companyName} value={signup.status} description={`${signup.email} · ${signup.plan}`} />)}
+      <SettingsSection title="Registrierungen" description="Neue Registrierungen und Trial-Starts aus PostgreSQL.">
+        {signups.map((signup) => <SettingsValueRow key={signup.id} title={signup.companyName} value={signup.status} description={`${signup.email} · ${signup.plan}`} />)}
       </SettingsSection>
 
-      {editing && <StandardFormSheet open title={<>{editing.companyName}</>} description={<>{editing.ownerEmail}</>} onClose={() => setEditing(null)} onSubmit={saveTenant} formId="platform-tenant-edit" footer={<><button type="button" className="button secondary" onClick={() => setEditing(null)}>Abbrechen</button><button type="submit" form="platform-tenant-edit" className="button primary">Speichern</button></>}>
+      {editing && <StandardFormSheet open title={<>{editing.companyName}</>} description={<>{editing.ownerEmail}</>} onClose={() => setEditing(null)} onSubmit={saveTenant} formId="platform-tenant-edit" footer={<><button type="button" className="button secondary" onClick={() => setEditing(null)}>Abbrechen</button>{canManage ? <button type="submit" form="platform-tenant-edit" className="button primary" disabled={saving}>{saving ? 'Speichern…' : 'Speichern'}</button> : null}</>}>
         <div className="form-grid">
-          <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
-          <label><span>Status</span><Select value={status} onChange={(event) => setStatus(event.target.value as PlatformTenant['status'])}><option value="trial">Trial</option><option value="active">Aktiv</option><option value="past_due">Zahlung offen</option><option value="suspended">Gesperrt</option><option value="cancelled">Gekündigt</option></Select></label>
+          <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)} disabled={!canManage}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
+          <label><span>Status</span><Select value={status} onChange={(event) => setStatus(event.target.value as PlatformTenant['status'])} disabled={!canManage}><option value="trial">Trial</option><option value="active">Aktiv</option><option value="past_due">Zahlung offen</option><option value="suspended">Gesperrt</option><option value="cancelled">Gekündigt</option></Select></label>
           <div className="full customer-overview-list">
             <div><span>Benutzer</span><strong>{editing.users} / {editing.seats}</strong></div>
             <div><span>Speicher</span><strong>{editing.storageMb} MB</strong></div>
             <div><span>MRR</span><strong>{formatChf(editing.monthlyRevenueChf)}</strong></div>
+            <div><span>Billing</span><strong>{editing.billingProvider ?? 'manual'}</strong></div>
+            <div><span>Trial bis</span><strong>{editing.trialUntil ? formatDateTime(editing.trialUntil) : '–'}</strong></div>
             <div><span>Zuletzt aktiv</span><strong>{formatDateTime(editing.lastActiveAt)}</strong></div>
           </div>
         </div>

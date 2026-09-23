@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run actions:check && npm run process:check && npm run mobile-ui:check && npm run saas:check && npm run data-foundation:check && npm run auth-membership:check && npm run registration-onboarding:check && npm run saas:product-check && npm run platform:check && npm run build",
+    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run actions:check && npm run process:check && npm run mobile-ui:check && npm run saas:check && npm run data-foundation:check && npm run auth-membership:check && npm run registration-onboarding:check && npm run subscription-billing:check && npm run saas:product-check && npm run platform:check && npm run build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -20,7 +20,8 @@
     "db:migrate": "node scripts/db-migrate.mjs",
     "data-foundation:check": "node scripts/check-data-foundation.mjs",
     "auth-membership:check": "node scripts/check-auth-membership.mjs",
-    "registration-onboarding:check": "node scripts/check-registration-onboarding.mjs"
+    "registration-onboarding:check": "node scripts/check-registration-onboarding.mjs",
+    "subscription-billing:check": "node scripts/check-subscription-billing.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",

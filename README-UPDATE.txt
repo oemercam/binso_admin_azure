@@ -53,3 +53,9 @@ V60 – Registration & Onboarding
 - Returning users are routed through /post-login based on membership/onboarding state.
 - BusinessStore receives authoritative organization/membership/subscription/entitlement bootstrap from PostgreSQL.
 - Added migration 0003_registration_onboarding.sql and registration-onboarding:check.
+
+V61: Subscription & Billing Foundation
+- Plattformmandanten und Registrierungen werden im Platform Admin aus PostgreSQL geladen.
+- Plan-/Statusänderungen sind serverseitig, auditiert und synchronisieren Entitlements/Limits.
+- Billing-Lifecycle, Subscription-Events und Stripe-Webhook-Inbox sind vorbereitet.
+- Inhaber können Planwechsel/Kündigung/Reaktivierung über die Billing-API anfordern.

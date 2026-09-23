@@ -4,7 +4,6 @@ import { AppShell } from '@/components/app-shell/app-shell'
 import { BusinessStoreProvider } from '@/components/state/business-store'
 import { RouteTransition } from '@/components/navigation/route-transition'
 import { CurrentUserProvider } from '@/components/state/current-user'
-import { PlatformStoreProvider } from '@/components/state/platform-store'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { getBusinessBootstrapForUser } from '@/lib/db/repositories/business-bootstrap'
@@ -17,14 +16,12 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   const bootstrap = isDatabaseConfigured() ? await getBusinessBootstrapForUser(session.user.id) : null
 
   return (
-    <PlatformStoreProvider>
-      <BusinessStoreProvider user={session.user} bootstrap={bootstrap}>
+    <BusinessStoreProvider user={session.user} bootstrap={bootstrap}>
         <CurrentUserProvider user={session.user}>
           <AppShell user={session.user}>
             <RouteTransition>{children}</RouteTransition>
           </AppShell>
         </CurrentUserProvider>
-      </BusinessStoreProvider>
-    </PlatformStoreProvider>
+    </BusinessStoreProvider>
   )
 }

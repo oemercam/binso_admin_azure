@@ -97,9 +97,9 @@ export async function createTrialOrganization(input: {
       [organizationId, input.userId, input.userEmail],
     )
     await client.query(
-      `insert into organization_subscriptions (organization_id, plan, status, seats, trial_until)
-       values ($1, $2, 'trial', $3, $4)`,
-      [organizationId, signup.plan, plan.includedUsers, trialUntil],
+      `insert into organization_subscriptions (organization_id, plan, status, seats, trial_until, billing_provider, billing_interval, unit_amount_chf)
+       values ($1, $2, 'trial', $3, $4, 'manual', 'monthly', $5)`,
+      [organizationId, signup.plan, plan.includedUsers, trialUntil, plan.monthlyPriceChf ?? 0],
     )
     await client.query(
       `insert into organization_entitlements (organization_id, features, max_users, max_storage_mb)

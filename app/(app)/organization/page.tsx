@@ -8,7 +8,8 @@ import { SettingsSection, SettingsValueRow } from '@/components/settings/setting
 import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
 import { useFeedback } from '@/components/ui/feedback'
-import type { Role } from '@/types/domain'
+import type { Role, SubscriptionPlan } from '@/types/domain'
+import { planDefinitions } from '@/lib/data/plans'
 
 export default function OrganizationPage() {
   const store = useBusinessStore()
@@ -17,10 +18,39 @@ export default function OrganizationPage() {
   const [inviteOpen, setInviteOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Role>('employee')
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false)
+  const [subscriptionPlan, setSubscriptionPlan] = useState<SubscriptionPlan>('business')
+  const [subscriptionSaving, setSubscriptionSaving] = useState(false)
 
   const subscription = store.subscriptions[0]
   const entitlement = store.entitlements[0]
   const members = useMemo(() => store.memberships.filter((item) => item.status !== 'suspended'), [store.memberships])
+
+  async function updateSubscription(action: 'change_plan' | 'cancel' | 'reactivate') {
+    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    setSubscriptionSaving(true)
+    try {
+      const response = await fetch('/api/billing/subscription', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action, plan: action === 'change_plan' ? subscriptionPlan : undefined }),
+      })
+      const result = await response.json().catch(() => ({})) as { error?: string; mode?: string }
+      if (!response.ok) throw new Error(result.error || 'Abonnement konnte nicht aktualisiert werden.')
+      feedback.success(action === 'cancel' ? 'Kündigung wurde vorgemerkt.' : action === 'reactivate' ? 'Kündigung wurde zurückgenommen.' : result.mode === 'immediate' ? 'Plan wurde aktualisiert.' : 'Planwechsel wurde vorgemerkt.')
+      setSubscriptionOpen(false)
+      window.location.reload()
+    } catch (cause) {
+      feedback.error(cause instanceof Error ? cause.message : 'Abonnement konnte nicht aktualisiert werden.')
+    } finally {
+      setSubscriptionSaving(false)
+    }
+  }
+
+  function openSubscription() {
+    setSubscriptionPlan(subscription?.scheduledPlan ?? subscription?.plan ?? 'business')
+    setSubscriptionOpen(true)
+  }
 
   function invite(event: React.FormEvent) {
     event.preventDefault()
@@ -60,7 +90,8 @@ export default function OrganizationPage() {
       <SettingsSection title="Mandant" description="Aktive Organisation und Produktstatus.">
         <SettingsValueRow title="Organisation" value={store.currentOrganization.name} description={store.currentOrganization.slug} />
         <SettingsValueRow title="Land und Sprache" value={`${store.currentOrganization.country} · ${store.currentOrganization.locale}`} description={`Währung ${store.currentOrganization.currency}`} />
-        <SettingsValueRow title="Abonnement" value={subscription ? `${subscription.plan} · ${subscription.status}` : 'Kein Abonnement'} description={subscription ? `${subscription.seats} Benutzer` : undefined} />
+        <SettingsValueRow title="Abonnement" value={subscription ? `${subscription.plan} · ${subscription.status}` : 'Kein Abonnement'} description={subscription ? `${subscription.seats} Benutzer${subscription.cancelAtPeriodEnd ? ' · Kündigung vorgemerkt' : subscription.scheduledPlan ? ` · Wechsel zu ${subscription.scheduledPlan} vorgemerkt` : ''}` : undefined} />
+        {subscription && user.role === 'owner' ? <div className="customer-quick-actions"><button type="button" className="button secondary" onClick={openSubscription}>Abonnement verwalten</button></div> : null}
         <SettingsValueRow title="Funktionen" value={`${entitlement?.features.length ?? 0} aktiviert`} description={entitlement ? `Max. ${entitlement.maxUsers} Benutzer` : 'Keine Limits definiert'} />
       </SettingsSection>
 
@@ -76,6 +107,32 @@ export default function OrganizationPage() {
         ))}
         {!store.auditEvents.length && <div className="list-empty">Noch keine Audit-Ereignisse.</div>}
       </SettingsSection>
+
+
+      {subscriptionOpen && subscription && (
+        <StandardFormSheet
+          open
+          title={<>Abonnement verwalten</>}
+          description={<>{store.currentOrganization.name}</>}
+          onClose={() => setSubscriptionOpen(false)}
+          onSubmit={(event) => event.preventDefault()}
+          formId="subscription-manage"
+          footer={<><button type="button" className="button secondary" onClick={() => setSubscriptionOpen(false)}>Schliessen</button><button type="button" className="button primary" disabled={subscriptionSaving || subscriptionPlan === subscription.plan} onClick={() => void updateSubscription('change_plan')}>{subscriptionSaving ? 'Speichern…' : 'Plan wechseln'}</button></>}
+        >
+          <div className="form-grid">
+            <label className="full"><span>Plan</span><Select value={subscriptionPlan} onChange={(event) => setSubscriptionPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}/Monat` : ''}</option>)}</Select></label>
+            <div className="full customer-overview-list">
+              <div><span>Status</span><strong>{subscription.status}</strong></div>
+              <div><span>Benutzer</span><strong>{subscription.seats}</strong></div>
+              <div><span>Billing</span><strong>{subscription.billingProvider ?? 'manual'}</strong></div>
+              {subscription.trialUntil ? <div><span>Trial bis</span><strong>{new Date(subscription.trialUntil).toLocaleDateString('de-CH')}</strong></div> : null}
+            </div>
+            <div className="full customer-quick-actions">
+              {subscription.cancelAtPeriodEnd ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('reactivate')}>Kündigung zurücknehmen</button> : <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('cancel')}>Zum Periodenende kündigen</button>}
+            </div>
+          </div>
+        </StandardFormSheet>
+      )}
 
       {inviteOpen && (
         <StandardFormSheet

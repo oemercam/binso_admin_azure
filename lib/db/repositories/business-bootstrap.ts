@@ -26,6 +26,14 @@ type BootstrapRow = {
   trial_until: Date | null
   billing_customer_id: string | null
   current_period_end: Date | null
+  billing_subscription_id: string | null
+  billing_provider: 'manual' | 'stripe' | null
+  billing_interval: 'monthly' | 'yearly' | null
+  unit_amount_chf: string | null
+  next_billing_at: Date | null
+  cancel_at_period_end: boolean | null
+  cancelled_at: Date | null
+  scheduled_plan: SubscriptionPlan | null
   features: OrganizationFeature[] | null
   max_users: number | null
   max_storage_mb: number | null
@@ -51,7 +59,8 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
        m.id as membership_id, m.user_id, m.email as membership_email, m.role as membership_role,
        m.status as membership_status, m.created_at as membership_created_at, m.updated_at as membership_updated_at,
        s.id as subscription_id, s.plan, s.status as subscription_status, s.seats, s.trial_until,
-       s.billing_customer_id, s.current_period_end,
+       s.billing_customer_id, s.current_period_end, s.billing_subscription_id, s.billing_provider,
+       s.billing_interval, s.unit_amount_chf::text, s.next_billing_at, s.cancel_at_period_end, s.cancelled_at, s.scheduled_plan,
        e.features, e.max_users, e.max_storage_mb,
        p.name as profile_name, p.address, p.zip, p.city, p.country as profile_country,
        p.email as profile_email, p.phone, p.uid, p.iban, p.bank_name, p.website
@@ -96,6 +105,14 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
     trialUntil: row.trial_until?.toISOString(),
     billingCustomerId: row.billing_customer_id ?? undefined,
     currentPeriodEnd: row.current_period_end?.toISOString(),
+    billingSubscriptionId: row.billing_subscription_id ?? undefined,
+    billingProvider: row.billing_provider ?? undefined,
+    billingInterval: row.billing_interval ?? undefined,
+    unitAmountChf: row.unit_amount_chf ? Number(row.unit_amount_chf) : undefined,
+    nextBillingAt: row.next_billing_at?.toISOString(),
+    cancelAtPeriodEnd: row.cancel_at_period_end ?? false,
+    cancelledAt: row.cancelled_at?.toISOString(),
+    scheduledPlan: row.scheduled_plan ?? undefined,
   }] : [])
   const entitlements: OrganizationEntitlements[] = result.rows.flatMap((row) => row.features && row.max_users && row.max_storage_mb ? [{
     organizationId: row.organization_id,

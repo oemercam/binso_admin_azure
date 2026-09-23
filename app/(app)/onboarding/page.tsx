@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { useBusinessStore } from '@/components/state/business-store'
-import { usePlatformStore } from '@/components/state/platform-store'
 import type { OrganizationMembership, SignupRequest } from '@/types/domain'
 
 type OnboardingState = {
@@ -15,7 +14,6 @@ type OnboardingState = {
 export default function OnboardingPage() {
   const router = useRouter()
   const store = useBusinessStore()
-  const platform = usePlatformStore()
   const [state, setState] = useState<OnboardingState | null>(null)
   const [ready, setReady] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -54,17 +52,14 @@ export default function OnboardingPage() {
       const result = await response.json() as { organizationId?: string; error?: string }
       if (!response.ok || !result.organizationId) throw new Error(result.error || 'Organisation konnte nicht erstellt werden.')
 
-      // Compatibility mirror until the business modules are moved from browser persistence to PostgreSQL.
-      platform.registerSignup(signup)
       const slug = signup.companyName.toLowerCase().replace(/[^a-z0-9äöü]+/g, '-').replace(/^-|-$/g, '')
-      const organization = store.createOrganization({
+      store.createOrganization({
         organizationId: result.organizationId,
         name: signup.companyName,
         slug: slug || `firma-${Date.now()}`,
         ownerEmail: signup.email,
         plan: signup.plan,
       })
-      platform.activateSignup(signup.id, organization.id)
       router.push('/dashboard')
       router.refresh()
     } catch (cause) {

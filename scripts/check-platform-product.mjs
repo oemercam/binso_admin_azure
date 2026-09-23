@@ -16,7 +16,7 @@ const checks=[
  ['platform auth guard',server.includes('requirePlatformRole')],
  ['platform-only nav',nav.includes('platformOnly')],
  ['four plans',pricing.includes("id: 'starter'")&&pricing.includes("id: 'business'")&&pricing.includes("id: 'professional'")&&pricing.includes("id: 'enterprise'")],
- ['platform admin page',platform.includes('SaaS-Kunden, Abonnemente')],
+ ['platform admin page',platform.includes('SaaS-Kunden, Abonnemente')&&platform.includes('/api/platform/tenants')],
  ['registration page',register.includes('/api/registration')],
  ['onboarding creates organization',onboarding.includes('store.createOrganization')],
  ['per-org profiles',store.includes('companyProfiles: Record<string, CompanyProfile>')],

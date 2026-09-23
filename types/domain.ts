@@ -74,7 +74,15 @@ export type OrganizationSubscription = {
   seats: number
   trialUntil?: string
   billingCustomerId?: string
+  billingSubscriptionId?: string
+  billingProvider?: 'manual' | 'stripe'
+  billingInterval?: 'monthly' | 'yearly'
+  unitAmountChf?: number
   currentPeriodEnd?: string
+  nextBillingAt?: string
+  cancelAtPeriodEnd?: boolean
+  cancelledAt?: string
+  scheduledPlan?: SubscriptionPlan
 }
 
 export type AuditEvent = {
@@ -149,12 +157,18 @@ export type PlatformTenant = {
   ownerEmail: string
   plan: SubscriptionPlan
   status: PlatformTenantStatus
+  subscriptionStatus?: SubscriptionStatus
   seats: number
   users: number
   monthlyRevenueChf: number
   createdAt: string
   lastActiveAt: string
   storageMb: number
+  trialUntil?: string
+  currentPeriodEnd?: string
+  cancelAtPeriodEnd?: boolean
+  scheduledPlan?: SubscriptionPlan
+  billingProvider?: 'manual' | 'stripe'
 }
 
 export type SignupRequest = {
