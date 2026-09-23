@@ -311,7 +311,9 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
     const organizationId = state.currentOrganizationId
 
     if (productionPersistence) {
-      setHydrated(false)
+      queueMicrotask(() => {
+        if (!cancelled) setHydrated(false)
+      })
       void (async () => {
         try {
           const response = await fetch(`/api/business/state?organizationId=${encodeURIComponent(organizationId)}`, { cache: 'no-store' })
@@ -416,7 +418,9 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
           return
         }
         window.dispatchEvent(new CustomEvent('binso:persistence-error'))
-      }).catch(() => window.dispatchEvent(new CustomEvent('binso:persistence-error')))
+      }).catch(() => {
+        window.dispatchEvent(new CustomEvent('binso:persistence-error'))
+      })
     }, 650)
     return () => window.clearTimeout(timer)
   }, [state, hydrated, productionPersistence])

@@ -9,7 +9,6 @@ const register=read('app/register/page.tsx')
 const onboarding=read('app/onboarding/page.tsx')
 const store=read('components/state/business-store.tsx')
 const schema=read('database/schema.sql')
-const onboardingSource=read('app/onboarding/page.tsx')
 
 const checks=[
  ['platform role',domain.includes("export type PlatformRole")],

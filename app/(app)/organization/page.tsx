@@ -45,7 +45,9 @@ export default function OrganizationPage() {
     }
   }, [feedback, store.currentOrganization.id])
 
-  useEffect(() => { void loadMembers() }, [loadMembers])
+  useEffect(() => {
+    queueMicrotask(() => { void loadMembers() })
+  }, [loadMembers])
 
   async function updateSubscription(action: 'change_plan' | 'cancel' | 'reactivate') {
     if (!subscription || subscriptionSaving || user.role !== 'owner') return
