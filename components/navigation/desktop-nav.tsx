@@ -4,10 +4,13 @@ import { usePathname } from 'next/navigation'
 import { NavigationItem } from './navigation-item'
 import { navForRole, navForUser } from './nav-items'
 import type { AppUser } from '@/types/domain'
+import { useBusinessStore } from '@/components/state/business-store'
 
 export function DesktopNav({ user }: { user: AppUser }) {
   const pathname = usePathname()
-  const items = user.platformRole ? navForUser(user) : navForRole(user.role)
+  const store = useBusinessStore()
+  const enabled = new Set(store.entitlements[0]?.features ?? [])
+  const items = (user.platformRole ? navForUser(user) : navForRole(user.role)).filter((item) => !item.feature || enabled.has(item.feature))
   const work = items.filter((item) => item.group === 'work')
   const management = items.filter((item) => item.group === 'management')
   const system = items.filter((item) => item.group === 'system')

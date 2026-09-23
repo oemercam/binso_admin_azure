@@ -7,19 +7,29 @@ import { CurrentUserProvider } from '@/components/state/current-user'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { getBusinessBootstrapForUser } from '@/lib/db/repositories/business-bootstrap'
+import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
+import { EntitlementGate } from '@/components/auth/entitlement-gate'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const session = await getSession()
   if (!session) redirect('/sign-in')
-  const bootstrap = isDatabaseConfigured() ? await getBusinessBootstrapForUser(session.user.id) : null
+  const databaseConfigured = isDatabaseConfigured()
+  const account = databaseConfigured
+    ? await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
+    : null
+  if (account?.status === 'suspended') redirect('/access-denied')
+
+  const user = account ? { ...session.user, name: account.displayName } : session.user
+  const bootstrap = databaseConfigured ? await getBusinessBootstrapForUser(user.id) : null
+  if (databaseConfigured && !bootstrap && !user.platformRole) redirect('/post-login')
 
   return (
-    <BusinessStoreProvider user={session.user} bootstrap={bootstrap}>
-        <CurrentUserProvider user={session.user}>
-          <AppShell user={session.user}>
-            <RouteTransition>{children}</RouteTransition>
+    <BusinessStoreProvider user={user} bootstrap={bootstrap} databaseConfigured={databaseConfigured}>
+        <CurrentUserProvider user={user}>
+          <AppShell user={user}>
+            <EntitlementGate><RouteTransition>{children}</RouteTransition></EntitlementGate>
           </AppShell>
         </CurrentUserProvider>
     </BusinessStoreProvider>

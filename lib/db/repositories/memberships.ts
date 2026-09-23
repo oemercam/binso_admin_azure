@@ -47,3 +47,25 @@ export async function findActiveMembership(userId: string, organizationId: strin
   )
   return result.rows[0] ? mapMembership(result.rows[0]) : null
 }
+
+export async function findAccessibleMembership(userId: string, organizationId?: string | null) {
+  const values: unknown[] = [userId]
+  const organizationFilter = organizationId ? 'and m.organization_id = $2' : ''
+  if (organizationId) values.push(organizationId)
+  const result = await query<MembershipRow>(
+    `select m.id, m.organization_id, m.user_id, m.email, m.role, m.status, m.created_at, m.updated_at
+       from organization_memberships m
+       join platform_tenants pt on pt.organization_id = m.organization_id
+       join organization_subscriptions s on s.organization_id = m.organization_id
+      where m.user_id = $1 and m.status = 'active'
+        ${organizationFilter}
+        and (
+          pt.platform_status in ('active','past_due')
+          or (pt.platform_status = 'trial' and s.trial_until is not null and s.trial_until > now())
+        )
+      order by m.created_at asc
+      limit 1`,
+    values,
+  )
+  return result.rows[0] ? mapMembership(result.rows[0]) : null
+}

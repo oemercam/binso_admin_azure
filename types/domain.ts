@@ -186,7 +186,7 @@ export type DataExportJob = {
   organizationId: OrganizationId
   requestedBy: string
   status: 'queued' | 'processing' | 'ready' | 'failed'
-  format: 'csv' | 'xlsx' | 'zip'
+  format: 'csv' | 'xlsx' | 'zip' | 'json'
   scope: 'all' | 'customers' | 'contacts' | 'invoices' | 'time'
   createdAt: string
   completedAt?: string

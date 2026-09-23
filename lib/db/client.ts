@@ -34,7 +34,7 @@ export function databasePool() {
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
       ssl: sslEnabled() ? { rejectUnauthorized: true } : undefined,
-      application_name: 'binso-admin-platform',
+      application_name: 'binso-one',
     })
   }
 

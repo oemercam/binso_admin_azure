@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -143,7 +144,9 @@ type BusinessStore = BusinessState & {
   updateMembership: (id: string, changes: Partial<OrganizationMembership>) => OrganizationMembership | null
   appendAuditEvent: (event: Omit<AuditEvent, 'id' | 'organizationId' | 'createdAt'>) => void
   createExportJob: (job: Omit<DataExportJob, 'id' | 'organizationId' | 'createdAt' | 'status'>) => DataExportJob
+  updateExportJob: (id: string, changes: Partial<DataExportJob>) => void
   createImportJob: (job: Omit<ImportJob, 'id' | 'organizationId' | 'createdAt' | 'status' | 'errorCount'>) => ImportJob
+  updateImportJob: (id: string, changes: Partial<ImportJob>) => void
   addCustomer: (customer: Customer) => void
   updateCustomer: (id: string, changes: Partial<Customer>) => Customer | null
   createContract: (input: CreateContractInput) => Contract | null
@@ -191,34 +194,34 @@ function scopeRecords<T extends { organizationId?: string }>(items: T[], organiz
   return items.map((item) => ({ ...item, organizationId: item.organizationId ?? organizationId }))
 }
 
-function freshState(): BusinessState {
+function freshState(includeDemo = true): BusinessState {
   return {
     organizations: [defaultOrganization],
     currentOrganizationId: DEFAULT_ORGANIZATION_ID,
-    memberships: seedMemberships,
-    subscriptions: seedSubscriptions,
-    entitlements: seedEntitlements,
-    auditEvents: seedAuditEvents,
-    numberSequences: seedNumberSequences,
-    importJobs: seedImportJobs,
-    exportJobs: seedExportJobs,
-    customers: scopeRecords(seedCustomers),
-    contracts: scopeRecords(seedContracts),
-    expenses: scopeRecords(seedExpenses),
-    creditNotes: scopeRecords(seedCreditNotes),
-    customerActivities: scopeRecords(seedCustomerActivities),
-    customerContacts: scopeRecords(seedCustomerContacts),
-    suppliers: scopeRecords(seedSuppliers),
-    quotes: scopeRecords(seedQuotes),
-    orders: scopeRecords(seedOrders),
-    timeEntries: scopeRecords(seedTimeEntries),
-    invoices: scopeRecords(seedInvoices),
-    payments: scopeRecords(seedPayments),
-    supplierInvoices: scopeRecords(seedSupplierInvoices),
-    employees: scopeRecords(seedEmployees),
-    timeEvidence: scopeRecords(seedTimeEvidence),
-    orderPolicies: scopeRecords(seedOrderPolicies),
-    orderAssignmentRules: scopeRecords(seedOrderAssignmentRules),
+    memberships: includeDemo ? seedMemberships : [],
+    subscriptions: includeDemo ? seedSubscriptions : [],
+    entitlements: includeDemo ? seedEntitlements : [],
+    auditEvents: includeDemo ? seedAuditEvents : [],
+    numberSequences: includeDemo ? seedNumberSequences : [],
+    importJobs: includeDemo ? seedImportJobs : [],
+    exportJobs: includeDemo ? seedExportJobs : [],
+    customers: includeDemo ? scopeRecords(seedCustomers) : [],
+    contracts: includeDemo ? scopeRecords(seedContracts) : [],
+    expenses: includeDemo ? scopeRecords(seedExpenses) : [],
+    creditNotes: includeDemo ? scopeRecords(seedCreditNotes) : [],
+    customerActivities: includeDemo ? scopeRecords(seedCustomerActivities) : [],
+    customerContacts: includeDemo ? scopeRecords(seedCustomerContacts) : [],
+    suppliers: includeDemo ? scopeRecords(seedSuppliers) : [],
+    quotes: includeDemo ? scopeRecords(seedQuotes) : [],
+    orders: includeDemo ? scopeRecords(seedOrders) : [],
+    timeEntries: includeDemo ? scopeRecords(seedTimeEntries) : [],
+    invoices: includeDemo ? scopeRecords(seedInvoices) : [],
+    payments: includeDemo ? scopeRecords(seedPayments) : [],
+    supplierInvoices: includeDemo ? scopeRecords(seedSupplierInvoices) : [],
+    employees: includeDemo ? scopeRecords(seedEmployees) : [],
+    timeEvidence: includeDemo ? scopeRecords(seedTimeEvidence) : [],
+    orderPolicies: includeDemo ? scopeRecords(seedOrderPolicies) : [],
+    orderAssignmentRules: includeDemo ? scopeRecords(seedOrderAssignmentRules) : [],
     companyProfile: { ...defaultCompanyProfile, organizationId: DEFAULT_ORGANIZATION_ID },
     documentTemplates: defaultDocumentTemplates,
     appSettings: defaultAppSettings,
@@ -245,47 +248,105 @@ function applyBootstrap(base: BusinessState, bootstrap?: BusinessBootstrap | nul
   }
 }
 
+
+const TENANT_ARRAY_KEYS = [
+  'auditEvents','numberSequences','importJobs','exportJobs','customers','contracts','expenses','creditNotes',
+  'customerActivities','customerContacts','suppliers','quotes','orders','timeEntries','invoices','payments',
+  'supplierInvoices','employees','timeEvidence','orderPolicies','orderAssignmentRules',
+] as const satisfies readonly (keyof BusinessState)[]
+
+function tenantSnapshot(state: BusinessState, organizationId: string): Record<string, unknown> {
+  const snapshot: Record<string, unknown> = {}
+  for (const key of TENANT_ARRAY_KEYS) {
+    const value = state[key]
+    if (Array.isArray(value)) snapshot[key] = value.filter((item) => typeof item === 'object' && item !== null && 'organizationId' in item && (item as { organizationId?: string }).organizationId === organizationId)
+  }
+  snapshot.companyProfile = state.companyProfiles[organizationId] ?? state.companyProfile
+  snapshot.documentTemplates = state.documentTemplatesByOrganization[organizationId] ?? state.documentTemplates
+  snapshot.appSettings = state.appSettingsByOrganization[organizationId] ?? state.appSettings
+  return snapshot
+}
+
+function mergeTenantSnapshot(current: BusinessState, snapshot: Record<string, unknown>, organizationId: string): BusinessState {
+  const next = { ...current }
+  for (const key of TENANT_ARRAY_KEYS) {
+    const incoming = Array.isArray(snapshot[key]) ? snapshot[key] : []
+    const existing = current[key]
+    if (!Array.isArray(existing)) continue
+    ;(next as unknown as Record<string, unknown>)[key] = [
+      ...existing.filter((item) => typeof item !== 'object' || item === null || !('organizationId' in item) || (item as { organizationId?: string }).organizationId !== organizationId),
+      ...incoming,
+    ]
+  }
+  if (snapshot.companyProfile && typeof snapshot.companyProfile === 'object') {
+    const profile = { ...defaultCompanyProfile, ...(snapshot.companyProfile as Partial<CompanyProfile>), organizationId }
+    next.companyProfile = profile
+    next.companyProfiles = { ...current.companyProfiles, [organizationId]: profile }
+  }
+  if (snapshot.documentTemplates && typeof snapshot.documentTemplates === 'object') {
+    const templates = { ...defaultDocumentTemplates, ...(snapshot.documentTemplates as Partial<DocumentTemplates>) }
+    next.documentTemplates = templates
+    next.documentTemplatesByOrganization = { ...current.documentTemplatesByOrganization, [organizationId]: templates }
+  }
+  if (snapshot.appSettings && typeof snapshot.appSettings === 'object') {
+    const settings = mergeAppSettings(snapshot.appSettings as Partial<AppSettings>)
+    next.appSettings = settings
+    next.appSettingsByOrganization = { ...current.appSettingsByOrganization, [organizationId]: settings }
+  }
+  return next
+}
+
 const BusinessContext = createContext<BusinessStore | null>(null)
 
-export function BusinessStoreProvider({ children, user, bootstrap }: { children: ReactNode; user?: AppUser; bootstrap?: BusinessBootstrap | null }) {
-  const [state, setState] = useState<BusinessState>(() => applyBootstrap(freshState(), bootstrap))
+export function BusinessStoreProvider({ children, user, bootstrap, databaseConfigured = false }: { children: ReactNode; user?: AppUser; bootstrap?: BusinessBootstrap | null; databaseConfigured?: boolean }) {
+  const productionPersistence = databaseConfigured
+  const [state, setState] = useState<BusinessState>(() => applyBootstrap(freshState(!productionPersistence), bootstrap))
   const [hydrated, setHydrated] = useState(false)
+  const remoteVersions = useRef<Record<string, number>>({})
+  const remoteReady = useRef<Set<string>>(new Set())
+  const remoteSaveChain = useRef<Promise<void>>(Promise.resolve())
 
   useEffect(() => {
     let cancelled = false
+    const organizationId = state.currentOrganizationId
+
+    if (productionPersistence) {
+      setHydrated(false)
+      void (async () => {
+        try {
+          const response = await fetch(`/api/business/state?organizationId=${encodeURIComponent(organizationId)}`, { cache: 'no-store' })
+          const result = await response.json().catch(() => ({})) as { state?: Record<string, unknown>; version?: number }
+          if (!response.ok) throw new Error('Geschäftsdaten konnten nicht geladen werden.')
+          if (cancelled) return
+          remoteVersions.current[organizationId] = Number(result.version ?? 0)
+          if (result.state && Object.keys(result.state).length) setState((current) => mergeTenantSnapshot(current, result.state ?? {}, organizationId))
+          remoteReady.current.add(organizationId)
+          setHydrated(true)
+        } catch {
+          if (!cancelled) setHydrated(false)
+        }
+      })()
+      return () => { cancelled = true }
+    }
+
     queueMicrotask(() => {
       if (cancelled) return
       try {
         let raw = readStorage(STORAGE_KEY)
-
         if (!raw) {
           for (const key of LEGACY_STORAGE_KEYS) {
             const legacy = readStorage(key)
-            if (legacy) {
-              raw = legacy
-              break
-            }
+            if (legacy) { raw = legacy; break }
           }
         }
-
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<BusinessState>
-          const seeded = freshState()
-
-          // Demo releases must always contain usable reference data. Older browser
-          // snapshots could contain empty arrays from previous UI-only versions and
-          // would otherwise make whole modules appear blank after an upgrade.
+          const seeded = freshState(true)
           const organizations = parsed.organizations?.length ? parsed.organizations : seeded.organizations
           const requestedOrganizationId = parsed.currentOrganizationId ?? DEFAULT_ORGANIZATION_ID
-          const currentOrganizationId = organizations.some((organization) => organization.id === requestedOrganizationId)
-            ? requestedOrganizationId
-            : organizations[0]?.id ?? DEFAULT_ORGANIZATION_ID
-
+          const currentOrganizationId = organizations.some((organization) => organization.id === requestedOrganizationId) ? requestedOrganizationId : organizations[0]?.id ?? DEFAULT_ORGANIZATION_ID
           setState(applyBootstrap({
-            ...seeded,
-            ...parsed,
-            organizations,
-            currentOrganizationId,
+            ...seeded, ...parsed, organizations, currentOrganizationId,
             memberships: parsed.memberships ?? seeded.memberships,
             subscriptions: parsed.subscriptions ?? seeded.subscriptions,
             entitlements: parsed.entitlements ?? seeded.entitlements,
@@ -319,18 +380,46 @@ export function BusinessStoreProvider({ children, user, bootstrap }: { children:
           }, bootstrap))
         }
       } catch {
-        // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
+        // Invalid development snapshots are ignored; demo seeds stay usable.
       } finally {
         if (!cancelled) setHydrated(true)
       }
     })
     return () => { cancelled = true }
-  }, [bootstrap])
+  }, [bootstrap, productionPersistence, state.currentOrganizationId])
 
   useEffect(() => {
     if (!hydrated) return
-    writeStorage(STORAGE_KEY, JSON.stringify(state))
-  }, [state, hydrated])
+    if (!productionPersistence) {
+      writeStorage(STORAGE_KEY, JSON.stringify(state))
+      return
+    }
+    const organizationId = state.currentOrganizationId
+    if (!remoteReady.current.has(organizationId)) return
+    const timer = window.setTimeout(() => {
+      const snapshot = tenantSnapshot(state, organizationId)
+      remoteSaveChain.current = remoteSaveChain.current.then(async () => {
+        const expectedVersion = remoteVersions.current[organizationId] ?? 0
+        const response = await fetch('/api/business/state', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ organizationId, expectedVersion, state: snapshot }),
+        })
+        const result = await response.json().catch(() => ({})) as { version?: number }
+        if (response.ok && typeof result.version === 'number') {
+          remoteVersions.current[organizationId] = result.version
+          return
+        }
+        if (response.status === 409 && typeof result.version === 'number') {
+          remoteVersions.current[organizationId] = result.version
+          window.dispatchEvent(new CustomEvent('binso:persistence-conflict'))
+          return
+        }
+        window.dispatchEvent(new CustomEvent('binso:persistence-error'))
+      }).catch(() => window.dispatchEvent(new CustomEvent('binso:persistence-error')))
+    }, 650)
+    return () => window.clearTimeout(timer)
+  }, [state, hydrated, productionPersistence])
 
   const currentOrganization = useMemo(
     () => state.organizations.find((organization) => organization.id === state.currentOrganizationId) ?? defaultOrganization,
@@ -469,10 +558,16 @@ export function BusinessStoreProvider({ children, user, bootstrap }: { children:
       setState((current) => ({ ...current, exportJobs: [created, ...current.exportJobs] }))
       return created
     },
+    updateExportJob(id, changes) {
+      setState((current) => ({ ...current, exportJobs: current.exportJobs.map((item) => item.id === id ? { ...item, ...changes, organizationId: item.organizationId } : item) }))
+    },
     createImportJob(job) {
       const created: ImportJob = { ...job, id: `import-${Date.now()}`, organizationId: state.currentOrganizationId, status: 'draft', errorCount: 0, createdAt: new Date().toISOString() }
       setState((current) => ({ ...current, importJobs: [created, ...current.importJobs] }))
       return created
+    },
+    updateImportJob(id, changes) {
+      setState((current) => ({ ...current, importJobs: current.importJobs.map((item) => item.id === id ? { ...item, ...changes, organizationId: item.organizationId } : item) }))
     },
     addCustomer(customer) {
       setState((current) => ({ ...current, customers: [{ ...customer, organizationId: state.currentOrganizationId }, ...current.customers] }))
@@ -1001,9 +1096,9 @@ export function BusinessStoreProvider({ children, user, bootstrap }: { children:
     },
     resetDemo() {
       removeStorage(STORAGE_KEY)
-      setState(freshState())
+      setState(applyBootstrap(freshState(!productionPersistence), bootstrap))
     },
-  }), [currentAppSettings, currentCompanyProfile, currentDocumentTemplates, currentOrganization, state, user])
+  }), [bootstrap, currentAppSettings, currentCompanyProfile, currentDocumentTemplates, currentOrganization, productionPersistence, state, user])
 
   return <BusinessContext.Provider value={store}>{children}</BusinessContext.Provider>
 }

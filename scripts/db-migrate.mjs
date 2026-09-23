@@ -36,7 +36,7 @@ const migrationsDir = path.join(process.cwd(), 'database', 'migrations')
 const client = new Client({
   connectionString: normalizedDatabaseUrl(databaseUrl),
   ssl: process.env.DATABASE_SSL?.toLowerCase() === 'false' ? undefined : { rejectUnauthorized: true },
-  application_name: 'binso-admin-platform-migrations',
+  application_name: 'binso-one-migrations',
 })
 
 await client.connect()

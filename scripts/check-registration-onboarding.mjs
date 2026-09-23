@@ -9,7 +9,7 @@ const checks = [
 
 const migration = fs.readFileSync('database/migrations/0003_registration_onboarding.sql', 'utf8')
 const registerPage = fs.readFileSync('app/register/page.tsx', 'utf8')
-const onboardingPage = fs.readFileSync('app/(app)/onboarding/page.tsx', 'utf8')
+const onboardingPage = fs.readFileSync('app/onboarding/page.tsx', 'utf8')
 const onboardingApi = fs.readFileSync('app/api/onboarding/route.ts', 'utf8')
 const layout = fs.readFileSync('app/(app)/layout.tsx', 'utf8')
 

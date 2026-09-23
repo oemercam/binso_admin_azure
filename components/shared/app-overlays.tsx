@@ -8,18 +8,18 @@ import { Icon, type IconName } from '@/components/ui/icon'
 import { CloseButton } from '@/components/ui/close-button'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { useBusinessStore } from '@/components/state/business-store'
-import type { AppUser, Role } from '@/types/domain'
+import type { AppUser, OrganizationFeature, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { signOutUrl } from '@/lib/auth/urls'
 
-const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[] }> = [
-  { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'] },
-  { label: 'Angebot erstellen', description: 'Leistungen offerieren und versenden', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'] },
-  { label: 'Auftrag erstellen', description: 'Neues Mandat oder Projekt eröffnen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'] },
-  { label: 'Vertrag erfassen', description: 'Laufzeit und wiederkehrende Abrechnung festlegen', icon: 'contracts', href: '/contracts?new=1', roles: ['owner', 'admin', 'finance'] },
-  { label: 'Zeit erfassen', description: 'Arbeitszeit direkt auf Auftrag buchen', icon: 'time', href: '/time?new=1', roles: ['owner', 'admin', 'employee'] },
-  { label: 'Rechnung erstellen', description: 'Offene Zeiten oder freie Positionen verrechnen', icon: 'invoices', href: '/invoices?new=1', roles: ['owner', 'admin', 'finance'] },
-  { label: 'Zahlung erfassen', description: 'Zahlung einer offenen Rechnung zuordnen', icon: 'credit-card', href: '/invoices?payment=1', roles: ['owner', 'admin', 'finance'] },
+const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[]; feature?: OrganizationFeature }> = [
+  { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'], feature: 'crm' },
+  { label: 'Angebot erstellen', description: 'Leistungen offerieren und versenden', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'], feature: 'quotes' },
+  { label: 'Auftrag erstellen', description: 'Neues Mandat oder Projekt eröffnen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'], feature: 'orders' },
+  { label: 'Vertrag erfassen', description: 'Laufzeit und wiederkehrende Abrechnung festlegen', icon: 'contracts', href: '/contracts?new=1', roles: ['owner', 'admin', 'finance'], feature: 'contracts' },
+  { label: 'Zeit erfassen', description: 'Arbeitszeit direkt auf Auftrag buchen', icon: 'time', href: '/time?new=1', roles: ['owner', 'admin', 'employee'], feature: 'time' },
+  { label: 'Rechnung erstellen', description: 'Offene Zeiten oder freie Positionen verrechnen', icon: 'invoices', href: '/invoices?new=1', roles: ['owner', 'admin', 'finance'], feature: 'invoices' },
+  { label: 'Zahlung erfassen', description: 'Zahlung einer offenen Rechnung zuordnen', icon: 'credit-card', href: '/invoices?payment=1', roles: ['owner', 'admin', 'finance'], feature: 'invoices' },
 ]
 
 const managementRoles: Role[] = ['owner', 'admin', 'finance']
@@ -48,10 +48,10 @@ export function AppOverlays({
   const store = useBusinessStore()
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const availableQuickActions = useMemo(
-    () => quickActions.filter((item) => item.roles.includes(user.role)),
-    [user.role],
-  )
+  const availableQuickActions = useMemo(() => {
+    const enabled = new Set(store.entitlements[0]?.features ?? [])
+    return quickActions.filter((item) => item.roles.includes(user.role) && (!item.feature || enabled.has(item.feature)))
+  }, [store.entitlements, user.role])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -181,7 +181,7 @@ export function AppOverlays({
         <div className="profile-popover" role="dialog">
           <div className="profile-card-head"><span className="avatar large">{initials(user.name)}</span><span><strong>{user.name}</strong><small>{roleLabel(user.role)}</small><small>{user.email}</small></span></div>
           <div className="profile-links">
-            <Link href="/settings" onClick={() => setProfileOpen(false)}><Icon name="user" size={16} />Profil und Einstellungen</Link>
+            <Link href="/account" onClick={() => setProfileOpen(false)}><Icon name="user" size={16} />Konto und Profil</Link>
             <Link href="/settings" onClick={() => setProfileOpen(false)}><Icon name="bell" size={16} />Benachrichtigungen</Link>
             <a href={signOutUrl()}><Icon name="logout" size={16} />Abmelden</a>
           </div>

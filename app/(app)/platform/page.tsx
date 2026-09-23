@@ -10,6 +10,17 @@ import type { PlatformTenant, SignupRequest, SubscriptionPlan } from '@/types/do
 import { planDefinitions } from '@/lib/data/plans'
 import { useFeedback } from '@/components/ui/feedback'
 
+
+type PlatformHealth = {
+  database: 'ok' | 'error' | 'not_configured'
+  databaseLatencyMs?: number
+  webhookFailures24h: number
+  applicationErrors24h: number
+  pendingSignups: number
+  activeTenants: number
+  measuredAt: string
+}
+
 type PlatformResponse = {
   tenants: PlatformTenant[]
   signups: SignupRequest[]
@@ -28,15 +39,18 @@ export default function PlatformAdminPage() {
   const [plan, setPlan] = useState<SubscriptionPlan>('business')
   const [status, setStatus] = useState<PlatformTenant['status']>('active')
   const [saving, setSaving] = useState(false)
+  const [health, setHealth] = useState<PlatformHealth | null>(null)
 
   const loadPlatform = useCallback(async () => {
     try {
-      const response = await fetch('/api/platform/tenants', { cache: 'no-store' })
+      const [response, healthResponse] = await Promise.all([fetch('/api/platform/tenants', { cache: 'no-store' }), fetch('/api/platform/health', { cache: 'no-store' })])
       const result = await response.json() as PlatformResponse
       if (!response.ok) throw new Error(result.error || 'Plattformdaten konnten nicht geladen werden.')
       setTenants(result.tenants)
       setSignups(result.signups)
       setCanManage(result.canManage)
+      const healthResult = await healthResponse.json().catch(() => null) as PlatformHealth | null
+      if (healthResult) setHealth(healthResult)
     } catch (cause) {
       feedback.error(cause instanceof Error ? cause.message : 'Plattformdaten konnten nicht geladen werden.')
     } finally {
@@ -100,12 +114,13 @@ export default function PlatformAdminPage() {
         <div><span>MRR</span><strong>{formatChf(metrics.mrr, { maximumFractionDigits: 0 })}</strong></div>
       </div>
 
-      <SettingsSection title="Betrieb" description="Status der zentralen Plattformdienste.">
+      <SettingsSection title="Betrieb" description="Live-Zustand der zentralen Plattformdienste aus Binso One.">
         <SettingsValueRow title="Web App" value="Betriebsbereit" description="Production" />
-        <SettingsValueRow title="Datenbank" value="Verbunden" description="Azure Database for PostgreSQL" />
-        <SettingsValueRow title="Billing" value="Stripe-fähig" description="Checkout, Portal und Webhooks bei konfiguriertem Stripe-Konto" />
-        <SettingsValueRow title="E-Mail" value="Nicht verbunden" description="Provider-Konfiguration ausstehend" />
-        <SettingsValueRow title="Backups" value="Azure Backup" description="Restore-Test vor Go-live einplanen" />
+        <SettingsValueRow title="Datenbank" value={health?.database === 'ok' ? 'Verbunden' : health?.database === 'error' ? 'Fehler' : 'Nicht konfiguriert'} description={health?.databaseLatencyMs !== undefined ? `${health.databaseLatencyMs} ms Prüfzeit` : 'Azure Database for PostgreSQL'} />
+        <SettingsValueRow title="Webhook-Fehler" value={`${health?.webhookFailures24h ?? 0}`} description="Letzte 24 Stunden" />
+        <SettingsValueRow title="Anwendungsfehler" value={`${health?.applicationErrors24h ?? 0}`} description="Letzte 24 Stunden" />
+        <SettingsValueRow title="Offene Registrierungen" value={`${health?.pendingSignups ?? 0}`} description="Noch nicht abgeschlossene Kontoeröffnungen" />
+        <SettingsValueRow title="Billing" value="Stripe" description="Checkout, Portal und signaturgeprüfte Webhooks" />
       </SettingsSection>
 
       <section>

@@ -18,7 +18,7 @@ export function evidenceFrequencyLabel(value: EvidenceFrequency) {
 export function timeTrackingModeLabel(value: TimeTrackingPolicy['mode']) {
   if (value === 'both') return 'Binso + Kundensystem'
   if (value === 'external_customer_system') return 'Kundensystem'
-  return 'Binso Admin'
+  return 'Binso One'
 }
 
 export function serviceProviderLabel(value: ServiceProviderType) {

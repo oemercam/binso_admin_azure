@@ -1,6 +1,6 @@
 {
-  "name": "binso-admin-platform",
-  "version": "0.2.1",
+  "name": "binso-one",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run actions:check && npm run process:check && npm run mobile-ui:check && npm run saas:check && npm run data-foundation:check && npm run auth-membership:check && npm run customer-auth:check && npm run registration-onboarding:check && npm run subscription-billing:check && npm run stripe-payment:check && npm run saas:product-check && npm run platform:check && npm run build",
+    "verify": "pnpm run typecheck && pnpm run lint && pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -42,5 +42,6 @@
   },
   "engines": {
     "node": ">=24 <25"
-  }
+  },
+  "packageManager": "pnpm@10.17.1"
 }

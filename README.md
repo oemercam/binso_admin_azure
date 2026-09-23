@@ -12,23 +12,24 @@ Binso One is a business platform developed and operated by Binso GmbH for custom
 
 ## Development
 
-Requirements: Node.js 24 and npm with the committed `package-lock.json`.
+Requirements: Node.js 24 and pnpm 10 with the committed `pnpm-lock.yaml`.
 
 ```bash
-npm ci
-npm run dev
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 Quality gates:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run architecture:check
-npm run build
+pnpm typecheck
+pnpm lint
+pnpm architecture:check
+pnpm build
 ```
 
-`npm run verify` runs the complete local release gate.
+`pnpm verify` runs the complete local release gate.
 
 ## Project structure
 
@@ -44,7 +45,7 @@ npm run build
 
 ## Deployment
 
-Production deploys from `main` and can also be started manually. GitHub Actions uses `ubuntu-24.04`, Node.js 24, deterministic `npm ci`, quality gates, a standalone deployment artifact and Azure OIDC login. See `docs/DEPLOYMENT.md`.
+Production deploys from `main` and can also be started manually. GitHub Actions uses `ubuntu-24.04`, Node.js 24, deterministic `pnpm install --frozen-lockfile`, quality gates, a standalone deployment artifact and Azure OIDC login. See `docs/DEPLOYMENT.md`.
 
 ## Architecture
 

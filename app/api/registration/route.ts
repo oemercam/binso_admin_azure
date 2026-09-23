@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireSameOrigin } from '@/lib/http/server-api'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
@@ -22,6 +23,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Bitte zuerst mit Microsoft anmelden.' }, { status: 401 })
   if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
@@ -56,7 +58,8 @@ export async function POST(request: Request) {
   return NextResponse.json({ signup }, { status: 200 })
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 })
   if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })

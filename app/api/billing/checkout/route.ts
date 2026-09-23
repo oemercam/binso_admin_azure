@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireSameOrigin } from '@/lib/http/server-api'
 import { resolveTenantContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost, stripePriceId } from '@/lib/billing/stripe'
 import { getBillingIdentity, saveStripeCustomer } from '@/lib/db/repositories/stripe-billing'
@@ -10,6 +11,7 @@ type StripeCustomer = { id: string }
 type StripeCheckoutSession = { id: string; url: string | null }
 
 export async function POST(request: Request) {
+  try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
   const context = await resolveTenantContext()
   if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
   if (context.membership.role !== 'owner') return NextResponse.json({ error: 'Nur der Inhaber kann die Abrechnung ändern.' }, { status: 403 })

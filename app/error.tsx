@@ -9,6 +9,12 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
 
   useEffect(() => {
     console.error('Binso One route error', { digest: error.digest, name: error.name })
+    void fetch('/api/monitoring/client-error', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ digest: error.digest, name: error.name, path: window.location.pathname }),
+      keepalive: true,
+    }).catch(() => undefined)
   }, [error])
 
   return (

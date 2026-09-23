@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
 import type { PlatformRole, Role } from '@/types/domain'
+import { isDatabaseConfigured } from '@/lib/db/client'
+import { findAccessibleMembership } from '@/lib/db/repositories/memberships'
+import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -91,12 +94,21 @@ export async function requireRole(...allowed: Array<Role | readonly Role[]>): Pr
   const session = await getSession()
   if (!session) redirect('/sign-in')
 
+  let effectiveRole = session.user.role
+  if (isDatabaseConfigured()) {
+    const account = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
+    if (account.status !== 'active') redirect('/access-denied')
+    const membership = await findAccessibleMembership(session.user.id)
+    if (!membership) redirect('/access-denied')
+    effectiveRole = membership.role
+  }
+
   const roles = allowed.flatMap((entry): Role[] =>
     typeof entry === 'string' ? [entry] : Array.from(entry)
   )
-  if (roles.length > 0 && !roles.includes(session.user.role)) redirect('/access-denied')
+  if (roles.length > 0 && !roles.includes(effectiveRole)) redirect('/access-denied')
 
-  return session
+  return { user: { ...session.user, role: effectiveRole } }
 }
 
 

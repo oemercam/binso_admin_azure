@@ -66,6 +66,9 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
        p.email as profile_email, p.phone, p.uid, p.iban, p.bank_name, p.website
      from organization_memberships m
      join organizations o on o.id = m.organization_id
+     join platform_tenants pt on pt.organization_id = o.id
+     join organization_subscriptions access_subscription on access_subscription.organization_id = o.id
+       and (pt.platform_status in ('active','past_due') or (pt.platform_status = 'trial' and access_subscription.trial_until is not null and access_subscription.trial_until > now()))
      left join organization_subscriptions s on s.organization_id = o.id
      left join organization_entitlements e on e.organization_id = o.id
      left join company_profile p on p.organization_id = o.id

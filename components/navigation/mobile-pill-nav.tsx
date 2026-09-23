@@ -7,6 +7,7 @@ import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { NavigationItem } from './navigation-item'
 import { navForRole, navForUser } from './nav-items'
 import type { AppUser } from '@/types/domain'
+import { useBusinessStore } from '@/components/state/business-store'
 
 export function MobilePillNav({
   user,
@@ -20,8 +21,10 @@ export function MobilePillNav({
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const store = useBusinessStore()
   const [menuOpen, setMenuOpen] = useState(false)
-  const items = user.platformRole ? navForUser(user) : navForRole(user.role)
+  const enabled = new Set(store.entitlements[0]?.features ?? [])
+  const items = (user.platformRole ? navForUser(user) : navForRole(user.role)).filter((item) => !item.feature || enabled.has(item.feature))
 
   const createLabels: Record<string, string> = {
     '/customers': 'Kunde erfassen',

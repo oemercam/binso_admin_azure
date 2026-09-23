@@ -1,4 +1,4 @@
-/* Binso Admin canonical application UI ownership.
+/* Binso One canonical application UI ownership.
    Historical version-specific geometry was consolidated here. */
 :root{
   --app-mobile-gutter: 16px;
@@ -158,7 +158,7 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
   .topbar, .toggle-thumb{ transition: none; }
 }
 
-/* Binso Admin – Mobile/PWA polish overrides */
+/* Binso One – Mobile/PWA polish overrides */
 
 .quick-actions-grid{
   display:none;
@@ -327,7 +327,7 @@ html[data-theme="dark"] .binso-logo-image{ filter: invert(1); }
   }
 }
 
-/* Binso Admin – enterprise interaction and settings polish */
+/* Binso One – enterprise interaction and settings polish */
 
 html, body{
   scroll-behavior: auto;

@@ -25,7 +25,7 @@ const invariants = [
   [loginRoute.includes("value.startsWith('/')") && loginRoute.includes("value.startsWith('//')"), 'login returnTo must reject external redirects'],
   [logoutRoute.includes("value.startsWith('/')") && logoutRoute.includes("value.startsWith('//')"), 'logout returnTo must reject external redirects'],
   [loginRoute.includes('env.authProviderName'), 'provider must be server-configurable'],
-  [signIn.includes('>Anmelden</a>') && signIn.includes('Registrieren</a>'), 'sign-in must expose distinct sign-in and registration actions'],
+  [signIn.includes('>Anmelden</a>') && (signIn.includes('Registrieren</a>') || signIn.includes('Konto erstellen</a>')), 'sign-in must expose distinct sign-in and registration actions'],
   [signIn.includes("redirect('/post-login')"), 'authenticated users must leave the sign-in page'],
   [register.includes('Registrierung starten') && register.includes('Bereits registriert?'), 'registration must provide a clear customer flow'],
   [env.includes('AUTH_PROVIDER_NAME=aad'), 'safe Microsoft fallback must remain configured'],

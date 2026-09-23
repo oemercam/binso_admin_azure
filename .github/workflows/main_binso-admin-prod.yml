@@ -1,4 +1,4 @@
-name: Build and deploy Binso Admin to Azure
+name: Build and deploy Binso One to Azure
 
 on:
   push:
@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: binso-admin-production
+  group: binso-one-production
   cancel-in-progress: false
 
 jobs:
   build:
-    name: Build
+    name: Quality, build and package
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -20,14 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Node
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+          run_install: false
+
+      - name: Setup Node 24
         uses: actions/setup-node@v7
         with:
-          node-version-file: package.json
-          cache: npm
+          node-version: 24
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Set build metadata
         shell: bash
@@ -37,16 +43,16 @@ jobs:
           echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
 
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm typecheck
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
 
-      - name: Architecture checks
-        run: npm run architecture:check
+      - name: Product checks
+        run: pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check
 
       - name: Build
-        run: npm run build
+        run: pnpm build
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
@@ -63,7 +69,7 @@ jobs:
       - name: Upload deployment artifact
         uses: actions/upload-artifact@v7
         with:
-          name: binso-admin
+          name: binso-one
           path: .next/standalone
           include-hidden-files: true
           if-no-files-found: error
@@ -82,7 +88,7 @@ jobs:
       - name: Download deployment artifact
         uses: actions/download-artifact@v7
         with:
-          name: binso-admin
+          name: binso-one
           path: app
 
       - name: Azure login (OIDC)

@@ -104,7 +104,7 @@ self.addEventListener('push', event => {
     icon: APP_ICON,
     badge: NOTIFICATION_BADGE,
     data: { url: safeAppPath(data.url) },
-    tag: data.tag || 'binso-admin'
+    tag: data.tag || 'binso-one'
   }))
 })
 
