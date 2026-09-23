@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { findActiveMembership, findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
 import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
+import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import type { OrganizationMembership } from '@/types/domain'
 
 export type TenantRequestContext = {
@@ -15,7 +16,7 @@ export type TenantRequestContext = {
 export async function authenticatedIdentity() {
   const session = await getSession()
   if (!session) return null
-  return { userId: session.user.id, email: session.user.email }
+  return { userId: session.user.id, email: session.user.email, name: session.user.name }
 }
 
 /**
@@ -46,6 +47,9 @@ export async function resolveTenantContext(preferredOrganizationId?: string | nu
     }
   }
 
+  const user = await upsertAuthenticatedUser({ id: identity.userId, email: identity.email, displayName: identity.name })
+  if (user.status !== 'active') return null
+
   if (preferredOrganizationId) {
     const membership = await findActiveMembership(identity.userId, preferredOrganizationId)
     if (!membership) return null
@@ -57,6 +61,7 @@ export async function resolveTenantContext(preferredOrganizationId?: string | nu
   if (!membership) return null
   return { ...identity, organizationId: membership.organizationId, membership }
 }
+
 
 export function assertTenantId(value: string | null | undefined) {
   if (!value) throw new Error('Organization context is required')

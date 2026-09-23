@@ -135,7 +135,7 @@ type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { 
 type BusinessStore = BusinessState & {
   currentOrganization: Organization
   setCurrentOrganization: (organizationId: string) => void
-  createOrganization: (input: { name: string; slug: string; ownerEmail: string; plan: OrganizationSubscription['plan'] }) => Organization
+  createOrganization: (input: { organizationId?: string; name: string; slug: string; ownerEmail: string; plan: OrganizationSubscription['plan'] }) => Organization
   activeMembership: OrganizationMembership | null
   can: (permission: Permission) => boolean
   addMembership: (membership: OrganizationMembership) => void
@@ -374,7 +374,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
     },
     createOrganization(input) {
       const now = new Date().toISOString()
-      const organizationId = `org-${Date.now()}`
+      const organizationId = input.organizationId ?? `org-${Date.now()}`
       const organization: Organization = {
         id: organizationId,
         name: input.name.trim(),

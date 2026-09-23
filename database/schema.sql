@@ -602,3 +602,19 @@ create index if not exists idx_platform_tenants_status on platform_tenants(platf
 create index if not exists idx_signup_requests_created on signup_requests(created_at desc);
 create index if not exists idx_platform_audit_created on platform_audit_events(created_at desc);
 
+
+-- V59 authentication and membership foundation
+create table if not exists app_users (
+  id text primary key,
+  email text not null,
+  display_name text not null,
+  status text not null default 'active' check (status in ('active','suspended')),
+  last_login_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create unique index if not exists uq_app_users_email_ci on app_users(lower(email));
+create index if not exists idx_memberships_email_ci on organization_memberships(lower(email), status);
+alter table signup_requests add column if not exists user_id text;
+alter table signup_requests add column if not exists organization_id uuid references organizations(id) on delete set null;
+create index if not exists idx_signup_requests_user on signup_requests(user_id, created_at desc);

@@ -15,6 +15,8 @@ export default function OnboardingPage() {
   const platform = usePlatformStore()
   const [signup, setSignup] = useState<SignupRequest | null>(null)
   const [ready, setReady] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -34,14 +36,44 @@ export default function OnboardingPage() {
     return () => { cancelled = true }
   }, [])
 
-  function create() {
-    if (!signup) return
-    platform.registerSignup(signup)
-    const slug = signup.companyName.toLowerCase().replace(/[^a-z0-9äöü]+/g, '-').replace(/^-|-$/g, '')
-    const organization = store.createOrganization({ name: signup.companyName, slug: slug || `firma-${Date.now()}`, ownerEmail: signup.email, plan: signup.plan })
-    platform.activateSignup(signup.id, organization.id)
-    localStorage.removeItem(KEY)
-    router.push('/dashboard')
+  async function create() {
+    if (!signup || submitting) return
+    setSubmitting(true)
+    setError('')
+    try {
+      const response = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          companyName: signup.companyName,
+          ownerName: signup.ownerName,
+          email: signup.email,
+          plan: signup.plan,
+        }),
+      })
+      const result = await response.json() as { organizationId?: string; error?: string }
+      if (!response.ok || !result.organizationId) throw new Error(result.error || 'Organisation konnte nicht erstellt werden.')
+
+      // V59 compatibility mirror: business modules still read their working data from the browser store.
+      // The authoritative organization/membership/subscription is already persisted in PostgreSQL.
+      platform.registerSignup(signup)
+      const slug = signup.companyName.toLowerCase().replace(/[^a-z0-9äöü]+/g, '-').replace(/^-|-$/g, '')
+      const organization = store.createOrganization({
+        organizationId: result.organizationId,
+        name: signup.companyName,
+        slug: slug || `firma-${Date.now()}`,
+        ownerEmail: signup.email,
+        plan: signup.plan,
+      })
+      platform.activateSignup(signup.id, organization.id)
+      localStorage.removeItem(KEY)
+      router.push('/dashboard')
+      router.refresh()
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Organisation konnte nicht erstellt werden.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!ready) return null
@@ -56,7 +88,8 @@ export default function OnboardingPage() {
           <div><span>E-Mail</span><strong>{signup.email}</strong></div>
           <div><span>Plan</span><strong>{signup.plan}</strong></div>
         </div>
-        <div className="customer-quick-actions"><button className="button primary" onClick={create}>Testzugang starten</button></div>
+        {error ? <p className="form-error" role="alert">{error}</p> : null}
+        <div className="customer-quick-actions"><button className="button primary" onClick={create} disabled={submitting}>{submitting ? 'Wird eingerichtet…' : 'Testzugang starten'}</button></div>
       </div> : <div className="list-empty">Keine offene Registrierung. <button className="button secondary" onClick={() => router.push('/pricing')}>Preise ansehen</button></div>}
     </section>
   )

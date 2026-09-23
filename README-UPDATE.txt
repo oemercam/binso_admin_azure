@@ -34,3 +34,13 @@ V58 – Production Data Foundation
 - Health endpoint reports database readiness without exposing credentials.
 - New data-foundation:check is part of verify.
 
+
+V59 – Authentication & Memberships
+- Server-side authenticated user registry (`app_users`)
+- PostgreSQL-backed organization onboarding with owner membership, trial subscription, entitlements, sequences and audit
+- `/api/auth/session` and `/api/onboarding`
+- Signup email is bound to the authenticated Microsoft identity
+- `db:migrate` automatically loads `.env.local`
+- Azure PostgreSQL SSL mode normalized to `verify-full`
+- New migration `0002_auth_memberships.sql`
+- New `auth-membership:check`

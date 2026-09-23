@@ -4,7 +4,15 @@ import { Pool, type PoolClient, type QueryResultRow } from 'pg'
 const globalForDb = globalThis as unknown as { __binsoPgPool?: Pool }
 
 function connectionString() {
-  return process.env.DATABASE_URL?.trim() || ''
+  const raw = process.env.DATABASE_URL?.trim() || ''
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    if (url.searchParams.get('sslmode') === 'require') url.searchParams.set('sslmode', 'verify-full')
+    return url.toString()
+  } catch {
+    return raw
+  }
 }
 
 function sslEnabled() {
