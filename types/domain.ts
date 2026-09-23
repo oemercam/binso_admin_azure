@@ -1,5 +1,27 @@
 export type Role = 'owner' | 'admin' | 'finance' | 'employee'
 
+export type OrganizationId = string
+
+export type Organization = {
+  id: OrganizationId
+  name: string
+  slug: string
+  status: 'active' | 'inactive'
+  country: string
+  currency: 'CHF' | 'EUR'
+  locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'
+  createdAt: string
+  updatedAt: string
+}
+
+export type OrganizationScoped = {
+  /**
+   * Optional during the V46 compatibility migration.
+   * V48 will make tenant ownership mandatory at all persistence boundaries.
+   */
+  organizationId?: OrganizationId
+}
+
 export type AppUser = {
   id: string
   name: string
@@ -24,6 +46,7 @@ export type SettlementPolicy = {
 }
 
 export type Customer = {
+  organizationId?: OrganizationId
   id: string
   name: string
   legalName?: string
@@ -44,6 +67,7 @@ export type Customer = {
 
 
 export type CustomerContact = {
+  organizationId?: OrganizationId
   id: string
   customerId: string
   name: string
@@ -54,6 +78,7 @@ export type CustomerContact = {
 }
 
 export type Supplier = {
+  organizationId?: OrganizationId
   id: string
   name: string
   supplierNo: string
@@ -66,6 +91,7 @@ export type Supplier = {
 }
 
 export type CompanyProfile = {
+  organizationId?: OrganizationId
   name: string
   address: string
   zip: string
@@ -107,6 +133,7 @@ export type QuoteLine = {
 }
 
 export type Quote = {
+  organizationId?: OrganizationId
   id: string
   number: string
   customerId: string
@@ -135,6 +162,7 @@ export type OrderStatus = 'active' | 'paused' | 'completed'
 export type BillingModel = 'time' | 'fixed' | 'retainer' | 'milestone' | 'mixed'
 
 export type Order = {
+  organizationId?: OrganizationId
   id: string
   customerId: string
   customerName: string
@@ -156,6 +184,7 @@ export type Order = {
 export type WorkerType = 'employee' | 'hourly_employee' | 'external'
 
 export type TimeEntry = {
+  organizationId?: OrganizationId
   id: string
   orderId: string
   orderName: string
@@ -188,6 +217,7 @@ export type InvoiceLine = {
 }
 
 export type Payment = {
+  organizationId?: OrganizationId
   id: string
   invoiceId: string
   date: string
@@ -197,6 +227,7 @@ export type Payment = {
 }
 
 export type Invoice = {
+  organizationId?: OrganizationId
   id: string
   number: string
   customerId: string
@@ -246,6 +277,7 @@ export type ContractLine = {
 }
 
 export type Contract = {
+  organizationId?: OrganizationId
   id: string
   number: string
   customerId: string
@@ -266,6 +298,7 @@ export type Contract = {
 }
 
 export type Expense = {
+  organizationId?: OrganizationId
   id: string
   customerId: string
   customerName: string
@@ -282,6 +315,7 @@ export type Expense = {
 }
 
 export type CreditNote = {
+  organizationId?: OrganizationId
   id: string
   number: string
   invoiceId: string
@@ -294,6 +328,7 @@ export type CreditNote = {
 }
 
 export type CustomerActivity = {
+  organizationId?: OrganizationId
   id: string
   customerId: string
   type: 'note' | 'quote' | 'order' | 'contract' | 'invoice' | 'payment' | 'reminder' | 'credit'
@@ -303,6 +338,7 @@ export type CustomerActivity = {
 }
 
 export type SupplierInvoice = {
+  organizationId?: OrganizationId
   id: string
   number: string
   supplierId: string
@@ -321,6 +357,7 @@ export type SupplierInvoice = {
 }
 
 export type Employee = {
+  organizationId?: OrganizationId
   id: string
   name: string
   role: Role

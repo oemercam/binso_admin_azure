@@ -25,6 +25,7 @@ export type TimeTrackingPolicy = {
 }
 
 export type TimeEvidence = {
+  organizationId?: string
   id: string
   timeEntryId?: string
   orderId: string

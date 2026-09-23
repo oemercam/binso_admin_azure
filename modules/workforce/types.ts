@@ -8,6 +8,7 @@ export type ServiceProviderType =
   | 'external_company'
 
 export type OrderAssignmentRule = {
+  organizationId?: string
   orderId: string
   personId: string
   providerType: ServiceProviderType

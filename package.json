@@ -9,11 +9,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run mobile-ui:check && npm run build",
+    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run mobile-ui:check && npm run saas:check && npm run build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
-    "mobile-ui:check": "node scripts/check-mobile-ui.mjs"
+    "mobile-ui:check": "node scripts/check-mobile-ui.mjs",
+    "saas:check": "node scripts/check-saas-foundation.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",

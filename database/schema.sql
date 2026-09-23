@@ -315,3 +315,95 @@ create table if not exists customer_contacts (
   created_at timestamptz not null default now()
 );
 create index if not exists idx_customer_contacts_customer on customer_contacts(customer_id);
+
+-- V46 SaaS foundation: organizations / tenant ownership.
+-- This block is intentionally additive so the current draft remains readable.
+-- V48 will add authorization/RLS policies and make tenant isolation enforceable.
+
+create table if not exists organizations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  status text not null default 'active' check (status in ('active','inactive')),
+  country text not null default 'Schweiz',
+  currency text not null default 'CHF' check (currency in ('CHF','EUR')),
+  locale text not null default 'de-CH' check (locale in ('de-CH','fr-CH','it-CH','en-CH')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Compatibility tenant for the existing Binso demo data.
+insert into organizations (id, name, slug, status, country, currency, locale)
+values ('00000000-0000-4000-8000-000000000001', 'Binso GmbH', 'binso', 'active', 'Schweiz', 'CHF', 'de-CH')
+on conflict (id) do nothing;
+
+alter table customers add column if not exists organization_id uuid references organizations(id);
+alter table suppliers add column if not exists organization_id uuid references organizations(id);
+alter table employees add column if not exists organization_id uuid references organizations(id);
+alter table quotes add column if not exists organization_id uuid references organizations(id);
+alter table orders add column if not exists organization_id uuid references organizations(id);
+alter table time_entries add column if not exists organization_id uuid references organizations(id);
+alter table invoices add column if not exists organization_id uuid references organizations(id);
+alter table payments add column if not exists organization_id uuid references organizations(id);
+alter table supplier_invoices add column if not exists organization_id uuid references organizations(id);
+alter table company_profile add column if not exists organization_id uuid references organizations(id);
+alter table document_templates add column if not exists organization_id uuid references organizations(id);
+alter table contracts add column if not exists organization_id uuid references organizations(id);
+alter table expenses add column if not exists organization_id uuid references organizations(id);
+alter table credit_notes add column if not exists organization_id uuid references organizations(id);
+alter table customer_activities add column if not exists organization_id uuid references organizations(id);
+alter table customer_contacts add column if not exists organization_id uuid references organizations(id);
+
+update customers set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update suppliers set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update employees set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update quotes set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update orders set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update time_entries set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update invoices set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update payments set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update supplier_invoices set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update company_profile set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update document_templates set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update contracts set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update expenses set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update credit_notes set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update customer_activities set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+update customer_contacts set organization_id = '00000000-0000-4000-8000-000000000001' where organization_id is null;
+
+alter table customers alter column organization_id set not null;
+alter table suppliers alter column organization_id set not null;
+alter table employees alter column organization_id set not null;
+alter table quotes alter column organization_id set not null;
+alter table orders alter column organization_id set not null;
+alter table time_entries alter column organization_id set not null;
+alter table invoices alter column organization_id set not null;
+alter table payments alter column organization_id set not null;
+alter table supplier_invoices alter column organization_id set not null;
+alter table company_profile alter column organization_id set not null;
+alter table document_templates alter column organization_id set not null;
+alter table contracts alter column organization_id set not null;
+alter table expenses alter column organization_id set not null;
+alter table credit_notes alter column organization_id set not null;
+alter table customer_activities alter column organization_id set not null;
+alter table customer_contacts alter column organization_id set not null;
+
+-- Numbering and business identifiers are unique per organization, not globally.
+alter table customers drop constraint if exists customers_customer_no_key;
+alter table quotes drop constraint if exists quotes_quote_no_key;
+alter table contracts drop constraint if exists contracts_contract_no_key;
+
+create unique index if not exists uq_customers_org_customer_no on customers(organization_id, customer_no);
+create unique index if not exists uq_quotes_org_quote_no on quotes(organization_id, quote_no);
+create unique index if not exists uq_contracts_org_contract_no on contracts(organization_id, contract_no);
+create unique index if not exists uq_organizations_slug on organizations(slug);
+
+create index if not exists idx_customers_org on customers(organization_id);
+create index if not exists idx_contacts_org on customer_contacts(organization_id);
+create index if not exists idx_quotes_org on quotes(organization_id);
+create index if not exists idx_orders_org on orders(organization_id);
+create index if not exists idx_contracts_org on contracts(organization_id);
+create index if not exists idx_invoices_org on invoices(organization_id);
+create index if not exists idx_time_entries_org on time_entries(organization_id);
+create index if not exists idx_employees_org on employees(organization_id);
+
