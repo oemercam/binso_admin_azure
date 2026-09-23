@@ -6476,3 +6476,27 @@ button.accounting-task-row{cursor:pointer;}
   }
 }
 
+/* V43 — Mobile/PWA list headers are never shown.
+   Column captions such as Kunde, Kontakt, Status, Betrag, Datum etc.
+   belong to desktop tables only. Mobile/PWA lists start directly with records. */
+@media(max-width:820px){
+  .mobile-standard-page .data-head,
+  .mobile-standard-page > .data-list > .data-head,
+  .mobile-standard-page > .compact-overview-list > .data-head,
+  .mobile-standard-page .customer-grid.data-head,
+  .mobile-standard-page .quote-grid.data-head,
+  .mobile-standard-page .order-grid.data-head,
+  .mobile-standard-page .contract-grid.data-head,
+  .mobile-standard-page .invoice-grid.data-head,
+  .mobile-standard-page .employee-grid.data-head{
+    display:none!important;
+    width:0!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+  }
+}
+

@@ -65,3 +65,11 @@ if (!customerPage.includes("desktop-only-inline") || !customerPage.includes("Kei
 }
 
 console.log("Mobile master-list check passed (strict two-line pattern).")
+
+
+if (!css.includes(".mobile-standard-page .data-head")) {
+  console.error("Mobile UI check failed: mobile list header suppression is missing.")
+  process.exit(1)
+}
+
+console.log("Mobile list-header check passed (desktop column captions hidden on Mobile/PWA).")

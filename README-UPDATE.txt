@@ -1,21 +1,22 @@
-Binso Admin V20 - Current Full V42
+Binso Admin V20 - Current Full V43
 
-V42 korrigiert die Mobile/PWA-Listen auf eine wirklich kompakte Darstellung.
+V43 entfernt die Tabellen-/Spaltenbeschriftungen aus allen Mobile/PWA-Masterlisten.
 
-Kunden nach der Suche:
-- pro Kunde nur eine kompakte Listenzeile
-- Zeile 1: Firmenname
-- Zeile 2: Kontaktperson
-- ca. 48 px Zeilenhöhe
-- nur 6 px vertikaler Innenabstand
-- Chevron rechts
-- kein Zahlungsziel
-- kein Status
-- keine Kundennummer
-- keine Adresse
-- keine zusätzlichen Metadaten
+Auf Mobile/PWA nicht mehr sichtbar:
+- Kunde
+- Kontakt
+- Status
+- Betrag
+- Gültig bis
+- Budget
+- Verbraucht
+- Rest
+- Abrechnung
+- weitere Desktop-Spaltenüberschriften
 
-Das gleiche kompakte 2-Zeilen-Muster gilt für:
+Nach Suchfeld/Toolbar beginnt die Liste direkt mit dem ersten Datensatz.
+
+Betroffen:
 - Kunden
 - Angebote
 - Aufträge
@@ -23,7 +24,9 @@ Das gleiche kompakte 2-Zeilen-Muster gilt für:
 - Rechnungen
 - Mitarbeitende
 
-Mitarbeitende verwenden denselben Rhythmus; Avatar wurde auf Mobile/PWA verkleinert, damit die Zeile nicht höher wird.
+Desktop/Web behält die Tabellenüberschriften.
+
+Alle V42-Anpassungen für die kompakte Zwei-Zeilen-Darstellung bleiben erhalten.
 
 Prüfen:
 npm run typecheck
