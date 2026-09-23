@@ -32,7 +32,6 @@ export default function CustomerDetailPage() {
   if (!customer) return <section className="page apple-page"><PageHeader title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
 
   const customerId = customer.id
-  const openAmount = related.invoices.reduce((sum, invoice) => sum + Math.max(0, invoice.amount - invoice.paidAmount - (invoice.creditedAmount ?? 0)), 0)
 
   function saveNote(event: React.FormEvent) { event.preventDefault(); store.addActivityNote(customerId, note); setNote(''); setNoteOpen(false) }
 

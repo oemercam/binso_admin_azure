@@ -1,22 +1,10 @@
-Binso Admin V20 - Current Full V32
+Binso Admin V20 - Current Full V33
 
-V32 korrigiert Seitenabstände und Kundenübersicht.
-
-Korrektur Seitenabstand:
-- Ursache war doppeltes Mobile-Padding: app-main hatte bereits den gleichen Abstand wie das Logo, mobile-standard-page fügte nochmals 16 px hinzu.
-- Jetzt besitzt nur app-main den horizontalen Seitenabstand.
-- Seiten selbst haben links/rechts kein zusätzliches Padding mehr.
-- Dadurch beginnen Überschrift, Listen, Kennzahlen und Inhalte auf derselben vertikalen Linie wie das Logo.
-- Gilt zentral für alle Seiten auf Mobile/PWA.
-
-Kunden:
-- Mobile Kundenliste zeigt nur Name/Kundennummer sowie kompakt Ansprechperson und Ort.
-- Status und Zahlungsziel werden dort nicht zusätzlich gezeigt.
-- Kundendetail-Übersicht zeigt nur echte Stammdaten: Kundennummer, Ansprechperson, E-Mail, Telefon und Adresse.
-- Zahlungsziel, Status und offener Betrag wurden aus der allgemeinen Kundenübersicht entfernt.
-- Angebote/Aufträge/Verträge bleiben als kompakte Dreierzeile bestehen.
-
-Alle bisherigen Anpassungen bleiben enthalten.
+Hotfix gegenüber V32:
+- unbenutzte Variable openAmount auf der Kundendetailseite entfernt
+- Ursache: Offener Betrag wurde in V32 bewusst aus der allgemeinen Kundenübersicht entfernt, die Berechnung blieb jedoch im Code bestehen
+- keine visuelle oder fachliche Änderung gegenüber V32
+- CI-Lint-Warnung damit bereinigt
 
 Prüfen:
 npm run typecheck
