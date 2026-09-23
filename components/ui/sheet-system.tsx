@@ -152,7 +152,16 @@ export function StandardFormSheet({
   const [dirty, setDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const resolvedFormId = formId ?? `sheet-form-${generatedId.replace(/:/g, '')}`
-  const resolvedMode: SheetMode = mode === 'auto' ? (isMobileLayout ? 'bottom' : 'dialog') : mode
+  const responsiveFullscreen = mode === 'fullscreen'
+  const resolvedMode: SheetMode = mode === 'auto'
+    ? (isMobileLayout ? 'bottom' : 'dialog')
+    : responsiveFullscreen
+      ? (isMobileLayout ? 'fullscreen' : 'dialog')
+      : mode
+  const resolvedPanelClassName = [
+    panelClassName,
+    responsiveFullscreen && !isMobileLayout ? 'app-sheet-desktop-wide' : '',
+  ].filter(Boolean).join(' ')
 
   useEffect(() => {
     if (!open) return
@@ -194,7 +203,7 @@ export function StandardFormSheet({
         title={title}
         description={description}
         onClose={requestClose}
-        panelClassName={panelClassName}
+        panelClassName={resolvedPanelClassName}
         footer={<div aria-busy={loading || undefined}><SheetActions>{normalizeFooter(footer)}</SheetActions></div>}
       >
         <form

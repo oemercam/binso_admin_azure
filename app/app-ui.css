@@ -4886,3 +4886,439 @@ button.accounting-task-row{cursor:pointer;}
   }
 }
 
+/* V20 — adaptive desktop/web forms.
+   Long editing flows stay fullscreen on mobile/PWA, but become bounded,
+   centred work dialogs on desktop so controls do not stretch across the viewport. */
+@media (min-width: 821px){
+  .app-sheet-desktop-wide{
+    width:min(1080px, calc(100vw - 64px))!important;
+    max-width:1080px!important;
+    max-height:min(860px, calc(100dvh - 64px))!important;
+    border:1px solid var(--line-strong)!important;
+    border-radius:18px!important;
+    box-shadow:0 24px 70px rgba(0,0,0,.24)!important;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-header{
+    min-height:58px;
+    padding:10px 18px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-content{
+    padding:14px 18px 18px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-footer{
+    padding:10px 18px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-actions > .button{
+    width:auto;
+    min-width:132px;
+    max-width:260px;
+    padding-inline:16px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-actions > .button.secondary:first-child{
+    margin-right:auto;
+  }
+
+  .app-sheet-desktop-wide .edit-step{
+    margin:0;
+    border:0;
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+    background:transparent;
+  }
+
+  .app-sheet-desktop-wide .edit-step:last-child{
+    border-bottom:0;
+  }
+
+  .app-sheet-desktop-wide .edit-step > summary{
+    min-height:52px;
+    padding:10px 0;
+  }
+
+  .app-sheet-desktop-wide .edit-step-body{
+    padding:2px 0 16px;
+  }
+
+  .app-sheet-desktop-wide .form-grid{
+    column-gap:14px;
+    row-gap:12px;
+  }
+
+  .app-sheet-desktop-wide .line-editor{
+    margin-top:14px;
+  }
+
+  .app-sheet-desktop-wide .line-editor-row{
+    gap:10px;
+    padding:10px 0;
+  }
+
+  .app-sheet-desktop-wide .line-editor-head{
+    min-height:42px;
+    padding:6px 0;
+  }
+
+  /* Keep long desktop forms readable on very large displays. */
+  @media (min-width: 1500px){
+    .app-sheet-desktop-wide{
+      width:min(1040px, calc(100vw - 96px))!important;
+    }
+  }
+}
+
+/* Mobile/PWA keeps the native task-screen treatment. */
+@media (max-width: 820px){
+  .app-sheet-fullscreen{
+    width:100%!important;
+    max-width:none!important;
+    height:var(--app-visual-viewport-height,100dvh)!important;
+    max-height:var(--app-visual-viewport-height,100dvh)!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+
+  .app-sheet-fullscreen .app-sheet-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .app-sheet-fullscreen .app-sheet-actions > .button{
+    width:100%;
+  }
+}
+
+/* V21 — comprehensive desktop/web optimisation.
+   Desktop prioritises information density, bounded reading widths and side-by-side workflows.
+   Mobile/PWA keeps touch-first fullscreen/bottom-sheet patterns. */
+
+@media (min-width:821px){
+  /* Main page canvas: no endless ultrawide stretching. */
+  .app-main{
+    padding-left:clamp(22px,2.2vw,36px);
+    padding-right:clamp(22px,2.2vw,36px);
+    padding-bottom:56px;
+  }
+
+  .apple-page{
+    width:100%;
+    max-width:1400px!important;
+    margin:0 auto!important;
+    padding-top:20px!important;
+  }
+
+  .apple-page .page-header{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    gap:24px;
+    margin-bottom:20px!important;
+  }
+
+  .apple-page .page-header > :first-child{
+    max-width:820px;
+  }
+
+  .apple-page .page-header h1{
+    font-size:clamp(28px,2.2vw,38px)!important;
+    line-height:1.08!important;
+    letter-spacing:-.025em;
+  }
+
+  .apple-page .page-description{
+    max-width:760px;
+    font-size:13px!important;
+    line-height:1.5!important;
+  }
+
+  .apple-page .page-actions,
+  .apple-page .page-action-group{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  /* Desktop data views: compact, readable and aligned like a web application. */
+  .apple-page > .data-list,
+  .apple-page .compact-overview-list{
+    width:100%;
+    margin-top:4px;
+  }
+
+  .apple-page > .data-list .data-head,
+  .apple-page .compact-overview-list .data-head{
+    min-height:38px!important;
+    padding-top:5px!important;
+    padding-bottom:5px!important;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:650;
+    letter-spacing:.01em;
+  }
+
+  .apple-page > .data-list .data-row:not(.data-head),
+  .apple-page .compact-overview-list .compact-overview-row{
+    min-height:54px!important;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+  }
+
+  .apple-page .primary-cell strong{
+    font-size:13px;
+    line-height:1.35;
+  }
+
+  .apple-page .primary-cell small,
+  .apple-page .desktop-row-detail{
+    font-size:11px!important;
+    line-height:1.35!important;
+  }
+
+  /* Summary/KPI areas use space efficiently on desktop. */
+  .apple-page .metric-strip,
+  .apple-page .metric-grid,
+  .apple-page .order-kpi-strip{
+    max-width:100%;
+    margin-bottom:24px!important;
+  }
+
+  .apple-page .metric,
+  .apple-page .order-kpi-strip > span{
+    min-height:82px;
+    padding:12px 16px!important;
+  }
+
+  .apple-page .metric > strong,
+  .apple-page .order-kpi-strip strong{
+    font-size:clamp(20px,1.55vw,27px)!important;
+  }
+
+  /* Detail/hub pages become a true desktop master-detail layout. */
+  .apple-page .object-hub-layout{
+    grid-template-columns:minmax(220px,260px) minmax(0,1fr)!important;
+    gap:30px!important;
+    align-items:start;
+  }
+
+  .apple-page .object-hub-nav{
+    position:sticky;
+    top:78px;
+    align-self:start;
+  }
+
+  .apple-page .object-hub-content{
+    min-width:0;
+    max-width:980px;
+  }
+
+  .apple-page .object-hub-back{
+    display:none!important;
+  }
+
+  .apple-page .hub-panel .section-title{
+    margin-bottom:12px!important;
+  }
+
+  /* Desktop forms: compact fields and predictable two-column rhythm. */
+  .app-sheet-desktop-wide .form-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  .app-sheet-desktop-wide .form-grid > .full,
+  .app-sheet-desktop-wide .form-grid > label.full{
+    grid-column:1 / -1!important;
+  }
+
+  .app-sheet-desktop-wide .ui-input,
+  .app-sheet-desktop-wide .ui-select-trigger{
+    min-height:38px!important;
+    height:38px!important;
+  }
+
+  .app-sheet-desktop-wide .ui-textarea{
+    min-height:82px;
+  }
+
+  .app-sheet-desktop-wide .form-toggle-field,
+  .app-sheet-desktop-wide .policy-toggle-row{
+    min-height:44px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-title strong{
+    font-size:16px;
+  }
+
+  .app-sheet-desktop-wide .app-sheet-title span{
+    max-width:720px;
+  }
+
+  /* Invoice/quote source and line editors read like desktop tables. */
+  .app-sheet-desktop-wide .invoice-source-row{
+    min-height:48px;
+    padding:8px 0;
+  }
+
+  .app-sheet-desktop-wide .line-editor-row,
+  .app-sheet-desktop-wide .quote-line-row{
+    min-height:48px;
+  }
+
+  /* Document preview: document on the left, business actions in a dedicated right rail. */
+  .document-overlay{
+    padding:28px;
+  }
+
+  .document-preview-shell.has-desktop-actions{
+    width:min(1320px,calc(100vw - 56px));
+    height:min(900px,calc(100dvh - 56px));
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 250px;
+    grid-template-rows:auto minmax(0,1fr);
+  }
+
+  .document-preview-shell.has-desktop-actions .preview-toolbar{
+    grid-column:1 / -1;
+    grid-row:1;
+  }
+
+  .document-preview-shell.has-desktop-actions .document-preview-content{
+    grid-column:1;
+    grid-row:2;
+    min-width:0;
+    min-height:0;
+    border-right:1px solid var(--line);
+    background:var(--surface-2);
+  }
+
+  .document-preview-shell.has-desktop-actions .preview-actions-desktop{
+    grid-column:2;
+    grid-row:2;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:stretch;
+    gap:8px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:16px;
+    border-top:0;
+    background:var(--surface);
+  }
+
+  .document-preview-shell.has-desktop-actions .preview-actions-desktop .button{
+    width:100%;
+    min-height:40px;
+    height:auto;
+    justify-content:flex-start;
+    text-align:left;
+    white-space:normal;
+    line-height:1.25;
+    padding:10px 12px;
+  }
+
+  .document-preview-shell.has-desktop-actions .preview-actions-desktop .button.primary{
+    justify-content:center;
+    text-align:center;
+  }
+
+  .document-preview-shell.has-desktop-actions .document-preview-frame{
+    height:100%;
+  }
+
+  .document-preview-shell.has-desktop-actions .preview-zoom-toolbar{
+    justify-content:flex-end;
+    min-height:44px;
+    padding:6px 14px;
+  }
+
+  .document-preview-shell.has-desktop-actions .document-fit-stage{
+    padding:22px 28px 32px;
+  }
+
+  .document-preview-shell.has-desktop-actions .document-warning{
+    margin:12px 16px 0;
+  }
+
+  /* Desktop-only action footer never duplicates the mobile footer. */
+  .document-preview-shell .preview-actions-mobile{
+    display:none!important;
+  }
+
+  /* Settings: web gets a stable two-pane feeling without boxed cards. */
+  .apple-page.settings-page{
+    max-width:1240px!important;
+  }
+
+  .settings-page .desktop-settings-tabs{
+    position:sticky;
+    top:58px;
+    z-index:8;
+    padding-top:8px;
+    padding-bottom:8px;
+    background:var(--bg);
+  }
+
+  .settings-page .settings-progressive-section{
+    max-width:980px;
+  }
+
+  /* Customer detail quick actions stay compact on web. */
+  .apple-page .customer-quick-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:22px;
+  }
+
+  .apple-page .customer-quick-actions .button{
+    width:auto;
+    min-width:0;
+  }
+}
+
+@media (min-width:821px) and (max-width:1180px){
+  .apple-page{
+    max-width:100%!important;
+  }
+
+  .apple-page .object-hub-layout{
+    grid-template-columns:210px minmax(0,1fr)!important;
+    gap:22px!important;
+  }
+
+  .document-preview-shell.has-desktop-actions{
+    grid-template-columns:minmax(0,1fr) 220px;
+  }
+
+  .app-sheet-desktop-wide{
+    width:min(960px,calc(100vw - 48px))!important;
+  }
+}
+
+/* Larger web displays gain breathing room, not larger controls. */
+@media (min-width:1500px){
+  .apple-page{
+    max-width:1440px!important;
+  }
+
+  .document-preview-shell.has-desktop-actions{
+    width:min(1380px,calc(100vw - 72px));
+  }
+}
+

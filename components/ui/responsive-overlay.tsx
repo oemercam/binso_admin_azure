@@ -33,6 +33,10 @@ export function ResponsiveOverlay({
 }) {
   const { isMobileLayout } = useDeviceEnvironment()
   const mode = isMobileLayout ? mobile : desktop
+  const resolvedPanelClassName = [
+    panelClassName,
+    !isMobileLayout && mobile === 'fullscreen' && desktop === 'dialog' ? 'app-sheet-desktop-wide' : '',
+  ].filter(Boolean).join(' ')
 
   return (
     <AppSheet
@@ -42,7 +46,7 @@ export function ResponsiveOverlay({
       description={description}
       onClose={onClose}
       footer={footer}
-      panelClassName={panelClassName}
+      panelClassName={resolvedPanelClassName}
       showClose={showClose}
       showGrabber={showGrabber ?? mode === 'bottom'}
     >

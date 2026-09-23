@@ -37,7 +37,7 @@ export function ResponsivePreview({
     <div className="document-overlay" role="presentation" onMouseDown={onClose}>
       <div
         ref={shellRef}
-        className="document-preview-shell"
+        className={`document-preview-shell${actions ? " has-desktop-actions" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label={typeof title === 'string' ? title : 'Dokumentvorschau'}
