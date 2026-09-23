@@ -40,6 +40,15 @@ export async function POST(request: Request) {
     })
     return NextResponse.json(result, { status: result.created ? 201 : 200 })
   } catch (cause) {
-    return NextResponse.json({ error: cause instanceof Error ? cause.message : 'Organisation konnte nicht erstellt werden.' }, { status: 409 })
+    console.error('Failed to create trial organization', {
+      error: cause instanceof Error ? cause.message : 'Unknown error',
+      userId: session.user.id,
+      signupId,
+    })
+
+    return NextResponse.json(
+      { error: 'Der Testzugang konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.' },
+      { status: 500 },
+    )
   }
 }

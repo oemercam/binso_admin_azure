@@ -135,8 +135,8 @@ export async function createTrialOrganization(input: {
     )
     await client.query(
       `insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, entity_id, detail)
-       values ($1, $2, $3, 'organization.created', 'organization', $1::text, 'Trial organisation created during onboarding')`,
-      [organizationId, input.userId, input.userName],
+       values ($1, $2, $3, 'organization.created', 'organization', $4, 'Trial organisation created during onboarding')`,
+      [organizationId, input.userId, input.userName, organizationId],
     )
 
     return { organizationId, created: true }
