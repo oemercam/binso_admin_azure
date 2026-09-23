@@ -29,6 +29,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Next.js 16.3.x + pnpm + Node 24 can omit the ESM half of @swc/helpers
+  // from standalone traces. Force the complete runtime helper package into every
+  // server trace so the copied standalone artifact is actually self-contained.
+  outputFileTracingIncludes: {
+    '/*': ['node_modules/@swc/helpers/**/*'],
+  },
   poweredByHeader: false,
   compress: true,
   reactStrictMode: true,

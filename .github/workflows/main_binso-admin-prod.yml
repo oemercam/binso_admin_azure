@@ -63,8 +63,32 @@ jobs:
           set -euo pipefail
           test -f .next/standalone/server.js
           mkdir -p .next/standalone/.next
-          if [ -d .next/static ]; then cp -r .next/static .next/standalone/.next/static; fi
-          if [ -d public ]; then cp -r public .next/standalone/public; fi
+          if [ -d .next/static ]; then cp -a .next/static .next/standalone/.next/static; fi
+          if [ -d public ]; then cp -a public .next/standalone/public; fi
+
+          # Next.js 16.3.x standalone tracing can omit the ESM files from
+          # @swc/helpers when pnpm + Node 24 are used. Replace any traced/symlinked
+          # helper with a complete physical copy before packaging for Azure.
+          SWC_HELPERS_DIR="$(node -p "require('path').dirname(require.resolve('@swc/helpers/package.json'))")"
+          rm -rf .next/standalone/node_modules/@swc/helpers
+          mkdir -p .next/standalone/node_modules/@swc
+          cp -aL "$SWC_HELPERS_DIR" .next/standalone/node_modules/@swc/helpers
+
+          test -f .next/standalone/node_modules/@swc/helpers/esm/_interop_require_default.js
+          test -f .next/standalone/node_modules/@swc/helpers/cjs/_interop_require_default.cjs
+
+      - name: Verify isolated standalone runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          TEST_DIR="$(mktemp -d)"
+          trap 'rm -rf "$TEST_DIR"' EXIT
+          cp -a .next/standalone/. "$TEST_DIR/"
+          (
+            cd "$TEST_DIR"
+            node -e "console.log(require.resolve('@swc/helpers/_/_interop_require_default'))"
+            node -e "require('next/dist/shared/lib/constants'); console.log('Next runtime dependency check passed')"
+          )
 
       - name: Upload deployment artifact
         uses: actions/upload-artifact@v7
