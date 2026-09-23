@@ -86,7 +86,7 @@ export default function AccountingPage() {
         }
       />
 
-      <div className="metric-strip">
+      <div className="metric-strip mobile-kpi-4">
         <div className="metric"><span>Offene Debitoren</span><strong>{chf(openCustomer)}</strong><small>Kundenrechnungen</small></div>
         <div className="metric"><span>Offene Kreditoren</span><strong>{chf(openSupplier)}</strong><small>Lieferantenrechnungen</small></div>
         <div className="metric"><span>Überfällig</span><strong>{overdueCustomerCount}</strong><small>Kundenrechnungen</small></div>

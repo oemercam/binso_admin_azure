@@ -23,7 +23,7 @@ export default function FinancePage() {
   return (
     <section className="page apple-page">
       <PageHeader title="Finanzen" description="Umsatz, Kosten, Marge und offene Positionen auswerten." />
-      <div className="metric-strip">
+      <div className="metric-strip mobile-kpi-4">
         <div className="metric"><span>Geleisteter Umsatz</span><strong>{chf(deliveredRevenue)}</strong><small>aus erfassten Zeiten</small></div>
         <div className="metric"><span>Offene Forderungen</span><strong>{chf(open)}</strong><small className="tone-warning">noch nicht bezahlt</small></div>
         <div className="metric"><span>Deckungsbeitrag</span><strong>{chf(contribution)}</strong><small>Marge {margin} %</small></div>

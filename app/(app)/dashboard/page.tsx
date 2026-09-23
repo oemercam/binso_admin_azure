@@ -33,10 +33,10 @@ function OwnerDashboard() {
   return (
     <section className="page apple-page">
       <PageHeader title="Dashboard" description="Überblick über Aufträge, Abrechnung und offene Aufgaben." />
-      <div className="metric-strip owner-metrics">
-        <Metric label="Geleisteter Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
-        <Metric label="Noch nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
-        <Metric label="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
+      <div className="metric-strip owner-metrics mobile-kpi-3">
+        <Metric label="Geleisteter Umsatz" mobileLabel="Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
+        <Metric label="Noch nicht verrechnet" mobileLabel="Nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
+        <Metric label="Offene Rechnungen" mobileLabel="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
         <Metric label="Deckungsbeitrag" value={chf(contribution)} detail={`Marge ${margin} %`} />
       </div>
 
@@ -101,7 +101,7 @@ function FinanceDashboard() {
   return (
     <section className="page apple-page">
       <PageHeader title="Finanzübersicht" description="Forderungen, Zahlungen und anstehende Aufgaben." />
-      <div className="metric-strip"><Metric label="Offene Forderungen" value={chf(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
+      <div className="metric-strip mobile-kpi-4"><Metric label="Offene Forderungen" value={chf(openAmount)} detail={`${open.length} Rechnungen`} tone="warning"/><Metric label="Verbuchte Zahlungen" value={chf(paid)} detail={`${store.payments.length} Zahlungen`} tone="positive"/><Metric label="Überfällig" value={chf(overdue.reduce((sum, invoice) => sum + invoiceOpenAmount(invoice), 0))} detail={`${overdue.length} Rechnungen`} tone="danger"/><Metric label="Noch verrechenbar" value={chf(billableAmount)} detail={`${billableEntries.reduce((sum, entry) => sum + entry.hours, 0)} h freigegeben`}/></div>
       <div className="dashboard-layout"><section className="surface chart-surface"><SectionTitle title="Umsatzentwicklung" subtitle="Entwicklung der letzten Perioden"/><RevenueChart/></section><section className="surface focus-surface"><SectionTitle title="Buchhaltungsaufgaben" subtitle="Heute relevant"/><div className="focus-list"><Focus href="/invoices?payment=1" icon="credit-card" label="Zahlung verbuchen" meta="Offene Rechnung auswählen"/><Focus href="/invoices" icon="warning" label="Mahnungen prüfen" meta="Überfällige Rechnungen" tone="danger"/><Focus href="/accounting" icon="accounting" label="Export vorbereiten" meta="Debitoren und Kreditoren"/></div></section></div>
     </section>
   )
@@ -120,13 +120,13 @@ function EmployeeDashboard() {
   return (
     <section className="page apple-page">
       <PageHeader title={`Hallo ${user.name.split(' ')[0]}`} description="Deine Aufträge, Zeiten und heutige Aufgaben." />
-      <div className="metric-strip employee-metrics"><Metric label="September" value={`${total} h`} detail={employee ? `${Math.max(0, employee.targetHours - total)} h offen` : 'Zeitübersicht'} /><Metric label="Verrechenbar" value={`${billable} h`} detail={total ? `${Math.round((billable / total) * 100)} % deiner Zeiten` : 'Noch keine Zeiten'} /><Metric label="Offene Nachweise" value={String(ownTimes.filter((entry) => store.orderPolicies.find((policy) => policy.orderId === entry.orderId)?.timeTracking.evidence.required && !store.timeEvidence.some((evidence) => evidence.timeEntryId === entry.id)).length)} detail="Zeitnachweise" /></div>
+      <div className="metric-strip employee-metrics mobile-kpi-3"><Metric label="September" value={`${total} h`} detail={employee ? `${Math.max(0, employee.targetHours - total)} h offen` : 'Zeitübersicht'} /><Metric label="Verrechenbar" value={`${billable} h`} detail={total ? `${Math.round((billable / total) * 100)} % deiner Zeiten` : 'Noch keine Zeiten'} /><Metric label="Offene Nachweise" value={String(ownTimes.filter((entry) => store.orderPolicies.find((policy) => policy.orderId === entry.orderId)?.timeTracking.evidence.required && !store.timeEvidence.some((evidence) => evidence.timeEntryId === entry.id)).length)} detail="Zeitnachweise" /></div>
       <div className="dashboard-layout"><section className="surface"><SectionTitle title="Meine Aufträge" subtitle="Aktuell zugewiesen"/><div className="compact-list">{assignedOrders.length ? assignedOrders.map((order) => <Link href={`/orders/${order.id}`} key={order.id}><span className="primary-cell"><strong>{order.name}</strong><small>{order.customerName}</small></span><span>{Math.max(0, order.budgetHours - store.timeEntries.filter((entry) => entry.orderId === order.id).reduce((sum, entry) => sum + entry.hours, 0))} h Rest</span><span className="status neutral">Aktiv</span></Link>) : <p className="muted">Keine Aufträge zugewiesen.</p>}</div></section><section className="surface"><SectionTitle title="Schnellerfassung" subtitle="Heute"/><Link href="/time?new=1" className="big-action"><Icon name="time" size={20}/><span><strong>Zeit erfassen</strong><small>Auf Auftrag oder Tätigkeit buchen</small></span><Icon name="chevron" size={16}/></Link></section></div>
     </section>
   )
 }
 
-function Metric({ label, value, detail, tone }: { label: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) { return <div className="metric"><span>{label}</span><strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div> }
+function Metric({ label, mobileLabel, value, detail, tone }: { label: string; mobileLabel?: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) { return <div className="metric"><span className="metric-label-desktop">{label}</span>{mobileLabel ? <span className="metric-label-mobile">{mobileLabel}</span> : null}<strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div> }
 function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) { return <div className="section-title"><div><h2>{title}</h2><p>{subtitle}</p></div></div> }
 function Focus({ href, icon, label, meta, tone }: { href: string; icon: IconName; label: string; meta: string; tone?: 'danger' }) { return <Link className="focus-item" href={href}><span className={tone ? `focus-icon ${tone}` : 'focus-icon'}><Icon name={icon} size={17}/></span><span><strong>{label}</strong><small>{meta}</small></span><Icon name="chevron" size={15}/></Link> }
 function Status({ value }: { value: string }) { const map: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', accepted: 'Angenommen', declined: 'Abgelehnt', expired: 'Abgelaufen', revised: 'Ersetzt' }; return <span className={`status ${value}`}>{map[value] ?? value}</span> }

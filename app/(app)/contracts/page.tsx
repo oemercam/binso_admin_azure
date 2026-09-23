@@ -81,7 +81,7 @@ export default function ContractsPage() {
     <div className="data-list compact-overview-list">
       <div className="data-row contract-grid data-head"><span>Vertrag</span><span>Kunde</span><span>Abrechnung</span><span>Nächste Rechnung</span><span>Status</span><span /></div>
       {store.contracts.map((contract) => <InteractiveRow className="data-row contract-grid compact-overview-row" key={contract.id} onActivate={() => setEditing(contract)} ariaLabel={`${contract.number} öffnen`}>
-        <span className="primary-cell"><strong>{contract.number} · {contract.name}</strong><small className="desktop-row-detail">Start {fmt(contract.startDate)}{contract.endDate ? ` · Ende ${fmt(contract.endDate)}` : ' · unbefristet'}</small><small className="mobile-row-summary">{contract.customerName} · {intervalLabel[contract.billingInterval]} · {statusLabel[contract.status]}</small></span>
+        <span className="primary-cell"><strong>{contract.number} · {contract.name}</strong><small className="desktop-row-detail">Start {fmt(contract.startDate)}{contract.endDate ? ` · Ende ${fmt(contract.endDate)}` : ' · unbefristet'}</small><small className="mobile-row-summary">{contract.customerName}</small></span>
         <span className="overview-desktop-cell">{contract.customerName}</span>
         <span className="overview-desktop-cell">{intervalLabel[contract.billingInterval]}</span>
         <span className="overview-desktop-cell">{contract.nextInvoiceDate ? fmt(contract.nextInvoiceDate) : '–'}</span>

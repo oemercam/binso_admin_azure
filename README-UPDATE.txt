@@ -1,10 +1,32 @@
-Binso Admin V20 - Current Full V33
+Binso Admin V20 - Current Full V37
 
-Hotfix gegenüber V32:
-- unbenutzte Variable openAmount auf der Kundendetailseite entfernt
-- Ursache: Offener Betrag wurde in V32 bewusst aus der allgemeinen Kundenübersicht entfernt, die Berechnung blieb jedoch im Code bestehen
-- keine visuelle oder fachliche Änderung gegenüber V32
-- CI-Lint-Warnung damit bereinigt
+V37 standardisiert den vertikalen Seitenaufbau.
+
+Korrigiert:
+- Abstand Titel -> Beschreibung ist überall gleich.
+- Abstand Beschreibung -> erster sichtbarer Seiteninhalt ist überall gleich.
+- Desktop: 20 px nach dem PageHeader.
+- Mobile/PWA: 14 px nach dem PageHeader.
+- Erste Listen/KPIs/Toolbars fügen keinen zusätzlichen oberen Abstand mehr hinzu.
+- Versteckte responsive Blöcke sind vollständig layout-neutral.
+
+Damit wurde insbesondere der zusätzliche Abstand auf Verträge zwischen Beschreibung und erstem Vertrag entfernt.
+
+Zentral geprüft/abgedeckt:
+- Dashboard
+- Kunden
+- Angebote
+- Aufträge
+- Verträge
+- Rechnungen
+- Finanzen
+- Buchhaltung
+- Mitarbeitende
+- Zeiterfassung
+- Einstellungen
+- Detailseiten mit gemeinsamen PageHeader-Strukturen
+
+Alle bisherigen V36-Anpassungen bleiben enthalten.
 
 Prüfen:
 npm run typecheck
