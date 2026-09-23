@@ -1,31 +1,29 @@
-Binso Admin V20 - Current Full V41
+Binso Admin V20 - Current Full V42
 
-V41 standardisiert die Mobile/PWA-Listen auf exakt zwei Textzeilen.
+V42 korrigiert die Mobile/PWA-Listen auf eine wirklich kompakte Darstellung.
 
-Kunden:
-- Zeile 1: nur Firmenname
+Kunden nach der Suche:
+- pro Kunde nur eine kompakte Listenzeile
+- Zeile 1: Firmenname
 - Zeile 2: Kontaktperson
-- Kundennummer auf Mobile/PWA ausgeblendet
-- Zahlungsziel aus der Kundenübersicht entfernt
-- Status aus der Kundenübersicht entfernt
-- keine zusätzlichen Kunden-Metadaten in der Mobile/PWA-Liste
-
-Einheitliches Muster auf allen Masterlisten:
-- Kunden: Firmenname / Kontaktperson
-- Angebote: Angebot / Kunde
-- Aufträge: Auftrag / Kunde
-- Verträge: Vertrag / Kunde
-- Rechnungen: Rechnung / Auftrag oder Periode
-- Mitarbeitende: Name / Rolle
-
-Mobile/PWA:
-- exakt zwei Textzeilen
+- ca. 48 px Zeilenhöhe
+- nur 6 px vertikaler Innenabstand
 - Chevron rechts
-- keine Status, Daten, Beträge oder sonstige operative Werte in der Übersicht
-- einheitliche Zeilenhöhe, Abstände und Typografie
+- kein Zahlungsziel
+- kein Status
+- keine Kundennummer
+- keine Adresse
+- keine zusätzlichen Metadaten
 
-Desktop:
-- zusätzliche fachliche Informationen bleiben dort erhalten, ausser Zahlungsziel/Status in der Kundenübersicht wurden bewusst entfernt.
+Das gleiche kompakte 2-Zeilen-Muster gilt für:
+- Kunden
+- Angebote
+- Aufträge
+- Verträge
+- Rechnungen
+- Mitarbeitende
+
+Mitarbeitende verwenden denselben Rhythmus; Avatar wurde auf Mobile/PWA verkleinert, damit die Zeile nicht höher wird.
 
 Prüfen:
 npm run typecheck

@@ -1,22 +1,27 @@
-# Mobile/PWA master-list standard — V41
+# Mobile/PWA master-list standard — V42
 
-All mobile/PWA master-data lists use the same two-line record pattern.
+The mobile/PWA list is intentionally dense so large customer/order datasets remain easy to scan.
 
-## Row structure
-- Line 1: primary object name/title
-- Line 2: one short context value
-- Chevron on the right
+## Canonical row
+Each record uses exactly two text lines:
+- line 1: primary name/title
+- line 2: one short context value
+- disclosure chevron on the right
 
-No third line and no operational metadata in the mobile overview.
+Target row height is approximately 48 px with 6 px vertical padding.
 
-## Page examples
-- Kunden: company name / contact person
-- Angebote: quote title / customer
-- Aufträge: order name / customer
-- Verträge: contract number + name / customer
-- Rechnungen: invoice number + customer / order or period
-- Mitarbeitende: employee name / role
+## Reference
+Customer list:
+- company name
+- contact person
 
-## Customer list
-Payment term and customer status were removed from the customer overview list.
-The customer number remains available on desktop but is hidden in the mobile/PWA primary line.
+No customer number, address, payment term, status or other metadata is shown in the mobile/PWA list.
+
+## Other master lists
+- Angebote: Angebot / Kunde
+- Aufträge: Auftrag / Kunde
+- Verträge: Vertrag / Kunde
+- Rechnungen: Rechnung / Auftrag oder Periode
+- Mitarbeitende: Name / Rolle
+
+Desktop can retain richer table information.
