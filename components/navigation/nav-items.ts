@@ -1,5 +1,5 @@
 import type { IconName } from '@/components/ui/icon'
-import type { Role } from '@/types/domain'
+import type { AppUser, Role } from '@/types/domain'
 
 export type NavItem = {
   href: string
@@ -7,6 +7,7 @@ export type NavItem = {
   icon: IconName
   roles: Role[]
   group: 'work' | 'management' | 'system'
+  platformOnly?: boolean
 }
 
 const all: Role[] = ['owner', 'admin', 'finance', 'employee']
@@ -28,8 +29,13 @@ export const navItems: NavItem[] = [
   { href: '/organization', label: 'Organisation', icon: 'building', roles: ownersAndAdmins, group: 'system' },
   { href: '/data', label: 'Daten', icon: 'download', roles: ownersAndAdmins, group: 'system' },
   { href: '/settings', label: 'Einstellungen', icon: 'settings', roles: all, group: 'system' },
+  { href: '/platform', label: 'Plattform', icon: 'dashboard', roles: ['owner'], group: 'system', platformOnly: true },
 ]
 
 export function navForRole(role: Role) {
-  return navItems.filter((item) => item.roles.includes(role))
+  return navItems.filter((item) => item.roles.includes(role) && !item.platformOnly)
+}
+
+export function navForUser(user: AppUser) {
+  return navItems.filter((item) => item.roles.includes(user.role) && (!item.platformOnly || Boolean(user.platformRole)))
 }

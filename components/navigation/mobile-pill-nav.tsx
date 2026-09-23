@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/icon'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { NavigationItem } from './navigation-item'
-import { navForRole } from './nav-items'
+import { navForRole, navForUser } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
 export function MobilePillNav({
@@ -21,7 +21,7 @@ export function MobilePillNav({
   const pathname = usePathname()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
-  const items = navForRole(user.role)
+  const items = user.platformRole ? navForUser(user) : navForRole(user.role)
 
   const createLabels: Record<string, string> = {
     '/customers': 'Kunde erfassen',

@@ -34,6 +34,7 @@ import { defaultAppSettings } from '@/lib/data/app-settings'
 import { DEFAULT_ORGANIZATION_ID, defaultOrganization } from '@/lib/data/organizations'
 import { seedAuditEvents, seedEntitlements, seedExportJobs, seedImportJobs, seedMemberships, seedNumberSequences, seedSubscriptions } from '@/lib/data/saas'
 import { hasPermission } from '@/lib/auth/permissions'
+import { getPlan } from '@/lib/data/plans'
 import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
   AppSettings,
@@ -104,6 +105,9 @@ type BusinessState = {
   companyProfile: CompanyProfile
   documentTemplates: DocumentTemplates
   appSettings: AppSettings
+  companyProfiles: Record<string, CompanyProfile>
+  documentTemplatesByOrganization: Record<string, DocumentTemplates>
+  appSettingsByOrganization: Record<string, AppSettings>
 }
 
 type CreateInvoiceInput = {
@@ -131,6 +135,7 @@ type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { 
 type BusinessStore = BusinessState & {
   currentOrganization: Organization
   setCurrentOrganization: (organizationId: string) => void
+  createOrganization: (input: { name: string; slug: string; ownerEmail: string; plan: OrganizationSubscription['plan'] }) => Organization
   activeMembership: OrganizationMembership | null
   can: (permission: Permission) => boolean
   addMembership: (membership: OrganizationMembership) => void
@@ -216,6 +221,9 @@ function freshState(): BusinessState {
     companyProfile: { ...defaultCompanyProfile, organizationId: DEFAULT_ORGANIZATION_ID },
     documentTemplates: defaultDocumentTemplates,
     appSettings: defaultAppSettings,
+    companyProfiles: { [DEFAULT_ORGANIZATION_ID]: { ...defaultCompanyProfile, organizationId: DEFAULT_ORGANIZATION_ID } },
+    documentTemplatesByOrganization: { [DEFAULT_ORGANIZATION_ID]: defaultDocumentTemplates },
+    appSettingsByOrganization: { [DEFAULT_ORGANIZATION_ID]: defaultAppSettings },
   }
 }
 
@@ -287,6 +295,9 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
             companyProfile: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}), organizationId: currentOrganizationId },
             documentTemplates: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) },
             appSettings: mergeAppSettings(parsed.appSettings),
+            companyProfiles: parsed.companyProfiles ?? { [currentOrganizationId]: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}), organizationId: currentOrganizationId } },
+            documentTemplatesByOrganization: parsed.documentTemplatesByOrganization ?? { [currentOrganizationId]: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) } },
+            appSettingsByOrganization: parsed.appSettingsByOrganization ?? { [currentOrganizationId]: mergeAppSettings(parsed.appSettings) },
           })
         }
       } catch {
@@ -302,6 +313,29 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
     if (!hydrated) return
     writeStorage(STORAGE_KEY, JSON.stringify(state))
   }, [state, hydrated])
+
+  const currentOrganization = useMemo(
+    () => state.organizations.find((organization) => organization.id === state.currentOrganizationId) ?? defaultOrganization,
+    [state.organizations, state.currentOrganizationId],
+  )
+  const currentCompanyProfile = useMemo(() => {
+    const existing = state.companyProfiles[state.currentOrganizationId]
+    if (existing) return existing
+
+    return {
+      ...defaultCompanyProfile,
+      name: currentOrganization.name,
+      organizationId: state.currentOrganizationId,
+    }
+  }, [currentOrganization.name, state.companyProfiles, state.currentOrganizationId])
+  const currentDocumentTemplates = useMemo(
+    () => state.documentTemplatesByOrganization[state.currentOrganizationId] ?? defaultDocumentTemplates,
+    [state.documentTemplatesByOrganization, state.currentOrganizationId],
+  )
+  const currentAppSettings = useMemo(
+    () => state.appSettingsByOrganization[state.currentOrganizationId] ?? defaultAppSettings,
+    [state.appSettingsByOrganization, state.currentOrganizationId],
+  )
 
   const store = useMemo<BusinessStore>(() => ({
     ...state,
@@ -329,11 +363,60 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
     numberSequences: state.numberSequences.filter((item) => item.organizationId === state.currentOrganizationId),
     importJobs: state.importJobs.filter((item) => item.organizationId === state.currentOrganizationId),
     exportJobs: state.exportJobs.filter((item) => item.organizationId === state.currentOrganizationId),
-    currentOrganization: state.organizations.find((organization) => organization.id === state.currentOrganizationId) ?? defaultOrganization,
+    currentOrganization,
+    companyProfile: currentCompanyProfile,
+    documentTemplates: currentDocumentTemplates,
+    appSettings: currentAppSettings,
     setCurrentOrganization(organizationId) {
       if (!state.organizations.some((organization) => organization.id === organizationId)) return
       if (user && !state.memberships.some((membership) => membership.organizationId === organizationId && membership.userId === user.id && membership.status === 'active')) return
       setState((current) => ({ ...current, currentOrganizationId: organizationId }))
+    },
+    createOrganization(input) {
+      const now = new Date().toISOString()
+      const organizationId = `org-${Date.now()}`
+      const organization: Organization = {
+        id: organizationId,
+        name: input.name.trim(),
+        slug: input.slug.trim().toLowerCase(),
+        status: 'active',
+        country: 'Schweiz',
+        currency: 'CHF',
+        locale: 'de-CH',
+        createdAt: now,
+        updatedAt: now,
+      }
+      const plan = getPlan(input.plan)
+      const membership: OrganizationMembership = {
+        id: `membership-${Date.now()}`,
+        organizationId,
+        userId: user?.id ?? input.ownerEmail,
+        email: input.ownerEmail,
+        role: 'owner',
+        status: 'active',
+        createdAt: now,
+        updatedAt: now,
+      }
+      const subscription: OrganizationSubscription = {
+        id: `subscription-${Date.now()}`,
+        organizationId,
+        plan: input.plan,
+        status: 'trial',
+        seats: plan.includedUsers,
+        trialUntil: new Date(Date.now() + 14 * 86400000).toISOString(),
+      }
+      setState((current) => ({
+        ...current,
+        organizations: [organization, ...current.organizations],
+        currentOrganizationId: organizationId,
+        memberships: [membership, ...current.memberships],
+        subscriptions: [subscription, ...current.subscriptions],
+        entitlements: [{ organizationId, features: plan.features, maxUsers: plan.includedUsers, maxStorageMb: input.plan === 'starter' ? 2048 : input.plan === 'business' ? 10240 : 51200 }, ...current.entitlements],
+        companyProfiles: { ...current.companyProfiles, [organizationId]: { ...defaultCompanyProfile, organizationId, name: organization.name, email: input.ownerEmail, uid: '', iban: '', bankName: '', website: '', phone: '', address: '', zip: '', city: '', country: 'Schweiz' } },
+        documentTemplatesByOrganization: { ...current.documentTemplatesByOrganization, [organizationId]: defaultDocumentTemplates },
+        appSettingsByOrganization: { ...current.appSettingsByOrganization, [organizationId]: { ...defaultAppSettings, mail: { ...defaultAppSettings.mail, senderName: organization.name, replyTo: input.ownerEmail, invoiceSender: input.ownerEmail, quoteSender: input.ownerEmail, reminderSender: input.ownerEmail, payrollSender: input.ownerEmail } } },
+      }))
+      return organization
     },
     activeMembership: user
       ? state.memberships.find((membership) =>
@@ -419,7 +502,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
       const hourlyRevenue = contract.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
       const order: Order = { organizationId: state.currentOrganizationId, id: `ord-${Date.now()}`, customerId: contract.customerId, customerName: contract.customerName, name: contract.name, mandateRef: contract.reference || contract.number, budgetHours: hours || 160, usedHours: 0, salesRate: hours ? Math.round(hourlyRevenue / hours) : 165, costRate: 105, billingModel: contract.billingInterval === 'none' ? 'mixed' : 'retainer', contractId: contract.id, status: 'active' }
       const policy = createDefaultOrderPolicy(order.id, order.billingModel, {
-        ...customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), state.appSettings),
+        ...customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings),
         ...(contract.workflowOverride ?? {}),
       })
       setState((current) => ({ ...current, orders: [order, ...current.orders], orderPolicies: [policy, ...current.orderPolicies], customerActivities: [makeActivity(state.currentOrganizationId, contract.customerId, 'order', `Auftrag aus ${contract.number} erstellt`, contract.name), ...current.customerActivities] }))
@@ -448,7 +531,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
         contractId: contract.id, contractName: contract.name, kind: 'recurring', period: billingPeriod, issueDate,
         due: addDays(issueDate, customer.paymentDays), status: 'draft', lines, ...invoiceTotals(lines), paidAmount: 0,
         recipientName: customer.legalName || customer.name, recipientAddress: customer.address, recipientZip: customer.zip, recipientCity: customer.city,
-        recipientCountry: customer.country, recipientEmail: customer.email, introText: state.documentTemplates.invoiceIntro, outroText: state.documentTemplates.invoiceOutro, reference: contract.reference,
+        recipientCountry: customer.country, recipientEmail: customer.email, introText: currentDocumentTemplates.invoiceIntro, outroText: currentDocumentTemplates.invoiceOutro, reference: contract.reference,
       }
       const nextInvoiceDate = advanceBillingDate(billingDate, contract.billingInterval)
       setState((current) => ({
@@ -497,7 +580,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
     },
     createOrder(input) {
       const order: Order = { ...input, organizationId: state.currentOrganizationId, id: `ord-${Date.now()}`, usedHours: 0 }
-      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), state.appSettings))
+      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],
@@ -539,7 +622,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
     updateTimeEntry(id, changes) {
       const existing = state.timeEntries.find((item) => item.id === id)
       if (!existing) return null
-      if (existing.invoicedInvoiceId && state.appSettings.workflow.lockInvoicedTimes) return null
+      if (existing.invoicedInvoiceId && currentAppSettings.workflow.lockInvoicedTimes) return null
       const updated = { ...existing, ...changes }
       setState((current) => ({ ...current, timeEntries: current.timeEntries.map((item) => item.id === id ? updated : item) }))
       return updated
@@ -619,8 +702,8 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
         recipientCity: customer.city,
         recipientCountry: customer.country,
         recipientEmail: customer.email,
-        introText: state.documentTemplates.quoteIntro,
-        outroText: state.documentTemplates.quoteOutro,
+        introText: currentDocumentTemplates.quoteIntro,
+        outroText: currentDocumentTemplates.quoteOutro,
         reference: input.reference,
       })
       setState((current) => ({ ...current, quotes: [quote, ...current.quotes], customerActivities: [makeActivity(state.currentOrganizationId, customer.id, 'quote', `Angebot ${quote.number} erstellt`, quote.title), ...current.customerActivities] }))
@@ -671,7 +754,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
         sourceQuoteId: quote.id,
         status: 'active',
       }
-      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), state.appSettings))
+      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],
@@ -716,8 +799,8 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
         recipientCity: customer.city,
         recipientCountry: customer.country,
         recipientEmail: customer.email,
-        introText: state.documentTemplates.invoiceIntro,
-        outroText: state.documentTemplates.invoiceOutro,
+        introText: currentDocumentTemplates.invoiceIntro,
+        outroText: currentDocumentTemplates.invoiceOutro,
         reference: quote.number,
       }
       setState((current) => ({ ...current, invoices: [invoice, ...current.invoices], customerActivities: [makeActivity(state.currentOrganizationId, customer.id, 'invoice', `Rechnung ${invoice.number} aus ${quote.number} erstellt`, quote.title), ...current.customerActivities] }))
@@ -792,8 +875,8 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
         recipientCity: customer.city,
         recipientCountry: customer.country,
         recipientEmail: customer.email,
-        introText: state.documentTemplates.invoiceIntro,
-        outroText: state.documentTemplates.invoiceOutro,
+        introText: currentDocumentTemplates.invoiceIntro,
+        outroText: currentDocumentTemplates.invoiceOutro,
         reference: order?.mandateRef,
       }
       setState((current) => ({
@@ -878,19 +961,31 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
       }))
     },
     updateCompanyProfile(changes) {
-      setState((current) => ({ ...current, companyProfile: { ...current.companyProfile, ...changes, organizationId: current.currentOrganizationId } }))
+      setState((current) => {
+        const existing = current.companyProfiles[current.currentOrganizationId] ?? { ...defaultCompanyProfile, organizationId: current.currentOrganizationId }
+        const updated = { ...existing, ...changes, organizationId: current.currentOrganizationId }
+        return { ...current, companyProfile: updated, companyProfiles: { ...current.companyProfiles, [current.currentOrganizationId]: updated } }
+      })
     },
     updateDocumentTemplates(changes) {
-      setState((current) => ({ ...current, documentTemplates: { ...current.documentTemplates, ...changes } }))
+      setState((current) => {
+        const existing = current.documentTemplatesByOrganization[current.currentOrganizationId] ?? defaultDocumentTemplates
+        const updated = { ...existing, ...changes }
+        return { ...current, documentTemplates: updated, documentTemplatesByOrganization: { ...current.documentTemplatesByOrganization, [current.currentOrganizationId]: updated } }
+      })
     },
     updateAppSettings(changes) {
-      setState((current) => ({ ...current, appSettings: mergeAppSettings(changes, current.appSettings) }))
+      setState((current) => {
+        const existing = current.appSettingsByOrganization[current.currentOrganizationId] ?? defaultAppSettings
+        const updated = mergeAppSettings(changes, existing)
+        return { ...current, appSettings: updated, appSettingsByOrganization: { ...current.appSettingsByOrganization, [current.currentOrganizationId]: updated } }
+      })
     },
     resetDemo() {
       removeStorage(STORAGE_KEY)
       setState(freshState())
     },
-  }), [state, user])
+  }), [currentAppSettings, currentCompanyProfile, currentDocumentTemplates, currentOrganization, state, user])
 
   return <BusinessContext.Provider value={store}>{children}</BusinessContext.Provider>
 }

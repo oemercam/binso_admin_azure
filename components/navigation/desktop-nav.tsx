@@ -2,12 +2,12 @@
 
 import { usePathname } from 'next/navigation'
 import { NavigationItem } from './navigation-item'
-import { navForRole } from './nav-items'
+import { navForRole, navForUser } from './nav-items'
 import type { AppUser } from '@/types/domain'
 
 export function DesktopNav({ user }: { user: AppUser }) {
   const pathname = usePathname()
-  const items = navForRole(user.role)
+  const items = user.platformRole ? navForUser(user) : navForRole(user.role)
   const work = items.filter((item) => item.group === 'work')
   const management = items.filter((item) => item.group === 'management')
   const system = items.filter((item) => item.group === 'system')

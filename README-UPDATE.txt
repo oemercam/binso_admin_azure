@@ -1,20 +1,19 @@
-Binso Business Platform - V51 Validation Hotfix
+Binso Business Platform V54
 
-V51 fixes the validation issues found after V50 without changing the approved UX.
+V54 fixes the remaining React/ESLint validation findings from V53.
 
 Fixed:
-- restored ROLE_GROUPS export required by existing protected route layouts
-- kept backwards-compatible role aliases for current route guards
-- removed synchronous setState from the membership effect
-- membership/permission resolution remains organization-aware without causing cascading renders
-- SaaS product check now verifies both regressions
+- onboarding no longer calls setState synchronously inside useEffect
+- localStorage hydration is deferred through queueMicrotask with cancellation guard
+- current organization/company profile/document templates/app settings are memoized
+- BusinessStore useMemo dependencies are complete and stable
+- platform regression checks cover these fixes
 
-No visual changes:
-- Mobile/PWA compact two-line lists unchanged
-- Dashboard/KPI layout unchanged
-- Bottom pill unchanged
-- sheets/overlays unchanged
-- Contact -> Company -> Business objects model unchanged
+No UX changes:
+- approved Mobile/PWA lists unchanged
+- Dashboard and KPI layout unchanged
+- Bottom Pill unchanged
+- Platform Admin, Pricing, Registration and Onboarding layout unchanged
 
 Run:
 npm run typecheck
@@ -25,4 +24,5 @@ npm run process:check
 npm run mobile-ui:check
 npm run saas:check
 npm run saas:product-check
+npm run platform:check
 npm run build

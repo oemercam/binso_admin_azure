@@ -564,3 +564,41 @@ begin
 end;
 $$;
 
+-- V52 platform operator / commercial SaaS layer
+create table if not exists platform_tenants (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null unique references organizations(id) on delete cascade,
+  owner_name text not null,
+  owner_email text not null,
+  platform_status text not null check (platform_status in ('trial','active','past_due','suspended','cancelled')),
+  seats integer not null default 1,
+  monthly_revenue_chf numeric(12,2) not null default 0,
+  storage_mb integer not null default 0,
+  last_active_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists signup_requests (
+  id uuid primary key default gen_random_uuid(),
+  company_name text not null,
+  owner_name text not null,
+  email text not null,
+  plan text not null check (plan in ('starter','business','professional','enterprise')),
+  status text not null check (status in ('started','account_created','trial_started','active','cancelled')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists platform_audit_events (
+  id uuid primary key default gen_random_uuid(),
+  actor_user_id text not null,
+  actor_email text not null,
+  action text not null,
+  tenant_id uuid references platform_tenants(id),
+  detail text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_platform_tenants_status on platform_tenants(platform_status);
+create index if not exists idx_signup_requests_created on signup_requests(created_at desc);
+create index if not exists idx_platform_audit_created on platform_audit_events(created_at desc);
+

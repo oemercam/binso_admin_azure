@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
-import type { Role } from '@/types/domain'
+import type { PlatformRole, Role } from '@/types/domain'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -11,6 +11,15 @@ type AzureClientPrincipal = {
   userDetails?: string
   userRoles?: string[]
   claims?: Array<{ typ: string; val: string }>
+}
+
+
+function platformRoleFromClaims(roles: string[]): PlatformRole | undefined {
+  const normalized = roles.map((role) => role.toLowerCase())
+  if (normalized.some((role) => role === 'platform_owner' || role === 'platform.owner' || role.endsWith('.platform_owner'))) return 'platform_owner'
+  if (normalized.some((role) => role === 'platform_admin' || role === 'platform.admin' || role.endsWith('.platform_admin'))) return 'platform_admin'
+  if (normalized.some((role) => role === 'platform_support' || role === 'platform.support' || role.endsWith('.platform_support'))) return 'platform_support'
+  return undefined
 }
 
 function roleFromClaims(roles: string[]): Role {
@@ -50,6 +59,7 @@ function parseAzurePrincipal(raw: string | null): Session {
         name,
         email,
         role: roleFromClaims(roles),
+        platformRole: platformRoleFromClaims(roles),
       },
     }
   } catch {
@@ -65,6 +75,7 @@ export async function getSession(): Promise<Session> {
         name: 'Demo Admin',
         email: 'demo@binso.ch',
         role: 'owner',
+        platformRole: 'platform_owner',
       },
     }
   }
@@ -83,5 +94,14 @@ export async function requireRole(...allowed: Array<Role | readonly Role[]>): Pr
   )
   if (roles.length > 0 && !roles.includes(session.user.role)) redirect('/access-denied')
 
+  return session
+}
+
+
+export async function requirePlatformRole(...allowed: PlatformRole[]): Promise<NonNullable<Session>> {
+  const session = await getSession()
+  if (!session) redirect('/sign-in')
+  const role = session.user.platformRole
+  if (!role || (allowed.length > 0 && !allowed.includes(role))) redirect('/access-denied')
   return session
 }

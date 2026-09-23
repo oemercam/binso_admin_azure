@@ -1,4 +1,5 @@
 export type Role = 'owner' | 'admin' | 'finance' | 'employee'
+export type PlatformRole = 'platform_owner' | 'platform_admin' | 'platform_support'
 
 export type OrganizationId = string
 
@@ -118,6 +119,45 @@ export type OrganizationEntitlements = {
   maxStorageMb: number
 }
 
+
+export type PlanDefinition = {
+  id: SubscriptionPlan
+  name: string
+  monthlyPriceChf?: number
+  includedUsers: number
+  features: OrganizationFeature[]
+  description: string
+  recommended?: boolean
+}
+
+export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled'
+
+export type PlatformTenant = {
+  id: string
+  organizationId: OrganizationId
+  companyName: string
+  ownerName: string
+  ownerEmail: string
+  plan: SubscriptionPlan
+  status: PlatformTenantStatus
+  seats: number
+  users: number
+  monthlyRevenueChf: number
+  createdAt: string
+  lastActiveAt: string
+  storageMb: number
+}
+
+export type SignupRequest = {
+  id: string
+  companyName: string
+  ownerName: string
+  email: string
+  plan: SubscriptionPlan
+  status: 'started' | 'account_created' | 'trial_started' | 'active' | 'cancelled'
+  createdAt: string
+}
+
 export type DataExportJob = {
   id: string
   organizationId: OrganizationId
@@ -146,6 +186,7 @@ export type AppUser = {
   name: string
   email: string
   role: Role
+  platformRole?: PlatformRole
 }
 
 export type CustomerWorkflowPolicy = {
