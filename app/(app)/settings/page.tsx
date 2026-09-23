@@ -118,7 +118,7 @@ export default function SettingsPage() {
 
   return (
     <section className="page apple-page settings-page">
-      <PageHeader eyebrow="EINSTELLUNGEN" title="Einstellungen" description="Unternehmen, Versand, Automationen und Benutzererlebnis zentral steuern." />
+      <PageHeader title="Einstellungen" description="Unternehmensdaten, Dokumente, Prozesse und Darstellung konfigurieren." />
 
 
       <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">

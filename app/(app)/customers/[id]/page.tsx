@@ -29,7 +29,7 @@ export default function CustomerDetailPage() {
     contacts: store.customerContacts.filter((item) => item.customerId === id),
   }), [id, store.contracts, store.customerActivities, store.customerContacts, store.invoices, store.orders, store.quotes])
 
-  if (!customer) return <section className="page apple-page"><PageHeader eyebrow="CRM" title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
+  if (!customer) return <section className="page apple-page"><PageHeader title="Kunde nicht gefunden" description="Der Datensatz ist nicht mehr vorhanden."/><button className="button secondary" onClick={() => router.push('/customers')}>Zurück zu Kunden</button></section>
 
   const customerId = customer.id
   const openAmount = related.invoices.reduce((sum, invoice) => sum + Math.max(0, invoice.amount - invoice.paidAmount - (invoice.creditedAmount ?? 0)), 0)
@@ -37,7 +37,7 @@ export default function CustomerDetailPage() {
   function saveNote(event: React.FormEvent) { event.preventDefault(); store.addActivityNote(customerId, note); setNote(''); setNoteOpen(false) }
 
   return <section className="page apple-page">
-    <PageHeader eyebrow="KUNDENAKTE" title={customer.name} description={`${customer.customerNo} · ${customer.contact || 'Keine Ansprechperson'} · ${customer.email || 'Keine E-Mail'}`} action={<button className="button secondary page-primary-action" onClick={() => router.push(`/customers?edit=${customer.id}`)}><Icon name="edit" size={16}/><span>Bearbeiten</span></button>} />
+    <PageHeader title={customer.name} description="Kundendaten, Kontakte und zugehörige Vorgänge verwalten." action={<button className="button secondary page-primary-action" onClick={() => router.push(`/customers?edit=${customer.id}`)}><Icon name="edit" size={16}/><span>Bearbeiten</span></button>} />
 
     <div className="customer-quick-actions" aria-label="Schnellaktionen">
       <Link className="button secondary" href={`/quotes?new=1&customer=${customer.id}`}><Icon name="quotes" size={15}/> Angebot</Link>
@@ -48,27 +48,38 @@ export default function CustomerDetailPage() {
       <button className="button secondary" onClick={() => setNoteOpen(true)}><Icon name="edit" size={15}/> Notiz</button>
     </div>
 
-    <div className="metric-grid compact-metrics">
-      <div className="metric"><span>Angebote</span><strong>{related.quotes.length}</strong><small>{related.quotes.filter((item) => item.status === 'sent').length} offen</small></div>
-      <div className="metric"><span>Aufträge</span><strong>{related.orders.length}</strong><small>{related.orders.filter((item) => item.status === 'active').length} aktiv</small></div>
-      <div className="metric"><span>Verträge</span><strong>{related.contracts.length}</strong><small>{related.contracts.filter((item) => item.status === 'active').length} aktiv</small></div>
-      <div className="metric"><span>Offener Betrag</span><strong>{chf(openAmount)}</strong><small>Rechnungen abzüglich Zahlungen/Gutschriften</small></div>
+    <div className="customer-kpi-row" aria-label="Kundenkennzahlen">
+      <div><span>Angebote</span><strong>{related.quotes.length}</strong></div>
+      <div><span>Aufträge</span><strong>{related.orders.length}</strong></div>
+      <div><span>Verträge</span><strong>{related.contracts.length}</strong></div>
     </div>
 
+    <section className="customer-overview-section">
+      <div className="section-title"><div><h2>Übersicht</h2><p>Wichtige Kundeninformationen auf einen Blick.</p></div></div>
+      <div className="customer-overview-list">
+        <div><span>Status</span><strong>{customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</strong></div>
+        <div><span>Hauptkontakt</span><strong>{customer.contact || related.contacts.find((item) => item.primary)?.name || '–'}</strong></div>
+        <div><span>Kontakt</span><strong>{customer.email || customer.phone || '–'}</strong></div>
+        <div><span>Adresse</span><strong>{[customer.address, `${customer.zip || ''} ${customer.city || ''}`.trim()].filter(Boolean).join(', ') || '–'}</strong></div>
+        <div><span>Zahlungsziel</span><strong>{customer.paymentDays} Tage</strong></div>
+        <div><span>Offener Betrag</span><strong>{chf(openAmount)}</strong></div>
+      </div>
+    </section>
+
     <div className="customer-file-grid">
-      <section className="panel"><div className="section-title"><div><h2>Kontakte</h2><p>Ansprechpersonen dieses Kunden</p></div><button className="button secondary compact-action" onClick={() => setContactOpen(true)}><Icon name="plus" size={14}/> Kontakt</button></div><div className="customer-contact-list">{related.contacts.length ? related.contacts.map((contact) => <div key={contact.id}><span><strong>{contact.name}{contact.primary ? ' · Hauptkontakt' : ''}</strong><small>{contact.role || 'Kontakt'} · {contact.email || 'keine E-Mail'}{contact.phone ? ` · ${contact.phone}` : ''}</small></span></div>) : <div className="search-empty">Noch keine Kontakte.</div>}</div></section>
+      <section className="panel"><div className="section-title"><div><h2>Kontakte</h2><p>Ansprechpersonen dieses Kunden</p></div><button className="button secondary compact-action" onClick={() => setContactOpen(true)}><Icon name="plus" size={14}/> Kontakt</button></div><div className="customer-contact-list">{related.contacts.length ? related.contacts.map((contact) => <div key={contact.id}><span><strong>{contact.name}{contact.primary ? ' · Hauptkontakt' : ''}</strong><small>{contact.role || 'Kontakt'} · {contact.email || 'keine E-Mail'}{contact.phone ? ` · ${contact.phone}` : ''}</small></span></div>) : <div className="list-empty">Keine Kontakte erfasst</div>}</div></section>
 
       <section className="panel"><div className="section-title"><div><h2>Geschäftsvorgänge</h2><p>Vom Angebot bis zur Rechnung</p></div></div><div className="customer-linked-list">
         {related.quotes.slice(0, 4).map((quote) => <Link key={quote.id} href={`/quotes?view=${quote.id}`}><span><strong>{quote.number}</strong><small>Angebot · {quote.title}</small></span><span>{quote.status === 'accepted' ? 'Angenommen' : quote.status === 'declined' ? 'Abgelehnt' : quote.status === 'sent' ? 'Versendet' : quote.status === 'revised' ? 'Ersetzt' : 'Entwurf'}</span></Link>)}
         {related.orders.slice(0, 4).map((order) => <Link key={order.id} href={`/orders/${order.id}`}><span><strong>{order.name}</strong><small>Auftrag</small></span><span>{order.status === 'active' ? 'Aktiv' : order.status === 'completed' ? 'Abgeschlossen' : 'Pausiert'}</span></Link>)}
         {related.contracts.slice(0, 4).map((contract) => <Link key={contract.id} href={`/contracts?view=${contract.id}`}><span><strong>{contract.number}</strong><small>Vertrag · {contract.name}</small></span><span>{contract.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span></Link>)}
         {related.invoices.slice(0, 4).map((invoice) => <Link key={invoice.id} href={`/invoices?view=${invoice.id}`}><span><strong>{invoice.number}</strong><small>Rechnung · {invoice.period}</small></span><span>{chf(invoice.amount)}</span></Link>)}
-        {!related.quotes.length && !related.orders.length && !related.contracts.length && !related.invoices.length && <div className="search-empty">Noch keine Vorgänge.</div>}
+        {!related.quotes.length && !related.orders.length && !related.contracts.length && !related.invoices.length && <div className="list-empty">Keine Geschäftsvorgänge vorhanden</div>}
       </div></section>
 
       <section className="panel"><div className="section-title"><div><h2>Aktivität</h2><p>Chronologische Kundenhistorie</p></div></div><div className="customer-activity-list">
         {related.activities.slice(0, 10).map((activity) => <div key={activity.id}><span className="activity-dot"/><span><strong>{activity.title}</strong><small>{activity.detail || activity.type} · {formatDateTime(activity.createdAt)}</small></span></div>)}
-        {!related.activities.length && <div className="search-empty">Noch keine Aktivitäten.</div>}
+        {!related.activities.length && <div className="list-empty">Keine Aktivitäten vorhanden</div>}
       </div></section>
     </div>
 

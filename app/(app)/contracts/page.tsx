@@ -69,10 +69,10 @@ export default function ContractsPage() {
     router.push(`/invoices?view=${invoice.id}`)
   }
 
-  return <section className="page apple-page">
-    <PageHeader eyebrow="KUNDENBEZIEHUNG" title="Verträge" description="Laufende Vereinbarungen, Kündigungsfristen und wiederkehrende Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)}><Icon name="plus" size={16}/><span>Vertrag erfassen</span></button>} />
+  return <section className="page apple-page mobile-standard-page">
+    <PageHeader title="Verträge" description="Verträge, Laufzeiten, Konditionen und wiederkehrende Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setCreating(true)}><Icon name="plus" size={16}/><span>Vertrag erfassen</span></button>} />
 
-    <div className="metric-grid compact-metrics">
+    <div className="metric-grid compact-metrics mobile-desktop-supplement">
       <div className="metric"><span>Aktive Verträge</span><strong>{store.contracts.filter((item) => item.status === 'active').length}</strong><small>Laufende Kundenvereinbarungen</small></div>
       <div className="metric"><span>Wiederkehrender Wert</span><strong>{chf(activeValue)}</strong><small>Summe pro jeweiligem Abrechnungsintervall</small></div>
       <div className="metric"><span>Nächste Abrechnung</span><strong>{nextBillingDate(store.contracts)}</strong><small>Frühester geplanter Rechnungstermin</small></div>

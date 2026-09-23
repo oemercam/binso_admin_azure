@@ -130,8 +130,8 @@ export default function InvoicesPage() {
   const previewHasMoreActions = previewCanRemind || previewCanCredit || previewCanCancel
 
   return (
-    <section className="page apple-page">
-      <PageHeader eyebrow="FAKTURIERUNG" title="Rechnungen" description="Leistungen abrechnen, Versandstatus dokumentieren, Zahlungen, Mahnungen und Korrekturen verwalten." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
+    <section className="page apple-page mobile-standard-page">
+      <PageHeader title="Rechnungen" description="Rechnungen erstellen, prüfen, Zahlungen erfassen und Korrekturen verwalten." action={<button className="button primary page-primary-action" onClick={() => setBuilderOpen(true)} aria-label="Rechnung erstellen" title="Rechnung erstellen"><Icon name="plus" size={16}/><span>Rechnung erstellen</span></button>} />
 
 
       <div className="data-list compact-overview-list">

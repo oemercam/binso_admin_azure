@@ -161,9 +161,8 @@ export default function TimePage() {
   return (
     <section className="page apple-page">
       <PageHeader
-        eyebrow="ZEIT"
         title="Zeiterfassung"
-        description="Zeiten erfassen, Nachweise prüfen, freigeben und direkt fakturieren."
+        description="Zeiten erfassen, prüfen, freigeben und für die Abrechnung vorbereiten."
         action={canWrite ? <button className="button primary page-primary-action" onClick={() => setOpen(true)}><Icon name="plus" size={16}/><span>Zeit erfassen</span></button> : undefined}
       />
 

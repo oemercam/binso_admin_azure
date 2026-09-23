@@ -71,9 +71,8 @@ export default function AccountingPage() {
   return (
     <section className="page apple-page">
       <PageHeader
-        eyebrow="BUCHHALTUNG"
         title="Buchhaltung"
-        description="Offene Posten, Lieferantenrechnungen und Zahlungen verwalten."
+        description="Offene Posten, Lieferantenrechnungen und Zahlungen bearbeiten."
         action={
           <button
             className="button primary page-primary-action"

@@ -75,11 +75,10 @@ export default function CustomersPage() {
   }
 
   return (
-    <section className="page apple-page">
+    <section className="page apple-page mobile-standard-page">
       <PageHeader
-        eyebrow="CRM"
         title="Kunden"
-        description="Kunden schnell erfassen und alle Angebote, Aufträge, Verträge und Rechnungen zentral verfolgen."
+        description="Kunden erfassen und zugehörige Angebote, Aufträge, Verträge und Rechnungen verwalten."
         action={<button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kunde erfassen</span></button>}
       />
 

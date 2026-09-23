@@ -4,7 +4,7 @@ import { Select, Input } from '@/components/ui/form-controls'
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Icon } from '@/components/ui/icon'
 import { PageHeader } from '@/components/ui/page-header'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
@@ -48,9 +48,8 @@ export default function OrderDetailPage() {
     <section className="page apple-page">
       <div className="detail-back-row"><Link className="text-link" href="/orders">← Aufträge</Link></div>
       <PageHeader
-        eyebrow="AUFTRAG"
         title={order.name}
-        description={`${order.customerName}${order.endCustomerName ? ` · Endkunde: ${order.endCustomerName}` : ''}`}
+        description="Auftragsdaten, Team, Zeiten, Nachweise und Abrechnung verwalten."
         action={
           <div className="page-action-group">
             <span className={`status ${order.status === 'active' ? 'active' : 'neutral'}`}>{order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</span>

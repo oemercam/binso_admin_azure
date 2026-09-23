@@ -64,8 +64,8 @@ export default function OrdersPage() {
   }
 
   return (
-    <section className="page apple-page">
-      <PageHeader eyebrow="LEISTUNG" title="Aufträge" description="Kundenaufträge, Budgets, Leistungserbringung und Abrechnung zentral steuern." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
+    <section className="page apple-page mobile-standard-page">
+      <PageHeader title="Aufträge" description="Aufträge, Leistungen, Budgets und Abrechnung verwalten." action={<button className="button primary page-primary-action" onClick={() => setOpen(true)} aria-label="Auftrag erstellen" title="Auftrag erstellen"><Icon name="plus" size={16}/><span>Auftrag erstellen</span></button>} />
       <div className="data-list compact-overview-list">
         <div className="data-row order-grid data-head"><span>Auftrag</span><span>Budget</span><span>Verbraucht</span><span>Rest</span><span>Umsatz</span><span>Marge</span><span /></div>
         {store.orders.map((order) => {

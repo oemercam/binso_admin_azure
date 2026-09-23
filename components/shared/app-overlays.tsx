@@ -137,7 +137,7 @@ export function AppOverlays({
               <Icon name="chevron" size={15} />
             </Link>
           ))}
-          {!results.length && <div className="search-empty">Keine Treffer.</div>}
+          {!results.length && <div className="list-empty">Keine Treffer.</div>}
         </div>
       </ResponsiveOverlay>
 
@@ -168,7 +168,7 @@ export function AppOverlays({
             {overdue.map((invoice) => <Link href={`/invoices?view=${invoice.id}`} key={invoice.id} onClick={() => setNotificationsOpen(false)}><Icon name="warning" size={16} /><span><strong>{invoice.number} überfällig</strong><small>{invoice.customerName}</small></span></Link>)}
             {expiring.map((quote) => <Link href={`/quotes?view=${quote.id}`} key={quote.id} onClick={() => setNotificationsOpen(false)}><Icon name="quotes" size={16} /><span><strong>{quote.number} offen</strong><small>Gültig bis {quote.validUntil}</small></span></Link>)}
             {unverified.map((proof) => <Link href={`/orders/${proof.orderId}#evidence`} key={proof.id} onClick={() => setNotificationsOpen(false)}><Icon name="time" size={16} /><span><strong>Zeitnachweis prüfen</strong><small>{proof.fileName}</small></span></Link>)}
-            {!overdue.length && !expiring.length && !unverified.length && <div className="search-empty">Keine offenen Hinweise.</div>}
+            {!overdue.length && !expiring.length && !unverified.length && <div className="list-empty">Keine offenen Hinweise.</div>}
           </div>
         </div>
       )}
