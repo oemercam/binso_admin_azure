@@ -15,4 +15,5 @@ export const env = {
   authDefaultRole: resolveDefaultRole(),
   appName: process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Binso Admin',
   vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || '',
+  authProviderName: process.env.AUTH_PROVIDER_NAME?.trim() || 'aad',
 } as const

@@ -1,5 +1,5 @@
 export function signInUrl(returnTo = '/') {
-  return `/.auth/login/aad?post_login_redirect_uri=${encodeURIComponent(returnTo)}`
+  return `/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`
 }
 
 export function signOutUrl(returnTo = '/sign-in') {

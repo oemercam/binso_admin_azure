@@ -65,3 +65,12 @@ V63 – Stripe Payment Provider
 - Stripe Billing Portal for existing Stripe customers.
 - Signed, idempotent webhook processing and PostgreSQL subscription synchronization.
 - Stripe remains optional until server-side test/live keys and Price IDs are configured.
+
+V64 – Customer Authentication
+- Customer sign-in is no longer Microsoft-only in the product UI.
+- Recommended production identity layer is Microsoft Entra External ID behind Azure App Service Authentication.
+- Common methods: email + password, Microsoft, Google and Apple.
+- Password verification, reset and provider secrets stay outside the Binso application/database.
+- Added a server-side /api/auth/login gateway with local-return validation to prevent open redirects.
+- Existing AAD login remains the fallback until the External ID custom OIDC provider is configured in Azure.
+- Added customer-auth:check to verify.

@@ -6527,3 +6527,8 @@ button.accounting-task-row{cursor:pointer;}
 @media(max-width:900px){.pricing-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.public-product-page{padding:36px var(--app-mobile-gutter)}.pricing-grid{grid-template-columns:1fr}.pricing-card{padding:18px}.public-product-head h1{font-size:34px}}
 
+
+/* V64 – Customer authentication */
+.auth-methods{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.auth-methods span{display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;font-weight:600;line-height:1.2}
+.auth-note{display:block;margin-top:12px;color:var(--muted);line-height:1.5}

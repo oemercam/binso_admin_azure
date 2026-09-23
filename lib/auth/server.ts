@@ -39,15 +39,17 @@ function parseAzurePrincipal(raw: string | null): Session {
     const principal = JSON.parse(json) as AzureClientPrincipal
     const claims = principal.claims ?? []
 
-    const email =
+    const claimValue = (...needles: string[]) =>
+      claims.find((claim) => needles.some((needle) => claim.typ.toLowerCase().includes(needle)))?.val
+
+    const rawEmail =
       principal.userDetails ??
-      claims.find((claim) => claim.typ.includes('preferred_username'))?.val ??
-      claims.find((claim) => claim.typ.includes('email'))?.val ??
+      claimValue('preferred_username', 'emailaddress', 'emails', 'email') ??
       ''
+    const email = rawEmail.replace(/^\[?['"]?/, '').replace(/['"]?\]?$/, '').trim().toLowerCase()
 
     const name =
-      claims.find((claim) => claim.typ.endsWith('/name'))?.val ??
-      claims.find((claim) => claim.typ === 'name')?.val ??
+      claimValue('/name', 'displayname', 'name') ??
       email.split('@')[0] ??
       'Benutzer'
 

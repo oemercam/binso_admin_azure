@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { Input, Select } from '@/components/ui/form-controls'
 import { planDefinitions } from '@/lib/data/plans'
 import { signInUrl } from '@/lib/auth/urls'
+import { AuthMethods } from '@/components/auth/auth-methods'
 import type { AppUser, OrganizationMembership, SignupRequest, SubscriptionPlan } from '@/types/domain'
 
 type RegistrationState = {
@@ -101,10 +102,12 @@ function RegisterForm() {
         <section className="public-form-shell">
           <div className="public-product-head">
             <span>Registrierung</span>
-            <h1>Zuerst anmelden</h1>
-            <p>Die Organisation wird deinem Firmenkonto eindeutig zugeordnet.</p>
+            <h1>Konto erstellen oder anmelden</h1>
+            <p>Registriere dich mit E-Mail und Passwort oder nutze ein bestehendes Konto. Danach wird deine Organisation eindeutig zugeordnet.</p>
           </div>
-          <a className="button primary" href={signInUrl(returnTo)}>Mit Microsoft anmelden</a>
+          <AuthMethods />
+          <a className="button primary" href={signInUrl(returnTo)}>Anmelden oder registrieren</a>
+          <small>E-Mail-Verifikation und Passwort-Reset erfolgen über den zentralen Anmeldedienst.</small>
         </section>
       </main>
     )
