@@ -1,12 +1,18 @@
 'use client'
 
 import { createContext, useContext, type ReactNode } from 'react'
+import { useBusinessStore } from '@/components/state/business-store'
 import type { AppUser } from '@/types/domain'
 
 const CurrentUserContext = createContext<AppUser | null>(null)
 
 export function CurrentUserProvider({ user, children }: { user: AppUser; children: ReactNode }) {
-  return <CurrentUserContext.Provider value={user}>{children}</CurrentUserContext.Provider>
+  const store = useBusinessStore()
+  const effectiveUser: AppUser = {
+    ...user,
+    role: store.activeMembership?.role ?? user.role,
+  }
+  return <CurrentUserContext.Provider value={effectiveUser}>{children}</CurrentUserContext.Provider>
 }
 
 export function useCurrentUser() {

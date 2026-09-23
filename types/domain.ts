@@ -22,6 +22,125 @@ export type OrganizationScoped = {
   organizationId?: OrganizationId
 }
 
+
+export type OrganizationMembership = {
+  id: string
+  organizationId: OrganizationId
+  userId: string
+  email: string
+  role: Role
+  status: 'invited' | 'active' | 'suspended'
+  createdAt: string
+  updatedAt: string
+}
+
+export type Permission =
+  | 'organization.read'
+  | 'organization.manage'
+  | 'members.read'
+  | 'members.manage'
+  | 'customers.read'
+  | 'customers.write'
+  | 'quotes.read'
+  | 'quotes.write'
+  | 'orders.read'
+  | 'orders.write'
+  | 'contracts.read'
+  | 'contracts.write'
+  | 'time.read'
+  | 'time.write'
+  | 'time.approve'
+  | 'invoices.read'
+  | 'invoices.write'
+  | 'payments.write'
+  | 'finance.read'
+  | 'margin.read'
+  | 'employees.read'
+  | 'employees.write'
+  | 'employee_costs.read'
+  | 'settings.manage'
+  | 'audit.read'
+  | 'exports.create'
+
+export type SubscriptionPlan = 'starter' | 'business' | 'professional' | 'enterprise'
+export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled'
+
+export type OrganizationSubscription = {
+  id: string
+  organizationId: OrganizationId
+  plan: SubscriptionPlan
+  status: SubscriptionStatus
+  seats: number
+  trialUntil?: string
+  billingCustomerId?: string
+  currentPeriodEnd?: string
+}
+
+export type AuditEvent = {
+  id: string
+  organizationId: OrganizationId
+  actorUserId: string
+  actorName: string
+  action: string
+  entityType: string
+  entityId?: string
+  detail?: string
+  createdAt: string
+}
+
+export type NumberSequence = {
+  organizationId: OrganizationId
+  kind: 'customer' | 'quote' | 'order' | 'contract' | 'invoice' | 'credit_note'
+  prefix: string
+  nextValue: number
+  padding: number
+  includeYear: boolean
+}
+
+export type OrganizationFeature =
+  | 'crm'
+  | 'quotes'
+  | 'orders'
+  | 'contracts'
+  | 'time'
+  | 'invoices'
+  | 'finance'
+  | 'employees'
+  | 'audit'
+  | 'imports'
+  | 'exports'
+  | 'api'
+
+export type OrganizationEntitlements = {
+  organizationId: OrganizationId
+  features: OrganizationFeature[]
+  maxUsers: number
+  maxStorageMb: number
+}
+
+export type DataExportJob = {
+  id: string
+  organizationId: OrganizationId
+  requestedBy: string
+  status: 'queued' | 'processing' | 'ready' | 'failed'
+  format: 'csv' | 'xlsx' | 'zip'
+  scope: 'all' | 'customers' | 'contacts' | 'invoices' | 'time'
+  createdAt: string
+  completedAt?: string
+}
+
+export type ImportJob = {
+  id: string
+  organizationId: OrganizationId
+  requestedBy: string
+  status: 'draft' | 'validated' | 'importing' | 'completed' | 'failed'
+  entityType: 'customers' | 'contacts' | 'employees' | 'invoices'
+  fileName: string
+  createdAt: string
+  completedAt?: string
+  errorCount: number
+}
+
 export type AppUser = {
   id: string
   name: string

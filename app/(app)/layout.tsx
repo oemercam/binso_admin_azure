@@ -13,12 +13,12 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   if (!session) redirect('/sign-in')
 
   return (
-    <CurrentUserProvider user={session.user}>
-      <BusinessStoreProvider>
+    <BusinessStoreProvider user={session.user}>
+      <CurrentUserProvider user={session.user}>
         <AppShell user={session.user}>
           <RouteTransition>{children}</RouteTransition>
         </AppShell>
-      </BusinessStoreProvider>
-    </CurrentUserProvider>
+      </CurrentUserProvider>
+    </BusinessStoreProvider>
   )
 }

@@ -85,13 +85,17 @@ export function AppOverlays({
     const management = managementRoles.includes(user.role)
     return [
       ...availableQuickActions.map((item) => ({ label: item.label, meta: 'Aktion', href: item.href, icon: item.icon })),
-      ...(management ? store.customers.map((item) => ({ label: item.name, meta: `Kunde · ${item.customerNo}`, href: `/customers?edit=${item.id}`, icon: 'building' as const })) : []),
+      ...(management ? store.customerContacts.map((contact) => {
+        const company = store.customers.find((item) => item.id === contact.customerId)
+        return { label: contact.name, meta: `Kontakt · ${company?.name ?? 'Firma'}`, href: `/customers/${contact.customerId}?contact=${contact.id}`, icon: 'user' as const }
+      }) : []),
+      ...(management ? store.customers.map((item) => ({ label: item.name, meta: `Firma · ${item.customerNo}`, href: `/customers/${item.id}`, icon: 'building' as const })) : []),
       ...store.orders.map((item) => ({ label: item.name, meta: `Auftrag · ${item.customerName}`, href: `/orders/${item.id}`, icon: 'briefcase' as const })),
       ...(management ? store.contracts.map((item) => ({ label: item.number, meta: `Vertrag · ${item.customerName}`, href: '/contracts', icon: 'contracts' as const })) : []),
       ...(management ? store.quotes.map((item) => ({ label: item.number, meta: `Angebot · ${item.customerName}`, href: `/quotes?view=${item.id}`, icon: 'quotes' as const })) : []),
       ...(management ? store.invoices.map((item) => ({ label: item.number, meta: `Rechnung · ${item.customerName}`, href: `/invoices?view=${item.id}`, icon: 'receipt' as const })) : []),
     ]
-  }, [availableQuickActions, store.contracts, store.customers, store.invoices, store.orders, store.quotes, user.role])
+  }, [availableQuickActions, store.contracts, store.customerContacts, store.customers, store.invoices, store.orders, store.quotes, user.role])
 
   const results = useMemo(() => {
     const cleaned = query.trim().toLowerCase()

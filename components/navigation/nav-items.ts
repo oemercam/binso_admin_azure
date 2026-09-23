@@ -25,6 +25,8 @@ export const navItems: NavItem[] = [
   { href: '/finance', label: 'Finanzen', icon: 'finance', roles: management, group: 'management' },
   { href: '/accounting', label: 'Buchhaltung', icon: 'accounting', roles: management, group: 'management' },
   { href: '/employees', label: 'Mitarbeitende', icon: 'employees', roles: ownersAndAdmins, group: 'management' },
+  { href: '/organization', label: 'Organisation', icon: 'building', roles: ownersAndAdmins, group: 'system' },
+  { href: '/data', label: 'Daten', icon: 'download', roles: ownersAndAdmins, group: 'system' },
   { href: '/settings', label: 'Einstellungen', icon: 'settings', roles: all, group: 'system' },
 ]
 

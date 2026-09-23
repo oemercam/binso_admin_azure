@@ -1,28 +1,20 @@
-Binso Admin / Business Platform - Current Full V46
+Binso Business Platform - V51 Validation Hotfix
 
-V46 introduces the SaaS organization foundation underneath the existing UX.
+V51 fixes the validation issues found after V50 without changing the approved UX.
 
-Implemented:
-- Organization domain object
-- Binso GmbH as compatibility/default organization
-- currentOrganizationId + currentOrganization in BusinessStore
-- organizationId migration for existing demo/localStorage data
-- organization ownership metadata for business entities
-- organization ownership for new records created through the central store
-- PostgreSQL organizations table
-- organization_id added to target business tables
-- per-organization unique customer/quote/contract numbering in target schema
-- new automated SaaS foundation check
+Fixed:
+- restored ROLE_GROUPS export required by existing protected route layouts
+- kept backwards-compatible role aliases for current route guards
+- removed synchronous setState from the membership effect
+- membership/permission resolution remains organization-aware without causing cascading renders
+- SaaS product check now verifies both regressions
 
 No visual changes:
 - Mobile/PWA compact two-line lists unchanged
 - Dashboard/KPI layout unchanged
 - Bottom pill unchanged
 - sheets/overlays unchanged
-- Contacts -> Company product model unchanged
-
-Important:
-V46 is NOT yet tenant security. V47 adds memberships/roles. V48 enforces tenant isolation.
+- Contact -> Company -> Business objects model unchanged
 
 Run:
 npm run typecheck
@@ -32,4 +24,5 @@ npm run actions:check
 npm run process:check
 npm run mobile-ui:check
 npm run saas:check
+npm run saas:product-check
 npm run build

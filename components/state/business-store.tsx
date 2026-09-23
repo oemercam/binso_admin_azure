@@ -32,6 +32,8 @@ import {
 import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/document-defaults'
 import { defaultAppSettings } from '@/lib/data/app-settings'
 import { DEFAULT_ORGANIZATION_ID, defaultOrganization } from '@/lib/data/organizations'
+import { seedAuditEvents, seedEntitlements, seedExportJobs, seedImportJobs, seedMemberships, seedNumberSequences, seedSubscriptions } from '@/lib/data/saas'
+import { hasPermission } from '@/lib/auth/permissions'
 import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
   AppSettings,
@@ -49,6 +51,14 @@ import type {
   InvoiceLine,
   Order,
   Organization,
+  OrganizationMembership,
+  OrganizationSubscription,
+  OrganizationEntitlements,
+  AuditEvent,
+  NumberSequence,
+  ImportJob,
+  DataExportJob,
+  Permission,
   Payment,
   Quote,
   QuoteLine,
@@ -67,6 +77,13 @@ import { readStorage, removeStorage, writeStorage } from '@/lib/browser/storage'
 type BusinessState = {
   organizations: Organization[]
   currentOrganizationId: string
+  memberships: OrganizationMembership[]
+  subscriptions: OrganizationSubscription[]
+  entitlements: OrganizationEntitlements[]
+  auditEvents: AuditEvent[]
+  numberSequences: NumberSequence[]
+  importJobs: ImportJob[]
+  exportJobs: DataExportJob[]
   customers: Customer[]
   contracts: Contract[]
   expenses: Expense[]
@@ -114,6 +131,13 @@ type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { 
 type BusinessStore = BusinessState & {
   currentOrganization: Organization
   setCurrentOrganization: (organizationId: string) => void
+  activeMembership: OrganizationMembership | null
+  can: (permission: Permission) => boolean
+  addMembership: (membership: OrganizationMembership) => void
+  updateMembership: (id: string, changes: Partial<OrganizationMembership>) => OrganizationMembership | null
+  appendAuditEvent: (event: Omit<AuditEvent, 'id' | 'organizationId' | 'createdAt'>) => void
+  createExportJob: (job: Omit<DataExportJob, 'id' | 'organizationId' | 'createdAt' | 'status'>) => DataExportJob
+  createImportJob: (job: Omit<ImportJob, 'id' | 'organizationId' | 'createdAt' | 'status' | 'errorCount'>) => ImportJob
   addCustomer: (customer: Customer) => void
   updateCustomer: (id: string, changes: Partial<Customer>) => Customer | null
   createContract: (input: CreateContractInput) => Contract | null
@@ -165,6 +189,13 @@ function freshState(): BusinessState {
   return {
     organizations: [defaultOrganization],
     currentOrganizationId: DEFAULT_ORGANIZATION_ID,
+    memberships: seedMemberships,
+    subscriptions: seedSubscriptions,
+    entitlements: seedEntitlements,
+    auditEvents: seedAuditEvents,
+    numberSequences: seedNumberSequences,
+    importJobs: seedImportJobs,
+    exportJobs: seedExportJobs,
     customers: scopeRecords(seedCustomers),
     contracts: scopeRecords(seedContracts),
     expenses: scopeRecords(seedExpenses),
@@ -190,7 +221,7 @@ function freshState(): BusinessState {
 
 const BusinessContext = createContext<BusinessStore | null>(null)
 
-export function BusinessStoreProvider({ children }: { children: ReactNode; user?: AppUser }) {
+export function BusinessStoreProvider({ children, user }: { children: ReactNode; user?: AppUser }) {
   const [state, setState] = useState<BusinessState>(freshState)
   const [hydrated, setHydrated] = useState(false)
 
@@ -229,6 +260,13 @@ export function BusinessStoreProvider({ children }: { children: ReactNode; user?
             ...parsed,
             organizations,
             currentOrganizationId,
+            memberships: parsed.memberships ?? seeded.memberships,
+            subscriptions: parsed.subscriptions ?? seeded.subscriptions,
+            entitlements: parsed.entitlements ?? seeded.entitlements,
+            auditEvents: parsed.auditEvents ?? seeded.auditEvents,
+            numberSequences: parsed.numberSequences ?? seeded.numberSequences,
+            importJobs: parsed.importJobs ?? seeded.importJobs,
+            exportJobs: parsed.exportJobs ?? seeded.exportJobs,
             customers: scopeRecords(parsed.customers?.length ? parsed.customers : seeded.customers, currentOrganizationId),
             contracts: scopeRecords(parsed.contracts ?? seeded.contracts, currentOrganizationId),
             expenses: scopeRecords(parsed.expenses ?? seeded.expenses, currentOrganizationId),
@@ -267,10 +305,73 @@ export function BusinessStoreProvider({ children }: { children: ReactNode; user?
 
   const store = useMemo<BusinessStore>(() => ({
     ...state,
+    customers: state.customers.filter((item) => item.organizationId === state.currentOrganizationId),
+    contracts: state.contracts.filter((item) => item.organizationId === state.currentOrganizationId),
+    expenses: state.expenses.filter((item) => item.organizationId === state.currentOrganizationId),
+    creditNotes: state.creditNotes.filter((item) => item.organizationId === state.currentOrganizationId),
+    customerActivities: state.customerActivities.filter((item) => item.organizationId === state.currentOrganizationId),
+    customerContacts: state.customerContacts.filter((item) => item.organizationId === state.currentOrganizationId),
+    suppliers: state.suppliers.filter((item) => item.organizationId === state.currentOrganizationId),
+    quotes: state.quotes.filter((item) => item.organizationId === state.currentOrganizationId),
+    orders: state.orders.filter((item) => item.organizationId === state.currentOrganizationId),
+    timeEntries: state.timeEntries.filter((item) => item.organizationId === state.currentOrganizationId),
+    invoices: state.invoices.filter((item) => item.organizationId === state.currentOrganizationId),
+    payments: state.payments.filter((item) => item.organizationId === state.currentOrganizationId),
+    supplierInvoices: state.supplierInvoices.filter((item) => item.organizationId === state.currentOrganizationId),
+    employees: state.employees.filter((item) => item.organizationId === state.currentOrganizationId),
+    timeEvidence: state.timeEvidence.filter((item) => item.organizationId === state.currentOrganizationId),
+    orderPolicies: state.orderPolicies.filter((item) => item.organizationId === state.currentOrganizationId),
+    orderAssignmentRules: state.orderAssignmentRules.filter((item) => item.organizationId === state.currentOrganizationId),
+    memberships: state.memberships.filter((item) => item.organizationId === state.currentOrganizationId),
+    subscriptions: state.subscriptions.filter((item) => item.organizationId === state.currentOrganizationId),
+    entitlements: state.entitlements.filter((item) => item.organizationId === state.currentOrganizationId),
+    auditEvents: state.auditEvents.filter((item) => item.organizationId === state.currentOrganizationId),
+    numberSequences: state.numberSequences.filter((item) => item.organizationId === state.currentOrganizationId),
+    importJobs: state.importJobs.filter((item) => item.organizationId === state.currentOrganizationId),
+    exportJobs: state.exportJobs.filter((item) => item.organizationId === state.currentOrganizationId),
     currentOrganization: state.organizations.find((organization) => organization.id === state.currentOrganizationId) ?? defaultOrganization,
     setCurrentOrganization(organizationId) {
       if (!state.organizations.some((organization) => organization.id === organizationId)) return
+      if (user && !state.memberships.some((membership) => membership.organizationId === organizationId && membership.userId === user.id && membership.status === 'active')) return
       setState((current) => ({ ...current, currentOrganizationId: organizationId }))
+    },
+    activeMembership: user
+      ? state.memberships.find((membership) =>
+          membership.organizationId === state.currentOrganizationId &&
+          (membership.userId === user.id || membership.email.toLowerCase() === user.email.toLowerCase()) &&
+          membership.status === 'active'
+        ) ?? null
+      : null,
+    can(permission) {
+      const role = user
+        ? state.memberships.find((membership) => membership.organizationId === state.currentOrganizationId && (membership.userId === user.id || membership.email.toLowerCase() === user.email.toLowerCase()) && membership.status === 'active')?.role ?? user.role
+        : 'employee'
+      return hasPermission(role, permission)
+    },
+    addMembership(membership) {
+      if (membership.organizationId !== state.currentOrganizationId) return
+      setState((current) => ({ ...current, memberships: [membership, ...current.memberships] }))
+    },
+    updateMembership(id, changes) {
+      const existing = state.memberships.find((item) => item.id === id && item.organizationId === state.currentOrganizationId)
+      if (!existing) return null
+      const updated = { ...existing, ...changes, organizationId: existing.organizationId, updatedAt: new Date().toISOString() }
+      setState((current) => ({ ...current, memberships: current.memberships.map((item) => item.id === id ? updated : item) }))
+      return updated
+    },
+    appendAuditEvent(event) {
+      const created: AuditEvent = { ...event, id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, organizationId: state.currentOrganizationId, createdAt: new Date().toISOString() }
+      setState((current) => ({ ...current, auditEvents: [created, ...current.auditEvents] }))
+    },
+    createExportJob(job) {
+      const created: DataExportJob = { ...job, id: `export-${Date.now()}`, organizationId: state.currentOrganizationId, status: 'queued', createdAt: new Date().toISOString() }
+      setState((current) => ({ ...current, exportJobs: [created, ...current.exportJobs] }))
+      return created
+    },
+    createImportJob(job) {
+      const created: ImportJob = { ...job, id: `import-${Date.now()}`, organizationId: state.currentOrganizationId, status: 'draft', errorCount: 0, createdAt: new Date().toISOString() }
+      setState((current) => ({ ...current, importJobs: [created, ...current.importJobs] }))
+      return created
     },
     addCustomer(customer) {
       setState((current) => ({ ...current, customers: [{ ...customer, organizationId: state.currentOrganizationId }, ...current.customers] }))
@@ -789,7 +890,7 @@ export function BusinessStoreProvider({ children }: { children: ReactNode; user?
       removeStorage(STORAGE_KEY)
       setState(freshState())
     },
-  }), [state])
+  }), [state, user])
 
   return <BusinessContext.Provider value={store}>{children}</BusinessContext.Provider>
 }

@@ -407,3 +407,160 @@ create index if not exists idx_invoices_org on invoices(organization_id);
 create index if not exists idx_time_entries_org on time_entries(organization_id);
 create index if not exists idx_employees_org on employees(organization_id);
 
+-- V50 complete SaaS product foundation
+
+create table if not exists organization_memberships (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references organizations(id) on delete cascade,
+  user_id text not null,
+  email text not null,
+  role text not null check (role in ('owner','admin','finance','employee')),
+  status text not null default 'invited' check (status in ('invited','active','suspended')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (organization_id, user_id)
+);
+
+create index if not exists idx_memberships_user on organization_memberships(user_id, status);
+create index if not exists idx_memberships_org on organization_memberships(organization_id, status);
+
+create table if not exists organization_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null unique references organizations(id) on delete cascade,
+  plan text not null check (plan in ('starter','business','professional','enterprise')),
+  status text not null check (status in ('trial','active','past_due','cancelled')),
+  seats integer not null default 1 check (seats > 0),
+  trial_until timestamptz,
+  billing_customer_id text,
+  current_period_end timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists organization_entitlements (
+  organization_id uuid primary key references organizations(id) on delete cascade,
+  features text[] not null default '{}',
+  max_users integer not null default 1,
+  max_storage_mb integer not null default 1024,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists number_sequences (
+  organization_id uuid not null references organizations(id) on delete cascade,
+  kind text not null check (kind in ('customer','quote','order','contract','invoice','credit_note')),
+  prefix text not null,
+  next_value bigint not null default 1,
+  padding integer not null default 3,
+  include_year boolean not null default true,
+  primary key (organization_id, kind)
+);
+
+create table if not exists audit_events (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references organizations(id) on delete cascade,
+  actor_user_id text not null,
+  actor_name text not null,
+  action text not null,
+  entity_type text not null,
+  entity_id text,
+  detail text,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_audit_org_created on audit_events(organization_id, created_at desc);
+
+create table if not exists import_jobs (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references organizations(id) on delete cascade,
+  requested_by text not null,
+  status text not null check (status in ('draft','validated','importing','completed','failed')),
+  entity_type text not null check (entity_type in ('customers','contacts','employees','invoices')),
+  file_name text not null,
+  error_count integer not null default 0,
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+
+create table if not exists export_jobs (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references organizations(id) on delete cascade,
+  requested_by text not null,
+  status text not null check (status in ('queued','processing','ready','failed')),
+  format text not null check (format in ('csv','xlsx','zip')),
+  scope text not null check (scope in ('all','customers','contacts','invoices','time')),
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+
+-- Tenant-aware document/template uniqueness.
+alter table document_templates drop constraint if exists document_templates_pkey;
+alter table document_templates add primary key (organization_id, key);
+
+-- RLS foundation. Application DB sessions must set app.organization_id and app.user_id.
+-- Platform-level maintenance connections should use a dedicated role outside normal app traffic.
+do $$
+declare
+  t text;
+begin
+  foreach t in array array[
+    'customers','suppliers','employees','quotes','orders','time_entries','invoices',
+    'payments','supplier_invoices','company_profile','document_templates','contracts',
+    'expenses','credit_notes','customer_activities','customer_contacts',
+    'organization_memberships','organization_subscriptions','organization_entitlements',
+    'number_sequences','audit_events','import_jobs','export_jobs'
+  ]
+  loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists tenant_isolation on %I', t);
+    execute format(
+      'create policy tenant_isolation on %I using (organization_id = nullif(current_setting(''app.organization_id'', true), '''')::uuid) with check (organization_id = nullif(current_setting(''app.organization_id'', true), '''')::uuid)',
+      t
+    );
+  end loop;
+end $$;
+
+alter table organizations enable row level security;
+drop policy if exists organization_membership_access on organizations;
+create policy organization_membership_access on organizations
+using (
+  exists (
+    select 1
+    from organization_memberships m
+    where m.organization_id = organizations.id
+      and m.user_id = current_setting('app.user_id', true)
+      and m.status = 'active'
+  )
+);
+
+-- Per-tenant sequence allocation must be transactional.
+create or replace function next_business_number(
+  p_organization_id uuid,
+  p_kind text
+) returns text
+language plpgsql
+as $$
+declare
+  r number_sequences%rowtype;
+  value_text text;
+begin
+  select * into r
+  from number_sequences
+  where organization_id = p_organization_id and kind = p_kind
+  for update;
+
+  if not found then
+    raise exception 'Missing number sequence for organization %, kind %', p_organization_id, p_kind;
+  end if;
+
+  value_text :=
+    r.prefix || '-' ||
+    case when r.include_year then extract(year from current_date)::int::text || '-' else '' end ||
+    lpad(r.next_value::text, r.padding, '0');
+
+  update number_sequences
+  set next_value = next_value + 1
+  where organization_id = p_organization_id and kind = p_kind;
+
+  return value_text;
+end;
+$$;
+
