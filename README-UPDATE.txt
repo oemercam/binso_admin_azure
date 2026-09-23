@@ -26,3 +26,11 @@ npm run saas:check
 npm run saas:product-check
 npm run platform:check
 npm run build
+V58 – Production Data Foundation
+- Azure PostgreSQL/PostgreSQL server-only connection pool added.
+- Versioned database migrations and db:migrate command added.
+- Tenant transactions now bind app.organization_id and app.user_id for RLS.
+- Authenticated tenant context resolves organization access via active memberships.
+- Health endpoint reports database readiness without exposing credentials.
+- New data-foundation:check is part of verify.
+

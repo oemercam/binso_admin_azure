@@ -1,24 +1,61 @@
 import 'server-only'
 import { getSession } from '@/lib/auth/server'
+import { isDatabaseConfigured } from '@/lib/db/client'
+import { findActiveMembership, findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
+import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
+import type { OrganizationMembership } from '@/types/domain'
 
 export type TenantRequestContext = {
   userId: string
   email: string
   organizationId: string
+  membership: OrganizationMembership
 }
 
-/**
- * Production contract for tenant-aware APIs.
- *
- * The organization id must be resolved from an authenticated membership,
- * never trusted directly from a request body/query parameter.
- * The current demo has no database membership repository yet, so callers
- * must inject the resolved organization id after the persistence layer is connected.
- */
 export async function authenticatedIdentity() {
   const session = await getSession()
   if (!session) return null
   return { userId: session.user.id, email: session.user.email }
+}
+
+/**
+ * Resolves a tenant only from the authenticated user's active membership.
+ * A request body/query organization id is treated as a selector, never as authorization.
+ */
+export async function resolveTenantContext(preferredOrganizationId?: string | null): Promise<TenantRequestContext | null> {
+  const identity = await authenticatedIdentity()
+  if (!identity) return null
+
+  if (!isDatabaseConfigured()) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('DATABASE_URL must be configured before production tenant access is enabled')
+    }
+    return {
+      ...identity,
+      organizationId: DEFAULT_ORGANIZATION_ID,
+      membership: {
+        id: 'local-membership',
+        organizationId: DEFAULT_ORGANIZATION_ID,
+        userId: identity.userId,
+        email: identity.email,
+        role: 'owner',
+        status: 'active',
+        createdAt: new Date(0).toISOString(),
+        updatedAt: new Date(0).toISOString(),
+      },
+    }
+  }
+
+  if (preferredOrganizationId) {
+    const membership = await findActiveMembership(identity.userId, preferredOrganizationId)
+    if (!membership) return null
+    return { ...identity, organizationId: membership.organizationId, membership }
+  }
+
+  const memberships = await findActiveMembershipsForUser(identity.userId)
+  const membership = memberships[0]
+  if (!membership) return null
+  return { ...identity, organizationId: membership.organizationId, membership }
 }
 
 export function assertTenantId(value: string | null | undefined) {

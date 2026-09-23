@@ -9,19 +9,22 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run actions:check && npm run process:check && npm run mobile-ui:check && npm run saas:check && npm run saas:product-check && npm run platform:check && npm run build",
+    "verify": "npm run typecheck && npm run lint && npm run architecture:check && npm run actions:check && npm run process:check && npm run mobile-ui:check && npm run saas:check && npm run data-foundation:check && npm run saas:product-check && npm run platform:check && npm run build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
     "mobile-ui:check": "node scripts/check-mobile-ui.mjs",
     "saas:check": "node scripts/check-saas-foundation.mjs",
     "saas:product-check": "node scripts/check-saas-product.mjs",
-    "platform:check": "node scripts/check-platform-product.mjs"
+    "platform:check": "node scripts/check-platform-product.mjs",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "data-foundation:check": "node scripts/check-data-foundation.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -29,7 +32,8 @@
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.9.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "^16.0.0"
+    "eslint-config-next": "^16.0.0",
+    "@types/pg": "^8.11.10"
   },
   "engines": {
     "node": ">=24 <25"
