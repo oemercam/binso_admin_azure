@@ -28,19 +28,20 @@
     "go-live:check": "node scripts/check-go-live.mjs"
   },
   "dependencies": {
+    "@swc/helpers": "0.5.23",
     "next": "^16.0.0",
+    "pg": "^8.13.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "pg": "^8.13.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@types/pg": "^8.11.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.9.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.0.0",
-    "@types/pg": "^8.11.10"
+    "typescript": "^5.9.0"
   },
   "engines": {
     "node": ">=24 <25"
