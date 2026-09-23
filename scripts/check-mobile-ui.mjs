@@ -51,3 +51,17 @@ if (!ownerBlock) {
 }
 
 console.log("Dashboard KPI check passed (single labels, canonical three-column owner strip).")
+
+
+const customerPage = fs.readFileSync("app/(app)/customers/page.tsx", "utf8")
+if (customerPage.includes("<span>Zahlungsziel</span>") || customerPage.includes("customer.paymentDays") || customerPage.includes("customer.status === 'active'")) {
+  console.error("Mobile UI check failed: customer overview list still exposes payment term or status.")
+  process.exit(1)
+}
+
+if (!customerPage.includes("desktop-only-inline") || !customerPage.includes("Keine Ansprechperson")) {
+  console.error("Mobile UI check failed: customer row is not using the canonical company + contact pattern.")
+  process.exit(1)
+}
+
+console.log("Mobile master-list check passed (strict two-line pattern).")

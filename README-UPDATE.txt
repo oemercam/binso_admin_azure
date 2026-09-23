@@ -1,27 +1,31 @@
-Binso Admin V20 - Current Full V39
+Binso Admin V20 - Current Full V41
 
-V39 korrigiert das Dashboard-KPI-Problem strukturell.
+V41 standardisiert die Mobile/PWA-Listen auf exakt zwei Textzeilen.
 
-Ursache:
-- V35 hatte für dieselbe Kennzahl zwei Label-Elemente in den DOM geschrieben:
-  vollständige Desktop-Bezeichnung + separate Mobile-Bezeichnung.
-- Die Sichtbarkeit war CSS-abhängig. Sobald eine ältere/generische Regel eingriff,
-  konnten beide Bezeichnungen erscheinen.
-- Für die drei Owner-KPIs wirkten weiterhin mehrere generische metric-Regeln.
+Kunden:
+- Zeile 1: nur Firmenname
+- Zeile 2: Kontaktperson
+- Kundennummer auf Mobile/PWA ausgeblendet
+- Zahlungsziel aus der Kundenübersicht entfernt
+- Status aus der Kundenübersicht entfernt
+- keine zusätzlichen Kunden-Metadaten in der Mobile/PWA-Liste
 
-Korrektur:
-- pro KPI existiert jetzt exakt EIN Label im React/DOM
-- Dashboard verwendet die kompakten Bezeichnungen:
-  Umsatz
-  Nicht verrechnet
-  Offene Rechnungen
-- kein mobileLabel/desktopLabel-System mehr
-- Owner-KPI-Zeile besitzt eine eigene kanonische ID
-- Mobile/PWA erzwingt exakt 3 gleich breite Spalten und exakt 1 Zeile
-- vierte Kennzahl wird Mobile/PWA ausgeblendet
-- Werte und Bezeichnungen bleiben einzeilig
-- gleiche Höhe, gleiche Innenabstände, gleiche Trennlinien
-- zusätzliche automatische Prüfung verhindert doppelte Dashboard-KPI-Labels
+Einheitliches Muster auf allen Masterlisten:
+- Kunden: Firmenname / Kontaktperson
+- Angebote: Angebot / Kunde
+- Aufträge: Auftrag / Kunde
+- Verträge: Vertrag / Kunde
+- Rechnungen: Rechnung / Auftrag oder Periode
+- Mitarbeitende: Name / Rolle
+
+Mobile/PWA:
+- exakt zwei Textzeilen
+- Chevron rechts
+- keine Status, Daten, Beträge oder sonstige operative Werte in der Übersicht
+- einheitliche Zeilenhöhe, Abstände und Typografie
+
+Desktop:
+- zusätzliche fachliche Informationen bleiben dort erhalten, ausser Zahlungsziel/Status in der Kundenübersicht wurden bewusst entfernt.
 
 Prüfen:
 npm run typecheck
