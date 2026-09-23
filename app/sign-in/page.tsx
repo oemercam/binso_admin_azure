@@ -10,8 +10,8 @@ export default function SignInPage() {
         <h1>Binso Admin</h1>
         <p className="muted">Mit deinem Firmenkonto anmelden.</p>
         {env.authMode === 'azure'
-          ? <a className="button primary" href={signInUrl('/dashboard')}>Mit Microsoft anmelden</a>
-          : <a className="button primary" href="/dashboard">Lokale Demo öffnen</a>}
+          ? <a className="button primary" href={signInUrl('/post-login')}>Mit Microsoft anmelden</a>
+          : <a className="button primary" href="/post-login">Lokale Demo öffnen</a>}
       </div>
     </main>
   )

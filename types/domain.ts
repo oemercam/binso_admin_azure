@@ -119,6 +119,15 @@ export type OrganizationEntitlements = {
   maxStorageMb: number
 }
 
+export type BusinessBootstrap = {
+  organizations: Organization[]
+  currentOrganizationId: OrganizationId
+  memberships: OrganizationMembership[]
+  subscriptions: OrganizationSubscription[]
+  entitlements: OrganizationEntitlements[]
+  companyProfiles: Record<string, CompanyProfile>
+}
+
 
 export type PlanDefinition = {
   id: SubscriptionPlan

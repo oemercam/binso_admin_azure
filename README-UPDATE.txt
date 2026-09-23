@@ -44,3 +44,12 @@ V59 – Authentication & Memberships
 - Azure PostgreSQL SSL mode normalized to `verify-full`
 - New migration `0002_auth_memberships.sql`
 - New `auth-membership:check`
+
+V60 – Registration & Onboarding
+- Registration drafts are persisted in Azure PostgreSQL instead of localStorage.
+- Authenticated Microsoft identity owns the registration and fixes the business email.
+- Onboarding can be resumed after refresh/new session.
+- Trial creation consumes a persisted signup transactionally and is idempotent.
+- Returning users are routed through /post-login based on membership/onboarding state.
+- BusinessStore receives authoritative organization/membership/subscription/entitlement bootstrap from PostgreSQL.
+- Added migration 0003_registration_onboarding.sql and registration-onboarding:check.

@@ -17,7 +17,7 @@ const checks=[
  ['platform-only nav',nav.includes('platformOnly')],
  ['four plans',pricing.includes("id: 'starter'")&&pricing.includes("id: 'business'")&&pricing.includes("id: 'professional'")&&pricing.includes("id: 'enterprise'")],
  ['platform admin page',platform.includes('SaaS-Kunden, Abonnemente')],
- ['registration page',register.includes('business-platform-pending-signup')],
+ ['registration page',register.includes('/api/registration')],
  ['onboarding creates organization',onboarding.includes('store.createOrganization')],
  ['per-org profiles',store.includes('companyProfiles: Record<string, CompanyProfile>')],
  ['per-org settings',store.includes('appSettingsByOrganization')],

@@ -38,6 +38,7 @@ import { getPlan } from '@/lib/data/plans'
 import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
   AppSettings,
+  BusinessBootstrap,
   AppUser,
   CompanyProfile,
   Contract,
@@ -227,10 +228,27 @@ function freshState(): BusinessState {
   }
 }
 
+function applyBootstrap(base: BusinessState, bootstrap?: BusinessBootstrap | null): BusinessState {
+  if (!bootstrap?.organizations.length) return base
+  const currentOrganizationId = bootstrap.currentOrganizationId
+  return {
+    ...base,
+    organizations: bootstrap.organizations,
+    currentOrganizationId,
+    memberships: bootstrap.memberships,
+    subscriptions: bootstrap.subscriptions,
+    entitlements: bootstrap.entitlements,
+    companyProfile: bootstrap.companyProfiles[currentOrganizationId] ?? { ...defaultCompanyProfile, organizationId: currentOrganizationId, name: bootstrap.organizations[0].name },
+    companyProfiles: { ...base.companyProfiles, ...bootstrap.companyProfiles },
+    documentTemplatesByOrganization: { ...base.documentTemplatesByOrganization, [currentOrganizationId]: base.documentTemplatesByOrganization[currentOrganizationId] ?? defaultDocumentTemplates },
+    appSettingsByOrganization: { ...base.appSettingsByOrganization, [currentOrganizationId]: base.appSettingsByOrganization[currentOrganizationId] ?? defaultAppSettings },
+  }
+}
+
 const BusinessContext = createContext<BusinessStore | null>(null)
 
-export function BusinessStoreProvider({ children, user }: { children: ReactNode; user?: AppUser }) {
-  const [state, setState] = useState<BusinessState>(freshState)
+export function BusinessStoreProvider({ children, user, bootstrap }: { children: ReactNode; user?: AppUser; bootstrap?: BusinessBootstrap | null }) {
+  const [state, setState] = useState<BusinessState>(() => applyBootstrap(freshState(), bootstrap))
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
@@ -263,7 +281,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
             ? requestedOrganizationId
             : organizations[0]?.id ?? DEFAULT_ORGANIZATION_ID
 
-          setState({
+          setState(applyBootstrap({
             ...seeded,
             ...parsed,
             organizations,
@@ -298,7 +316,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
             companyProfiles: parsed.companyProfiles ?? { [currentOrganizationId]: { ...defaultCompanyProfile, ...(parsed.companyProfile ?? {}), organizationId: currentOrganizationId } },
             documentTemplatesByOrganization: parsed.documentTemplatesByOrganization ?? { [currentOrganizationId]: { ...defaultDocumentTemplates, ...(parsed.documentTemplates ?? {}) } },
             appSettingsByOrganization: parsed.appSettingsByOrganization ?? { [currentOrganizationId]: mergeAppSettings(parsed.appSettings) },
-          })
+          }, bootstrap))
         }
       } catch {
         // Ungültige Demo-Daten werden ignoriert; Seeds bleiben verfügbar.
@@ -307,7 +325,7 @@ export function BusinessStoreProvider({ children, user }: { children: ReactNode;
       }
     })
     return () => { cancelled = true }
-  }, [])
+  }, [bootstrap])
 
   useEffect(() => {
     if (!hydrated) return

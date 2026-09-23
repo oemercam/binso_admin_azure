@@ -25,15 +25,37 @@ async function uniqueSlug(client: PoolClient, name: string) {
   return `${base}-${Date.now()}`
 }
 
+type SignupRow = {
+  id: string
+  company_name: string
+  owner_name: string
+  email: string
+  plan: SubscriptionPlan
+  status: 'started' | 'account_created' | 'trial_started' | 'active' | 'cancelled'
+  organization_id: string | null
+}
+
 export async function createTrialOrganization(input: {
+  signupId: string
   userId: string
   userEmail: string
   userName: string
-  companyName: string
-  ownerName: string
-  plan: SubscriptionPlan
 }) {
   return withTransaction(async (client) => {
+    const signupResult = await client.query<SignupRow>(
+      `select id, company_name, owner_name, email, plan, status, organization_id
+         from signup_requests
+        where id = $1 and user_id = $2
+        for update`,
+      [input.signupId, input.userId],
+    )
+    const signup = signupResult.rows[0]
+    if (!signup) throw new Error('Registrierung wurde nicht gefunden.')
+    if (signup.status === 'cancelled') throw new Error('Diese Registrierung wurde abgebrochen.')
+    if (signup.email.trim().toLowerCase() !== input.userEmail.trim().toLowerCase()) {
+      throw new Error('Die Registrierung gehört nicht zum angemeldeten Konto.')
+    }
+
     const existing = await client.query<{ organization_id: string }>(
       `select organization_id
          from organization_memberships
@@ -43,20 +65,31 @@ export async function createTrialOrganization(input: {
       [input.userId],
     )
     if (existing.rows[0]) {
-      return { organizationId: existing.rows[0].organization_id, created: false }
+      const organizationId = existing.rows[0].organization_id
+      await client.query(
+        `update signup_requests
+            set status = 'trial_started', organization_id = $2, updated_at = now(), completed_at = coalesce(completed_at, now())
+          where id = $1`,
+        [signup.id, organizationId],
+      )
+      return { organizationId, created: false }
     }
 
-    const plan = getPlan(input.plan)
-    const slug = await uniqueSlug(client, input.companyName)
+    if (signup.organization_id) {
+      return { organizationId: signup.organization_id, created: false }
+    }
+
+    const plan = getPlan(signup.plan)
+    const slug = await uniqueSlug(client, signup.company_name)
     const organization = await client.query<{ id: string }>(
       `insert into organizations (name, slug, status, country, currency, locale)
        values ($1, $2, 'active', 'Schweiz', 'CHF', 'de-CH')
        returning id`,
-      [input.companyName.trim(), slug],
+      [signup.company_name.trim(), slug],
     )
     const organizationId = organization.rows[0].id
     const trialUntil = new Date(Date.now() + 14 * 86_400_000)
-    const maxStorageMb = input.plan === 'starter' ? 2048 : input.plan === 'business' ? 10240 : 51200
+    const maxStorageMb = signup.plan === 'starter' ? 2048 : signup.plan === 'business' ? 10240 : 51200
 
     await client.query(
       `insert into organization_memberships (organization_id, user_id, email, role, status)
@@ -66,7 +99,7 @@ export async function createTrialOrganization(input: {
     await client.query(
       `insert into organization_subscriptions (organization_id, plan, status, seats, trial_until)
        values ($1, $2, 'trial', $3, $4)`,
-      [organizationId, input.plan, plan.includedUsers, trialUntil],
+      [organizationId, signup.plan, plan.includedUsers, trialUntil],
     )
     await client.query(
       `insert into organization_entitlements (organization_id, features, max_users, max_storage_mb)
@@ -76,7 +109,7 @@ export async function createTrialOrganization(input: {
     await client.query(
       `insert into company_profile (organization_id, name, address, zip, city, country, email, iban)
        values ($1, $2, '', '', '', 'Schweiz', $3, '')`,
-      [organizationId, input.companyName.trim(), input.userEmail],
+      [organizationId, signup.company_name.trim(), input.userEmail],
     )
     await client.query(
       `insert into number_sequences (organization_id, kind, prefix, next_value, padding, include_year)
@@ -92,12 +125,13 @@ export async function createTrialOrganization(input: {
     await client.query(
       `insert into platform_tenants (organization_id, owner_name, owner_email, platform_status, seats, monthly_revenue_chf, storage_mb, last_active_at)
        values ($1, $2, $3, 'trial', $4, 0, 0, now())`,
-      [organizationId, input.ownerName.trim() || input.userName, input.userEmail, plan.includedUsers],
+      [organizationId, signup.owner_name.trim() || input.userName, input.userEmail, plan.includedUsers],
     )
     await client.query(
-      `insert into signup_requests (company_name, owner_name, email, plan, status, user_id, organization_id)
-       values ($1, $2, $3, $4, 'trial_started', $5, $6)`,
-      [input.companyName.trim(), input.ownerName.trim() || input.userName, input.userEmail, input.plan, input.userId, organizationId],
+      `update signup_requests
+          set status = 'trial_started', organization_id = $2, updated_at = now(), completed_at = now()
+        where id = $1`,
+      [signup.id, organizationId],
     )
     await client.query(
       `insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, entity_id, detail)
