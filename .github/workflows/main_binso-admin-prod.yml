@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.17.1
           run_install: false
@@ -66,9 +66,6 @@ jobs:
           if [ -d .next/static ]; then cp -a .next/static .next/standalone/.next/static; fi
           if [ -d public ]; then cp -a public .next/standalone/public; fi
 
-          # Next.js 16.3.x standalone tracing can omit the ESM files from
-          # @swc/helpers when pnpm + Node 24 are used. Replace any traced/symlinked
-          # helper with a complete physical copy before packaging for Azure.
           SWC_HELPERS_DIR="$(node -p "require('path').dirname(require.resolve('@swc/helpers/package.json'))")"
           rm -rf .next/standalone/node_modules/@swc/helpers
           mkdir -p .next/standalone/node_modules/@swc
@@ -90,12 +87,23 @@ jobs:
             node -e "require('next/dist/shared/lib/constants'); console.log('Next runtime dependency check passed')"
           )
 
+      - name: Create immutable deployment ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f binso-one.zip
+          (
+            cd .next/standalone
+            zip -qry "$GITHUB_WORKSPACE/binso-one.zip" .
+          )
+          unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
+          unzip -l binso-one.zip | grep -F 'server.js'
+
       - name: Upload deployment artifact
         uses: actions/upload-artifact@v7
         with:
           name: binso-one
-          path: .next/standalone
-          include-hidden-files: true
+          path: binso-one.zip
           if-no-files-found: error
           retention-days: 1
 
@@ -112,7 +120,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.17.1
           run_install: false
@@ -135,7 +143,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     needs: [build, migrate]
     environment: production
     permissions:
@@ -146,7 +154,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: binso-one
-          path: app
+          path: deploy
 
       - name: Azure login (OIDC)
         uses: azure/login@v3
@@ -155,9 +163,68 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2CCE2EB4F39347B98167444DC3298211 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_062EB98486644201BBC1D99AE3FDD2FC }}
 
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: binso-admin-prod
-          slot-name: Production
-          package: app
+      - name: Resolve Azure resource group
+        id: app
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESOURCE_GROUP="$(az webapp list --query "[?name=='binso-admin-prod'].resourceGroup | [0]" -o tsv)"
+          test -n "$RESOURCE_GROUP"
+          echo "resource_group=$RESOURCE_GROUP" >> "$GITHUB_OUTPUT"
+
+      - name: Disable App Service build automation
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp config appsettings set \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+            --output none
+
+      - name: Set explicit standalone startup command
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp config set \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --startup-file "node server.js" \
+            --output none
+
+      - name: Deploy clean prebuilt ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f deploy/binso-one.zip
+          az webapp deploy \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --src-path deploy/binso-one.zip \
+            --type zip \
+            --clean true \
+            --restart true \
+            --async false \
+            --output json
+
+      - name: Verify production health
+        shell: bash
+        env:
+          BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$BASE_URL"
+          for attempt in $(seq 1 30); do
+            STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$BASE_URL/api/health" || true)"
+            if [ "$STATUS" = "200" ]; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            echo "Health check attempt $attempt returned HTTP $STATUS"
+            sleep 10
+          done
+          echo "Production health check failed"
+          cat /tmp/health.json 2>/dev/null || true
+          exit 1
