@@ -102,11 +102,11 @@ function RegisterForm() {
           <div className="public-product-head">
             <span>Registrierung</span>
             <h1>Konto erstellen oder anmelden</h1>
-            <p>Erstelle dein Binso-Konto über den zentralen Anmeldedienst. Danach richtest du deine Organisation mit den wichtigsten Angaben ein.</p>
+            <p>Erstelle dein Konto für Binso One. Danach richtest du deine Organisation mit den wichtigsten Angaben ein.</p>
           </div>
           <a className="button primary" href={signInUrl(returnTo)}>Registrierung starten</a>
           <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Anmelden</a></p>
-          <small>E-Mail-Verifikation und Kontosicherheit werden über den zentralen Binso-Anmeldedienst verwaltet.</small>
+          <small>Die sichere Anmeldung und E-Mail-Verifikation erfolgen über den Anmeldedienst von Binso One. Binso One wird von Binso GmbH entwickelt und betrieben.</small>
         </section>
       </main>
     )

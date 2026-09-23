@@ -6532,3 +6532,36 @@ button.accounting-task-row{cursor:pointer;}
 .auth-methods{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
 .auth-methods span{display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;font-weight:600;line-height:1.2}
 .auth-note{display:block;margin-top:12px;color:var(--muted);line-height:1.5}
+
+/* Binso One — public product authentication */
+.product-auth-page{
+  padding:clamp(24px,5vw,64px);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(15,23,42,.045), transparent 32%),
+    var(--background);
+}
+.product-auth-card{
+  width:min(440px,100%)!important;
+  padding:40px!important;
+  border-radius:24px!important;
+  box-shadow:0 24px 70px rgba(18,22,30,.10)!important;
+}
+.product-auth-brand{display:flex;align-items:center;gap:12px;min-height:32px}
+.product-auth-brand .binso-logo-image{height:25px}
+.product-auth-name{padding-left:12px;border-left:1px solid var(--line);font-size:18px;font-weight:650;letter-spacing:-.02em;line-height:24px}
+.product-auth-copy{margin-top:42px}
+.product-auth-eyebrow{margin:0 0 10px!important;color:var(--muted);font-size:11px!important;font-weight:650;letter-spacing:.08em;text-transform:uppercase}
+.product-auth-card h1{margin:0!important;font-size:30px!important;line-height:1.08;letter-spacing:-.04em}
+.product-auth-lead{margin:12px 0 0!important;color:var(--muted);font-size:13px!important;line-height:1.55}
+.product-auth-actions{margin-top:30px}
+.product-auth-primary{width:100%;min-height:46px;justify-content:center;border-radius:12px!important;font-size:13px}
+.product-auth-card .auth-register-prompt{margin:16px 0 0!important;text-align:center;font-size:11px!important;color:var(--muted)}
+.product-auth-card .auth-register-prompt a{color:var(--foreground);font-weight:650;text-underline-offset:3px}
+.product-auth-footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;line-height:1.55}
+.product-auth-footer span{color:var(--foreground);font-weight:650}
+@media(max-width:620px){
+  .product-auth-page{padding:18px}
+  .product-auth-card{padding:28px!important;border-radius:20px!important}
+  .product-auth-copy{margin-top:34px}
+  .product-auth-card h1{font-size:27px!important}
+}

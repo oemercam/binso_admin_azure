@@ -168,8 +168,8 @@ export default function SettingsPage() {
             <SettingsSection title="Standardprozess Zeit und Monatsrapport" description="Gilt für neue Aufträge. Kunde und Leistungserbringer können davon abweichen.">
               <SettingsSelectRow title="Führende Zeiterfassung" description="Wo die tägliche Leistung primär erfasst wird." value={store.appSettings.workflow.customerProcess.timeTrackingMode} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, timeTrackingMode: value as 'internal' | 'external_customer_system' | 'both' } } })}>
                 <option value="external_customer_system">Kundensystem</option>
-                <option value="internal">Binso Admin</option>
-                <option value="both">Kundensystem und Binso</option>
+                <option value="internal">Binso One</option>
+                <option value="both">Kundensystem und Binso One</option>
               </SettingsSelectRow>
               <SettingsToggleRow title="Monatsrapport erforderlich" description="Ende Monat muss ein Rapport für die Leistung vorliegen." checked={store.appSettings.workflow.customerProcess.monthlyReportRequired} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, monthlyReportRequired: value } } })} />
               <SettingsToggleRow title="Unterschrift des Kunden erforderlich" checked={store.appSettings.workflow.customerProcess.customerSignatureRequired} onChange={(value) => store.updateAppSettings({ workflow: { ...store.appSettings.workflow, customerProcess: { ...store.appSettings.workflow.customerProcess, customerSignatureRequired: value } } })} disabled={!store.appSettings.workflow.customerProcess.monthlyReportRequired} />

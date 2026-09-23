@@ -1,6 +1,6 @@
-# Binso Admin
+# Binso One
 
-Binso Admin is the internal administration application for Binso GmbH. It combines customers, offers, orders, time tracking, invoicing, finance, accounting, employees and application settings in one responsive Next.js application for desktop, mobile browser and installed PWA use.
+Binso One is a business platform developed and operated by Binso GmbH for customer organizations. It combines customers, offers, orders, time tracking, invoicing, finance, accounting, employees and application settings in one responsive Next.js application for desktop, mobile browser and installed PWA use.
 
 ## Stack
 

@@ -1,10 +1,10 @@
 import packageJson from '@/package.json'
 
 export const appIdentity = {
-  name: 'Binso Admin',
-  shortName: 'Binso',
+  name: 'Binso One',
+  shortName: 'Binso One',
   company: 'Binso GmbH',
-  description: 'Administration, Verkauf, Zeiterfassung und Finanzen für Binso GmbH.',
+  description: 'Die Business-Plattform von Binso GmbH für Kunden, Aufträge, Zeit, Abrechnung und Finanzen.',
   supportEmail: 'oemer.cam@binso.ch',
   website: 'https://www.binso.ch',
   version: packageJson.version,

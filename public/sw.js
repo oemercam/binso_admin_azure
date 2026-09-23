@@ -98,7 +98,7 @@ self.addEventListener('message', event => {
 })
 
 self.addEventListener('push', event => {
-  const data = event.data?.json() ?? { title: 'Binso Admin', body: 'Neue Benachrichtigung' }
+  const data = event.data?.json() ?? { title: 'Binso One', body: 'Neue Benachrichtigung' }
   event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
     icon: APP_ICON,

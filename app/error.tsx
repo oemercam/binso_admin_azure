@@ -8,7 +8,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
   const router = useRouter()
 
   useEffect(() => {
-    console.error('Binso Admin route error', { digest: error.digest, name: error.name })
+    console.error('Binso One route error', { digest: error.digest, name: error.name })
   }, [error])
 
   return (
