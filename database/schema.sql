@@ -570,7 +570,7 @@ create table if not exists platform_tenants (
   organization_id uuid not null unique references organizations(id) on delete cascade,
   owner_name text not null,
   owner_email text not null,
-  platform_status text not null check (platform_status in ('trial','active','past_due','suspended','cancelled')),
+  platform_status text not null check (platform_status in ('trial','active','past_due','suspended','expired','cancelled')),
   seats integer not null default 1,
   monthly_revenue_chf numeric(12,2) not null default 0,
   storage_mb integer not null default 0,

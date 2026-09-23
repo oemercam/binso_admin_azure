@@ -64,7 +64,7 @@ export type Permission =
   | 'exports.create'
 
 export type SubscriptionPlan = 'starter' | 'business' | 'professional' | 'enterprise'
-export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled'
+export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'expired' | 'cancelled'
 
 export type OrganizationSubscription = {
   id: string
@@ -147,7 +147,7 @@ export type PlanDefinition = {
   recommended?: boolean
 }
 
-export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled'
+export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'expired' | 'cancelled'
 
 export type PlatformTenant = {
   id: string

@@ -3,6 +3,8 @@ import { isDatabaseConfigured } from '@/lib/db/client'
 import { inviteOrganizationMember, listOrganizationMembers, updateOrganizationMember } from '@/lib/db/repositories/membership-management'
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
 import type { Role } from '@/types/domain'
+import { sendOrganizationInvitation } from '@/lib/email/graph'
+import { query } from '@/lib/db/client'
 
 const roles = new Set<Role>(['owner','admin','finance','employee'])
 
@@ -37,7 +39,19 @@ export async function POST(request: Request) {
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können weitere Inhaber einladen.', id)
   try {
     const member = await inviteOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, email, role: body.role })
-    return apiJson({ member }, { status: 201 }, id)
+    const organization = await query<{ name: string }>('select name from organizations where id = $1 limit 1', [context.organizationId])
+    let emailDelivery: { delivered: boolean; provider: 'graph' | 'disabled'; messageId?: string }
+    try {
+      const baseUrl = (process.env.APP_BASE_URL?.trim() || new URL(request.url).origin).replace(/\/$/, '')
+      emailDelivery = await sendOrganizationInvitation({
+        to: email, organizationName: organization.rows[0]?.name ?? 'Binso One', inviter: context.email, roleLabel: body.role,
+        signInUrl: `${baseUrl}/api/auth/login?returnTo=${encodeURIComponent('/post-login')}`,
+      })
+    } catch (mailError) {
+      console.error('Organization invitation email failed', { requestId: id, organizationId: context.organizationId, error: mailError instanceof Error ? mailError.message : 'Unknown error' })
+      emailDelivery = { delivered: false, provider: 'graph' }
+    }
+    return apiJson({ member, emailDelivery }, { status: 201 }, id)
   } catch (cause) {
     return apiError(409, 'membership_conflict', cause instanceof Error ? cause.message : 'Benutzer konnte nicht eingeladen werden.', id)
   }

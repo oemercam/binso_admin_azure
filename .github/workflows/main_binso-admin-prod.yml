@@ -49,7 +49,7 @@ jobs:
         run: pnpm lint
 
       - name: Product checks
-        run: pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check
+        run: pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check
 
       - name: Build
         run: pnpm build
@@ -75,11 +75,44 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  migrate:
+    name: Migrate production database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: build
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+          run_install: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply database migrations
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: 'true'
+
   deploy:
     name: Deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    needs: build
+    needs: [build, migrate]
     environment: production
     permissions:
       id-token: write

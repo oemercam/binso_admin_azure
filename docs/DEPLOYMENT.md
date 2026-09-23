@@ -2,17 +2,42 @@
 
 Production workflow: `.github/workflows/main_binso-admin-prod.yml`.
 
-- Trigger: push to `main` or manual `workflow_dispatch`
+- Trigger: push to `main` oder `workflow_dispatch`
 - Runner: `ubuntu-24.04`
-- Application runtime: Node.js 24
-- Package manager: pnpm 10.17.1 with committed `pnpm-lock.yaml`
-- Install: deterministic `pnpm install --frozen-lockfile`
-- Gates: typecheck, ESLint, architecture, action, process, Mobile/PWA, SaaS, authentication, registration/onboarding, subscription, Stripe and platform checks, followed by the production build
-- Artifact: Next.js standalone output only
-- Azure authentication: OIDC via `azure/login@v3` with repository `id-token: write`
-- Deployment: existing Azure App Service `binso-admin-prod`, Production slot
-- Concurrency: production deploys are serialized and an active deployment is not cancelled
+- Runtime: Node.js 24
+- Package Manager: pnpm 10.17.1 mit committed `pnpm-lock.yaml`
+- Install: `pnpm install --frozen-lockfile`
+- Gates: Typecheck, ESLint, Architektur-, Action-, Prozess-, Mobile/PWA-, SaaS-, Auth-, Registration-, Subscription-, Stripe-, Plattform- und Go-live-Checks
+- Build: Next.js Standalone
+- Datenbank: Migrationen werden nach erfolgreichem Build und vor dem Deployment im GitHub Environment `production` ausgeführt
+- Azure Login: OIDC via `azure/login@v3`
+- Deployment: bestehender Azure App Service `binso-admin-prod`, Production Slot
+- Concurrency: Production-Deployments werden serialisiert
 
-The Azure App Service runtime must be configured for Node.js 24. The existing Azure resource name is intentionally retained; the product presented to users is Binso One.
+## GitHub Environment `production`
 
-Before deployment, configure the production secrets documented in `.env.example`, run database migrations and execute `pnpm verify` on Node.js 24. Production must not use `AUTH_MODE=local` and must have `DATABASE_URL` configured.
+Erforderlich ist `DATABASE_URL` als Secret. Der Wert wird nur für den Migration-Job verwendet und nicht in das Build-Artefakt geschrieben.
+
+Für `.github/workflows/binso-one-lifecycle.yml` werden zusätzlich benötigt:
+
+- Environment Variable `BINSO_ONE_BASE_URL`
+- Environment Secret `BINSO_ONE_INTERNAL_JOB_SECRET`
+
+Das Secret muss mit `INTERNAL_JOB_SECRET` in Azure App Service identisch sein.
+
+## Azure App Service
+
+Der App Service muss Node.js 24 verwenden. Der Azure-Ressourcenname `binso-admin-prod` bleibt aus Infrastrukturgründen bestehen; der Produktname ist Binso One.
+
+Vor Go-live:
+
+1. Produktionsvariablen aus `.env.example` in Azure setzen.
+2. Entra/App-Service-Authentication konfigurieren.
+3. Stripe Webhook und Live/Test Price-IDs setzen.
+4. Graph-Mail für Organisationseinladungen konfigurieren; Push bleibt optional.
+5. `pnpm db:migrate` ausführen bzw. den Migration-Job der Pipeline erfolgreich laufen lassen.
+6. `pnpm production:preflight` mit Produktionsvariablen ausführen.
+7. `pnpm verify` ausführen.
+8. `/api/health` muss in Produktion HTTP 200 liefern.
+
+Production darf niemals `AUTH_MODE=local` verwenden. Eine fehlende produktive PostgreSQL-Verbindung führt bewusst zu einem nicht-betriebsbereiten Health-Status.

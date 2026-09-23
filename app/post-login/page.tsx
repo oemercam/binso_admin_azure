@@ -20,7 +20,7 @@ export default async function PostLoginPage() {
   if (memberships.length > 0) {
     const bootstrap = await getBusinessBootstrapForUser(session.user.id)
     if (bootstrap) redirect('/dashboard')
-    redirect('/access-denied')
+    redirect('/subscription-required')
   }
 
   const signup = await findOpenSignupForUser(session.user.id)

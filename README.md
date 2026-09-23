@@ -1,52 +1,35 @@
 # Binso One
 
-Binso One is a business platform developed and operated by Binso GmbH for customer organizations. It combines customers, offers, orders, time tracking, invoicing, finance, accounting, employees and application settings in one responsive Next.js application for desktop, mobile browser and installed PWA use.
+Binso One ist die von Binso GmbH entwickelte und betriebene SaaS-Plattform für Schweizer Dienstleistungsunternehmen.
 
-## Stack
+## Technischer Stand
 
-- Next.js 16 / React 19 / TypeScript
-- Node.js 24
-- PWA with service worker and manifest
-- Microsoft Entra / Azure App Service deployment path
-- GitHub Actions with OIDC-based Azure login
+- Next.js 16 / React 19 / Node.js 24
+- Azure App Service
+- PostgreSQL mit tenant-gebundener Persistenz und RLS
+- Azure App Service Authentication / Microsoft Entra ID bzw. External ID
+- Stripe Checkout, Billing Portal und Webhooks
+- Account, Organisationen, Rollen und Memberships
+- Trial, Preispläne und modulbasierte Entitlements
+- Binso-GmbH-Plattform-/Betreiberbereich
+- Desktop, Mobile und PWA
+- Microsoft-Graph-Mail für Organisationseinladungen optional integriert
+- automatischer Subscription-Lifecycle und Billing-Recovery für abgelaufene Trials
 
-## Development
+## Qualitätsprüfung
 
-Requirements: Node.js 24 and pnpm 10 with the committed `pnpm-lock.yaml`.
-
-```bash
-corepack enable
+```powershell
 pnpm install --frozen-lockfile
-pnpm dev
-```
-
-Quality gates:
-
-```bash
-pnpm typecheck
 pnpm lint
-pnpm architecture:check
-pnpm build
+pnpm typecheck
+pnpm verify
 ```
 
-`pnpm verify` runs the complete local release gate.
+Für den produktiven Go-live zusätzlich:
 
-## Project structure
+```powershell
+pnpm db:migrate
+pnpm production:preflight
+```
 
-- `app/` routes, metadata, manifest and application styles
-- `components/` shared application and design-system components
-- `hooks/` centralized interaction hooks
-- `lib/` auth, configuration, browser and HTTP infrastructure
-- `modules/` domain-specific rules and types
-- `database/` target database schema
-- `public/` canonical brand assets, generated PWA icons and service worker
-- `scripts/` architecture guardrails
-- `docs/` current architecture, design system and deployment notes
-
-## Deployment
-
-Production deploys from `main` and can also be started manually. GitHub Actions uses `ubuntu-24.04`, Node.js 24, deterministic `pnpm install --frozen-lockfile`, quality gates, a standalone deployment artifact and Azure OIDC login. See `docs/DEPLOYMENT.md`.
-
-## Architecture
-
-See `docs/ARCHITECTURE.md` and `docs/DESIGN_SYSTEM.md`. Historical migration reports are intentionally not kept in the production repository; Git history is the archive.
+Produktionsdetails: `docs/GO-LIVE-V68.md` und `docs/DEPLOYMENT.md`.

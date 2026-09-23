@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSameOrigin } from '@/lib/http/server-api'
-import { resolveTenantContext } from '@/lib/auth/tenant-server'
+import { resolveMembershipContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost } from '@/lib/billing/stripe'
 import { getBillingIdentity } from '@/lib/db/repositories/stripe-billing'
 
@@ -8,7 +8,7 @@ type PortalSession = { url: string }
 
 export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const context = await resolveTenantContext()
+  const context = await resolveMembershipContext()
   if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
   if (context.membership.role !== 'owner') return NextResponse.json({ error: 'Nur der Inhaber kann die Abrechnung ändern.' }, { status: 403 })
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const params = new URLSearchParams()
     params.set('customer', billing.billingCustomerId)
-    params.set('return_url', `${appBaseUrl(request)}/organization`)
+    params.set('return_url', `${appBaseUrl(request)}/post-login`)
     const session = await stripePost<PortalSession>('/billing_portal/sessions', params)
     return NextResponse.json({ url: session.url })
   } catch (cause) {

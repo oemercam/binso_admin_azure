@@ -6,7 +6,7 @@ import { listPlatformSignups, listPlatformTenants, updatePlatformSubscription } 
 import type { PlatformTenantStatus, SubscriptionPlan } from '@/types/domain'
 
 const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional', 'enterprise'])
-const statuses = new Set<PlatformTenantStatus>(['trial', 'active', 'past_due', 'suspended', 'cancelled'])
+const statuses = new Set<PlatformTenantStatus>(['trial', 'active', 'past_due', 'suspended', 'expired', 'cancelled'])
 
 function canManagePlatform(role: string | undefined) {
   return role === 'platform_owner' || role === 'platform_admin'

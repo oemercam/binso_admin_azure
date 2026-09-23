@@ -1,0 +1,27 @@
+name: Binso One subscription lifecycle
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: production
+    steps:
+      - name: Run subscription lifecycle
+        shell: bash
+        env:
+          BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
+          JOB_SECRET: ${{ secrets.BINSO_ONE_INTERNAL_JOB_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$BASE_URL"
+          test -n "$JOB_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-delay 5 \
+            -X POST "${BASE_URL%/}/api/internal/lifecycle" \
+            -H "Authorization: Bearer $JOB_SECRET" \
+            -H "Content-Type: application/json"

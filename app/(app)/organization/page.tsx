@@ -97,10 +97,12 @@ export default function OrganizationPage() {
         const now = new Date().toISOString()
         store.addMembership({ id: `membership-${Date.now()}`, organizationId: store.currentOrganization.id, userId: `invited:${value}`, email: value, role, status: 'invited', createdAt: now, updatedAt: now })
       } else {
-        const result = await response.json().catch(() => ({})) as { member?: OrganizationMembership; error?: { message?: string } }
+        const result = await response.json().catch(() => ({})) as { member?: OrganizationMembership; emailDelivery?: { delivered: boolean; provider: 'graph' | 'disabled' }; error?: { message?: string } }
         if (!response.ok) throw new Error(result.error?.message || 'Einladung konnte nicht erstellt werden.')
+        if (result.emailDelivery?.delivered) feedback.success('Einladung wurde erstellt und per E-Mail versendet.')
+        else feedback.success('Einladung wurde erstellt. Der Mailversand ist nicht aktiv oder war nicht verfügbar.')
       }
-      setInviteOpen(false); setEmail(''); feedback.success('Einladung wurde erstellt.'); await loadMembers()
+      setInviteOpen(false); setEmail(''); await loadMembers()
     } catch (cause) { feedback.error(cause instanceof Error ? cause.message : 'Einladung konnte nicht erstellt werden.') } finally { setMemberSaving(false) }
   }
 

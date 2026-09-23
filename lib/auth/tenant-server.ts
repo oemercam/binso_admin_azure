@@ -1,7 +1,7 @@
 import 'server-only'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
-import { findAccessibleMembership } from '@/lib/db/repositories/memberships'
+import { findAccessibleMembership, findActiveMembership, findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
 import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import type { OrganizationMembership } from '@/types/domain'
@@ -59,6 +59,36 @@ export async function resolveTenantContext(preferredOrganizationId?: string | nu
   const membership = await findAccessibleMembership(identity.userId)
   if (!membership) return null
   return { ...identity, organizationId: membership.organizationId, membership }
+}
+
+export async function resolveMembershipContext(preferredOrganizationId?: string | null): Promise<TenantRequestContext | null> {
+  const identity = await authenticatedIdentity()
+  if (!identity) return null
+
+  if (!isDatabaseConfigured()) {
+    if (process.env.NODE_ENV === 'production') throw new Error('DATABASE_URL must be configured before production membership access is enabled')
+    return {
+      ...identity,
+      organizationId: DEFAULT_ORGANIZATION_ID,
+      membership: {
+        id: 'local-membership', organizationId: DEFAULT_ORGANIZATION_ID, userId: identity.userId, email: identity.email,
+        role: 'owner', status: 'active', createdAt: new Date(0).toISOString(), updatedAt: new Date(0).toISOString(),
+      },
+    }
+  }
+
+  const user = await upsertAuthenticatedUser({ id: identity.userId, email: identity.email, displayName: identity.name })
+  if (user.status !== 'active') return null
+
+  if (preferredOrganizationId) {
+    const membership = await findActiveMembership(identity.userId, preferredOrganizationId)
+    if (!membership) return null
+    return { ...identity, organizationId: membership.organizationId, membership }
+  }
+
+  const memberships = await findActiveMembershipsForUser(identity.userId)
+  const membership = memberships[0] ?? null
+  return membership ? { ...identity, organizationId: membership.organizationId, membership } : null
 }
 
 

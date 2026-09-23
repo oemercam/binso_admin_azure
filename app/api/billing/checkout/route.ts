@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSameOrigin } from '@/lib/http/server-api'
-import { resolveTenantContext } from '@/lib/auth/tenant-server'
+import { resolveMembershipContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost, stripePriceId } from '@/lib/billing/stripe'
 import { getBillingIdentity, saveStripeCustomer } from '@/lib/db/repositories/stripe-billing'
 import type { SubscriptionPlan } from '@/types/domain'
@@ -12,7 +12,7 @@ type StripeCheckoutSession = { id: string; url: string | null }
 
 export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const context = await resolveTenantContext()
+  const context = await resolveMembershipContext()
   if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
   if (context.membership.role !== 'owner') return NextResponse.json({ error: 'Nur der Inhaber kann die Abrechnung ändern.' }, { status: 403 })
 
@@ -46,8 +46,8 @@ export async function POST(request: Request) {
     params.set('line_items[0][price]', priceId)
     params.set('line_items[0][quantity]', '1')
     params.set('client_reference_id', billing.organizationId)
-    params.set('success_url', `${baseUrl}/organization?billing=success`)
-    params.set('cancel_url', `${baseUrl}/organization?billing=cancelled`)
+    params.set('success_url', `${baseUrl}/post-login?billing=success`)
+    params.set('cancel_url', `${baseUrl}/subscription-required?billing=cancelled`)
     params.set('subscription_data[metadata][organizationId]', billing.organizationId)
     params.set('metadata[organizationId]', billing.organizationId)
     params.set('metadata[plan]', body.plan)

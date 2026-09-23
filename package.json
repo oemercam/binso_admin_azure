@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "pnpm run typecheck && pnpm run lint && pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run build",
+    "verify": "pnpm run typecheck && pnpm run lint && pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -23,7 +23,9 @@
     "registration-onboarding:check": "node scripts/check-registration-onboarding.mjs",
     "subscription-billing:check": "node scripts/check-subscription-billing.mjs",
     "stripe-payment:check": "node scripts/check-stripe-payment.mjs",
-    "customer-auth:check": "node scripts/check-customer-auth.mjs"
+    "customer-auth:check": "node scripts/check-customer-auth.mjs",
+    "production:preflight": "node scripts/production-preflight.mjs",
+    "go-live:check": "node scripts/check-go-live.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",
