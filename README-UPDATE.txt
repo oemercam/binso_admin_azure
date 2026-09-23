@@ -1,23 +1,27 @@
-Binso Admin V20 - Current Full V38
+Binso Admin V20 - Current Full V39
 
-V38 konsolidiert die Mobile/PWA-Darstellung strukturell.
+V39 korrigiert das Dashboard-KPI-Problem strukturell.
 
-Wichtig:
-- keine weitere Patch-Schicht über V37
-- alte widersprüchliche Mobile-Regeln für die gemeinsamen Seitenkomponenten wurden entfernt
-- V23/V25/V30/V34/V35/V36/V37 CSS-Patchbereiche wurden durch eine einzige kanonische Mobile/PWA-Schicht ersetzt
-- App-Main besitzt den Seitenrand
-- PageHeader besitzt den vertikalen Abstand
-- Standardlisten besitzen eine gemeinsame Mobile-Geometrie
-- 3er-, 4er- und 2er-KPI-Darstellungen sind zentral definiert
-- Dashboard Heute wichtig ist zentral definiert
-- Kunden-Detaildarstellung verwendet den gleichen Mobile-Rhythmus
-- Navigation, Overlays, PDF/Preview und Fullscreen-Editoren bleiben in ihren eigenen bestehenden Systemen
+Ursache:
+- V35 hatte für dieselbe Kennzahl zwei Label-Elemente in den DOM geschrieben:
+  vollständige Desktop-Bezeichnung + separate Mobile-Bezeichnung.
+- Die Sichtbarkeit war CSS-abhängig. Sobald eine ältere/generische Regel eingriff,
+  konnten beide Bezeichnungen erscheinen.
+- Für die drei Owner-KPIs wirkten weiterhin mehrere generische metric-Regeln.
 
-Neue Qualitätsprüfung:
-npm run mobile-ui:check
-
-verify führt diese Prüfung automatisch mit aus.
+Korrektur:
+- pro KPI existiert jetzt exakt EIN Label im React/DOM
+- Dashboard verwendet die kompakten Bezeichnungen:
+  Umsatz
+  Nicht verrechnet
+  Offene Rechnungen
+- kein mobileLabel/desktopLabel-System mehr
+- Owner-KPI-Zeile besitzt eine eigene kanonische ID
+- Mobile/PWA erzwingt exakt 3 gleich breite Spalten und exakt 1 Zeile
+- vierte Kennzahl wird Mobile/PWA ausgeblendet
+- Werte und Bezeichnungen bleiben einzeilig
+- gleiche Höhe, gleiche Innenabstände, gleiche Trennlinien
+- zusätzliche automatische Prüfung verhindert doppelte Dashboard-KPI-Labels
 
 Prüfen:
 npm run typecheck

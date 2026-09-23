@@ -33,10 +33,10 @@ function OwnerDashboard() {
   return (
     <section className="page apple-page">
       <PageHeader title="Dashboard" description="Überblick über Aufträge, Abrechnung und offene Aufgaben." />
-      <div className="metric-strip owner-metrics mobile-kpi-3">
-        <Metric label="Geleisteter Umsatz" mobileLabel="Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
-        <Metric label="Noch nicht verrechnet" mobileLabel="Nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
-        <Metric label="Offene Rechnungen" mobileLabel="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
+      <div id="owner-dashboard-kpis" className="metric-strip owner-metrics mobile-kpi-3">
+        <Metric label="Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
+        <Metric label="Nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
+        <Metric label="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
         <Metric label="Deckungsbeitrag" value={chf(contribution)} detail={`Marge ${margin} %`} />
       </div>
 
@@ -126,7 +126,7 @@ function EmployeeDashboard() {
   )
 }
 
-function Metric({ label, mobileLabel, value, detail, tone }: { label: string; mobileLabel?: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) { return <div className="metric"><span className="metric-label-desktop">{label}</span>{mobileLabel ? <span className="metric-label-mobile">{mobileLabel}</span> : null}<strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div> }
+function Metric({ label, value, detail, tone }: { label: string; value: string; detail: string; tone?: 'positive' | 'warning' | 'danger' }) { return <div className="metric"><span>{label}</span><strong>{value}</strong><small className={tone ? `tone-${tone}` : undefined}>{detail}</small></div> }
 function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) { return <div className="section-title"><div><h2>{title}</h2><p>{subtitle}</p></div></div> }
 function Focus({ href, icon, label, meta, tone }: { href: string; icon: IconName; label: string; meta: string; tone?: 'danger' }) { return <Link className="focus-item" href={href}><span className={tone ? `focus-icon ${tone}` : 'focus-icon'}><Icon name={icon} size={17}/></span><span><strong>{label}</strong><small>{meta}</small></span><Icon name="chevron" size={15}/></Link> }
 function Status({ value }: { value: string }) { const map: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', accepted: 'Angenommen', declined: 'Abgelehnt', expired: 'Abgelaufen', revised: 'Ersetzt' }; return <span className={`status ${value}`}>{map[value] ?? value}</span> }

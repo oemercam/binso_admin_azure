@@ -5898,16 +5898,8 @@ button.accounting-task-row{cursor:pointer;}
   .apple-page > .owner-metrics.metric-strip > .metric:nth-child(n+4){
     display:none!important;
   }
-
-  .apple-page .metric-label-desktop{
-    display:none!important;
-  }
-
-  .apple-page .metric-label-mobile{
-    display:block!important;
-  }
-
-  .apple-page .mobile-kpi-3 > .metric > span,
+.apple-page 
+.apple-page .mobile-kpi-3 > .metric > span,
   .apple-page > .owner-metrics.metric-strip > .metric > span,
   .apple-page .employee-metrics > .metric > span,
   .apple-page .customer-kpi-row > div > span,
@@ -6158,6 +6150,106 @@ button.accounting-task-row{cursor:pointer;}
   .apple-page .customer-kpi-row > div > strong,
   .apple-page .order-kpi-strip > span > strong{
     font-size:clamp(11px,3.45vw,14px)!important;
+  }
+}
+
+/* V39 — deterministic owner dashboard KPI layout.
+   This component has one textual label per KPI in the DOM. */
+@media(max-width:820px){
+  #owner-dashboard-kpis{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+    grid-template-rows:1fr!important;
+    grid-auto-columns:0!important;
+    grid-auto-rows:0!important;
+    column-gap:0!important;
+    row-gap:0!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0 0 18px!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+  }
+
+  #owner-dashboard-kpis > .metric{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-items:flex-start!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:64px!important;
+    height:64px!important;
+    margin:0!important;
+    padding:8px 8px!important;
+    border:0!important;
+    border-right:1px solid var(--line)!important;
+    border-bottom:0!important;
+    background:transparent!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  #owner-dashboard-kpis > .metric:nth-child(3){
+    border-right:0!important;
+  }
+
+  #owner-dashboard-kpis > .metric:nth-child(n+4){
+    display:none!important;
+  }
+
+  #owner-dashboard-kpis > .metric > span{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0 0 4px!important;
+    padding:0!important;
+    font-size:9px!important;
+    line-height:1!important;
+    font-weight:600!important;
+    color:var(--muted)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  #owner-dashboard-kpis > .metric > strong{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    font-size:clamp(12px,3.45vw,16px)!important;
+    line-height:1!important;
+    font-weight:700!important;
+    letter-spacing:-.03em!important;
+    font-variant-numeric:tabular-nums!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  #owner-dashboard-kpis > .metric > small{
+    display:none!important;
+  }
+}
+
+@media(max-width:390px){
+  #owner-dashboard-kpis > .metric{
+    min-height:60px!important;
+    height:60px!important;
+    padding:7px 5px!important;
+  }
+
+  #owner-dashboard-kpis > .metric > span{
+    font-size:8px!important;
+  }
+
+  #owner-dashboard-kpis > .metric > strong{
+    font-size:clamp(11px,3.35vw,14px)!important;
   }
 }
 
