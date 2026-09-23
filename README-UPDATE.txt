@@ -59,3 +59,9 @@ V61: Subscription & Billing Foundation
 - Plan-/Statusänderungen sind serverseitig, auditiert und synchronisieren Entitlements/Limits.
 - Billing-Lifecycle, Subscription-Events und Stripe-Webhook-Inbox sind vorbereitet.
 - Inhaber können Planwechsel/Kündigung/Reaktivierung über die Billing-API anfordern.
+
+V63 – Stripe Payment Provider
+- Stripe Checkout for Starter, Business and Professional plans.
+- Stripe Billing Portal for existing Stripe customers.
+- Signed, idempotent webhook processing and PostgreSQL subscription synchronization.
+- Stripe remains optional until server-side test/live keys and Price IDs are configured.

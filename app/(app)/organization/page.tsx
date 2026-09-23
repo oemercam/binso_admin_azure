@@ -47,6 +47,38 @@ export default function OrganizationPage() {
     }
   }
 
+  async function startCheckout() {
+    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    setSubscriptionSaving(true)
+    try {
+      const response = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ plan: subscriptionPlan }),
+      })
+      const result = await response.json().catch(() => ({})) as { error?: string; url?: string }
+      if (!response.ok || !result.url) throw new Error(result.error || 'Checkout konnte nicht gestartet werden.')
+      window.location.assign(result.url)
+    } catch (cause) {
+      feedback.error(cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.')
+      setSubscriptionSaving(false)
+    }
+  }
+
+  async function openBillingPortal() {
+    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    setSubscriptionSaving(true)
+    try {
+      const response = await fetch('/api/billing/portal', { method: 'POST' })
+      const result = await response.json().catch(() => ({})) as { error?: string; url?: string }
+      if (!response.ok || !result.url) throw new Error(result.error || 'Abrechnungsportal konnte nicht geöffnet werden.')
+      window.location.assign(result.url)
+    } catch (cause) {
+      feedback.error(cause instanceof Error ? cause.message : 'Abrechnungsportal konnte nicht geöffnet werden.')
+      setSubscriptionSaving(false)
+    }
+  }
+
   function openSubscription() {
     setSubscriptionPlan(subscription?.scheduledPlan ?? subscription?.plan ?? 'business')
     setSubscriptionOpen(true)
@@ -117,7 +149,7 @@ export default function OrganizationPage() {
           onClose={() => setSubscriptionOpen(false)}
           onSubmit={(event) => event.preventDefault()}
           formId="subscription-manage"
-          footer={<><button type="button" className="button secondary" onClick={() => setSubscriptionOpen(false)}>Schliessen</button><button type="button" className="button primary" disabled={subscriptionSaving || subscriptionPlan === subscription.plan} onClick={() => void updateSubscription('change_plan')}>{subscriptionSaving ? 'Speichern…' : 'Plan wechseln'}</button></>}
+          footer={<><button type="button" className="button secondary" onClick={() => setSubscriptionOpen(false)}>Schliessen</button>{subscription.billingProvider === 'stripe' && subscription.billingCustomerId && subscription.billingSubscriptionId ? <button type="button" className="button primary" disabled={subscriptionSaving} onClick={() => void openBillingPortal()}>{subscriptionSaving ? 'Öffnen…' : 'Abrechnung verwalten'}</button> : <button type="button" className="button primary" disabled={subscriptionSaving || subscriptionPlan === 'enterprise'} onClick={() => void startCheckout()}>{subscriptionSaving ? 'Weiter…' : 'Zahlung einrichten'}</button>}</>}
         >
           <div className="form-grid">
             <label className="full"><span>Plan</span><Select value={subscriptionPlan} onChange={(event) => setSubscriptionPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}/Monat` : ''}</option>)}</Select></label>
@@ -128,7 +160,13 @@ export default function OrganizationPage() {
               {subscription.trialUntil ? <div><span>Trial bis</span><strong>{new Date(subscription.trialUntil).toLocaleDateString('de-CH')}</strong></div> : null}
             </div>
             <div className="full customer-quick-actions">
-              {subscription.cancelAtPeriodEnd ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('reactivate')}>Kündigung zurücknehmen</button> : <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('cancel')}>Zum Periodenende kündigen</button>}
+              {subscription.billingProvider === 'stripe' && subscription.billingCustomerId && subscription.billingSubscriptionId ? (
+                <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void openBillingPortal()}>Zahlungsmethode und Rechnungen</button>
+              ) : subscription.cancelAtPeriodEnd ? (
+                <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('reactivate')}>Kündigung zurücknehmen</button>
+              ) : (
+                <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('cancel')}>Zum Periodenende kündigen</button>
+              )}
             </div>
           </div>
         </StandardFormSheet>

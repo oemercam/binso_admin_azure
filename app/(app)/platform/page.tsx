@@ -103,7 +103,7 @@ export default function PlatformAdminPage() {
       <SettingsSection title="Betrieb" description="Status der zentralen Plattformdienste.">
         <SettingsValueRow title="Web App" value="Betriebsbereit" description="Production" />
         <SettingsValueRow title="Datenbank" value="Verbunden" description="Azure Database for PostgreSQL" />
-        <SettingsValueRow title="Billing" value="Foundation aktiv" description="Manuelle Verwaltung; Stripe-Anbindung vorbereitet" />
+        <SettingsValueRow title="Billing" value="Stripe-fähig" description="Checkout, Portal und Webhooks bei konfiguriertem Stripe-Konto" />
         <SettingsValueRow title="E-Mail" value="Nicht verbunden" description="Provider-Konfiguration ausstehend" />
         <SettingsValueRow title="Backups" value="Azure Backup" description="Restore-Test vor Go-live einplanen" />
       </SettingsSection>

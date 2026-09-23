@@ -110,9 +110,10 @@ export async function updatePlatformSubscription(input: {
       plan: SubscriptionPlan
       subscription_status: SubscriptionStatus
       platform_status: PlatformTenant['status']
+      billing_provider: 'manual' | 'stripe'
     }>(
       `select pt.organization_id, s.id as subscription_id, s.plan,
-              s.status as subscription_status, pt.platform_status
+              s.status as subscription_status, pt.platform_status, s.billing_provider
          from platform_tenants pt
          join organization_subscriptions s on s.organization_id = pt.organization_id
         where pt.id = $1
@@ -121,6 +122,21 @@ export async function updatePlatformSubscription(input: {
     )
     const current = currentResult.rows[0]
     if (!current) throw new Error('Mandant wurde nicht gefunden.')
+
+    if (current.billing_provider === 'stripe') {
+      if (input.plan !== current.plan) throw new Error('Stripe verwaltet den Plan. Planwechsel über Stripe durchführen.')
+      if (input.status !== 'active' && input.status !== 'suspended') throw new Error('Der Zahlungsstatus wird durch Stripe synchronisiert.')
+      await client.query(
+        `update platform_tenants set platform_status = $2, last_active_at = coalesce(last_active_at, now()) where id = $1`,
+        [input.tenantId, input.status],
+      )
+      await client.query(
+        `insert into platform_audit_events (actor_user_id, actor_email, action, tenant_id, detail)
+         values ($1, $2, 'tenant.platform_status.updated', $3, $4)`,
+        [input.actorUserId, input.actorEmail, input.tenantId, `${current.platform_status} -> ${input.status}`],
+      )
+      return { organizationId: current.organization_id }
+    }
 
     const plan = getPlan(input.plan)
     const activeUsers = await client.query<{ count: string }>(
@@ -230,8 +246,9 @@ export async function requestSubscriptionChange(input: {
       plan: SubscriptionPlan
       status: SubscriptionStatus
       seats: number
+      billing_provider: 'manual' | 'stripe'
     }>(
-      `select id, plan, status, seats
+      `select id, plan, status, seats, billing_provider
          from organization_subscriptions
         where organization_id = $1
         for update`,
@@ -239,6 +256,9 @@ export async function requestSubscriptionChange(input: {
     )
     const current = result.rows[0]
     if (!current) throw new Error('Abonnement wurde nicht gefunden.')
+    if (current.billing_provider === 'stripe') {
+      throw new Error('Dieses Abonnement wird durch Stripe verwaltet. Bitte das Abrechnungsportal verwenden.')
+    }
 
     if (input.action === 'cancel') {
       await client.query(
