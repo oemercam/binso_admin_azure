@@ -2248,7 +2248,7 @@ body{overflow-x:hidden;}
   .owner-metrics .metric:nth-child(n/**/+4){display:none!important;}
   .dashboard-layout{display:block!important;margin-bottom:14px!important;}
   .dashboard-layout .chart-surface{display:none!important;}
-  .dashboard-layout .focus-surface{padding:0!important;border-left:0!important;border-top:1px solid var(--line)!important;}
+  .dashboard-layout .focus-surface{padding:0!important;border:0!important;}
   .mobile-dashboard-summary{display:grid;border-top:1px solid var(--line);margin-top:14px;}
   .desktop-dashboard-rich{display:none!important;}
 
@@ -3909,7 +3909,7 @@ button.accounting-task-row{cursor:pointer;}
 .apple-page .surface.chart-surface,
 .apple-page .surface.focus-surface{
   padding:16px;
-  border-left:1px solid var(--apple-card-border)!important;
+  border-left:0!important;
 }
 
 .apple-page .section-title{
@@ -4144,7 +4144,7 @@ button.accounting-task-row{cursor:pointer;}
   }
 
   .apple-page .surface.focus-surface{
-    border-left:1px solid var(--apple-card-border)!important;
+    border-left:0!important;
   }
 }
 
@@ -5750,7 +5750,6 @@ button.accounting-task-row{cursor:pointer;}
   min-height:54px;
   padding:9px 0!important;
   border:0!important;
-  border-bottom:1px solid var(--line)!important;
   background:transparent!important;
   box-shadow:none!important;
 }
@@ -6019,6 +6018,181 @@ button.accounting-task-row{cursor:pointer;}
 
   .customer-kpi-row strong{
     font-size:17px!important;
+  }
+}
+
+/* V30 — force Dashboard mobile KPI row above the generic metric-grid rules.
+   The generic Apple mobile rules have higher selector specificity, so the
+   dashboard exception must match/exceed that specificity. */
+@media (max-width:820px){
+  .apple-page .owner-metrics{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    grid-auto-flow:column!important;
+    gap:0!important;
+    width:100%!important;
+  }
+
+  .apple-page .owner-metrics .metric{
+    min-width:0!important;
+    width:auto!important;
+    border-bottom:0!important;
+  }
+
+  .apple-page .owner-metrics .metric:nth-child(1),
+  .apple-page .owner-metrics .metric:nth-child(2){
+    border-right:1px solid var(--line)!important;
+  }
+
+  .apple-page .owner-metrics .metric:nth-child(3){
+    border-right:0!important;
+  }
+
+  .apple-page .owner-metrics .metric:nth-child(n+4){
+    display:none!important;
+  }
+
+  .apple-page .owner-metrics .metric > span,
+  .apple-page .owner-metrics .metric > strong{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .apple-page .owner-metrics .metric > small{
+    display:none!important;
+  }
+
+  .apple-page .owner-metrics .metric > strong{
+    font-size:clamp(14px,4.2vw,18px)!important;
+    letter-spacing:-.03em!important;
+  }
+}
+
+@media (max-width:390px){
+  .apple-page .owner-metrics{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  .apple-page .owner-metrics .metric{
+    border-bottom:0!important;
+    padding:8px 5px!important;
+  }
+
+  .apple-page .owner-metrics .metric > span{
+    font-size:8px!important;
+  }
+
+  .apple-page .owner-metrics .metric > strong{
+    font-size:clamp(13px,4vw,16px)!important;
+  }
+}
+
+
+
+/* V31 — final Dashboard "Heute wichtig" cleanup.
+   No top/left/frame/row divider lines; hierarchy uses whitespace only. */
+.apple-page .dashboard-layout .focus-surface,
+.apple-page .dashboard-layout .surface.focus-surface{
+  border:0!important;
+  border-top:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  border-left:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+
+.apple-page .dashboard-layout .focus-list{
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+}
+
+.apple-page .dashboard-layout .focus-item,
+.apple-page .dashboard-layout .focus-item:last-child{
+  border:0!important;
+  border-top:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  margin:0!important;
+}
+
+.apple-page .dashboard-layout .focus-item + .focus-item{
+  margin-top:4px!important;
+}
+
+@media(max-width:820px){
+  .apple-page .dashboard-layout .focus-surface{
+    margin-top:16px!important;
+    padding:0!important;
+    border:0!important;
+  }
+
+  .apple-page .dashboard-layout .focus-item{
+    min-height:54px!important;
+    padding:8px 0!important;
+  }
+}
+
+/* V32 — one horizontal gutter owner across the whole app.
+   The app shell/topbar defines the page edge. Individual pages must not add a second inset. */
+.apple-page,
+.mobile-standard-page,
+.page.apple-page.mobile-standard-page{
+  padding-left:0!important;
+  padding-right:0!important;
+}
+
+@media(max-width:820px){
+  .app-main{
+    padding-left:max(var(--app-mobile-gutter),var(--safe-left))!important;
+    padding-right:max(var(--app-mobile-gutter),var(--safe-right))!important;
+  }
+
+  .apple-page,
+  .mobile-standard-page,
+  .page.apple-page.mobile-standard-page{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  .apple-page > .page-header,
+  .apple-page > .module-toolbar,
+  .apple-page > .data-list,
+  .apple-page > .compact-list,
+  .apple-page > .metric-strip,
+  .apple-page > .metric-grid,
+  .apple-page > .customer-kpi-row,
+  .apple-page > .customer-overview-section,
+  .apple-page > .customer-file-grid,
+  .apple-page > .section-block,
+  .apple-page > .surface{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+
+/* Customer overview: actual customer master data only.
+   Financial/process metadata stays in its respective business areas. */
+.customer-overview-list .customer-overview-wide{
+  grid-column:1 / -1;
+}
+
+@media(max-width:820px){
+  .customer-overview-list .customer-overview-wide{
+    grid-column:auto;
   }
 }
 

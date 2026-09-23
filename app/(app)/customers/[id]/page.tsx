@@ -57,12 +57,11 @@ export default function CustomerDetailPage() {
     <section className="customer-overview-section">
       <div className="section-title"><div><h2>Übersicht</h2><p>Wichtige Kundeninformationen auf einen Blick.</p></div></div>
       <div className="customer-overview-list">
-        <div><span>Status</span><strong>{customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</strong></div>
-        <div><span>Hauptkontakt</span><strong>{customer.contact || related.contacts.find((item) => item.primary)?.name || '–'}</strong></div>
-        <div><span>Kontakt</span><strong>{customer.email || customer.phone || '–'}</strong></div>
-        <div><span>Adresse</span><strong>{[customer.address, `${customer.zip || ''} ${customer.city || ''}`.trim()].filter(Boolean).join(', ') || '–'}</strong></div>
-        <div><span>Zahlungsziel</span><strong>{customer.paymentDays} Tage</strong></div>
-        <div><span>Offener Betrag</span><strong>{chf(openAmount)}</strong></div>
+        <div><span>Kundennummer</span><strong>{customer.customerNo}</strong></div>
+        <div><span>Ansprechperson</span><strong>{customer.contact || related.contacts.find((item) => item.primary)?.name || '–'}</strong></div>
+        <div><span>E-Mail</span><strong>{customer.email || '–'}</strong></div>
+        <div><span>Telefon</span><strong>{customer.phone || '–'}</strong></div>
+        <div className="customer-overview-wide"><span>Adresse</span><strong>{[customer.address, `${customer.zip || ''} ${customer.city || ''}`.trim()].filter(Boolean).join(', ') || '–'}</strong></div>
       </div>
     </section>
 

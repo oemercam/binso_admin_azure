@@ -91,7 +91,7 @@ export default function CustomersPage() {
         <div className="data-row customer-grid data-head"><span>Kunde</span><span>Kontakt</span><span>Zahlungsziel</span><span>Status</span><span /></div>
         {filtered.map((customer) => (
           <InteractiveRow className="data-row customer-grid compact-overview-row" key={customer.id} href={`/customers/${customer.id}`} ariaLabel={`${customer.name} öffnen`}>
-            <span className="primary-cell"><strong>{customer.customerNo} · {customer.name}</strong><small className="desktop-row-detail">{customer.address || 'Adresse fehlt'}, {customer.zip} {customer.city}</small><small className="mobile-row-summary">{customer.contact || 'Keine Ansprechperson'} · {customer.city || 'Ort fehlt'} · {customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</small></span>
+            <span className="primary-cell"><strong>{customer.customerNo} · {customer.name}</strong><small className="desktop-row-detail">{customer.address || 'Adresse fehlt'}, {customer.zip} {customer.city}</small><small className="mobile-row-summary">{customer.contact || 'Keine Ansprechperson'} · {customer.city || 'Ort fehlt'}</small></span>
             <span className="primary-cell overview-desktop-cell"><strong>{customer.contact || '–'}</strong><small>{customer.email || 'E-Mail fehlt'}</small></span>
             <span className="overview-desktop-cell">{customer.paymentDays} Tage</span>
             <span className={`status ${customer.status} overview-desktop-cell`}>{customer.status === 'active' ? 'Aktiv' : 'Inaktiv'}</span>
