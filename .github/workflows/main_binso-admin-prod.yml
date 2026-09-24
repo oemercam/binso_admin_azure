@@ -217,6 +217,7 @@ jobs:
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
             --settings \
+              WEBSITE_RUN_FROM_PACKAGE=1 \
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
               BUILD_FLAGS=Off \
