@@ -1,56 +1,13 @@
 import { NextResponse } from 'next/server'
-import { requireSameOrigin } from '@/lib/http/server-api'
+import { requireSameOrigin, readJsonBody } from '@/lib/http/server-api'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { createTrialOrganization } from '@/lib/db/repositories/onboarding'
 import { findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
-import { findOpenSignupForUser } from '@/lib/db/repositories/registration'
+import { findOpenSignupForUser, updateSignupOnboarding } from '@/lib/db/repositories/registration'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 
-export async function GET() {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 })
-  if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
-
-  const user = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
-  if (user.status !== 'active') return NextResponse.json({ error: 'Benutzerkonto ist gesperrt.' }, { status: 403 })
-
-  const memberships = await findActiveMembershipsForUser(session.user.id)
-  const signup = await findOpenSignupForUser(session.user.id)
-  return NextResponse.json({ user: session.user, memberships, signup })
-}
-
-export async function POST(request: Request) {
-  try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 })
-  if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
-
-  const body = await request.json().catch(() => null) as null | { signupId?: string }
-  const signupId = body?.signupId?.trim() ?? ''
-  if (!signupId) return NextResponse.json({ error: 'Registrierung fehlt.' }, { status: 400 })
-
-  const user = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
-  if (user.status !== 'active') return NextResponse.json({ error: 'Benutzerkonto ist gesperrt.' }, { status: 403 })
-
-  try {
-    const result = await createTrialOrganization({
-      signupId,
-      userId: session.user.id,
-      userEmail: session.user.email.trim().toLowerCase(),
-      userName: session.user.name,
-    })
-    return NextResponse.json(result, { status: result.created ? 201 : 200 })
-  } catch (cause) {
-    console.error('Failed to create trial organization', {
-      error: cause instanceof Error ? cause.message : 'Unknown error',
-      userId: session.user.id,
-      signupId,
-    })
-
-    return NextResponse.json(
-      { error: 'Der Testzugang konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.' },
-      { status: 500 },
-    )
-  }
-}
+async function actor(){const session=await getSession();if(!session)return null;if(!isDatabaseConfigured())return null;const user=await upsertAuthenticatedUser({id:session.user.id,email:session.user.email,displayName:session.user.name});if(user.status!=='active')return null;return {session,user}}
+export async function GET(){const a=await actor();if(!a)return NextResponse.json({error:'Nicht angemeldet oder Datenbank nicht verfügbar.'},{status:401});const memberships=await findActiveMembershipsForUser(a.session.user.id);const signup=await findOpenSignupForUser(a.session.user.id);return NextResponse.json({user:a.session.user,memberships,signup})}
+export async function PATCH(request:Request){try{requireSameOrigin(request)}catch{return NextResponse.json({error:'Ungültige Anfragequelle.'},{status:403})}const a=await actor();if(!a)return NextResponse.json({error:'Nicht angemeldet.'},{status:401});const b=await readJsonBody<{signupId?:string;step?:number;completedSteps?:number[];modulePreferences?:string[];businessSettings?:Record<string,string|number|boolean>;status?:'not_started'|'in_progress'|'completed'|'skipped'}>(request,32768).catch(()=>null);if(!b?.signupId||typeof b.step!=='number')return NextResponse.json({error:'Ungültige Onboardingdaten.'},{status:422});const signup=await updateSignupOnboarding({userId:a.session.user.id,signupId:b.signupId,step:b.step,completedSteps:Array.isArray(b.completedSteps)?b.completedSteps.filter(Number.isInteger):[],modulePreferences:Array.isArray(b.modulePreferences)?b.modulePreferences.filter(x=>typeof x==='string').slice(0,30):[],businessSettings:b.businessSettings&&typeof b.businessSettings==='object'?b.businessSettings:{},status:b.status});return signup?NextResponse.json({signup}):NextResponse.json({error:'Registrierung wurde nicht gefunden.'},{status:404})}
+export async function POST(request:Request){try{requireSameOrigin(request)}catch{return NextResponse.json({error:'Ungültige Anfragequelle.'},{status:403})}const a=await actor();if(!a)return NextResponse.json({error:'Nicht angemeldet.'},{status:401});const body=await request.json().catch(()=>null) as null|{signupId?:string};const signupId=body?.signupId?.trim()??'';if(!signupId)return NextResponse.json({error:'Registrierung fehlt.'},{status:400});try{const result=await createTrialOrganization({signupId,userId:a.session.user.id,userEmail:a.session.user.email.trim().toLowerCase(),userName:a.session.user.name});return NextResponse.json(result,{status:result.created?201:200})}catch{return NextResponse.json({error:'Der Testzugang konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.'},{status:500})}}

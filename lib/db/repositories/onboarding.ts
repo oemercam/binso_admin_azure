@@ -110,7 +110,7 @@ export async function createTrialOrganization(input: {
     )
     await client.query(
       `update signup_requests
-          set status = 'trial_started', organization_id = $2, updated_at = now(), completed_at = now()
+          set status = 'trial_started', organization_id = $2, onboarding_status='completed', onboarding_step=5, onboarding_updated_at=now(), updated_at = now(), completed_at = now()
         where id = $1`,
       [signup.id, organizationId],
     )

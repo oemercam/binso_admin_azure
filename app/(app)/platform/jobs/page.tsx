@@ -1,0 +1,1 @@
+import { PageHeader } from '@/components/ui/page-header'; import { PlatformOperations } from '@/components/settings/platform-operations'; export default function Page(){return <section className="page apple-page"><PageHeader title="Jobs" description="Hintergrundverarbeitung und letzte Jobläufe."/><PlatformOperations canManage={false}/></section>}

@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.72.0",
+  "version": "0.73.0",
   "private": true,
   "scripts": {
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm build",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -36,7 +36,8 @@
     "test:v69": "node scripts/test-v69.mjs",
     "test:e2e": "playwright test",
     "security:check": "node scripts/check-security-baseline.mjs && node scripts/check-secrets.mjs",
-    "product:simplicity-check": "node scripts/check-product-simplicity.mjs"
+    "product:simplicity-check": "node scripts/check-product-simplicity.mjs",
+    "platform-foundation:check": "node scripts/check-platform-foundation-v73.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",

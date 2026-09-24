@@ -1,19 +1,8 @@
 import Link from 'next/link'
-import { PublicPageIntro, PublicShell } from '@/components/public/public-shell'
-import { appIdentity } from '@/lib/config/app-identity'
+import { PublicPageIntro,PublicShell } from '@/components/public/public-shell'
+import { CustomerSupport } from '@/components/support/customer-support'
+import { getSession } from '@/lib/auth/server'
+import { isDatabaseConfigured } from '@/lib/db/client'
 
-export default function SupportPage() {
-  return (
-    <PublicShell>
-      <main className="public-main public-main-narrow">
-        <PublicPageIntro eyebrow="Support" title="Hilfe, wenn du sie brauchst." description="Wähle den passenden Einstieg für Fragen zur Nutzung, Anmeldung, Abrechnung oder einem technischen Problem." />
-        <section className="public-support-grid">
-          <article><span>01</span><h2>Fragen zur Nutzung</h2><p>Für allgemeine Fragen zu Funktionen und Abläufen findest du die wichtigsten Antworten direkt im FAQ.</p><Link href="/faq">FAQ öffnen →</Link></article>
-          <article><span>02</span><h2>Technischer Support</h2><p>Wenn eine Funktion nicht wie erwartet arbeitet, sende uns eine kurze Beschreibung mit dem betroffenen Bereich.</p><a href={`mailto:${appIdentity.supportEmail}?subject=Binso%20One%20Support`}>Support kontaktieren →</a></article>
-          <article><span>03</span><h2>Abrechnung und Abo</h2><p>Bei Fragen zu Plan, Rechnung oder Zahlungsstatus kannst du uns ebenfalls direkt kontaktieren.</p><a href={`mailto:${appIdentity.supportEmail}?subject=Binso%20One%20Abrechnung`}>Abrechnung kontaktieren →</a></article>
-        </section>
-        <section className="public-support-note"><strong>Für eine schnelle Bearbeitung</strong><p>Nenne möglichst deine Organisation, den betroffenen Bereich und was du unmittelbar vor dem Problem gemacht hast. Keine Passwörter oder Zugangsdaten senden.</p></section>
-      </main>
-    </PublicShell>
-  )
-}
+export const dynamic='force-dynamic'
+export default async function SupportPage(){const session=await getSession();if(session&&isDatabaseConfigured())return <PublicShell><CustomerSupport/></PublicShell>;return <PublicShell><main className="public-main public-main-narrow"><PublicPageIntro eyebrow="Support" title="Hilfe, wenn du sie brauchst." description="Melde dich an, um einen Supportfall direkt in Binso One zu erstellen und den Verlauf zu sehen."/><section className="public-support-grid"><article><span>01</span><h2>Direkter Support</h2><p>Supportfälle werden digital in Binso One bearbeitet und bleiben nachvollziehbar.</p><Link href="/sign-in">Anmelden →</Link></article><article><span>02</span><h2>FAQ</h2><p>Antworten auf häufige Fragen zu Nutzung, Anmeldung und Abrechnung.</p><Link href="/faq">FAQ öffnen →</Link></article><article><span>03</span><h2>Sicher kommunizieren</h2><p>Keine Passwörter, Tokens oder Zugangsdaten senden. Diagnosekontext wird nur in sicherem Umfang ergänzt.</p></article></section></main></PublicShell>}

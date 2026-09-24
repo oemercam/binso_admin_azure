@@ -22,6 +22,8 @@ function platformRoleFromClaims(roles: string[]): PlatformRole | undefined {
   if (normalized.some((role) => role === 'platform_owner' || role === 'platform.owner' || role.endsWith('.platform_owner'))) return 'platform_owner'
   if (normalized.some((role) => role === 'platform_admin' || role === 'platform.admin' || role.endsWith('.platform_admin'))) return 'platform_admin'
   if (normalized.some((role) => role === 'platform_support' || role === 'platform.support' || role.endsWith('.platform_support'))) return 'platform_support'
+  if (normalized.some((role) => role === 'platform_billing' || role === 'platform.billing' || role.endsWith('.platform_billing'))) return 'platform_billing'
+  if (normalized.some((role) => role === 'platform_auditor' || role === 'platform.auditor' || role.endsWith('.platform_auditor'))) return 'platform_auditor'
   return undefined
 }
 
@@ -125,6 +127,8 @@ export async function requirePlatformRole(...allowed: PlatformRole[]): Promise<N
 export async function getPlatformSession(): Promise<Session> {
   const session = await getSession()
   if (!session?.user.platformRole) return null
+  // Operator access is reserved for official Binso identities. Entra single-tenant and MFA remain Azure configuration requirements.
+  if (!session.user.email.toLowerCase().endsWith('@binso.ch')) return null
   if (isDatabaseConfigured()) {
     const account = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
     if (account.status !== 'active') return null

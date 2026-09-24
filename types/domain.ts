@@ -1,9 +1,47 @@
 export type Role = 'owner' | 'admin' | 'finance' | 'employee'
 export type OrganizationStatus = 'trial' | 'active' | 'grace_period' | 'read_only' | 'suspended' | 'cancelled' | 'archived'
 export type TenantAccessMode = 'full' | 'read_only' | 'blocked'
-export type PlatformRole = 'platform_owner' | 'platform_admin' | 'platform_support'
+export type PlatformRole = 'platform_owner' | 'platform_admin' | 'platform_support' | 'platform_billing' | 'platform_auditor'
 
 export type OrganizationId = string
+
+
+export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed' | 'skipped'
+export type SupportCaseStatus = 'open' | 'in_progress' | 'waiting_for_customer' | 'resolved' | 'closed'
+export type SupportCaseCategory = 'usage' | 'technical' | 'billing' | 'account' | 'other'
+
+export type SupportCase = {
+  id: string
+  caseNumber: string
+  organizationId: OrganizationId
+  createdByUserId: string
+  category: SupportCaseCategory
+  subject: string
+  status: SupportCaseStatus
+  currentPage?: string
+  entityType?: string
+  entityId?: string
+  buildVersion?: string
+  correlationId?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type SupportMessage = {
+  id: string
+  caseId: string
+  authorType: 'customer' | 'operator'
+  authorUserId: string
+  message: string
+  createdAt: string
+}
+
+export type PlatformFeatureFlag = {
+  key: string
+  description: string
+  enabled: boolean
+  updatedAt: string
+}
 
 export type Organization = {
   id: OrganizationId

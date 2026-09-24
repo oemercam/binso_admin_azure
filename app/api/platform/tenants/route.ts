@@ -13,7 +13,7 @@ function canManagePlatform(role: string | undefined) {
 }
 
 function canReadPlatform(role: string | undefined) {
-  return canManagePlatform(role) || role === 'platform_support'
+  return canManagePlatform(role) || role === 'platform_support' || role === 'platform_billing' || role === 'platform_auditor'
 }
 
 export async function GET() {
@@ -33,9 +33,10 @@ export async function PATCH(request: Request) {
   if (!canManagePlatform(session.user.platformRole)) return NextResponse.json({ error: 'Keine Berechtigung.' }, { status: 403 })
   if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
 
-  const body = await request.json().catch(() => null) as null | { tenantId?: string; plan?: SubscriptionPlan; status?: PlatformTenantStatus }
+  const body = await request.json().catch(() => null) as null | { tenantId?: string; plan?: SubscriptionPlan; status?: PlatformTenantStatus; reason?: string }
   const tenantId = body?.tenantId?.trim() ?? ''
-  if (!tenantId || !body?.plan || !plans.has(body.plan) || !body?.status || !statuses.has(body.status)) {
+  const reason = body?.reason?.trim() ?? ''
+  if (!tenantId || !body?.plan || !plans.has(body.plan) || !body?.status || !statuses.has(body.status) || reason.length < 3 || reason.length > 500) {
     return NextResponse.json({ error: 'Ungültige Abonnementdaten.' }, { status: 400 })
   }
 
@@ -46,6 +47,7 @@ export async function PATCH(request: Request) {
       actorEmail: session.user.email,
       plan: body.plan,
       status: body.status,
+      reason,
     })
     return NextResponse.json({ ok: true })
   } catch (cause) {

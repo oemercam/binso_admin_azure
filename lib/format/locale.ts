@@ -39,12 +39,12 @@ export function isoFromDate(value: Date) {
   return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`
 }
 
-export function formatDate(value?: string | null, fallback = 'â€“') {
+export function formatDate(value?: string | null, fallback = '–') {
   const date = dateFromIso(value)
   return date ? DATE_FORMATTER.format(date) : fallback
 }
 
-export function formatDateTime(value?: string | null, fallback = 'â€“') {
+export function formatDateTime(value?: string | null, fallback = '–') {
   if (!value) return fallback
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? fallback : DATE_TIME_FORMATTER.format(date)
@@ -52,17 +52,17 @@ export function formatDateTime(value?: string | null, fallback = 'â€“') {
 
 export function formatMonthYear(value: string | Date) {
   const date = typeof value === 'string' ? dateFromIso(value) : value
-  return date ? MONTH_YEAR_FORMATTER.format(date) : 'â€“'
+  return date ? MONTH_YEAR_FORMATTER.format(date) : '–'
 }
 
 export function formatMonth(value: string | Date) {
   const date = typeof value === 'string' ? dateFromIso(value) : value
-  return date ? MONTH_FORMATTER.format(date) : 'â€“'
+  return date ? MONTH_FORMATTER.format(date) : '–'
 }
 
 export function formatMonthShort(value: string | Date) {
   const date = typeof value === 'string' ? dateFromIso(value) : value
-  return date ? MONTH_SHORT_FORMATTER.format(date).replace('.', '') : 'â€“'
+  return date ? MONTH_SHORT_FORMATTER.format(date).replace('.', '') : '–'
 }
 
 export function isSameMonthIso(value: string, reference = todayIso()) {
