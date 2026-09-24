@@ -14,14 +14,11 @@ type Preferences = {
 }
 
 function readPreferences(raw: string | null): Preferences | null {
-  if (!raw) return null
+  if (!raw || raw === SERVER_SNAPSHOT) return null
 
   try {
     const parsed = JSON.parse(raw) as Partial<Preferences>
-    return {
-      necessary: true,
-      statistics: Boolean(parsed.statistics),
-    }
+    return { necessary: true, statistics: Boolean(parsed.statistics) }
   } catch {
     return null
   }
@@ -30,7 +27,6 @@ function readPreferences(raw: string | null): Preferences | null {
 function subscribeToConsent(onStoreChange: () => void) {
   window.addEventListener('storage', onStoreChange)
   window.addEventListener(CONSENT_EVENT, onStoreChange)
-
   return () => {
     window.removeEventListener('storage', onStoreChange)
     window.removeEventListener(CONSENT_EVENT, onStoreChange)
@@ -46,63 +42,84 @@ function getConsentServerSnapshot() {
 }
 
 export function CookieConsent() {
-  const storedPreferences = useSyncExternalStore(
-    subscribeToConsent,
-    getConsentSnapshot,
-    getConsentServerSnapshot,
-  )
+  const storedPreferences = useSyncExternalStore(subscribeToConsent, getConsentSnapshot, getConsentServerSnapshot)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [statistics, setStatistics] = useState(false)
 
-  const hasSavedPreferences = storedPreferences !== null && storedPreferences !== SERVER_SNAPSHOT
-  const open = settingsOpen || storedPreferences === null
+  const clientReady = storedPreferences !== SERVER_SNAPSHOT
+  const preferences = readPreferences(storedPreferences)
+  const showBanner = clientReady && !preferences && !settingsOpen
 
   function openSettings() {
-    const preferences = readPreferences(window.localStorage.getItem(STORAGE_KEY))
-    setStatistics(preferences?.statistics ?? false)
+    const saved = readPreferences(window.localStorage.getItem(STORAGE_KEY))
+    setStatistics(saved?.statistics ?? false)
     setSettingsOpen(true)
   }
 
   function save(nextStatistics: boolean) {
-    const preferences: Preferences = { necessary: true, statistics: nextStatistics }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
+    const next: Preferences = { necessary: true, statistics: nextStatistics }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
     window.dispatchEvent(new Event(CONSENT_EVENT))
     setStatistics(nextStatistics)
     setSettingsOpen(false)
   }
 
-  const showPanel = open && (settingsOpen || hasSavedPreferences || storedPreferences !== SERVER_SNAPSHOT)
-
   return (
     <>
       <CookieSettingsEventBridge onOpen={openSettings} />
-      {showPanel ? <div className="cookie-layer" role="presentation">
-        <section className="cookie-panel" role="dialog" aria-modal="true" aria-labelledby="cookie-title">
-          <div className="cookie-copy">
+
+      {showBanner ? (
+        <aside className="cookie-banner" aria-labelledby="cookie-banner-title">
+          <div className="cookie-banner-icon" aria-hidden="true">◎</div>
+          <div className="cookie-banner-copy">
             <span>Datenschutz</span>
-            <h2 id="cookie-title">Cookie-Einstellungen</h2>
-            <p>Binso One verwendet technisch notwendige Speicher- und Anmeldefunktionen. Optionale Statistikfunktionen werden nur nach deiner Auswahl verwendet.</p>
+            <h2 id="cookie-banner-title">Cookies nach deiner Wahl.</h2>
+            <p>Notwendige Funktionen brauchen wir für den sicheren Betrieb. Optionale Statistik aktivieren wir nur mit deiner Zustimmung.</p>
+            <a href="/legal/cookies">Mehr erfahren</a>
           </div>
-          {settingsOpen ? (
-            <div className="cookie-settings">
-              <div className="cookie-setting-row">
-                <div><strong>Notwendig</strong><small>Für Anmeldung, Sicherheit, Session und grundlegende App-Funktionen.</small></div>
-                <span>Immer aktiv</span>
+          <div className="cookie-banner-actions">
+            <button className="button primary" type="button" onClick={() => save(true)}>Alle akzeptieren</button>
+            <button className="button secondary" type="button" onClick={() => save(false)}>Nur notwendige</button>
+            <button className="cookie-text-action" type="button" onClick={openSettings}>Einstellungen</button>
+          </div>
+        </aside>
+      ) : null}
+
+      {settingsOpen ? (
+        <div className="cookie-settings-layer" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setSettingsOpen(false)
+        }}>
+          <section className="cookie-settings-panel" role="dialog" aria-modal="true" aria-labelledby="cookie-settings-title">
+            <header className="cookie-settings-head">
+              <div>
+                <span>Datenschutz</span>
+                <h2 id="cookie-settings-title">Cookie-Einstellungen</h2>
+                <p>Du entscheidest, welche optionalen Funktionen verwendet werden dürfen. Notwendige Funktionen können nicht deaktiviert werden.</p>
               </div>
-              <label className="cookie-setting-row">
-                <div><strong>Statistik</strong><small>Reserviert für datenschutzfreundliche Nutzungsstatistiken. Derzeit ist keine Statistikfunktion aktiv.</small></div>
+              <button className="cookie-close" type="button" aria-label="Cookie-Einstellungen schliessen" onClick={() => setSettingsOpen(false)}>×</button>
+            </header>
+
+            <div className="cookie-settings-list">
+              <div className="cookie-preference-row">
+                <div><strong>Notwendig</strong><small>Anmeldung, Sicherheit, Session und grundlegende Website- und App-Funktionen.</small></div>
+                <span className="cookie-always-on">Immer aktiv</span>
+              </div>
+              <label className="cookie-preference-row">
+                <div><strong>Statistik</strong><small>Hilft uns, die Nutzung zu verstehen und Binso One zu verbessern. Aktuell ist keine Statistikfunktion aktiv.</small></div>
                 <Checkbox checked={statistics} onChange={(event) => setStatistics(event.target.checked)} aria-label="Optionale Statistik zulassen" />
               </label>
             </div>
-          ) : null}
-          <div className="cookie-actions">
-            {!settingsOpen ? <button className="button secondary" type="button" onClick={openSettings}>Einstellungen</button> : null}
-            <button className="button secondary" type="button" onClick={() => save(false)}>Nur notwendige</button>
-            {settingsOpen ? <button className="button primary" type="button" onClick={() => save(statistics)}>Auswahl speichern</button> : null}
-          </div>
-          <a className="cookie-more" href="/legal/cookies">Mehr zu Cookies und Datenschutz</a>
-        </section>
-      </div> : null}
+
+            <footer className="cookie-settings-footer">
+              <a href="/legal/cookies">Cookie-Richtlinie</a>
+              <div>
+                <button className="button secondary" type="button" onClick={() => save(false)}>Nur notwendige</button>
+                <button className="button primary" type="button" onClick={() => save(statistics)}>Auswahl speichern</button>
+              </div>
+            </footer>
+          </section>
+        </div>
+      ) : null}
     </>
   )
 }
@@ -120,7 +137,6 @@ function CookieSettingsEventBridge({ onOpen }: { onOpen: () => void }) {
     () => 'client',
     () => 'server',
   )
-
   return null
 }
 

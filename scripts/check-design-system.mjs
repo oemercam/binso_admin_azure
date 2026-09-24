@@ -11,6 +11,9 @@ const contact = readFileSync(join(root, 'app/contact/page.tsx'), 'utf8')
 const imprint = readFileSync(join(root, 'app/legal/imprint/page.tsx'), 'utf8')
 const privacy = readFileSync(join(root, 'app/legal/privacy/page.tsx'), 'utf8')
 
+const productVisuals = readFileSync(join(root, 'components/public/product-visuals.tsx'), 'utf8')
+const cookieConsent = readFileSync(join(root, 'components/public/cookie-consent.tsx'), 'utf8')
+
 const requiredTokens = [
   '--font-sans',
   '--font-size-display-xl',
@@ -45,8 +48,8 @@ for (const value of forbiddenLegacyVars) {
   if (globals.includes(value) || appUi.includes(value)) throw new Error(`Legacy CSS variable remains: ${value}`)
 }
 
-const canonicalMarker = '/* V70.1 — canonical Binso One public brand, product entry and authentication */'
-if (appUi.split(canonicalMarker).length !== 2) throw new Error('Canonical V70.1 public/auth style block must exist exactly once')
+const canonicalMarker = '/* V70.2 — canonical Binso One public brand, product entry and authentication */'
+if (appUi.split(canonicalMarker).length !== 2) throw new Error('Canonical V70.2 public/auth style block must exist exactly once')
 if (appUi.includes('V52 public product/registration pages')) throw new Error('Obsolete V52 public style block still exists')
 if (appUi.includes('Binso One — public product authentication')) throw new Error('Obsolete duplicate authentication style block still exists')
 
@@ -65,4 +68,17 @@ for (const [name, source] of [['contact', contact], ['imprint', imprint], ['priv
   if (hardCodedContactPattern.test(source)) throw new Error(`${name} page contains hard-coded contact data instead of appIdentity`)
 }
 
-console.log('Design-system checks passed (tokens, public/auth ownership, centralized brand/contact/navigation).')
+
+for (const value of ['DashboardProductVisual', 'BusinessFlowVisual', 'FeatureVisualGrid', 'OnboardingVisual']) {
+  if (!productVisuals.includes(value)) throw new Error(`Missing public product visual: ${value}`)
+}
+
+for (const value of ['Alle akzeptieren', 'Nur notwendige', 'Auswahl speichern', 'cookie-settings-panel']) {
+  if (!cookieConsent.includes(value)) throw new Error(`Cookie consent is missing canonical control: ${value}`)
+}
+
+for (const obsolete of ['.public-hero-preview{', '.preview-window-head{', '.public-module-grid{', '.cookie-layer{', '.cookie-panel{']) {
+  if (appUi.includes(obsolete)) throw new Error(`Obsolete public style remains: ${obsolete}`)
+}
+
+console.log('Design-system checks passed (tokens, public/auth ownership, visuals, cookie consent, centralized brand/contact/navigation).')
