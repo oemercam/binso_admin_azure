@@ -85,6 +85,7 @@ jobs:
           echo "NEXT_PUBLIC_BUILD_ID=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SITE_URL=${{ vars.BINSO_ONE_BASE_URL }}" >> "$GITHUB_ENV"
 
       - name: Typecheck
         run: pnpm typecheck
@@ -93,7 +94,7 @@ jobs:
         run: pnpm lint
 
       - name: Product checks
-        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check
+        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run public-site:check
 
       - name: Behavioral regression tests
         run: pnpm test

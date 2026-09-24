@@ -1,5 +1,13 @@
 import { LegalPage } from '@/components/public/legal-page'
 import { appIdentity } from '@/lib/config/app-identity'
+import { createPublicMetadata } from '@/lib/config/seo'
+
+export const metadata = createPublicMetadata({
+  title: 'Datenschutz',
+  description: 'Datenschutzerklärung der Binso GmbH für Binso One.',
+  path: '/legal/privacy',
+  keywords: ['Binso Datenschutz', 'Binso One Datenschutz'],
+})
 
 export default function PrivacyPage() {
   return (

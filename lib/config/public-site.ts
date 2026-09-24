@@ -2,12 +2,12 @@ import { appIdentity } from './app-identity'
 
 export const publicSite = {
   primaryNavigation: [
-    { href: '/', label: 'Startseite' },
     { href: '/features', label: 'Funktionen' },
-    { href: '/how-it-works', label: 'So funktioniert es' },
+    { href: '/how-it-works', label: 'Ablauf' },
     { href: '/pricing', label: 'Preise' },
     { href: '/security', label: 'Sicherheit' },
     { href: '/faq', label: 'FAQ' },
+    { href: '/contact', label: 'Kontakt' },
   ],
   productNavigation: [
     { href: '/features', label: 'Funktionen' },
@@ -29,5 +29,31 @@ export const publicSite = {
     { href: '/legal/cookies', label: 'Cookies' },
     { href: '/legal/imprint', label: 'Impressum' },
   ],
+  sitemapRoutes: [
+    '/',
+    '/features',
+    '/how-it-works',
+    '/pricing',
+    '/security',
+    '/faq',
+    '/contact',
+    '/status',
+    '/legal/privacy',
+    '/legal/terms',
+    '/legal/cookies',
+    '/legal/imprint',
+  ],
+  seo: {
+    defaultTitle: 'Business-Software für Schweizer KMU',
+    description: 'Binso One verbindet Kunden, Angebote, Aufträge, Zeiterfassung, Rechnungen, Mitarbeitende und Finanzen in einer klaren Business-Plattform für Schweizer Dienstleistungsunternehmen.',
+    keywords: [
+      'Business Software Schweiz',
+      'KMU Software Schweiz',
+      'Auftragsverwaltung',
+      'Zeiterfassung',
+      'Rechnungssoftware',
+      'CRM Dienstleistungsunternehmen',
+    ],
+  },
   footerDescription: appIdentity.description,
 } as const

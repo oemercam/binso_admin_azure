@@ -5,14 +5,35 @@ import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
 import './app-ui.css'
 import { appIdentity } from '@/lib/config/app-identity'
+import { publicSite } from '@/lib/config/public-site'
+import { publicBaseUrl } from '@/lib/config/seo'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(publicBaseUrl),
   title: {
-    default: appIdentity.name,
+    default: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
     template: `%s · ${appIdentity.name}`,
   },
-  description: appIdentity.description,
+  description: publicSite.seo.description,
+  keywords: [...publicSite.seo.keywords],
   applicationName: appIdentity.name,
+  category: 'business',
+  creator: appIdentity.company,
+  publisher: appIdentity.company,
+  authors: [{ name: appIdentity.company, url: appIdentity.website }],
+  manifest: '/manifest.webmanifest',
+  openGraph: {
+    title: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
+    description: publicSite.seo.description,
+    siteName: appIdentity.name,
+    locale: 'de_CH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
+    description: publicSite.seo.description,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
