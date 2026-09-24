@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 }
 

@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { Input, Select } from '@/components/ui/form-controls'
 import { planDefinitions } from '@/lib/data/plans'
 import { signInUrl } from '@/lib/auth/urls'
+import { PublicShell } from '@/components/public/public-shell'
 import type { AppUser, OrganizationMembership, SignupRequest, SubscriptionPlan } from '@/types/domain'
 
 type RegistrationState = {
@@ -97,26 +98,34 @@ function RegisterForm() {
   if (!sessionState?.authenticated) {
     const returnTo = `/register?plan=${encodeURIComponent(plan)}`
     return (
-      <main className="public-product-page">
-        <section className="public-form-shell">
-          <div className="public-product-head">
-            <span>Registrierung</span>
-            <h1>Konto erstellen oder anmelden</h1>
-            <p>Erstelle dein Konto für Binso One. Danach richtest du deine Organisation mit den wichtigsten Angaben ein.</p>
-          </div>
-          <a className="button primary" href={signInUrl(returnTo)}>Registrierung starten</a>
-          <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Anmelden</a></p>
-          <small>Die sichere Anmeldung und E-Mail-Verifikation erfolgen über den Anmeldedienst von Binso One. Binso One wird von Binso GmbH entwickelt und betrieben.</small>
-        </section>
-      </main>
+      <PublicShell compact>
+        <main className="public-main public-main-narrow register-entry">
+          <section className="public-form-shell register-entry-shell">
+            <div className="public-product-head">
+              <span>Registrierung</span>
+              <h1>In wenigen Schritten zu Binso One.</h1>
+              <p>Starte mit einer sicheren Anmeldung. Danach richtest du dein Unternehmen mit den wichtigsten Angaben ein.</p>
+            </div>
+            <div className="register-entry-steps">
+              <div><b>01</b><span><strong>Sicher anmelden</strong><small>E-Mail und Identität werden über den Anmeldedienst bestätigt.</small></span></div>
+              <div><b>02</b><span><strong>Unternehmen einrichten</strong><small>Nur die Angaben erfassen, die für den Start benötigt werden.</small></span></div>
+              <div><b>03</b><span><strong>14 Tage testen</strong><small>Noch keine Zahlung bei der Registrierung.</small></span></div>
+            </div>
+            <a className="button primary register-entry-primary" href={signInUrl(returnTo)}>Registrierung starten</a>
+            <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Anmelden</a></p>
+            <small className="register-privacy-note">Mit dem Start gelten unsere <a href="/legal/terms">AGB</a> und die <a href="/legal/privacy">Datenschutzerklärung</a>.</small>
+          </section>
+        </main>
+      </PublicShell>
     )
   }
 
   return (
-    <main className="public-product-page">
-      <section className="public-form-shell">
-        <div className="public-product-head"><span>Registrierung</span><h1>Organisation erstellen</h1><p>Nur die wichtigsten Angaben. Der Entwurf wird gespeichert und kann im Onboarding fortgesetzt werden.</p></div>
-        <form className="public-form" onSubmit={submit}>
+    <PublicShell compact>
+      <main className="public-main public-main-narrow register-entry">
+        <section className="public-form-shell register-entry-shell">
+          <div className="public-product-head"><span>Registrierung</span><h1>Unternehmen erstellen</h1><p>Nur die wichtigsten Angaben. Weitere Einstellungen folgen geführt im Onboarding.</p></div>
+          <form className="public-form" onSubmit={submit}>
           <label><span>Firma *</span><Input value={companyName} onChange={(event) => setCompanyName(event.target.value)} required /></label>
           <label><span>Name *</span><Input value={ownerName} onChange={(event) => setOwnerName(event.target.value)} required /></label>
           <label><span>Geschäftliche E-Mail *</span><Input type="email" value={email} readOnly required /></label>
@@ -124,9 +133,10 @@ function RegisterForm() {
           {error ? <p className="form-error" role="alert">{error}</p> : null}
           <button className="button primary" type="submit" disabled={submitting}>{submitting ? 'Wird gespeichert…' : 'Weiter zum Onboarding'}</button>
           <small>Noch keine Zahlung. Der 14-tägige Testzugang wird erst im nächsten Schritt aktiviert.</small>
-        </form>
-      </section>
-    </main>
+          </form>
+        </section>
+      </main>
+    </PublicShell>
   )
 }
 

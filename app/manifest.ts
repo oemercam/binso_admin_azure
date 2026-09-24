@@ -12,7 +12,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: appIdentity.name,
     short_name: appIdentity.shortName,
     description: appIdentity.description,
-    start_url: '/dashboard',
+    start_url: '/post-login',
     scope: '/',
     display: 'standalone',
     orientation: 'any',
