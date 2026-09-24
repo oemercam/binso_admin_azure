@@ -2,14 +2,58 @@ name: Build and deploy Binso One to Azure
 
 on:
   push:
-    branches: [main]
+    branches: [main, v69-production-completion]
+  pull_request:
   workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: 'Production-Migration und Deployment ausdrücklich freigeben'
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: binso-one-production
   cancel-in-progress: false
 
 jobs:
+  database-test:
+    name: Isolated PostgreSQL migrations and RLS
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: binso_v69_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile
+      - name: Apply and repeat migrations
+        run: |
+          pnpm db:migrate
+          pnpm db:migrate
+          node scripts/test-database.mjs
+        env:
+          DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
+          DATABASE_TEST_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
+          DATABASE_SSL: 'false'
   build:
     name: Quality, build and package
     runs-on: ubuntu-24.04
@@ -51,48 +95,17 @@ jobs:
       - name: Product checks
         run: pnpm run architecture:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check
 
+      - name: Behavioral regression tests
+        run: pnpm test
+
       - name: Build
         run: pnpm build
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
 
-      - name: Prepare standalone deployment
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f .next/standalone/server.js
-          mkdir -p .next/standalone/.next
-          if [ -d .next/static ]; then cp -a .next/static .next/standalone/.next/static; fi
-          if [ -d public ]; then cp -a public .next/standalone/public; fi
-
-          SWC_HELPERS_DIR="$(node -p "require('path').dirname(require.resolve('@swc/helpers/package.json'))")"
-          rm -rf .next/standalone/node_modules/@swc/helpers
-          mkdir -p .next/standalone/node_modules/@swc
-          cp -aL "$SWC_HELPERS_DIR" .next/standalone/node_modules/@swc/helpers
-
-          test -f .next/standalone/node_modules/@swc/helpers/esm/_interop_require_default.js
-          test -f .next/standalone/node_modules/@swc/helpers/cjs/_interop_require_default.cjs
-
-      - name: Materialize standalone runtime
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf deploy-root
-          mkdir -p deploy-root
-
-          # Azure ZipDeploy/OneDeploy does not reliably preserve pnpm symlinks.
-          # Dereference every symlink so node_modules contains physical files/directories.
-          cp -aL .next/standalone/. deploy-root/
-
-          test -f deploy-root/server.js
-          test -d deploy-root/node_modules/next
-          test ! -L deploy-root/node_modules/next
-          test -f deploy-root/node_modules/next/package.json
-          test -d deploy-root/node_modules/@swc/helpers
-          test ! -L deploy-root/node_modules/@swc/helpers
-          test -f deploy-root/node_modules/@swc/helpers/esm/_interop_require_default.js
-          test -f deploy-root/node_modules/@swc/helpers/cjs/_interop_require_default.cjs
+      - name: Materialize complete standalone runtime
+        run: pnpm deployment:prepare deploy-root
 
       - name: Verify isolated standalone runtime dependencies
         shell: bash
@@ -118,6 +131,9 @@ jobs:
           unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
           unzip -l binso-one.zip | grep -F 'server.js'
 
+      - name: Smoke test isolated artifact
+        run: node scripts/smoke-standalone.mjs deploy-root
+
       - name: Upload deployment artifact
         uses: actions/upload-artifact@v7
         with:
@@ -127,10 +143,11 @@ jobs:
           retention-days: 1
 
   migrate:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
     name: Migrate production database
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: build
+    needs: [build, database-test]
     environment: production
     permissions:
       contents: read
@@ -160,6 +177,7 @@ jobs:
           DATABASE_SSL: 'true'
 
   deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
     name: Deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -211,6 +229,8 @@ jobs:
           az webapp config set \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
+            --linux-fx-version 'NODE|24-lts' \
+            --always-on true \
             --startup-file "node server.js" \
             --output none
 

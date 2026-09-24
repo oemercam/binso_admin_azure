@@ -37,10 +37,13 @@ const client = new Client({
   connectionString: normalizedDatabaseUrl(databaseUrl),
   ssl: process.env.DATABASE_SSL?.toLowerCase() === 'false' ? undefined : { rejectUnauthorized: true },
   application_name: 'binso-one-migrations',
+  connectionTimeoutMillis: 10_000,
+  statement_timeout: 120_000,
 })
 
 await client.connect()
 try {
+  await client.query("select pg_advisory_lock(hashtext('binso-schema-migrations'))")
   await client.query(`create table if not exists schema_migrations (
     version text primary key,
     applied_at timestamptz not null default now()

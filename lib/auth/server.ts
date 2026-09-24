@@ -40,10 +40,10 @@ function parseAzurePrincipal(raw: string | null): Session {
   try {
     const json = Buffer.from(raw, 'base64').toString('utf8')
     const principal = JSON.parse(json) as AzureClientPrincipal
-    const claims = principal.claims ?? []
+    const claims = Array.isArray(principal.claims) ? principal.claims.filter(claim => typeof claim.typ === 'string' && typeof claim.val === 'string') : []
 
     const claimValue = (...needles: string[]) =>
-      claims.find((claim) => needles.some((needle) => claim.typ.toLowerCase().includes(needle)))?.val
+      claims.find((claim) => needles.some((needle) => claim.typ.toLowerCase() === needle || claim.typ.toLowerCase().endsWith(`/${needle}`)))?.val
 
     const rawEmail =
       principal.userDetails ??
@@ -56,11 +56,13 @@ function parseAzurePrincipal(raw: string | null): Session {
       email.split('@')[0] ??
       'Benutzer'
 
-    const roles = principal.userRoles ?? []
+    const roles = [...(Array.isArray(principal.userRoles) ? principal.userRoles.filter(role => typeof role === 'string') : []), ...claims.filter(claim => claim.typ === 'roles' || claim.typ.endsWith('/role')).map(claim => claim.val)]
+    const subject = principal.userId || claimValue('nameidentifier', 'oid', 'sub')
+    if (!subject || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null
 
     return {
       user: {
-        id: principal.userId ?? email,
+        id: subject,
         name,
         email,
         role: roleFromClaims(roles),
@@ -113,9 +115,19 @@ export async function requireRole(...allowed: Array<Role | readonly Role[]>): Pr
 
 
 export async function requirePlatformRole(...allowed: PlatformRole[]): Promise<NonNullable<Session>> {
-  const session = await getSession()
+  const session = await getPlatformSession()
   if (!session) redirect('/sign-in')
   const role = session.user.platformRole
   if (!role || (allowed.length > 0 && !allowed.includes(role))) redirect('/access-denied')
+  return session
+}
+
+export async function getPlatformSession(): Promise<Session> {
+  const session = await getSession()
+  if (!session?.user.platformRole) return null
+  if (isDatabaseConfigured()) {
+    const account = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
+    if (account.status !== 'active') return null
+  } else if (process.env.NODE_ENV === 'production') return null
   return session
 }

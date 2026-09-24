@@ -9,6 +9,7 @@ import { formatChf, formatDateTime } from '@/lib/format/locale'
 import type { PlatformTenant, SignupRequest, SubscriptionPlan } from '@/types/domain'
 import { planDefinitions } from '@/lib/data/plans'
 import { useFeedback } from '@/components/ui/feedback'
+import { PlatformOperations } from '@/components/settings/platform-operations'
 
 
 type PlatformHealth = {
@@ -115,7 +116,7 @@ export default function PlatformAdminPage() {
       </div>
 
       <SettingsSection title="Betrieb" description="Live-Zustand der zentralen Plattformdienste aus Binso One.">
-        <SettingsValueRow title="Web App" value="Betriebsbereit" description="Production" />
+        <SettingsValueRow title="Web App" value={health?.database === 'ok' ? 'Erreichbar' : 'Prüfung erforderlich'} description="Aktueller Prüfzustand" />
         <SettingsValueRow title="Datenbank" value={health?.database === 'ok' ? 'Verbunden' : health?.database === 'error' ? 'Fehler' : 'Nicht konfiguriert'} description={health?.databaseLatencyMs !== undefined ? `${health.databaseLatencyMs} ms Prüfzeit` : 'Azure Database for PostgreSQL'} />
         <SettingsValueRow title="Webhook-Fehler" value={`${health?.webhookFailures24h ?? 0}`} description="Letzte 24 Stunden" />
         <SettingsValueRow title="Anwendungsfehler" value={`${health?.applicationErrors24h ?? 0}`} description="Letzte 24 Stunden" />
@@ -123,6 +124,7 @@ export default function PlatformAdminPage() {
         <SettingsValueRow title="Billing" value="Stripe" description="Checkout, Portal und signaturgeprüfte Webhooks" />
       </SettingsSection>
 
+      <PlatformOperations canManage={canManage} />
       <section>
         <div className="section-title"><div><h2>Mandanten</h2><p>Produktive SaaS-Kunden und Testkonten aus PostgreSQL.</p></div></div>
         <div className="module-toolbar">

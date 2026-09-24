@@ -14,3 +14,11 @@ export function nextInvoiceNumber(numbers: string[], date = new Date()) {
 export function nextQuoteNumber(numbers: string[], date = new Date()) {
   return nextSequence(numbers, 'AN', date.getFullYear())
 }
+
+export function nextContractNumber(numbers: string[], date = new Date()) {
+  return nextSequence(numbers, 'VR', date.getFullYear())
+}
+
+export function nextCreditNumber(numbers: string[], date = new Date()) {
+  return nextSequence(numbers, 'GS', date.getFullYear())
+}

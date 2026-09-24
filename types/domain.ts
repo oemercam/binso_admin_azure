@@ -274,6 +274,7 @@ export type Supplier = {
 }
 
 export type CompanyProfile = {
+  paymentAddress?: { street: string; buildingNumber?: string; postalCode: string; town: string; country: string }
   organizationId?: OrganizationId
   name: string
   address: string

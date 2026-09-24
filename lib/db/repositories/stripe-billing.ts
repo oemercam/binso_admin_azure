@@ -1,7 +1,7 @@
 import 'server-only'
 import { query, withTransaction } from '@/lib/db/client'
 import { getPlan } from '@/lib/data/plans'
-import { stripePlanForPriceId } from '@/lib/billing/stripe'
+import { stripePlanForPriceId, stripeGet } from '@/lib/billing/stripe'
 import type { SubscriptionPlan, SubscriptionStatus } from '@/types/domain'
 
 type BillingIdentity = {
@@ -68,9 +68,12 @@ export async function registerWebhookEvent(input: {
   organizationId?: string | null
 }) {
   const result = await query<{ id: string; status: string }>(
-    `insert into billing_webhook_events (provider, external_event_id, event_type, organization_id, payload)
-     values ('stripe', $1, $2, $3, $4::jsonb)
-     on conflict (provider, external_event_id) do nothing
+    `insert into billing_webhook_events (provider, external_event_id, event_type, organization_id, payload, processing_started_at, attempts)
+     values ('stripe', $1, $2, $3, $4::jsonb, now(), 1)
+     on conflict (provider, external_event_id) do update
+       set status = 'received', processing_started_at = now(), attempts = billing_webhook_events.attempts + 1
+       where billing_webhook_events.status = 'failed'
+          or (billing_webhook_events.status = 'received' and billing_webhook_events.processing_started_at < now() - interval '5 minutes')
      returning id, status`,
     [input.externalEventId, input.eventType, input.organizationId ?? null, JSON.stringify(input.payload)],
   )
@@ -89,7 +92,8 @@ export async function completeWebhookEvent(externalEventId: string, status: 'pro
 function mapStripeStatus(status: string): SubscriptionStatus {
   if (status === 'active' || status === 'trialing') return status === 'trialing' ? 'trial' : 'active'
   if (status === 'canceled') return 'cancelled'
-  return 'past_due'
+  if (status === 'past_due') return 'past_due'
+  return 'expired'
 }
 
 function unixDate(value: unknown) {
@@ -111,14 +115,25 @@ export async function applyStripeSubscription(input: {
       id: string
       plan: SubscriptionPlan
       status: SubscriptionStatus
+      billing_last_event_id: string | null
+      stripe_subscription_created: string | null
     }>(
-      `select id, plan, status from organization_subscriptions where organization_id = $1 for update`,
+      `select id, plan, status, billing_last_event_id, stripe_subscription_created::text from organization_subscriptions where organization_id = $1 for update`,
       [input.organizationId],
     )
     const current = currentResult.rows[0]
     if (!current) throw new Error('Abonnement wurde nicht gefunden.')
+    if (current.billing_last_event_id === input.eventId) return
+    // Read the authoritative provider state under the subscription lock. Stripe
+    // does not guarantee event order, including invoice/subscription events.
+    const live = await stripeGet<{ status: string; created: number; trial_end?: number; customer: string; metadata?: { organizationId?: string }; cancel_at_period_end: boolean; current_period_end?: number; items: { data: Array<{ current_period_end?: number; price: { id: string } }> } }>(`/subscriptions/${encodeURIComponent(input.stripeSubscriptionId)}`)
+    if (live.metadata?.organizationId !== input.organizationId) throw new Error('Stripe-Mandant stimmt nicht überein.')
+    if (current.stripe_subscription_created && live.created < Number(current.stripe_subscription_created)) return
+    input = { ...input, stripeStatus: live.status, stripeCustomerId: live.customer, priceId: live.items.data[0]?.price.id,
+      currentPeriodEnd: live.items.data[0]?.current_period_end ?? live.current_period_end, cancelAtPeriodEnd: live.cancel_at_period_end }
 
-    const mappedPlan = stripePlanForPriceId(input.priceId) ?? current.plan
+    const mappedPlan = stripePlanForPriceId(input.priceId)
+    if (!mappedPlan) throw new Error('Unbekannte Stripe Price-ID.')
     const plan = getPlan(mappedPlan)
     const nextStatus = mapStripeStatus(input.stripeStatus)
     const periodEnd = unixDate(input.currentPeriodEnd)
@@ -134,15 +149,16 @@ export async function applyStripeSubscription(input: {
               cancel_at_period_end = coalesce($8, cancel_at_period_end),
               scheduled_plan = null,
               cancelled_at = case when $3 = 'cancelled' then coalesce(cancelled_at, now()) else null end,
+              stripe_subscription_created = $10, trial_until = coalesce($11, trial_until),
               billing_last_synced_at = now(), billing_last_event_id = $9, updated_at = now()
         where id = $1`,
       [current.id, mappedPlan, nextStatus, input.stripeCustomerId ?? null, input.stripeSubscriptionId,
-        plan.monthlyPriceChf ?? 0, periodEnd, input.cancelAtPeriodEnd ?? null, input.eventId],
+        plan.monthlyPriceChf ?? 0, periodEnd, input.cancelAtPeriodEnd ?? null, input.eventId, live.created, unixDate(live.trial_end)],
     )
 
     await client.query(
       `update organization_entitlements
-          set features = $2, max_users = greatest(max_users, $3), max_storage_mb = $4, updated_at = now()
+          set features = $2, max_users = $3, max_storage_mb = $4, updated_at = now()
         where organization_id = $1`,
       [input.organizationId, plan.features, plan.includedUsers, storageForPlan(mappedPlan)],
     )

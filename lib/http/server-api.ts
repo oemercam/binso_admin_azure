@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 export function requestId(request?: Request) {
-  return request?.headers.get('x-correlation-id')?.trim() || crypto.randomUUID()
+  const supplied = request?.headers.get('x-correlation-id')?.trim()
+  return supplied && /^[a-zA-Z0-9_-]{1,80}$/.test(supplied) ? supplied : crypto.randomUUID()
 }
 
 export function apiJson<T>(data: T, init?: ResponseInit, correlationId = crypto.randomUUID()) {
@@ -16,20 +17,39 @@ export function apiError(status: number, code: string, message: string, correlat
 }
 
 export function requireSameOrigin(request: Request) {
+  if (request.headers.get('sec-fetch-site') === 'cross-site') throw new Error('invalid_origin')
   const origin = request.headers.get('origin')
   if (!origin) return
-  const expected = new URL(request.url).origin
+  const expected = new URL(process.env.APP_BASE_URL || request.url).origin
   if (origin !== expected) throw new Error('invalid_origin')
 }
 
 export async function readJsonBody<T>(request: Request, maxBytes = 32_768): Promise<T> {
   const declared = Number(request.headers.get('content-length') ?? 0)
   if (Number.isFinite(declared) && declared > maxBytes) throw new Error('payload_too_large')
-  const text = await request.text()
-  if (new TextEncoder().encode(text).byteLength > maxBytes) throw new Error('payload_too_large')
+  const text = await readTextBody(request, maxBytes)
   try {
-    return JSON.parse(text) as T
+    const value: unknown = JSON.parse(text)
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid_json')
+    return value as T
   } catch {
     throw new Error('invalid_json')
   }
+}
+
+export async function readTextBody(request: Request, maxBytes: number) {
+  const reader = request.body?.getReader()
+  if (!reader) return ''
+  const chunks: Uint8Array[] = []
+  let size = 0
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      size += value.byteLength
+      if (size > maxBytes) { await reader.cancel(); throw new Error('payload_too_large') }
+      chunks.push(value)
+    }
+  } finally { reader.releaseLock() }
+  return Buffer.concat(chunks).toString('utf8')
 }

@@ -1,17 +1,17 @@
 import type { CompanyProfile, DocumentTemplates } from '@/types/domain'
 
 export const defaultCompanyProfile: CompanyProfile = {
-  name: 'Binso GmbH',
-  address: 'Weissbadstrasse 8b',
-  zip: '9050',
-  city: 'Appenzell',
+  name: '',
+  address: '',
+  zip: '',
+  city: '',
   country: 'Schweiz',
-  uid: 'CHE-000.000.000 MWST',
-  email: 'info@binso.ch',
-  phone: '+41 58 510 77 58',
-  website: 'www.binso.ch',
-  iban: 'CH00 0000 0000 0000 0000 0',
-  bankName: 'Schweizer Bank',
+  uid: '',
+  email: '',
+  phone: '',
+  website: '',
+  iban: '',
+  bankName: '',
   defaultPaymentDays: 30,
 }
 
@@ -28,13 +28,13 @@ export const defaultDocumentTemplates: DocumentTemplates = {
     'Bei unserer Kontrolle haben wir festgestellt, dass die unten aufgeführte Rechnung noch offen ist.',
   reminderOutro:
     'Falls sich Ihre Zahlung mit diesem Schreiben gekreuzt hat, betrachten Sie diese Erinnerung bitte als gegenstandslos. Besten Dank für die zeitnahe Erledigung.',
-  invoiceEmailSubject: 'Rechnung {{number}} – Binso GmbH',
+  invoiceEmailSubject: 'Rechnung {{number}}',
   invoiceEmailBody:
-    'Guten Tag\n\nIm Anhang erhalten Sie unsere Rechnung {{number}} über {{amount}}.\n\nFreundliche Grüsse\nBinso GmbH',
-  quoteEmailSubject: 'Angebot {{number}} – Binso GmbH',
+    'Guten Tag\n\nIm Anhang erhalten Sie unsere Rechnung {{number}} über {{amount}}.\n\nFreundliche Grüsse',
+  quoteEmailSubject: 'Angebot {{number}}',
   quoteEmailBody:
-    'Guten Tag\n\nIm Anhang erhalten Sie unser Angebot {{number}}.\n\nFreundliche Grüsse\nBinso GmbH',
-  reminderEmailSubject: 'Zahlungserinnerung zu Rechnung {{number}} – Binso GmbH',
+    'Guten Tag\n\nIm Anhang erhalten Sie unser Angebot {{number}}.\n\nFreundliche Grüsse',
+  reminderEmailSubject: 'Zahlungserinnerung zu Rechnung {{number}}',
   reminderEmailBody:
-    'Guten Tag\n\nGerne erinnern wir Sie an die noch offene Rechnung {{number}} über {{amount}}.\n\nFreundliche Grüsse\nBinso GmbH',
+    'Guten Tag\n\nGerne erinnern wir Sie an die noch offene Rechnung {{number}} über {{amount}}.\n\nFreundliche Grüsse',
 }

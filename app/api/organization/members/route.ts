@@ -3,8 +3,7 @@ import { isDatabaseConfigured } from '@/lib/db/client'
 import { inviteOrganizationMember, listOrganizationMembers, updateOrganizationMember } from '@/lib/db/repositories/membership-management'
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
 import type { Role } from '@/types/domain'
-import { sendOrganizationInvitation } from '@/lib/email/graph'
-import { query } from '@/lib/db/client'
+import { graphMailConfigured } from '@/lib/email/graph'
 
 const roles = new Set<Role>(['owner','admin','finance','employee'])
 
@@ -13,7 +12,7 @@ export async function GET(request: Request) {
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   const organizationId = new URL(request.url).searchParams.get('organizationId')
   const context = await resolveTenantContext(organizationId)
-  if (!context) return apiError(403, 'tenant_forbidden', 'Keine Berechtigung.', id)
+  if (!context || context.membership.role === 'employee') return apiError(403, 'tenant_forbidden', 'Keine Berechtigung.', id)
   const members = await listOrganizationMembers(context)
   const { withTenantTransaction } = await import('@/lib/db/tenant')
   const auditEvents = await withTenantTransaction(context, async (client) => {
@@ -38,19 +37,11 @@ export async function POST(request: Request) {
   if (!/^\S+@\S+\.\S+$/.test(email) || !body.role || !roles.has(body.role)) return apiError(422, 'validation', 'E-Mail oder Rolle ist ungültig.', id)
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können weitere Inhaber einladen.', id)
   try {
-    const member = await inviteOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, email, role: body.role })
-    const organization = await query<{ name: string }>('select name from organizations where id = $1 limit 1', [context.organizationId])
-    let emailDelivery: { delivered: boolean; provider: 'graph' | 'disabled'; messageId?: string }
-    try {
-      const baseUrl = (process.env.APP_BASE_URL?.trim() || new URL(request.url).origin).replace(/\/$/, '')
-      emailDelivery = await sendOrganizationInvitation({
-        to: email, organizationName: organization.rows[0]?.name ?? 'Binso One', inviter: context.email, roleLabel: body.role,
-        signInUrl: `${baseUrl}/api/auth/login?returnTo=${encodeURIComponent('/post-login')}`,
-      })
-    } catch (mailError) {
-      console.error('Organization invitation email failed', { requestId: id, organizationId: context.organizationId, error: mailError instanceof Error ? mailError.message : 'Unknown error' })
-      emailDelivery = { delivered: false, provider: 'graph' }
-    }
+    const queued = graphMailConfigured()
+    const baseUrl = (process.env.APP_BASE_URL?.trim() || new URL(request.url).origin).replace(/\/$/, '')
+    const member = await inviteOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, email, role: body.role,
+      invitationUrl: queued ? `${baseUrl}/api/auth/login?returnTo=${encodeURIComponent('/post-login')}` : undefined })
+    const emailDelivery = { queued, delivered: false, provider: queued ? 'graph' : 'disabled' }
     return apiJson({ member, emailDelivery }, { status: 201 }, id)
   } catch (cause) {
     return apiError(409, 'membership_conflict', cause instanceof Error ? cause.message : 'Benutzer konnte nicht eingeladen werden.', id)
@@ -68,7 +59,7 @@ export async function PATCH(request: Request) {
   if (!body.membershipId || (body.role && !roles.has(body.role)) || (body.status && !['active','suspended'].includes(body.status))) return apiError(422, 'validation', 'Änderung ist ungültig.', id)
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können die Inhaberrolle vergeben.', id)
   try {
-    const member = await updateOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, membershipId: body.membershipId, role: body.role, status: body.status })
+    const member = await updateOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, actorRole: context.membership.role, membershipId: body.membershipId, role: body.role, status: body.status })
     return apiJson({ member }, undefined, id)
   } catch (cause) {
     return apiError(409, 'membership_conflict', cause instanceof Error ? cause.message : 'Benutzer konnte nicht geändert werden.', id)

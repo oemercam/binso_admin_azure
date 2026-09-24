@@ -9,13 +9,8 @@ import { useBusinessStore } from '@/components/state/business-store'
 import { useCurrentUser } from '@/components/state/current-user'
 import { useFeedback } from '@/components/ui/feedback'
 import type { Customer, CustomerContact, DataExportJob, Employee, ImportJob } from '@/types/domain'
+import { csv, parseCsv, importNumber } from '@/lib/format/csv'
 
-const csvCell = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`
-const csv = (rows: Record<string, unknown>[]) => {
-  if (!rows.length) return ''
-  const headers = Array.from(new Set(rows.flatMap((row) => Object.keys(row))))
-  return [headers.map(csvCell).join(';'), ...rows.map((row) => headers.map((key) => csvCell(row[key])).join(';'))].join('\r\n')
-}
 
 function download(name: string, content: string, type: string) {
   const blob = new Blob([content], { type })
@@ -29,24 +24,6 @@ function download(name: string, content: string, type: string) {
   URL.revokeObjectURL(url)
 }
 
-function parseCsv(text: string) {
-  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean)
-  if (!lines.length) return []
-  const separator = (lines[0].match(/;/g)?.length ?? 0) >= (lines[0].match(/,/g)?.length ?? 0) ? ';' : ','
-  const parseLine = (line: string) => {
-    const values: string[] = []; let current = ''; let quoted = false
-    for (let i = 0; i < line.length; i += 1) {
-      const char = line[i]
-      if (char === '"' && quoted && line[i + 1] === '"') { current += '"'; i += 1; continue }
-      if (char === '"') { quoted = !quoted; continue }
-      if (char === separator && !quoted) { values.push(current.trim()); current = ''; continue }
-      current += char
-    }
-    values.push(current.trim()); return values
-  }
-  const headers = parseLine(lines[0]).map((value) => value.trim().toLowerCase())
-  return lines.slice(1).map((line) => Object.fromEntries(headers.map((header, index) => [header, parseLine(line)[index] ?? ''])))
-}
 
 export default function DataPage() {
   const store = useBusinessStore()
@@ -60,6 +37,8 @@ export default function DataPage() {
   async function runImport(event: React.FormEvent) {
     event.preventDefault()
     if (!file || entityType === 'invoices') return
+    if (!store.can(entityType === 'employees' ? 'employees.write' : 'customers.write')) { feedback.error('Keine Importberechtigung.'); return }
+    if (file.size > 2_000_000) { feedback.error('Maximale Dateigrösse: 2 MB.'); return }
     const job = store.createImportJob({ requestedBy: user.id, entityType, fileName: file.name })
     store.updateImportJob(job.id, { status: 'importing' })
     try {
@@ -69,7 +48,7 @@ export default function DataPage() {
         try {
           if (entityType === 'customers') {
             if (!row.name) throw new Error('name')
-            const customer: Customer = { id: crypto.randomUUID(), name: row.name, legalName: row.legalname || undefined, customerNo: row.customerno || `IMP-${Date.now()}-${imported + 1}`, contact: row.contact || undefined, email: row.email || undefined, phone: row.phone || undefined, address: row.address || undefined, zip: row.zip || undefined, city: row.city || undefined, country: row.country || 'CH', uid: row.uid || undefined, paymentDays: Number(row.paymentdays || 30), status: row.status === 'inactive' ? 'inactive' : 'active', notes: row.notes || undefined }
+            const customer: Customer = { id: crypto.randomUUID(), name: row.name, legalName: row.legalname || undefined, customerNo: row.customerno || `IMP-${Date.now()}-${imported + 1}`, contact: row.contact || undefined, email: row.email || undefined, phone: row.phone || undefined, address: row.address || undefined, zip: row.zip || undefined, city: row.city || undefined, country: row.country || 'CH', uid: row.uid || undefined, paymentDays: importNumber(row.paymentdays, 30), status: row.status === 'inactive' ? 'inactive' : 'active', notes: row.notes || undefined }
             store.addCustomer(customer)
           } else if (entityType === 'contacts') {
             const customer = store.customers.find((item) => item.customerNo === row.customerno || item.name.toLowerCase() === row.customer?.toLowerCase())
@@ -78,7 +57,7 @@ export default function DataPage() {
             store.addCustomerContact(contact)
           } else if (entityType === 'employees') {
             if (!row.name || !row.email) throw new Error('name/email')
-            const employee: Employee = { id: crypto.randomUUID(), name: row.name, email: row.email, role: ['owner','admin','finance','employee'].includes(row.role) ? row.role as Employee['role'] : 'employee', employmentType: row.employmenttype === 'hourly' ? 'hourly' : 'salary', status: row.status === 'inactive' ? 'inactive' : 'active', targetHours: Number(row.targethours || 0), bookedHours: Number(row.bookedhours || 0), billableHours: Number(row.billablehours || 0), utilisation: Number(row.utilisation || 0), internalCostRate: Number(row.internalcostrate || 0) }
+            const employee: Employee = { id: crypto.randomUUID(), name: row.name, email: row.email, role: ['owner','admin','finance','employee'].includes(row.role) ? row.role as Employee['role'] : 'employee', employmentType: row.employmenttype === 'hourly' ? 'hourly' : 'salary', status: row.status === 'inactive' ? 'inactive' : 'active', targetHours: importNumber(row.targethours), bookedHours: importNumber(row.bookedhours), billableHours: importNumber(row.billablehours), utilisation: importNumber(row.utilisation), internalCostRate: importNumber(row.internalcostrate) }
             store.addEmployee(employee)
           }
           imported += 1

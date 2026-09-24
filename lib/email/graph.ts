@@ -1,6 +1,5 @@
 import 'server-only'
 
-type EmailDeliveryResult = { delivered: boolean; provider: 'graph' | 'disabled'; messageId?: string }
 
 function deliveryMode() {
   return process.env.EMAIL_DELIVERY_MODE?.trim().toLowerCase() === 'graph' ? 'graph' : 'disabled'
@@ -23,6 +22,7 @@ async function graphAccessToken() {
     grant_type: 'client_credentials',
   })
   const response = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(tenantId)}/oauth2/v2.0/token`, {
+    signal: AbortSignal.timeout(15_000),
     method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body, cache: 'no-store',
   })
   const payload = await response.json().catch(() => ({})) as { access_token?: string; error_description?: string }
@@ -35,44 +35,17 @@ export function graphMailConfigured() {
   return ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GRAPH_SENDER_USER_ID'].every((name) => Boolean(process.env[name]?.trim()))
 }
 
-export async function sendOrganizationInvitation(input: {
-  to: string
-  organizationName: string
-  inviter: string
-  roleLabel: string
-  signInUrl: string
-}): Promise<EmailDeliveryResult> {
-  if (deliveryMode() !== 'graph') return { delivered: false, provider: 'disabled' }
-
-  const sender = required('GRAPH_SENDER_USER_ID')
+export async function sendGraphMail(input: { to: string; subject: string; text: string; htmlAttachment?: string }) {
+  if (!graphMailConfigured()) throw new Error('Microsoft Graph Mail ist nicht konfiguriert.')
   const token = await graphAccessToken()
-  const subject = `Einladung zu ${input.organizationName} in Binso One`
-  const text = [
-    `Du wurdest von ${input.inviter} zu ${input.organizationName} in Binso One eingeladen.`,
-    `Rolle: ${input.roleLabel}`,
-    '',
-    'Melde dich mit genau dieser E-Mail-Adresse an, damit die Einladung deinem Konto zugeordnet werden kann:',
-    input.signInUrl,
-    '',
-    'Binso One wird von Binso GmbH entwickelt und betrieben.',
-  ].join('\n')
-
+  const sender = required('GRAPH_SENDER_USER_ID')
   const response = await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(sender)}/sendMail`, {
-    method: 'POST',
-    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-    body: JSON.stringify({
-      message: {
-        subject,
-        body: { contentType: 'Text', content: text },
-        toRecipients: [{ emailAddress: { address: input.to } }],
-      },
-      saveToSentItems: true,
-    }),
-    cache: 'no-store',
+    method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    signal: AbortSignal.timeout(20_000), cache: 'no-store',
+    body: JSON.stringify({ message: { subject: input.subject, body: { contentType: 'Text', content: input.text },
+      toRecipients: [{ emailAddress: { address: input.to } }],
+      ...(input.htmlAttachment ? { attachments: [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'Dokument.html', contentType: 'text/html', contentBytes: Buffer.from(input.htmlAttachment).toString('base64') }] } : {}) }, saveToSentItems: true }),
   })
-  if (!response.ok) {
-    const payload = await response.json().catch(() => ({})) as { error?: { message?: string } }
-    throw new Error(payload.error?.message || `Microsoft Graph Mailversand fehlgeschlagen (${response.status}).`)
-  }
-  return { delivered: true, provider: 'graph', messageId: response.headers.get('request-id') ?? undefined }
+  if (response.status !== 202) throw new Error(`Graph Mail-Annahme fehlgeschlagen (${response.status}).`)
+  return { accepted: true, requestId: response.headers.get('request-id') }
 }

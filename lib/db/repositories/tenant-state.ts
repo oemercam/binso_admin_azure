@@ -1,5 +1,7 @@
 import 'server-only'
 import { withTenantTransaction } from '@/lib/db/tenant'
+import { mergeAuthorizedState, validateFinancialChanges, type StateActor } from '@/lib/auth/business-state-policy'
+import type { Role } from '@/types/domain'
 
 export type TenantStateRecord = {
   state: Record<string, unknown>
@@ -27,10 +29,21 @@ export async function saveTenantBusinessState(input: {
   userId: string
   expectedVersion: number
   state: Record<string, unknown>
+  actor: StateActor
 }) {
   return withTenantTransaction({ organizationId: input.organizationId, userId: input.userId }, async (client) => {
-    const current = await client.query<{ version: string }>(
-      `select version::text from tenant_business_state where organization_id = $1 for update`,
+    await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [input.organizationId])
+    const access = await client.query<{ role: Role; features: string[] }>(`select m.role,e.features from organization_memberships m
+      join organization_entitlements e on e.organization_id=m.organization_id
+      join organizations o on o.id=m.organization_id and o.status='active'
+      join platform_tenants pt on pt.organization_id=m.organization_id
+      join organization_subscriptions s on s.organization_id=m.organization_id
+      where m.organization_id=$1 and m.user_id=$2 and m.status='active'
+      and (pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now()))`, [input.organizationId, input.userId])
+    if (!access.rows[0]) throw new Error('state_forbidden')
+    input.actor = { ...input.actor, role: access.rows[0].role, features: access.rows[0].features }
+    const current = await client.query<{ version: string; state: Record<string, unknown> }>(
+      `select version::text, state from tenant_business_state where organization_id = $1 for update`,
       [input.organizationId],
     )
     const currentVersion = current.rows[0] ? Number(current.rows[0].version) : 0
@@ -38,6 +51,8 @@ export async function saveTenantBusinessState(input: {
       return { saved: false as const, conflict: true as const, version: currentVersion }
     }
 
+    const state = mergeAuthorizedState(current.rows[0]?.state ?? {}, input.state, input.actor)
+    validateFinancialChanges(current.rows[0]?.state ?? {}, state)
     const nextVersion = currentVersion + 1
     await client.query(
       `insert into tenant_business_state (organization_id, state, version, updated_by, updated_at)
@@ -47,29 +62,12 @@ export async function saveTenantBusinessState(input: {
              version = excluded.version,
              updated_by = excluded.updated_by,
              updated_at = now()`,
-      [input.organizationId, JSON.stringify(input.state), nextVersion, input.userId],
+      [input.organizationId, JSON.stringify(state), nextVersion, input.userId],
     )
 
-    const auditEvents = Array.isArray(input.state.auditEvents) ? input.state.auditEvents.slice(-250) : []
-    if (auditEvents.length > 0) {
-      await client.query(
-        `insert into audit_events
-          (organization_id, actor_user_id, actor_name, action, entity_type, entity_id, detail, created_at, client_event_id)
-         select $1,
-                coalesce(nullif(event->>'actorUserId',''), $2),
-                coalesce(nullif(event->>'actorName',''), 'Benutzer'),
-                coalesce(nullif(event->>'action',''), 'business.changed'),
-                coalesce(nullif(event->>'entityType',''), 'business'),
-                nullif(event->>'entityId',''),
-                nullif(event->>'detail',''),
-                coalesce(nullif(event->>'createdAt','')::timestamptz, now()),
-                event->>'id'
-           from jsonb_array_elements($3::jsonb) event
-          where nullif(event->>'id','') is not null
-         on conflict (organization_id, client_event_id) where client_event_id is not null do nothing`,
-        [input.organizationId, input.userId, JSON.stringify(auditEvents)],
-      )
-    }
+    await client.query(`insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, detail)
+      values ($1,$2,$3,'business.saved','business_state',$4)`,
+      [input.organizationId, input.userId, input.actor.email, `Version ${nextVersion}`])
     return { saved: true as const, conflict: false as const, version: nextVersion }
   })
 }

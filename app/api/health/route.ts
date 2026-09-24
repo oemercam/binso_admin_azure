@@ -16,7 +16,7 @@ export async function GET() {
       const table = await query<{ name: string | null }>("select to_regclass('public.schema_migrations') as name")
       if (!table.rows[0]?.name) migrations = 'missing'
       else {
-        const latest = await query<{ ok: number }>("select 1 as ok from schema_migrations where version = '0007_subscription_lifecycle.sql' limit 1")
+        const latest = await query<{ ok: number }>("select 1 as ok from schema_migrations where version = '0008_production_completion.sql' limit 1")
         migrations = latest.rowCount ? 'ok' : 'missing'
       }
     } catch {

@@ -67,6 +67,6 @@ const env = readFileSync('lib/config/env.ts', 'utf8')
 assert.ok(!env.includes('ALLOW_LOCAL_AUTH'), 'production local-auth bypass must not exist')
 
 const pushRoute = readFileSync('app/api/push/subscriptions/route.ts', 'utf8')
-assert.ok(!pushRoute.includes('stored: true'), 'push API must not claim unpersisted subscriptions are stored')
+assert.ok(pushRoute.includes('await upsertPushSubscription'), 'push API must await durable persistence before reporting success')
 
 console.log('Core tests passed.')

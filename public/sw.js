@@ -28,7 +28,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.filter(key => key.startsWith('binso-shell-') && key !== CACHE).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   )
 })
@@ -43,7 +43,7 @@ self.addEventListener('fetch', event => {
 
   // Navigations must always use the current deployment. Offline is fallback only.
   if (request.mode === 'navigate' || request.destination === 'document') {
-    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)))
+    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL).then(hit => hit || Response.error())))
     return
   }
 

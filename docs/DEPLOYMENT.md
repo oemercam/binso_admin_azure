@@ -2,17 +2,20 @@
 
 Production workflow: `.github/workflows/main_binso-admin-prod.yml`.
 
-- Trigger: push to `main` oder `workflow_dispatch`
+- Build: Push auf `main` / `v69-production-completion`, Pull Request oder manueller Workflow. Production-Migration und Deployment ausschliesslich per `workflow_dispatch` mit `deploy_production=true` auf `main` und Freigabe des GitHub-Environments.
 - Runner: `ubuntu-24.04`
 - Runtime: Node.js 24
 - Package Manager: pnpm 10.17.1 mit committed `pnpm-lock.yaml`
 - Install: `pnpm install --frozen-lockfile`
 - Gates: Typecheck, ESLint, Architektur-, Action-, Prozess-, Mobile/PWA-, SaaS-, Auth-, Registration-, Subscription-, Stripe-, Plattform- und Go-live-Checks
 - Build: Next.js Standalone
+- Packaging: `pnpm deployment:prepare deploy-root` erstellt physische Runtime-Pakete einschliesslich transitiver Abhängigkeiten. Kein einfaches Kopieren dereferenzierter pnpm-Links; identische React-Pakete müssen gemeinsam aufgelöst werden.
 - Datenbank: Migrationen werden nach erfolgreichem Build und vor dem Deployment im GitHub Environment `production` ausgeführt
 - Azure Login: OIDC via `azure/login@v3`
 - Deployment: bestehender Azure App Service `binso-admin-prod`, Production Slot
 - Concurrency: Production-Deployments werden serialisiert
+- Vor Upload: isolierter HTTP-Smoke-Test des materialisierten Standalone-Artefakts.
+- V69-Abnahme, Azure-Konfiguration und Rollback: `docs/V69-REVIEW-AND-GO-LIVE.md`.
 
 ## GitHub Environment `production`
 

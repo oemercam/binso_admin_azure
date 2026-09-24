@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { readTextBody } from '@/lib/http/server-api'
+import { query } from '@/lib/db/client'
 import { verifyStripeWebhook } from '@/lib/billing/stripe'
 import { applyStripeSubscription, completeWebhookEvent, findOrganizationByStripeCustomer, registerWebhookEvent } from '@/lib/db/repositories/stripe-billing'
 
@@ -19,7 +21,8 @@ function metadataOrganizationId(object: Record<string, unknown>) {
 }
 
 export async function POST(request: Request) {
-  const rawBody = await request.text()
+  let rawBody: string
+  try { rawBody = await readTextBody(request, 512_000) } catch { return NextResponse.json({ error: 'Payload zu gross.' }, { status: 413 }) }
   if (!verifyStripeWebhook(rawBody, request.headers.get('stripe-signature'))) {
     return NextResponse.json({ error: 'Ungültige Stripe-Signatur.' }, { status: 400 })
   }
@@ -30,6 +33,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: 'Ungültiges Event.' }, { status: 400 })
   }
+  if (!event || typeof event.id !== 'string' || typeof event.type !== 'string' || !event.data?.object) return NextResponse.json({ error: 'Ungültiges Event.' }, { status: 400 })
 
   const object = event.data?.object ?? {}
   const customerId = stringValue(object.customer)
@@ -41,7 +45,11 @@ export async function POST(request: Request) {
     payload: { id: event.id, type: event.type, objectId: stringValue(object.id), customerId, organizationId },
     organizationId,
   })
-  if (!inserted) return NextResponse.json({ received: true, duplicate: true })
+  if (!inserted) {
+    const existing = await query<{ status: string }>("select status from billing_webhook_events where provider='stripe' and external_event_id=$1", [event.id])
+    if (existing.rows[0]?.status === 'received') return NextResponse.json({ error: 'Event wird verarbeitet.' }, { status: 503 })
+    return NextResponse.json({ received: true, duplicate: true })
+  }
 
   try {
     if (event.type.startsWith('customer.subscription.')) {
@@ -67,8 +75,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true })
     }
 
-    if (event.type === 'invoice.payment_failed' && organizationId) {
-      const subscriptionId = stringValue(object.subscription)
+    if (['invoice.payment_failed', 'invoice.paid'].includes(event.type) && organizationId) {
+      const parent = object.parent as { subscription_details?: { subscription?: string } } | undefined
+      const subscriptionId = stringValue(object.subscription) ?? parent?.subscription_details?.subscription
       if (subscriptionId) {
         await applyStripeSubscription({
           organizationId,

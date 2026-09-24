@@ -46,6 +46,8 @@ required('STRIPE_PRICE_STARTER')
 required('STRIPE_PRICE_BUSINESS')
 required('STRIPE_PRICE_PROFESSIONAL')
 required('INTERNAL_JOB_SECRET')
+if ((process.env.INTERNAL_JOB_SECRET?.trim().length ?? 0) < 32) fail('INTERNAL_JOB_SECRET must contain at least 32 characters.')
+if (process.env.DATABASE_SSL?.toLowerCase() === 'false') fail('DATABASE_SSL must not be disabled in production.')
 
 const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim()
 if (vapidPublic) {

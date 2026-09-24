@@ -1,4 +1,7 @@
 'use client'
+import { nextInvoiceNumber as invoiceNumber, nextQuoteNumber as quoteNumber, nextContractNumber as contractNumber, nextCreditNumber as creditNumber } from '@/modules/documents/numbering'
+import { advanceContractDate } from '@/modules/contracts/schedule'
+
 
 import {
   createContext,
@@ -135,6 +138,7 @@ type CreateOrderInput = Omit<Order, 'id' | 'usedHours'>
 type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { customerId: string }
 
 type BusinessStore = BusinessState & {
+  queueDocumentMail: (kind: 'quote' | 'invoice' | 'reminder', entityId: string, to: string, key: string) => Promise<void>
   currentOrganization: Organization
   setCurrentOrganization: (organizationId: string) => void
   createOrganization: (input: { organizationId?: string; name: string; slug: string; ownerEmail: string; plan: OrganizationSubscription['plan'] }) => Organization
@@ -305,6 +309,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
   const remoteVersions = useRef<Record<string, number>>({})
   const remoteReady = useRef<Set<string>>(new Set())
   const remoteSaveChain = useRef<Promise<void>>(Promise.resolve())
+  const remoteBlocked = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     let cancelled = false
@@ -401,6 +406,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
     const timer = window.setTimeout(() => {
       const snapshot = tenantSnapshot(state, organizationId)
       remoteSaveChain.current = remoteSaveChain.current.then(async () => {
+        if (remoteBlocked.current.has(organizationId)) return
         const expectedVersion = remoteVersions.current[organizationId] ?? 0
         const response = await fetch('/api/business/state', {
           method: 'PUT',
@@ -413,7 +419,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
           return
         }
         if (response.status === 409 && typeof result.version === 'number') {
-          remoteVersions.current[organizationId] = result.version
+          remoteBlocked.current.add(organizationId)
           window.dispatchEvent(new CustomEvent('binso:persistence-conflict'))
           return
         }
@@ -542,6 +548,22 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         : 'employee'
       return hasPermission(role, permission)
     },
+    async queueDocumentMail(kind, entityId, to, key) {
+      const organizationId = state.currentOrganizationId
+      if (!productionPersistence || !remoteReady.current.has(organizationId) || remoteBlocked.current.has(organizationId)) throw new Error('Versand benötigt aktuelle gespeicherte Daten. Bitte Seite neu laden.')
+      const operation = remoteSaveChain.current.then(async () => {
+        if (remoteBlocked.current.has(organizationId)) throw new Error('Speicherkonflikt. Bitte neu laden.')
+        const saved = await fetch('/api/business/state', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organizationId, expectedVersion: remoteVersions.current[organizationId] ?? 0, state: tenantSnapshot(state, organizationId) }) })
+        const saveResult = await saved.json() as { version: number }
+        if (!saved.ok) { remoteBlocked.current.add(organizationId); throw new Error('Daten konnten nicht gespeichert werden. Bitte neu laden.') }
+        remoteVersions.current[organizationId] = saveResult.version
+        const response = await fetch('/api/documents/send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organizationId, kind, entityId, to, key, expectedVersion: saveResult.version }) })
+        const result = await response.json() as { error?: { message?: string } }
+        if (!response.ok) throw new Error(result.error?.message || 'Versand konnte nicht eingeplant werden.')
+      })
+      remoteSaveChain.current = operation.catch(() => undefined)
+      await operation
+    },
     addMembership(membership) {
       if (membership.organizationId !== state.currentOrganizationId) return
       setState((current) => ({ ...current, memberships: [membership, ...current.memberships] }))
@@ -622,7 +644,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         ...customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings),
         ...(contract.workflowOverride ?? {}),
       })
-      setState((current) => ({ ...current, orders: [order, ...current.orders], orderPolicies: [policy, ...current.orderPolicies], customerActivities: [makeActivity(state.currentOrganizationId, contract.customerId, 'order', `Auftrag aus ${contract.number} erstellt`, contract.name), ...current.customerActivities] }))
+      setState((current) => ({ ...current, orders: [order, ...current.orders], orderPolicies: [{ ...policy, organizationId: state.currentOrganizationId }, ...current.orderPolicies], customerActivities: [makeActivity(state.currentOrganizationId, contract.customerId, 'order', `Auftrag aus ${contract.number} erstellt`, contract.name), ...current.customerActivities] }))
       return order
     },
     createInvoiceFromContract(contractId, period) {
@@ -701,7 +723,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],
-        orderPolicies: [policy, ...current.orderPolicies],
+        orderPolicies: [{ ...policy, organizationId: state.currentOrganizationId }, ...current.orderPolicies],
         customerActivities: [makeActivity(state.currentOrganizationId, order.customerId, 'order', 'Auftrag erstellt', order.name), ...current.customerActivities],
       }))
       return order
@@ -858,6 +880,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
       const hours = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity, 0)
       const weightedRevenue = quote.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
       const order: Order = {
+        organizationId: state.currentOrganizationId,
         id: `ord-${Date.now()}`,
         customerId: quote.customerId,
         customerName: quote.customerName,
@@ -875,7 +898,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],
-        orderPolicies: [policy, ...current.orderPolicies],
+        orderPolicies: [{ ...policy, organizationId: state.currentOrganizationId }, ...current.orderPolicies],
         customerActivities: [makeActivity(state.currentOrganizationId, order.customerId, 'order', `Auftrag aus ${quote.number} erstellt`, order.name), ...current.customerActivities],
       }))
       return order
@@ -1129,14 +1152,14 @@ function invoiceTotals(lines: InvoiceLine[]) {
   return { subtotal, vatAmount, amount: round2(subtotal + vatAmount) }
 }
 function round2(value: number) { return Math.round((value + Number.EPSILON) * 100) / 100 }
-function nextInvoiceNumber(invoices: Invoice[]) { const year = new Date().getFullYear(); const current = invoices.reduce((max, invoice) => { const match = invoice.number.match(new RegExp(`^RE-${year}-(\d+)$`)); return match ? Math.max(max, Number(match[1])) : max }, 0); return `RE-${year}-${String(current + 1).padStart(3, '0')}` }
-function nextContractNumber(contracts: Contract[]) { const year = new Date().getFullYear(); const current = contracts.reduce((max, contract) => { const match = contract.number.match(new RegExp(`^VR-${year}-(\d+)$`)); return match ? Math.max(max, Number(match[1])) : max }, 0); return `VR-${year}-${String(current + 1).padStart(3, '0')}` }
-function nextCreditNumber(credits: CreditNote[]) { const year = new Date().getFullYear(); const current = credits.reduce((max, credit) => { const match = credit.number.match(new RegExp(`^GS-${year}-(\d+)$`)); return match ? Math.max(max, Number(match[1])) : max }, 0); return `GS-${year}-${String(current + 1).padStart(3, '0')}` }
-function nextQuoteNumber(quotes: Quote[]) { const year = new Date().getFullYear(); const current = quotes.reduce((max, quote) => { const match = quote.number.match(new RegExp(`^AN-${year}-(\d+)$`)); return match ? Math.max(max, Number(match[1])) : max }, 0); return `AN-${year}-${String(current + 1).padStart(3, '0')}` }
+function nextInvoiceNumber(records: { number: string }[]) { return invoiceNumber(records.map(item => item.number)) }
+function nextContractNumber(records: { number: string }[]) { return contractNumber(records.map(item => item.number)) }
+function nextCreditNumber(records: { number: string }[]) { return creditNumber(records.map(item => item.number)) }
+function nextQuoteNumber(records: { number: string }[]) { return quoteNumber(records.map(item => item.number)) }
 function addDays(date: string, days: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return value.toISOString().slice(0, 10) }
 function today() { return new Date().toISOString().slice(0, 10) }
 function monthLabel(date: string) { return formatMonthYear(date) }
-function advanceBillingDate(date: string, interval: Contract['billingInterval']) { const value = new Date(`${date}T12:00:00`); if (interval === 'monthly') value.setMonth(value.getMonth() + 1); else if (interval === 'quarterly') value.setMonth(value.getMonth() + 3); else if (interval === 'yearly') value.setFullYear(value.getFullYear() + 1); return value.toISOString().slice(0, 10) }
+function advanceBillingDate(date: string, interval: Contract['billingInterval']) { return interval === 'none' ? date : advanceContractDate(date, interval) }
 function makeActivity(organizationId: string, customerId: string, type: CustomerActivity['type'], title: string, detail?: string): CustomerActivity { return { organizationId, id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, customerId, type, title, detail, createdAt: new Date().toISOString() } }
 function formatDate(date: string) { return formatLocaleDate(date) }
 function mergeAppSettings(changes?: Partial<AppSettings>, base: AppSettings = defaultAppSettings): AppSettings {

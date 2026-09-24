@@ -79,7 +79,7 @@ export function PushSettings() {
         throw error
       }
       setEnabled(true)
-      feedback.success('Push wurde auf diesem Gerät aktiviert. Die serverseitige Zustellung bleibt bis zur Datenbank-/Worker-Anbindung im Demo-Modus.')
+      feedback.success('Das Gerät wurde für Push registriert. Automatische Push-Zustellung ist noch nicht implementiert.')
     } catch (error) {
       feedback.error(error instanceof ApiError || error instanceof Error ? error.message : 'Push konnte nicht geändert werden.')
     } finally {

@@ -164,7 +164,7 @@ export default function InvoicesPage() {
         warning={preview && readiness(preview).length > 0 ? <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {readiness(preview).join(', ')}</span></div> : null}
         actions={preview ? <>
           {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
-          {previewCanSend && <button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {previewIsDraft ? 'Als versendet markieren' : 'Versand erneut erfassen'}</button>}
+          {previewCanSend && <button className="button secondary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {previewIsDraft ? 'Per E-Mail senden' : 'Erneut per E-Mail senden'}</button>}
           {previewCanRemind && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung</button>}
           {previewCanCredit && <button className="button secondary" onClick={() => setCreditInvoice(preview)}>Gutschrift</button>}
           {previewCanCancel && <button className="button secondary" onClick={() => setCancelInvoiceTarget(preview)}>Stornieren</button>}
@@ -172,11 +172,11 @@ export default function InvoicesPage() {
         </> : null}
         mobileActions={preview ? <>
           {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
-          {previewCanSend && <button className="button primary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {previewIsDraft ? 'Als versendet markieren' : 'Versand erneut erfassen'}</button>}
+          {previewCanSend && <button className="button primary" disabled={readiness(preview).length > 0} onClick={() => setSending({ invoice: preview, mode: 'invoice' })}><Icon name="send" size={15}/> {previewIsDraft ? 'Per E-Mail senden' : 'Erneut per E-Mail senden'}</button>}
           {previewCanRecordPayment && <button className="button secondary" onClick={() => setPayment(preview)}><Icon name="credit-card" size={15}/> Zahlung</button>}
         </> : null}
         mobileMoreActions={preview && previewHasMoreActions ? <>
-          {previewCanRemind && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung erfassen</button>}
+          {previewCanRemind && <button className="button secondary" onClick={() => setSending({ invoice: preview, mode: 'reminder' })}><Icon name="warning" size={15}/> Mahnung senden</button>}
           {previewCanCredit && <button className="button secondary" onClick={() => setCreditInvoice(preview)}>Gutschrift erstellen</button>}
           {previewCanCancel && <button className="button secondary" onClick={() => setCancelInvoiceTarget(preview)}>Rechnung stornieren</button>}
         </> : null}
@@ -185,7 +185,7 @@ export default function InvoicesPage() {
       </ResponsivePreview>
 
       {editing && <InvoiceEditor invoice={editing} onClose={() => setEditing(null)} onSave={(updated) => { setEditing(null); setPreview(updated) }} />}
-      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnung wurde dokumentiert.' : 'Versandstatus der Rechnung wurde gespeichert.') }} />}
+      {sending && <SendDialog invoice={sending.invoice} mode={sending.mode} onClose={() => setSending(null)} onSent={(updated) => { setSending(null); setPreview(updated); feedback.success(sending.mode === 'reminder' ? 'Mahnversand wurde eingeplant.' : 'Versandauftrag wurde gespeichert.') }} />}
       {payment && <PaymentDialog invoice={payment} onClose={() => setPayment(null)} />}
       {creditInvoice && <CreditDialog invoice={creditInvoice} onClose={() => setCreditInvoice(null)} />}
       {paymentPicker && <ResponsiveOverlay open={paymentPicker} title="Zahlung erfassen" description="Offene Rechnung auswählen" onClose={() => setPaymentPicker(false)}><div className="compact-list">{store.invoices.filter((item) => ['sent', 'partial', 'overdue'].includes(effectiveInvoiceStatus(item))).map((item) => <button type="button" className="payment-pick-row" key={item.id} onClick={() => { setPaymentPicker(false); setPayment(item) }}><span className="primary-cell"><strong>{item.number} · {item.customerName}</strong><small>{chf(invoiceOpenAmount(item))} offen</small></span><Icon name="chevron" size={15}/></button>)}</div></ResponsiveOverlay>}
@@ -228,12 +228,17 @@ export default function InvoicesPage() {
   function SendDialog({ invoice, mode, onClose, onSent }: { invoice: Invoice; mode: 'invoice' | 'reminder'; onClose: () => void; onSent: (invoice: Invoice) => void }) {
     const customer = documentCustomer(invoice)
     const [to, setTo] = useState(invoice.recipientEmail || customer?.email || '')
-    function save(event: React.FormEvent) {
+    const [busy, setBusy] = useState(false)
+    const [key] = useState(() => crypto.randomUUID())
+    async function save(event: React.FormEvent) {
       event.preventDefault()
-      const updated = store.sendInvoice(invoice.id, to, mode)
-      if (updated) onSent(updated)
+      if (busy) return
+      setBusy(true)
+      try { await store.queueDocumentMail(mode, invoice.id, to, key); onSent(invoice) }
+      catch (error) { feedback.error(error instanceof Error ? error.message : 'Versand fehlgeschlagen.') }
+      finally { setBusy(false) }
     }
-    return <StandardFormSheet open title={<>{mode === 'reminder' ? 'Mahnung erfassen' : 'Versand erfassen'}</>} description={<>{mode === 'reminder' ? 'Dokumentiert die Mahnung und erhöht die Mahnstufe. Es wird aktuell keine E-Mail verschickt.' : 'Speichert Empfänger, Versandzeitpunkt und Status. Es wird aktuell keine E-Mail verschickt.'}</>} onClose={onClose} onSubmit={save} formId="invoices-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-2" className="button primary"><Icon name="check" size={15}/> {mode === 'reminder' ? 'Mahnung dokumentieren' : 'Als versendet markieren'}</button></>}><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label></div></StandardFormSheet>
+    return <StandardFormSheet open title={<>{mode === 'reminder' ? 'Mahnung per E-Mail senden' : 'Rechnung per E-Mail senden'}</>} description={<>Versand mit druckbarer HTML-Datei über die Warteschlange. Der Status wird nach Annahme durch den Maildienst aktualisiert.</>} onClose={onClose} onSubmit={save} formId="invoices-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="invoices-page-sheet-2" className="button primary" disabled={busy}><Icon name="send" size={15}/> Versand einplanen</button></>}><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label></div></StandardFormSheet>
   }
 
   function CreditDialog({ invoice, onClose }: { invoice: Invoice; onClose: () => void }) {

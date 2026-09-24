@@ -23,15 +23,15 @@ export const planDefinitions: PlanDefinition[] = [
     name: 'Professional',
     monthlyPriceChf: 149,
     includedUsers: 25,
-    description: 'Für wachsende Dienstleistungsunternehmen mit Workflows, Audit, API und erweiterten Prozessen.',
-    features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports','api'],
+    description: 'Für wachsende Dienstleistungsunternehmen mit Workflows, Audit und erweiterten Prozessen.',
+    features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports'],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     includedUsers: 100,
     description: 'Für grössere Organisationen mit individuellen Integrationen, Governance und Support.',
-    features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports','api'],
+    features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports'],
   },
 ]
 

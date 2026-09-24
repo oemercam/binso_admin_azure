@@ -33,9 +33,12 @@ export function databasePool() {
       max: Number(process.env.DATABASE_POOL_MAX || 10),
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
+      statement_timeout: 30_000,
+      idle_in_transaction_session_timeout: 60_000,
       ssl: sslEnabled() ? { rejectUnauthorized: true } : undefined,
       application_name: 'binso-one',
     })
+    globalForDb.__binsoPgPool.on('error', (error) => console.error('PostgreSQL idle connection error', { code: (error as Error & { code?: string }).code }))
   }
 
   return globalForDb.__binsoPgPool

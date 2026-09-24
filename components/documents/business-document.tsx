@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import type { CompanyProfile, Customer, Invoice, Quote } from '@/types/domain'
 
 type Props = {
@@ -41,7 +40,7 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
     <article className="document-a4" data-document-print>
       <header className="document-head">
         <div className="document-brand">
-          <Image src="/brand/logo-black.svg" alt="Binso GmbH" width={1439} height={365} />
+          <strong>{company.name}</strong>
         </div>
         <div className="document-title">
           <strong>{type === 'invoice' ? 'RECHNUNG' : type === 'quote' ? 'ANGEBOT' : 'ZAHLUNGSERINNERUNG'}</strong>
@@ -62,6 +61,7 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
           <div><dt>Nummer</dt><dd>{number}</dd></div>
           {!isQuote && <div><dt>Rechnungsdatum</dt><dd>{fmt(invoice?.issueDate)}</dd></div>}
           {!isQuote && <div><dt>Fällig</dt><dd>{fmt(invoice?.due)}</dd></div>}
+          {!isQuote && <div><dt>Leistungszeitraum</dt><dd>{invoice?.period}</dd></div>}
           {isQuote && <div><dt>Angebotsdatum</dt><dd>{fmt(quote?.issueDate)}</dd></div>}
           {isQuote && <div><dt>Gültig bis</dt><dd>{fmt(quote?.validUntil)}</dd></div>}
           {(isQuote ? quote?.reference : invoice?.reference) && (
@@ -83,7 +83,7 @@ export function BusinessDocument({ type, company, customer, invoice, quote }: Pr
         {lines.map((line, index) => (
           <div className="document-line" key={line.id}>
             <span>{String(index + 1).padStart(2, '0')}</span>
-            <span>{line.description}</span>
+            <span>{line.description}<small> · MWST {line.vatRate ?? 8.1}%</small></span>
             <span>{line.quantity} {line.unit}</span>
             <span>{chf.format(line.unitPrice)}</span>
             <strong>{chf.format(line.quantity * line.unitPrice)}</strong>
