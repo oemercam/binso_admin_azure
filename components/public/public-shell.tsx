@@ -3,12 +3,14 @@ import type { ReactNode } from 'react'
 import { BinsoLogo } from '@/components/ui/binso-logo'
 import { appIdentity } from '@/lib/config/app-identity'
 import { publicSite } from '@/lib/config/public-site'
+import { signInUrl } from '@/lib/auth/urls'
 import { CookieConsent, CookieSettingsButton } from './cookie-consent'
 
 function BrandLink() {
   return (
     <Link className="public-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
       <BinsoLogo />
+      <span className="public-product-name">ONE</span>
     </Link>
   )
 }
@@ -22,15 +24,15 @@ export function PublicHeader() {
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="public-header-actions">
-          <Link className="public-login-link" href="/sign-in">Anmelden</Link>
+          <a className="public-login-link" href={signInUrl('/post-login')}>Anmelden</a>
           <Link className="button primary public-cta" href="/register">Kostenlos starten</Link>
           <details className="public-mobile-menu">
-            <summary aria-label="Navigation öffnen">Menü</summary>
+            <summary aria-label="Navigation öffnen"><span className="public-menu-icon" aria-hidden="true"><i /><i /><i /></span><span className="public-menu-label">Menü</span></summary>
             <nav aria-label="Mobile Navigation">
               {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
               <Link href="/support">Support</Link>
               <Link href="/contact">Kontakt</Link>
-              <Link href="/sign-in">Anmelden</Link>
+              <a href={signInUrl('/post-login')}>Anmelden</a>
             </nav>
           </details>
         </div>
@@ -64,7 +66,6 @@ export function PublicFooter() {
       </div>
       <div className="public-footer-bottom">
         <span>© {new Date().getFullYear()} {appIdentity.company}</span>
-        <span>{appIdentity.name}</span>
       </div>
     </footer>
   )

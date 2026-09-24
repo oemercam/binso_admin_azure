@@ -98,22 +98,27 @@ function RegisterForm() {
   if (!sessionState?.authenticated) {
     const returnTo = `/register?plan=${encodeURIComponent(plan)}`
     return (
-      <PublicShell compact>
-        <main className="public-main public-main-narrow register-entry">
-          <section className="public-form-shell register-entry-shell">
-            <div className="public-product-head">
-              <span>Registrierung</span>
-              <h1>In wenigen Schritten zu Binso One.</h1>
-              <p>Starte mit einer sicheren Anmeldung. Danach richtest du dein Unternehmen mit den wichtigsten Angaben ein.</p>
+      <PublicShell light>
+        <main className="public-main register-entry register-entry-v706">
+          <section className="register-start-layout">
+            <div className="register-start-copy">
+              <span className="public-eyebrow">Kostenlos starten</span>
+              <h1>In wenigen Minuten mit Binso One starten.</h1>
+              <p>Erstelle deinen Zugang, richte dein Unternehmen ein und teste Binso One 14 Tage. Für den Start brauchst du keine Zahlungsdaten.</p>
+              <div className="register-start-facts" aria-label="Vorteile der Testphase">
+                <span>14 Tage kostenlos testen</span>
+                <span>Keine Zahlungsdaten beim Start</span>
+                <span>Desktop, Mobile und PWA</span>
+              </div>
             </div>
-            <div className="register-entry-steps">
-              <div><b>01</b><span><strong>Sicher anmelden</strong><small>E-Mail und Identität werden über den Anmeldedienst bestätigt.</small></span></div>
-              <div><b>02</b><span><strong>Unternehmen einrichten</strong><small>Nur die Angaben erfassen, die für den Start benötigt werden.</small></span></div>
-              <div><b>03</b><span><strong>14 Tage testen</strong><small>Noch keine Zahlung bei der Registrierung.</small></span></div>
+            <div className="register-start-flow">
+              <div className="register-start-step"><b>01</b><span><strong>Zugang erstellen</strong><small>E-Mail und Identität sicher bestätigen.</small></span></div>
+              <div className="register-start-step"><b>02</b><span><strong>Unternehmen einrichten</strong><small>Nur die wichtigsten Angaben für den Start erfassen.</small></span></div>
+              <div className="register-start-step"><b>03</b><span><strong>Direkt loslegen</strong><small>Kunden, Angebote, Aufträge und Zeiten in einem Ablauf verwalten.</small></span></div>
+              <a className="button primary register-entry-primary" href={signInUrl(returnTo)}>Kostenlos starten</a>
+              <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Direkt anmelden</a></p>
+              <small className="register-privacy-note">Mit dem Start gelten unsere <a href="/legal/terms">AGB</a> und die <a href="/legal/privacy">Datenschutzerklärung</a>.</small>
             </div>
-            <a className="button primary register-entry-primary" href={signInUrl(returnTo)}>Registrierung starten</a>
-            <p className="auth-register-prompt">Bereits registriert? <a href={signInUrl('/post-login')}>Anmelden</a></p>
-            <small className="register-privacy-note">Mit dem Start gelten unsere <a href="/legal/terms">AGB</a> und die <a href="/legal/privacy">Datenschutzerklärung</a>.</small>
           </section>
         </main>
       </PublicShell>
@@ -121,10 +126,15 @@ function RegisterForm() {
   }
 
   return (
-    <PublicShell compact>
-      <main className="public-main public-main-narrow register-entry">
-        <section className="public-form-shell register-entry-shell">
-          <div className="public-product-head"><span>Registrierung</span><h1>Unternehmen erstellen</h1><p>Nur die wichtigsten Angaben. Weitere Einstellungen folgen geführt im Onboarding.</p></div>
+    <PublicShell light>
+      <main className="public-main register-entry register-entry-v706">
+        <section className="register-form-layout">
+          <div className="register-start-copy">
+            <span className="public-eyebrow">Unternehmen einrichten</span>
+            <h1>Nur die Angaben, die du zum Start brauchst.</h1>
+            <p>Weitere Einstellungen folgen danach Schritt für Schritt im Onboarding.</p>
+          </div>
+          <div className="register-form-panel">
           <form className="public-form" onSubmit={submit}>
           <label><span>Firma *</span><Input value={companyName} onChange={(event) => setCompanyName(event.target.value)} required /></label>
           <label><span>Name *</span><Input value={ownerName} onChange={(event) => setOwnerName(event.target.value)} required /></label>
@@ -134,6 +144,7 @@ function RegisterForm() {
           <button className="button primary" type="submit" disabled={submitting}>{submitting ? 'Wird gespeichert…' : 'Weiter zum Onboarding'}</button>
           <small>Noch keine Zahlung. Der 14-tägige Testzugang wird erst im nächsten Schritt aktiviert.</small>
           </form>
+          </div>
         </section>
       </main>
     </PublicShell>
