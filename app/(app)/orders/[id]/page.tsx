@@ -125,7 +125,7 @@ export default function OrderDetailPage() {
       {editOpen && <OrderEditor order={order} onClose={() => setEditOpen(false)} />}
       {uploadOpen && <EvidenceUpload orderId={order.id} onClose={() => setUploadOpen(false)} />}
       {expenseOpen && <ExpenseForm order={order} onClose={() => setExpenseOpen(false)} />}
-      {policyOpen && <PolicyEditor orderId={order.id} current={policy ?? createDefaultOrderPolicy(order.id, order.billingModel, { ...store.appSettings.workflow.customerProcess, ...(store.customers.find((customer) => customer.id === order.customerId)?.workflowOverride ?? {}) })} onClose={() => setPolicyOpen(false)} />}
+      {policyOpen && <PolicyEditor orderId={order.id} current={policy ?? createDefaultOrderPolicy(store.currentOrganizationId, order.id, order.billingModel, { ...store.appSettings.workflow.customerProcess, ...(store.customers.find((customer) => customer.id === order.customerId)?.workflowOverride ?? {}) })} onClose={() => setPolicyOpen(false)} />}
       {assignmentOpen && <AssignmentEditor orderId={order.id} current={assignmentOpen === 'new' ? null : assignmentOpen} onClose={() => setAssignmentOpen(null)} />}
     </section>
   )

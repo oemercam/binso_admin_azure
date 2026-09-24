@@ -48,16 +48,16 @@ export default function DataPage() {
         try {
           if (entityType === 'customers') {
             if (!row.name) throw new Error('name')
-            const customer: Customer = { id: crypto.randomUUID(), name: row.name, legalName: row.legalname || undefined, customerNo: row.customerno || `IMP-${Date.now()}-${imported + 1}`, contact: row.contact || undefined, email: row.email || undefined, phone: row.phone || undefined, address: row.address || undefined, zip: row.zip || undefined, city: row.city || undefined, country: row.country || 'CH', uid: row.uid || undefined, paymentDays: importNumber(row.paymentdays, 30), status: row.status === 'inactive' ? 'inactive' : 'active', notes: row.notes || undefined }
+            const customer: Customer = { organizationId: store.currentOrganizationId, id: crypto.randomUUID(), name: row.name, legalName: row.legalname || undefined, customerNo: row.customerno || `IMP-${Date.now()}-${imported + 1}`, contact: row.contact || undefined, email: row.email || undefined, phone: row.phone || undefined, address: row.address || undefined, zip: row.zip || undefined, city: row.city || undefined, country: row.country || 'CH', uid: row.uid || undefined, paymentDays: importNumber(row.paymentdays, 30), status: row.status === 'inactive' ? 'inactive' : 'active', notes: row.notes || undefined }
             store.addCustomer(customer)
           } else if (entityType === 'contacts') {
             const customer = store.customers.find((item) => item.customerNo === row.customerno || item.name.toLowerCase() === row.customer?.toLowerCase())
             if (!customer || !row.name) throw new Error('customer/name')
-            const contact: CustomerContact = { id: crypto.randomUUID(), customerId: customer.id, name: row.name, email: row.email || undefined, phone: row.phone || undefined, role: row.role || undefined, primary: ['1','true','ja','yes'].includes((row.primary || '').toLowerCase()) }
+            const contact: CustomerContact = { organizationId: store.currentOrganizationId, id: crypto.randomUUID(), customerId: customer.id, name: row.name, email: row.email || undefined, phone: row.phone || undefined, role: row.role || undefined, primary: ['1','true','ja','yes'].includes((row.primary || '').toLowerCase()) }
             store.addCustomerContact(contact)
           } else if (entityType === 'employees') {
             if (!row.name || !row.email) throw new Error('name/email')
-            const employee: Employee = { id: crypto.randomUUID(), name: row.name, email: row.email, role: ['owner','admin','finance','employee'].includes(row.role) ? row.role as Employee['role'] : 'employee', employmentType: row.employmenttype === 'hourly' ? 'hourly' : 'salary', status: row.status === 'inactive' ? 'inactive' : 'active', targetHours: importNumber(row.targethours), bookedHours: importNumber(row.bookedhours), billableHours: importNumber(row.billablehours), utilisation: importNumber(row.utilisation), internalCostRate: importNumber(row.internalcostrate) }
+            const employee: Employee = { organizationId: store.currentOrganizationId, id: crypto.randomUUID(), name: row.name, email: row.email, role: ['owner','admin','finance','employee'].includes(row.role) ? row.role as Employee['role'] : 'employee', employmentType: row.employmenttype === 'hourly' ? 'hourly' : 'salary', status: row.status === 'inactive' ? 'inactive' : 'active', targetHours: importNumber(row.targethours), bookedHours: importNumber(row.bookedhours), billableHours: importNumber(row.billablehours), utilisation: importNumber(row.utilisation), internalCostRate: importNumber(row.internalcostrate) }
             store.addEmployee(employee)
           }
           imported += 1

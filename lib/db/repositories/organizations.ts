@@ -1,12 +1,12 @@
 import 'server-only'
 import type { PoolClient } from 'pg'
-import type { Organization } from '@/types/domain'
+import type { Organization, OrganizationStatus } from '@/types/domain'
 
 type OrganizationRow = {
   id: string
   name: string
   slug: string
-  status: 'active' | 'inactive'
+  status: OrganizationStatus
   country: string
   currency: 'CHF' | 'EUR'
   locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'

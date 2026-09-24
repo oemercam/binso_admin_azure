@@ -53,6 +53,7 @@ export default function CustomersPage() {
   function createCustomer(event: React.FormEvent) {
     event.preventDefault()
     const customer: Customer = {
+      organizationId: store.currentOrganizationId,
       id: `cus-${Date.now()}`,
       customerNo: `K-${1000 + store.customers.length + 1}`,
       name: form.name.trim(),

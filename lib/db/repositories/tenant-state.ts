@@ -35,11 +35,11 @@ export async function saveTenantBusinessState(input: {
     await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [input.organizationId])
     const access = await client.query<{ role: Role; features: string[] }>(`select m.role,e.features from organization_memberships m
       join organization_entitlements e on e.organization_id=m.organization_id
-      join organizations o on o.id=m.organization_id and o.status='active'
+      join organizations o on o.id=m.organization_id and o.status in ('active','grace_period')
       join platform_tenants pt on pt.organization_id=m.organization_id
       join organization_subscriptions s on s.organization_id=m.organization_id
       where m.organization_id=$1 and m.user_id=$2 and m.status='active'
-      and (pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now()))`, [input.organizationId, input.userId])
+      and (pt.platform_status in ('active','past_due','grace_period') or (pt.platform_status='trial' and s.trial_until>now()))`, [input.organizationId, input.userId])
     if (!access.rows[0]) throw new Error('state_forbidden')
     input.actor = { ...input.actor, role: access.rows[0].role, features: access.rows[0].features }
     const current = await client.query<{ version: string; state: Record<string, unknown> }>(

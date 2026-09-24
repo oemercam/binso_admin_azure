@@ -1,12 +1,12 @@
 import 'server-only'
 import { query } from '@/lib/db/client'
-import type { BusinessBootstrap, CompanyProfile, Organization, OrganizationEntitlements, OrganizationMembership, OrganizationSubscription, OrganizationFeature, Role, SubscriptionPlan, SubscriptionStatus } from '@/types/domain'
+import type { BusinessBootstrap, CompanyProfile, Organization, OrganizationEntitlements, OrganizationMembership, OrganizationSubscription, OrganizationFeature, OrganizationStatus, Role, SubscriptionPlan, SubscriptionStatus } from '@/types/domain'
 
 type BootstrapRow = {
   organization_id: string
   organization_name: string
   organization_slug: string
-  organization_status: 'active' | 'inactive'
+  organization_status: OrganizationStatus
   country: string
   currency: 'CHF' | 'EUR'
   locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'
@@ -37,6 +37,8 @@ type BootstrapRow = {
   features: OrganizationFeature[] | null
   max_users: number | null
   max_storage_mb: number | null
+  max_monthly_documents: number | null
+  max_api_requests_per_month: number | null
   profile_name: string | null
   address: string | null
   zip: string | null
@@ -61,18 +63,18 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
        s.id as subscription_id, s.plan, s.status as subscription_status, s.seats, s.trial_until,
        s.billing_customer_id, s.current_period_end, s.billing_subscription_id, s.billing_provider,
        s.billing_interval, s.unit_amount_chf::text, s.next_billing_at, s.cancel_at_period_end, s.cancelled_at, s.scheduled_plan,
-       e.features, e.max_users, e.max_storage_mb,
+       e.features, e.max_users, e.max_storage_mb, e.max_monthly_documents, e.max_api_requests_per_month,
        p.name as profile_name, p.address, p.zip, p.city, p.country as profile_country,
        p.email as profile_email, p.phone, p.uid, p.iban, p.bank_name, p.website
      from organization_memberships m
      join organizations o on o.id = m.organization_id
      join platform_tenants pt on pt.organization_id = o.id
      join organization_subscriptions access_subscription on access_subscription.organization_id = o.id
-       and (pt.platform_status in ('active','past_due') or (pt.platform_status = 'trial' and access_subscription.trial_until is not null and access_subscription.trial_until > now()))
+       and (pt.platform_status in ('active','past_due','grace_period','read_only') or (pt.platform_status = 'trial' and access_subscription.trial_until is not null and access_subscription.trial_until > now()))
      left join organization_subscriptions s on s.organization_id = o.id
      left join organization_entitlements e on e.organization_id = o.id
      left join company_profile p on p.organization_id = o.id
-     where m.user_id = $1 and m.status = 'active' and o.status = 'active'
+     where m.user_id = $1 and m.status = 'active' and o.status in ('trial','active','grace_period','read_only')
      order by m.created_at asc`,
     [userId],
   )
@@ -122,6 +124,8 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
     features: row.features,
     maxUsers: row.max_users,
     maxStorageMb: row.max_storage_mb,
+    maxMonthlyDocuments: row.max_monthly_documents ?? undefined,
+    maxApiRequestsPerMonth: row.max_api_requests_per_month ?? undefined,
   }] : [])
   const companyProfiles: Record<string, CompanyProfile> = {}
   for (const row of result.rows) {

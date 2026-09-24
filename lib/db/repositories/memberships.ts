@@ -56,12 +56,12 @@ export async function findAccessibleMembership(userId: string, organizationId?: 
     `select m.id, m.organization_id, m.user_id, m.email, m.role, m.status, m.created_at, m.updated_at
        from organization_memberships m
        join platform_tenants pt on pt.organization_id = m.organization_id
-       join organizations o on o.id = m.organization_id and o.status = 'active'
+       join organizations o on o.id = m.organization_id and o.status in ('trial','active','grace_period','read_only')
        join organization_subscriptions s on s.organization_id = m.organization_id
       where m.user_id = $1 and m.status = 'active'
         ${organizationFilter}
         and (
-          pt.platform_status in ('active','past_due')
+          pt.platform_status in ('active','past_due','grace_period','read_only')
           or (pt.platform_status = 'trial' and s.trial_until is not null and s.trial_until > now())
         )
       order by m.created_at asc

@@ -1,4 +1,6 @@
 export type Role = 'owner' | 'admin' | 'finance' | 'employee'
+export type OrganizationStatus = 'trial' | 'active' | 'grace_period' | 'read_only' | 'suspended' | 'cancelled' | 'archived'
+export type TenantAccessMode = 'full' | 'read_only' | 'blocked'
 export type PlatformRole = 'platform_owner' | 'platform_admin' | 'platform_support'
 
 export type OrganizationId = string
@@ -7,7 +9,7 @@ export type Organization = {
   id: OrganizationId
   name: string
   slug: string
-  status: 'active' | 'inactive'
+  status: OrganizationStatus
   country: string
   currency: 'CHF' | 'EUR'
   locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'
@@ -16,11 +18,8 @@ export type Organization = {
 }
 
 export type OrganizationScoped = {
-  /**
-   * Optional during the V46 compatibility migration.
-   * V48 will make tenant ownership mandatory at all persistence boundaries.
-   */
-  organizationId?: OrganizationId
+  /** Every business record belongs to exactly one tenant. */
+  organizationId: OrganizationId
 }
 
 
@@ -62,9 +61,13 @@ export type Permission =
   | 'settings.manage'
   | 'audit.read'
   | 'exports.create'
+  | 'subscription.read'
+  | 'subscription.manage'
+  | 'billing.manage'
+  | 'support.request'
 
 export type SubscriptionPlan = 'starter' | 'business' | 'professional' | 'enterprise'
-export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'expired' | 'cancelled'
+export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'grace_period' | 'read_only' | 'suspended' | 'expired' | 'cancelled'
 
 export type OrganizationSubscription = {
   id: string
@@ -83,6 +86,8 @@ export type OrganizationSubscription = {
   cancelAtPeriodEnd?: boolean
   cancelledAt?: string
   scheduledPlan?: SubscriptionPlan
+  graceUntil?: string
+  accessMode?: TenantAccessMode
 }
 
 export type AuditEvent = {
@@ -125,6 +130,8 @@ export type OrganizationEntitlements = {
   features: OrganizationFeature[]
   maxUsers: number
   maxStorageMb: number
+  maxMonthlyDocuments?: number
+  maxApiRequestsPerMonth?: number
 }
 
 export type BusinessBootstrap = {
@@ -142,12 +149,13 @@ export type PlanDefinition = {
   name: string
   monthlyPriceChf?: number
   includedUsers: number
+  maxStorageMb: number
   features: OrganizationFeature[]
   description: string
   recommended?: boolean
 }
 
-export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'expired' | 'cancelled'
+export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'grace_period' | 'read_only' | 'suspended' | 'expired' | 'cancelled' | 'archived'
 
 export type PlatformTenant = {
   id: string
@@ -169,6 +177,27 @@ export type PlatformTenant = {
   cancelAtPeriodEnd?: boolean
   scheduledPlan?: SubscriptionPlan
   billingProvider?: 'manual' | 'stripe'
+}
+
+export type SupportAccessGrant = {
+  id: string
+  organizationId: OrganizationId
+  requestedByUserId: string
+  approvedByUserId?: string
+  platformActorUserId?: string
+  reason: string
+  status: 'requested' | 'approved' | 'active' | 'revoked' | 'expired'
+  validFrom?: string
+  validUntil?: string
+  createdAt: string
+}
+
+export type UsageCounter = {
+  organizationId: OrganizationId
+  period: string
+  metric: 'users' | 'storage_mb' | 'documents' | 'api_requests'
+  value: number
+  updatedAt: string
 }
 
 export type SignupRequest = {
@@ -229,7 +258,7 @@ export type SettlementPolicy = {
 }
 
 export type Customer = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   name: string
   legalName?: string
@@ -250,7 +279,7 @@ export type Customer = {
 
 
 export type CustomerContact = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   customerId: string
   name: string
@@ -261,7 +290,7 @@ export type CustomerContact = {
 }
 
 export type Supplier = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   name: string
   supplierNo: string
@@ -275,7 +304,7 @@ export type Supplier = {
 
 export type CompanyProfile = {
   paymentAddress?: { street: string; buildingNumber?: string; postalCode: string; town: string; country: string }
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   name: string
   address: string
   zip: string
@@ -317,7 +346,7 @@ export type QuoteLine = {
 }
 
 export type Quote = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   number: string
   customerId: string
@@ -346,7 +375,7 @@ export type OrderStatus = 'active' | 'paused' | 'completed'
 export type BillingModel = 'time' | 'fixed' | 'retainer' | 'milestone' | 'mixed'
 
 export type Order = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   customerId: string
   customerName: string
@@ -368,7 +397,7 @@ export type Order = {
 export type WorkerType = 'employee' | 'hourly_employee' | 'external'
 
 export type TimeEntry = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   orderId: string
   orderName: string
@@ -401,7 +430,7 @@ export type InvoiceLine = {
 }
 
 export type Payment = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   invoiceId: string
   date: string
@@ -411,7 +440,7 @@ export type Payment = {
 }
 
 export type Invoice = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   number: string
   customerId: string
@@ -461,7 +490,7 @@ export type ContractLine = {
 }
 
 export type Contract = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   number: string
   customerId: string
@@ -482,7 +511,7 @@ export type Contract = {
 }
 
 export type Expense = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   customerId: string
   customerName: string
@@ -499,7 +528,7 @@ export type Expense = {
 }
 
 export type CreditNote = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   number: string
   invoiceId: string
@@ -512,7 +541,7 @@ export type CreditNote = {
 }
 
 export type CustomerActivity = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   customerId: string
   type: 'note' | 'quote' | 'order' | 'contract' | 'invoice' | 'payment' | 'reminder' | 'credit'
@@ -522,7 +551,7 @@ export type CustomerActivity = {
 }
 
 export type SupplierInvoice = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   number: string
   supplierId: string
@@ -541,7 +570,7 @@ export type SupplierInvoice = {
 }
 
 export type Employee = {
-  organizationId?: OrganizationId
+  organizationId: OrganizationId
   id: string
   name: string
   role: Role

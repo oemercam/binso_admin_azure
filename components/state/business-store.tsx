@@ -37,7 +37,7 @@ import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/docu
 import { defaultAppSettings } from '@/lib/data/app-settings'
 import { DEFAULT_ORGANIZATION_ID, defaultOrganization } from '@/lib/data/organizations'
 import { seedAuditEvents, seedEntitlements, seedExportJobs, seedImportJobs, seedMemberships, seedNumberSequences, seedSubscriptions } from '@/lib/data/saas'
-import { hasPermission } from '@/lib/auth/permissions'
+import { canTenantAction } from '@/lib/auth/access-policy'
 import { getPlan } from '@/lib/data/plans'
 import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
@@ -133,9 +133,9 @@ type CreateQuoteInput = {
   reference?: string
 }
 
-type CreateOrderInput = Omit<Order, 'id' | 'usedHours'>
+type CreateOrderInput = Omit<Order, 'id' | 'usedHours' | 'organizationId'>
 
-type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName'> & { customerId: string }
+type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName' | 'organizationId'> & { customerId: string }
 
 type BusinessStore = BusinessState & {
   queueDocumentMail: (kind: 'quote' | 'invoice' | 'reminder', entityId: string, to: string, key: string) => Promise<void>
@@ -155,25 +155,25 @@ type BusinessStore = BusinessState & {
   updateCustomer: (id: string, changes: Partial<Customer>) => Customer | null
   createContract: (input: CreateContractInput) => Contract | null
   updateContract: (id: string, changes: Partial<Contract>) => Contract | null
-  addExpense: (expense: Expense) => void
+  addExpense: (expense: Omit<Expense, 'organizationId'>) => void
   createOrderFromContract: (contractId: string) => Order | null
   createInvoiceFromContract: (contractId: string, period?: string) => Invoice | null
   createCreditNote: (invoiceId: string, amount: number, reason: string) => CreditNote | null
   addActivityNote: (customerId: string, note: string) => void
-  addCustomerContact: (contact: CustomerContact) => void
+  addCustomerContact: (contact: Omit<CustomerContact, 'organizationId'>) => void
   updateCustomerContact: (id: string, changes: Partial<CustomerContact>) => CustomerContact | null
   createOrder: (input: CreateOrderInput) => Order
   updateOrder: (id: string, changes: Partial<Order>) => Order | null
   addEmployee: (employee: Employee) => void
   updateEmployee: (id: string, changes: Partial<Employee>) => Employee | null
-  addSupplierInvoice: (invoice: SupplierInvoice) => void
+  addSupplierInvoice: (invoice: Omit<SupplierInvoice, 'organizationId'>) => void
   updateSupplierInvoice: (id: string, changes: Partial<SupplierInvoice>) => SupplierInvoice | null
-  addTimeEntry: (entry: TimeEntry) => void
+  addTimeEntry: (entry: Omit<TimeEntry, 'organizationId'>) => void
   updateTimeEntry: (id: string, changes: Partial<TimeEntry>) => TimeEntry | null
-  addEvidence: (evidence: TimeEvidence) => void
+  addEvidence: (evidence: Omit<TimeEvidence, 'organizationId'>) => void
   updateEvidence: (id: string, changes: Partial<TimeEvidence>) => TimeEvidence | null
   updateOrderPolicy: (orderId: string, policy: OrderPolicy) => void
-  updateOrderAssignmentRule: (rule: OrderAssignmentRule) => void
+  updateOrderAssignmentRule: (rule: Omit<OrderAssignmentRule, 'organizationId'>) => void
   updateQuote: (id: string, changes: Partial<Quote>) => void
   createQuote: (input: CreateQuoteInput) => Quote | null
   createQuoteRevision: (quoteId: string) => Quote | null
@@ -194,7 +194,7 @@ type BusinessStore = BusinessState & {
 const STORAGE_KEY = 'business-platform-demo-v13-organizations'
 const LEGACY_STORAGE_KEYS = ['binso-admin-demo-v12-responsive', 'binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
 
-function scopeRecords<T extends { organizationId?: string }>(items: T[], organizationId = DEFAULT_ORGANIZATION_ID): T[] {
+function scopeRecords<T extends { organizationId: string }>(items: T[], organizationId = DEFAULT_ORGANIZATION_ID): T[] {
   return items.map((item) => ({ ...item, organizationId: item.organizationId ?? organizationId }))
 }
 
@@ -263,7 +263,7 @@ function tenantSnapshot(state: BusinessState, organizationId: string): Record<st
   const snapshot: Record<string, unknown> = {}
   for (const key of TENANT_ARRAY_KEYS) {
     const value = state[key]
-    if (Array.isArray(value)) snapshot[key] = value.filter((item) => typeof item === 'object' && item !== null && 'organizationId' in item && (item as { organizationId?: string }).organizationId === organizationId)
+    if (Array.isArray(value)) snapshot[key] = value.filter((item) => typeof item === 'object' && item !== null && 'organizationId' in item && (item as { organizationId: string }).organizationId === organizationId)
   }
   snapshot.companyProfile = state.companyProfiles[organizationId] ?? state.companyProfile
   snapshot.documentTemplates = state.documentTemplatesByOrganization[organizationId] ?? state.documentTemplates
@@ -278,7 +278,7 @@ function mergeTenantSnapshot(current: BusinessState, snapshot: Record<string, un
     const existing = current[key]
     if (!Array.isArray(existing)) continue
     ;(next as unknown as Record<string, unknown>)[key] = [
-      ...existing.filter((item) => typeof item !== 'object' || item === null || !('organizationId' in item) || (item as { organizationId?: string }).organizationId !== organizationId),
+      ...existing.filter((item) => typeof item !== 'object' || item === null || !('organizationId' in item) || (item as { organizationId: string }).organizationId !== organizationId),
       ...incoming,
     ]
   }
@@ -528,7 +528,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         currentOrganizationId: organizationId,
         memberships: [membership, ...current.memberships],
         subscriptions: [subscription, ...current.subscriptions],
-        entitlements: [{ organizationId, features: plan.features, maxUsers: plan.includedUsers, maxStorageMb: input.plan === 'starter' ? 2048 : input.plan === 'business' ? 10240 : 51200 }, ...current.entitlements],
+        entitlements: [{ organizationId, features: plan.features, maxUsers: plan.includedUsers, maxStorageMb: plan.maxStorageMb }, ...current.entitlements],
         companyProfiles: { ...current.companyProfiles, [organizationId]: { ...defaultCompanyProfile, organizationId, name: organization.name, email: input.ownerEmail, uid: '', iban: '', bankName: '', website: '', phone: '', address: '', zip: '', city: '', country: 'Schweiz' } },
         documentTemplatesByOrganization: { ...current.documentTemplatesByOrganization, [organizationId]: defaultDocumentTemplates },
         appSettingsByOrganization: { ...current.appSettingsByOrganization, [organizationId]: { ...defaultAppSettings, mail: { ...defaultAppSettings.mail, senderName: organization.name, replyTo: input.ownerEmail, invoiceSender: input.ownerEmail, quoteSender: input.ownerEmail, reminderSender: input.ownerEmail, payrollSender: input.ownerEmail } } },
@@ -546,7 +546,10 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
       const role = user
         ? state.memberships.find((membership) => membership.organizationId === state.currentOrganizationId && (membership.userId === user.id || membership.email.toLowerCase() === user.email.toLowerCase()) && membership.status === 'active')?.role ?? user.role
         : 'employee'
-      return hasPermission(role, permission)
+      const entitlement = state.entitlements.find((item) => item.organizationId === state.currentOrganizationId)
+      const subscription = state.subscriptions.find((item) => item.organizationId === state.currentOrganizationId)
+      if (!entitlement || !subscription) return false
+      return canTenantAction({ role, permission, features: entitlement.features, subscriptionStatus: subscription.status })
     },
     async queueDocumentMail(kind, entityId, to, key) {
       const organizationId = state.currentOrganizationId
@@ -640,7 +643,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
       const hours = contract.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity, 0)
       const hourlyRevenue = contract.lines.filter((line) => line.unit === 'h').reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)
       const order: Order = { organizationId: state.currentOrganizationId, id: `ord-${Date.now()}`, customerId: contract.customerId, customerName: contract.customerName, name: contract.name, mandateRef: contract.reference || contract.number, budgetHours: hours || 160, usedHours: 0, salesRate: hours ? Math.round(hourlyRevenue / hours) : 165, costRate: 105, billingModel: contract.billingInterval === 'none' ? 'mixed' : 'retainer', contractId: contract.id, status: 'active' }
-      const policy = createDefaultOrderPolicy(order.id, order.billingModel, {
+      const policy = createDefaultOrderPolicy(state.currentOrganizationId, order.id, order.billingModel, {
         ...customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings),
         ...(contract.workflowOverride ?? {}),
       })
@@ -719,7 +722,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
     },
     createOrder(input) {
       const order: Order = { ...input, organizationId: state.currentOrganizationId, id: `ord-${Date.now()}`, usedHours: 0 }
-      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
+      const policy = createDefaultOrderPolicy(state.currentOrganizationId, order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],
@@ -894,7 +897,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         sourceQuoteId: quote.id,
         status: 'active',
       }
-      const policy = createDefaultOrderPolicy(order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
+      const policy = createDefaultOrderPolicy(state.currentOrganizationId, order.id, order.billingModel, customerProcessFor(state.customers.find((customer) => customer.id === order.customerId), currentAppSettings))
       setState((current) => ({
         ...current,
         orders: [order, ...current.orders],

@@ -2,7 +2,7 @@ import type { ApprovalPolicy, ContractChain } from '@/modules/contracts/types'
 import type { TimeTrackingPolicy } from '@/modules/time/types'
 
 export type OrderPolicy = {
-  organizationId?: string
+  organizationId: string
   orderId: string
   contractChain?: ContractChain
   timeTracking: TimeTrackingPolicy

@@ -1,7 +1,7 @@
 import type { BillingModel, CustomerWorkflowPolicy } from '@/types/domain'
 import type { OrderPolicy } from '@/modules/orders/types'
 
-export function createDefaultOrderPolicy(orderId: string, billingModel: BillingModel, process?: CustomerWorkflowPolicy): OrderPolicy {
+export function createDefaultOrderPolicy(organizationId: string, orderId: string, billingModel: BillingModel, process?: CustomerWorkflowPolicy): OrderPolicy {
   const workflow: CustomerWorkflowPolicy = process ?? {
     timeTrackingMode: 'internal',
     monthlyReportRequired: false,
@@ -11,6 +11,7 @@ export function createDefaultOrderPolicy(orderId: string, billingModel: BillingM
     blockPayoutUntilReportApproved: false,
   }
   return {
+    organizationId,
     orderId,
     timeTracking: {
       mode: workflow.timeTrackingMode,

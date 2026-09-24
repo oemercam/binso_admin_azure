@@ -1,6 +1,8 @@
 import type { CompanyProfile, DocumentTemplates } from '@/types/domain'
+import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
 
 export const defaultCompanyProfile: CompanyProfile = {
+  organizationId: DEFAULT_ORGANIZATION_ID,
   name: '',
   address: '',
   zip: '',

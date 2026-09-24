@@ -59,13 +59,14 @@ export default function EmployeesPage() {
 }
 
 function EmployeeForm({ onClose, onSave }: { onClose: () => void; onSave: (employee: Employee) => void }) {
+  const store = useBusinessStore()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Role>('employee')
   const [employmentType, setEmploymentType] = useState<Employee['employmentType']>('salary')
   const [targetHours, setTargetHours] = useState(168)
   const [internalCostRate, setInternalCostRate] = useState(80)
-  function submit(event: React.FormEvent) { event.preventDefault(); onSave({ id: `emp-${Date.now()}`, name: name.trim(), email: email.trim(), role, employmentType, status: 'active', targetHours, bookedHours: 0, billableHours: 0, utilisation: 0, internalCostRate }) }
+  function submit(event: React.FormEvent) { event.preventDefault(); onSave({ organizationId: store.currentOrganizationId, id: `emp-${Date.now()}`, name: name.trim(), email: email.trim(), role, employmentType, status: 'active', targetHours, bookedHours: 0, billableHours: 0, utilisation: 0, internalCostRate }) }
   return <StandardFormSheet open title={<>Mitarbeitenden erfassen</>} description={<>Profil und betriebliche Basisdaten.</>} onClose={onClose} onSubmit={submit} formId="employees-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="employees-page-sheet-1" className="button primary">Erfassen</button></>}><div className="form-grid"><label className="full"><span>Name *</span><Input value={name} onChange={(e) => setName(e.target.value)} required/></label><label className="full"><span>E-Mail *</span><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required/></label><label><span>Rolle</span><Select value={role} onChange={(e) => setRole(e.target.value as Role)}><option value="employee">Mitarbeiter</option><option value="finance">Buchhaltung</option><option value="admin">Admin</option><option value="owner">Inhaber</option></Select></label><label><span>Anstellung</span><Select value={employmentType} onChange={(e) => setEmploymentType(e.target.value as Employee['employmentType'])}><option value="salary">Festlohn</option><option value="hourly">Stundenlohn</option></Select></label><label><span>Sollstunden / Monat</span><Input type="number" min="0" value={targetHours} onChange={(e) => setTargetHours(Number(e.target.value))}/></label><label><span>Interne Kosten CHF/h</span><Input type="number" min="0" step="0.05" value={internalCostRate} onChange={(e) => setInternalCostRate(Number(e.target.value))}/></label></div></StandardFormSheet>
 }
 

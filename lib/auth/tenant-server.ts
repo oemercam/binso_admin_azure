@@ -1,10 +1,13 @@
 import 'server-only'
+import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { findAccessibleMembership, findActiveMembership, findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
 import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
-import type { OrganizationMembership } from '@/types/domain'
+import type { OrganizationMembership, Permission } from '@/types/domain'
+import { getTenantAccess } from '@/lib/db/repositories/tenant-access'
+import { canTenantAction } from '@/lib/auth/access-policy'
 
 export type TenantRequestContext = {
   userId: string
@@ -95,4 +98,30 @@ export async function resolveMembershipContext(preferredOrganizationId?: string 
 export function assertTenantId(value: string | null | undefined) {
   if (!value) throw new Error('Organization context is required')
   return value
+}
+
+
+export async function resolveAuthorizedTenantContext(
+  preferredOrganizationId: string | null | undefined,
+  permission: Permission,
+) {
+  const context = await resolveTenantContext(preferredOrganizationId)
+  if (!context) return null
+  if (!isDatabaseConfigured()) return context
+  const access = await getTenantAccess(context.organizationId)
+  if (!access) return null
+  if (!canTenantAction({
+    role: context.membership.role,
+    permission,
+    features: access.features,
+    subscriptionStatus: access.subscriptionStatus,
+  })) return null
+  return { ...context, access }
+}
+
+
+export async function requireTenantPermission(permission: Permission, preferredOrganizationId?: string | null) {
+  const context = await resolveAuthorizedTenantContext(preferredOrganizationId, permission)
+  if (!context) redirect('/access-denied')
+  return context
 }

@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
-import { requireRole } from '@/lib/auth/server'
-import { ROLE_GROUPS } from '@/lib/auth/permissions'
+import { requireTenantPermission } from '@/lib/auth/tenant-server'
 
 export default async function EmployeesRouteLayout({ children }: { children: ReactNode }) {
-  await requireRole(ROLE_GROUPS.ownersAndAdmins)
+  await requireTenantPermission('employees.read')
   return children
 }

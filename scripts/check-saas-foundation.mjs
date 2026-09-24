@@ -6,7 +6,7 @@ const schema = fs.readFileSync('database/schema.sql', 'utf8')
 
 const requiredDomain = [
   'export type Organization =',
-  'organizationId?: OrganizationId',
+  'organizationId: OrganizationId',
 ]
 
 const requiredStore = [

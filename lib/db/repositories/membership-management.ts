@@ -78,14 +78,14 @@ export async function inviteOrganizationMember(input: {
     const result = existingMembership
       ? await client.query<MembershipRow>(
           `update organization_memberships
-              set role = $3, status = 'invited', updated_at = now()
+              set role = $3, role_id = (select id from organization_roles where organization_id = $1 and code = $3 limit 1), status = 'invited', updated_at = now()
             where organization_id = $1 and id = $2
             returning id, organization_id, user_id, email, role, status, created_at, updated_at`,
           [input.organizationId, existingMembership.id, input.role],
         )
       : await client.query<MembershipRow>(
-          `insert into organization_memberships (organization_id, user_id, email, role, status, updated_at)
-           values ($1,$2,$3,$4,'invited',now())
+          `insert into organization_memberships (organization_id, user_id, email, role, role_id, status, updated_at)
+           values ($1,$2,$3,$4,(select id from organization_roles where organization_id = $1 and code = $4 limit 1),'invited',now())
            returning id, organization_id, user_id, email, role, status, created_at, updated_at`,
           [input.organizationId, invitedUserId, input.email.toLowerCase(), input.role],
         )
@@ -141,7 +141,9 @@ export async function updateOrganizationMember(input: {
 
     const result = await client.query<MembershipRow>(
       `update organization_memberships
-          set role = coalesce($3, role), status = coalesce($4, status), updated_at = now()
+          set role = coalesce($3, role),
+              role_id = case when $3 is null then role_id else (select id from organization_roles where organization_id = $1 and code = $3 limit 1) end,
+              status = coalesce($4, status), updated_at = now()
         where organization_id = $1 and id = $2
         returning id, organization_id, user_id, email, role, status, created_at, updated_at`,
       [input.organizationId, input.membershipId, input.role ?? null, input.status ?? null],

@@ -42,10 +42,6 @@ function RegisterForm() {
           if (!response.ok) throw new Error(result.error || 'Registrierung konnte nicht geladen werden.')
           if (cancelled) return
           setSessionState(result)
-          if (result.memberships?.length) {
-            router.replace('/dashboard')
-            return
-          }
           if (result.signup) {
             setCompanyName(result.signup.companyName)
             setOwnerName(result.signup.ownerName)

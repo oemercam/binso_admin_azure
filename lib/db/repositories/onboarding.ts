@@ -56,25 +56,6 @@ export async function createTrialOrganization(input: {
       throw new Error('Die Registrierung gehört nicht zum angemeldeten Konto.')
     }
 
-    const existing = await client.query<{ organization_id: string }>(
-      `select organization_id
-         from organization_memberships
-        where user_id = $1 and status = 'active'
-        order by created_at asc
-        limit 1`,
-      [input.userId],
-    )
-    if (existing.rows[0]) {
-      const organizationId = existing.rows[0].organization_id
-      await client.query(
-        `update signup_requests
-            set status = 'trial_started', organization_id = $2, updated_at = now(), completed_at = coalesce(completed_at, now())
-          where id = $1`,
-        [signup.id, organizationId],
-      )
-      return { organizationId, created: false }
-    }
-
     if (signup.organization_id) {
       return { organizationId: signup.organization_id, created: false }
     }
@@ -89,11 +70,11 @@ export async function createTrialOrganization(input: {
     )
     const organizationId = organization.rows[0].id
     const trialUntil = new Date(Date.now() + 14 * 86_400_000)
-    const maxStorageMb = signup.plan === 'starter' ? 2048 : signup.plan === 'business' ? 10240 : 51200
+    const maxStorageMb = plan.maxStorageMb
 
     await client.query(
-      `insert into organization_memberships (organization_id, user_id, email, role, status)
-       values ($1, $2, $3, 'owner', 'active')`,
+      `insert into organization_memberships (organization_id, user_id, email, role, role_id, status)
+       values ($1, $2, $3, 'owner', (select id from organization_roles where organization_id = $1 and code = 'owner' limit 1), 'active')`,
       [organizationId, input.userId, input.userEmail],
     )
     await client.query(

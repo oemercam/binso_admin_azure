@@ -144,7 +144,7 @@ export async function updatePlatformSubscription(input: {
       [current.organization_id],
     )
     const seats = Math.max(Number(activeUsers.rows[0]?.count ?? 0), plan.includedUsers)
-    const subscriptionStatus: SubscriptionStatus = input.status === 'suspended'
+    const subscriptionStatus: SubscriptionStatus = input.status === 'archived'
       ? current.subscription_status
       : input.status
     const amount = plan.monthlyPriceChf ?? 0
@@ -163,7 +163,7 @@ export async function updatePlatformSubscription(input: {
       `update organization_entitlements
           set features = $2, max_users = $3, max_storage_mb = $4, updated_at = now()
         where organization_id = $1`,
-      [current.organization_id, plan.features, seats, storageForPlan(input.plan)],
+      [current.organization_id, plan.features, seats, plan.maxStorageMb],
     )
     await client.query(
       `update platform_tenants
@@ -172,6 +172,20 @@ export async function updatePlatformSubscription(input: {
               last_active_at = coalesce(last_active_at, now())
         where id = $1`,
       [input.tenantId, input.status, seats, amount],
+    )
+    await client.query(
+      `update organizations
+          set status = case
+            when $2 in ('trial','active','past_due') then 'active'
+            when $2 = 'grace_period' then 'grace_period'
+            when $2 in ('read_only','expired') then 'read_only'
+            when $2 = 'suspended' then 'suspended'
+            when $2 = 'cancelled' then 'cancelled'
+            when $2 = 'archived' then 'archived'
+            else status end,
+              updated_at = now()
+        where id = $1`,
+      [current.organization_id, input.status],
     )
     await client.query(
       `insert into subscription_events
@@ -186,12 +200,6 @@ export async function updatePlatformSubscription(input: {
     )
     return { organizationId: current.organization_id }
   })
-}
-
-function storageForPlan(plan: SubscriptionPlan) {
-  if (plan === 'starter') return 2048
-  if (plan === 'business') return 10240
-  return 51200
 }
 
 export async function getOrganizationSubscription(organizationId: string) {
@@ -296,7 +304,7 @@ export async function requestSubscriptionChange(input: {
         `update organization_entitlements
             set features = $2, max_users = $3, max_storage_mb = $4, updated_at = now()
           where organization_id = $1`,
-        [input.organizationId, nextPlan.features, seats, storageForPlan(input.plan)],
+        [input.organizationId, nextPlan.features, seats, nextPlan.maxStorageMb],
       )
       await client.query(
         `update platform_tenants set seats = $2 where organization_id = $1`,

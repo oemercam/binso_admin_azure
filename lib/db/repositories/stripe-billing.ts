@@ -149,6 +149,7 @@ export async function applyStripeSubscription(input: {
               cancel_at_period_end = coalesce($8, cancel_at_period_end),
               scheduled_plan = null,
               cancelled_at = case when $3 = 'cancelled' then coalesce(cancelled_at, now()) else null end,
+              grace_until = case when $3 = 'active' then null else grace_until end,
               stripe_subscription_created = $10, trial_until = coalesce($11, trial_until),
               billing_last_synced_at = now(), billing_last_event_id = $9, updated_at = now()
         where id = $1`,
@@ -160,7 +161,7 @@ export async function applyStripeSubscription(input: {
       `update organization_entitlements
           set features = $2, max_users = $3, max_storage_mb = $4, updated_at = now()
         where organization_id = $1`,
-      [input.organizationId, plan.features, plan.includedUsers, storageForPlan(mappedPlan)],
+      [input.organizationId, plan.features, plan.includedUsers, plan.maxStorageMb],
     )
     await client.query(
       `update platform_tenants
@@ -169,6 +170,16 @@ export async function applyStripeSubscription(input: {
               seats = greatest(seats, $4), last_active_at = now()
         where organization_id = $1`,
       [input.organizationId, nextStatus, plan.monthlyPriceChf ?? 0, plan.includedUsers],
+    )
+    await client.query(
+      `update organizations
+          set status = case
+            when $2 in ('trial','active','past_due') then 'active'
+            when $2 = 'cancelled' then 'cancelled'
+            else status end,
+              updated_at = now()
+        where id = $1`,
+      [input.organizationId, nextStatus],
     )
     await client.query(
       `insert into subscription_events
@@ -187,8 +198,3 @@ export async function findOrganizationByStripeCustomer(customerId: string) {
   return result.rows[0]?.organization_id ?? null
 }
 
-function storageForPlan(plan: SubscriptionPlan) {
-  if (plan === 'starter') return 2048
-  if (plan === 'business') return 10240
-  return 51200
-}

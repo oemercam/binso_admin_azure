@@ -9,10 +9,12 @@ import type {
   SupplierInvoice,
   TimeEntry,
 } from '@/types/domain'
+import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
 
 // Lokale Referenzdaten für Entwicklung und UI-Tests. Firmen- und Personennamen sind fiktiv.
 export const customers: Customer[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'cus-001',
     customerNo: 'K-1001',
     name: 'Alpine Public IT AG',
@@ -30,6 +32,7 @@ export const customers: Customer[] = [
     notes: 'Vertragspartner für den Auftrag Digital Workplace. Leistungserbringung für Bundesstelle Digital Services.',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'cus-002',
     customerNo: 'K-1002',
     name: 'Muster Industrie AG',
@@ -45,6 +48,7 @@ export const customers: Customer[] = [
     status: 'active',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'cus-003',
     customerNo: 'K-1003',
     name: 'Helvetic Systems AG',
@@ -62,6 +66,7 @@ export const customers: Customer[] = [
 
 export const suppliers: Supplier[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'sup-001',
     supplierNo: 'L-2001',
     name: 'Meier Cloud Consulting GmbH',
@@ -75,6 +80,7 @@ export const suppliers: Supplier[] = [
 
 export const quotes: Quote[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'quo-001',
     number: 'AN-2026-014',
     customerId: 'cus-002',
@@ -91,6 +97,7 @@ export const quotes: Quote[] = [
     amount: 16800,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'quo-002',
     number: 'AN-2026-013',
     customerId: 'cus-003',
@@ -109,6 +116,7 @@ export const quotes: Quote[] = [
 
 export const orders: Order[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'ord-001',
     customerId: 'cus-001',
     customerName: 'Alpine Public IT AG',
@@ -125,6 +133,7 @@ export const orders: Order[] = [
     status: 'active',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'ord-002',
     customerId: 'cus-002',
     customerName: 'Muster Industrie AG',
@@ -138,6 +147,7 @@ export const orders: Order[] = [
     status: 'active',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'ord-003',
     customerId: 'cus-003',
     customerName: 'Helvetic Systems AG',
@@ -154,41 +164,49 @@ export const orders: Order[] = [
 
 export const timeEntries: TimeEntry[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-001', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-01', hours: 8,
     description: 'Workplace Architektur, Abstimmung und technische Führung', billable: true, approved: true, salesRate: 165, internalCostRate: 105, invoicedInvoiceId: 'inv-001',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-002', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-02', hours: 7.5,
     description: 'Client Engineering und Pakettests', billable: true, approved: true, salesRate: 145, internalCostRate: 72, invoicedInvoiceId: 'inv-001',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-003', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-03', hours: 8,
     description: 'M365 Engineering und technische Analyse', billable: true, approved: true, salesRate: 165, internalCostRate: 125, invoicedInvoiceId: 'inv-001',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-004', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-08', hours: 8,
     description: 'Security Hardening und Review', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-005', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'emp-002', personName: 'Nina Keller', workerType: 'hourly_employee', date: '2026-09-09', hours: 8,
     description: 'Treiber- und Hardwarevalidierung', billable: true, approved: true, salesRate: 145, internalCostRate: 72,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-006', orderId: 'ord-001', orderName: 'Digital Workplace', customerId: 'cus-001', customerName: 'Alpine Public IT AG',
     personId: 'ext-001', personName: 'Dario Meier / Meier Cloud Consulting GmbH', workerType: 'external', date: '2026-09-10', hours: 6,
     description: 'Intune Policy Review', billable: true, approved: true, salesRate: 165, internalCostRate: 125,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-007', orderId: 'ord-002', orderName: 'Client Migration Phase 2', customerId: 'cus-002', customerName: 'Muster Industrie AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-09-15', hours: 7.5,
     description: 'Migration und Abnahmetest', billable: true, approved: true, salesRate: 165, internalCostRate: 105,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'time-008', orderId: 'ord-003', orderName: 'M365 Security Assessment', customerId: 'cus-003', customerName: 'Helvetic Systems AG',
     personId: 'emp-001', personName: 'Ömer Cam', workerType: 'employee', date: '2026-08-28', hours: 6.5,
     description: 'Assessment und Management Summary', billable: true, approved: true, salesRate: 185, internalCostRate: 105, invoicedInvoiceId: 'inv-002',
@@ -197,6 +215,7 @@ export const timeEntries: TimeEntry[] = [
 
 export const invoices: Invoice[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'inv-001', number: 'RE-2026-009', customerId: 'cus-001', customerName: 'Alpine Public IT AG', orderId: 'ord-001', orderName: 'Digital Workplace',
     period: 'September 2026', issueDate: '2026-09-18', due: '2026-10-18', status: 'sent',
     lines: [
@@ -210,6 +229,7 @@ export const invoices: Invoice[] = [
     paidAmount: 0,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'inv-002', number: 'RE-2026-008', customerId: 'cus-003', customerName: 'Helvetic Systems AG', orderId: 'ord-003', orderName: 'M365 Security Assessment',
     period: 'August 2026', issueDate: '2026-08-31', due: '2026-09-20', status: 'overdue',
     lines: [
@@ -222,6 +242,7 @@ export const invoices: Invoice[] = [
     paidAmount: 0,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'inv-003', number: 'RE-2026-007', customerId: 'cus-002', customerName: 'Muster Industrie AG', orderId: 'ord-002', orderName: 'Client Migration Phase 2',
     period: 'August 2026', issueDate: '2026-08-25', due: '2026-09-14', status: 'paid',
     lines: [
@@ -235,11 +256,12 @@ export const invoices: Invoice[] = [
 ]
 
 export const payments: Payment[] = [
-  { id: 'pay-001', invoiceId: 'inv-003', date: '2026-09-18', amount: 8383.16, method: 'Bank', reference: 'BANK-20260918-0042' },
+  { organizationId: DEFAULT_ORGANIZATION_ID, id: 'pay-001', invoiceId: 'inv-003', date: '2026-09-18', amount: 8383.16, method: 'Bank', reference: 'BANK-20260918-0042' },
 ]
 
 export const supplierInvoices: SupplierInvoice[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'sinv-001', number: 'MCC-2026-091', supplierId: 'sup-001', supplierName: 'Meier Cloud Consulting GmbH',
     orderId: 'ord-001', orderName: 'Digital Workplace', invoiceDate: '2026-09-15', due: '2026-10-05',
     netAmount: 1750, vatAmount: 141.75, amount: 1891.75, status: 'open',
@@ -249,14 +271,17 @@ export const supplierInvoices: SupplierInvoice[] = [
 
 export const employees: Employee[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'emp-001', name: 'Ömer Cam', role: 'owner', email: 'oemer.cam@binso.ch', employmentType: 'salary', status: 'active',
     targetHours: 168, bookedHours: 124.5, billableHours: 112, utilisation: 67, internalCostRate: 105,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'emp-002', name: 'Nina Keller', role: 'employee', email: 'nina.keller@example.ch', employmentType: 'hourly', status: 'active',
     targetHours: 120, bookedHours: 94.5, billableHours: 88, utilisation: 73, internalCostRate: 72,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'emp-003', name: 'David Frei', role: 'finance', email: 'david.frei@example.ch', employmentType: 'salary', status: 'active',
     targetHours: 168, bookedHours: 142, billableHours: 41, utilisation: 24, internalCostRate: 86,
   },

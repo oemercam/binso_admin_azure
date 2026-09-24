@@ -49,11 +49,6 @@ export async function POST(request: Request) {
   const user = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
   if (user.status !== 'active') return NextResponse.json({ error: 'Benutzerkonto ist gesperrt.' }, { status: 403 })
 
-  const memberships = await findActiveMembershipsForUser(session.user.id)
-  if (memberships.length > 0) {
-    return NextResponse.json({ error: 'Für dieses Konto besteht bereits eine aktive Organisation.', organizationId: memberships[0].organizationId }, { status: 409 })
-  }
-
   const signup = await saveRegistration({ userId: session.user.id, companyName, ownerName, email, plan })
   return NextResponse.json({ signup }, { status: 200 })
 }

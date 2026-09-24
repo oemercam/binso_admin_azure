@@ -1,4 +1,4 @@
-import { resolveTenantContext } from '@/lib/auth/tenant-server'
+import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { inviteOrganizationMember, listOrganizationMembers, updateOrganizationMember } from '@/lib/db/repositories/membership-management'
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
@@ -11,8 +11,8 @@ export async function GET(request: Request) {
   const id = requestId(request)
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   const organizationId = new URL(request.url).searchParams.get('organizationId')
-  const context = await resolveTenantContext(organizationId)
-  if (!context || context.membership.role === 'employee') return apiError(403, 'tenant_forbidden', 'Keine Berechtigung.', id)
+  const context = await resolveAuthorizedTenantContext(organizationId, 'members.read')
+  if (!context) return apiError(403, 'tenant_forbidden', 'Keine Berechtigung.', id)
   const members = await listOrganizationMembers(context)
   const { withTenantTransaction } = await import('@/lib/db/tenant')
   const auditEvents = await withTenantTransaction(context, async (client) => {
@@ -31,8 +31,8 @@ export async function POST(request: Request) {
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   let body: { organizationId?: string; email?: string; role?: Role }
   try { body = await readJsonBody(request, 16_384) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
-  const context = await resolveTenantContext(body.organizationId)
-  if (!context || !['owner','admin'].includes(context.membership.role)) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
+  const context = await resolveAuthorizedTenantContext(body.organizationId, 'members.manage')
+  if (!context) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
   const email = body.email?.trim().toLowerCase() ?? ''
   if (!/^\S+@\S+\.\S+$/.test(email) || !body.role || !roles.has(body.role)) return apiError(422, 'validation', 'E-Mail oder Rolle ist ungültig.', id)
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können weitere Inhaber einladen.', id)
@@ -54,8 +54,8 @@ export async function PATCH(request: Request) {
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   let body: { organizationId?: string; membershipId?: string; role?: Role; status?: 'active' | 'suspended' }
   try { body = await readJsonBody(request, 16_384) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
-  const context = await resolveTenantContext(body.organizationId)
-  if (!context || !['owner','admin'].includes(context.membership.role)) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
+  const context = await resolveAuthorizedTenantContext(body.organizationId, 'members.manage')
+  if (!context) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
   if (!body.membershipId || (body.role && !roles.has(body.role)) || (body.status && !['active','suspended'].includes(body.status))) return apiError(422, 'validation', 'Änderung ist ungültig.', id)
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können die Inhaberrolle vergeben.', id)
   try {

@@ -7,6 +7,7 @@ const allPermissions: Permission[] = [
   'time.read','time.write','time.approve','invoices.read','invoices.write',
   'payments.write','finance.read','margin.read','employees.read','employees.write',
   'employee_costs.read','settings.manage','audit.read','exports.create',
+  'subscription.read','subscription.manage','billing.manage','support.request',
 ]
 
 
@@ -25,15 +26,15 @@ export const ROLE_GROUPS = {
 
 export const rolePermissions: Record<Role, Permission[]> = {
   owner: allPermissions,
-  admin: allPermissions.filter((permission) => permission !== 'organization.manage'),
+  admin: allPermissions.filter((permission) => !['organization.manage','subscription.manage','billing.manage'].includes(permission)),
   finance: [
     'organization.read','members.read','customers.read','quotes.read',
     'orders.read','contracts.read','time.read','invoices.read','invoices.write',
     'payments.write','finance.read','margin.read','employees.read',
-    'employee_costs.read','audit.read','exports.create',
+    'employee_costs.read','audit.read','exports.create','subscription.read','support.request',
   ],
   employee: [
-    'organization.read','customers.read','orders.read','time.read','time.write',
+    'organization.read','customers.read','orders.read','time.read','time.write','support.request',
   ],
 }
 

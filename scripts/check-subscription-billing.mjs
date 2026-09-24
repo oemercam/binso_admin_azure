@@ -20,7 +20,7 @@ const checks=[
  ['platform ui no local store',!platform.includes('usePlatformStore')],
  ['domain billing lifecycle',domain.includes('billingSubscriptionId')&&domain.includes('cancelAtPeriodEnd')],
  ['new trials record billing amount',onboarding.includes('unit_amount_chf')],
- ['owner self-service api',customerApi.includes("context.membership.role !== 'owner'")&&customerApi.includes('change_plan')&&customerApi.includes('reactivate')],
+ ['owner self-service api',customerApi.includes("'subscription.manage'")&&customerApi.includes('change_plan')&&customerApi.includes('reactivate')],
  ['owner subscription ui',organization.includes('Abonnement verwalten')&&organization.includes('/api/billing/subscription')],
 ]
 const failed=checks.filter(([,ok])=>!ok)

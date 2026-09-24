@@ -1,9 +1,11 @@
 import type { OrderPolicy } from '@/modules/orders/types'
 import type { OrderAssignmentRule } from '@/modules/workforce/types'
 import type { TimeEvidence } from '@/modules/time/types'
+import { DEFAULT_ORGANIZATION_ID } from '@/lib/data/organizations'
 
 export const orderPolicies: OrderPolicy[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-001',
     contractChain: {
       id: 'chain-001',
@@ -53,6 +55,7 @@ export const orderPolicies: OrderPolicy[] = [
     budgetWarnings: [70, 85, 100],
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-002',
     timeTracking: {
       mode: 'internal',
@@ -88,6 +91,7 @@ export const orderPolicies: OrderPolicy[] = [
     budgetWarnings: [70, 85, 100],
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-003',
     timeTracking: {
       mode: 'internal',
@@ -124,18 +128,21 @@ export const orderPolicies: OrderPolicy[] = [
 
 export const orderAssignmentRules: OrderAssignmentRule[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-001',
     personId: 'emp-001',
     providerType: 'employee_salary',
     active: true,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-001',
     personId: 'emp-002',
     providerType: 'employee_hourly',
     active: true,
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     orderId: 'ord-001',
     personId: 'ext-001',
     providerType: 'external_company',
@@ -158,6 +165,7 @@ export const orderAssignmentRules: OrderAssignmentRule[] = [
 
 export const timeEvidence: TimeEvidence[] = [
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'evi-001',
     timeEntryId: 'time-004',
     orderId: 'ord-001',
@@ -172,6 +180,7 @@ export const timeEvidence: TimeEvidence[] = [
     verifiedAt: '2026-09-09T08:11:00+02:00',
   },
   {
+    organizationId: DEFAULT_ORGANIZATION_ID,
     id: 'evi-002',
     timeEntryId: 'time-005',
     orderId: 'ord-001',

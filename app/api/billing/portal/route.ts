@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSameOrigin } from '@/lib/http/server-api'
-import { resolveMembershipContext } from '@/lib/auth/tenant-server'
+import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost } from '@/lib/billing/stripe'
 import { getBillingIdentity } from '@/lib/db/repositories/stripe-billing'
 
@@ -8,9 +8,8 @@ type PortalSession = { url: string }
 
 export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const context = await resolveMembershipContext()
+  const context = await resolveAuthorizedTenantContext(undefined, 'billing.manage')
   if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
-  if (context.membership.role !== 'owner') return NextResponse.json({ error: 'Nur der Inhaber kann die Abrechnung ändern.' }, { status: 403 })
 
   const billing = await getBillingIdentity(context.organizationId)
   if (!billing?.billingCustomerId) return NextResponse.json({ error: 'Noch kein Stripe-Kundenkonto vorhanden.' }, { status: 409 })

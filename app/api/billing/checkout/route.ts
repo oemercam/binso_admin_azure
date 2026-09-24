@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSameOrigin } from '@/lib/http/server-api'
-import { resolveMembershipContext } from '@/lib/auth/tenant-server'
+import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost, stripePriceId } from '@/lib/billing/stripe'
 import { getBillingIdentity, saveStripeCustomer } from '@/lib/db/repositories/stripe-billing'
 import type { SubscriptionPlan } from '@/types/domain'
@@ -12,9 +12,8 @@ type StripeCheckoutSession = { id: string; url: string | null }
 
 export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const context = await resolveMembershipContext()
+  const context = await resolveAuthorizedTenantContext(undefined, 'billing.manage')
   if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
-  if (context.membership.role !== 'owner') return NextResponse.json({ error: 'Nur der Inhaber kann die Abrechnung ändern.' }, { status: 403 })
 
   const body = await request.json().catch(() => null) as { plan?: SubscriptionPlan } | null
   if (!body?.plan || !plans.has(body.plan)) return NextResponse.json({ error: 'Für diesen Plan ist kein Online-Checkout verfügbar.' }, { status: 400 })
