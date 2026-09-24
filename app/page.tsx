@@ -1,56 +1,84 @@
 import Link from 'next/link'
 import { planDefinitions } from '@/lib/data/plans'
 import { PublicCta, PublicShell } from '@/components/public/public-shell'
-import { BusinessFlowVisual, DashboardProductVisual, FeatureVisualGrid, OnboardingVisual } from '@/components/public/product-visuals'
+import {
+  BusinessFlowVisual,
+  DashboardProductVisual,
+  FeatureStoryVisual,
+  LandingProofVisual,
+  OnboardingVisual,
+} from '@/components/public/product-visuals'
 
 export default function HomePage() {
   const highlightedPlans = planDefinitions.filter((plan) => ['starter', 'business', 'professional'].includes(plan.id))
 
   return (
     <PublicShell>
-      <main className="public-main">
-        <section className="public-hero public-hero-visual">
-          <div className="public-hero-copy">
-            <span className="public-eyebrow">Business-Plattform für Schweizer Unternehmen</span>
+      <main className="public-main public-landing-v703">
+        <section className="landing-hero">
+          <div className="landing-hero-copy">
+            <span className="public-eyebrow">Die Business-Plattform für Dienstleistungsunternehmen</span>
             <h1>Dein Unternehmen.<br />Eine Plattform.</h1>
-            <p>Kunden, Angebote, Aufträge, Zeiten, Rechnungen und Mitarbeitende in einer klaren Arbeitsumgebung verwalten.</p>
-            <div className="public-hero-actions">
+            <p>Binso One verbindet Kunden, Angebote, Aufträge, Zeiterfassung, Rechnungen, Mitarbeitende und Finanzen in einem durchgängigen Arbeitsablauf.</p>
+            <div className="landing-hero-actions">
               <Link className="button primary" href="/register">Kostenlos starten</Link>
               <Link className="button secondary" href="/features">Funktionen ansehen</Link>
             </div>
-            <small>14 Tage testen. Noch keine Zahlung bei der Registrierung.</small>
+            <div className="landing-hero-meta" aria-label="Vorteile beim Einstieg">
+              <span>14 Tage testen</span>
+              <span>Keine Zahlung bei der Registrierung</span>
+              <span>Für Desktop, Mobile und PWA</span>
+            </div>
           </div>
           <DashboardProductVisual />
         </section>
 
-        <section className="public-section public-workflow-section">
-          <div className="public-section-head">
-            <span>Durchgängiger Ablauf</span>
-            <h2>Vom ersten Kontakt bis zur bezahlten Rechnung.</h2>
-            <p>Binso One verbindet die Arbeitsschritte, die im Alltag zusammengehören. Daten werden weitergeführt statt mehrfach erfasst.</p>
+        <section className="landing-statement">
+          <span>Einfach. Übersichtlich. Durchgängig.</span>
+          <h2>Weniger Administration.<br />Mehr Zeit fürs Geschäft.</h2>
+          <p>Wichtige Informationen bleiben dort, wo sie gebraucht werden. Aus einer Anfrage wird ein Angebot, aus dem Angebot ein Auftrag und aus erfassten Leistungen eine Rechnung.</p>
+        </section>
+
+        <section className="landing-showcase" aria-labelledby="landing-showcase-title">
+          <div className="landing-showcase-copy">
+            <span>Alles im Blick</span>
+            <h2 id="landing-showcase-title">Eine Oberfläche für den täglichen Betrieb.</h2>
+            <p>Dashboard, Kunden, Aufträge, Zeiten und Finanzen greifen ineinander. So musst du Informationen nicht in mehreren Werkzeugen zusammensuchen.</p>
+            <Link href="/features">Funktionen im Detail →</Link>
+          </div>
+          <LandingProofVisual />
+        </section>
+
+        <section className="landing-feature-stories" id="funktionen">
+          <div className="public-section-head centered">
+            <span>Die wichtigsten Bereiche</span>
+            <h2>Von der Kundenanfrage bis zur Zahlung.</h2>
+            <p>Binso One bildet die zentralen Abläufe eines Dienstleistungsunternehmens in einer gemeinsamen Arbeitsumgebung ab.</p>
+          </div>
+          <FeatureStoryVisual />
+        </section>
+
+        <section className="landing-flow-section">
+          <div className="public-section-head centered">
+            <span>Ein durchgängiger Prozess</span>
+            <h2>Arbeitsschritte bauen aufeinander auf.</h2>
+            <p>Daten werden weitergeführt statt doppelt erfasst. Das macht Abläufe nachvollziehbar und reduziert unnötige Handarbeit.</p>
           </div>
           <BusinessFlowVisual />
         </section>
 
-        <section className="public-section" id="funktionen">
-          <div className="public-section-head split">
-            <div><span>Funktionen</span><h2>Alles Wichtige für den täglichen Betrieb.</h2></div>
-            <Link href="/features">Alle Funktionen ansehen →</Link>
-          </div>
-          <FeatureVisualGrid />
-        </section>
-
-        <section className="public-section public-onboarding-section">
-          <div className="public-section-head">
+        <section className="landing-onboarding-section">
+          <div className="landing-onboarding-copy">
             <span>Einfach starten</span>
             <h2>Kein langes Einrichtungsprojekt.</h2>
-            <p>Registrieren, die wichtigsten Angaben erfassen und direkt mit dem ersten Kunden loslegen.</p>
+            <p>Registrieren, Unternehmen einrichten und direkt mit dem ersten Kunden starten. Die wichtigsten Schritte führen dich strukturiert in Binso One ein.</p>
+            <Link href="/how-it-works">So funktioniert Binso One →</Link>
           </div>
           <OnboardingVisual />
         </section>
 
-        <section className="public-section public-trust">
-          <div className="public-section-head"><span>Sicherheit</span><h2>Geschäftsdaten gehören in eine kontrollierte Umgebung.</h2></div>
+        <section className="public-section public-trust landing-trust">
+          <div className="public-section-head centered"><span>Sicherheit und Betrieb</span><h2>Für Geschäftsdaten entwickelt.</h2></div>
           <div className="public-trust-grid">
             <article><strong>Getrennte Organisationen</strong><p>Daten und Berechtigungen werden je Unternehmen getrennt verwaltet.</p></article>
             <article><strong>Sichere Anmeldung</strong><p>Die Anmeldung wird über eine Microsoft-basierte Identitätslösung abgesichert.</p></article>
@@ -59,7 +87,7 @@ export default function HomePage() {
           <Link href="/security">Mehr zu Sicherheit und Datenschutz →</Link>
         </section>
 
-        <section className="public-section">
+        <section className="public-section landing-pricing">
           <div className="public-section-head split">
             <div><span>Preise</span><h2>Ein Plan, der mit deinem Unternehmen mitwächst.</h2></div>
             <Link href="/pricing">Alle Preise vergleichen →</Link>
@@ -76,7 +104,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="public-section public-faq-preview">
+        <section className="public-section public-faq-preview landing-faq">
           <div className="public-section-head"><span>Häufige Fragen</span><h2>Die wichtigsten Antworten vor dem Start.</h2></div>
           <div className="public-faq-list">
             <details><summary>Für wen ist Binso One gedacht?</summary><p>Für Dienstleistungsunternehmen und Teams, die Kunden, Angebote, Aufträge, Zeit, Rechnungen und interne Abläufe zentral verwalten möchten.</p></details>

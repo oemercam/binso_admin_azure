@@ -17,81 +17,95 @@ function ProductIcon({ name }: { name: IconName }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
 }
 
-export function DashboardProductVisual() {
+function DesktopDashboard({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="product-visual-stage" aria-label="Vorschau der Binso One Anwendung">
-      <div className="product-browser-frame">
-        <div className="product-browser-bar">
-          <div className="product-browser-dots"><span /><span /><span /></div>
-          <span className="product-browser-address">app.binso.one</span>
-          <span className="product-browser-status">Live</span>
+    <div className={compact ? 'marketing-dashboard compact' : 'marketing-dashboard'}>
+      <aside>
+        <div className="marketing-dashboard-brand"><span>B</span><strong>One</strong></div>
+        <nav>
+          <span className="active"><i />Übersicht</span>
+          <span><i />Kunden</span>
+          <span><i />Angebote</span>
+          <span><i />Aufträge</span>
+          <span><i />Zeiterfassung</span>
+          <span><i />Rechnungen</span>
+          <span><i />Mitarbeitende</span>
+        </nav>
+      </aside>
+      <div className="marketing-dashboard-main">
+        <div className="marketing-dashboard-top"><span>Übersicht</span><div><i /><i /></div></div>
+        <div className="marketing-dashboard-heading"><div><small>Heute</small><strong>Willkommen zurück</strong></div><button type="button" tabIndex={-1}>+ Neu</button></div>
+        <div className="marketing-dashboard-kpis">
+          <article><span>Offene Aufträge</span><strong>12</strong><small>+ 3 diese Woche</small></article>
+          <article><span>Erfasste Stunden</span><strong>142 h</strong><small>+ 12 %</small></article>
+          <article><span>Umsatz Monat</span><strong>CHF 24’830</strong><small>+ 18 %</small></article>
         </div>
-        <div className="product-app-frame">
-          <aside className="product-app-sidebar">
-            <div className="product-app-brand"><span className="product-app-mark">B</span><strong>One</strong></div>
-            <div className="product-app-nav">
-              <span className="active"><i />Übersicht</span>
-              <span><i />Kunden</span>
-              <span><i />Angebote</span>
-              <span><i />Aufträge</span>
-              <span><i />Zeiterfassung</span>
-              <span><i />Rechnungen</span>
-            </div>
-          </aside>
-          <div className="product-app-content">
-            <div className="product-app-topline"><span>Übersicht</span><div><i /><i /></div></div>
-            <div className="product-app-title"><div><small>Mittwoch, 24. September</small><strong>Guten Morgen</strong></div><button type="button" tabIndex={-1}>+ Neu</button></div>
-            <div className="product-kpis">
-              <article><span>Offene Angebote</span><strong>CHF 24’800</strong><small>8 Angebote</small></article>
-              <article><span>Laufende Aufträge</span><strong>12</strong><small>4 diese Woche</small></article>
-              <article><span>Offene Rechnungen</span><strong>CHF 18’420</strong><small>6 Rechnungen</small></article>
-            </div>
-            <div className="product-app-grid">
-              <section className="product-chart-card">
-                <div className="product-card-head"><span>Umsatz</span><small>Letzte 6 Monate</small></div>
-                <div className="product-chart-bars"><i style={{height:'34%'}}/><i style={{height:'48%'}}/><i style={{height:'42%'}}/><i style={{height:'64%'}}/><i style={{height:'72%'}}/><i style={{height:'88%'}}/></div>
-              </section>
-              <section className="product-focus-card">
-                <div className="product-card-head"><span>Heute im Fokus</span><small>3 Punkte</small></div>
-                <div className="product-focus-list"><span><i/>Angebot prüfen</span><span><i/>Zeiten freigeben</span><span><i/>Rechnung senden</span></div>
-              </section>
-            </div>
-          </div>
+        <div className="marketing-dashboard-grid">
+          <section>
+            <div className="marketing-card-head"><span>Umsatzentwicklung</span><small>6 Monate</small></div>
+            <div className="marketing-line-chart"><i/><i/><i/><i/><i/><i/></div>
+          </section>
+          <section>
+            <div className="marketing-card-head"><span>Aktuelle Aufträge</span><small>Alle</small></div>
+            <div className="marketing-task-list"><span><i/>Website Relaunch</span><span><i/>IT-Beratung</span><span><i/>Support & Wartung</span></div>
+          </section>
         </div>
-      </div>
-      <div className="product-phone-frame" aria-hidden="true">
-        <div className="product-phone-status"><span>9:41</span><i /></div>
-        <div className="product-phone-head"><strong>One</strong><span>•••</span></div>
-        <div className="product-phone-copy"><small>Heute</small><strong>Übersicht</strong></div>
-        <div className="product-phone-metric"><span>Offene Rechnungen</span><strong>CHF 18’420</strong></div>
-        <div className="product-phone-list"><span><i/>Kunden</span><span><i/>Aufträge</span><span><i/>Zeit erfassen</span></div>
-        <div className="product-phone-pill"><span>Suchen</span><b>+</b><span>Menü</span></div>
       </div>
     </div>
   )
 }
 
-export const featureVisuals: Array<{ title: string; text: string; icon: IconName; meta: string }> = [
-  { title: 'Kunden', text: 'Kontakte und Firmen an einem Ort verwalten.', icon: 'customers', meta: 'CRM' },
-  { title: 'Angebote', text: 'Angebote schnell erstellen und direkt weiterführen.', icon: 'quotes', meta: 'Verkauf' },
-  { title: 'Aufträge', text: 'Arbeit, Zuständigkeiten und Status übersichtlich organisieren.', icon: 'orders', meta: 'Ausführung' },
-  { title: 'Zeiterfassung', text: 'Arbeitszeit direkt auf Kunden und Aufträge erfassen.', icon: 'time', meta: 'Leistung' },
-  { title: 'Rechnungen', text: 'Leistungen übernehmen, verrechnen und nachverfolgen.', icon: 'invoices', meta: 'Abrechnung' },
-  { title: 'Mitarbeitende', text: 'Teams, Rollen und Zugriffe zentral verwalten.', icon: 'employees', meta: 'Team' },
-  { title: 'Verträge', text: 'Laufzeiten und wiederkehrende Leistungen im Blick behalten.', icon: 'contracts', meta: 'Verträge' },
-  { title: 'Finanzen', text: 'Offene Beträge und wichtige Kennzahlen kompakt überblicken.', icon: 'finance', meta: 'Finanzen' },
+function MobileDashboard() {
+  return (
+    <div className="marketing-phone-ui">
+      <div className="marketing-phone-status"><span>9:41</span><i /></div>
+      <div className="marketing-phone-brand"><strong>Binso One</strong><span>•••</span></div>
+      <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Überblick.</span></div>
+      <div className="marketing-phone-kpis"><article><span>Aufträge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24’830</strong></article></div>
+      <div className="marketing-phone-tasks"><strong>Meine Aufgaben</strong><span><i/>Angebot versenden</span><span><i/>Rechnung erstellen</span><span><i/>Zeit erfassen</span></div>
+      <div className="marketing-phone-nav"><span>Übersicht</span><span>Kunden</span><span>Zeit</span><span>Mehr</span></div>
+    </div>
+  )
+}
+
+export function DashboardProductVisual() {
+  return (
+    <div className="landing-device-stage" aria-label="Vorschau der Binso One Anwendung auf Desktop und Mobile">
+      <div className="landing-laptop">
+        <div className="landing-laptop-screen"><DesktopDashboard /></div>
+        <div className="landing-laptop-base" />
+      </div>
+      <div className="landing-phone"><MobileDashboard /></div>
+    </div>
+  )
+}
+
+export function LandingProofVisual() {
+  return (
+    <div className="landing-proof-visual" aria-label="Binso One Dashboard Vorschau">
+      <div className="landing-proof-window">
+        <div className="landing-proof-window-bar"><span/><span/><span/><b>Binso One</b></div>
+        <DesktopDashboard compact />
+      </div>
+      <div className="landing-proof-callout"><strong>Alles verbunden</strong><span>Kunden, Aufträge, Zeiten und Rechnungen greifen ineinander.</span></div>
+    </div>
+  )
+}
+
+const stories = [
+  { title: 'Angebot bis Rechnung', text: 'Angebote erstellen, in Aufträge übernehmen und erfasste Leistungen direkt weiterverrechnen.', icon: 'quotes' as const, className: 'blue' },
+  { title: 'Zeit und Team', text: 'Arbeitszeit projektbezogen erfassen und Mitarbeitende mit klaren Rollen organisieren.', icon: 'time' as const, className: 'green' },
+  { title: 'Kunden und Verträge', text: 'Kontakte, Firmen, Verträge und wiederkehrende Leistungen zentral verwalten.', icon: 'customers' as const, className: 'violet' },
 ]
 
-export function FeatureVisualGrid() {
+export function FeatureStoryVisual() {
   return (
-    <div className="feature-visual-grid">
-      {featureVisuals.map((feature) => (
-        <article key={feature.title} className="feature-visual-card">
-          <div className="feature-visual-icon"><ProductIcon name={feature.icon} /></div>
-          <div className="feature-visual-meta">{feature.meta}</div>
-          <h3>{feature.title}</h3>
-          <p>{feature.text}</p>
-          <div className="feature-mini-ui" aria-hidden="true"><span/><span/><span/></div>
+    <div className="landing-story-grid">
+      {stories.map((story) => (
+        <article className={`landing-story-card ${story.className}`} key={story.title}>
+          <div className="landing-story-icon"><ProductIcon name={story.icon} /></div>
+          <div><h3>{story.title}</h3><p>{story.text}</p></div>
+          <div className="landing-story-ui" aria-hidden="true"><span/><span/><span/></div>
         </article>
       ))}
     </div>
@@ -99,17 +113,17 @@ export function FeatureVisualGrid() {
 }
 
 const workflow = [
-  ['01', 'Kunde', 'Kontakt und Firma erfassen'],
+  ['01', 'Anfrage', 'Anfrage erfassen und zuordnen'],
   ['02', 'Angebot', 'Leistung und Preis festlegen'],
   ['03', 'Auftrag', 'Annahme direkt weiterführen'],
   ['04', 'Zeit & Leistung', 'Arbeit laufend erfassen'],
-  ['05', 'Rechnung', 'Leistungen automatisch übernehmen'],
-  ['06', 'Zahlung', 'Offene Beträge im Blick behalten'],
+  ['05', 'Rechnung', 'Leistungen übernehmen'],
+  ['06', 'Zahlung', 'Offene Beträge verfolgen'],
 ] as const
 
 export function BusinessFlowVisual() {
   return (
-    <div className="business-flow-visual" aria-label="Geschäftsprozess vom Kunden bis zur Zahlung">
+    <div className="business-flow-visual landing-process" aria-label="Geschäftsprozess von der Anfrage bis zur Zahlung">
       {workflow.map(([number, title, detail], index) => (
         <div className="business-flow-step" key={title}>
           <div className="business-flow-node"><span>{number}</span><strong>{title}</strong><small>{detail}</small></div>
@@ -129,7 +143,7 @@ export function OnboardingVisual() {
   ] as const
 
   return (
-    <div className="onboarding-visual">
+    <div className="onboarding-visual landing-onboarding-visual">
       <div className="onboarding-progress"><span>Einrichtung</span><strong>75%</strong><i><b /></i></div>
       <div className="onboarding-steps">
         {steps.map(([title, detail], index) => <div key={title} className={index < 3 ? 'done' : ''}><span>{index < 3 ? '✓' : '4'}</span><div><strong>{title}</strong><small>{detail}</small></div></div>)}

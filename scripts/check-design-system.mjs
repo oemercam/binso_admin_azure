@@ -69,7 +69,7 @@ for (const [name, source] of [['contact', contact], ['imprint', imprint], ['priv
 }
 
 
-for (const value of ['DashboardProductVisual', 'BusinessFlowVisual', 'FeatureVisualGrid', 'OnboardingVisual']) {
+for (const value of ['DashboardProductVisual', 'LandingProofVisual', 'FeatureStoryVisual', 'BusinessFlowVisual', 'OnboardingVisual']) {
   if (!productVisuals.includes(value)) throw new Error(`Missing public product visual: ${value}`)
 }
 
@@ -81,4 +81,4 @@ for (const obsolete of ['.public-hero-preview{', '.preview-window-head{', '.publ
   if (appUi.includes(obsolete)) throw new Error(`Obsolete public style remains: ${obsolete}`)
 }
 
-console.log('Design-system checks passed (tokens, public/auth ownership, visuals, cookie consent, centralized brand/contact/navigation).')
+console.log('Design-system checks passed (tokens, public/auth ownership, marketing visuals, cookie consent, centralized brand/contact/navigation).')
