@@ -49,7 +49,7 @@ jobs:
         run: |
           pnpm db:migrate
           pnpm db:migrate
-          node scripts/test-database.mjs
+          pnpm run test:integration:db
         env:
           DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           DATABASE_TEST_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
@@ -93,7 +93,7 @@ jobs:
         run: pnpm lint
 
       - name: Product checks
-        run: pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check
+        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check
 
       - name: Behavioral regression tests
         run: pnpm test
@@ -142,12 +142,38 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+
+  e2e:
+    name: Critical E2E
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs: [build]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e --project=desktop-chromium
+        env:
+          AUTH_MODE: local
+          ALLOW_LOCAL_AUTH: 'true'
+          DATABASE_URL: ''
+          NEXT_PUBLIC_APP_ENV: e2e
+
   migrate:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
     name: Migrate production database
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [build, database-test]
+    needs: [build, database-test, e2e]
     environment: production
     permissions:
       contents: read

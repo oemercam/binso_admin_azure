@@ -14,7 +14,7 @@ const routeFeatures: Array<{ prefix: string; anyOf: OrganizationFeature[] }> = [
   { prefix: '/time', anyOf: ['time'] },
   { prefix: '/invoices', anyOf: ['invoices'] },
   { prefix: '/finance', anyOf: ['finance'] },
-  { prefix: '/accounting', anyOf: ['finance'] },
+  { prefix: '/accounting', anyOf: ['accounting'] },
   { prefix: '/employees', anyOf: ['employees'] },
   { prefix: '/data', anyOf: ['imports', 'exports'] },
 ]
@@ -25,7 +25,7 @@ export function EntitlementGate({ children }: { children: React.ReactNode }) {
   const rule = routeFeatures.find((item) => pathname === item.prefix || pathname.startsWith(`${item.prefix}/`))
   if (!rule) return children
 
-  const features = new Set(store.entitlements[0]?.features ?? [])
+  const features = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
   const allowed = rule.anyOf.some((feature) => features.has(feature))
   if (allowed) return children
 

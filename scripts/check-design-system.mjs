@@ -78,7 +78,7 @@ for (const value of ['DashboardProductVisual', 'LandingProofVisual', 'FeatureSto
   if (!productVisuals.includes(value)) throw new Error(`Missing public product visual: ${value}`)
 }
 
-for (const value of ['landing-feature-row', 'landing-process-line', 'landing-onboarding-line']) {
+for (const value of ['landing-feature-row', 'landing-process-line', 'landing-onboarding-modern']) {
   if (!productVisuals.includes(value)) throw new Error(`V70.5 landing visual structure is missing: ${value}`)
 }
 
@@ -94,4 +94,4 @@ for (const obsolete of ['.public-hero-preview{', '.preview-window-head{', '.publ
   if (appUi.includes(obsolete)) throw new Error(`Obsolete public style remains: ${obsolete}`)
 }
 
-console.log('Design-system checks passed (tokens, public/auth ownership, original logo, fixed-light landing, spacious marketing sections, process visuals, cookie consent, centralized brand/contact/navigation).')
+console.log('Design-system checks passed (tokens, public/auth ownership, original logo, unified light public site, spacious marketing sections, modern onboarding/security, mobile pricing carousel, cookie consent, centralized brand/contact/navigation).')

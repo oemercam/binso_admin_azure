@@ -29,7 +29,7 @@ export default function OrganizationPage() {
   const [subscriptionSaving, setSubscriptionSaving] = useState(false)
 
   const subscription = store.subscriptions[0]
-  const entitlement = store.entitlements[0]
+  const entitlement = store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)
   const visibleMembers = useMemo(() => members.filter((item) => item.status !== 'suspended'), [members])
 
   const loadMembers = useCallback(async () => {

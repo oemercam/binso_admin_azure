@@ -54,7 +54,8 @@ console.log("Dashboard KPI check passed (single labels, canonical three-column o
 
 
 const customerPage = fs.readFileSync("app/(app)/customers/page.tsx", "utf8")
-if (customerPage.includes("<span>Zahlungsziel</span>") || customerPage.includes("customer.paymentDays") || customerPage.includes("customer.status === 'active'")) {
+const customerOverview = customerPage.split("{open &&")[0]
+if (customerOverview.includes("<span>Zahlungsziel</span>") || customerOverview.includes("customer.paymentDays") || customerOverview.includes("customer.status === 'active'")) {
   console.error("Mobile UI check failed: customer overview list still exposes payment term or status.")
   process.exit(1)
 }

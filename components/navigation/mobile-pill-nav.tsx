@@ -23,7 +23,7 @@ export function MobilePillNav({
   const router = useRouter()
   const store = useBusinessStore()
   const [menuOpen, setMenuOpen] = useState(false)
-  const enabled = new Set(store.entitlements[0]?.features ?? [])
+  const enabled = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
   const items = (user.platformRole ? navForUser(user) : navForRole(user.role)).filter((item) => !item.feature || enabled.has(item.feature))
 
   const createLabels: Record<string, string> = {

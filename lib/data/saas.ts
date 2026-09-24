@@ -30,9 +30,9 @@ export const seedSubscriptions: OrganizationSubscription[] = [{
 
 export const seedEntitlements: OrganizationEntitlements[] = [{
   organizationId: DEFAULT_ORGANIZATION_ID,
-  features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports','api'],
-  maxUsers: 10,
-  maxStorageMb: 10240,
+  features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','expenses','reminders','approvals','accounting','margin','audit','imports','exports','api','automations'],
+  maxUsers: 25,
+  maxStorageMb: 51200,
 }]
 
 export const seedNumberSequences: NumberSequence[] = [

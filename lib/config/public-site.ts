@@ -2,6 +2,7 @@ import { appIdentity } from './app-identity'
 
 export const publicSite = {
   primaryNavigation: [
+    { href: '/', label: 'Startseite' },
     { href: '/features', label: 'Funktionen' },
     { href: '/how-it-works', label: 'So funktioniert es' },
     { href: '/pricing', label: 'Preise' },

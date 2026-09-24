@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { planDefinitions } from '@/lib/data/plans'
 import { PublicCta, PublicShell } from '@/components/public/public-shell'
+import { SwipeCarousel } from '@/components/public/swipe-carousel'
 import {
   BusinessFlowVisual,
   DashboardProductVisual,
@@ -83,12 +84,21 @@ export default function HomePage() {
             <h2>Für Geschäftsdaten entwickelt.</h2>
             <p>Klare Zugriffe, getrennte Organisationen und eine sichere Anmeldung bilden die Grundlage für den täglichen Einsatz.</p>
           </div>
-          <div className="landing-trust-columns">
-            <div><span>01</span><strong>Getrennte Organisationen</strong><p>Daten und Berechtigungen werden je Unternehmen getrennt verwaltet.</p></div>
-            <div><span>02</span><strong>Sichere Anmeldung</strong><p>Die Anmeldung wird über eine Microsoft-basierte Identitätslösung abgesichert.</p></div>
-            <div><span>03</span><strong>Klare Zugriffsrechte</strong><p>Rollen und Zugriffe werden zentral gesteuert und nachvollziehbar verwaltet.</p></div>
+          <div className="landing-security-stage">
+            <div className="landing-security-core" aria-hidden="true">
+              <span className="landing-security-ring ring-one" />
+              <span className="landing-security-ring ring-two" />
+              <div className="landing-security-lock"><i /><b /></div>
+              <small>Binso One</small>
+              <strong>Geschützt auf mehreren Ebenen</strong>
+            </div>
+            <div className="landing-security-points">
+              <div><span>01</span><div><strong>Mandantentrennung</strong><p>Geschäftsdaten werden je Organisation getrennt verarbeitet und geprüft.</p></div></div>
+              <div><span>02</span><div><strong>Identität und Rollen</strong><p>Anmeldung, Mitgliedschaft und Berechtigungen greifen als gemeinsame Zugriffskette.</p></div></div>
+              <div><span>03</span><div><strong>Nachvollziehbarer Betrieb</strong><p>Relevante Aktionen und Plattformzugriffe werden kontrolliert und protokolliert.</p></div></div>
+            </div>
           </div>
-          <div className="landing-centered-link"><Link href="/security">Mehr zu Sicherheit und Datenschutz →</Link></div>
+          <div className="landing-centered-link"><Link href="/security">Sicherheitsmodell ansehen →</Link></div>
         </section>
 
         <section className="public-section landing-pricing">
@@ -96,7 +106,7 @@ export default function HomePage() {
             <div><span>Preise</span><h2>Ein Plan, der mit deinem Unternehmen mitwächst.</h2></div>
             <Link href="/pricing">Alle Preise vergleichen →</Link>
           </div>
-          <div className="public-price-preview">
+          <SwipeCarousel className="public-price-preview" count={highlightedPlans.length}>
             {highlightedPlans.map((plan) => (
               <article key={plan.id} className={plan.recommended ? 'recommended' : ''}>
                 <div><span>{plan.name}</span>{plan.recommended ? <small>Empfohlen</small> : null}</div>
@@ -105,7 +115,7 @@ export default function HomePage() {
                 <Link className="button secondary" href={`/register?plan=${plan.id}`}>14 Tage testen</Link>
               </article>
             ))}
-          </div>
+          </SwipeCarousel>
         </section>
 
         <section className="public-section public-faq-preview landing-faq">

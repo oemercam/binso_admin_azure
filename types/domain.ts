@@ -124,6 +124,12 @@ export type OrganizationFeature =
   | 'imports'
   | 'exports'
   | 'api'
+  | 'expenses'
+  | 'reminders'
+  | 'approvals'
+  | 'accounting'
+  | 'margin'
+  | 'automations'
 
 export type OrganizationEntitlements = {
   organizationId: OrganizationId
@@ -153,6 +159,9 @@ export type PlanDefinition = {
   features: OrganizationFeature[]
   description: string
   recommended?: boolean
+  selfService: boolean
+  positioning: string
+  highlights: string[]
 }
 
 export type PlatformTenantStatus = 'trial' | 'active' | 'past_due' | 'grace_period' | 'read_only' | 'suspended' | 'expired' | 'cancelled' | 'archived'

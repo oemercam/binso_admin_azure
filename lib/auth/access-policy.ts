@@ -20,7 +20,7 @@ const featureByPermission: Partial<Record<Permission, OrganizationFeature>> = {
   'contracts.read': 'contracts', 'contracts.write': 'contracts',
   'time.read': 'time', 'time.write': 'time', 'time.approve': 'time',
   'invoices.read': 'invoices', 'invoices.write': 'invoices', 'payments.write': 'invoices',
-  'finance.read': 'finance', 'margin.read': 'finance',
+  'finance.read': 'finance', 'margin.read': 'margin',
   'employees.read': 'employees', 'employees.write': 'employees', 'employee_costs.read': 'employees',
   'audit.read': 'audit', 'exports.create': 'exports',
 }

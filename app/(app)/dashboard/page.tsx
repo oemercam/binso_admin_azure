@@ -29,15 +29,27 @@ function OwnerDashboard() {
   const deliveredCost = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0) + store.supplierInvoices.reduce((sum, invoice) => sum + invoice.netAmount, 0)
   const contribution = deliveredRevenue - deliveredCost
   const margin = deliveredRevenue ? Math.round((contribution / deliveredRevenue) * 100) : 0
+  const features = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
+  const hasTime = features.has('time')
+  const hasFinance = features.has('finance')
+  const hasMargin = features.has('margin')
+  const openQuotes = store.quotes.filter((quote) => ['draft','sent'].includes(quote.status)).length
+  const activeOrders = store.orders.filter((order) => order.status === 'active').length
 
   return (
     <section className="page apple-page">
-      <PageHeader title="Dashboard" description="Überblick über Aufträge, Abrechnung und offene Aufgaben." />
+      <PageHeader title="Übersicht" description="Die wichtigsten Aufgaben direkt erledigen – ohne Umwege." />
+      <nav className="dashboard-quick-start" aria-label="Schnell starten">
+        <Link href="/customers?new=1"><Icon name="customers" size={18}/><span><strong>Kunde</strong><small>in Sekunden erfassen</small></span></Link>
+        <Link href="/quotes?new=1"><Icon name="quotes" size={18}/><span><strong>Angebot</strong><small>erstellen und senden</small></span></Link>
+        <Link href="/invoices?new=1"><Icon name="invoices" size={18}/><span><strong>Rechnung</strong><small>direkt erstellen</small></span></Link>
+        {store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features.includes('time') ? <Link href="/time?new=1"><Icon name="time" size={18}/><span><strong>Zeit</strong><small>schnell erfassen</small></span></Link> : null}
+      </nav>
       <div id="owner-dashboard-kpis" className="metric-strip owner-metrics mobile-kpi-3">
-        <Metric label="Umsatz" value={chf(deliveredRevenue)} detail="aus erfassten Zeiten" />
-        <Metric label="Nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} />
-        <Metric label="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Positionen`} tone="warning" />
-        <Metric label="Deckungsbeitrag" value={chf(contribution)} detail={`Marge ${margin} %`} />
+        {hasTime ? <Metric label="Nicht verrechnet" value={chf(billableValue)} detail={`${billableHours} h abrechenbar`} /> : <Metric label="Offene Angebote" value={String(openQuotes)} detail="Entwürfe und versendet" />}
+        <Metric label="Aktive Aufträge" value={String(activeOrders)} detail="laufende Arbeiten" />
+        <Metric label="Offene Rechnungen" value={chf(openAmount)} detail={`${openInvoices.length} Rechnungen`} tone="warning" />
+        {hasMargin ? <Metric label="Deckungsbeitrag" value={chf(contribution)} detail={`Marge ${margin} %`} /> : null}
       </div>
 
       <div className="dashboard-layout">
@@ -47,7 +59,7 @@ function OwnerDashboard() {
           <div className="focus-list">
             {openInvoices.some((invoice) => effectiveInvoiceStatus(invoice) === 'overdue') && <Focus href="/invoices" icon="warning" label="Rechnung überfällig" meta="Mahnung oder Zahlung prüfen" tone="danger" />}
             {store.quotes.some((quote) => quote.status === 'sent') && <Focus href="/quotes" icon="quotes" label="Offene Angebote" meta="Nachfassen oder Status aktualisieren" />}
-            <Focus href="/time" icon="time" label={`${billableHours} h abrechenbar`} meta="Zeiten prüfen und fakturieren" />
+            {hasTime ? <Focus href="/time" icon="time" label={`${billableHours} h abrechenbar`} meta="Zeiten prüfen und fakturieren" /> : <Focus href="/quotes?new=1" icon="quotes" label="Neues Angebot" meta="Direkt beim Kunden starten" />}
           </div>
         </section>
       </div>
@@ -56,7 +68,7 @@ function OwnerDashboard() {
         <Link href="/orders" className="hub-row"><span><strong>Aufträge</strong><small>{store.orders.filter((order) => order.status === 'active').length} aktive Mandate</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/quotes" className="hub-row"><span><strong>Pipeline</strong><small>{store.quotes.filter((quote) => ['draft','sent'].includes(quote.status)).length} offene Angebote</small></span><Icon name="chevron" size={15}/></Link>
         <Link href="/invoices" className="hub-row"><span><strong>Abrechnung</strong><small>{chf(openAmount)} offene Forderungen</small></span><Icon name="chevron" size={15}/></Link>
-        <Link href="/finance" className="hub-row"><span><strong>Finanzen</strong><small>Marge, Kosten und Liquidität</small></span><Icon name="chevron" size={15}/></Link>
+        {hasFinance ? <Link href="/finance" className="hub-row"><span><strong>Finanzen</strong><small>Forderungen und Zahlungen</small></span><Icon name="chevron" size={15}/></Link> : null}
       </nav>
 
       <div className="desktop-dashboard-rich">

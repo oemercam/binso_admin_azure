@@ -25,9 +25,9 @@ export default function OrdersPage() {
   const [name, setName] = useState('')
   const [mandateRef, setMandateRef] = useState('')
   const [endCustomerName, setEndCustomerName] = useState('')
-  const [budgetHours, setBudgetHours] = useState('160')
+  const [budgetHours, setBudgetHours] = useState('0')
   const [salesRate, setSalesRate] = useState('165')
-  const [costRate, setCostRate] = useState('105')
+  const [costRate, setCostRate] = useState('0')
   const [billingModel, setBillingModel] = useState<BillingModel>('time')
 
   useEffect(() => {
@@ -79,16 +79,17 @@ export default function OrdersPage() {
         })}
       </div>
       {open && (
-        <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Neues Mandat oder Projekt eröffnen.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="form-grid">
+        <StandardFormSheet open title={<>Auftrag erstellen</>} description={<>Für den Start reichen Kunde und Auftragsname. Planung und Kalkulation können später ergänzt werden.</>} onClose={() => setOpen(false)} onSubmit={save} formId="orders-page-sheet-1" footer={<><button type="button" className="button secondary" onClick={() => setOpen(false)}>Abbrechen</button><button type="submit" form="orders-page-sheet-1" className="button primary">Auftrag erstellen</button></>}><div className="quick-form-stack"><div className="form-grid">
               <label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}</Select></label>
-              <label className="full"><span>Auftragsname *</span><Input value={name} onChange={(e) => setName(e.target.value)} required/></label>
+              <label className="full"><span>Auftragsname *</span><Input autoFocus value={name} onChange={(e) => setName(e.target.value)} required placeholder="z. B. Support und Beratung"/></label>
+            </div><details className="progressive-fields"><summary>Planung und Kalkulation</summary><div className="form-grid">
               <label><span>Mandats-/Vertragsreferenz</span><Input value={mandateRef} onChange={(e) => setMandateRef(e.target.value)}/></label>
               <label><span>Endkunde</span><Input value={endCustomerName} onChange={(e) => setEndCustomerName(e.target.value)} placeholder="Optional"/></label>
-              <label><span>Budget Stunden *</span><Input type="number" min="0.25" step="0.25" value={budgetHours} onChange={(e) => setBudgetHours(e.target.value)} required/></label>
-              <label><span>Verkaufssatz CHF/h *</span><Input type="number" min="0" step="0.05" value={salesRate} onChange={(e) => setSalesRate(e.target.value)} required/></label>
-              <label><span>Interner Kostensatz CHF/h *</span><Input type="number" min="0" step="0.05" value={costRate} onChange={(e) => setCostRate(e.target.value)} required/></label>
-              <label><span>Abrechnungsmodell *</span><Select value={billingModel} onChange={(e) => setBillingModel(e.target.value as BillingModel)}><option value="time">Nach Aufwand</option><option value="fixed">Pauschal</option><option value="retainer">Retainer</option><option value="milestone">Meilenstein</option><option value="mixed">Gemischt</option></Select></label>
-            </div></StandardFormSheet>
+              <label><span>Budget Stunden</span><Input type="number" min="0" step="0.25" value={budgetHours} onChange={(e) => setBudgetHours(e.target.value)}/></label>
+              <label><span>Verkaufssatz CHF/h</span><Input type="number" min="0" step="0.05" value={salesRate} onChange={(e) => setSalesRate(e.target.value)}/></label>
+              <label><span>Interner Kostensatz CHF/h</span><Input type="number" min="0" step="0.05" value={costRate} onChange={(e) => setCostRate(e.target.value)}/></label>
+              <label><span>Abrechnungsmodell</span><Select value={billingModel} onChange={(e) => setBillingModel(e.target.value as BillingModel)}><option value="time">Nach Aufwand</option><option value="fixed">Pauschal</option><option value="retainer">Retainer</option><option value="milestone">Meilenstein</option><option value="mixed">Gemischt</option></Select></label>
+            </div></details></div></StandardFormSheet>
       )}
     </section>
   )

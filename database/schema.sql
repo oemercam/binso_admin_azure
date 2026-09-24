@@ -1125,3 +1125,8 @@ create trigger trg_seed_system_roles
 after insert on organizations
 for each row execute function seed_system_roles_for_organization();
 
+
+
+-- V72 shared subscription catalogue (see migration 0010 for seed data).
+create table if not exists subscription_plan_catalog (plan_id text primary key, name text not null, self_service boolean not null default true, sort_order integer not null, monthly_price_chf numeric(10,2), included_users integer not null, max_storage_mb integer not null, updated_at timestamptz not null default now());
+create table if not exists subscription_plan_features (plan_id text not null references subscription_plan_catalog(plan_id) on delete cascade, feature text not null, primary key(plan_id,feature));

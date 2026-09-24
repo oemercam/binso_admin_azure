@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { PublicMobileMenu } from './public-mobile-menu'
 import { BinsoLogo } from '@/components/ui/binso-logo'
 import { appIdentity } from '@/lib/config/app-identity'
 import { publicSite } from '@/lib/config/public-site'
@@ -26,15 +27,7 @@ export function PublicHeader() {
         <div className="public-header-actions">
           <a className="public-login-link" href={signInUrl('/post-login')}>Anmelden</a>
           <Link className="button primary public-cta" href="/register">Kostenlos starten</Link>
-          <details className="public-mobile-menu">
-            <summary aria-label="Navigation öffnen"><span className="public-menu-icon" aria-hidden="true"><i /><i /><i /></span><span className="public-menu-label">Menü</span></summary>
-            <nav aria-label="Mobile Navigation">
-              {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-              <Link href="/support">Support</Link>
-              <Link href="/contact">Kontakt</Link>
-              <a href={signInUrl('/post-login')}>Anmelden</a>
-            </nav>
-          </details>
+          <PublicMobileMenu />
         </div>
       </div>
     </header>
@@ -71,7 +64,7 @@ export function PublicFooter() {
   )
 }
 
-export function PublicShell({ children, compact = false, light = false }: { children: ReactNode; compact?: boolean; light?: boolean }) {
+export function PublicShell({ children, compact = false, light = true }: { children: ReactNode; compact?: boolean; light?: boolean }) {
   const classes = ['public-site', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
   return (
     <div className={classes}>

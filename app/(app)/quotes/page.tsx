@@ -13,7 +13,7 @@ import { BusinessDocument } from '@/components/documents/business-document'
 import { DocumentPreviewFrame } from '@/components/documents/document-preview-frame'
 import { ResponsivePreview } from '@/components/documents/responsive-preview'
 import { useBusinessStore } from '@/components/state/business-store'
-import type { Quote, QuoteLine, QuoteStatus } from '@/types/domain'
+import type { Customer, Quote, QuoteLine, QuoteStatus } from '@/types/domain'
 import { printCurrentDocument } from '@/lib/browser/actions'
 import { useFeedback } from '@/components/ui/feedback'
 import { formatChf } from '@/lib/format/locale'
@@ -173,21 +173,60 @@ export default function QuotesPage() {
 
   function QuoteForm({ onClose, onSave }: { onClose: () => void; onSave: (q: Quote) => void }) {
     const requestedCustomer = searchParams.get('customer')
-    const [customerId, setCustomerId] = useState(requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? '')
+    const initialCustomer = requestedCustomer && store.customers.some((item) => item.id === requestedCustomer) ? requestedCustomer : store.customers.find((item) => item.status === 'active')?.id ?? ''
+    const [customerId, setCustomerId] = useState(initialCustomer)
+    const [newCustomerName, setNewCustomerName] = useState('')
     const [title, setTitle] = useState('')
     const [validUntil, setValidUntil] = useState(new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10))
     const [reference, setReference] = useState('')
     const [lines, setLines] = useState<QuoteLine[]>([newLine()])
 
+    function ensureCustomer() {
+      if (customerId) return customerId
+      const name = newCustomerName.trim()
+      if (!name) return ''
+      const customer: Customer = {
+        organizationId: store.currentOrganizationId,
+        id: `cus-${Date.now()}`,
+        customerNo: `K-${1000 + store.customers.length + 1}`,
+        name,
+        legalName: name,
+        country: 'Schweiz',
+        paymentDays: 30,
+        status: 'active',
+      }
+      store.addCustomer(customer)
+      setCustomerId(customer.id)
+      return customer.id
+    }
+
     function save(e: React.FormEvent) {
       e.preventDefault()
+      const resolvedCustomerId = ensureCustomer()
       const validLines = lines.filter((line) => line.description.trim() && line.quantity > 0)
-      const q = store.createQuote({ customerId, title, validUntil, reference, lines: validLines })
+      if (!resolvedCustomerId || !title.trim() || !validLines.length) return
+      const q = store.createQuote({ customerId: resolvedCustomerId, title: title.trim(), validUntil, reference, lines: validLines })
       if (q) onSave(q)
     }
     function updateLine(id: string, changes: Partial<QuoteLine>) { setLines((current) => current.map((line) => line.id === id ? { ...line, ...changes } : line)) }
 
-    return <StandardFormSheet open title={<>Angebot erstellen</>} description={<>Pflichtfelder und Rechnungsadresse werden geprüft.</>} onClose={onClose} onSubmit={save} formId="quotes-page-sheet-1" panelClassName="quote-editor-sheet" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-1" className="button primary">Entwurf erstellen</button></>} mode="fullscreen"><details className="edit-step" open><summary><span><strong>1 · Stammdaten</strong><small>Kunde, Titel und Gültigkeit</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="form-grid"><label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>{store.customers.filter((c) => c.status === 'active').map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></label><label className="full"><span>Titel *</span><Input value={title} onChange={(e) => setTitle(e.target.value)} required/></label><label><span>Gültig bis *</span><DatePicker value={validUntil} onChange={(e) => setValidUntil(e.target.value)} required/></label><label><span>Referenz / PO</span><Input value={reference} onChange={(e) => setReference(e.target.value)}/></label></div></div></details><details className="edit-step"><summary><span><strong>2 · Positionen</strong><small>{lines.length} Positionen</small></span><Icon name="chevron" size={15}/></summary><div className="edit-step-body"><div className="line-editor"><div className="line-editor-head"><strong>Positionen</strong><button type="button" className="text-button" onClick={() => setLines((current) => [...current, newLine()])}><Icon name="plus" size={14}/> Position</button></div>{lines.map((line) => <div className="line-editor-row quote-line-editor" key={line.id}><label><span>Beschreibung</span><Input value={line.description} onChange={(e) => updateLine(line.id, { description: e.target.value })} required/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => updateLine(line.id, { quantity: Number(e.target.value) })}/></label><label><span>Einheit</span><Select value={line.unit} onChange={(e) => updateLine(line.id, { unit: e.target.value as QuoteLine['unit'] })}><option value="h">h</option><option value="Tag">Tag</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => updateLine(line.id, { unitPrice: Number(e.target.value) })}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" disabled={lines.length === 1} onClick={() => setLines((current) => current.filter((item) => item.id !== line.id))} /></div>)}</div></div></details></StandardFormSheet>
+    return <StandardFormSheet open title={<>Angebot erstellen</>} description={<>Kunde, Leistung und Preis – weitere Angaben nur bei Bedarf.</>} onClose={onClose} onSubmit={save} formId="quotes-page-sheet-1" panelClassName="quote-editor-sheet quick-document-sheet" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-1" className="button primary">Angebot erstellen</button></>} mode="fullscreen">
+      <div className="quick-document-flow">
+        <div className="quick-document-core form-grid">
+          <label className="full"><span>Kunde *</span><Select value={customerId} onChange={(e) => setCustomerId(e.target.value)}><option value="">Neuen Kunden erfassen…</option>{store.customers.filter((c) => c.status === 'active').map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></label>
+          {!customerId && <label className="full quick-inline-create"><span>Firmenname *</span><Input autoFocus value={newCustomerName} onChange={(e) => setNewCustomerName(e.target.value)} placeholder="z. B. Muster AG" required/></label>}
+          <label className="full"><span>Titel *</span><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. IT-Beratung September" required/></label>
+        </div>
+        <div className="line-editor quick-line-editor">
+          <div className="line-editor-head"><strong>Positionen</strong><button type="button" className="text-button" onClick={() => setLines((current) => [...current, newLine()])}><Icon name="plus" size={14}/> Position</button></div>
+          {lines.map((line) => <div className="line-editor-row quote-line-editor" key={line.id}><label><span>Beschreibung</span><Input value={line.description} onChange={(e) => updateLine(line.id, { description: e.target.value })} placeholder="Leistung" required/></label><label><span>Menge</span><Input type="number" min="0.01" step="0.25" value={line.quantity} onChange={(e) => updateLine(line.id, { quantity: Number(e.target.value) })}/></label><label><span>Einheit</span><Select value={line.unit} onChange={(e) => updateLine(line.id, { unit: e.target.value as QuoteLine['unit'] })}><option value="h">h</option><option value="Tag">Tag</option><option value="pauschal">pauschal</option></Select></label><label><span>Preis CHF</span><Input type="number" min="0" step="0.05" value={line.unitPrice} onChange={(e) => updateLine(line.id, { unitPrice: Number(e.target.value) })}/></label><RemoveButton className="line-remove" ariaLabel="Position entfernen" disabled={lines.length === 1} onClick={() => setLines((current) => current.filter((item) => item.id !== line.id))} /></div>)}
+        </div>
+        <details className="progressive-fields">
+          <summary>Weitere Angaben</summary>
+          <div className="form-grid"><label><span>Gültig bis</span><DatePicker value={validUntil} onChange={(e) => setValidUntil(e.target.value)}/></label><label><span>Referenz / PO</span><Input value={reference} onChange={(e) => setReference(e.target.value)}/></label></div>
+        </details>
+      </div>
+    </StandardFormSheet>
   }
 
   function QuoteEdit({ quote, onClose, onSave }: { quote: Quote; onClose: () => void; onSave: (q: Quote) => void }) {

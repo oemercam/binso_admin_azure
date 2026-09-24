@@ -214,21 +214,31 @@ export function BusinessFlowVisual() {
 
 export function OnboardingVisual() {
   const steps = [
-    ['01', 'Registrieren', 'Konto erstellen und sicher anmelden.'],
-    ['02', 'Firma einrichten', 'Die wichtigsten Firmendaten erfassen.'],
-    ['03', 'Kunden erfassen', 'Kontakte und Firmen übernehmen.'],
-    ['04', 'Loslegen', 'Angebote, Aufträge, Zeiten und Rechnungen nutzen.'],
+    ['01', 'Registrieren', 'Zugang erstellen und Identität bestätigen.'],
+    ['02', 'Firma einrichten', 'Die wichtigsten Unternehmensdaten erfassen.'],
+    ['03', 'Ersten Ablauf starten', 'Kunde erfassen und direkt weiterarbeiten.'],
+    ['04', 'Produktiv arbeiten', 'Angebote, Aufträge, Zeiten und Rechnungen verbinden.'],
   ] as const
 
   return (
-    <div className="landing-onboarding-line" aria-label="Einrichtung von Binso One in vier Schritten">
-      {steps.map(([number, title, detail], index) => (
-        <div className="landing-onboarding-step" key={title}>
-          <span>{number}</span>
-          <div><strong>{title}</strong><small>{detail}</small></div>
-          {index < steps.length - 1 ? <i aria-hidden="true" /> : null}
-        </div>
-      ))}
+    <div className="landing-onboarding-modern" aria-label="Einrichtung von Binso One in vier Schritten">
+      <div className="landing-onboarding-progress" aria-hidden="true">
+        <div><span>Einrichtung</span><strong>04 Schritte</strong></div>
+        <i><b /></i>
+      </div>
+      <div className="landing-onboarding-path">
+        {steps.map(([number, title, detail], index) => (
+          <div className="landing-onboarding-node" key={title}>
+            <div className="landing-onboarding-number"><span>{number}</span>{index < steps.length - 1 ? <i aria-hidden="true" /> : null}</div>
+            <div><strong>{title}</strong><small>{detail}</small></div>
+          </div>
+        ))}
+      </div>
+      <div className="landing-onboarding-ready" aria-hidden="true">
+        <span>Bereit</span>
+        <strong>Dein Arbeitsbereich steht.</strong>
+        <div><i /><i /><i /></div>
+      </div>
     </div>
   )
 }

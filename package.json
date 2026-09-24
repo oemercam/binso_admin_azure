@@ -1,9 +1,9 @@
 {
   "name": "binso-one",
-  "version": "0.71.1",
+  "version": "0.72.0",
   "private": true,
   "scripts": {
-    "test": "node scripts/test-core.mjs && node scripts/test-v69.mjs",
+    "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",
     "deployment:prepare": "node scripts/prepare-standalone.mjs",
     "dev": "next dev",
     "build": "next build --webpack",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "pnpm test && pnpm run typecheck && pnpm run lint && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run build",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -29,7 +29,14 @@
     "production:preflight": "node scripts/production-preflight.mjs",
     "go-live:check": "node scripts/check-go-live.mjs",
     "design-system:check": "node scripts/check-design-system.mjs",
-    "multitenant:check": "node scripts/check-multitenant-foundation.mjs"
+    "multitenant:check": "node scripts/check-multitenant-foundation.mjs",
+    "test:unit": "node scripts/test-unit.mjs",
+    "test:integration": "node scripts/test-integration.mjs",
+    "test:integration:db": "node scripts/test-database.mjs",
+    "test:v69": "node scripts/test-v69.mjs",
+    "test:e2e": "playwright test",
+    "security:check": "node scripts/check-security-baseline.mjs && node scripts/check-secrets.mjs",
+    "product:simplicity-check": "node scripts/check-product-simplicity.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",
@@ -45,7 +52,8 @@
     "typescript": "^5.9.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.0.0",
-    "@types/pg": "^8.11.10"
+    "@types/pg": "^8.11.10",
+    "@playwright/test": "1.51.1"
   },
   "engines": {
     "node": ">=24 <25"

@@ -13,9 +13,9 @@ import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { signOutUrl } from '@/lib/auth/urls'
 
 const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[]; feature?: OrganizationFeature }> = [
-  { label: 'Kunde erfassen', description: 'Firma oder Kontakt neu anlegen', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'], feature: 'crm' },
-  { label: 'Angebot erstellen', description: 'Leistungen offerieren und versenden', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'], feature: 'quotes' },
-  { label: 'Auftrag erstellen', description: 'Neues Mandat oder Projekt eröffnen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'], feature: 'orders' },
+  { label: 'Kunde erfassen', description: 'Firmenname reicht für den Start', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'], feature: 'crm' },
+  { label: 'Angebot erstellen', description: 'Kunde, Leistung und Preis', icon: 'quotes', href: '/quotes?new=1', roles: ['owner', 'admin'], feature: 'quotes' },
+  { label: 'Auftrag erstellen', description: 'Kunde und Auftragsname genügen', icon: 'orders', href: '/orders?new=1', roles: ['owner', 'admin'], feature: 'orders' },
   { label: 'Vertrag erfassen', description: 'Laufzeit und wiederkehrende Abrechnung festlegen', icon: 'contracts', href: '/contracts?new=1', roles: ['owner', 'admin', 'finance'], feature: 'contracts' },
   { label: 'Zeit erfassen', description: 'Arbeitszeit direkt auf Auftrag buchen', icon: 'time', href: '/time?new=1', roles: ['owner', 'admin', 'employee'], feature: 'time' },
   { label: 'Rechnung erstellen', description: 'Offene Zeiten oder freie Positionen verrechnen', icon: 'invoices', href: '/invoices?new=1', roles: ['owner', 'admin', 'finance'], feature: 'invoices' },
@@ -49,9 +49,9 @@ export function AppOverlays({
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const availableQuickActions = useMemo(() => {
-    const enabled = new Set(store.entitlements[0]?.features ?? [])
+    const enabled = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
     return quickActions.filter((item) => item.roles.includes(user.role) && (!item.feature || enabled.has(item.feature)))
-  }, [store.entitlements, user.role])
+  }, [store.currentOrganizationId, store.entitlements, user.role])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

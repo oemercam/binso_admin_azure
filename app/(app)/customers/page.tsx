@@ -78,14 +78,14 @@ export default function CustomersPage() {
   return (
     <section className="page apple-page mobile-standard-page">
       <PageHeader
-        title="Firmen"
-        description="Firmen verwalten und die gesamte Geschäftsbeziehung öffnen."
+        title="Kunden"
+        description="Kunden schnell erfassen und die Geschäftsbeziehung zentral weiterführen."
         action={<button className="button primary page-primary-action" onClick={() => { setForm(emptyCustomer); setOpen(true) }}><Icon name="plus" size={16}/><span>Kunde erfassen</span></button>}
       />
 
       <div className="module-toolbar">
-        <label className="search-field"><Icon name="search" size={16}/><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Firmen durchsuchen" /></label>
-        <span className="toolbar-meta">{filtered.length} Firmen</span>
+        <label className="search-field"><Icon name="search" size={16}/><Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden durchsuchen" /></label>
+        <span className="toolbar-meta">{filtered.length} Kunden</span>
       </div>
 
       <div className="data-list compact-overview-list">
@@ -118,11 +118,11 @@ export default function CustomersPage() {
       <StandardFormSheet open title={<>{customer.name}</>} description={<>{customer.customerNo} · Kundendaten bearbeiten</>} onClose={onClose} onSubmit={save} formId="customers-page-sheet-2" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="customers-page-sheet-2" className="button primary">Änderungen speichern</button></>}><div className="form-grid">
             <label><span>Firma *</span><Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value, legalName: e.target.value })} required/></label>
             <label><span>Ansprechperson</span><Input value={draft.contact ?? ''} onChange={(e) => setDraft({ ...draft, contact: e.target.value })}/></label>
-            <label><span>E-Mail *</span><Input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })} required/></label>
+            <label><span>E-Mail</span><Input type="email" value={draft.email ?? ''} onChange={(e) => setDraft({ ...draft, email: e.target.value })}/></label>
             <label><span>Telefon</span><Input value={draft.phone ?? ''} onChange={(e) => setDraft({ ...draft, phone: e.target.value })}/></label>
-            <label className="full"><span>Adresse *</span><Input value={draft.address ?? ''} onChange={(e) => setDraft({ ...draft, address: e.target.value })} required/></label>
-            <label><span>PLZ *</span><Input value={draft.zip ?? ''} onChange={(e) => setDraft({ ...draft, zip: e.target.value })} required/></label>
-            <label><span>Ort *</span><Input value={draft.city ?? ''} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required/></label>
+            <label className="full"><span>Adresse</span><Input value={draft.address ?? ''} onChange={(e) => setDraft({ ...draft, address: e.target.value })}/></label>
+            <label><span>PLZ</span><Input value={draft.zip ?? ''} onChange={(e) => setDraft({ ...draft, zip: e.target.value })}/></label>
+            <label><span>Ort</span><Input value={draft.city ?? ''} onChange={(e) => setDraft({ ...draft, city: e.target.value })}/></label>
             <label><span>Land *</span><Input value={draft.country} onChange={(e) => setDraft({ ...draft, country: e.target.value })} required/></label>
             <label><span>UID / MWST</span><Input value={draft.uid ?? ''} onChange={(e) => setDraft({ ...draft, uid: e.target.value })}/></label>
             <label><span>Zahlungsziel *</span><Input type="number" min="1" value={draft.paymentDays} onChange={(e) => setDraft({ ...draft, paymentDays: Number(e.target.value) })} required/></label>
@@ -142,16 +142,23 @@ export default function CustomersPage() {
 }
 
 function CustomerFields({ form, setForm }: { form: typeof emptyCustomer; setForm: (value: typeof emptyCustomer) => void }) {
-  return <div className="form-grid">
-    <label><span>Firma *</span><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required/></label>
-    <label><span>Ansprechperson</span><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })}/></label>
-    <label><span>E-Mail</span><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></label>
-    <label><span>Telefon</span><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}/></label>
-    <label className="full"><span>Adresse</span><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}/></label>
-    <label><span>PLZ</span><Input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })}/></label>
-    <label><span>Ort</span><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}/></label>
-    <label><span>Land</span><Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}/></label>
-    <label><span>UID / MWST</span><Input value={form.uid} onChange={(e) => setForm({ ...form, uid: e.target.value })}/></label>
-    <label><span>Zahlungsziel *</span><Input type="number" min="1" value={form.paymentDays} onChange={(e) => setForm({ ...form, paymentDays: Number(e.target.value) })} required/></label>
+  return <div className="quick-form-stack">
+    <div className="form-grid">
+      <label className="full"><span>Firmenname *</span><Input autoFocus value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="z. B. Muster AG"/></label>
+      <label><span>Ansprechperson</span><Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })}/></label>
+      <label><span>E-Mail</span><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/></label>
+    </div>
+    <details className="progressive-fields">
+      <summary>Weitere Angaben</summary>
+      <div className="form-grid">
+        <label><span>Telefon</span><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}/></label>
+        <label><span>UID / MWST</span><Input value={form.uid} onChange={(e) => setForm({ ...form, uid: e.target.value })}/></label>
+        <label className="full"><span>Adresse</span><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}/></label>
+        <label><span>PLZ</span><Input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })}/></label>
+        <label><span>Ort</span><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}/></label>
+        <label><span>Land</span><Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}/></label>
+        <label><span>Zahlungsziel</span><Input type="number" min="1" value={form.paymentDays} onChange={(e) => setForm({ ...form, paymentDays: Number(e.target.value) })}/></label>
+      </div>
+    </details>
   </div>
 }

@@ -9,7 +9,7 @@ import { useBusinessStore } from '@/components/state/business-store'
 export function DesktopNav({ user }: { user: AppUser }) {
   const pathname = usePathname()
   const store = useBusinessStore()
-  const enabled = new Set(store.entitlements[0]?.features ?? [])
+  const enabled = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
   const items = (user.platformRole ? navForUser(user) : navForRole(user.role)).filter((item) => !item.feature || enabled.has(item.feature))
   const work = items.filter((item) => item.group === 'work')
   const management = items.filter((item) => item.group === 'management')

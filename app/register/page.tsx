@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { Input, Select } from '@/components/ui/form-controls'
-import { planDefinitions } from '@/lib/data/plans'
+import { selfServicePlanDefinitions } from '@/lib/data/plans'
 import { signInUrl } from '@/lib/auth/urls'
 import { PublicShell } from '@/components/public/public-shell'
 import type { AppUser, OrganizationMembership, SignupRequest, SubscriptionPlan } from '@/types/domain'
@@ -18,7 +18,8 @@ type RegistrationState = {
 function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const initialPlan = (searchParams.get('plan') as SubscriptionPlan | null) ?? 'business'
+  const requestedPlan = searchParams.get('plan') as SubscriptionPlan | null
+  const initialPlan: SubscriptionPlan = selfServicePlanDefinitions.some((item) => item.id === requestedPlan) ? requestedPlan as SubscriptionPlan : 'business'
   const [companyName, setCompanyName] = useState('')
   const [ownerName, setOwnerName] = useState('')
   const [email, setEmail] = useState('')
@@ -135,7 +136,7 @@ function RegisterForm() {
           <label><span>Firma *</span><Input value={companyName} onChange={(event) => setCompanyName(event.target.value)} required /></label>
           <label><span>Name *</span><Input value={ownerName} onChange={(event) => setOwnerName(event.target.value)} required /></label>
           <label><span>Geschäftliche E-Mail *</span><Input type="email" value={email} readOnly required /></label>
-          <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}` : ''}</option>)}</Select></label>
+          <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)}>{selfServicePlanDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}` : ''}</option>)}</Select></label>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
           <button className="button primary" type="submit" disabled={submitting}>{submitting ? 'Wird gespeichert…' : 'Weiter zum Onboarding'}</button>
           <small>Noch keine Zahlung. Der 14-tägige Testzugang wird erst im nächsten Schritt aktiviert.</small>
