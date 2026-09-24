@@ -24,22 +24,22 @@ function DesktopDashboard({ compact = false }: { compact?: boolean }) {
       <aside>
         <div className="marketing-dashboard-brand"><BinsoLogo /></div>
         <nav>
-          <span className="active"><i />Übersicht</span>
+          <span className="active"><i />Ãœbersicht</span>
           <span><i />Kunden</span>
           <span><i />Angebote</span>
-          <span><i />Aufträge</span>
+          <span><i />AuftrÃ¤ge</span>
           <span><i />Zeiterfassung</span>
           <span><i />Rechnungen</span>
           <span><i />Mitarbeitende</span>
         </nav>
       </aside>
       <div className="marketing-dashboard-main">
-        <div className="marketing-dashboard-top"><span>Übersicht</span><div><i /><i /></div></div>
-        <div className="marketing-dashboard-heading"><div><small>Heute</small><strong>Willkommen zurück</strong></div><button type="button" tabIndex={-1}>+ Neu</button></div>
+        <div className="marketing-dashboard-top"><span>Ãœbersicht</span><div><i /><i /></div></div>
+        <div className="marketing-dashboard-heading"><div><small>Heute</small><strong>Willkommen zurÃ¼ck</strong></div><span className="marketing-dashboard-new-action">+ Neu</span></div>
         <div className="marketing-dashboard-kpis">
-          <article><span>Offene Aufträge</span><strong>12</strong><small>+ 3 diese Woche</small></article>
+          <article><span>Offene AuftrÃ¤ge</span><strong>12</strong><small>+ 3 diese Woche</small></article>
           <article><span>Erfasste Stunden</span><strong>142 h</strong><small>+ 12 %</small></article>
-          <article><span>Umsatz Monat</span><strong>CHF 24’830</strong><small>+ 18 %</small></article>
+          <article><span>Umsatz Monat</span><strong>CHF 24â€™830</strong><small>+ 18 %</small></article>
         </div>
         <div className="marketing-dashboard-grid">
           <section>
@@ -47,7 +47,7 @@ function DesktopDashboard({ compact = false }: { compact?: boolean }) {
             <div className="marketing-line-chart"><i/><i/><i/><i/><i/><i/></div>
           </section>
           <section>
-            <div className="marketing-card-head"><span>Aktuelle Aufträge</span><small>Alle</small></div>
+            <div className="marketing-card-head"><span>Aktuelle AuftrÃ¤ge</span><small>Alle</small></div>
             <div className="marketing-task-list"><span><i/>Website Relaunch</span><span><i/>IT-Beratung</span><span><i/>Support & Wartung</span></div>
           </section>
         </div>
@@ -60,11 +60,11 @@ function MobileDashboard() {
   return (
     <div className="marketing-phone-ui">
       <div className="marketing-phone-status"><span>9:41</span><i /></div>
-      <div className="marketing-phone-brand"><BinsoLogo /><span>•••</span></div>
-      <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Überblick.</span></div>
-      <div className="marketing-phone-kpis"><article><span>Aufträge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24’830</strong></article></div>
+      <div className="marketing-phone-brand"><BinsoLogo /><span>â€¢â€¢â€¢</span></div>
+      <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Ãœberblick.</span></div>
+      <div className="marketing-phone-kpis"><article><span>AuftrÃ¤ge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24â€™830</strong></article></div>
       <div className="marketing-phone-tasks"><strong>Meine Aufgaben</strong><span><i/>Angebot versenden</span><span><i/>Rechnung erstellen</span><span><i/>Zeit erfassen</span></div>
-      <div className="marketing-phone-nav"><span>Übersicht</span><span>Kunden</span><span>Zeit</span><span>Mehr</span></div>
+      <div className="marketing-phone-nav"><span>Ãœbersicht</span><span>Kunden</span><span>Zeit</span><span>Mehr</span></div>
     </div>
   )
 }
@@ -88,15 +88,15 @@ export function LandingProofVisual() {
         <div className="landing-proof-window-bar"><span/><span/><span/><b><BinsoLogo /></b></div>
         <DesktopDashboard compact />
       </div>
-      <div className="landing-proof-callout"><strong>Alles verbunden</strong><span>Kunden, Aufträge, Zeiten und Rechnungen greifen ineinander.</span></div>
+      <div className="landing-proof-callout"><strong>Alles verbunden</strong><span>Kunden, AuftrÃ¤ge, Zeiten und Rechnungen greifen ineinander.</span></div>
     </div>
   )
 }
 
 const stories = [
-  { title: 'Angebot bis Rechnung', text: 'Angebote erstellen, in Aufträge übernehmen und erfasste Leistungen direkt weiterverrechnen.', icon: 'quotes' as const, className: 'blue' },
+  { title: 'Angebot bis Rechnung', text: 'Angebote erstellen, in AuftrÃ¤ge Ã¼bernehmen und erfasste Leistungen direkt weiterverrechnen.', icon: 'quotes' as const, className: 'blue' },
   { title: 'Zeit und Team', text: 'Arbeitszeit projektbezogen erfassen und Mitarbeitende mit klaren Rollen organisieren.', icon: 'time' as const, className: 'green' },
-  { title: 'Kunden und Verträge', text: 'Kontakte, Firmen, Verträge und wiederkehrende Leistungen zentral verwalten.', icon: 'customers' as const, className: 'violet' },
+  { title: 'Kunden und VertrÃ¤ge', text: 'Kontakte, Firmen, VertrÃ¤ge und wiederkehrende Leistungen zentral verwalten.', icon: 'customers' as const, className: 'violet' },
 ]
 
 export function FeatureStoryVisual() {
@@ -116,19 +116,19 @@ export function FeatureStoryVisual() {
 const workflow = [
   ['01', 'Anfrage', 'Anfrage erfassen und zuordnen'],
   ['02', 'Angebot', 'Leistung und Preis festlegen'],
-  ['03', 'Auftrag', 'Annahme direkt weiterführen'],
+  ['03', 'Auftrag', 'Annahme direkt weiterfÃ¼hren'],
   ['04', 'Zeit & Leistung', 'Arbeit laufend erfassen'],
-  ['05', 'Rechnung', 'Leistungen übernehmen'],
-  ['06', 'Zahlung', 'Offene Beträge verfolgen'],
+  ['05', 'Rechnung', 'Leistungen Ã¼bernehmen'],
+  ['06', 'Zahlung', 'Offene BetrÃ¤ge verfolgen'],
 ] as const
 
 export function BusinessFlowVisual() {
   return (
-    <div className="business-flow-visual landing-process" aria-label="Geschäftsprozess von der Anfrage bis zur Zahlung">
+    <div className="business-flow-visual landing-process" aria-label="GeschÃ¤ftsprozess von der Anfrage bis zur Zahlung">
       {workflow.map(([number, title, detail], index) => (
         <div className="business-flow-step" key={title}>
           <div className="business-flow-node"><span>{number}</span><strong>{title}</strong><small>{detail}</small></div>
-          {index < workflow.length - 1 ? <div className="business-flow-connector" aria-hidden="true"><i /><b>→</b></div> : null}
+          {index < workflow.length - 1 ? <div className="business-flow-connector" aria-hidden="true"><i /><b>â†’</b></div> : null}
         </div>
       ))}
     </div>
@@ -137,17 +137,17 @@ export function BusinessFlowVisual() {
 
 export function OnboardingVisual() {
   const steps = [
-    ['Konto erstellen', 'Geschäftliche E-Mail und sichere Anmeldung'],
-    ['Unternehmen einrichten', 'Nur die wichtigsten Angaben für den Start'],
-    ['Ersten Kunden erfassen', 'Direkt mit echten Geschäftsdaten arbeiten'],
-    ['Ablauf starten', 'Angebot, Auftrag und Rechnung durchgängig weiterführen'],
+    ['Konto erstellen', 'GeschÃ¤ftliche E-Mail und sichere Anmeldung'],
+    ['Unternehmen einrichten', 'Nur die wichtigsten Angaben fÃ¼r den Start'],
+    ['Ersten Kunden erfassen', 'Direkt mit echten GeschÃ¤ftsdaten arbeiten'],
+    ['Ablauf starten', 'Angebot, Auftrag und Rechnung durchgÃ¤ngig weiterfÃ¼hren'],
   ] as const
 
   return (
     <div className="onboarding-visual landing-onboarding-visual">
       <div className="onboarding-progress"><span>Einrichtung</span><strong>75%</strong><i><b /></i></div>
       <div className="onboarding-steps">
-        {steps.map(([title, detail], index) => <div key={title} className={index < 3 ? 'done' : ''}><span>{index < 3 ? '✓' : '4'}</span><div><strong>{title}</strong><small>{detail}</small></div></div>)}
+        {steps.map(([title, detail], index) => <div key={title} className={index < 3 ? 'done' : ''}><span>{index < 3 ? 'âœ“' : '4'}</span><div><strong>{title}</strong><small>{detail}</small></div></div>)}
       </div>
     </div>
   )
