@@ -102,6 +102,7 @@ export async function updatePlatformSubscription(input: {
   actorEmail: string
   plan: SubscriptionPlan
   status: PlatformTenant['status']
+  reason: string
 }) {
   return withTransaction(async (client) => {
     const currentResult = await client.query<{
@@ -133,7 +134,7 @@ export async function updatePlatformSubscription(input: {
       await client.query(
         `insert into platform_audit_events (actor_user_id, actor_email, action, tenant_id, detail)
          values ($1, $2, 'tenant.platform_status.updated', $3, $4)`,
-        [input.actorUserId, input.actorEmail, input.tenantId, `${current.platform_status} -> ${input.status}`],
+        [input.actorUserId, input.actorEmail, input.tenantId, `${current.platform_status} -> ${input.status}; reason=${input.reason}`],
       )
       return { organizationId: current.organization_id }
     }
@@ -196,7 +197,7 @@ export async function updatePlatformSubscription(input: {
     await client.query(
       `insert into platform_audit_events (actor_user_id, actor_email, action, tenant_id, detail)
        values ($1, $2, 'subscription.updated', $3, $4)`,
-      [input.actorUserId, input.actorEmail, input.tenantId, `${current.plan}/${current.platform_status} -> ${input.plan}/${input.status}`],
+      [input.actorUserId, input.actorEmail, input.tenantId, `${current.plan}/${current.platform_status} -> ${input.plan}/${input.status}; reason=${input.reason}`],
     )
     return { organizationId: current.organization_id }
   })

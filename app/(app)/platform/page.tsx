@@ -40,6 +40,7 @@ export default function PlatformAdminPage() {
   const [plan, setPlan] = useState<SubscriptionPlan>('business')
   const [status, setStatus] = useState<PlatformTenant['status']>('active')
   const [saving, setSaving] = useState(false)
+  const [reason, setReason] = useState('')
   const [health, setHealth] = useState<PlatformHealth | null>(null)
 
   const loadPlatform = useCallback(async () => {
@@ -91,12 +92,13 @@ export default function PlatformAdminPage() {
       const response = await fetch('/api/platform/tenants', {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ tenantId: editing.id, plan, status }),
+        body: JSON.stringify({ tenantId: editing.id, plan, status, reason }),
       })
       const result = await response.json().catch(() => ({})) as { error?: string }
       if (!response.ok) throw new Error(result.error || 'Mandant konnte nicht aktualisiert werden.')
       await loadPlatform()
       setEditing(null)
+      setReason('')
       feedback.success('Abonnement wurde aktualisiert.')
     } catch (cause) {
       feedback.error(cause instanceof Error ? cause.message : 'Mandant konnte nicht aktualisiert werden.')
@@ -152,6 +154,7 @@ export default function PlatformAdminPage() {
         <div className="form-grid">
           <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)} disabled={!canManage}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
           <label><span>Status</span><Select value={status} onChange={(event) => setStatus(event.target.value as PlatformTenant['status'])} disabled={!canManage}><option value="trial">Trial</option><option value="active">Aktiv</option><option value="past_due">Zahlung offen</option><option value="grace_period">Kulanzfrist</option><option value="read_only">Nur lesen</option><option value="suspended">Gesperrt</option><option value="expired">Trial abgelaufen</option><option value="cancelled">Gekündigt</option><option value="archived">Archiviert</option></Select></label>
+          <label className="full"><span>Änderungsgrund *</span><Input value={reason} onChange={(event) => setReason(event.target.value)} required minLength={3} maxLength={500} placeholder="Warum wird Plan oder Status geändert?" /></label>
           <div className="full customer-overview-list">
             <div><span>Benutzer</span><strong>{editing.users} / {editing.seats}</strong></div>
             <div><span>Speicher</span><strong>{editing.storageMb} MB</strong></div>
