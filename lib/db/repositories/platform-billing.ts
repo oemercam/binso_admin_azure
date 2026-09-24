@@ -128,7 +128,7 @@ export async function updatePlatformSubscription(input: {
       if (input.status !== 'active' && input.status !== 'suspended') throw new Error('Der Zahlungsstatus wird durch Stripe synchronisiert.')
       await client.query(
         `update platform_tenants set platform_status = $2, last_active_at = coalesce(last_active_at, now()) where id = $1`,
-        [input.tenantId, input.status],
+        [input.tenantId, input.status === 'active' ? current.subscription_status : input.status],
       )
       await client.query(
         `insert into platform_audit_events (actor_user_id, actor_email, action, tenant_id, detail)

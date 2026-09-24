@@ -26,7 +26,9 @@
 
 ## Data and auth
 
-HTTP behaviour is centralized under `lib/http/`. Authentication logic is centralized under `lib/auth/`. The current demo business store persists locally; `database/schema.sql` documents the PostgreSQL target schema.
+HTTP behaviour is centralized under `lib/http/`. Authentication logic is centralized under `lib/auth/`. Production business data is a versioned JSON snapshot per organization in PostgreSQL (`tenant_business_state`), protected by tenant context, role-aware projection/mutation and optimistic concurrency. Relational business tables are historical foundations, not a second authoritative data source. Local development can still use isolated seed data. Sequential files under `database/migrations` are the deployment schema source.
+
+V69 adds durable `mail_outbox`, `job_runs` and private storage metadata. Background work locks each tenant using the same advisory lock as interactive saves. Microsoft Graph acceptance updates document status; ambiguous attempts require operator inspection. `docs/V69-REVIEW-AND-GO-LIVE.md` records implementation boundaries and external acceptance requirements.
 
 ## PWA
 

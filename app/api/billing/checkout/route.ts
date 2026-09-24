@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   const billing = await getBillingIdentity(context.organizationId)
   if (!billing) return NextResponse.json({ error: 'Kein Abonnement gefunden.' }, { status: 404 })
-  if (billing.billingSubscriptionId && billing.billingProvider === 'stripe') {
+  if (billing.billingSubscriptionId && billing.billingProvider === 'stripe' && !['cancelled','expired'].includes(billing.status)) {
     return NextResponse.json({ error: 'Es besteht bereits ein Stripe-Abonnement. Bitte das Abrechnungsportal verwenden.' }, { status: 409 })
   }
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       params.set('email', billing.ownerEmail)
       params.set('name', billing.organizationName)
       params.set('metadata[organizationId]', billing.organizationId)
-      const customer = await stripePost<StripeCustomer>('/customers', params)
+      const customer = await stripePost<StripeCustomer>('/customers', params, `customer-${billing.organizationId}`)
       customerId = customer.id
       await saveStripeCustomer(billing.organizationId, customer.id)
     }
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     params.set('metadata[plan]', body.plan)
     params.set('allow_promotion_codes', 'true')
 
-    const session = await stripePost<StripeCheckoutSession>('/checkout/sessions', params)
+    const session = await stripePost<StripeCheckoutSession>('/checkout/sessions', params, `checkout-${billing.organizationId}-${body.plan}-${Math.floor(Date.now() / 1_800_000)}`)
     if (!session.url) throw new Error('Stripe hat keine Checkout-URL zurückgegeben.')
     return NextResponse.json({ url: session.url })
   } catch (cause) {

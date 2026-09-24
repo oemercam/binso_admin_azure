@@ -144,7 +144,7 @@ export default function QuotesPage() {
       warning={preview && missing(preview).length > 0 ? <div className="document-warning"><strong>Noch nicht versandbereit</strong><span>Fehlend: {missing(preview).join(', ')}</span></div> : null}
       actions={preview ? <>
         {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
-        {previewCanRecordDispatch && <button className="button secondary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Versand erneut erfassen' : 'Als versendet markieren'}</button>}
+        {previewCanRecordDispatch && <button className="button secondary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Erneut per E-Mail senden' : 'Per E-Mail senden'}</button>}
         {previewCanDecide && <button className="button secondary" onClick={() => setStatus('accepted')}><Icon name="check" size={15}/> Als angenommen markieren</button>}
         {previewCanDecide && <button className="button secondary" onClick={() => setStatus('declined')}>Als abgelehnt markieren</button>}
         {previewIsAccepted && <button className="button primary" onClick={orderFromQuote}><Icon name="orders" size={15}/> {previewExistingOrder ? 'Auftrag öffnen' : 'Auftrag erstellen'}</button>}
@@ -153,7 +153,7 @@ export default function QuotesPage() {
       </> : null}
       mobileActions={preview ? <>
         {previewIsDraft && <button className="button secondary" onClick={() => setEditing(preview)}><Icon name="edit" size={15}/> Bearbeiten</button>}
-        {previewCanRecordDispatch && <button className="button primary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Versand erfassen' : 'Als versendet markieren'}</button>}
+        {previewCanRecordDispatch && <button className="button primary" disabled={missing(preview).length > 0} onClick={() => setSending(preview)}><Icon name="send" size={15}/> {previewIsSent ? 'Per E-Mail senden' : 'Per E-Mail senden'}</button>}
         {previewIsAccepted && <button className="button primary" onClick={orderFromQuote}><Icon name="orders" size={15}/> {previewExistingOrder ? 'Auftrag öffnen' : 'Auftrag erstellen'}</button>}
       </> : null}
       mobileMoreActions={preview && previewHasMoreActions ? <>
@@ -168,7 +168,7 @@ export default function QuotesPage() {
 
     {creating && <QuoteForm onClose={() => setCreating(false)} onSave={(quote) => { setCreating(false); setPreview(quote) }} />}
     {editing && <QuoteEdit quote={editing} onClose={() => setEditing(null)} onSave={(quote) => { setEditing(null); setPreview(quote) }} />}
-    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); feedback.success('Versandstatus des Angebots wurde gespeichert.') }} />}
+    {sending && <QuoteSend quote={sending} onClose={() => setSending(null)} onSent={(quote) => { setSending(null); setPreview(quote); feedback.success('Versandauftrag wurde gespeichert.') }} />}
   </section>
 
   function QuoteForm({ onClose, onSave }: { onClose: () => void; onSave: (q: Quote) => void }) {
@@ -201,11 +201,16 @@ export default function QuotesPage() {
   function QuoteSend({ quote, onClose, onSent }: { quote: Quote; onClose: () => void; onSent: (q: Quote) => void }) {
     const customer = customerFor(quote)
     const [to, setTo] = useState(quote.recipientEmail || customer?.email || '')
-    function save(event: React.FormEvent) {
+    const [busy, setBusy] = useState(false)
+    const [key] = useState(() => crypto.randomUUID())
+    async function save(event: React.FormEvent) {
       event.preventDefault()
-      const updated = store.sendQuote(quote.id, to)
-      if (updated) onSent(updated)
+      if (busy) return
+      setBusy(true)
+      try { await store.queueDocumentMail('quote', quote.id, to, key); onSent(quote) }
+      catch (error) { feedback.error(error instanceof Error ? error.message : 'Versand fehlgeschlagen.') }
+      finally { setBusy(false) }
     }
-    return <StandardFormSheet open title={<>Versand erfassen</>} description={<>Speichert Empfänger, Versandzeitpunkt und Status. Es wird aktuell keine E-Mail verschickt.</>} onClose={onClose} onSubmit={save} formId="quotes-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-3" className="button primary"><Icon name="check" size={15}/> Als versendet markieren</button></>}><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label></div></StandardFormSheet>
+    return <StandardFormSheet open title={<>Angebot per E-Mail senden</>} description={<>Versand mit druckbarer HTML-Datei über die Warteschlange. Der Status wird nach Annahme durch den Maildienst aktualisiert.</>} onClose={onClose} onSubmit={save} formId="quotes-page-sheet-3" footer={<><button type="button" className="button secondary" onClick={onClose}>Abbrechen</button><button type="submit" form="quotes-page-sheet-3" className="button primary" disabled={busy}><Icon name="send" size={15}/> Versand einplanen</button></>}><div className="form-grid"><label className="full"><span>Empfänger *</span><Input type="email" value={to} onChange={(e) => setTo(e.target.value)} required/></label></div></StandardFormSheet>
   }
 }

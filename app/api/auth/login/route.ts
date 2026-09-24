@@ -3,7 +3,7 @@ import { env } from '@/lib/config/env'
 import { publicRequestOrigin } from '@/lib/auth/public-origin'
 
 function safeReturnTo(value: string | null) {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/post-login'
+  if (!value || !value.startsWith('/') || value.startsWith('//') || /[\\\r\n]/.test(value)) return '/post-login'
   return value
 }
 

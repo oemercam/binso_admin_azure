@@ -32,4 +32,4 @@ pnpm db:migrate
 pnpm production:preflight
 ```
 
-Produktionsdetails: `docs/GO-LIVE-V68.md` und `docs/DEPLOYMENT.md`.
+V69-Bestandsaufnahme: `docs/V69-INVENTORY-AND-PLAN.md`. Aktueller Review, Implementierungsgrenzen und manuelle Go-live-Schritte: `docs/V69-REVIEW-AND-GO-LIVE.md` und `docs/DEPLOYMENT.md`. Historische Vxx-Dokumente beschreiben frühere Zwischenstände.

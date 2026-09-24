@@ -190,7 +190,7 @@ export default function SettingsPage() {
 
         {tab === 'mail' && (
           <>
-            <SettingsSection title="Microsoft 365 Versand" description={mailReady ? 'Absender vollständig · Verbindung noch nicht aktiviert' : 'Versandkonfiguration unvollständig'}>
+            <SettingsSection title="Microsoft 365 Versand" description={mailReady ? 'Profilangaben vollständig · Versand über Betreiberpostfach' : 'Versandkonfiguration unvollständig'}>
               <SettingsValueRow title="Absendername" value={store.appSettings.mail.senderName || 'Nicht gesetzt'} onClick={() => openMail('senderName', 'Absendername')} />
               <SettingsValueRow title="Antwortadresse" value={store.appSettings.mail.replyTo || 'Nicht gesetzt'} onClick={() => openMail('replyTo', 'Antwortadresse', 'email')} />
               <SettingsValueRow title="Rechnungen" value={store.appSettings.mail.invoiceSender || 'Nicht gesetzt'} onClick={() => openMail('invoiceSender', 'Rechnungsabsender', 'email')} />
@@ -200,17 +200,17 @@ export default function SettingsPage() {
               <SettingsValueRow title="CC Buchhaltung" value={store.appSettings.mail.financeCc || 'Nicht gesetzt'} onClick={() => openMail('financeCc', 'CC Buchhaltung', 'email')} />
             </SettingsSection>
 
-            <SettingsSection title="Versandoptionen" description="Standardverhalten für geschäftliche E-Mails.">
-              <SettingsToggleRow title="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen als PDF anhängen." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
-              <SettingsToggleRow title="Versand protokollieren" description="Versandstatus für die spätere revisionssichere Protokollierung speichern." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
-              <SettingsToggleRow title="Kopie an Absender" description="Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
+            <SettingsSection title="Versandoptionen" description="Versand erfolgt über das konfigurierte Betreiberpostfach. Eigene Absender, CC und PDF-Anhänge sind noch nicht angebunden.">
+              <SettingsToggleRow disabled title="PDF automatisch anhängen" description="Angebote, Rechnungen, Mahnungen und Lohnabrechnungen als PDF anhängen." checked={store.appSettings.mail.attachPdf} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, attachPdf: value } })} />
+              <SettingsToggleRow disabled title="Versand protokollieren" description="Versandstatus für die spätere revisionssichere Protokollierung speichern." checked={store.appSettings.mail.deliveryTracking} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, deliveryTracking: value } })} />
+              <SettingsToggleRow disabled title="Kopie an Absender" description="Kopie jeder versendeten Nachricht im Absenderpostfach zustellen." checked={store.appSettings.mail.copySender} onChange={(value) => store.updateAppSettings({ mail: { ...store.appSettings.mail, copySender: value } })} />
             </SettingsSection>
           </>
         )}
 
         {tab === 'automation' && (
           <>
-            <div className="integration-banner"><strong>Automationen sind konfiguriert, aber noch nicht serverseitig aktiv.</strong><span>Ausführung benötigt Azure-Datenbank, Microsoft Graph und Scheduler/Worker.</span></div>
+            <div className="integration-banner"><strong>Vertragsentwürfe und aktivierte Mahnungen werden vom Scheduler verarbeitet.</strong><span>Ausführung benötigt einen aktivierten Scheduler; E-Mail-Versand zusätzlich Microsoft Graph.</span></div>
 
             <SettingsSection title="Mahnwesen" description="Status direkt ändern, Zeitabstände gezielt öffnen.">
               <SettingsToggleRow title="Mahnwesen aktiv" checked={store.appSettings.reminders.enabled} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, enabled: value } })} />
@@ -222,12 +222,12 @@ export default function SettingsPage() {
               <SettingsToggleRow title="Nach Zahlung sofort stoppen" checked={store.appSettings.reminders.stopWhenPaid} onChange={(value) => store.updateAppSettings({ reminders: { ...store.appSettings.reminders, stopWhenPaid: value } })} />
             </SettingsSection>
 
-            <SettingsSection title="Stundenlohn und Lohnabrechnung" description="Workflow und Versand der monatlichen Lohnvorbereitung.">
+            <SettingsSection title="Stundenlohn und Lohnabrechnung" description="Lohnvorbereitung vorhanden. Automatische Lohnabrechnung und Lohnversand sind noch nicht implementiert.">
               <SettingsToggleRow title="Lohnprozess aktiv" checked={store.appSettings.payroll.enabled} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, enabled: value } })} />
-              <SettingsToggleRow title="Lohnabrechnung nach Freigabe vorbereiten" checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Nur Stundenlohn-Mitarbeitende" checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Freigabe durch Buchhaltung erforderlich" checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled={!store.appSettings.payroll.enabled} />
-              <SettingsToggleRow title="Nach Freigabe automatisch versenden" checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled={!store.appSettings.payroll.enabled} />
+              <SettingsToggleRow title="Lohnabrechnung nach Freigabe vorbereiten" checked={store.appSettings.payroll.generateAfterApprovedTimesheet} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, generateAfterApprovedTimesheet: value } })} disabled />
+              <SettingsToggleRow title="Nur Stundenlohn-Mitarbeitende" checked={store.appSettings.payroll.hourlyEmployeesOnly} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, hourlyEmployeesOnly: value } })} disabled />
+              <SettingsToggleRow title="Freigabe durch Buchhaltung erforderlich" checked={store.appSettings.payroll.requireFinanceApproval} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, requireFinanceApproval: value } })} disabled />
+              <SettingsToggleRow title="Nach Freigabe automatisch versenden" checked={store.appSettings.payroll.autoSend} onChange={(value) => store.updateAppSettings({ payroll: { ...store.appSettings.payroll, autoSend: value } })} disabled />
               <SettingsValueRow title="E-Mail-Betreff" value={store.appSettings.payroll.subject || 'Nicht gesetzt'} onClick={() => openPayroll('subject', 'E-Mail-Betreff')} />
               <SettingsValueRow title="E-Mail-Text" value="Text bearbeiten" onClick={() => openPayroll('emailBody', 'E-Mail-Text', true)} />
             </SettingsSection>

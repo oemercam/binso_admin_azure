@@ -24,7 +24,7 @@ export function stripePlanForPriceId(priceId: string | null | undefined): Subscr
   return entries.find(([, id]) => id?.trim() === priceId)?.[0] ?? null
 }
 
-export async function stripePost<T>(path: string, params: URLSearchParams): Promise<T> {
+export async function stripePost<T>(path: string, params: URLSearchParams, idempotencyKey?: string): Promise<T> {
   const key = process.env.STRIPE_SECRET_KEY?.trim()
   if (!key) throw new Error('Stripe ist nicht konfiguriert.')
   const response = await fetch(`${STRIPE_API}${path}`, {
@@ -32,13 +32,23 @@ export async function stripePost<T>(path: string, params: URLSearchParams): Prom
     headers: {
       authorization: `Bearer ${key}`,
       'content-type': 'application/x-www-form-urlencoded',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: params,
     cache: 'no-store',
+    signal: AbortSignal.timeout(20_000),
   })
   const payload = await response.json().catch(() => ({})) as T & { error?: { message?: string } }
   if (!response.ok) throw new Error(payload.error?.message || 'Stripe-Anfrage fehlgeschlagen.')
   return payload
+}
+
+export async function stripeGet<T>(path: string): Promise<T> {
+  const key = process.env.STRIPE_SECRET_KEY?.trim()
+  if (!key) throw new Error('Stripe ist nicht konfiguriert.')
+  const response = await fetch(`${STRIPE_API}${path}`, { headers: { authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(20_000) })
+  if (!response.ok) throw new Error(`Stripe-Abgleich fehlgeschlagen (${response.status}).`)
+  return response.json() as Promise<T>
 }
 
 export function appBaseUrl(request: Request) {

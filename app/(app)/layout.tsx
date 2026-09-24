@@ -16,6 +16,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   const session = await getSession()
   if (!session) redirect('/sign-in')
   const databaseConfigured = isDatabaseConfigured()
+  if (process.env.NODE_ENV === 'production' && !databaseConfigured) redirect('/access-denied')
   const account = databaseConfigured
     ? await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
     : null
