@@ -24,22 +24,22 @@ function DesktopDashboard({ compact = false }: { compact?: boolean }) {
       <aside>
         <div className="marketing-dashboard-brand"><BinsoLogo /></div>
         <nav>
-          <span className="active"><i />Ãœbersicht</span>
+          <span className="active"><i />Übersicht</span>
           <span><i />Kunden</span>
           <span><i />Angebote</span>
-          <span><i />AuftrÃ¤ge</span>
+          <span><i />Aufträge</span>
           <span><i />Zeiterfassung</span>
           <span><i />Rechnungen</span>
           <span><i />Mitarbeitende</span>
         </nav>
       </aside>
       <div className="marketing-dashboard-main">
-        <div className="marketing-dashboard-top"><span>Ãœbersicht</span><div><i /><i /></div></div>
-        <div className="marketing-dashboard-heading"><div><small>Heute</small><strong>Willkommen zurÃ¼ck</strong></div><span className="marketing-dashboard-new-action">+ Neu</span></div>
+        <div className="marketing-dashboard-top"><span>Übersicht</span><div><i /><i /></div></div>
+        <div className="marketing-dashboard-heading"><div><small>Heute</small><strong>Willkommen zurück</strong></div><span className="marketing-dashboard-new-action">+ Neu</span></div>
         <div className="marketing-dashboard-kpis">
-          <article><span>Offene AuftrÃ¤ge</span><strong>12</strong><small>+ 3 diese Woche</small></article>
+          <article><span>Offene Aufträge</span><strong>12</strong><small>+ 3 diese Woche</small></article>
           <article><span>Erfasste Stunden</span><strong>142 h</strong><small>+ 12 %</small></article>
-          <article><span>Umsatz Monat</span><strong>CHF 24â€™830</strong><small>+ 18 %</small></article>
+          <article><span>Umsatz Monat</span><strong>CHF 24’830</strong><small>+ 18 %</small></article>
         </div>
         <div className="marketing-dashboard-grid">
           <section>
@@ -47,7 +47,7 @@ function DesktopDashboard({ compact = false }: { compact?: boolean }) {
             <div className="marketing-line-chart"><i/><i/><i/><i/><i/><i/></div>
           </section>
           <section>
-            <div className="marketing-card-head"><span>Aktuelle AuftrÃ¤ge</span><small>Alle</small></div>
+            <div className="marketing-card-head"><span>Aktuelle Aufträge</span><small>Alle</small></div>
             <div className="marketing-task-list"><span><i/>Website Relaunch</span><span><i/>IT-Beratung</span><span><i/>Support & Wartung</span></div>
           </section>
         </div>
@@ -60,11 +60,11 @@ function MobileDashboard() {
   return (
     <div className="marketing-phone-ui">
       <div className="marketing-phone-status"><span>9:41</span><i /></div>
-      <div className="marketing-phone-brand"><BinsoLogo /><span>â€¢â€¢â€¢</span></div>
-      <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Ãœberblick.</span></div>
-      <div className="marketing-phone-kpis"><article><span>AuftrÃ¤ge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24â€™830</strong></article></div>
+      <div className="marketing-phone-brand"><BinsoLogo /><span>•••</span></div>
+      <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Überblick.</span></div>
+      <div className="marketing-phone-kpis"><article><span>Aufträge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24’830</strong></article></div>
       <div className="marketing-phone-tasks"><strong>Meine Aufgaben</strong><span><i/>Angebot versenden</span><span><i/>Rechnung erstellen</span><span><i/>Zeit erfassen</span></div>
-      <div className="marketing-phone-nav"><span>Ãœbersicht</span><span>Kunden</span><span>Zeit</span><span>Mehr</span></div>
+      <div className="marketing-phone-nav"><span>Übersicht</span><span>Kunden</span><span>Zeit</span><span>Mehr</span></div>
     </div>
   )
 }
@@ -88,25 +88,99 @@ export function LandingProofVisual() {
         <div className="landing-proof-window-bar"><span/><span/><span/><b><BinsoLogo /></b></div>
         <DesktopDashboard compact />
       </div>
-      <div className="landing-proof-callout"><strong>Alles verbunden</strong><span>Kunden, AuftrÃ¤ge, Zeiten und Rechnungen greifen ineinander.</span></div>
+    </div>
+  )
+}
+
+function CustomerListVisual() {
+  return (
+    <div className="landing-feature-ui landing-feature-ui-customers" aria-hidden="true">
+      <div className="landing-feature-ui-head"><span>Kunden</span><b>+ Neuer Kunde</b></div>
+      <div className="landing-feature-search">Kunden suchen …</div>
+      <div className="landing-feature-list">
+        <span><i>A</i><strong>Acme GmbH</strong><small>Zürich</small><b>Aktiv</b></span>
+        <span><i>M</i><strong>Müller AG</strong><small>Bern</small><b>Aktiv</b></span>
+        <span><i>C</i><strong>Creative Minds</strong><small>Luzern</small><b>Aktiv</b></span>
+      </div>
+    </div>
+  )
+}
+
+function QuoteOrderVisual() {
+  return (
+    <div className="landing-feature-ui landing-feature-ui-quotes" aria-hidden="true">
+      <div className="landing-feature-ui-head"><span>Angebote</span><b>+ Neues Angebot</b></div>
+      <div className="landing-feature-tabs"><i>Alle</i><span>Offen</span><span>Angenommen</span></div>
+      <div className="landing-feature-table">
+        <span><strong>Website Relaunch</strong><small>Acme GmbH</small><b>CHF 12’450.–</b><em>Offen</em></span>
+        <span><strong>IT-Beratung</strong><small>Müller AG</small><b>CHF 8’900.–</b><em>Angenommen</em></span>
+        <span><strong>Support</strong><small>Creative Minds</small><b>CHF 3’250.–</b><em>Offen</em></span>
+      </div>
+    </div>
+  )
+}
+
+function TimeInvoiceVisual() {
+  return (
+    <div className="landing-feature-duo" aria-hidden="true">
+      <div className="landing-time-visual">
+        <span>Zeiterfassung</span>
+        <strong>00:24:17</strong>
+        <small>Website Relaunch · Acme GmbH</small>
+        <div><i>▶</i><b>Timer läuft</b></div>
+      </div>
+      <div className="landing-invoice-visual">
+        <span>Rechnung RE-2026-004</span>
+        <strong>CHF 12’450.–</strong>
+        <small>Acme GmbH</small>
+        <div><i>✓</i><b>Bezahlt</b></div>
+      </div>
     </div>
   )
 }
 
 const stories = [
-  { title: 'Angebot bis Rechnung', text: 'Angebote erstellen, in AuftrÃ¤ge Ã¼bernehmen und erfasste Leistungen direkt weiterverrechnen.', icon: 'quotes' as const, className: 'blue' },
-  { title: 'Zeit und Team', text: 'Arbeitszeit projektbezogen erfassen und Mitarbeitende mit klaren Rollen organisieren.', icon: 'time' as const, className: 'green' },
-  { title: 'Kunden und VertrÃ¤ge', text: 'Kontakte, Firmen, VertrÃ¤ge und wiederkehrende Leistungen zentral verwalten.', icon: 'customers' as const, className: 'violet' },
+  {
+    eyebrow: 'Kunden und Kontakte',
+    title: 'Alle Kundeninformationen an einem Ort.',
+    text: 'Kontakte, Firmen und die wichtigsten Informationen bleiben übersichtlich zusammen. So ist sofort sichtbar, mit wem du arbeitest und was als Nächstes ansteht.',
+    bullets: ['Zentrale Kundenübersicht', 'Kontakte und Firmen zusammen verwalten', 'Direkter Einstieg in Angebote und Aufträge'],
+    icon: 'customers' as const,
+    tone: 'blue',
+    visual: <CustomerListVisual />,
+  },
+  {
+    eyebrow: 'Angebote und Aufträge',
+    title: 'Von der Anfrage direkt in die Umsetzung.',
+    text: 'Erstelle Angebote, führe angenommene Leistungen als Auftrag weiter und behalte den Status im Blick – ohne Informationen nochmals erfassen zu müssen.',
+    bullets: ['Professionelle Angebote', 'Direkte Übernahme in Aufträge', 'Klare Status und nächste Schritte'],
+    icon: 'quotes' as const,
+    tone: 'violet',
+    visual: <QuoteOrderVisual />,
+  },
+  {
+    eyebrow: 'Zeit, Rechnungen und Finanzen',
+    title: 'Erfasste Arbeit wird zur Rechnung.',
+    text: 'Arbeitszeiten und Leistungen werden dort erfasst, wo sie entstehen. Daraus lassen sich Rechnungen erstellen und offene Beträge nachvollziehen.',
+    bullets: ['Zeit per Timer oder manuell erfassen', 'Leistungen direkt weiterverrechnen', 'Zahlungsstatus im Blick behalten'],
+    icon: 'time' as const,
+    tone: 'green',
+    visual: <TimeInvoiceVisual />,
+  },
 ]
 
 export function FeatureStoryVisual() {
   return (
-    <div className="landing-story-grid">
-      {stories.map((story) => (
-        <article className={`landing-story-card ${story.className}`} key={story.title}>
-          <div className="landing-story-icon"><ProductIcon name={story.icon} /></div>
-          <div><h3>{story.title}</h3><p>{story.text}</p></div>
-          <div className="landing-story-ui" aria-hidden="true"><span/><span/><span/></div>
+    <div className="landing-feature-sequence">
+      {stories.map((story, index) => (
+        <article className={`landing-feature-row ${story.tone} ${index % 2 ? 'visual-first' : ''}`} key={story.title}>
+          <div className="landing-feature-copy">
+            <div className="landing-feature-kicker"><span><ProductIcon name={story.icon} /></span>{story.eyebrow}</div>
+            <h3>{story.title}</h3>
+            <p>{story.text}</p>
+            <ul>{story.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>
+          </div>
+          <div className="landing-feature-visual">{story.visual}</div>
         </article>
       ))}
     </div>
@@ -114,21 +188,24 @@ export function FeatureStoryVisual() {
 }
 
 const workflow = [
-  ['01', 'Anfrage', 'Anfrage erfassen und zuordnen'],
-  ['02', 'Angebot', 'Leistung und Preis festlegen'],
-  ['03', 'Auftrag', 'Annahme direkt weiterfÃ¼hren'],
-  ['04', 'Zeit & Leistung', 'Arbeit laufend erfassen'],
-  ['05', 'Rechnung', 'Leistungen Ã¼bernehmen'],
-  ['06', 'Zahlung', 'Offene BetrÃ¤ge verfolgen'],
+  ['01', 'Kunde', 'Kontakt erfassen', 'customers' as const, 'blue'],
+  ['02', 'Angebot', 'Leistung festlegen', 'quotes' as const, 'violet'],
+  ['03', 'Auftrag', 'Arbeit starten', 'orders' as const, 'green'],
+  ['04', 'Zeit', 'Leistung erfassen', 'time' as const, 'blue'],
+  ['05', 'Rechnung', 'Abrechnung erstellen', 'invoices' as const, 'violet'],
+  ['06', 'Zahlung', 'Eingang verfolgen', 'finance' as const, 'green'],
 ] as const
 
 export function BusinessFlowVisual() {
   return (
-    <div className="business-flow-visual landing-process" aria-label="GeschÃ¤ftsprozess von der Anfrage bis zur Zahlung">
-      {workflow.map(([number, title, detail], index) => (
-        <div className="business-flow-step" key={title}>
-          <div className="business-flow-node"><span>{number}</span><strong>{title}</strong><small>{detail}</small></div>
-          {index < workflow.length - 1 ? <div className="business-flow-connector" aria-hidden="true"><i /><b>â†’</b></div> : null}
+    <div className="landing-process-line" aria-label="Geschäftsprozess vom Kundenkontakt bis zur Zahlung">
+      <div className="landing-process-track" aria-hidden="true" />
+      {workflow.map(([number, title, detail, icon, tone]) => (
+        <div className={`landing-process-step ${tone}`} key={title}>
+          <span className="landing-process-number">{number}</span>
+          <span className="landing-process-icon"><ProductIcon name={icon} /></span>
+          <strong>{title}</strong>
+          <small>{detail}</small>
         </div>
       ))}
     </div>
@@ -137,18 +214,21 @@ export function BusinessFlowVisual() {
 
 export function OnboardingVisual() {
   const steps = [
-    ['Konto erstellen', 'GeschÃ¤ftliche E-Mail und sichere Anmeldung'],
-    ['Unternehmen einrichten', 'Nur die wichtigsten Angaben fÃ¼r den Start'],
-    ['Ersten Kunden erfassen', 'Direkt mit echten GeschÃ¤ftsdaten arbeiten'],
-    ['Ablauf starten', 'Angebot, Auftrag und Rechnung durchgÃ¤ngig weiterfÃ¼hren'],
+    ['01', 'Registrieren', 'Konto erstellen und sicher anmelden.'],
+    ['02', 'Firma einrichten', 'Die wichtigsten Firmendaten erfassen.'],
+    ['03', 'Kunden erfassen', 'Kontakte und Firmen übernehmen.'],
+    ['04', 'Loslegen', 'Angebote, Aufträge, Zeiten und Rechnungen nutzen.'],
   ] as const
 
   return (
-    <div className="onboarding-visual landing-onboarding-visual">
-      <div className="onboarding-progress"><span>Einrichtung</span><strong>75%</strong><i><b /></i></div>
-      <div className="onboarding-steps">
-        {steps.map(([title, detail], index) => <div key={title} className={index < 3 ? 'done' : ''}><span>{index < 3 ? 'âœ“' : '4'}</span><div><strong>{title}</strong><small>{detail}</small></div></div>)}
-      </div>
+    <div className="landing-onboarding-line" aria-label="Einrichtung von Binso One in vier Schritten">
+      {steps.map(([number, title, detail], index) => (
+        <div className="landing-onboarding-step" key={title}>
+          <span>{number}</span>
+          <div><strong>{title}</strong><small>{detail}</small></div>
+          {index < steps.length - 1 ? <i aria-hidden="true" /> : null}
+        </div>
+      ))}
     </div>
   )
 }

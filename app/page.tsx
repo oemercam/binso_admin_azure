@@ -14,7 +14,7 @@ export default function HomePage() {
 
   return (
     <PublicShell light>
-      <main className="public-main public-landing-v703">
+      <main className="public-main public-landing-v705">
         <section className="landing-hero">
           <div className="landing-hero-copy">
             <span className="public-eyebrow">Einfach. Effizient. Zusammen.</span>
@@ -33,65 +33,62 @@ export default function HomePage() {
           <DashboardProductVisual />
         </section>
 
-        <section className="landing-benefit-strip" aria-label="Vorteile von Binso One">
-          <article className="blue"><span>01</span><div><strong>Alles an einem Ort</strong><p>Kunden, Angebote, Aufträge, Zeit und Finanzen übersichtlich verbunden.</p></div></article>
-          <article className="green"><span>02</span><div><strong>Schneller von Angebot zu Rechnung</strong><p>Weniger Klicks, weniger doppelte Erfassung und klare Übergaben.</p></div></article>
-          <article className="violet"><span>03</span><div><strong>PWA für unterwegs</strong><p>Auf allen Geräten nutzbar – im Büro, mobil oder direkt beim Kunden.</p></div></article>
-          <article className="red"><span>04</span><div><strong>Schweizer SaaS</strong><p>Für Schweizer Unternehmen entwickelt und zentral betrieben.</p></div></article>
-        </section>
-
-        <section className="landing-statement">
+        <section className="landing-statement landing-section-spacious">
           <span>Einfach. Übersichtlich. Durchgängig.</span>
           <h2>Weniger Administration.<br />Mehr Zeit fürs Geschäft.</h2>
-          <p>Wichtige Informationen bleiben dort, wo sie gebraucht werden. Aus einer Anfrage wird ein Angebot, aus dem Angebot ein Auftrag und aus erfassten Leistungen eine Rechnung.</p>
+          <p>Binso One verbindet die wichtigsten Bereiche deines Unternehmens. Informationen werden einmal erfasst und im nächsten Arbeitsschritt direkt weiterverwendet.</p>
         </section>
 
-        <section className="landing-showcase" aria-labelledby="landing-showcase-title">
-          <div className="landing-showcase-copy">
+        <section className="landing-dashboard-stage" aria-labelledby="landing-dashboard-title">
+          <div className="landing-dashboard-copy">
             <span>Alles im Blick</span>
-            <h2 id="landing-showcase-title">Eine Oberfläche für den täglichen Betrieb.</h2>
-            <p>Dashboard, Kunden, Aufträge, Zeiten und Finanzen greifen ineinander. So musst du Informationen nicht in mehreren Werkzeugen zusammensuchen.</p>
+            <h2 id="landing-dashboard-title">Eine Oberfläche für den täglichen Betrieb.</h2>
+            <p>Dashboard, Kunden, Aufträge, Zeiten und Finanzen greifen ineinander. So bleibt der aktuelle Stand sichtbar, ohne Informationen in mehreren Werkzeugen zusammensuchen zu müssen.</p>
             <Link href="/features">Funktionen im Detail →</Link>
           </div>
           <LandingProofVisual />
         </section>
 
         <section className="landing-feature-stories" id="funktionen">
-          <div className="public-section-head centered">
+          <div className="public-section-head centered landing-section-heading">
             <span>Die wichtigsten Bereiche</span>
-            <h2>Von der Kundenanfrage bis zur Zahlung.</h2>
-            <p>Binso One bildet die zentralen Abläufe eines Dienstleistungsunternehmens in einer gemeinsamen Arbeitsumgebung ab.</p>
+            <h2>Die Arbeit steht im Mittelpunkt. Nicht die Software.</h2>
+            <p>Statt vieler einzelner Module führt Binso One durch zusammenhängende Abläufe – vom ersten Kundenkontakt bis zur Abrechnung.</p>
           </div>
           <FeatureStoryVisual />
         </section>
 
-        <section className="landing-flow-section">
-          <div className="public-section-head centered">
+        <section className="landing-flow-section landing-section-spacious">
+          <div className="public-section-head centered landing-section-heading">
             <span>Ein durchgängiger Prozess</span>
-            <h2>Arbeitsschritte bauen aufeinander auf.</h2>
-            <p>Daten werden weitergeführt statt doppelt erfasst. Das macht Abläufe nachvollziehbar und reduziert unnötige Handarbeit.</p>
+            <h2>Vom Kundenkontakt bis zur Zahlung.</h2>
+            <p>Die nächsten Schritte entstehen aus dem vorherigen Arbeitsschritt. Das reduziert doppelte Erfassung und macht den Ablauf verständlich.</p>
           </div>
           <BusinessFlowVisual />
         </section>
 
-        <section className="landing-onboarding-section">
+        <section className="landing-onboarding-section landing-section-spacious">
           <div className="landing-onboarding-copy">
             <span>Einfach starten</span>
-            <h2>Kein langes Einrichtungsprojekt.</h2>
-            <p>Registrieren, Unternehmen einrichten und direkt mit dem ersten Kunden starten. Die wichtigsten Schritte führen dich strukturiert in Binso One ein.</p>
+            <h2>In wenigen Schritten arbeitsbereit.</h2>
+            <p>Du brauchst kein Einführungsprojekt. Konto erstellen, Unternehmen einrichten, ersten Kunden erfassen und mit dem normalen Arbeitsablauf beginnen.</p>
             <Link href="/how-it-works">So funktioniert Binso One →</Link>
           </div>
           <OnboardingVisual />
         </section>
 
-        <section className="public-section public-trust landing-trust">
-          <div className="public-section-head centered"><span>Sicherheit und Betrieb</span><h2>Für Geschäftsdaten entwickelt.</h2></div>
-          <div className="public-trust-grid">
-            <article><strong>Getrennte Organisationen</strong><p>Daten und Berechtigungen werden je Unternehmen getrennt verwaltet.</p></article>
-            <article><strong>Sichere Anmeldung</strong><p>Die Anmeldung wird über eine Microsoft-basierte Identitätslösung abgesichert.</p></article>
-            <article><strong>Klare Zugriffsrechte</strong><p>Rollen und Zugriffe werden zentral gesteuert und nachvollziehbar verwaltet.</p></article>
+        <section className="landing-trust landing-section-spacious">
+          <div className="public-section-head centered landing-section-heading">
+            <span>Sicherheit und Vertrauen</span>
+            <h2>Für Geschäftsdaten entwickelt.</h2>
+            <p>Klare Zugriffe, getrennte Organisationen und eine sichere Anmeldung bilden die Grundlage für den täglichen Einsatz.</p>
           </div>
-          <Link href="/security">Mehr zu Sicherheit und Datenschutz →</Link>
+          <div className="landing-trust-columns">
+            <div><span>01</span><strong>Getrennte Organisationen</strong><p>Daten und Berechtigungen werden je Unternehmen getrennt verwaltet.</p></div>
+            <div><span>02</span><strong>Sichere Anmeldung</strong><p>Die Anmeldung wird über eine Microsoft-basierte Identitätslösung abgesichert.</p></div>
+            <div><span>03</span><strong>Klare Zugriffsrechte</strong><p>Rollen und Zugriffe werden zentral gesteuert und nachvollziehbar verwaltet.</p></div>
+          </div>
+          <div className="landing-centered-link"><Link href="/security">Mehr zu Sicherheit und Datenschutz →</Link></div>
         </section>
 
         <section className="public-section landing-pricing">

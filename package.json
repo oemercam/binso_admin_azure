@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.70.4",
+  "version": "0.70.5",
   "private": true,
   "scripts": {
     "test": "node scripts/test-core.mjs && node scripts/test-v69.mjs",

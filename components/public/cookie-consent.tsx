@@ -71,11 +71,11 @@ export function CookieConsent() {
 
       {showBanner ? (
         <aside className="cookie-banner" aria-labelledby="cookie-banner-title">
-          <div className="cookie-banner-icon" aria-hidden="true">Ã¢â€”Å½</div>
+          <div className="cookie-banner-icon" aria-hidden="true">◎</div>
           <div className="cookie-banner-copy">
             <span>Datenschutz</span>
             <h2 id="cookie-banner-title">Cookies nach deiner Wahl.</h2>
-            <p>Notwendige Funktionen brauchen wir fÃƒÂ¼r den sicheren Betrieb. Optionale Statistik aktivieren wir nur mit deiner Zustimmung.</p>
+            <p>Notwendige Funktionen brauchen wir für den sicheren Betrieb. Optionale Statistik aktivieren wir nur mit deiner Zustimmung.</p>
             <a href="/legal/cookies">Mehr erfahren</a>
           </div>
           <div className="cookie-banner-actions">
@@ -95,14 +95,9 @@ export function CookieConsent() {
               <div>
                 <span>Datenschutz</span>
                 <h2 id="cookie-settings-title">Cookie-Einstellungen</h2>
-                <p>Du entscheidest, welche optionalen Funktionen verwendet werden dÃƒÂ¼rfen. Notwendige Funktionen kÃƒÂ¶nnen nicht deaktiviert werden.</p>
+                <p>Du entscheidest, welche optionalen Funktionen verwendet werden dürfen. Notwendige Funktionen können nicht deaktiviert werden.</p>
               </div>
-              <CloseButton
-                className="cookie-close"
-                variant="compact"
-                ariaLabel="Cookie-Einstellungen schliessen"
-                onClick={() => setSettingsOpen(false)}
-              />
+              <CloseButton className="cookie-close" variant="compact" ariaLabel="Cookie-Einstellungen schliessen" onClick={() => setSettingsOpen(false)} />
             </header>
 
             <div className="cookie-settings-list">
