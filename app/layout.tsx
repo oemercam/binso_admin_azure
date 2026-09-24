@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: `%s · ${appIdentity.name}`,
   },
   description: publicSite.seo.description,
-  keywords: publicSite.seo.keywords,
+  keywords: [...publicSite.seo.keywords],
   applicationName: appIdentity.name,
   category: 'business',
   creator: appIdentity.company,
