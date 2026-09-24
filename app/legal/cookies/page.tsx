@@ -1,4 +1,12 @@
 import { LegalPage } from '@/components/public/legal-page'
+import { createPublicMetadata } from '@/lib/config/seo'
+
+export const metadata = createPublicMetadata({
+  title: 'Cookie-Richtlinie',
+  description: 'Informationen zu Cookies und vergleichbaren Speichermechanismen bei Binso One.',
+  path: '/legal/cookies',
+  keywords: ['Binso One Cookies'],
+})
 
 export default function CookiesPage() {
   return (

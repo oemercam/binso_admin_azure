@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { planDefinitions } from '@/lib/data/plans'
+import { planDefinitions, selfServicePlanDefinitions } from '@/lib/data/plans'
 import { PublicCta, PublicShell } from '@/components/public/public-shell'
 import { SwipeCarousel } from '@/components/public/swipe-carousel'
 import {
@@ -9,29 +9,109 @@ import {
   LandingProofVisual,
   OnboardingVisual,
 } from '@/components/public/product-visuals'
+import { appIdentity } from '@/lib/config/app-identity'
+import { createPublicMetadata, publicUrl } from '@/lib/config/seo'
+
+export const metadata = createPublicMetadata({
+  title: 'Business-Software für Schweizer KMU',
+  description: 'Binso One verbindet Kunden, Angebote, Aufträge, Zeiterfassung, Rechnungen, Mitarbeitende und Finanzen in einer klaren Plattform für Schweizer Dienstleistungsunternehmen.',
+  path: '/',
+  keywords: ['Business Plattform Schweiz', 'KMU Administration', 'Software Dienstleistungsunternehmen'],
+})
+
+const selfServicePrices = selfServicePlanDefinitions
+  .map((plan) => plan.monthlyPriceChf)
+  .filter((price): price is number => typeof price === 'number')
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': publicUrl('/#organization'),
+      name: appIdentity.company,
+      url: appIdentity.website,
+      email: appIdentity.supportEmail,
+      telephone: appIdentity.phoneDisplay,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: appIdentity.address.street,
+        postalCode: appIdentity.address.postalCode,
+        addressLocality: appIdentity.address.city,
+        addressCountry: 'CH',
+      },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': publicUrl('/#software'),
+      name: appIdentity.name,
+      url: publicUrl('/'),
+      description: appIdentity.description,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      provider: {
+        '@id': publicUrl('/#organization'),
+      },
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'CHF',
+        lowPrice: Math.min(...selfServicePrices),
+        highPrice: Math.max(...selfServicePrices),
+        offerCount: selfServicePlanDefinitions.length,
+      },
+      featureList: [
+        'Kunden und Kontakte',
+        'Angebote und Aufträge',
+        'Zeiterfassung',
+        'Rechnungen und Finanzen',
+        'Mitarbeitende und Rollen',
+      ],
+    },
+  ],
+}
 
 export default function HomePage() {
   const highlightedPlans = planDefinitions.filter((plan) => ['starter', 'business', 'professional'].includes(plan.id))
 
   return (
     <PublicShell light>
-      <main className="public-main public-landing-v705">
+      <main className="public-main public-landing-v705 public-landing-v74">
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+
         <section className="landing-hero">
           <div className="landing-hero-copy">
-            <span className="public-eyebrow">Einfach. Effizient. Zusammen.</span>
-            <h1>Deine Plattform<br />fürs Unternehmen.</h1>
-            <p>Binso One verbindet Kunden, Angebote, Aufträge, Zeiten, Rechnungen und Mitarbeitende zentral in einer klaren Plattform für den Arbeitsalltag von Dienstleistungsunternehmen.</p>
+            <span className="public-eyebrow">Business-Software für Schweizer Dienstleistungsunternehmen</span>
+            <h1>Dein Unternehmen.<br />Eine Plattform.</h1>
+            <p>Binso One verbindet Kunden und Kontakte, Angebote, Aufträge, Zeiterfassung, Rechnungen, Mitarbeitende und Finanzen in einem durchgängigen Arbeitsablauf.</p>
             <div className="landing-hero-actions">
-              <Link className="button primary" href="/register">Kostenlos starten</Link>
-              <Link className="button secondary" href="/features">Demo ansehen</Link>
+              <Link className="button primary" href="/register">14 Tage kostenlos testen</Link>
+              <Link className="button secondary" href="/features">Funktionen ansehen</Link>
             </div>
             <div className="landing-hero-meta" aria-label="Vorteile beim Einstieg">
-              <span>Für KMU in der Schweiz</span>
-              <span>In wenigen Minuten startklar</span>
+              <span>Keine Zahlungsdaten beim Start</span>
+              <span>Für Schweizer KMU</span>
               <span>Desktop, Mobile und PWA</span>
             </div>
           </div>
           <DashboardProductVisual />
+        </section>
+
+        <section className="landing-value-strip" aria-label="Warum Binso One">
+          <article>
+            <span>01</span>
+            <strong>Einmal erfassen.</strong>
+            <p>Kunden- und Auftragsdaten werden im nächsten Arbeitsschritt direkt weiterverwendet.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>Durchgängig arbeiten.</strong>
+            <p>Angebot, Auftrag, Zeit und Rechnung bleiben Teil desselben Geschäftsablaufs.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>Einfach wachsen.</strong>
+            <p>Starte mit dem passenden Plan und erweitere Funktionen, wenn dein Unternehmen sie braucht.</p>
+          </article>
         </section>
 
         <section className="landing-statement landing-section-spacious">
@@ -112,18 +192,30 @@ export default function HomePage() {
                 <div><span>{plan.name}</span>{plan.recommended ? <small>Empfohlen</small> : null}</div>
                 <strong>{plan.monthlyPriceChf ? <>CHF {plan.monthlyPriceChf}<small> / Monat</small></> : 'Individuell'}</strong>
                 <p>{plan.description}</p>
-                <Link className="button secondary" href={`/register?plan=${plan.id}`}>14 Tage testen</Link>
+                <Link className="button secondary" href={`/register?plan=${plan.id}`}>14 Tage kostenlos testen</Link>
               </article>
             ))}
           </SwipeCarousel>
         </section>
 
+        <section className="landing-contact-cta landing-section-spacious">
+          <div>
+            <span>Persönlicher Kontakt</span>
+            <h2>Fragen zu Produkt, Plan oder Einführung?</h2>
+            <p>Sprich direkt mit Binso. Wir helfen dir, den passenden Einstieg für dein Unternehmen einzuordnen.</p>
+          </div>
+          <div className="landing-contact-actions">
+            <Link className="button primary" href="/contact">Kontakt aufnehmen</Link>
+            <a className="button secondary" href={appIdentity.phoneHref}>{appIdentity.phoneDisplay}</a>
+          </div>
+        </section>
+
         <section className="public-section public-faq-preview landing-faq">
           <div className="public-section-head"><span>Häufige Fragen</span><h2>Die wichtigsten Antworten vor dem Start.</h2></div>
           <div className="public-faq-list">
-            <details><summary>Für wen ist Binso One gedacht?</summary><p>Für Dienstleistungsunternehmen und Teams, die Kunden, Angebote, Aufträge, Zeit, Rechnungen und interne Abläufe zentral verwalten möchten.</p></details>
-            <details><summary>Muss ich bei der Registrierung bereits Zahlungsdaten angeben?</summary><p>Nein. Die Registrierung und der Einstieg in die Testphase erfolgen ohne sofortige Zahlung.</p></details>
-            <details><summary>Kann ich Binso One auch als PWA auf dem Smartphone verwenden?</summary><p>Ja. Binso One ist für Desktop, Mobile und eine installierte PWA ausgelegt.</p></details>
+            <details><summary>Für wen ist Binso One gedacht?</summary><p>Für Schweizer Dienstleistungsunternehmen und Teams, die Kunden, Angebote, Aufträge, Zeit, Rechnungen und interne Abläufe zentral verwalten möchten.</p></details>
+            <details><summary>Muss ich bei der Registrierung bereits Zahlungsdaten angeben?</summary><p>Nein. Die Registrierung und der Einstieg in die 14-tägige Testphase erfolgen ohne sofortige Zahlung.</p></details>
+            <details><summary>Kann ich Binso One auch auf dem Smartphone verwenden?</summary><p>Ja. Binso One ist für Desktop, Mobile und eine installierte PWA ausgelegt.</p></details>
           </div>
           <Link href="/faq">Alle Fragen ansehen →</Link>
         </section>

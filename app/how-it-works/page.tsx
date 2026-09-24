@@ -1,4 +1,12 @@
 import { PublicCta, PublicPageIntro, PublicShell } from '@/components/public/public-shell'
+import { createPublicMetadata } from '@/lib/config/seo'
+
+export const metadata = createPublicMetadata({
+  title: 'So funktioniert Binso One',
+  description: 'Vom Kunden über Angebot und Auftrag bis zu Zeiterfassung, Rechnung und Zahlung: ein durchgängiger Geschäftsprozess ohne doppelte Erfassung.',
+  path: '/how-it-works',
+  keywords: ['Geschäftsprozess KMU', 'Angebot Auftrag Rechnung', 'Dienstleistungssoftware Schweiz'],
+})
 
 const flow = [
   ['Kunde erfassen', 'Erfasse nur die wichtigsten Angaben. Weitere Informationen können später ergänzt werden.'],
