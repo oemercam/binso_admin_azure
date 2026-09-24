@@ -7,7 +7,7 @@ export default function CookiesPage() {
       <p>Binso One benötigt technische Mechanismen für Anmeldung, Session, Sicherheit und Einstellungen. Diese Funktionen sind erforderlich, damit die Anwendung zuverlässig und sicher betrieben werden kann.</p>
       <h2>Lokale Einstellungen</h2>
       <p>Bestimmte Einstellungen, beispielsweise Darstellungs- oder Cookie-Präferenzen, können lokal im Browser gespeichert werden. Diese Speicherung dient nicht automatisch der Erstellung eines personenbezogenen Nutzungsprofils.</p>
-      <h2>Authentisierung</h2>
+      <h2>Anmeldung</h2>
       <p>Der eingesetzte Microsoft-basierte Identitätsdienst kann während Anmeldung und Session eigene technisch notwendige Cookies setzen. Art und Dauer können sich nach der jeweiligen Identity-Konfiguration richten.</p>
       <h2>Statistik</h2>
       <p>Die öffentliche Cookie-Auswahl enthält eine Kategorie für optionale Statistikfunktionen. Im aktuellen Produktstand ist keine solche Statistikfunktion aktiviert. Wird später eine optionale Analysefunktion eingeführt, soll sie erst nach entsprechender Auswahl aktiviert werden.</p>

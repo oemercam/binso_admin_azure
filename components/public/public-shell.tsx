@@ -1,30 +1,39 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { BinsoLogo } from '@/components/ui/binso-logo'
+import { appIdentity } from '@/lib/config/app-identity'
+import { publicSite } from '@/lib/config/public-site'
 import { CookieConsent, CookieSettingsButton } from './cookie-consent'
 
-const primaryNavigation = [
-  { href: '/features', label: 'Funktionen' },
-  { href: '/how-it-works', label: 'So funktioniert es' },
-  { href: '/pricing', label: 'Preise' },
-  { href: '/security', label: 'Sicherheit' },
-  { href: '/faq', label: 'FAQ' },
-]
+function BrandLink() {
+  return (
+    <Link className="public-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
+      <BinsoLogo />
+      <span>One</span>
+    </Link>
+  )
+}
 
 export function PublicHeader() {
   return (
     <header className="public-header">
       <div className="public-header-inner">
-        <Link className="public-brand" href="/" aria-label="Binso One Startseite">
-          <BinsoLogo />
-          <span>One</span>
-        </Link>
+        <BrandLink />
         <nav className="public-nav" aria-label="Hauptnavigation">
-          {primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+          {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="public-header-actions">
           <Link className="public-login-link" href="/sign-in">Anmelden</Link>
           <Link className="button primary public-cta" href="/register">Kostenlos starten</Link>
+          <details className="public-mobile-menu">
+            <summary aria-label="Navigation öffnen">Menü</summary>
+            <nav aria-label="Mobile Navigation">
+              {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+              <Link href="/support">Support</Link>
+              <Link href="/contact">Kontakt</Link>
+              <Link href="/sign-in">Anmelden</Link>
+            </nav>
+          </details>
         </div>
       </div>
     </header>
@@ -36,41 +45,27 @@ export function PublicFooter() {
     <footer className="public-footer">
       <div className="public-footer-grid">
         <div className="public-footer-brand">
-          <Link className="public-brand" href="/">
-            <BinsoLogo />
-            <span>One</span>
-          </Link>
-          <p>Die Business-Plattform für Kunden, Angebote, Aufträge, Zeit, Rechnungen und Zusammenarbeit.</p>
-          <small>Ein Produkt der Binso GmbH, Appenzell.</small>
+          <BrandLink />
+          <p>{publicSite.footerDescription}</p>
+          <small>Ein Produkt der {appIdentity.company}, {appIdentity.address.city}.</small>
         </div>
         <div>
           <strong>Produkt</strong>
-          <Link href="/features">Funktionen</Link>
-          <Link href="/how-it-works">So funktioniert es</Link>
-          <Link href="/pricing">Preise</Link>
-          <Link href="/security">Sicherheit</Link>
-          <Link href="/status">Systemstatus</Link>
+          {publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </div>
         <div>
           <strong>Hilfe</strong>
-          <Link href="/faq">FAQ</Link>
-          <Link href="/support">Support</Link>
-          <Link href="/contact">Kontakt</Link>
-          <Link href="/sign-in">Anmelden</Link>
-          <Link href="/register">Registrieren</Link>
+          {publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </div>
         <div>
           <strong>Rechtliches</strong>
-          <Link href="/legal/terms">AGB</Link>
-          <Link href="/legal/privacy">Datenschutz</Link>
-          <Link href="/legal/cookies">Cookies</Link>
-          <Link href="/legal/imprint">Impressum</Link>
+          {publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
           <CookieSettingsButton />
         </div>
       </div>
       <div className="public-footer-bottom">
-        <span>© {new Date().getFullYear()} Binso GmbH</span>
-        <span>Binso One</span>
+        <span>© {new Date().getFullYear()} {appIdentity.company}</span>
+        <span>{appIdentity.name}</span>
       </div>
     </footer>
   )

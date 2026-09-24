@@ -30,7 +30,7 @@ export const planDefinitions: PlanDefinition[] = [
     id: 'enterprise',
     name: 'Enterprise',
     includedUsers: 100,
-    description: 'Für grössere Organisationen mit individuellen Integrationen, Governance und Support.',
+    description: 'Für grössere Organisationen mit individuellen Integrationen, erweiterten Verwaltungsfunktionen und Support.',
     features: ['crm','quotes','orders','contracts','time','invoices','finance','employees','audit','imports','exports'],
   },
 ]

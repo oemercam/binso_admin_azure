@@ -83,7 +83,7 @@ export default function HomePage() {
           <div className="public-section-head"><span>Sicherheit</span><h2>Geschäftsdaten gehören in eine kontrollierte Umgebung.</h2></div>
           <div className="public-trust-grid">
             <article><strong>Mandantentrennung</strong><p>Organisationen und Berechtigungen werden getrennt verwaltet.</p></article>
-            <article><strong>Sichere Anmeldung</strong><p>Identität und Anmeldung werden über Microsoft-basierte Authentisierung abgesichert.</p></article>
+            <article><strong>Sichere Anmeldung</strong><p>Identität und Anmeldung werden über Microsoft-basierte Anmeldung abgesichert.</p></article>
             <article><strong>Nachvollziehbare Prozesse</strong><p>Rollen, Zugriffe und kritische Vorgänge werden bewusst gesteuert.</p></article>
           </div>
           <Link href="/security">Mehr zu Sicherheit und Datenschutz →</Link>

@@ -1,15 +1,16 @@
 import { LegalPage } from '@/components/public/legal-page'
+import { appIdentity } from '@/lib/config/app-identity'
 
 export default function PrivacyPage() {
   return (
     <LegalPage title="Datenschutzerklärung" description="Informationen zur Bearbeitung personenbezogener Daten im Zusammenhang mit Binso One. Stand: 24. September 2026.">
       <h2>1. Verantwortliche Stelle</h2>
-      <p>Binso GmbH, Weissbadstrasse 8b, 9050 Appenzell, Schweiz. Datenschutzanfragen können an <a href="mailto:oemer.cam@binso.ch">oemer.cam@binso.ch</a> gerichtet werden.</p>
+      <p>{appIdentity.company}, {appIdentity.address.street}, {appIdentity.address.postalCode} {appIdentity.address.city}, {appIdentity.address.country}. Datenschutzanfragen können an <a href={`mailto:${appIdentity.supportEmail}`}>{appIdentity.supportEmail}</a> gerichtet werden.</p>
       <h2>2. Welche Daten wir bearbeiten</h2>
       <p>Je nach Nutzung bearbeiten wir insbesondere Konto- und Kontaktdaten, Organisations- und Geschäftsdaten, Rollen und Berechtigungen, von Nutzenden erfasste Kunden- und Auftragsdaten, Dokument- und Abrechnungsinformationen sowie technische Protokoll- und Sicherheitsdaten.</p>
       <h2>3. Zwecke der Bearbeitung</h2>
       <p>Wir bearbeiten Daten, um Binso One bereitzustellen, Benutzer zu authentisieren, Organisationen und Berechtigungen zu verwalten, Geschäftsprozesse auszuführen, Support zu leisten, Abonnemente abzurechnen, Missbrauch zu verhindern, den Betrieb zu sichern und gesetzliche Pflichten zu erfüllen.</p>
-      <h2>4. Authentisierung</h2>
+      <h2>4. Anmeldung</h2>
       <p>Die produktive Anmeldung wird über Azure App Service Authentication und eine konfigurierte Microsoft-Identitätsplattform abgewickelt. Binso One speichert keine Benutzerpasswörter. Der Identitätsdienst kann eigene Cookies und technische Informationen verarbeiten.</p>
       <h2>5. Hosting und Infrastruktur</h2>
       <p>Binso One wird auf Microsoft Azure betrieben. Dabei können Daten auf von Microsoft bereitgestellten Infrastruktur- und Datenbankdiensten verarbeitet werden. Die konkrete Region und Konfiguration richtet sich nach der produktiven Bereitstellung.</p>

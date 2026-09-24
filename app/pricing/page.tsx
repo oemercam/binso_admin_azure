@@ -35,7 +35,7 @@ export default function PricingPage() {
             </article>
           ))}
         </section>
-        <section className="pricing-note"><strong>Noch unsicher?</strong><p>Du kannst mit einem passenden Plan starten und später wechseln. Bei Enterprise-Anforderungen klären wir Integrationen, Governance und Support individuell.</p></section>
+        <section className="pricing-note"><strong>Noch unsicher?</strong><p>Du kannst mit einem passenden Plan starten und später wechseln. Bei Enterprise-Anforderungen klären wir Integrationen, Verwaltung und Support individuell.</p></section>
       </main>
     </PublicShell>
   )

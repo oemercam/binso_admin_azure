@@ -1,46 +1,75 @@
-# Design system
+# Binso One Design System
 
-## Foundations
+## Ziel
 
-`app/globals.css` contains base theme tokens and legacy-neutral page structures. `app/app-ui.css` is the current responsibility-based application UI stylesheet. Version-numbered active stylesheets are not used.
+Binso One verwendet ein gemeinsames Design-System für Public Website, Authentisierung, Desktop-App, Mobile und PWA. Farben, Typografie, Abstände, Radien und Controls werden zentral über CSS Custom Properties in `app/globals.css` definiert. Fachliche Layout-Regeln der Anwendung liegen in `app/app-ui.css`. Neue Seiten dürfen keine parallelen Design-Tokens oder versionierte Stylesheets einführen.
 
-The canonical mobile gutter is `--app-mobile-gutter: clamp(14px, 4vw, 18px)`. The same token is used by the mobile topbar, page content, navigation and mobile AppSheet content.
+## Verantwortlichkeiten
 
-## Typography and fields
+- `app/globals.css`: globale Brand-, Farb-, Typografie-, Spacing-, Radius- und Control-Tokens sowie neutrale Basisstile.
+- `app/app-ui.css`: kanonische Komponenten- und Layoutregeln für App, Public Website und Authentisierung.
+- `components/ui/*`: wiederverwendbare UI-Controls.
+- `components/public/*`: Public Header, Footer, Cookie Consent und Legal Layout.
+- `lib/config/app-identity.ts`: Produktname, Beschreibung und Unternehmens-Kontaktdaten.
+- `lib/config/public-site.ts`: öffentliche Navigation und Footer-Struktur.
 
-- Field label: 13px / medium
-- Field value: 14px / regular
-- Placeholder: 13px
-- Help/error: 12px
-- Standard control height: 40px
-- Textarea minimum: 88px
+## Typografie
 
-`Input`, `Textarea` and `Select` share border, radius, background, focus and disabled states. Controls always use `width:100%`, `max-width:100%`, `min-width:0` and border-box sizing.
+Die Oberfläche verwendet den System-Font-Stack (`-apple-system`, BlinkMacSystemFont, Segoe UI, Inter, Arial). Keine externe Webfont ist für die Darstellung erforderlich.
 
-## Navigation
+| Token | Einsatz |
+| --- | --- |
+| `--font-size-display-xl` | Public Hero |
+| `--font-size-display-lg` | Public Seiten-H1 / Auth Marketing |
+| `--font-size-display-md` | Public Abschnittsüberschriften |
+| `--font-size-title-lg` | App H1 / grosse UI-Titel |
+| `--font-size-title-md` | Karten- und Abschnittstitel |
+| `--font-size-body-lg` | Public Lead-Text |
+| `--font-size-body` | Standardtext / Felder |
+| `--font-size-small` | Sekundärtext / Public Cards |
+| `--font-size-caption` | Hinweise / Meta |
+| `--font-size-micro` | Eyebrows / kompakte Labels |
 
-Mobile navigation rows are 48px high with 17px icons, a compact icon column, 9px icon/label gap and 15px chevrons. Selected state is deliberately subtle. Mobile/PWA menus are content-sized until the visual viewport max-height is reached.
+Fliesstext verwendet für Lesbarkeit grundsätzlich eine Zeilenhöhe von `--line-body` (1.6). Sehr kleine Schriften sind auf Metainformationen beschränkt.
 
-## Header
+## Spacing und Geometrie
 
-The topbar uses one semantic `--header-background`, no blur and no opacity effect. Mobile/PWA content height is 56px plus the safe-area top. The wordmark is optically 26px high. `useHeaderVisibility` is the only scroll visibility behaviour.
+Spacing verwendet die zentrale Skala `4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64 / 80`. Radien sind auf `8 / 12 / 16 / 24` standardisiert. Public Content ist maximal `1180px` breit, längere Lesetexte maximal `820px`. Mobile/PWA verwendet den kanonischen Gutter `clamp(14px, 4vw, 18px)`.
 
-## Sheets and actions
+## Controls
 
-AppSheet is flex-column with header/content/footer. Only content scrolls. Mobile sheet gutters use the canonical application gutter. Standard action footers keep two actions side by side, secondary on the left and primary/destructive on the right.
+- Standard kompakt: 34px
+- Form Controls: 40px
+- Public CTA / Touch: mindestens 46px
+- Mobile/PWA primäre Aktionen: 48–50px
 
-## Switches
+Buttons verwenden nur die vorhandenen Varianten `primary`, `secondary` und kontextbezogene Textlinks. Form Controls teilen Border, Radius, Focus, Disabled und Invalid States.
 
-The canonical Toggle is visually 36×20px with a 14px thumb. The surrounding settings row provides the larger touch target. Semantic switch tokens keep OFF and ON states visible in Light and Dark themes.
+## Brand und Sprache
 
-## Feedback
+- Produktname: **Binso One**
+- Anbieterin: **Binso GmbH**
+- Ton: kurz, sachlich, verständlich, Deutsch (Schweiz).
+- Keine unnötigen Fachbegriffe auf Kundenseiten. Technische Details werden nur dort genannt, wo sie für Sicherheit, Datenschutz oder Support relevant sind.
+- Kein Marketing-Blabla und keine Aussagen, die technisch oder vertraglich nicht belegt sind.
 
-`FeedbackProvider` owns success/info/warning/error toasts. `ConfirmationDialog` owns destructive/discard confirmation. Business pages do not create competing toast or confirmation layouts.
+## Public Website
 
-## Close / Back / Remove
+Header, Footer, Navigation, CTA, Seitenintro und Legal-Seiten verwenden gemeinsame Komponenten. Mobile verwendet dieselben Inhalte über eine kompakte Navigation. Die öffentliche Website darf nicht auf eigene Farb- oder Typografievariablen ausweichen.
 
-- `CloseButton`: closes temporary surfaces
-- `BackButton`: previous route or workflow step
-- `RemoveButton`: removes a row/item
+## Authentisierung und PWA
 
-These controls are not interchangeable.
+Desktop zeigt eine reduzierte Produktfläche plus Login. Mobile und installierte PWA zeigen eine app-artige, vollflächige Anmeldung. Die PWA berücksichtigt Safe Areas und `100dvh`; Marketing-Navigation wird dort nicht benötigt.
+
+## Accessibility
+
+- sichtbarer `:focus-visible` Zustand
+- semantische Überschriftenhierarchie
+- Labels für Form Controls und Navigation
+- Touch-Flächen auf Mobile mindestens ca. 44px
+- `prefers-reduced-motion` wird respektiert
+- Kontrast basiert auf den zentralen Light/Dark Tokens
+
+## Performance
+
+Die Public Website verwendet keine externe Webfont und keine zusätzliche UI-/Animationsbibliothek. Marketingseiten sind statisch, wo keine Laufzeitdaten benötigt werden. Visuelle Effekte bleiben CSS-basiert und werden sparsam eingesetzt.
