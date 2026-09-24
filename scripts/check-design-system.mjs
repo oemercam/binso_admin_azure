@@ -63,6 +63,11 @@ for (const value of ['primaryNavigation', 'productNavigation', 'helpNavigation',
 
 if (!publicShell.includes("from '@/lib/config/public-site'")) throw new Error('Public shell must consume centralized public navigation')
 
+if (!publicShell.includes('<BinsoLogo />')) throw new Error('Public header must use the canonical original Binso logo')
+if (publicShell.includes('<span>One</span>')) throw new Error('Public header must not reconstruct the logo with separate text')
+if (!publicShell.includes("light ? 'public-site-light'")) throw new Error('Public shell must support the fixed light landing mode')
+if (!appUi.includes('.public-site-light{')) throw new Error('Fixed light public landing theme is missing')
+
 const hardCodedContactPattern = /Weissbadstrasse 8b|\+41 58 510 77 58|oemer\.cam@binso\.ch/
 for (const [name, source] of [['contact', contact], ['imprint', imprint], ['privacy', privacy]]) {
   if (hardCodedContactPattern.test(source)) throw new Error(`${name} page contains hard-coded contact data instead of appIdentity`)
@@ -81,4 +86,4 @@ for (const obsolete of ['.public-hero-preview{', '.preview-window-head{', '.publ
   if (appUi.includes(obsolete)) throw new Error(`Obsolete public style remains: ${obsolete}`)
 }
 
-console.log('Design-system checks passed (tokens, public/auth ownership, marketing visuals, cookie consent, centralized brand/contact/navigation).')
+console.log('Design-system checks passed (tokens, public/auth ownership, original logo, fixed-light landing, marketing visuals, cookie consent, centralized brand/contact/navigation).')

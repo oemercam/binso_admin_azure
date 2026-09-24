@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { BinsoLogo } from '@/components/ui/binso-logo'
 
 type IconName = 'customers' | 'quotes' | 'orders' | 'time' | 'invoices' | 'employees' | 'contracts' | 'finance'
 
@@ -21,7 +22,7 @@ function DesktopDashboard({ compact = false }: { compact?: boolean }) {
   return (
     <div className={compact ? 'marketing-dashboard compact' : 'marketing-dashboard'}>
       <aside>
-        <div className="marketing-dashboard-brand"><span>B</span><strong>One</strong></div>
+        <div className="marketing-dashboard-brand"><BinsoLogo /></div>
         <nav>
           <span className="active"><i />Übersicht</span>
           <span><i />Kunden</span>
@@ -59,7 +60,7 @@ function MobileDashboard() {
   return (
     <div className="marketing-phone-ui">
       <div className="marketing-phone-status"><span>9:41</span><i /></div>
-      <div className="marketing-phone-brand"><strong>Binso One</strong><span>•••</span></div>
+      <div className="marketing-phone-brand"><BinsoLogo /><span>•••</span></div>
       <div className="marketing-phone-welcome"><small>Heute</small><strong>Guten Morgen</strong><span>Hier ist dein Überblick.</span></div>
       <div className="marketing-phone-kpis"><article><span>Aufträge</span><strong>12</strong></article><article><span>Stunden</span><strong>142 h</strong></article><article><span>Umsatz</span><strong>CHF 24’830</strong></article></div>
       <div className="marketing-phone-tasks"><strong>Meine Aufgaben</strong><span><i/>Angebot versenden</span><span><i/>Rechnung erstellen</span><span><i/>Zeit erfassen</span></div>
@@ -84,7 +85,7 @@ export function LandingProofVisual() {
   return (
     <div className="landing-proof-visual" aria-label="Binso One Dashboard Vorschau">
       <div className="landing-proof-window">
-        <div className="landing-proof-window-bar"><span/><span/><span/><b>Binso One</b></div>
+        <div className="landing-proof-window-bar"><span/><span/><span/><b><BinsoLogo /></b></div>
         <DesktopDashboard compact />
       </div>
       <div className="landing-proof-callout"><strong>Alles verbunden</strong><span>Kunden, Aufträge, Zeiten und Rechnungen greifen ineinander.</span></div>

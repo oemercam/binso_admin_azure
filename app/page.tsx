@@ -13,24 +13,31 @@ export default function HomePage() {
   const highlightedPlans = planDefinitions.filter((plan) => ['starter', 'business', 'professional'].includes(plan.id))
 
   return (
-    <PublicShell>
+    <PublicShell light>
       <main className="public-main public-landing-v703">
         <section className="landing-hero">
           <div className="landing-hero-copy">
-            <span className="public-eyebrow">Die Business-Plattform für Dienstleistungsunternehmen</span>
-            <h1>Dein Unternehmen.<br />Eine Plattform.</h1>
-            <p>Binso One verbindet Kunden, Angebote, Aufträge, Zeiterfassung, Rechnungen, Mitarbeitende und Finanzen in einem durchgängigen Arbeitsablauf.</p>
+            <span className="public-eyebrow">Einfach. Effizient. Zusammen.</span>
+            <h1>Deine Plattform<br />fürs Unternehmen.</h1>
+            <p>Binso One verbindet Kunden, Angebote, Aufträge, Zeiten, Rechnungen und Mitarbeitende zentral in einer klaren Plattform für den Arbeitsalltag von Dienstleistungsunternehmen.</p>
             <div className="landing-hero-actions">
               <Link className="button primary" href="/register">Kostenlos starten</Link>
-              <Link className="button secondary" href="/features">Funktionen ansehen</Link>
+              <Link className="button secondary" href="/features">Demo ansehen</Link>
             </div>
             <div className="landing-hero-meta" aria-label="Vorteile beim Einstieg">
-              <span>14 Tage testen</span>
-              <span>Keine Zahlung bei der Registrierung</span>
-              <span>Für Desktop, Mobile und PWA</span>
+              <span>Für KMU in der Schweiz</span>
+              <span>In wenigen Minuten startklar</span>
+              <span>Desktop, Mobile und PWA</span>
             </div>
           </div>
           <DashboardProductVisual />
+        </section>
+
+        <section className="landing-benefit-strip" aria-label="Vorteile von Binso One">
+          <article className="blue"><span>01</span><div><strong>Alles an einem Ort</strong><p>Kunden, Angebote, Aufträge, Zeit und Finanzen übersichtlich verbunden.</p></div></article>
+          <article className="green"><span>02</span><div><strong>Schneller von Angebot zu Rechnung</strong><p>Weniger Klicks, weniger doppelte Erfassung und klare Übergaben.</p></div></article>
+          <article className="violet"><span>03</span><div><strong>PWA für unterwegs</strong><p>Auf allen Geräten nutzbar – im Büro, mobil oder direkt beim Kunden.</p></div></article>
+          <article className="red"><span>04</span><div><strong>Schweizer SaaS</strong><p>Für Schweizer Unternehmen entwickelt und zentral betrieben.</p></div></article>
         </section>
 
         <section className="landing-statement">

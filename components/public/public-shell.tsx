@@ -9,7 +9,6 @@ function BrandLink() {
   return (
     <Link className="public-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
       <BinsoLogo />
-      <span>One</span>
     </Link>
   )
 }
@@ -71,9 +70,10 @@ export function PublicFooter() {
   )
 }
 
-export function PublicShell({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
+export function PublicShell({ children, compact = false, light = false }: { children: ReactNode; compact?: boolean; light?: boolean }) {
+  const classes = ['public-site', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
   return (
-    <div className={compact ? 'public-site public-site-compact' : 'public-site'}>
+    <div className={classes}>
       <PublicHeader />
       {children}
       <PublicFooter />
