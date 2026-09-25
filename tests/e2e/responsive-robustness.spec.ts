@@ -124,7 +124,7 @@ test('V80 desktop public navigation and balanced hero remain visible at 1440x900
   await expectNoViewportOverflow(page, '1440px V80 landing')
 })
 
-test('V81.4 mobile public navigation and mockup content order stay exact at 390x844', async ({ page }) => {
+test('V81.5 mobile public reconstruction keeps mockup content order at 390x844', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.v80-desktop-nav')).toBeHidden()
@@ -149,5 +149,5 @@ test('V81.4 mobile public navigation and mockup content order stay exact at 390x
 
   const screenshot = page.locator('.v81-row').first().locator('.marketing-real-screenshot img')
   await expect(screenshot).toHaveAttribute('src', /orders-desktop\.png$/)
-  await expectNoViewportOverflow(page, '390px V81.4 landing')
+  await expectNoViewportOverflow(page, '390px V81.5 landing')
 })
