@@ -1,54 +1,28 @@
 import type { Metadata } from 'next'
 import { appIdentity } from './app-identity'
-import { publicSite } from './public-site'
 
-const configuredBaseUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+export const publicBaseUrl = new URL(appIdentity.website)
 
-export const publicBaseUrl = (configuredBaseUrl || appIdentity.website).replace(/\/+$/, '')
-
-export function publicUrl(path = '/') {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  return new URL(normalizedPath, `${publicBaseUrl}/`).toString()
-}
-
-type PublicMetadataOptions = {
-  title: string
-  description: string
-  path: string
-  keywords?: string[]
-}
-
-export function createPublicMetadata({
-  title,
-  description,
-  path,
-  keywords = [],
-}: PublicMetadataOptions): Metadata {
-  const canonical = publicUrl(path)
-
+export function publicMetadata(input: { title: string; description: string; path: string }): Metadata {
+  const url = new URL(input.path, publicBaseUrl)
   return {
-    title,
-    description,
-    keywords: [...publicSite.seo.keywords, ...keywords],
-    alternates: {
-      canonical,
-    },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    title: input.title,
+    description: input.description,
+    alternates: { canonical: url.pathname },
     openGraph: {
-      title,
-      description,
-      url: canonical,
-      siteName: appIdentity.name,
-      locale: 'de_CH',
       type: 'website',
+      locale: 'de_CH',
+      siteName: appIdentity.name,
+      title: input.title,
+      description: input.description,
+      url,
+      images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: `${appIdentity.name} – ${appIdentity.tagline}` }],
     },
     twitter: {
-      card: 'summary',
-      title,
-      description,
+      card: 'summary_large_image',
+      title: input.title,
+      description: input.description,
+      images: ['/opengraph-image'],
     },
   }
 }

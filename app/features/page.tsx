@@ -1,12 +1,7 @@
+import { publicMetadata } from '@/lib/config/seo'
 import { PublicCta, PublicPageIntro, PublicShell } from '@/components/public/public-shell'
-import { createPublicMetadata } from '@/lib/config/seo'
 
-export const metadata = createPublicMetadata({
-  title: 'Funktionen',
-  description: 'Kunden, Angebote, Aufträge, Zeiterfassung, Rechnungen, Verträge, Mitarbeitende und Finanzen in einer gemeinsamen Business-Plattform.',
-  path: '/features',
-  keywords: ['CRM Schweiz', 'Auftragsverwaltung Schweiz', 'Zeiterfassung KMU', 'Rechnungssoftware KMU'],
-})
+export const metadata = publicMetadata({ title: 'Funktionen', description: 'Kunden, Angebote, Aufträge, Zeiten und Rechnungen in Binso One durchgängig verwalten.', path: '/features' })
 
 const features = [
   ['Kunden und Kontakte', 'Firmen und Ansprechpartner zentral pflegen. Kundeninformationen bleiben dort, wo Angebote, Aufträge und Rechnungen entstehen.'],

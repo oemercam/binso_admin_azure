@@ -5,35 +5,16 @@ import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
 import './app-ui.css'
 import { appIdentity } from '@/lib/config/app-identity'
-import { publicSite } from '@/lib/config/public-site'
 import { publicBaseUrl } from '@/lib/config/seo'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(publicBaseUrl),
+  metadataBase: publicBaseUrl,
   title: {
-    default: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
+    default: `${appIdentity.name} – ${appIdentity.tagline}`,
     template: `%s · ${appIdentity.name}`,
   },
-  description: publicSite.seo.description,
-  keywords: [...publicSite.seo.keywords],
+  description: appIdentity.description,
   applicationName: appIdentity.name,
-  category: 'business',
-  creator: appIdentity.company,
-  publisher: appIdentity.company,
-  authors: [{ name: appIdentity.company, url: appIdentity.website }],
-  manifest: '/manifest.webmanifest',
-  openGraph: {
-    title: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
-    description: publicSite.seo.description,
-    siteName: appIdentity.name,
-    locale: 'de_CH',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary',
-    title: `${publicSite.seo.defaultTitle} · ${appIdentity.name}`,
-    description: publicSite.seo.description,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -42,10 +23,16 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  robots: {
-    index: true,
-    follow: true,
+  openGraph: {
+    type: 'website',
+    locale: 'de_CH',
+    siteName: appIdentity.name,
+    title: `${appIdentity.name} – ${appIdentity.tagline}`,
+    description: appIdentity.description,
+    url: '/',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: `${appIdentity.name} – ${appIdentity.tagline}` }],
   },
+  twitter: { card: 'summary_large_image', title: `${appIdentity.name} – ${appIdentity.tagline}`, description: appIdentity.description, images: ['/opengraph-image'] },
 }
 
 export const viewport: Viewport = {

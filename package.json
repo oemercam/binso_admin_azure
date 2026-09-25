@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run public-site:check && pnpm build",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run v74:check && pnpm build",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -38,7 +38,9 @@
     "security:check": "node scripts/check-security-baseline.mjs && node scripts/check-secrets.mjs",
     "product:simplicity-check": "node scripts/check-product-simplicity.mjs",
     "platform-foundation:check": "node scripts/check-platform-foundation-v73.mjs",
-    "public-site:check": "node scripts/check-public-site-v74.mjs"
+    "demo:seed": "node scripts/demo-seed.mjs",
+    "demo:reset": "node scripts/demo-reset.mjs",
+    "v74:check": "node scripts/check-v74-hardening.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",

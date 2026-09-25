@@ -1,8 +1,17 @@
 import { getPlatformSession } from '@/lib/auth/server'
-import { getPlatformSupportThread, listPlatformSupportCases, platformReplySupportCase } from '@/lib/db/repositories/support-cases'
+import { getPlatformSupportThread, listPlatformSupportCases, platformUpdateSupportCase } from '@/lib/db/repositories/support-cases'
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import type { SupportCaseStatus } from '@/types/domain'
+import type { SupportCaseClassification, SupportCaseStatus, SupportCaseType } from '@/types/domain'
 const statuses=new Set<SupportCaseStatus>(['open','in_progress','waiting_for_customer','resolved','closed'])
+const caseTypes=new Set<SupportCaseType>(['support','feedback','feature_request','billing'])
+const classifications=new Set<SupportCaseClassification>(['blocker','friction','request'])
 function canSupport(role?:string){return !!role&&['platform_owner','platform_admin','platform_support'].includes(role)}
 export async function GET(request:Request){const s=await getPlatformSession();if(!s||!canSupport(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');const id=new URL(request.url).searchParams.get('caseId');if(id){const t=await getPlatformSupportThread(id);return t?apiJson(t):apiError(404,'not_found','Supportfall nicht gefunden.')}return apiJson({cases:await listPlatformSupportCases()})}
-export async function PATCH(request:Request){try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}const s=await getPlatformSession();if(!s||!canSupport(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');const b=await readJsonBody<{caseId?:string;message?:string;status?:SupportCaseStatus}>(request,16_384).catch(()=>null);const m=b?.message?.trim()??'';if(!b?.caseId||!b.status||!statuses.has(b.status)||m.length<1||m.length>5000)return apiError(422,'validation','Antwort oder Status ungültig.');try{return apiJson({message:await platformReplySupportCase({caseId:b.caseId,userId:s.user.id,email:s.user.email,message:m,status:b.status})})}catch(e){return apiError(404,'not_found',e instanceof Error?e.message:'Supportfall nicht gefunden.')}}
+export async function PATCH(request:Request){
+  try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}
+  const s=await getPlatformSession();if(!s||!canSupport(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.')
+  const b=await readJsonBody<{caseId?:string;message?:string;status?:SupportCaseStatus;caseType?:SupportCaseType;classification?:SupportCaseClassification|null}>(request,16_384).catch(()=>null)
+  const m=b?.message?.trim()??''
+  if(!b?.caseId||!b.status||!statuses.has(b.status)||!b.caseType||!caseTypes.has(b.caseType)||m.length>5000||(b.classification!=null&&!classifications.has(b.classification)))return apiError(422,'validation','Anliegen, Status oder Antwort ungültig.')
+  try{return apiJson({message:await platformUpdateSupportCase({caseId:b.caseId,userId:s.user.id,email:s.user.email,message:m,status:b.status,caseType:b.caseType,classification:b.classification??undefined})})}catch(e){return apiError(404,'not_found',e instanceof Error?e.message:'Supportfall nicht gefunden.')}
+}

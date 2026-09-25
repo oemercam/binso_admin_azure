@@ -26,7 +26,7 @@ export function PublicHeader() {
         </nav>
         <div className="public-header-actions">
           <a className="public-login-link" href={signInUrl('/post-login')}>Anmelden</a>
-          <Link className="button primary public-cta" href="/register">Kostenlos testen</Link>
+          <Link className="button primary public-cta" href="/register">Kostenlos starten</Link>
           <PublicMobileMenu />
         </div>
       </div>
@@ -91,11 +91,11 @@ export function PublicCta() {
     <section className="public-final-cta">
       <div>
         <span>Bereit für den nächsten Schritt?</span>
-        <h2>Teste Binso One 14 Tage und richte dein Unternehmen in wenigen Schritten ein.</h2>
+        <h2>Starte mit Binso One und richte dein Unternehmen in wenigen Schritten ein.</h2>
       </div>
       <div className="public-final-cta-actions">
-        <Link className="button primary" href="/register">14 Tage kostenlos testen</Link>
-        <Link className="button secondary" href="/pricing">Preise vergleichen</Link>
+        <Link className="button primary" href="/register">Kostenlos starten</Link>
+        <Link className="button secondary" href="/pricing">Preise ansehen</Link>
       </div>
     </section>
   )

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { Select, Textarea } from '@/components/ui/form-controls'
-import type { SupportCase, SupportCaseStatus, SupportMessage } from '@/types/domain'
+import type { SupportCase, SupportCaseClassification, SupportCaseStatus, SupportCaseType, SupportMessage } from '@/types/domain'
 
 type PlatformCase = SupportCase & { organizationName: string }
 type Thread = { case: PlatformCase; messages: SupportMessage[] }
@@ -13,6 +13,8 @@ export function PlatformSupportView() {
   const [thread, setThread] = useState<Thread | null>(null)
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<SupportCaseStatus>('in_progress')
+  const [caseType, setCaseType] = useState<SupportCaseType>('support')
+  const [classification, setClassification] = useState<SupportCaseClassification | ''>('')
 
   const loadCases = useCallback(async () => {
     const response = await fetch('/api/platform/support', { cache: 'no-store' })
@@ -26,6 +28,8 @@ export function PlatformSupportView() {
     if (response.ok) {
       setThread(payload)
       setStatus(payload.case.status)
+      setCaseType(payload.case.caseType)
+      setClassification(payload.case.classification ?? '')
     }
   }, [])
 
@@ -44,11 +48,11 @@ export function PlatformSupportView() {
   }, [])
 
   async function reply() {
-    if (!thread || !message.trim()) return
+    if (!thread) return
     const response = await fetch('/api/platform/support', {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ caseId: thread.case.id, message, status }),
+      body: JSON.stringify({ caseId: thread.case.id, message, status, caseType, classification: classification || null }),
     })
     if (response.ok) {
       setMessage('')
@@ -60,8 +64,8 @@ export function PlatformSupportView() {
   return (
     <section className="page apple-page">
       <PageHeader
-        title="Support"
-        description="Digitale Supportfälle mit sicherem Diagnosekontext und nachvollziehbarem Verlauf."
+        title="Support & Feedback"
+        description="Support, Feedback und Funktionswünsche mit sicherem Diagnosekontext und nachvollziehbarem Verlauf."
       />
       <div className="support-layout-v73">
         <div className="data-list compact-overview-list">
@@ -74,7 +78,7 @@ export function PlatformSupportView() {
             >
               <span className="primary-cell">
                 <strong>{supportCase.caseNumber} · {supportCase.subject}</strong>
-                <small>{supportCase.organizationName} · {supportCase.category}</small>
+                <small>{supportCase.organizationName} · {supportCase.caseType} · {supportCase.category}{supportCase.isPilotRelated ? ' · Pilot' : ''}</small>
               </span>
               <span>{supportCase.status}</span>
               <span className="row-disclosure">›</span>
@@ -86,7 +90,7 @@ export function PlatformSupportView() {
           <div className="support-thread-v73">
             <h2>{thread.case.caseNumber}</h2>
             <p>
-              {thread.case.organizationName} · {thread.case.currentPage ?? 'Kein Seitenkontext'} · Build{' '}
+              {thread.case.organizationName} · {thread.case.caseType}{thread.case.isPilotRelated ? ' · Pilot' : ''} · {thread.case.currentPage ?? 'Kein Seitenkontext'} · Build{' '}
               {thread.case.buildVersion ?? '–'}
             </p>
             {thread.messages.map((item) => (
@@ -95,6 +99,24 @@ export function PlatformSupportView() {
                 <p>{item.message}</p>
               </div>
             ))}
+            <label>
+              <span>Anliegen</span>
+              <Select value={caseType} onChange={(event) => setCaseType(event.target.value as SupportCaseType)}>
+                <option value="support">Support</option>
+                <option value="feedback">Feedback</option>
+                <option value="feature_request">Funktionswunsch</option>
+                <option value="billing">Abrechnung und Abo</option>
+              </Select>
+            </label>
+            <label>
+              <span>Pilot-Einordnung</span>
+              <Select value={classification} onChange={(event) => setClassification(event.target.value as SupportCaseClassification | '')}>
+                <option value="">Keine</option>
+                <option value="blocker">Blocker</option>
+                <option value="friction">Friction</option>
+                <option value="request">Request</option>
+              </Select>
+            </label>
             <label>
               <span>Status</span>
               <Select value={status} onChange={(event) => setStatus(event.target.value as SupportCaseStatus)}>
@@ -109,10 +131,10 @@ export function PlatformSupportView() {
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               rows={4}
-              placeholder="Antwort an den Kunden"
+              placeholder="Optionale Antwort an den Kunden"
             />
             <button className="button primary" onClick={() => void reply()}>
-              Antwort senden
+              Änderung speichern
             </button>
           </div>
         )}

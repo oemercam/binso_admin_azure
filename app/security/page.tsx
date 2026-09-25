@@ -1,13 +1,8 @@
+import { publicMetadata } from '@/lib/config/seo'
 import Link from 'next/link'
 import { PublicCta, PublicShell } from '@/components/public/public-shell'
-import { createPublicMetadata } from '@/lib/config/seo'
 
-export const metadata = createPublicMetadata({
-  title: 'Sicherheit',
-  description: 'Identität, Mandantentrennung, Rollen, verschlüsselte Verbindungen und nachvollziehbarer Betrieb bilden das Sicherheitsmodell von Binso One.',
-  path: '/security',
-  keywords: ['SaaS Sicherheit Schweiz', 'Mandantentrennung', 'RBAC Business Software'],
-})
+export const metadata = publicMetadata({ title: 'Sicherheit', description: 'Erfahre, wie Binso One Identitäten, Berechtigungen, Mandantentrennung und den sicheren Betrieb umsetzt.', path: '/security' })
 
 const controls = [
   ['Identität', 'Die produktive Anmeldung läuft über Azure App Service Authentication und eine Microsoft-basierte Identitätsplattform. Binso One speichert keine Benutzerpasswörter.'],

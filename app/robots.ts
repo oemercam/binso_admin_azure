@@ -1,41 +1,17 @@
 import type { MetadataRoute } from 'next'
-import { publicBaseUrl, publicUrl } from '@/lib/config/seo'
+import { headers } from 'next/headers'
+import { appIdentity } from '@/lib/config/app-identity'
 
-const privateRoutes = [
-  '/api/',
-  '/account',
-  '/accounting',
-  '/access-denied',
-  '/contracts',
-  '/customers',
-  '/dashboard',
-  '/data',
-  '/employees',
-  '/finance',
-  '/invoices',
-  '/offline',
-  '/onboarding',
-  '/orders',
-  '/organization',
-  '/platform',
-  '/post-login',
-  '/quotes',
-  '/register',
-  '/settings',
-  '/sign-in',
-  '/subscription-required',
-  '/support',
-  '/time',
-]
+export const dynamic = 'force-dynamic'
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const requestHeaders = await headers()
+  const host = (requestHeaders.get('x-forwarded-host') || requestHeaders.get('host') || '').split(':')[0].toLowerCase()
+  const publicHost = (process.env.BINSO_PUBLIC_HOST || new URL(appIdentity.website).host).toLowerCase()
+  if (host && host !== publicHost) return { rules: { userAgent: '*', disallow: '/' } }
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: privateRoutes,
-    },
-    sitemap: publicUrl('/sitemap.xml'),
-    host: new URL(publicBaseUrl).origin,
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/platform/', '/post-login', '/onboarding', '/support'] }],
+    sitemap: `${appIdentity.website}/sitemap.xml`,
+    host: appIdentity.website,
   }
 }

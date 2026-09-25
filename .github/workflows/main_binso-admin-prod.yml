@@ -85,7 +85,6 @@ jobs:
           echo "NEXT_PUBLIC_BUILD_ID=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
-          echo "NEXT_PUBLIC_SITE_URL=${{ vars.BINSO_ONE_BASE_URL }}" >> "$GITHUB_ENV"
 
       - name: Typecheck
         run: pnpm typecheck
@@ -94,7 +93,7 @@ jobs:
         run: pnpm lint
 
       - name: Product checks
-        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run public-site:check
+        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check
 
       - name: Behavioral regression tests
         run: pnpm test
@@ -236,33 +235,35 @@ jobs:
           test -n "$RESOURCE_GROUP"
           echo "resource_group=$RESOURCE_GROUP" >> "$GITHUB_OUTPUT"
 
-      - name: Disable App Service build automation
+      - name: Require staging slot
+        shell: bash
+        run: |
+          set -euo pipefail
+          SLOT="${{ vars.BINSO_ONE_STAGING_SLOT || 'staging' }}"
+          FOUND="$(az webapp deployment slot list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --query "[?name=='$SLOT'].name | [0]" -o tsv)"
+          test "$FOUND" = "$SLOT" || { echo "Required App Service staging slot '$SLOT' is missing."; exit 1; }
+          echo "STAGING_SLOT=$SLOT" >> "$GITHUB_ENV"
+
+      - name: Configure staging slot runtime
         shell: bash
         run: |
           set -euo pipefail
           az webapp config appsettings set \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
-            --settings \
-              WEBSITE_RUN_FROM_PACKAGE=1 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
-              ENABLE_ORYX_BUILD=false \
-              BUILD_FLAGS=Off \
+            --slot "$STAGING_SLOT" \
+            --settings WEBSITE_RUN_FROM_PACKAGE=1 SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false BUILD_FLAGS=Off \
             --output none
-
-      - name: Set explicit standalone startup command
-        shell: bash
-        run: |
-          set -euo pipefail
           az webapp config set \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
             --linux-fx-version 'NODE|24-lts' \
             --always-on true \
             --startup-file "node server.js" \
             --output none
 
-      - name: Deploy clean prebuilt ZIP
+      - name: Deploy immutable artifact to staging slot
         shell: bash
         run: |
           set -euo pipefail
@@ -270,6 +271,7 @@ jobs:
           az webapp deploy \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
             --src-path deploy/binso-one.zip \
             --type zip \
             --clean true \
@@ -277,22 +279,51 @@ jobs:
             --async false \
             --output json
 
-      - name: Verify production health
+      - name: Verify staging health and smoke
+        shell: bash
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$STAGING_URL"
+          node scripts/smoke-url.mjs "$STAGING_URL"
+
+      - name: Swap validated staging slot to production
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp deployment slot swap \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --target-slot production \
+            --output none
+
+      - name: Verify production health or rollback swap
         shell: bash
         env:
           BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
         run: |
           set -euo pipefail
           test -n "$BASE_URL"
+          HEALTHY=false
           for attempt in $(seq 1 30); do
             STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$BASE_URL/api/health" || true)"
             if [ "$STATUS" = "200" ]; then
               cat /tmp/health.json
-              exit 0
+              HEALTHY=true
+              break
             fi
-            echo "Health check attempt $attempt returned HTTP $STATUS"
+            echo "Production health check attempt $attempt returned HTTP $STATUS"
             sleep 10
           done
-          echo "Production health check failed"
-          cat /tmp/health.json 2>/dev/null || true
-          exit 1
+          if [ "$HEALTHY" != "true" ]; then
+            echo "Production health failed after swap. Rolling back to previous slot content."
+            az webapp deployment slot swap \
+              --resource-group "${{ steps.app.outputs.resource_group }}" \
+              --name binso-admin-prod \
+              --slot "$STAGING_SLOT" \
+              --target-slot production \
+              --output none
+            exit 1
+          fi

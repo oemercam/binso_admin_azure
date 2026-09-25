@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Input, Select, Textarea } from '@/components/ui/form-controls'
-import type { SupportCase, SupportCaseCategory, SupportMessage } from '@/types/domain'
+import type { SupportCase, SupportCaseCategory, SupportCaseType, SupportMessage } from '@/types/domain'
 
 type Thread = { case: SupportCase; messages: SupportMessage[] }
 
@@ -14,9 +14,17 @@ const labels: Record<SupportCaseCategory, string> = {
   other: 'Andere Frage',
 }
 
+const typeLabels: Record<SupportCaseType, string> = {
+  support: 'Support',
+  feedback: 'Feedback',
+  feature_request: 'Funktionswunsch',
+  billing: 'Abrechnung und Abo',
+}
+
 export function CustomerSupport() {
   const [cases, setCases] = useState<SupportCase[]>([])
   const [selected, setSelected] = useState<Thread | null>(null)
+  const [caseType, setCaseType] = useState<SupportCaseType>('support')
   const [category, setCategory] = useState<SupportCaseCategory>('usage')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
@@ -66,6 +74,7 @@ export function CustomerSupport() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
+          caseType,
           category,
           subject,
           message,
@@ -122,8 +131,16 @@ export function CustomerSupport() {
 
       <div className="support-layout-v73">
         <section>
-          <h2>Neuer Supportfall</h2>
+          <h2>Neues Anliegen</h2>
           <form onSubmit={create} className="support-form-v73">
+            <label>
+              <span>Anliegen</span>
+              <Select value={caseType} onChange={(event) => setCaseType(event.target.value as SupportCaseType)}>
+                {Object.entries(typeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </Select>
+            </label>
             <label>
               <span>Kategorie</span>
               <Select value={category} onChange={(event) => setCategory(event.target.value as SupportCaseCategory)}>
@@ -141,13 +158,13 @@ export function CustomerSupport() {
               <Textarea value={message} maxLength={5000} onChange={(event) => setMessage(event.target.value)} required rows={5} />
             </label>
             <button type="submit" className="button primary" disabled={sending}>
-              {sending ? 'Wird gesendet…' : 'Supportfall senden'}
+              {sending ? 'Wird gesendet…' : 'Anliegen senden'}
             </button>
           </form>
         </section>
 
         <section>
-          <h2>Meine Supportfälle</h2>
+          <h2>Meine Anliegen</h2>
           <div className="data-list compact-overview-list">
             {cases.length ? cases.map((supportCase) => (
               <button
@@ -158,11 +175,11 @@ export function CustomerSupport() {
               >
                 <span className="primary-cell">
                   <strong>{supportCase.caseNumber} · {supportCase.subject}</strong>
-                  <small>{labels[supportCase.category]} · {supportCase.status}</small>
+                  <small>{typeLabels[supportCase.caseType]} · {labels[supportCase.category]} · {supportCase.status}</small>
                 </span>
                 <span className="row-disclosure">›</span>
               </button>
-            )) : <div className="list-empty">Noch keine Supportfälle.</div>}
+            )) : <div className="list-empty">Noch keine Anliegen.</div>}
           </div>
         </section>
       </div>

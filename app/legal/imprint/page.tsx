@@ -1,13 +1,8 @@
+import { publicMetadata } from '@/lib/config/seo'
 import { LegalPage } from '@/components/public/legal-page'
 import { appIdentity } from '@/lib/config/app-identity'
-import { createPublicMetadata } from '@/lib/config/seo'
 
-export const metadata = createPublicMetadata({
-  title: 'Impressum',
-  description: 'Anbieter- und Kontaktinformationen der Binso GmbH zu Binso One.',
-  path: '/legal/imprint',
-  keywords: ['Binso Impressum', 'Binso GmbH'],
-})
+export const metadata = publicMetadata({ title: 'Impressum', description: 'Impressum und Anbieterinformationen der Binso GmbH.', path: '/legal/imprint' })
 
 export default function ImprintPage() {
   return (

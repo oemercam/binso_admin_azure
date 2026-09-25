@@ -9,13 +9,18 @@ export type OrganizationId = string
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed' | 'skipped'
 export type SupportCaseStatus = 'open' | 'in_progress' | 'waiting_for_customer' | 'resolved' | 'closed'
 export type SupportCaseCategory = 'usage' | 'technical' | 'billing' | 'account' | 'other'
+export type SupportCaseType = 'support' | 'feedback' | 'feature_request' | 'billing'
+export type SupportCaseClassification = 'blocker' | 'friction' | 'request'
 
 export type SupportCase = {
   id: string
   caseNumber: string
   organizationId: OrganizationId
   createdByUserId: string
+  caseType: SupportCaseType
   category: SupportCaseCategory
+  classification?: SupportCaseClassification
+  isPilotRelated: boolean
   subject: string
   status: SupportCaseStatus
   currentPage?: string

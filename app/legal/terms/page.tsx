@@ -1,12 +1,7 @@
+import { publicMetadata } from '@/lib/config/seo'
 import { LegalPage } from '@/components/public/legal-page'
-import { createPublicMetadata } from '@/lib/config/seo'
 
-export const metadata = createPublicMetadata({
-  title: 'Allgemeine Geschäftsbedingungen',
-  description: 'Allgemeine Geschäftsbedingungen für die Nutzung von Binso One.',
-  path: '/legal/terms',
-  keywords: ['Binso One AGB', 'Binso AGB'],
-})
+export const metadata = publicMetadata({ title: 'AGB', description: 'Allgemeine Geschäftsbedingungen für Binso One.', path: '/legal/terms' })
 
 export default function TermsPage() {
   return (
