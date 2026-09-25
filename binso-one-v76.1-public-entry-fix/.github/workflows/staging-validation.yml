@@ -1,0 +1,25 @@
+name: Validate Binso One staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Validate configured staging URL
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$STAGING_URL"
+          node scripts/smoke-url.mjs "$STAGING_URL"

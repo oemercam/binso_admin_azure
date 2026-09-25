@@ -1,0 +1,4 @@
+import { recordPlatformRelease } from '@/lib/db/repositories/platform-workflows'
+import { apiError, apiJson, readJsonBody } from '@/lib/http/server-api'
+function authorized(request:Request){const expected=process.env.INTERNAL_JOB_SECRET?.trim();return Boolean(expected&&request.headers.get('authorization')===`Bearer ${expected}`)}
+export async function POST(request:Request){if(!authorized(request))return apiError(401,'unauthorized','Nicht autorisiert.');const b=await readJsonBody<{buildId?:string;environment?:'staging'|'production';status?:'started'|'healthy'|'failed'|'rolled_back';commitSha?:string;detail?:string}>(request,8192).catch(()=>null);if(!b?.buildId||!b.environment||!b.status)return apiError(422,'validation','Release-Ereignis ist ungültig.');await recordPlatformRelease({buildId:b.buildId.slice(0,120),environment:b.environment,status:b.status,commitSha:b.commitSha?.slice(0,80),detail:b.detail?.slice(0,2000)});return apiJson({ok:true},{status:201})}

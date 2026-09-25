@@ -1,0 +1,8 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { PageHeader } from '@/components/ui/page-header'
+import { SettingsSection, SettingsValueRow } from '@/components/settings/settings-row'
+import { formatChf } from '@/lib/format/locale'
+
+type Data={summary?:{active_orgs:string;trial_orgs:string;pilot_orgs:string;mrr:string;events_30d:string;converted_30d:string;churn_30d:string};milestones?:Array<{milestone:string;organizations:number}>}
+export default function Page(){const[data,setData]=useState<Data>({});useEffect(()=>{void fetch('/api/platform/analytics',{cache:'no-store'}).then(r=>r.json()).then(setData)},[]);const s=data.summary;return <section className="page apple-page"><PageHeader title="Analytics" description="Datensparsame Produkt- und Geschäftskennzahlen. Demo-Organisationen sind ausgeschlossen."/><div className="customer-kpi-row" aria-label="Plattformkennzahlen"><div><span>Aktiv</span><strong>{s?.active_orgs??'–'}</strong></div><div><span>MRR</span><strong>{s?formatChf(Number(s.mrr)): '–'}</strong></div><div><span>Pilot</span><strong>{s?.pilot_orgs??'–'}</strong></div></div><SettingsSection title="Letzte 30 Tage" description="Kompakte operative Kennzahlen ohne invasive Klicküberwachung."><SettingsValueRow title="Produkt-Ereignisse" value={s?.events_30d??'–'}/><SettingsValueRow title="Pilot → konvertiert" value={s?.converted_30d??'–'}/><SettingsValueRow title="Kündigungen" value={s?.churn_30d??'–'}/></SettingsSection><SettingsSection title="Time-to-Value Meilensteine" description="Erste produktive Schritte pro Organisation.">{data.milestones?.map(m=><SettingsValueRow key={m.milestone} title={m.milestone} value={String(m.organizations)}/>)}</SettingsSection></section>}

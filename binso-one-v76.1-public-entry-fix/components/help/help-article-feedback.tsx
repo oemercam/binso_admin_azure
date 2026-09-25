@@ -1,0 +1,3 @@
+'use client'
+import { useState } from 'react'
+export function HelpArticleFeedback({articleId}:{articleId:string}){const[sent,setSent]=useState(false);async function send(helpful:boolean){const r=await fetch('/api/help',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({articleId,helpful})});if(r.ok)setSent(true)}return <div className="module-toolbar">{sent?<span>Danke für dein Feedback.</span>:<><span>War dieser Artikel hilfreich?</span><button type="button" className="button secondary" onClick={()=>void send(true)}>Ja</button><button type="button" className="button secondary" onClick={()=>void send(false)}>Nein</button></>}</div>}

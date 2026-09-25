@@ -1,0 +1,400 @@
+name: Build and deploy Binso One to Azure
+
+on:
+  push:
+    branches: [main, v69-production-completion]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: 'Production-Migration und Deployment ausdrücklich freigeben'
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: binso-one-production
+  cancel-in-progress: false
+
+jobs:
+  database-test:
+    name: Isolated PostgreSQL migrations and RLS
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: binso_v69_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile
+      - name: Apply and repeat migrations
+        run: |
+          pnpm db:migrate
+          pnpm db:migrate
+          pnpm run test:integration:db
+        env:
+          DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
+          PLATFORM_DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
+          DATABASE_TEST_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
+          DATABASE_SSL: 'false'
+
+  build:
+    name: Quality, build and package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+          run_install: false
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Set build metadata
+        shell: bash
+        run: |
+          echo "NEXT_PUBLIC_BUILD_ID=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Product checks
+        run: >
+          pnpm run security:check &&
+          pnpm run architecture:check &&
+          pnpm run design-system:check &&
+          pnpm run actions:check &&
+          pnpm run process:check &&
+          pnpm run mobile-ui:check &&
+          pnpm run product:simplicity-check &&
+          pnpm run saas:check &&
+          pnpm run multitenant:check &&
+          pnpm run data-foundation:check &&
+          pnpm run auth-membership:check &&
+          pnpm run customer-auth:check &&
+          pnpm run registration-onboarding:check &&
+          pnpm run subscription-billing:check &&
+          pnpm run stripe-payment:check &&
+          pnpm run saas:product-check &&
+          pnpm run platform:check &&
+          pnpm run go-live:check &&
+          pnpm run platform-foundation:check &&
+          pnpm run v74:check &&
+          pnpm run v75:check
+      - name: Behavioral regression tests
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
+      - name: Materialize complete standalone runtime
+        run: pnpm deployment:prepare deploy-root
+      - name: Verify isolated standalone runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd deploy-root
+            node -e "console.log(require.resolve('@swc/helpers/_/_interop_require_default'))"
+            node -e "require('next/dist/shared/lib/constants'); console.log('Next runtime dependency check passed')"
+            node -e "const fs=require('fs'); const s=fs.lstatSync('node_modules/next'); if (!s.isDirectory() || s.isSymbolicLink()) process.exit(1); console.log('Next package is materialized')"
+          )
+      - name: Create immutable deployment ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f binso-one.zip
+          (
+            cd deploy-root
+            zip -qry "$GITHUB_WORKSPACE/binso-one.zip" .
+          )
+          unzip -l binso-one.zip | grep -F 'node_modules/next/package.json'
+          unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
+          unzip -l binso-one.zip | grep -F 'server.js'
+      - name: Smoke test isolated artifact
+        run: node scripts/smoke-standalone.mjs deploy-root
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: binso-one
+          path: binso-one.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  e2e:
+    name: Critical E2E
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs: [build]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e --project=desktop-chromium
+        env:
+          AUTH_MODE: local
+          ALLOW_LOCAL_AUTH: 'true'
+          DATABASE_URL: ''
+          NEXT_PUBLIC_APP_ENV: e2e
+
+  migrate:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
+    name: Migrate production database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: [build, database-test, e2e]
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+          run_install: false
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Apply database migrations
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PLATFORM_DATABASE_URL: ${{ secrets.PLATFORM_DATABASE_URL || secrets.DATABASE_URL }}
+          DATABASE_SSL: 'true'
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
+    name: Deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    needs: [build, migrate]
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: binso-one
+          path: deploy
+      - name: Azure login (OIDC)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_26AFEFB731284F009ED9276FD775F286 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2CCE2EB4F39347B98167444DC3298211 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_062EB98486644201BBC1D99AE3FDD2FC }}
+      - name: Resolve Azure resource group
+        id: app
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESOURCE_GROUP="$(az webapp list --query "[?name=='binso-admin-prod'].resourceGroup | [0]" -o tsv)"
+          test -n "$RESOURCE_GROUP"
+          echo "resource_group=$RESOURCE_GROUP" >> "$GITHUB_OUTPUT"
+      - name: Ensure staging slot exists
+        shell: bash
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          SLOT="${{ vars.BINSO_ONE_STAGING_SLOT || 'staging' }}"
+          FOUND="$(az webapp deployment slot list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --query "[?name=='$SLOT'].name | [0]" -o tsv)"
+          if [ "$FOUND" != "$SLOT" ]; then
+            echo "Creating staging slot '$SLOT' by cloning Production configuration."
+            az webapp deployment slot create \
+              --resource-group "${{ steps.app.outputs.resource_group }}" \
+              --name binso-admin-prod \
+              --slot "$SLOT" \
+              --configuration-source binso-admin-prod \
+              --output none
+          fi
+          test -n "$STAGING_URL"
+          echo "STAGING_SLOT=$SLOT" >> "$GITHUB_ENV"
+      - name: Sync missing staging runtime settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROD_JSON="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod -o json)"
+          STAGING_JSON="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --slot "$STAGING_SLOT" -o json)"
+          REQUIRED=(DATABASE_URL DATABASE_SSL AUTH_MODE AUTH_PROVIDER_NAME INTERNAL_JOB_SECRET)
+          OPTIONAL=(EMAIL_DELIVERY_MODE GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PRICE_STARTER STRIPE_PRICE_BUSINESS STRIPE_PRICE_PROFESSIONAL STRIPE_PRICE_ENTERPRISE PUSH_SUBSCRIPTION_ENCRYPTION_KEY PLATFORM_DATABASE_URL PLATFORM_ROLE_SOURCE BINSO_OPERATOR_HOST BINSO_PUBLIC_HOST)
+          sync_if_missing() {
+            local KEY="$1"
+            local MUST="$2"
+            local CURRENT
+            local PROD
+            CURRENT="$(jq -r --arg key "$KEY" '.[] | select(.name==$key) | .value' <<<"$STAGING_JSON" | head -n1)"
+            if [ -n "$CURRENT" ] && [ "$CURRENT" != "null" ]; then return 0; fi
+            PROD="$(jq -r --arg key "$KEY" '.[] | select(.name==$key) | .value' <<<"$PROD_JSON" | head -n1)"
+            if [ -z "$PROD" ] || [ "$PROD" = "null" ]; then
+              if [ "$MUST" = "required" ]; then echo "Required Production setting '$KEY' is missing."; exit 1; fi
+              return 0
+            fi
+            echo "Syncing missing staging setting: $KEY"
+            az webapp config appsettings set --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --slot "$STAGING_SLOT" --settings "$KEY=$PROD" --output none
+            STAGING_JSON="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --slot "$STAGING_SLOT" -o json)"
+          }
+          for KEY in "${REQUIRED[@]}"; do sync_if_missing "$KEY" required; done
+          for KEY in "${OPTIONAL[@]}"; do sync_if_missing "$KEY" optional; done
+      - name: Configure and validate staging slot runtime
+        shell: bash
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          az webapp config appsettings set \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --settings WEBSITE_RUN_FROM_PACKAGE=1 SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false BUILD_FLAGS=Off \
+            --output none
+          az webapp config appsettings set \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --slot-settings APP_BASE_URL="$STAGING_URL" \
+            --output none
+          az webapp config set \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --linux-fx-version 'NODE|24-lts' \
+            --always-on true \
+            --startup-file "node server.js" \
+            --output none
+          NAMES="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --slot "$STAGING_SLOT" --query '[].name' -o tsv)"
+          for REQUIRED in DATABASE_URL DATABASE_SSL AUTH_MODE APP_BASE_URL INTERNAL_JOB_SECRET; do
+            echo "$NAMES" | grep -Fxq "$REQUIRED" || { echo "Required staging setting '$REQUIRED' is missing."; exit 1; }
+          done
+      - name: Deploy immutable artifact to staging slot
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f deploy/binso-one.zip
+          az webapp deploy \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --src-path deploy/binso-one.zip \
+            --type zip \
+            --clean true \
+            --restart true \
+            --async false \
+            --output json
+      - name: Verify staging health and smoke
+        shell: bash
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          node scripts/smoke-url.mjs "$STAGING_URL"
+      - name: Record healthy staging release
+        continue-on-error: true
+        shell: bash
+        env:
+          STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
+          JOB_SECRET: ${{ secrets.BINSO_ONE_INTERNAL_JOB_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error -X POST "${STAGING_URL%/}/api/internal/release-event" \
+            -H "Authorization: Bearer $JOB_SECRET" -H 'Content-Type: application/json' \
+            --data "{\"buildId\":\"${GITHUB_SHA::12}\",\"environment\":\"staging\",\"status\":\"healthy\",\"commitSha\":\"$GITHUB_SHA\"}"
+      - name: Swap validated staging slot to production
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp deployment slot swap \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --slot "$STAGING_SLOT" \
+            --target-slot production \
+            --output none
+      - name: Verify production health or rollback swap
+        shell: bash
+        env:
+          BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$BASE_URL"
+          HEALTHY=false
+          for attempt in $(seq 1 30); do
+            STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$BASE_URL/api/health" || true)"
+            if [ "$STATUS" = "200" ]; then
+              cat /tmp/health.json
+              HEALTHY=true
+              break
+            fi
+            echo "Production health check attempt $attempt returned HTTP $STATUS"
+            sleep 10
+          done
+          if [ "$HEALTHY" != "true" ]; then
+            echo "Production health failed after swap. Rolling back to previous slot content."
+            az webapp deployment slot swap \
+              --resource-group "${{ steps.app.outputs.resource_group }}" \
+              --name binso-admin-prod \
+              --slot "$STAGING_SLOT" \
+              --target-slot production \
+              --output none
+            exit 1
+          fi
+      - name: Record healthy production release
+        continue-on-error: true
+        shell: bash
+        env:
+          BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
+          JOB_SECRET: ${{ secrets.BINSO_ONE_INTERNAL_JOB_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error -X POST "${BASE_URL%/}/api/internal/release-event" \
+            -H "Authorization: Bearer $JOB_SECRET" -H 'Content-Type: application/json' \
+            --data "{\"buildId\":\"${GITHUB_SHA::12}\",\"environment\":\"production\",\"status\":\"healthy\",\"commitSha\":\"$GITHUB_SHA\"}"
