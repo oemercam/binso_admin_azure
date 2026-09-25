@@ -1,12 +1,14 @@
 import 'server-only'
+import { serverEnv } from '@/lib/config/server-env'
 
 
 function deliveryMode() {
-  return process.env.EMAIL_DELIVERY_MODE?.trim().toLowerCase() === 'graph' ? 'graph' : 'disabled'
+  return serverEnv.emailDeliveryMode === 'graph' ? 'graph' : 'disabled'
 }
 
 function required(name: string) {
-  const value = process.env[name]?.trim()
+  const map: Record<string, string> = { GRAPH_TENANT_ID: serverEnv.graphTenantId, GRAPH_CLIENT_ID: serverEnv.graphClientId, GRAPH_CLIENT_SECRET: serverEnv.graphClientSecret, GRAPH_SENDER_USER_ID: serverEnv.graphSenderUserId }
+  const value = map[name]?.trim()
   if (!value) throw new Error(`${name} ist für Microsoft Graph Mailversand erforderlich.`)
   return value
 }
@@ -32,7 +34,7 @@ async function graphAccessToken() {
 
 export function graphMailConfigured() {
   if (deliveryMode() !== 'graph') return false
-  return ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GRAPH_SENDER_USER_ID'].every((name) => Boolean(process.env[name]?.trim()))
+  return Boolean(serverEnv.graphTenantId && serverEnv.graphClientId && serverEnv.graphClientSecret && serverEnv.graphSenderUserId)
 }
 
 export async function sendGraphMail(input: { to: string; subject: string; text: string; htmlAttachment?: string }) {

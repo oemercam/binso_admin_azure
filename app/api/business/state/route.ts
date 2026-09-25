@@ -4,8 +4,8 @@ import { getTenantBusinessState, saveTenantBusinessState } from '@/lib/db/reposi
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
 import { recordApplicationEvent } from '@/lib/db/repositories/application-events'
 import { projectBusinessState } from '@/lib/auth/business-state-policy'
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 
-const MAX_STATE_BYTES = 2_000_000
 
 const allowedStateKeys = new Set([
   'auditEvents','numberSequences','importJobs','exportJobs','customers','contracts','expenses','creditNotes',
@@ -18,7 +18,7 @@ function sanitizeTenantState(state: Record<string, unknown>, organizationId: str
   for (const [key, value] of Object.entries(state)) {
     if (!allowedStateKeys.has(key)) continue
     if (Array.isArray(value)) {
-      if (value.length > 10_000) throw new Error('too_many_records')
+      if (value.length > PRODUCT_LIMITS.businessStateRecordsPerCollection) throw new Error('too_many_records')
       const ids = new Set<string>()
       for (const item of value) {
         if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error('state_invalid')
@@ -61,7 +61,7 @@ export async function PUT(request: Request) {
 
   let body: { organizationId?: string; expectedVersion?: number; state?: Record<string, unknown> }
   try {
-    body = await readJsonBody(request, MAX_STATE_BYTES)
+    body = await readJsonBody(request, PRODUCT_LIMITS.businessStateBodyBytes)
   } catch (cause) {
     return apiError(cause instanceof Error && cause.message === 'payload_too_large' ? 413 : 400, 'invalid_payload', 'Geschäftsdaten sind ungültig oder zu gross.', id)
   }

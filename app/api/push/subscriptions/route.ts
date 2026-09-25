@@ -1,3 +1,4 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { deletePushSubscription, upsertPushSubscription } from '@/lib/db/repositories/push-subscriptions'
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
 
   try {
-    const subscription = await readJsonBody<PushSubscriptionBody>(request, 16_384)
+    const subscription = await readJsonBody<PushSubscriptionBody>(request, PRODUCT_LIMITS.apiBodyStandardBytes)
     if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth || subscription.endpoint.length > 4096) {
       return apiError(422, 'validation', 'Ungültiges Push-Abonnement.', id)
     }
@@ -42,7 +43,7 @@ export async function DELETE(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
 
   try {
-    const subscription = await readJsonBody<PushSubscriptionBody>(request, 16_384)
+    const subscription = await readJsonBody<PushSubscriptionBody>(request, PRODUCT_LIMITS.apiBodyStandardBytes)
     if (!subscription.endpoint) return apiError(422, 'validation', 'Push-Endpunkt fehlt.', id)
     await deletePushSubscription(session.user.id, subscription.endpoint)
     return apiJson({ ok: true }, undefined, id)

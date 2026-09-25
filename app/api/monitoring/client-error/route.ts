@@ -1,3 +1,4 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { authenticatedIdentity } from '@/lib/auth/tenant-server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { recordApplicationEvent } from '@/lib/db/repositories/application-events'
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   if (!isDatabaseConfigured()) return apiJson({ ok: true }, undefined, id)
 
   let body: { digest?: string; name?: string; path?: string }
-  try { body = await readJsonBody(request, 4096) } catch { return apiError(400, 'invalid_payload', 'Fehlerdaten sind ungültig.', id) }
+  try { body = await readJsonBody(request, PRODUCT_LIMITS.apiBodySmallBytes) } catch { return apiError(400, 'invalid_payload', 'Fehlerdaten sind ungültig.', id) }
 
   await recordApplicationEvent({
     severity: 'error',

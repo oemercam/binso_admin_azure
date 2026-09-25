@@ -1,0 +1,19 @@
+/* Canonical form geometry shared by public, onboarding and authenticated UI. */
+:where(.ui-input,.ui-textarea,.ui-select-trigger,input,textarea,select){max-width:100%;min-width:0}
+:where(.ui-input,.ui-select-trigger){min-height:var(--ui-touch)}
+.ui-textarea{min-height:112px;resize:vertical}
+:where(.ui-input,.ui-textarea,.ui-select-trigger):focus-visible{outline:2px solid currentColor;outline-offset:2px}
+:where(.ui-form-field,.form-grid>label,.public-form>label,.settings-section>label){min-width:0}
+:where(.ui-field-label,.form-grid label>span,.public-form label>span){overflow-wrap:anywhere}
+.ui-field-help,.ui-field-error{display:block;max-width:70ch;overflow-wrap:anywhere}
+.form-grid{min-width:0}
+.form-grid>*{min-width:0}
+.ui-select{position:relative;min-width:0;max-width:100%}
+.ui-select-trigger{width:100%}
+.ui-select-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ui-select-options{max-width:100%}
+@media(max-width:720px){
+  :where(.form-grid,.public-form){grid-template-columns:minmax(0,1fr)!important}
+  :where(.form-grid,.public-form)>*{grid-column:1/-1!important}
+  .ui-textarea{min-height:104px}
+}

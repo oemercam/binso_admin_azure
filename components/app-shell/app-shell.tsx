@@ -13,9 +13,11 @@ import { useHeaderVisibility } from '@/hooks/use-header-visibility'
 export function AppShell({
   user,
   children,
+  isDemo = false,
 }: {
   user: AppUser
   children: ReactNode
+  isDemo?: boolean
 }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
@@ -51,6 +53,8 @@ export function AppShell({
           </button>
         </div>
       </header>
+
+      {isDemo ? <div className="app-demo-notice" role="status"><strong>Demo-Arbeitsbereich</strong><span>Fiktive Beispieldaten · keine Abrechnung oder externen Aktionen</span></div> : null}
 
       <div className="app-shell">
         <DesktopNav user={user} />

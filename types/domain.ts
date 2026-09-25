@@ -63,6 +63,7 @@ export type Organization = {
   country: string
   currency: 'CHF' | 'EUR'
   locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'
+  isDemo?: boolean
   createdAt: string
   updatedAt: string
 }
@@ -223,6 +224,7 @@ export type PlatformTenant = {
   ownerName: string
   ownerEmail: string
   plan: SubscriptionPlan
+  mode: SignupMode
   status: PlatformTenantStatus
   subscriptionStatus?: SubscriptionStatus
   seats: number
@@ -259,12 +261,15 @@ export type UsageCounter = {
   updatedAt: string
 }
 
+export type SignupMode = 'trial' | 'demo'
+
 export type SignupRequest = {
   id: string
   companyName: string
   ownerName: string
   email: string
   plan: SubscriptionPlan
+  mode: SignupMode
   status: 'started' | 'account_created' | 'trial_started' | 'active' | 'cancelled'
   createdAt: string
 }

@@ -1,4 +1,5 @@
 'use client'
+import { apiErrorMessage } from '@/lib/http/client-errors'
 import { nextInvoiceNumber as invoiceNumber, nextQuoteNumber as quoteNumber, nextContractNumber as contractNumber, nextCreditNumber as creditNumber } from '@/modules/documents/numbering'
 import { advanceContractDate } from '@/modules/contracts/schedule'
 
@@ -548,11 +549,13 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         : 'employee'
       const entitlement = state.entitlements.find((item) => item.organizationId === state.currentOrganizationId)
       const subscription = state.subscriptions.find((item) => item.organizationId === state.currentOrganizationId)
+      const organization = state.organizations.find((item) => item.id === state.currentOrganizationId)
       if (!entitlement || !subscription) return false
-      return canTenantAction({ role, permission, features: entitlement.features, subscriptionStatus: subscription.status })
+      return canTenantAction({ role, permission, features: entitlement.features, subscriptionStatus: subscription.status, isDemo: organization?.isDemo })
     },
     async queueDocumentMail(kind, entityId, to, key) {
       const organizationId = state.currentOrganizationId
+      if (state.organizations.find((item) => item.id === organizationId)?.isDemo) throw new Error('E-Mail-Versand ist in der Produktdemo deaktiviert.')
       if (!productionPersistence || !remoteReady.current.has(organizationId) || remoteBlocked.current.has(organizationId)) throw new Error('Versand benötigt aktuelle gespeicherte Daten. Bitte Seite neu laden.')
       const operation = remoteSaveChain.current.then(async () => {
         if (remoteBlocked.current.has(organizationId)) throw new Error('Speicherkonflikt. Bitte neu laden.')
@@ -562,7 +565,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         remoteVersions.current[organizationId] = saveResult.version
         const response = await fetch('/api/documents/send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organizationId, kind, entityId, to, key, expectedVersion: saveResult.version }) })
         const result = await response.json() as { error?: { message?: string } }
-        if (!response.ok) throw new Error(result.error?.message || 'Versand konnte nicht eingeplant werden.')
+        if (!response.ok) throw new Error(apiErrorMessage(result, 'Versand konnte nicht eingeplant werden.'))
       })
       remoteSaveChain.current = operation.catch(() => undefined)
       await operation

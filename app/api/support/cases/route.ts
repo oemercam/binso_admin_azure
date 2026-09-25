@@ -1,3 +1,4 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { addTenantSupportMessage, createTenantSupportCase, getTenantSupportThread, listTenantSupportCases } from '@/lib/db/repositories/support-cases'
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
@@ -16,7 +17,7 @@ export async function GET(request:Request){
 
 export async function POST(request:Request){
   try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}
-  const body=await readJsonBody<{caseType?:SupportCaseType;category?:SupportCaseCategory;subject?:string;message?:string;currentPage?:string;entityType?:string;entityId?:string;buildVersion?:string;browser?:string}>(request,32_768).catch(()=>null)
+  const body=await readJsonBody<{caseType?:SupportCaseType;category?:SupportCaseCategory;subject?:string;message?:string;currentPage?:string;entityType?:string;entityId?:string;buildVersion?:string;browser?:string}>(request,PRODUCT_LIMITS.defaultApiBodyBytes).catch(()=>null)
   if(!body||!body.caseType||!caseTypes.has(body.caseType)||!body.category||!categories.has(body.category)) return apiError(422,'validation','Anliegen oder Kategorie fehlt.')
   const subject=body.subject?.trim()??''; const message=body.message?.trim()??''
   if(subject.length<3||subject.length>160||message.length<1||message.length>5000) return apiError(422,'validation','Bitte Betreff und Nachricht prüfen.')
@@ -27,7 +28,7 @@ export async function POST(request:Request){
 
 export async function PATCH(request:Request){
   try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}
-  const body=await readJsonBody<{caseId?:string;message?:string}>(request,16_384).catch(()=>null); const message=body?.message?.trim()??''
+  const body=await readJsonBody<{caseId?:string;message?:string}>(request,PRODUCT_LIMITS.apiBodyStandardBytes).catch(()=>null); const message=body?.message?.trim()??''
   if(!body?.caseId||message.length<1||message.length>5000) return apiError(422,'validation','Nachricht fehlt.')
   const context=await resolveAuthorizedTenantContext(undefined,'support.request'); if(!context) return apiError(403,'forbidden','Keine Berechtigung.')
   try{return apiJson({message:await addTenantSupportMessage({organizationId:context.organizationId,userId:context.userId,caseId:body.caseId,message})})}catch(e){return apiError(404,'not_found',e instanceof Error?e.message:'Supportfall wurde nicht gefunden.')}

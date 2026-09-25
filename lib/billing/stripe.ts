@@ -1,31 +1,31 @@
 import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { SubscriptionPlan } from '@/types/domain'
+import { serverEnv } from '@/lib/config/server-env'
 
 const STRIPE_API = 'https://api.stripe.com/v1'
 
 export function stripeConfigured() {
-  return Boolean(process.env.STRIPE_SECRET_KEY?.trim() && process.env.STRIPE_WEBHOOK_SECRET?.trim())
+  return Boolean(serverEnv.stripeSecretKey && serverEnv.stripeWebhookSecret)
 }
 
 export function stripePriceId(plan: SubscriptionPlan) {
-  const key = `STRIPE_PRICE_${plan.toUpperCase()}`
-  return process.env[key]?.trim() || null
+  return serverEnv.stripePrices[plan] || null
 }
 
 export function stripePlanForPriceId(priceId: string | null | undefined): SubscriptionPlan | null {
   if (!priceId) return null
   const entries: Array<[SubscriptionPlan, string | undefined]> = [
-    ['starter', process.env.STRIPE_PRICE_STARTER],
-    ['business', process.env.STRIPE_PRICE_BUSINESS],
-    ['professional', process.env.STRIPE_PRICE_PROFESSIONAL],
-    ['enterprise', process.env.STRIPE_PRICE_ENTERPRISE],
+    ['starter', serverEnv.stripePrices.starter],
+    ['business', serverEnv.stripePrices.business],
+    ['professional', serverEnv.stripePrices.professional],
+    ['enterprise', serverEnv.stripePrices.enterprise],
   ]
   return entries.find(([, id]) => id?.trim() === priceId)?.[0] ?? null
 }
 
 export async function stripePost<T>(path: string, params: URLSearchParams, idempotencyKey?: string): Promise<T> {
-  const key = process.env.STRIPE_SECRET_KEY?.trim()
+  const key = serverEnv.stripeSecretKey
   if (!key) throw new Error('Stripe ist nicht konfiguriert.')
   const response = await fetch(`${STRIPE_API}${path}`, {
     method: 'POST',
@@ -44,7 +44,7 @@ export async function stripePost<T>(path: string, params: URLSearchParams, idemp
 }
 
 export async function stripeGet<T>(path: string): Promise<T> {
-  const key = process.env.STRIPE_SECRET_KEY?.trim()
+  const key = serverEnv.stripeSecretKey
   if (!key) throw new Error('Stripe ist nicht konfiguriert.')
   const response = await fetch(`${STRIPE_API}${path}`, { headers: { authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(20_000) })
   if (!response.ok) throw new Error(`Stripe-Abgleich fehlgeschlagen (${response.status}).`)
@@ -52,13 +52,13 @@ export async function stripeGet<T>(path: string): Promise<T> {
 }
 
 export function appBaseUrl(request: Request) {
-  const configured = process.env.APP_BASE_URL?.trim()
+  const configured = serverEnv.appBaseUrl
   if (configured) return configured.replace(/\/$/, '')
   return new URL(request.url).origin
 }
 
 export function verifyStripeWebhook(rawBody: string, signatureHeader: string | null) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim()
+  const secret = serverEnv.stripeWebhookSecret
   if (!secret || !signatureHeader) return false
 
   const parts = signatureHeader.split(',').map((part) => part.trim())

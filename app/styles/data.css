@@ -1,0 +1,20 @@
+/* Canonical data/list overflow behaviour. Business semantics remain in each module. */
+:where(.data-list,.compact-list,.hub-row-list,.settings-section,.customer-overview-list){min-width:0;max-width:100%}
+:where(.data-row,.compact-list>a,.hub-row,.settings-value-row)>*{min-width:0}
+:where(.primary-cell,.primary-cell strong,.primary-cell small,.settings-value-row strong,.settings-value-row span){overflow-wrap:anywhere}
+.table-scroll,.responsive-table{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+:where(table){max-width:100%}
+:where(td,th){overflow-wrap:anywhere}
+@media(max-width:820px){
+  .data-head{display:none!important}
+  :where(.data-row,.compact-overview-row){max-width:100%}
+  :where(.overview-desktop-cell,.desktop-row-detail){display:none!important}
+  .mobile-row-summary{display:block}
+}
+
+/* Semantic status presentation. Components use tone classes instead of business-specific CSS. */
+.status-success{background:var(--green-bg,#e8f7ef)!important;color:var(--green,#18794e)!important}
+.status-info{background:var(--blue-bg,#edf4ff)!important;color:var(--blue,#245ea8)!important}
+.status-warning{background:var(--amber-bg,#fff4dc)!important;color:var(--amber,#8a5a00)!important}
+.status-danger{background:var(--red-bg,#fff0ef)!important;color:var(--red,#b42318)!important}
+.status-neutral{background:var(--surface-3,#f2f3f5)!important;color:var(--text-2,#5f636b)!important}

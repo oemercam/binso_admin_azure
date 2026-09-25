@@ -1,9 +1,10 @@
 import 'server-only'
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto'
 import { query } from '@/lib/db/client'
+import { serverEnv } from '@/lib/config/server-env'
 
 function encryptionKey() {
-  const raw = process.env.PUSH_SUBSCRIPTION_ENCRYPTION_KEY?.trim() || ''
+  const raw = serverEnv.pushSubscriptionEncryptionKey
   if (!raw) throw new Error('PUSH_SUBSCRIPTION_ENCRYPTION_KEY is not configured')
   const key = Buffer.from(raw, 'base64')
   if (key.length !== 32) throw new Error('PUSH_SUBSCRIPTION_ENCRYPTION_KEY must be a base64 encoded 32-byte key')

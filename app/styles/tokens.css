@@ -1,0 +1,37 @@
+:root{
+  --ui-content-max:1240px;
+  --ui-content-narrow:760px;
+  --ui-gutter-mobile:14px;
+  --ui-gutter-tablet:22px;
+  --ui-gutter-desktop:32px;
+  --ui-touch:44px;
+  --ui-radius-sm:10px;
+  --ui-radius-md:14px;
+  --ui-radius-lg:20px;
+  --ui-radius-xl:24px;
+  --ui-space-1:4px;
+  --ui-space-2:8px;
+  --ui-space-3:12px;
+  --ui-space-4:16px;
+  --ui-space-5:20px;
+  --ui-space-6:24px;
+  --ui-space-8:32px;
+  --ui-space-10:40px;
+  --ui-space-12:48px;
+  --ui-z-header:100;
+  --ui-z-sticky:200;
+  --ui-z-dropdown:400;
+  --ui-z-pill:500;
+  --ui-z-sheet:700;
+  --ui-z-modal:800;
+  --ui-z-toast:900;
+  --ui-safe-top:env(safe-area-inset-top,0px);
+  --ui-safe-right:env(safe-area-inset-right,0px);
+  --ui-safe-bottom:env(safe-area-inset-bottom,0px);
+  --ui-safe-left:env(safe-area-inset-left,0px);
+  --ui-body-size:clamp(14px,.2vw + 13.5px,16px);
+  --ui-small-size:clamp(12px,.15vw + 11.5px,14px);
+  --ui-h1-size:clamp(2.35rem,5.2vw,5.5rem);
+  --ui-h2-size:clamp(1.9rem,3.6vw,3.8rem);
+  --ui-h3-size:clamp(1.2rem,1.5vw,1.65rem);
+}

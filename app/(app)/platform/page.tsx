@@ -10,6 +10,9 @@ import type { PlatformTenant, SignupRequest, SubscriptionPlan } from '@/types/do
 import { planDefinitions } from '@/lib/data/plans'
 import { useFeedback } from '@/components/ui/feedback'
 import { PlatformOperations } from '@/components/settings/platform-operations'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
+import { StatusBadge } from '@/components/ui/status-badge'
+import { statusLabel } from '@/lib/status/presentation'
 
 
 type PlatformHealth = {
@@ -45,13 +48,13 @@ export default function PlatformAdminPage() {
 
   const loadPlatform = useCallback(async () => {
     try {
-      const [response, healthResponse] = await Promise.all([fetch('/api/platform/tenants', { cache: 'no-store' }), fetch('/api/platform/health', { cache: 'no-store' })])
-      const result = await response.json() as PlatformResponse
-      if (!response.ok) throw new Error(result.error || 'Plattformdaten konnten nicht geladen werden.')
+      const [result, healthResult] = await Promise.all([
+        apiRequest<PlatformResponse>('/api/platform/tenants'),
+        apiRequest<PlatformHealth>('/api/platform/health', { retry: 0 }).catch(() => null),
+      ])
       setTenants(result.tenants)
       setSignups(result.signups)
       setCanManage(result.canManage)
-      const healthResult = await healthResponse.json().catch(() => null) as PlatformHealth | null
       if (healthResult) setHealth(healthResult)
     } catch (cause) {
       feedback.error(cause instanceof Error ? cause.message : 'Plattformdaten konnten nicht geladen werden.')
@@ -89,13 +92,10 @@ export default function PlatformAdminPage() {
     if (!editing || saving || !canManage) return
     setSaving(true)
     try {
-      const response = await fetch('/api/platform/tenants', {
+      await apiRequest('/api/platform/tenants', {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ tenantId: editing.id, plan, status, reason }),
+        body: jsonBody({ tenantId: editing.id, plan, status, reason }),
       })
-      const result = await response.json().catch(() => ({})) as { error?: string }
-      if (!response.ok) throw new Error(result.error || 'Mandant konnte nicht aktualisiert werden.')
       await loadPlatform()
       setEditing(null)
       setReason('')
@@ -139,28 +139,28 @@ export default function PlatformAdminPage() {
             <button type="button" className="data-row compact-overview-row" key={tenant.id} onClick={() => openTenant(tenant)}>
               <span className="primary-cell"><strong>{tenant.companyName}</strong><small className="mobile-row-summary">{tenant.ownerEmail}</small><small className="desktop-row-detail">{tenant.ownerEmail}</small></span>
               <span className="overview-desktop-cell">{tenant.plan}</span>
-              <span className="overview-desktop-cell">{tenant.status}</span>
+              <StatusBadge status={tenant.status} className="overview-desktop-cell" />
               <span className="row-disclosure">›</span>
             </button>
           ))}
         </div>
       </section>
 
-      <SettingsSection title="Registrierungen" description="Neue Registrierungen und Trial-Starts aus PostgreSQL.">
-        {signups.map((signup) => <SettingsValueRow key={signup.id} title={signup.companyName} value={signup.status} description={`${signup.email} · ${signup.plan}`} />)}
+      <SettingsSection title="Registrierungen" description="Neue Registrierungen und Testzugänge aus PostgreSQL.">
+        {signups.map((signup) => <SettingsValueRow key={signup.id} title={signup.companyName} value={statusLabel(signup.status)} description={`${signup.email} · ${signup.plan}`} />)}
       </SettingsSection>
 
       {editing && <StandardFormSheet open title={<>{editing.companyName}</>} description={<>{editing.ownerEmail}</>} onClose={() => setEditing(null)} onSubmit={saveTenant} formId="platform-tenant-edit" footer={<><button type="button" className="button secondary" onClick={() => setEditing(null)}>Abbrechen</button>{canManage ? <button type="submit" form="platform-tenant-edit" className="button primary" disabled={saving}>{saving ? 'Speichern…' : 'Speichern'}</button> : null}</>}>
         <div className="form-grid">
           <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)} disabled={!canManage}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
-          <label><span>Status</span><Select value={status} onChange={(event) => setStatus(event.target.value as PlatformTenant['status'])} disabled={!canManage}><option value="trial">Trial</option><option value="active">Aktiv</option><option value="past_due">Zahlung offen</option><option value="grace_period">Kulanzfrist</option><option value="read_only">Nur lesen</option><option value="suspended">Gesperrt</option><option value="expired">Trial abgelaufen</option><option value="cancelled">Gekündigt</option><option value="archived">Archiviert</option></Select></label>
+          <label><span>Status</span><Select value={status} onChange={(event) => setStatus(event.target.value as PlatformTenant['status'])} disabled={!canManage}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Zahlung offen</option><option value="grace_period">Kulanzfrist</option><option value="read_only">Nur lesen</option><option value="suspended">Gesperrt</option><option value="expired">Testphase abgelaufen</option><option value="cancelled">Gekündigt</option><option value="archived">Archiviert</option></Select></label>
           <label className="full"><span>Änderungsgrund *</span><Input value={reason} onChange={(event) => setReason(event.target.value)} required minLength={3} maxLength={500} placeholder="Warum wird Plan oder Status geändert?" /></label>
           <div className="full customer-overview-list">
             <div><span>Benutzer</span><strong>{editing.users} / {editing.seats}</strong></div>
             <div><span>Speicher</span><strong>{editing.storageMb} MB</strong></div>
             <div><span>MRR</span><strong>{formatChf(editing.monthlyRevenueChf)}</strong></div>
             <div><span>Billing</span><strong>{editing.billingProvider ?? 'manual'}</strong></div>
-            <div><span>Trial bis</span><strong>{editing.trialUntil ? formatDateTime(editing.trialUntil) : '–'}</strong></div>
+            <div><span>Testphase bis</span><strong>{editing.trialUntil ? formatDateTime(editing.trialUntil) : '–'}</strong></div>
             <div><span>Zuletzt aktiv</span><strong>{formatDateTime(editing.lastActiveAt)}</strong></div>
           </div>
         </div>

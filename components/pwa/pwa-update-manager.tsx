@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { publicEnv } from '@/lib/config/public-env'
 
 const ACTIVE_BUILD_KEY = 'binso:pwa-active-build'
 
@@ -18,10 +19,10 @@ export function PWAUpdateManager() {
   const [updateReady, setUpdateReady] = useState(false)
   const reloadAfterUpdate = useRef(false)
   const cleanupRegistrationListeners = useRef<(() => void) | null>(null)
-  const buildId = process.env.NEXT_PUBLIC_BUILD_ID?.trim()
+  const buildId = publicEnv.buildId
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production' || !buildId) return
+    if (!('serviceWorker' in navigator) || !publicEnv.isProduction || !buildId) return
 
     let disposed = false
 

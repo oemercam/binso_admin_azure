@@ -2,7 +2,9 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db/client'
 import { getPlan } from '@/lib/data/plans'
-import type { SubscriptionPlan } from '@/types/domain'
+import type { SignupMode, SubscriptionPlan } from '@/types/domain'
+import { DEMO_ACCESS_HOURS, TRIAL_DAYS } from '@/lib/config/product'
+import { createDemoBusinessState } from '@/lib/data/demo-workspace'
 
 function safeSlug(value: string) {
   const slug = value
@@ -31,9 +33,31 @@ type SignupRow = {
   owner_name: string
   email: string
   plan: SubscriptionPlan
+  signup_mode: SignupMode
   status: 'started' | 'account_created' | 'trial_started' | 'active' | 'cancelled'
   organization_id: string | null
   onboarding_business_settings: unknown
+}
+
+async function seedDemoWorkspace(client: PoolClient, input: {
+  organizationId: string
+  organizationName: string
+  ownerName: string
+  ownerEmail: string
+  userId: string
+  address: string
+  zip: string
+  city: string
+  uid: string
+}) {
+  const state = createDemoBusinessState(input)
+  await client.query(
+    `insert into tenant_business_state (organization_id, state, version, updated_by, updated_at)
+     values ($1, $2::jsonb, 1, $3, now())
+     on conflict (organization_id) do update
+       set state = excluded.state, version = excluded.version, updated_by = excluded.updated_by, updated_at = now()`,
+    [input.organizationId, JSON.stringify(state), input.userId],
+  )
 }
 
 export async function createTrialOrganization(input: {
@@ -44,7 +68,7 @@ export async function createTrialOrganization(input: {
 }) {
   return withTransaction(async (client) => {
     const signupResult = await client.query<SignupRow>(
-      `select id, company_name, owner_name, email, plan, status, organization_id, onboarding_business_settings
+      `select id, company_name, owner_name, email, plan, signup_mode, status, organization_id, onboarding_business_settings
          from signup_requests
         where id = $1 and user_id = $2
         for update`,
@@ -58,10 +82,12 @@ export async function createTrialOrganization(input: {
     }
 
     if (signup.organization_id) {
-      return { organizationId: signup.organization_id, created: false }
+      return { organizationId: signup.organization_id, created: false, mode: signup.signup_mode ?? 'trial' }
     }
 
-    const plan = getPlan(signup.plan)
+    const mode: SignupMode = signup.signup_mode === 'demo' ? 'demo' : 'trial'
+    const plan = getPlan(mode === 'demo' ? 'business' : signup.plan)
+    const effectivePlan: SubscriptionPlan = mode === 'demo' ? 'business' : signup.plan
     const onboardingSettings = signup.onboarding_business_settings && typeof signup.onboarding_business_settings === 'object' && !Array.isArray(signup.onboarding_business_settings)
       ? signup.onboarding_business_settings as Record<string, unknown>
       : {}
@@ -69,16 +95,18 @@ export async function createTrialOrganization(input: {
     const profileZip = typeof onboardingSettings.zip === 'string' ? onboardingSettings.zip.trim() : ''
     const profileCity = typeof onboardingSettings.city === 'string' ? onboardingSettings.city.trim() : ''
     const profileUid = typeof onboardingSettings.uid === 'string' ? onboardingSettings.uid.trim() : ''
-    const slug = await uniqueSlug(client, signup.company_name)
+    const organizationName = mode === 'demo' ? `${signup.owner_name.trim() || 'Binso'} · Demo` : signup.company_name.trim()
+    const slug = await uniqueSlug(client, organizationName)
     const organization = await client.query<{ id: string }>(
-      `insert into organizations (name, slug, status, country, currency, locale)
-       values ($1, $2, 'active', 'Schweiz', 'CHF', 'de-CH')
+      `insert into organizations (name, slug, status, country, currency, locale, is_demo)
+       values ($1, $2, 'active', 'Schweiz', 'CHF', 'de-CH', $3)
        returning id`,
-      [signup.company_name.trim(), slug],
+      [organizationName, slug, mode === 'demo'],
     )
     const organizationId = organization.rows[0].id
-    const trialUntil = new Date(Date.now() + 14 * 86_400_000)
-    const maxStorageMb = plan.maxStorageMb
+    const accessUntil = mode === 'demo'
+      ? new Date(Date.now() + DEMO_ACCESS_HOURS * 3_600_000)
+      : new Date(Date.now() + TRIAL_DAYS * 86_400_000)
 
     await client.query(
       `insert into organization_memberships (organization_id, user_id, email, role, role_id, status)
@@ -88,26 +116,26 @@ export async function createTrialOrganization(input: {
     await client.query(
       `insert into organization_subscriptions (organization_id, plan, status, seats, trial_until, billing_provider, billing_interval, unit_amount_chf)
        values ($1, $2, 'trial', $3, $4, 'manual', 'monthly', $5)`,
-      [organizationId, signup.plan, plan.includedUsers, trialUntil, plan.monthlyPriceChf ?? 0],
+      [organizationId, effectivePlan, plan.includedUsers, accessUntil, mode === 'demo' ? 0 : plan.monthlyPriceChf ?? 0],
     )
     await client.query(
       `insert into organization_entitlements (organization_id, features, max_users, max_storage_mb)
        values ($1, $2, $3, $4)`,
-      [organizationId, plan.features, plan.includedUsers, maxStorageMb],
+      [organizationId, plan.features, plan.includedUsers, plan.maxStorageMb],
     )
     await client.query(
       `insert into company_profile (organization_id, name, address, zip, city, country, email, uid, iban)
        values ($1, $2, $3, $4, $5, 'Schweiz', $6, $7, '')`,
-      [organizationId, signup.company_name.trim(), profileAddress, profileZip, profileCity, input.userEmail, profileUid],
+      [organizationId, organizationName, profileAddress, profileZip, profileCity, input.userEmail, profileUid],
     )
     await client.query(
       `insert into number_sequences (organization_id, kind, prefix, next_value, padding, include_year)
        values
-         ($1, 'customer', 'K', 1, 3, true),
-         ($1, 'quote', 'AN', 1, 3, true),
-         ($1, 'order', 'AU', 1, 3, true),
+         ($1, 'customer', 'K', 2, 3, true),
+         ($1, 'quote', 'AN', 2, 3, true),
+         ($1, 'order', 'AU', 2, 3, true),
          ($1, 'contract', 'VT', 1, 3, true),
-         ($1, 'invoice', 'RE', 1, 3, true),
+         ($1, 'invoice', 'RE', 2, 3, true),
          ($1, 'credit_note', 'GS', 1, 3, true)`,
       [organizationId],
     )
@@ -116,6 +144,21 @@ export async function createTrialOrganization(input: {
        values ($1, $2, $3, 'trial', $4, 0, 0, now())`,
       [organizationId, signup.owner_name.trim() || input.userName, input.userEmail, plan.includedUsers],
     )
+
+    if (mode === 'demo') {
+      await seedDemoWorkspace(client, {
+        organizationId,
+        organizationName,
+        ownerName: signup.owner_name.trim() || input.userName,
+        ownerEmail: input.userEmail,
+        userId: input.userId,
+        address: profileAddress,
+        zip: profileZip,
+        city: profileCity,
+        uid: profileUid,
+      })
+    }
+
     await client.query(
       `update signup_requests
           set status = 'trial_started', organization_id = $2, onboarding_status='completed', onboarding_step=3, onboarding_updated_at=now(), updated_at = now(), completed_at = now()
@@ -124,10 +167,10 @@ export async function createTrialOrganization(input: {
     )
     await client.query(
       `insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, entity_id, detail)
-       values ($1, $2, $3, 'organization.created', 'organization', $4, 'Trial organisation created during onboarding')`,
-      [organizationId, input.userId, input.userName, organizationId],
+       values ($1, $2, $3, $4, 'organization', $5, $6)`,
+      [organizationId, input.userId, input.userName, mode === 'demo' ? 'organization.demo_created' : 'organization.created', organizationId, mode === 'demo' ? 'Isolated demo workspace created during onboarding' : 'Trial organisation created during onboarding'],
     )
 
-    return { organizationId, created: true }
+    return { organizationId, created: true, mode }
   })
 }

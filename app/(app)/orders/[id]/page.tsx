@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { Icon } from '@/components/ui/icon'
 import { PageHeader } from '@/components/ui/page-header'
+import { StatusBadge } from '@/components/ui/status-badge'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { InteractiveRow } from '@/components/ui/interactive-row'
 import { Toggle } from '@/components/ui/toggle'
@@ -52,7 +53,7 @@ export default function OrderDetailPage() {
         description="Auftragsdaten, Team, Zeiten, Nachweise und Abrechnung verwalten."
         action={
           <div className="page-action-group">
-            <span className={`status ${order.status === 'active' ? 'active' : 'neutral'}`}>{order.status === 'active' ? 'Aktiv' : order.status === 'paused' ? 'Pausiert' : 'Abgeschlossen'}</span>
+            <StatusBadge status={order.status} />
             <button className="button secondary" onClick={() => setEditOpen(true)}><Icon name="edit" size={15}/> Bearbeiten</button>
           </div>
         }

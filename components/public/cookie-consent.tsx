@@ -3,12 +3,13 @@
 import { useState, useSyncExternalStore } from 'react'
 import { Checkbox } from '@/components/ui/form-controls'
 import { CloseButton } from '@/components/ui/close-button'
+import { publicEnv } from '@/lib/config/public-env'
 
 const STORAGE_KEY = 'binso-cookie-preferences-v1'
 const SETTINGS_EVENT = 'binso:cookie-settings'
 const CONSENT_EVENT = 'binso:cookie-consent-changed'
 const SERVER_SNAPSHOT = '__server__'
-const OPTIONAL_ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_OPTIONAL_ANALYTICS === 'true'
+const OPTIONAL_ANALYTICS_ENABLED = publicEnv.optionalAnalytics
 
 type Preferences = { necessary: true; statistics: boolean }
 

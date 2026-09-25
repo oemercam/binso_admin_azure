@@ -11,6 +11,7 @@ import { useBusinessStore } from '@/components/state/business-store'
 import type { AppUser, OrganizationFeature, Role } from '@/types/domain'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { signOutUrl } from '@/lib/auth/urls'
+import { roleLabel } from '@/lib/auth/permissions'
 
 const quickActions: Array<{ label: string; description: string; icon: IconName; href: string; roles: Role[]; feature?: OrganizationFeature }> = [
   { label: 'Kunde erfassen', description: 'Firmenname reicht für den Start', icon: 'customers', href: '/customers?new=1', roles: ['owner', 'admin'], feature: 'crm' },
@@ -193,11 +194,4 @@ export function AppOverlays({
 
 function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BI'
-}
-
-export function roleLabel(role: AppUser['role']) {
-  if (role === 'owner') return 'Inhaber'
-  if (role === 'admin') return 'Administrator'
-  if (role === 'finance') return 'Buchhaltung'
-  return 'Mitarbeiter'
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { apiRequest } from '@/lib/http/api-client'
 import { ApiError } from '@/lib/http/errors'
 import { useFeedback } from '@/components/ui/feedback'
+import { publicEnv } from '@/lib/config/public-env'
 
 function urlBase64ToUint8Array(base64: string) {
   const padding = '='.repeat((4 - base64.length % 4) % 4)
@@ -16,7 +17,7 @@ export function PushSettings() {
   const [enabled, setEnabled] = useState(false)
   const [busy, setBusy] = useState(false)
   const feedback = useFeedback()
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+  const publicKey = publicEnv.vapidPublicKey
 
   useEffect(() => {
     const isSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window

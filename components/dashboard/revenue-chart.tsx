@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { useBusinessStore } from '@/components/state/business-store'
+import { formatMonthShort } from '@/lib/format/locale'
 
 export type RevenuePoint = { month: string; revenue: number; cost: number }
 
@@ -38,7 +39,6 @@ export function RevenueChart({ series }: { series?: RevenuePoint[] } = {}) {
 }
 
 function buildSeries(invoices: Array<{ issueDate: string; amount: number; status: string }>, supplierInvoices: Array<{ invoiceDate: string; amount: number }>): RevenuePoint[] {
-  const formatter = new Intl.DateTimeFormat('de-CH', { month: 'short' })
   const now = new Date()
   return Array.from({ length: 6 }, (_, offset) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (5 - offset), 1)
@@ -49,7 +49,7 @@ function buildSeries(invoices: Array<{ issueDate: string; amount: number; status
       return parsed.getFullYear() === year && parsed.getMonth() === month
     }
     return {
-      month: formatter.format(date).replace('.', ''),
+      month: formatMonthShort(date),
       revenue: invoices.filter((item) => item.status !== 'cancelled' && sameMonth(item.issueDate)).reduce((sum, item) => sum + item.amount, 0),
       cost: supplierInvoices.filter((item) => sameMonth(item.invoiceDate)).reduce((sum, item) => sum + item.amount, 0),
     }

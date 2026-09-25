@@ -10,13 +10,13 @@ const screenshotNames = new Set(['customers', 'quotes', 'orders', 'time', 'invoi
 export default function FeaturesPage() {
   return (
     <PublicShell>
-      <main className="public-main v78-subpage">
-        <PublicPageIntro eyebrow="Funktionen" title="Die wichtigsten Abläufe. Ohne unnötige Umwege." description="Binso One verbindet die Arbeitsschritte, die im Alltag zusammengehören. Hier siehst du die Funktionen direkt in der echten Anwendung." />
-        <section className="v78-feature-showcase v78-feature-showcase-page">
+      <main className="public-main v78-subpage v782-features-page">
+        <PublicPageIntro eyebrow="Funktionen" title="Alles, was deinen Arbeitsablauf verbindet." description="Vom Kunden über Angebot und Auftrag bis zur Rechnung. Die Bereiche sind so aufgebaut, dass Informationen im nächsten Schritt weiterverwendet werden können." />
+        <section className="v78-feature-showcase v78-feature-showcase-page v782-feature-showcase-page">
           {marketingFeatures.map((feature, index) => (
             <article className="v78-feature-row" key={feature.id}>
               <div className="v78-feature-copy"><span>{String(index + 1).padStart(2, '0')}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
-              {screenshotNames.has(feature.id) ? <div className="v78-feature-shot"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} /></div> : <div className="v78-feature-text-card"><span>Mitarbeitende</span><strong>Rollen passend zur Aufgabe.</strong><p>Zugriffe werden nicht über die Darstellung, sondern serverseitig über Rollen und Berechtigungen gesteuert.</p></div>}
+              {screenshotNames.has(feature.id) ? <div className="v78-feature-shot v782-feature-shot"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} /></div> : <div className="v78-feature-text-card"><span>Mitarbeitende</span><strong>Rollen passend zur Aufgabe.</strong><p>Zugriffe werden serverseitig über Rollen und Berechtigungen gesteuert.</p></div>}
             </article>
           ))}
         </section>

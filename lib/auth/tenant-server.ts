@@ -8,6 +8,7 @@ import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import type { OrganizationMembership, Permission } from '@/types/domain'
 import { getTenantAccess } from '@/lib/db/repositories/tenant-access'
 import { canTenantAction } from '@/lib/auth/access-policy'
+import { publicEnv } from '@/lib/config/public-env'
 
 export type TenantRequestContext = {
   userId: string
@@ -31,7 +32,7 @@ export async function resolveTenantContext(preferredOrganizationId?: string | nu
   if (!identity) return null
 
   if (!isDatabaseConfigured()) {
-    if (process.env.NODE_ENV === 'production') {
+    if (publicEnv.isProduction) {
       throw new Error('DATABASE_URL must be configured before production tenant access is enabled')
     }
     return {
@@ -69,7 +70,7 @@ export async function resolveMembershipContext(preferredOrganizationId?: string 
   if (!identity) return null
 
   if (!isDatabaseConfigured()) {
-    if (process.env.NODE_ENV === 'production') throw new Error('DATABASE_URL must be configured before production membership access is enabled')
+    if (publicEnv.isProduction) throw new Error('DATABASE_URL must be configured before production membership access is enabled')
     return {
       ...identity,
       organizationId: DEFAULT_ORGANIZATION_ID,
@@ -115,6 +116,7 @@ export async function resolveAuthorizedTenantContext(
     permission,
     features: access.features,
     subscriptionStatus: access.subscriptionStatus,
+    isDemo: access.isDemo,
   })) return null
   return { ...context, access }
 }

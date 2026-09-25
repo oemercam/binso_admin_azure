@@ -6,7 +6,7 @@ import { graphMailConfigured } from '@/lib/email/graph'
 import { advanceContractDate } from '@/modules/contracts/schedule'
 import { calculateInvoiceTotals } from '@/modules/invoices/calculations'
 import { nextInvoiceNumber } from '@/modules/documents/numbering'
-import { formatMonthYear } from '@/lib/format/locale'
+import { formatMonthYear, todayZurichIso } from '@/lib/format/locale'
 import type { AppSettings, Contract, Customer, DocumentTemplates, Invoice } from '@/types/domain'
 import { recordApplicationEvent } from './application-events'
 
@@ -16,8 +16,9 @@ export async function runBusinessJobs() {
   try {
     const tenants = await query<{ organization_id: string }>(`select pt.organization_id from platform_tenants pt
       join organization_subscriptions s on s.organization_id=pt.organization_id
+      join organizations o on o.id=pt.organization_id and o.is_demo=false
       where pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now())`)
-    const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' }).format(new Date())
+    const today = todayZurichIso()
     for (const tenant of tenants.rows) {
       try {
         const result = await withTenantTransaction({ organizationId: tenant.organization_id, userId: 'system' }, async client => {

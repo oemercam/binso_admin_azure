@@ -1,3 +1,4 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { inviteOrganizationMember, listOrganizationMembers, updateOrganizationMember } from '@/lib/db/repositories/membership-management'
@@ -5,6 +6,7 @@ import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@
 import type { Role } from '@/types/domain'
 import { graphMailConfigured } from '@/lib/email/graph'
 import { enforceDistributedRateLimit } from '@/lib/http/rate-limit'
+import { serverEnv } from '@/lib/config/server-env'
 
 const roles = new Set<Role>(['owner','admin','finance','employee'])
 
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   let body: { organizationId?: string; email?: string; role?: Role }
-  try { body = await readJsonBody(request, 16_384) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
+  try { body = await readJsonBody(request, PRODUCT_LIMITS.apiBodyStandardBytes) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
   const context = await resolveAuthorizedTenantContext(body.organizationId, 'members.manage')
   if (!context) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
   const email = body.email?.trim().toLowerCase() ?? ''
@@ -41,7 +43,7 @@ export async function POST(request: Request) {
   if (body.role === 'owner' && context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur Inhaber können weitere Inhaber einladen.', id)
   try {
     const queued = graphMailConfigured()
-    const baseUrl = (process.env.APP_BASE_URL?.trim() || new URL(request.url).origin).replace(/\/$/, '')
+    const baseUrl = (serverEnv.appBaseUrl || new URL(request.url).origin).replace(/\/$/, '')
     const member = await inviteOrganizationMember({ organizationId: context.organizationId, userId: context.userId, actorName: context.email, email, role: body.role,
       invitationUrl: queued ? `${baseUrl}/api/auth/login?returnTo=${encodeURIComponent('/post-login')}` : undefined })
     const emailDelivery = { queued, delivered: false, provider: queued ? 'graph' : 'disabled' }
@@ -56,7 +58,7 @@ export async function PATCH(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
   let body: { organizationId?: string; membershipId?: string; role?: Role; status?: 'active' | 'suspended' }
-  try { body = await readJsonBody(request, 16_384) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
+  try { body = await readJsonBody(request, PRODUCT_LIMITS.apiBodyStandardBytes) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
   const context = await resolveAuthorizedTenantContext(body.organizationId, 'members.manage')
   if (!context) return apiError(403, 'forbidden', 'Keine Berechtigung.', id)
   if (!body.membershipId || (body.role && !roles.has(body.role)) || (body.status && !['active','suspended'].includes(body.status))) return apiError(422, 'validation', 'Änderung ist ungültig.', id)

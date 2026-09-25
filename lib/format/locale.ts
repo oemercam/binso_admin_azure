@@ -4,6 +4,8 @@ const DATE_TIME_FORMATTER = new Intl.DateTimeFormat('de-CH', { dateStyle: 'short
 const MONTH_YEAR_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'long', year: 'numeric' })
 const MONTH_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'long' })
 const MONTH_SHORT_FORMATTER = new Intl.DateTimeFormat('de-CH', { month: 'short' })
+
+const ZURICH_DATE_FORMATTER = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zurich' })
 const HOURS_FORMATTER = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 })
 
 function currencyFormatter(minimumFractionDigits: number, maximumFractionDigits: number) {
@@ -44,9 +46,16 @@ export function formatDate(value?: string | null, fallback = '–') {
   return date ? DATE_FORMATTER.format(date) : fallback
 }
 
-export function formatDateTime(value?: string | null, fallback = '–') {
+
+export function formatCalendarDate(value?: string | Date | null, fallback = '–') {
   if (!value) return fallback
-  const date = new Date(value)
+  const date = value instanceof Date ? value : (/^\d{4}-\d{2}-\d{2}$/.test(value) ? dateFromIso(value) : new Date(value))
+  return date && !Number.isNaN(date.getTime()) ? DATE_FORMATTER.format(date) : fallback
+}
+
+export function formatDateTime(value?: string | Date | null, fallback = '–') {
+  if (!value) return fallback
+  const date = value instanceof Date ? value : new Date(value)
   return Number.isNaN(date.getTime()) ? fallback : DATE_TIME_FORMATTER.format(date)
 }
 
@@ -71,6 +80,10 @@ export function isSameMonthIso(value: string, reference = todayIso()) {
 
 export function todayIso() {
   return isoFromDate(new Date())
+}
+
+export function todayZurichIso() {
+  return ZURICH_DATE_FORMATTER.format(new Date())
 }
 
 export function addDaysIso(value: string, days: number) {

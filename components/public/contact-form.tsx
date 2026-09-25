@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Input, Select, Textarea } from '@/components/ui/form-controls'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
 
 type State = 'idle' | 'sending' | 'success' | 'error'
 
@@ -17,13 +18,7 @@ export function ContactForm() {
     const form = new FormData(event.currentTarget)
     const payload = Object.fromEntries(form.entries())
     try {
-      const response = await fetch('/api/public/contact', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const data = (await response.json()) as { error?: { message?: string } }
-      if (!response.ok) throw new Error(data.error?.message || 'Nachricht konnte nicht gesendet werden.')
+      await apiRequest('/api/public/contact', { method: 'POST', body: jsonBody(payload) })
       event.currentTarget.reset()
       setState('success')
     } catch (caught) {

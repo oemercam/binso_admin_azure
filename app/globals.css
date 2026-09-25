@@ -618,3 +618,60 @@ h3{margin:var(--space-2) 0 0;font-size:var(--font-size-caption);line-height:var(
  .v78-final-cta{padding:34px 24px;border-radius:20px}.v78-final-cta-actions{display:grid;width:100%}.v78-final-cta-actions .button{width:100%}
  .v78-footer-grid{grid-template-columns:1fr 1fr;gap:30px}.v78-footer-grid .public-footer-brand{grid-column:1/-1;grid-row:auto}.v78-footer-grid>div:last-child{grid-column:1/-1}
 }
+
+/* V78.2 public UX cleanup — shorter mobile rhythm and compact real product views. */
+.public-site-v782 .v78-public-header .public-nav{gap:28px}
+.public-site-v782 .v78-public-header .public-nav a{font-weight:550}
+.v782-intro-section{padding-top:96px}
+.v782-feature-showcase{gap:96px;padding-bottom:104px}
+.v782-security-section{margin-top:8px}
+.v782-process-list{display:grid;border-top:1px solid #e3e6e9;margin-bottom:72px}
+.v782-process-list article{display:grid;grid-template-columns:54px minmax(0,1fr) 24px;gap:20px;align-items:start;padding:26px 0;border-bottom:1px solid #e3e6e9}
+.v782-process-list b{padding-top:4px;color:#9a9fa8;font-size:10px}
+.v782-process-list h2{font-size:22px;letter-spacing:-.025em}
+.v782-process-list p{max-width:700px;margin:7px 0 0;color:#666b74;font-size:14px;line-height:1.65}
+.v782-process-list article>span{padding-top:4px;color:#a0a5ad;font-size:16px}
+.v782-process-screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;padding-bottom:90px}
+.v782-process-screens>article>span{display:block;margin-bottom:10px;color:#777c84;font-size:11px;font-weight:650}
+.v782-process-shot{padding:8px;border-radius:18px;box-shadow:0 18px 44px rgba(17,18,20,.08)}
+
+@media(max-width:720px){
+  .v782-hero{gap:30px;padding:42px 0 34px}
+  .v782-hero .v78-proof-row{margin-top:22px;gap:8px 16px}
+  .v782-hero-shot,.v782-feature-shot,.v782-process-shot{box-shadow:0 14px 34px rgba(17,18,20,.08)}
+  .v782-hero-shot{max-height:286px;padding:7px!important}
+  .v782-hero-shot .marketing-real-screenshot{height:238px;overflow:hidden;border-radius:10px}
+  .v782-hero-shot .marketing-real-screenshot img{height:100%;object-fit:cover;object-position:top}
+  .v782-hero-shot .v78-shot-label{padding:2px 2px 8px}
+  .v782-trust-strip>*{font-size:11px}
+  .v782-flow-section{padding-top:4px!important;padding-bottom:62px!important}
+  .v782-flow-section .v78-section-heading{padding-top:62px}
+  .v782-flow-section .v78-flow-grid article{min-height:118px;padding:20px}
+  .v782-flow-section .v78-flow-grid strong{margin-top:18px;font-size:16px}
+  .v782-flow-section .v78-flow-grid p{font-size:12px}
+  .v782-intro-section{padding:62px 0 32px!important}
+  .v782-feature-showcase,.v782-feature-showcase-page{gap:58px!important;padding-bottom:64px!important}
+  .v782-feature-showcase .v78-feature-row,.v782-feature-showcase-page .v78-feature-row{gap:22px!important}
+  .v782-feature-showcase .v78-feature-copy h2,.v782-feature-showcase-page .v78-feature-copy h2{font-size:1.9rem}
+  .v782-feature-showcase .v78-feature-copy p,.v782-feature-showcase-page .v78-feature-copy p{margin-top:12px;font-size:14px}
+  .v782-feature-showcase .v78-feature-copy strong,.v782-feature-showcase-page .v78-feature-copy strong{margin-top:12px}
+  .v782-feature-shot{max-height:230px;padding:6px!important;border-radius:14px!important}
+  .v782-feature-shot .marketing-real-screenshot{height:216px;overflow:hidden;border-radius:9px}
+  .v782-feature-shot .marketing-real-screenshot img{height:100%;object-fit:cover;object-position:top}
+  .v782-security-section{gap:26px!important;padding:66px 0!important}
+  .v782-security-section .v78-security-points span{padding:16px 0;font-size:14px}
+  .v782-pricing-preview,.v782-faq-preview{padding:72px 0!important}
+  .v782-process-page .v78-page-intro{padding-bottom:36px}
+  .v782-process-list{margin-bottom:48px}
+  .v782-process-list article{grid-template-columns:36px minmax(0,1fr) 16px;gap:10px;padding:20px 0}
+  .v782-process-list h2{font-size:18px}
+  .v782-process-list p{font-size:13px}
+  .v782-process-screens{display:flex;overflow-x:auto;gap:14px;margin-right:-14px;padding:0 14px 60px 0;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .v782-process-screens::-webkit-scrollbar{display:none}
+  .v782-process-screens>article{flex:0 0 min(78vw,310px);scroll-snap-align:start}
+  .v782-process-shot{max-height:196px}
+  .v782-process-shot .marketing-real-screenshot{height:180px;overflow:hidden;border-radius:9px}
+  .v782-process-shot .marketing-real-screenshot img{height:100%;object-fit:cover;object-position:top}
+  .v782-features-page .v78-page-intro{padding-bottom:40px}
+  .v78-final-cta{margin-top:32px!important}
+}

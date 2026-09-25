@@ -11,6 +11,17 @@ const allPermissions: Permission[] = [
 ]
 
 
+export const ROLE_OPTIONS = [
+  { value: 'employee', label: 'Mitarbeitende' },
+  { value: 'finance', label: 'Buchhaltung' },
+  { value: 'admin', label: 'Administrator' },
+  { value: 'owner', label: 'Inhaber' },
+] as const satisfies readonly { value: Role; label: string }[]
+
+export function roleLabel(role: Role) {
+  return ROLE_OPTIONS.find((option) => option.value === role)?.label ?? role
+}
+
 export const ROLE_GROUPS = {
   all: ['owner', 'admin', 'finance', 'employee'],
   management: ['owner', 'admin', 'finance'],

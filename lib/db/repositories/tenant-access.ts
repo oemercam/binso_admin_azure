@@ -8,6 +8,7 @@ export type TenantAccessRecord = {
   features: OrganizationFeature[]
   maxUsers: number
   maxStorageMb: number
+  isDemo: boolean
 }
 
 export async function getTenantAccess(organizationId: string): Promise<TenantAccessRecord | null> {
@@ -17,8 +18,9 @@ export async function getTenantAccess(organizationId: string): Promise<TenantAcc
     features: OrganizationFeature[] | null
     max_users: number | null
     max_storage_mb: number | null
+    is_demo: boolean
   }>(
-    `select s.organization_id, s.status, e.features, e.max_users, e.max_storage_mb
+    `select s.organization_id, s.status, e.features, e.max_users, e.max_storage_mb, o.is_demo
        from organization_subscriptions s
        join organizations o on o.id = s.organization_id
        left join organization_entitlements e on e.organization_id = s.organization_id
@@ -35,5 +37,6 @@ export async function getTenantAccess(organizationId: string): Promise<TenantAcc
     features: row.features ?? [],
     maxUsers: row.max_users ?? 1,
     maxStorageMb: row.max_storage_mb ?? 1024,
+    isDemo: row.is_demo ?? false,
   }
 }

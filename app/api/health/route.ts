@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server'
+import { apiJson } from '@/lib/http/server-api'
 import { isDatabaseConfigured, query } from '@/lib/db/client'
+import { publicEnv } from '@/lib/config/public-env'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const production = process.env.NODE_ENV === 'production'
+  const production = publicEnv.isProduction
   let dependencyHealthy = !production && !isDatabaseConfigured()
 
   if (isDatabaseConfigured()) {
@@ -18,10 +19,10 @@ export async function GET() {
   }
 
   const status = dependencyHealthy ? 'ok' : 'degraded'
-  return NextResponse.json(
+  return apiJson(
     {
       status,
-      buildId: process.env.NEXT_PUBLIC_BUILD_ID || 'unknown',
+      buildId: publicEnv.buildId || 'unknown',
       timestamp: new Date().toISOString(),
     },
     { status: status === 'ok' ? 200 : 503, headers: { 'Cache-Control': 'no-store' } },

@@ -5,7 +5,9 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Input, Select } from '@/components/ui/form-controls'
 import { SettingsSection, SettingsValueRow } from '@/components/settings/settings-row'
 import { useFeedback } from '@/components/ui/feedback'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
 import { useCurrentUser } from '@/components/state/current-user'
+import { formatDateTime } from '@/lib/format/locale'
 
  type AccountProfile = {
   id: string
@@ -34,9 +36,7 @@ export default function AccountPage() {
     let cancelled = false
     void (async () => {
       try {
-        const response = await fetch('/api/account', { cache: 'no-store' })
-        const result = await response.json().catch(() => ({})) as { profile?: AccountProfile; error?: { message?: string } }
-        if (!response.ok || !result.profile) throw new Error(result.error?.message || 'Konto konnte nicht geladen werden.')
+        const result = await apiRequest<{ profile: AccountProfile }>('/api/account')
         if (cancelled) return
         setProfile(result.profile)
         setDisplayName(result.profile.displayName)
@@ -57,13 +57,10 @@ export default function AccountPage() {
     if (saving) return
     setSaving(true)
     try {
-      const response = await fetch('/api/account', {
+      const result = await apiRequest<{ profile: AccountProfile }>('/api/account', {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ displayName, phone, locale, timezone }),
+        body: jsonBody({ displayName, phone, locale, timezone }),
       })
-      const result = await response.json().catch(() => ({})) as { profile?: AccountProfile; error?: { message?: string } }
-      if (!response.ok || !result.profile) throw new Error(result.error?.message || 'Konto konnte nicht gespeichert werden.')
       setProfile(result.profile)
       feedback.success('Kontodaten wurden gespeichert.')
     } catch (cause) {
@@ -92,7 +89,7 @@ export default function AccountPage() {
 
       <SettingsSection title="Sicherheit" description="Authentifizierung wird über den konfigurierten Identitätsanbieter verwaltet.">
         <SettingsValueRow title="Kontostatus" value={profile?.status === 'suspended' ? 'Gesperrt' : 'Aktiv'} />
-        <SettingsValueRow title="Letzte Anmeldung" value={profile?.lastLoginAt ? new Date(profile.lastLoginAt).toLocaleString('de-CH') : '–'} />
+        <SettingsValueRow title="Letzte Anmeldung" value={profile?.lastLoginAt ? formatDateTime(profile.lastLoginAt) : '–'} />
         <SettingsValueRow title="Anmeldung" value="Extern verwaltet" description="Binso One speichert keine Passwörter." />
       </SettingsSection>
     </section>

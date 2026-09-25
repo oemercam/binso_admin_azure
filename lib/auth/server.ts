@@ -8,6 +8,9 @@ import { isDatabaseConfigured, isPlatformDatabaseConfigured } from '@/lib/db/cli
 import { findAccessibleMembership } from '@/lib/db/repositories/memberships'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import { findPlatformOperatorAssignment } from '@/lib/db/repositories/platform-operators'
+import { serverEnv } from '@/lib/config/server-env'
+import { publicEnv } from '@/lib/config/public-env'
+import { platformRoleFromClaims } from '@/lib/auth/platform-permissions'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -17,16 +20,6 @@ type AzureClientPrincipal = {
   claims?: Array<{ typ: string; val: string }>
 }
 
-
-function platformRoleFromClaims(roles: string[]): PlatformRole | undefined {
-  const normalized = roles.map((role) => role.toLowerCase())
-  if (normalized.some((role) => role === 'platform_owner' || role === 'platform.owner' || role.endsWith('.platform_owner'))) return 'platform_owner'
-  if (normalized.some((role) => role === 'platform_admin' || role === 'platform.admin' || role.endsWith('.platform_admin'))) return 'platform_admin'
-  if (normalized.some((role) => role === 'platform_support' || role === 'platform.support' || role.endsWith('.platform_support'))) return 'platform_support'
-  if (normalized.some((role) => role === 'platform_billing' || role === 'platform.billing' || role.endsWith('.platform_billing'))) return 'platform_billing'
-  if (normalized.some((role) => role === 'platform_auditor' || role === 'platform.auditor' || role.endsWith('.platform_auditor'))) return 'platform_auditor'
-  return undefined
-}
 
 function roleFromClaims(roles: string[]): Role {
   const normalized = roles.map((role) => role.toLowerCase())
@@ -137,9 +130,9 @@ export async function getPlatformSession(): Promise<Session> {
   if (isDatabaseConfigured()) {
     const account = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
     if (account.status !== 'active') return null
-  } else if (process.env.NODE_ENV === 'production') return null
+  } else if (publicEnv.isProduction) return null
 
-  const roleSource = (process.env.PLATFORM_ROLE_SOURCE || 'hybrid').trim().toLowerCase()
+  const roleSource = serverEnv.platformRoleSource
   if ((roleSource === 'database' || roleSource === 'hybrid') && isPlatformDatabaseConfigured()) {
     const assignment = await findPlatformOperatorAssignment(session.user.id, session.user.email)
     if (assignment) {

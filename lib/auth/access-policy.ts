@@ -13,6 +13,8 @@ const writePermissions = new Set<Permission>([
   'subscription.manage','billing.manage','support.request',
 ])
 
+const demoBlockedPermissions = new Set<Permission>(['subscription.manage','billing.manage','support.request'])
+
 const featureByPermission: Partial<Record<Permission, OrganizationFeature>> = {
   'customers.read': 'crm', 'customers.write': 'crm',
   'quotes.read': 'quotes', 'quotes.write': 'quotes',
@@ -45,8 +47,10 @@ export function canTenantAction(input: {
   permission: Permission
   features: readonly OrganizationFeature[]
   subscriptionStatus: SubscriptionStatus
+  isDemo?: boolean
 }) {
   if (!hasPermission(input.role, input.permission)) return false
+  if (input.isDemo && demoBlockedPermissions.has(input.permission)) return false
   const feature = permissionFeature(input.permission)
   if (feature && !input.features.includes(feature)) return false
   const mode = tenantAccessMode(input.subscriptionStatus)

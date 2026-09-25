@@ -10,16 +10,18 @@ import { isDatabaseConfigured } from '@/lib/db/client'
 import { getBusinessBootstrapForUser } from '@/lib/db/repositories/business-bootstrap'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import { EntitlementGate } from '@/components/auth/entitlement-gate'
+import { publicEnv } from '@/lib/config/public-env'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { robots: { index: false, follow: false } }
+export const metadata: Metadata = {
+  manifest: '/customer-manifest.webmanifest', robots: { index: false, follow: false } }
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const session = await getSession()
   if (!session) redirect('/sign-in')
   const databaseConfigured = isDatabaseConfigured()
-  if (process.env.NODE_ENV === 'production' && !databaseConfigured) redirect('/access-denied')
+  if (publicEnv.isProduction && !databaseConfigured) redirect('/access-denied')
   const account = databaseConfigured
     ? await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
     : null
@@ -32,7 +34,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   return (
     <BusinessStoreProvider user={user} bootstrap={bootstrap} databaseConfigured={databaseConfigured}>
         <CurrentUserProvider user={user}>
-          <AppShell user={user}>
+          <AppShell user={user} isDemo={bootstrap?.organizations.some((organization) => organization.id === bootstrap.currentOrganizationId && organization.isDemo) ?? false}>
             <EntitlementGate><RouteTransition>{children}</RouteTransition></EntitlementGate>
           </AppShell>
         </CurrentUserProvider>

@@ -1,22 +1,21 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { getPlatformSession } from '@/lib/auth/server'
 import { listPlatformHelpArticles, listPlatformHelpCategories, upsertPlatformHelpArticle } from '@/lib/db/repositories/help-center'
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-
-function canRead(role?:string){return !!role&&['platform_owner','platform_admin','platform_support','platform_auditor'].includes(role)}
-function canManage(role?:string){return role==='platform_owner'||role==='platform_admin'}
+import { PLATFORM_ROLE_GROUPS, canManagePlatform, hasPlatformRole } from '@/lib/auth/platform-permissions'
 
 export async function GET(){
   const session=await getPlatformSession()
-  if(!session||!canRead(session.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.')
+  if(!session||!hasPlatformRole(session.user.platformRole, PLATFORM_ROLE_GROUPS.help))return apiError(403,'forbidden','Keine Plattformberechtigung.')
   const [articles,categories]=await Promise.all([listPlatformHelpArticles(),listPlatformHelpCategories()])
-  return apiJson({articles,categories,canManage:canManage(session.user.platformRole)})
+  return apiJson({articles,categories,canManage:canManagePlatform(session.user.platformRole)})
 }
 
 export async function PUT(request:Request){
   try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}
   const session=await getPlatformSession()
-  if(!session||!canManage(session.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.')
-  const body=await readJsonBody<{id?:string;slug?:string;title?:string;summary?:string;body?:string;categoryId?:string;keywords?:string[];published?:boolean}>(request,64_000).catch(()=>null)
+  if(!session||!canManagePlatform(session.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.')
+  const body=await readJsonBody<{id?:string;slug?:string;title?:string;summary?:string;body?:string;categoryId?:string;keywords?:string[];published?:boolean}>(request,PRODUCT_LIMITS.apiBodyArticleBytes).catch(()=>null)
   const slug=body?.slug?.trim().toLowerCase()??''
   const title=body?.title?.trim()??''
   const articleBody=body?.body?.trim()??''

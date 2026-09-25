@@ -4,6 +4,7 @@ import './globals.css'
 import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
 import './app-ui.css'
+import './standardized-ui.css'
 import { appIdentity } from '@/lib/config/app-identity'
 import { publicBaseUrl } from '@/lib/config/seo'
 

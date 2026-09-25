@@ -12,6 +12,7 @@ import { SheetActions, StandardFormSheet } from '@/components/ui/sheet-system'
 import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { useFeedback } from '@/components/ui/feedback'
+import { StatusBadge } from '@/components/ui/status-badge'
 import { BusinessDocument } from '@/components/documents/business-document'
 import { DocumentPreviewFrame } from '@/components/documents/document-preview-frame'
 import { ResponsivePreview } from '@/components/documents/responsive-preview'
@@ -141,7 +142,7 @@ export default function InvoicesPage() {
         {visibleInvoices.map((invoice) => (
           <InteractiveRow className="data-row invoice-grid compact-overview-row" key={invoice.id} onActivate={() => setPreview(invoice)} ariaLabel={`${invoice.number} öffnen`}>
             <span className="primary-cell"><strong>{invoice.number} · {invoice.customerName}</strong><small className="desktop-row-detail">{invoice.orderName || invoice.period}</small><small className="mobile-row-summary">{invoice.orderName || invoice.period || 'Rechnung öffnen'}</small></span>
-            <span className="overview-desktop-cell">{invoice.customerName}</span><span className="overview-desktop-cell">{fmt(invoice.due)}</span><span className="overview-desktop-cell"><strong>{chf(invoice.amount)}</strong><small>{invoice.lines.length} Positionen</small></span><span className={`status ${effectiveInvoiceStatus(invoice)} overview-desktop-cell`}>{invoiceStatusLabel(effectiveInvoiceStatus(invoice))}</span>
+            <span className="overview-desktop-cell">{invoice.customerName}</span><span className="overview-desktop-cell">{fmt(invoice.due)}</span><span className="overview-desktop-cell"><strong>{chf(invoice.amount)}</strong><small>{invoice.lines.length} Positionen</small></span><StatusBadge status={effectiveInvoiceStatus(invoice)} className="overview-desktop-cell" />
             <span className="row-disclosure" aria-hidden="true"><Icon name="chevron" size={15}/></span>
           </InteractiveRow>
         ))}
@@ -271,4 +272,3 @@ export default function InvoicesPage() {
 
 function fmt(value?: string) { return formatDate(value) }
 
-function invoiceStatusLabel(value: string) { const labels: Record<string, string> = { draft: 'Entwurf', sent: 'Versendet', partial: 'Teilbezahlt', paid: 'Bezahlt', overdue: 'Überfällig', cancelled: 'Storniert' }; return labels[value] ?? value }

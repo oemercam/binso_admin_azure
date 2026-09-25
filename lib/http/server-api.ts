@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { serverEnv } from '@/lib/config/server-env'
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 
 export function requestId(request?: Request) {
   const supplied = request?.headers.get('x-correlation-id')?.trim()
@@ -20,11 +22,11 @@ export function requireSameOrigin(request: Request) {
   if (request.headers.get('sec-fetch-site') === 'cross-site') throw new Error('invalid_origin')
   const origin = request.headers.get('origin')
   if (!origin) return
-  const expected = new URL(process.env.APP_BASE_URL || request.url).origin
+  const expected = new URL(serverEnv.appBaseUrl || request.url).origin
   if (origin !== expected) throw new Error('invalid_origin')
 }
 
-export async function readJsonBody<T>(request: Request, maxBytes = 32_768): Promise<T> {
+export async function readJsonBody<T>(request: Request, maxBytes: number = PRODUCT_LIMITS.defaultApiBodyBytes): Promise<T> {
   const declared = Number(request.headers.get('content-length') ?? 0)
   if (Number.isFinite(declared) && declared > maxBytes) throw new Error('payload_too_large')
   const text = await readTextBody(request, maxBytes)

@@ -1,5 +1,7 @@
 import 'server-only'
 import { Pool, type PoolClient, type QueryResultRow } from 'pg'
+import { logError } from '@/lib/logging/server'
+import { serverEnv } from '@/lib/config/server-env'
 
 type DbGlobals = {
   __binsoPgPool?: Pool
@@ -21,7 +23,7 @@ function normalizeConnectionString(rawValue?: string) {
 }
 
 function sslEnabled() {
-  return process.env.DATABASE_SSL?.trim().toLowerCase() !== 'false'
+  return serverEnv.databaseSsl
 }
 
 function makePool(connectionString: string, applicationName: string, max: number) {
@@ -35,16 +37,16 @@ function makePool(connectionString: string, applicationName: string, max: number
     ssl: sslEnabled() ? { rejectUnauthorized: true } : undefined,
     application_name: applicationName,
   })
-  pool.on('error', (error) => console.error('PostgreSQL idle connection error', { applicationName, code: (error as Error & { code?: string }).code }))
+  pool.on('error', (error) => logError('database.idle_connection_error', error, { applicationName, code: (error as Error & { code?: string }).code }))
   return pool
 }
 
 function tenantConnectionString() {
-  return normalizeConnectionString(process.env.DATABASE_URL)
+  return normalizeConnectionString(serverEnv.databaseUrl)
 }
 
 function platformConnectionString() {
-  return normalizeConnectionString(process.env.PLATFORM_DATABASE_URL || process.env.DATABASE_URL)
+  return normalizeConnectionString(serverEnv.platformDatabaseUrl || serverEnv.databaseUrl)
 }
 
 export function isDatabaseConfigured() {
@@ -59,7 +61,7 @@ export function databasePool() {
   const url = tenantConnectionString()
   if (!url) throw new Error('DATABASE_URL is not configured')
   if (!globalForDb.__binsoPgPool) {
-    globalForDb.__binsoPgPool = makePool(url, 'binso-one-tenant', Number(process.env.DATABASE_POOL_MAX || 10))
+    globalForDb.__binsoPgPool = makePool(url, 'binso-one-tenant', serverEnv.databasePoolMax)
   }
   return globalForDb.__binsoPgPool
 }
@@ -68,7 +70,7 @@ export function platformDatabasePool() {
   const url = platformConnectionString()
   if (!url) throw new Error('PLATFORM_DATABASE_URL or DATABASE_URL is not configured')
   if (!globalForDb.__binsoPlatformPgPool) {
-    globalForDb.__binsoPlatformPgPool = makePool(url, 'binso-one-platform', Number(process.env.PLATFORM_DATABASE_POOL_MAX || 5))
+    globalForDb.__binsoPlatformPgPool = makePool(url, 'binso-one-platform', serverEnv.platformDatabasePoolMax)
   }
   return globalForDb.__binsoPlatformPgPool
 }
@@ -106,6 +108,6 @@ export function withPlatformTransaction<T>(callback: (client: PoolClient) => Pro
 
 export function databaseRoleSeparationConfigured() {
   const tenant = tenantConnectionString()
-  const platform = normalizeConnectionString(process.env.PLATFORM_DATABASE_URL)
+  const platform = normalizeConnectionString(serverEnv.platformDatabaseUrl)
   return Boolean(tenant && platform && tenant !== platform)
 }

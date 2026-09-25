@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server'
+import { serverEnv } from '@/lib/config/server-env'
 
 function firstHeaderValue(value: string | null) {
   return value?.split(',')[0]?.trim() || ''
@@ -14,11 +15,11 @@ function isPublicHost(value: string) {
 }
 
 export function publicRequestOrigin(request: NextRequest) {
-  const configured = process.env.APP_BASE_URL?.trim()
+  const configured = serverEnv.appBaseUrl
   if (configured) return new URL(configured).origin
   const forwardedHost = normalizeHost(firstHeaderValue(request.headers.get('x-forwarded-host')))
   const forwardedProto = firstHeaderValue(request.headers.get('x-forwarded-proto'))
-  const azureHost = normalizeHost(process.env.WEBSITE_HOSTNAME?.trim() || '')
+  const azureHost = normalizeHost(serverEnv.websiteHostname)
   const requestHost = normalizeHost(request.nextUrl.host)
 
   // Azure may expose the internal container host (for example <container>:8080)

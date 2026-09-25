@@ -7,6 +7,7 @@ type BootstrapRow = {
   organization_name: string
   organization_slug: string
   organization_status: OrganizationStatus
+  is_demo: boolean
   country: string
   currency: 'CHF' | 'EUR'
   locale: 'de-CH' | 'fr-CH' | 'it-CH' | 'en-CH'
@@ -56,7 +57,7 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
   const result = await query<BootstrapRow>(
     `select
        o.id as organization_id, o.name as organization_name, o.slug as organization_slug,
-       o.status as organization_status, o.country, o.currency, o.locale,
+       o.status as organization_status, o.is_demo, o.country, o.currency, o.locale,
        o.created_at as organization_created_at, o.updated_at as organization_updated_at,
        m.id as membership_id, m.user_id, m.email as membership_email, m.role as membership_role,
        m.status as membership_status, m.created_at as membership_created_at, m.updated_at as membership_updated_at,
@@ -88,6 +89,7 @@ export async function getBusinessBootstrapForUser(userId: string): Promise<Busin
     country: row.country,
     currency: row.currency,
     locale: row.locale,
+    isDemo: row.is_demo,
     createdAt: row.organization_created_at.toISOString(),
     updatedAt: row.organization_updated_at.toISOString(),
   }))

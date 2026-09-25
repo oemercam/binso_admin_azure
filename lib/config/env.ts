@@ -1,8 +1,10 @@
+import { publicEnv } from '@/lib/config/public-env'
+
 function resolveAuthMode() {
   const requested = process.env.AUTH_MODE
-  if (requested === 'local') return process.env.NODE_ENV === 'production' ? 'azure' as const : 'local' as const
+  if (requested === 'local') return publicEnv.isProduction ? 'azure' as const : 'local' as const
   if (requested === 'azure') return 'azure' as const
-  return process.env.NODE_ENV === 'production' ? 'azure' as const : 'local' as const
+  return publicEnv.isProduction ? 'azure' as const : 'local' as const
 }
 
 function resolveDefaultRole() {
@@ -13,8 +15,8 @@ function resolveDefaultRole() {
 export const env = {
   authMode: resolveAuthMode(),
   authDefaultRole: resolveDefaultRole(),
-  appName: process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Binso One',
-  vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || '',
+  appName: publicEnv.appName,
+  vapidPublicKey: publicEnv.vapidPublicKey,
   authProviderName: process.env.AUTH_PROVIDER_NAME?.trim() || 'aad',
   authAdminProviderName: process.env.AUTH_ADMIN_PROVIDER_NAME?.trim() || 'aad',
 } as const

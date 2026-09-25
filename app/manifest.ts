@@ -8,11 +8,11 @@ function versioned(path: string) {
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    id: '/',
+    id: '/public-site',
     name: appIdentity.name,
     short_name: appIdentity.shortName,
     description: appIdentity.description,
-    start_url: '/post-login',
+    start_url: '/',
     scope: '/',
     display: 'standalone',
     orientation: 'any',

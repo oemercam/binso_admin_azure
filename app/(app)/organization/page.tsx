@@ -10,6 +10,11 @@ import { useCurrentUser } from '@/components/state/current-user'
 import { useFeedback } from '@/components/ui/feedback'
 import type { AuditEvent, OrganizationMembership, Role, SubscriptionPlan } from '@/types/domain'
 import { planDefinitions } from '@/lib/data/plans'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
+import { formatCalendarDate } from '@/lib/format/locale'
+import { publicEnv } from '@/lib/config/public-env'
+import { ROLE_OPTIONS, roleLabel } from '@/lib/auth/permissions'
+import { statusLabel } from '@/lib/status/presentation'
 
 export default function OrganizationPage() {
   const store = useBusinessStore()
@@ -34,10 +39,7 @@ export default function OrganizationPage() {
 
   const loadMembers = useCallback(async () => {
     try {
-      const response = await fetch(`/api/organization/members?organizationId=${encodeURIComponent(store.currentOrganization.id)}`, { cache: 'no-store' })
-      if (response.status === 503) return
-      const result = await response.json().catch(() => ({})) as { members?: OrganizationMembership[]; auditEvents?: AuditEvent[]; error?: { message?: string } }
-      if (!response.ok) throw new Error(result.error?.message || 'Benutzer konnten nicht geladen werden.')
+      const result = await apiRequest<{ members?: OrganizationMembership[]; auditEvents?: AuditEvent[] }>(`/api/organization/members?organizationId=${encodeURIComponent(store.currentOrganization.id)}`)
       if (result.members) setMembers(result.members)
       if (result.auditEvents) setAuditEvents(result.auditEvents)
     } catch (cause) {
@@ -50,12 +52,10 @@ export default function OrganizationPage() {
   }, [loadMembers])
 
   async function updateSubscription(action: 'change_plan' | 'cancel' | 'reactivate') {
-    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    if (!subscription || subscriptionSaving || !store.can('subscription.manage')) return
     setSubscriptionSaving(true)
     try {
-      const response = await fetch('/api/billing/subscription', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, plan: action === 'change_plan' ? subscriptionPlan : undefined }) })
-      const result = await response.json().catch(() => ({})) as { error?: string; mode?: string }
-      if (!response.ok) throw new Error(result.error || 'Abonnement konnte nicht aktualisiert werden.')
+      const result = await apiRequest<{ mode?: string }>('/api/billing/subscription', { method: 'PATCH', body: jsonBody({ action, plan: action === 'change_plan' ? subscriptionPlan : undefined }) })
       feedback.success(action === 'cancel' ? 'Kündigung wurde vorgemerkt.' : action === 'reactivate' ? 'Kündigung wurde zurückgenommen.' : result.mode === 'immediate' ? 'Plan wurde aktualisiert.' : 'Planwechsel wurde vorgemerkt.')
       setSubscriptionOpen(false)
       window.location.reload()
@@ -63,23 +63,21 @@ export default function OrganizationPage() {
   }
 
   async function startCheckout() {
-    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    if (!subscription || subscriptionSaving || !store.can('subscription.manage')) return
     setSubscriptionSaving(true)
     try {
-      const response = await fetch('/api/billing/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ plan: subscriptionPlan }) })
-      const result = await response.json().catch(() => ({})) as { error?: string; url?: string }
-      if (!response.ok || !result.url) throw new Error(result.error || 'Checkout konnte nicht gestartet werden.')
+      const result = await apiRequest<{ url?: string }>('/api/billing/checkout', { method: 'POST', body: jsonBody({ plan: subscriptionPlan }) })
+      if (!result.url) throw new Error('Checkout konnte nicht gestartet werden.')
       window.location.assign(result.url)
     } catch (cause) { feedback.error(cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.'); setSubscriptionSaving(false) }
   }
 
   async function openBillingPortal() {
-    if (!subscription || subscriptionSaving || user.role !== 'owner') return
+    if (!subscription || subscriptionSaving || !store.can('subscription.manage')) return
     setSubscriptionSaving(true)
     try {
-      const response = await fetch('/api/billing/portal', { method: 'POST' })
-      const result = await response.json().catch(() => ({})) as { error?: string; url?: string }
-      if (!response.ok || !result.url) throw new Error(result.error || 'Abrechnungsportal konnte nicht geöffnet werden.')
+      const result = await apiRequest<{ url?: string }>('/api/billing/portal', { method: 'POST' })
+      if (!result.url) throw new Error('Abrechnungsportal konnte nicht geöffnet werden.')
       window.location.assign(result.url)
     } catch (cause) { feedback.error(cause instanceof Error ? cause.message : 'Abrechnungsportal konnte nicht geöffnet werden.'); setSubscriptionSaving(false) }
   }
@@ -92,15 +90,15 @@ export default function OrganizationPage() {
     if (!value || !store.can('members.manage')) return
     setMemberSaving(true)
     try {
-      const response = await fetch('/api/organization/members', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organizationId: store.currentOrganization.id, email: value, role }) })
-      if (response.status === 503 && process.env.NODE_ENV !== 'production') {
-        const now = new Date().toISOString()
-        store.addMembership({ id: `membership-${Date.now()}`, organizationId: store.currentOrganization.id, userId: `invited:${value}`, email: value, role, status: 'invited', createdAt: now, updatedAt: now })
-      } else {
-        const result = await response.json().catch(() => ({})) as { member?: OrganizationMembership; emailDelivery?: { queued: boolean; delivered: boolean; provider: 'graph' | 'disabled' }; error?: { message?: string } }
-        if (!response.ok) throw new Error(result.error?.message || 'Einladung konnte nicht erstellt werden.')
+      try {
+        const result = await apiRequest<{ member?: OrganizationMembership; emailDelivery?: { queued: boolean; delivered: boolean; provider: 'graph' | 'disabled' } }>('/api/organization/members', { method: 'POST', body: jsonBody({ organizationId: store.currentOrganization.id, email: value, role }) })
         if (result.emailDelivery?.queued) feedback.success('Einladung wurde erstellt und für den E-Mail-Versand eingeplant.')
         else feedback.success('Einladung wurde erstellt. Der Mailversand ist nicht aktiv oder war nicht verfügbar.')
+      } catch (error) {
+        if (!publicEnv.isProduction && error instanceof Error && 'status' in error && (error as { status?: number }).status === 503) {
+          const now = new Date().toISOString()
+          store.addMembership({ id: `membership-${Date.now()}`, organizationId: store.currentOrganization.id, userId: `invited:${value}`, email: value, role, status: 'invited', createdAt: now, updatedAt: now })
+        } else throw error
       }
       setInviteOpen(false); setEmail(''); await loadMembers()
     } catch (cause) { feedback.error(cause instanceof Error ? cause.message : 'Einladung konnte nicht erstellt werden.') } finally { setMemberSaving(false) }
@@ -118,9 +116,8 @@ export default function OrganizationPage() {
     if (!memberEditing) return
     setMemberSaving(true)
     try {
-      const response = await fetch('/api/organization/members', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ organizationId: store.currentOrganization.id, membershipId: memberEditing.id, role: memberRole, status: memberStatus }) })
-      const result = await response.json().catch(() => ({})) as { member?: OrganizationMembership; error?: { message?: string } }
-      if (!response.ok || !result.member) throw new Error(result.error?.message || 'Benutzer konnte nicht geändert werden.')
+      const result = await apiRequest<{ member?: OrganizationMembership }>('/api/organization/members', { method: 'PATCH', body: jsonBody({ organizationId: store.currentOrganization.id, membershipId: memberEditing.id, role: memberRole, status: memberStatus }) })
+      if (!result.member) throw new Error('Benutzer konnte nicht geändert werden.')
       setMemberEditing(null); feedback.success('Benutzer wurde aktualisiert.'); await loadMembers()
     } catch (cause) { feedback.error(cause instanceof Error ? cause.message : 'Benutzer konnte nicht geändert werden.') } finally { setMemberSaving(false) }
   }
@@ -132,13 +129,13 @@ export default function OrganizationPage() {
       <SettingsSection title="Mandant" description="Aktive Organisation und Produktstatus.">
         <SettingsValueRow title="Organisation" value={store.currentOrganization.name} description={store.currentOrganization.slug} />
         <SettingsValueRow title="Land und Sprache" value={`${store.currentOrganization.country} · ${store.currentOrganization.locale}`} description={`Währung ${store.currentOrganization.currency}`} />
-        <SettingsValueRow title="Abonnement" value={subscription ? `${subscription.plan} · ${subscription.status}` : 'Kein Abonnement'} description={subscription ? `${subscription.seats} Benutzer${subscription.cancelAtPeriodEnd ? ' · Kündigung vorgemerkt' : subscription.scheduledPlan ? ` · Wechsel zu ${subscription.scheduledPlan} vorgemerkt` : ''}` : undefined} />
-        {subscription && user.role === 'owner' ? <div className="customer-quick-actions"><button type="button" className="button secondary" onClick={openSubscription}>Abonnement verwalten</button></div> : null}
+        <SettingsValueRow title="Abonnement" value={subscription ? `${subscription.plan} · ${statusLabel(subscription.status)}` : 'Kein Abonnement'} description={subscription ? `${subscription.seats} Benutzer${subscription.cancelAtPeriodEnd ? ' · Kündigung vorgemerkt' : subscription.scheduledPlan ? ` · Wechsel zu ${subscription.scheduledPlan} vorgemerkt` : ''}` : undefined} />
+        {subscription && store.can('subscription.manage') ? <div className="customer-quick-actions"><button type="button" className="button secondary" onClick={openSubscription}>Abonnement verwalten</button></div> : null}
         <SettingsValueRow title="Funktionen" value={`${entitlement?.features.length ?? 0} aktiviert`} description={entitlement ? `Max. ${entitlement.maxUsers} Benutzer` : 'Keine Limits definiert'} />
       </SettingsSection>
 
       <SettingsSection title="Benutzer" description="Rolle gilt innerhalb dieser Organisation. Einladungen werden beim ersten Login über die verifizierte E-Mail übernommen.">
-        {visibleMembers.map((member) => <SettingsValueRow key={member.id} title={member.email} value={member.role} description={member.status} onClick={store.can('members.manage') ? () => openMember(member) : undefined} />)}
+        {visibleMembers.map((member) => <SettingsValueRow key={member.id} title={member.email} value={roleLabel(member.role)} description={member.status === 'active' ? 'Aktiv' : 'Gesperrt'} onClick={store.can('members.manage') ? () => openMember(member) : undefined} />)}
         {!visibleMembers.length && <div className="list-empty">Noch keine Benutzer vorhanden.</div>}
       </SettingsSection>
 
@@ -148,12 +145,12 @@ export default function OrganizationPage() {
       </SettingsSection>
 
       {subscriptionOpen && subscription && <StandardFormSheet open title={<>Abonnement verwalten</>} description={<>{store.currentOrganization.name}</>} onClose={() => setSubscriptionOpen(false)} onSubmit={(event) => event.preventDefault()} formId="subscription-manage" footer={<><button type="button" className="button secondary" onClick={() => setSubscriptionOpen(false)}>Schliessen</button>{subscription.billingProvider === 'stripe' && subscription.billingCustomerId && subscription.billingSubscriptionId ? <button type="button" className="button primary" disabled={subscriptionSaving} onClick={() => void openBillingPortal()}>{subscriptionSaving ? 'Öffnen…' : 'Abrechnung verwalten'}</button> : <button type="button" className="button primary" disabled={subscriptionSaving || subscriptionPlan === 'enterprise'} onClick={() => void startCheckout()}>{subscriptionSaving ? 'Weiter…' : 'Zahlung einrichten'}</button>}</>}>
-        <div className="form-grid"><label className="full"><span>Plan</span><Select value={subscriptionPlan} onChange={(event) => setSubscriptionPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}/Monat` : ''}</option>)}</Select></label><div className="full customer-overview-list"><div><span>Status</span><strong>{subscription.status}</strong></div><div><span>Benutzer</span><strong>{subscription.seats}</strong></div><div><span>Billing</span><strong>{subscription.billingProvider ?? 'manual'}</strong></div>{subscription.trialUntil ? <div><span>Trial bis</span><strong>{new Date(subscription.trialUntil).toLocaleDateString('de-CH')}</strong></div> : null}</div><div className="full customer-quick-actions">{subscription.billingProvider === 'stripe' && subscription.billingCustomerId && subscription.billingSubscriptionId ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void openBillingPortal()}>Zahlungsmethode und Rechnungen</button> : subscription.cancelAtPeriodEnd ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('reactivate')}>Kündigung zurücknehmen</button> : <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('cancel')}>Zum Periodenende kündigen</button>}</div></div>
+        <div className="form-grid"><label className="full"><span>Plan</span><Select value={subscriptionPlan} onChange={(event) => setSubscriptionPlan(event.target.value as SubscriptionPlan)}>{planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}/Monat` : ''}</option>)}</Select></label><div className="full customer-overview-list"><div><span>Status</span><strong>{statusLabel(subscription.status)}</strong></div><div><span>Benutzer</span><strong>{subscription.seats}</strong></div><div><span>Billing</span><strong>{subscription.billingProvider ?? 'manual'}</strong></div>{subscription.trialUntil ? <div><span>Trial bis</span><strong>{formatCalendarDate(subscription.trialUntil)}</strong></div> : null}</div><div className="full customer-quick-actions">{subscription.billingProvider === 'stripe' && subscription.billingCustomerId && subscription.billingSubscriptionId ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void openBillingPortal()}>Zahlungsmethode und Rechnungen</button> : subscription.cancelAtPeriodEnd ? <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('reactivate')}>Kündigung zurücknehmen</button> : <button type="button" className="button secondary" disabled={subscriptionSaving} onClick={() => void updateSubscription('cancel')}>Zum Periodenende kündigen</button>}</div></div>
       </StandardFormSheet>}
 
-      {inviteOpen && <StandardFormSheet open title={<>Benutzer einladen</>} description={<>Zugriff auf {store.currentOrganization.name}</>} onClose={() => setInviteOpen(false)} onSubmit={invite} formId="invite-member" footer={<><button type="button" className="button secondary" onClick={() => setInviteOpen(false)}>Abbrechen</button><button type="submit" form="invite-member" className="button primary" disabled={memberSaving}>{memberSaving ? 'Einladen…' : 'Einladen'}</button></>}><div className="form-grid"><label className="full"><span>E-Mail *</span><Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label className="full"><span>Rolle</span><Select value={role} onChange={(event) => setRole(event.target.value as Role)}><option value="employee">Mitarbeiter</option><option value="finance">Buchhaltung</option><option value="admin">Administrator</option>{user.role === 'owner' && <option value="owner">Inhaber</option>}</Select></label></div></StandardFormSheet>}
+      {inviteOpen && <StandardFormSheet open title={<>Benutzer einladen</>} description={<>Zugriff auf {store.currentOrganization.name}</>} onClose={() => setInviteOpen(false)} onSubmit={invite} formId="invite-member" footer={<><button type="button" className="button secondary" onClick={() => setInviteOpen(false)}>Abbrechen</button><button type="submit" form="invite-member" className="button primary" disabled={memberSaving}>{memberSaving ? 'Einladen…' : 'Einladen'}</button></>}><div className="form-grid"><label className="full"><span>E-Mail *</span><Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label className="full"><span>Rolle</span><Select value={role} onChange={(event) => setRole(event.target.value as Role)}>{ROLE_OPTIONS.filter((option) => option.value !== 'owner' || user.role === 'owner').map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</Select></label></div></StandardFormSheet>}
 
-      {memberEditing && <StandardFormSheet open title={<>{memberEditing.email}</>} description={<>Rolle und Zugriff verwalten</>} onClose={() => setMemberEditing(null)} onSubmit={saveMember} formId="member-edit" footer={<><button type="button" className="button secondary" onClick={() => setMemberEditing(null)}>Abbrechen</button><button type="submit" form="member-edit" className="button primary" disabled={memberSaving}>{memberSaving ? 'Speichern…' : 'Speichern'}</button></>}><div className="form-grid"><label className="full"><span>Rolle</span><Select value={memberRole} onChange={(event) => setMemberRole(event.target.value as Role)}><option value="employee">Mitarbeiter</option><option value="finance">Buchhaltung</option><option value="admin">Administrator</option>{user.role === 'owner' && <option value="owner">Inhaber</option>}</Select></label><label className="full"><span>Status</span><Select value={memberStatus} onChange={(event) => setMemberStatus(event.target.value as 'active' | 'suspended')}><option value="active">Aktiv</option><option value="suspended">Gesperrt</option></Select></label></div></StandardFormSheet>}
+      {memberEditing && <StandardFormSheet open title={<>{memberEditing.email}</>} description={<>Rolle und Zugriff verwalten</>} onClose={() => setMemberEditing(null)} onSubmit={saveMember} formId="member-edit" footer={<><button type="button" className="button secondary" onClick={() => setMemberEditing(null)}>Abbrechen</button><button type="submit" form="member-edit" className="button primary" disabled={memberSaving}>{memberSaving ? 'Speichern…' : 'Speichern'}</button></>}><div className="form-grid"><label className="full"><span>Rolle</span><Select value={memberRole} onChange={(event) => setMemberRole(event.target.value as Role)}>{ROLE_OPTIONS.filter((option) => option.value !== 'owner' || user.role === 'owner').map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</Select></label><label className="full"><span>Status</span><Select value={memberStatus} onChange={(event) => setMemberStatus(event.target.value as 'active' | 'suspended')}><option value="active">Aktiv</option><option value="suspended">Gesperrt</option></Select></label></div></StandardFormSheet>}
     </section>
   )
 }

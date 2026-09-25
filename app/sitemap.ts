@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { appIdentity } from '@/lib/config/app-identity'
-
-const paths = ['/', '/features', '/how-it-works', '/pricing', '/security', '/faq', '/contact', '/legal/terms', '/legal/privacy', '/legal/cookies', '/legal/imprint']
+import { publicSite } from '@/lib/config/public-site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return paths.map((path) => ({
+  return publicSite.sitemapRoutes.map((path) => ({
     url: new URL(path, appIdentity.website).toString(),
     lastModified: new Date(),
     changeFrequency: path === '/' ? 'weekly' : 'monthly',

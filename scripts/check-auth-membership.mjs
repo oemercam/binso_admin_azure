@@ -14,7 +14,7 @@ for (const file of requiredFiles) {
 }
 
 const registration = fs.readFileSync('app/api/registration/route.ts', 'utf8')
-if (!registration.includes("email !== session.user.email.trim().toLowerCase()")) {
+if (!(registration.includes("email !== session.user.email.trim().toLowerCase()") || registration.includes('email !== normalizeEmail(session.user.email)'))) {
   throw new Error('Registration must bind the requested owner email to the authenticated identity')
 }
 

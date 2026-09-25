@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Input } from '@/components/ui/form-controls'
 import type { OrganizationMembership, SignupRequest } from '@/types/domain'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
 
 type Signup = SignupRequest & {
   onboardingStatus: 'not_started' | 'in_progress' | 'completed' | 'skipped'
@@ -30,6 +31,7 @@ export default function OnboardingPage() {
   const [settings, setSettings] = useState<Settings>({ address: '', zip: '', city: '', uid: '' })
 
   const signup = state?.signup ?? null
+  const demoMode = signup?.mode === 'demo'
   const existing = state?.memberships?.[0]
   const progress = useMemo(() => Math.round((step / steps.length) * 100), [step])
 
@@ -38,9 +40,7 @@ export default function OnboardingPage() {
     queueMicrotask(() => {
       void (async () => {
         try {
-          const response = await fetch('/api/onboarding', { cache: 'no-store' })
-          const result = await response.json() as State & { error?: string }
-          if (!response.ok) throw new Error(result.error || 'Einrichtung konnte nicht geladen werden.')
+          const result = await apiRequest<State>('/api/onboarding')
           if (cancelled) return
           setState(result)
           if (result.signup) {
@@ -69,10 +69,9 @@ export default function OnboardingPage() {
     setError('')
     try {
       const completedSteps = Array.from(new Set([...(signup.onboardingCompletedSteps || []), step])).filter((value) => value < steps.length)
-      const response = await fetch('/api/onboarding', {
+      const result = await apiRequest<{ signup?: Signup }>('/api/onboarding', {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
+        body: jsonBody({
           signupId: signup.id,
           step: nextStep,
           completedSteps,
@@ -81,8 +80,7 @@ export default function OnboardingPage() {
           status: 'in_progress',
         }),
       })
-      const result = await response.json() as { signup?: Signup; error?: string }
-      if (!response.ok || !result.signup) throw new Error(result.error || 'Schritt konnte nicht gespeichert werden.')
+      if (!result.signup) throw new Error('Schritt konnte nicht gespeichert werden.')
       setState((current) => current ? { ...current, signup: result.signup! } : current)
       setStep(nextStep)
       return result.signup
@@ -99,10 +97,9 @@ export default function OnboardingPage() {
     setSaving(true)
     setError('')
     try {
-      const response = await fetch('/api/onboarding', {
+      const saved = await apiRequest<{ signup?: Signup }>('/api/onboarding', {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
+        body: jsonBody({
           signupId: signup.id,
           step: steps.length,
           completedSteps: [1, 2],
@@ -111,16 +108,13 @@ export default function OnboardingPage() {
           status: 'in_progress',
         }),
       })
-      const saved = await response.json() as { signup?: Signup; error?: string }
-      if (!response.ok || !saved.signup) throw new Error(saved.error || 'Angaben konnten nicht gespeichert werden.')
+      if (!saved.signup) throw new Error('Angaben konnten nicht gespeichert werden.')
 
-      const createResponse = await fetch('/api/onboarding', {
+      const created = await apiRequest<{ organizationId?: string }>('/api/onboarding', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ signupId: signup.id }),
+        body: jsonBody({ signupId: signup.id }),
       })
-      const created = await createResponse.json() as { organizationId?: string; error?: string }
-      if (!createResponse.ok || !created.organizationId) throw new Error(created.error || 'Binso One konnte nicht eingerichtet werden.')
+      if (!created.organizationId) throw new Error('Binso One konnte nicht eingerichtet werden.')
       router.push('/dashboard?welcome=1')
       router.refresh()
     } catch (cause) {
@@ -161,14 +155,14 @@ export default function OnboardingPage() {
       <section className="onboarding-entry-shell">
         <header className="onboarding-entry-header">
           <Link className="onboarding-entry-brand" href="/" aria-label="Binso One Startseite"><BinsoLogo /><span>ONE</span></Link>
-          <span>Einrichtung</span>
+          <span>{demoMode ? 'Demo einrichten' : 'Einrichtung'}</span>
         </header>
 
         <div className="onboarding-entry-layout">
           <aside className="onboarding-entry-context">
-            <span className="public-eyebrow">Schnell startklar</span>
-            <h1>Nur das Nötigste für den Start.</h1>
-            <p>Du kannst nichts kaputtmachen. Alle Angaben lassen sich später in Binso One ergänzen oder ändern.</p>
+            <span className="public-eyebrow">{demoMode ? 'Produktdemo' : 'Schnell startklar'}</span>
+            <h1>{demoMode ? 'Kurz einrichten. Dann direkt ausprobieren.' : 'Nur das Nötigste für den Start.'}</h1>
+            <p>{demoMode ? 'Der Demo-Arbeitsbereich wird mit fiktiven Beispieldaten gefüllt. Optionale Angaben kannst du einfach überspringen.' : 'Du kannst nichts kaputtmachen. Alle Angaben lassen sich später in Binso One ergänzen oder ändern.'}</p>
             <div className="onboarding-entry-step-list" aria-label="Schritte der Einrichtung">
               {steps.map((label, index) => {
                 const number = index + 1
@@ -193,7 +187,7 @@ export default function OnboardingPage() {
                     <div><dt>Unternehmen</dt><dd>{signup.companyName}</dd></div>
                     <div><dt>Kontakt</dt><dd>{signup.ownerName}</dd></div>
                     <div><dt>E-Mail</dt><dd>{signup.email}</dd></div>
-                    <div><dt>Plan</dt><dd>{signup.plan}</dd></div>
+                    <div><dt>{demoMode ? 'Zugang' : 'Plan'}</dt><dd>{demoMode ? 'Produktdemo · Business-Umfang' : signup.plan}</dd></div>
                   </dl>
                   <Link className="onboarding-entry-edit" href={`/register?plan=${signup.plan}`}>Angaben ändern</Link>
                 </>
@@ -217,12 +211,12 @@ export default function OnboardingPage() {
               {step === 3 ? (
                 <>
                   <span className="onboarding-entry-kicker">Fertig</span>
-                  <h2>Binso One ist bereit.</h2>
-                  <p>Wir erstellen jetzt deinen Arbeitsbereich. Danach kannst du direkt den ersten Kunden erfassen. Bankverbindung, Logo, Vorlagen und weitere Einstellungen folgen erst, wenn du sie brauchst.</p>
+                  <h2>{demoMode ? 'Deine Produktdemo ist bereit.' : 'Binso One ist bereit.'}</h2>
+                  <p>{demoMode ? 'Wir erstellen jetzt deinen isolierten Demo-Arbeitsbereich mit fiktiven Kunden, Angebot, Auftrag, Zeiten und Rechnung. Externe Aktionen und Abrechnung bleiben deaktiviert.' : 'Wir erstellen jetzt deinen Arbeitsbereich. Danach kannst du direkt den ersten Kunden erfassen. Bankverbindung, Logo, Vorlagen und weitere Einstellungen folgen erst, wenn du sie brauchst.'}</p>
                   <div className="onboarding-entry-ready-list">
-                    <span><b>✓</b>Unternehmen und Zugang</span>
-                    <span><b>✓</b>14-tägiger Testzugang</span>
-                    <span><b>✓</b>Einstellungen später änderbar</span>
+                    <span><b>✓</b>{demoMode ? 'Isolierter Demo-Arbeitsbereich' : 'Unternehmen und Zugang'}</span>
+                    <span><b>✓</b>{demoMode ? 'Fiktive Beispieldaten' : '14-tägiger Testzugang'}</span>
+                    <span><b>✓</b>{demoMode ? 'Keine Abrechnung oder externen Aktionen' : 'Einstellungen später änderbar'}</span>
                   </div>
                 </>
               ) : null}
@@ -236,7 +230,7 @@ export default function OnboardingPage() {
               {step < steps.length ? (
                 <button className="button primary" type="button" disabled={saving} onClick={() => void saveStep(step + 1)}>{saving ? 'Wird gespeichert…' : step === 2 ? 'Weiter' : 'Bestätigen und weiter'}</button>
               ) : (
-                <button className="button primary" type="button" disabled={saving} onClick={() => void finish()}>{saving ? 'Wird eingerichtet…' : 'Binso One starten'}</button>
+                <button className="button primary" type="button" disabled={saving} onClick={() => void finish()}>{saving ? 'Wird eingerichtet…' : demoMode ? 'Produktdemo öffnen' : 'Binso One starten'}</button>
               )}
             </footer>
           </div>

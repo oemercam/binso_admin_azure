@@ -1,0 +1,9 @@
+/* V79 canonical UI ownership layer. Keep these imports after legacy CSS in app/layout.tsx. */
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/app-shell.css';
+@import './styles/public.css';
+@import './styles/pricing.css';
+@import './styles/forms.css';
+@import './styles/data.css';
+@import './styles/overlays.css';

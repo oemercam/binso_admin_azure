@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server'
-import { requireSameOrigin } from '@/lib/http/server-api'
+import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
 import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost, stripePriceId } from '@/lib/billing/stripe'
 import { getBillingIdentity, saveStripeCustomer } from '@/lib/db/repositories/stripe-billing'
@@ -11,19 +10,25 @@ type StripeCustomer = { id: string }
 type StripeCheckoutSession = { id: string; url: string | null }
 
 export async function POST(request: Request) {
-  try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
-  const context = await resolveAuthorizedTenantContext(undefined, 'billing.manage')
-  if (!context) return NextResponse.json({ error: 'Keine aktive Organisation.' }, { status: 403 })
+  try {
+    requireSameOrigin(request)
+  } catch {
+    return apiError(403, 'forbidden', 'Ungültige Anfragequelle.')
+  }
 
-  const body = await request.json().catch(() => null) as { plan?: SubscriptionPlan } | null
-  if (!body?.plan || !plans.has(body.plan)) return NextResponse.json({ error: 'Für diesen Plan ist kein Online-Checkout verfügbar.' }, { status: 400 })
+  const context = await resolveAuthorizedTenantContext(undefined, 'billing.manage')
+  if (!context) return apiError(403, 'forbidden', 'Keine aktive Organisation.')
+
+  const body = await readJsonBody<{ plan?: SubscriptionPlan }>(request).catch(() => null)
+  if (!body?.plan || !plans.has(body.plan)) return apiError(422, 'validation', 'Für diesen Plan ist kein Online-Checkout verfügbar.')
+
   const priceId = stripePriceId(body.plan)
-  if (!priceId) return NextResponse.json({ error: 'Stripe Price-ID für diesen Plan fehlt.' }, { status: 503 })
+  if (!priceId) return apiError(503, 'server', 'Stripe Price-ID für diesen Plan fehlt.')
 
   const billing = await getBillingIdentity(context.organizationId)
-  if (!billing) return NextResponse.json({ error: 'Kein Abonnement gefunden.' }, { status: 404 })
-  if (billing.billingSubscriptionId && billing.billingProvider === 'stripe' && !['cancelled','expired'].includes(billing.status)) {
-    return NextResponse.json({ error: 'Es besteht bereits ein Stripe-Abonnement. Bitte das Abrechnungsportal verwenden.' }, { status: 409 })
+  if (!billing) return apiError(404, 'not_found', 'Kein Abonnement gefunden.')
+  if (billing.billingSubscriptionId && billing.billingProvider === 'stripe' && !['cancelled', 'expired'].includes(billing.status)) {
+    return apiError(409, 'conflict', 'Es besteht bereits ein Stripe-Abonnement. Bitte das Abrechnungsportal verwenden.')
   }
 
   try {
@@ -49,13 +54,11 @@ export async function POST(request: Request) {
     params.set('cancel_url', `${baseUrl}/subscription-required?billing=cancelled`)
     params.set('subscription_data[metadata][organizationId]', billing.organizationId)
     params.set('metadata[organizationId]', billing.organizationId)
-    params.set('metadata[plan]', body.plan)
-    params.set('allow_promotion_codes', 'true')
 
-    const session = await stripePost<StripeCheckoutSession>('/checkout/sessions', params, `checkout-${billing.organizationId}-${body.plan}-${Math.floor(Date.now() / 1_800_000)}`)
-    if (!session.url) throw new Error('Stripe hat keine Checkout-URL zurückgegeben.')
-    return NextResponse.json({ url: session.url })
+    const session = await stripePost<StripeCheckoutSession>('/checkout/sessions', params, `checkout-${billing.organizationId}-${body.plan}`)
+    if (!session.url) return apiError(502, 'server', 'Stripe hat keine Checkout-URL geliefert.')
+    return apiJson({ url: session.url })
   } catch (cause) {
-    return NextResponse.json({ error: cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.' }, { status: 502 })
+    return apiError(502, 'server', cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.')
   }
 }

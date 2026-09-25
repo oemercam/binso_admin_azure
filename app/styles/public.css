@@ -1,0 +1,36 @@
+/* Public site typography, screenshots and responsive rhythm. */
+.public-site-v78 .public-main{width:min(var(--ui-content-max),calc(100% - 40px))}
+.public-site-v78 h1{font-size:var(--ui-h1-size)}
+.public-site-v78 h2{font-size:var(--ui-h2-size)}
+.public-site-v78 h3{font-size:var(--ui-h3-size)}
+.public-site-v78 p{font-size:var(--ui-body-size)}
+.public-site-v78 small,.public-site-v78 .public-eyebrow{font-size:var(--ui-small-size)}
+.marketing-real-screenshot{max-width:100%;margin-inline:auto}
+.v79-hero-detail-link{display:inline-block;margin-top:14px;font-size:13px;font-weight:650;text-decoration:none}
+.v79-final-pricing-link{align-self:center;color:inherit;font-size:13px;font-weight:650;text-decoration:none}
+.public-form-readonly{display:grid;gap:4px;padding:14px 16px;border:1px solid var(--line,#e5e7eb);border-radius:var(--ui-radius-md);background:var(--surface-2,#f6f7f8)}
+.public-form-readonly>span,.public-form-readonly>small{font-size:12px;color:var(--muted,#686d75)}.public-form-readonly>strong{font-size:14px}
+@media(max-width:1023px){.public-site-v78 .public-main{width:min(100% - 32px,var(--ui-content-max))}.marketing-real-screenshot{max-width:min(100%,760px)}}
+@media(max-width:720px){
+  .public-site-v78 .public-main,.v78-public-header .public-header-inner{width:min(100% - 28px,var(--ui-content-max))}
+  .v78-hero{gap:32px!important;padding:42px 0 36px!important}.v78-hero-copy h1{font-size:clamp(2.45rem,11.5vw,3.5rem)!important;line-height:1.02!important}.v78-page-intro h1{font-size:clamp(2.25rem,10vw,3.2rem)!important}
+  .v78-intro-section h2,.v78-section-heading h2,.v78-mobile-copy h2,.v78-security-section h2{font-size:clamp(1.9rem,8.5vw,2.65rem)!important}.v78-feature-copy h2,.v78-process-copy h2{font-size:clamp(1.65rem,7.2vw,2.25rem)!important}
+  .v78-hero-copy>p,.v78-page-intro p{font-size:15px!important;line-height:1.62!important}.v78-feature-showcase{gap:58px!important;padding-bottom:68px!important}.v78-feature-row,.v78-process-showcase>article{gap:24px!important}
+  .v78-feature-shot,.v78-process-shot,.v78-hero-shot{max-width:100%;padding:6px!important;border-radius:14px!important;box-shadow:0 14px 38px rgba(17,18,20,.08)!important}.v78-feature-shot .marketing-real-screenshot,.v78-process-shot .marketing-real-screenshot{max-width:520px}.v78-shot-label{font-size:10px!important}
+  .v79-final-pricing-link{justify-self:start}.public-final-cta-actions{gap:10px}
+}
+@media(max-width:390px){.public-site-v78 .public-main,.v78-public-header .public-header-inner{width:min(100% - 24px,var(--ui-content-max))}.v78-hero-copy h1{font-size:clamp(2.25rem,11vw,2.95rem)!important}}
+@media(min-width:1440px){.public-site-v78 .public-main{width:min(var(--ui-content-max),calc(100% - 64px))}}
+
+/* V79.3 — avoid 100vw full-bleed overflow on narrow/tablet viewports.
+   The public main container already owns a deterministic edge gutter at these sizes,
+   so break the dark flow section out by that gutter instead of viewport units. */
+@media(max-width:1023px){
+  .public-site-v78 .v78-flow-section{margin-inline:-16px}
+}
+@media(max-width:720px){
+  .public-site-v78 .v78-flow-section{margin-inline:-14px}
+}
+@media(max-width:390px){
+  .public-site-v78 .v78-flow-section{margin-inline:-12px}
+}

@@ -5,10 +5,11 @@ import type { SubscriptionPlan } from '@/types/domain'
 
 export async function expireTrials() {
   return withTransaction(async (client) => {
-    const result = await client.query<{ organization_id: string; subscription_id: string; previous_status: string }>(
-      `select s.organization_id, s.id as subscription_id, s.status as previous_status
+    const result = await client.query<{ organization_id: string; subscription_id: string; previous_status: string; is_demo: boolean }>(
+      `select s.organization_id, s.id as subscription_id, s.status as previous_status, o.is_demo
          from organization_subscriptions s
          join platform_tenants pt on pt.organization_id = s.organization_id
+         join organizations o on o.id = s.organization_id
         where pt.platform_status = 'trial'
           and s.trial_until is not null
           and s.trial_until <= now()
@@ -24,21 +25,27 @@ export async function expireTrials() {
       )
       await client.query(
         `update platform_tenants
-            set platform_status = 'read_only', monthly_revenue_chf = 0
+            set platform_status = $2, monthly_revenue_chf = 0
           where organization_id = $1 and platform_status = 'trial'`,
-        [row.organization_id],
+        [row.organization_id, row.is_demo ? 'suspended' : 'read_only'],
       )
       await client.query(
         `update organizations
-            set status = 'read_only', updated_at = now()
-          where id = $1 and status = 'trial'`,
-        [row.organization_id],
+            set status = $2, updated_at = now()
+          where id = $1`,
+        [row.organization_id, row.is_demo ? 'suspended' : 'read_only'],
       )
       await client.query(
         `insert into subscription_events
           (organization_id, subscription_id, actor_user_id, source, event_type, previous_status, new_status, detail)
-         values ($1,$2,'system','system','trial.expired',$3,'expired','14-day trial expired')`,
-        [row.organization_id, row.subscription_id, row.previous_status],
+         values ($1,$2,'system','system',$4,$3,'expired',$5)`,
+        [
+          row.organization_id,
+          row.subscription_id,
+          row.previous_status,
+          row.is_demo ? 'demo.expired' : 'trial.expired',
+          row.is_demo ? '24-hour demo access expired' : '14-day trial expired',
+        ],
       )
     }
 

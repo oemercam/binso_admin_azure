@@ -6,6 +6,9 @@ import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Select } from '@/components/ui/form-controls'
 import { planDefinitions } from '@/lib/data/plans'
 import type { OrganizationSubscription, SubscriptionPlan } from '@/types/domain'
+import { apiRequest, jsonBody } from '@/lib/http/api-client'
+import { formatCalendarDate } from '@/lib/format/locale'
+import { statusLabel } from '@/lib/status/presentation'
 
 type SubscriptionResponse = { subscription?: OrganizationSubscription; canManage?: boolean; error?: string }
 
@@ -23,9 +26,8 @@ export default function SubscriptionRequiredPage() {
     queueMicrotask(() => {
       void (async () => {
         try {
-          const response = await fetch('/api/billing/subscription', { cache: 'no-store' })
-          const result = await response.json().catch(() => ({})) as SubscriptionResponse
-          if (!response.ok || !result.subscription) throw new Error(result.error || 'Abonnement konnte nicht geladen werden.')
+          const result = await apiRequest<SubscriptionResponse>('/api/billing/subscription')
+          if (!result.subscription) throw new Error('Abonnement konnte nicht geladen werden.')
           if (cancelled) return
           setSubscription(result.subscription)
           setCanManage(Boolean(result.canManage))
@@ -46,13 +48,11 @@ export default function SubscriptionRequiredPage() {
     setSubmitting(true)
     setError('')
     try {
-      const response = await fetch('/api/billing/checkout', {
+      const result = await apiRequest<{ url?: string }>('/api/billing/checkout', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: jsonBody({ plan }),
       })
-      const result = await response.json().catch(() => ({})) as { url?: string; error?: string }
-      if (!response.ok || !result.url) throw new Error(result.error || 'Checkout konnte nicht gestartet werden.')
+      if (!result.url) throw new Error('Checkout konnte nicht gestartet werden.')
       window.location.assign(result.url)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.')
@@ -77,7 +77,7 @@ export default function SubscriptionRequiredPage() {
               {planDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}/Monat` : ''}</option>)}
             </Select>
           </label>
-          <small>Status: {subscription.status}{subscription.trialUntil ? ` · Trial bis ${new Date(subscription.trialUntil).toLocaleDateString('de-CH')}` : ''}</small>
+          <small>Status: {statusLabel(subscription.status)}{subscription.trialUntil ? ` · Testphase bis ${formatCalendarDate(subscription.trialUntil)}` : ''}</small>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
           {!canManage ? <p className="form-error">Nur der Inhaber der Organisation kann das Abonnement aktivieren. Bitte wende dich an den Inhaber.</p> : plan === 'enterprise'
             ? <a className="button primary" href="mailto:info@binso.ch?subject=Binso%20One%20Enterprise">Enterprise anfragen</a>

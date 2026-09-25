@@ -11,6 +11,7 @@ import { useFeedback } from '@/components/ui/feedback'
 import type { Customer, CustomerContact, DataExportJob, Employee, ImportJob } from '@/types/domain'
 import { csv, parseCsv, importNumber } from '@/lib/format/csv'
 import { DataLifecycleCard } from '@/components/data-lifecycle-card'
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 
 
 function download(name: string, content: string, type: string) {
@@ -39,7 +40,7 @@ export default function DataPage() {
     event.preventDefault()
     if (!file || entityType === 'invoices') return
     if (!store.can(entityType === 'employees' ? 'employees.write' : 'customers.write')) { feedback.error('Keine Importberechtigung.'); return }
-    if (file.size > 2_000_000) { feedback.error('Maximale Dateigrösse: 2 MB.'); return }
+    if (file.size > PRODUCT_LIMITS.csvUploadBytes) { feedback.error('Maximale Dateigrösse: 2 MB.'); return }
     const job = store.createImportJob({ requestedBy: user.id, entityType, fileName: file.name })
     store.updateImportJob(job.id, { status: 'importing' })
     try {

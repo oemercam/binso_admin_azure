@@ -1,6 +1,7 @@
 import { getPlatformSession } from '@/lib/auth/server'
 import { platformQuery } from '@/lib/db/client'
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
+import { canManagePlatform } from '@/lib/auth/platform-permissions'
 
 export async function GET() {
   const session = await getPlatformSession()
@@ -19,7 +20,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.') }
   const session = await getPlatformSession()
-  if (!session?.user.platformRole || !['platform_owner','platform_admin'].includes(session.user.platformRole)) return apiError(403, 'forbidden', 'Keine Plattformberechtigung.')
+  if (!session?.user.platformRole || !canManagePlatform(session.user.platformRole)) return apiError(403, 'forbidden', 'Keine Plattformberechtigung.')
   try {
     const body = await readJsonBody<{ id: string; action: string }>(request)
     if (typeof body.id !== 'string' || body.action !== 'cancel') return apiError(422, 'validation', 'Ungültige Aktion.')

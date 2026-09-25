@@ -1,3 +1,4 @@
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 import { getSession } from '@/lib/auth/server'
 import { isDatabaseConfigured } from '@/lib/db/client'
 import { getAccountProfile, updateAccountProfile } from '@/lib/db/repositories/account'
@@ -25,7 +26,7 @@ export async function PATCH(request: Request) {
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
 
   let body: { displayName?: string; phone?: string; locale?: string; timezone?: string }
-  try { body = await readJsonBody(request, 16_384) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
+  try { body = await readJsonBody(request, PRODUCT_LIMITS.apiBodyStandardBytes) } catch { return apiError(400, 'invalid_json', 'Ungültige Anfrage.', id) }
   const displayName = body.displayName?.trim() ?? ''
   const phone = body.phone?.trim() ?? ''
   const locale = body.locale?.trim() ?? 'de-CH'

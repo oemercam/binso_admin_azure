@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
-import { readTextBody } from '@/lib/http/server-api'
+import { apiError, apiJson, readTextBody } from '@/lib/http/server-api'
 import { query } from '@/lib/db/client'
 import { verifyStripeWebhook } from '@/lib/billing/stripe'
 import { applyStripeSubscription, completeWebhookEvent, findOrganizationByStripeCustomer, registerWebhookEvent } from '@/lib/db/repositories/stripe-billing'
+import { PRODUCT_LIMITS } from '@/lib/config/product'
 
 type StripeEvent = {
   id: string
@@ -22,33 +22,45 @@ function metadataOrganizationId(object: Record<string, unknown>) {
 
 export async function POST(request: Request) {
   let rawBody: string
-  try { rawBody = await readTextBody(request, 512_000) } catch { return NextResponse.json({ error: 'Payload zu gross.' }, { status: 413 }) }
+  try {
+    rawBody = await readTextBody(request, PRODUCT_LIMITS.stripeWebhookBodyBytes)
+  } catch {
+    return apiError(413, 'validation', 'Payload zu gross.')
+  }
+
   if (!verifyStripeWebhook(rawBody, request.headers.get('stripe-signature'))) {
-    return NextResponse.json({ error: 'Ungültige Stripe-Signatur.' }, { status: 400 })
+    return apiError(400, 'validation', 'Ungültige Stripe-Signatur.')
   }
 
   let event: StripeEvent
   try {
     event = JSON.parse(rawBody) as StripeEvent
   } catch {
-    return NextResponse.json({ error: 'Ungültiges Event.' }, { status: 400 })
+    return apiError(400, 'validation', 'Ungültiges Event.')
   }
-  if (!event || typeof event.id !== 'string' || typeof event.type !== 'string' || !event.data?.object) return NextResponse.json({ error: 'Ungültiges Event.' }, { status: 400 })
+  if (!event || typeof event.id !== 'string' || typeof event.type !== 'string' || !event.data?.object) {
+    return apiError(400, 'validation', 'Ungültiges Event.')
+  }
 
-  const object = event.data?.object ?? {}
+  const object = event.data.object
   const customerId = stringValue(object.customer)
   let organizationId = metadataOrganizationId(object)
   if (!organizationId && customerId) organizationId = await findOrganizationByStripeCustomer(customerId)
+
   const inserted = await registerWebhookEvent({
     externalEventId: event.id,
     eventType: event.type,
     payload: { id: event.id, type: event.type, objectId: stringValue(object.id), customerId, organizationId },
     organizationId,
   })
+
   if (!inserted) {
-    const existing = await query<{ status: string }>("select status from billing_webhook_events where provider='stripe' and external_event_id=$1", [event.id])
-    if (existing.rows[0]?.status === 'received') return NextResponse.json({ error: 'Event wird verarbeitet.' }, { status: 503 })
-    return NextResponse.json({ received: true, duplicate: true })
+    const existing = await query<{ status: string }>(
+      "select status from billing_webhook_events where provider='stripe' and external_event_id=$1",
+      [event.id],
+    )
+    if (existing.rows[0]?.status === 'received') return apiError(503, 'server', 'Event wird verarbeitet.')
+    return apiJson({ received: true, duplicate: true })
   }
 
   try {
@@ -67,12 +79,12 @@ export async function POST(request: Request) {
         eventId: event.id,
       })
       await completeWebhookEvent(event.id, 'processed')
-      return NextResponse.json({ received: true })
+      return apiJson({ received: true })
     }
 
     if (event.type === 'checkout.session.completed') {
       await completeWebhookEvent(event.id, 'processed')
-      return NextResponse.json({ received: true })
+      return apiJson({ received: true })
     }
 
     if (['invoice.payment_failed', 'invoice.paid'].includes(event.type) && organizationId) {
@@ -88,14 +100,14 @@ export async function POST(request: Request) {
         })
       }
       await completeWebhookEvent(event.id, 'processed')
-      return NextResponse.json({ received: true })
+      return apiJson({ received: true })
     }
 
     await completeWebhookEvent(event.id, 'ignored')
-    return NextResponse.json({ received: true, ignored: true })
+    return apiJson({ received: true, ignored: true })
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : 'Webhook-Verarbeitung fehlgeschlagen.'
     await completeWebhookEvent(event.id, 'failed', message)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return apiError(500, 'server', message)
   }
 }

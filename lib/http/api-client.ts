@@ -1,4 +1,5 @@
 import { ApiError, errorFromStatus } from '@/lib/http/errors'
+import { apiErrorMessage, type ApiErrorPayload } from '@/lib/http/client-errors'
 
 type ApiRequestOptions = RequestInit & {
   timeoutMs?: number
@@ -9,6 +10,18 @@ const DEFAULT_TIMEOUT = 15_000
 
 function canRetry(method: string, attempt: number, maxRetries: number) {
   return method === 'GET' && attempt < maxRetries
+}
+
+function serverErrorCode(payload: unknown) {
+  if (!payload || typeof payload !== 'object') return undefined
+  const error = (payload as ApiErrorPayload).error
+  return error && typeof error === 'object' && typeof error.code === 'string' ? error.code : undefined
+}
+
+async function responsePayload(response: Response) {
+  const contentType = response.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) return undefined
+  return response.json().catch(() => undefined)
 }
 
 export async function apiRequest<T>(input: string, options: ApiRequestOptions = {}): Promise<T> {
@@ -34,12 +47,19 @@ export async function apiRequest<T>(input: string, options: ApiRequestOptions = 
 
       const correlationId = response.headers.get('x-correlation-id') ?? undefined
       if (!response.ok) {
+        const payload = await responsePayload(response)
         const mapped = errorFromStatus(response.status, correlationId)
         if (canRetry(method, attempt, maxRetries) && response.status >= 500) {
           await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)))
           continue
         }
-        throw mapped
+        throw new ApiError(
+          mapped.code,
+          apiErrorMessage(payload, mapped.message),
+          response.status,
+          correlationId,
+          serverErrorCode(payload),
+        )
       }
 
       if (response.status === 204) return undefined as T
@@ -57,4 +77,8 @@ export async function apiRequest<T>(input: string, options: ApiRequestOptions = 
       window.clearTimeout(timeout)
     }
   }
+}
+
+export function jsonBody(value: unknown) {
+  return JSON.stringify(value)
 }

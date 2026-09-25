@@ -10,10 +10,10 @@ import { StandardFormSheet } from '@/components/ui/sheet-system'
 import { Toggle } from '@/components/ui/toggle'
 import { useBusinessStore } from '@/components/state/business-store'
 import { useFeedback } from '@/components/ui/feedback'
+import { StatusBadge } from '@/components/ui/status-badge'
 import type { BillingInterval, Contract, ContractLine, ContractStatus } from '@/types/domain'
 import { formatChf, formatDate, formatMonthYear } from '@/lib/format/locale'
 const chf = (value: number) => formatChf(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const statusLabel: Record<ContractStatus, string> = { draft: 'Entwurf', active: 'Aktiv', paused: 'Pausiert', ended: 'Beendet', cancelled: 'Storniert' }
 const intervalLabel: Record<BillingInterval, string> = { none: 'Keine', monthly: 'Monatlich', quarterly: 'Quartalsweise', yearly: 'Jährlich' }
 const newLine = (): ContractLine => ({ id: `cl-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, description: '', quantity: 1, unit: 'pauschal', unitPrice: 0, vatRate: 8.1 })
 
@@ -87,7 +87,7 @@ export default function ContractsPage() {
         <span className="overview-desktop-cell">{contract.customerName}</span>
         <span className="overview-desktop-cell">{intervalLabel[contract.billingInterval]}</span>
         <span className="overview-desktop-cell">{contract.nextInvoiceDate ? fmt(contract.nextInvoiceDate) : '–'}</span>
-        <span className={`status ${contract.status} overview-desktop-cell`}>{statusLabel[contract.status]}</span>
+        <StatusBadge status={contract.status} className="overview-desktop-cell" />
         <span className="row-disclosure"><Icon name="chevron" size={15}/></span>
       </InteractiveRow>)}
     </div>

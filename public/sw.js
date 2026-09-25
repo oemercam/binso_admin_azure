@@ -51,6 +51,8 @@ self.addEventListener('fetch', event => {
   // Use network-first and keep a cache fallback for notification/offline use.
   if (
     url.pathname === '/manifest.webmanifest' ||
+    url.pathname === '/customer-manifest.webmanifest' ||
+    url.pathname === '/admin-manifest.webmanifest' ||
     url.pathname.startsWith('/icons/') ||
     url.pathname === '/icon.png' ||
     url.pathname === '/apple-icon.png' ||

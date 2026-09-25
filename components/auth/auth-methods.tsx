@@ -1,3 +1,5 @@
+import { publicEnv } from '@/lib/config/public-env'
+
 type AuthMethod = 'email' | 'microsoft' | 'google' | 'apple'
 
 const labels: Record<AuthMethod, string> = {
@@ -8,8 +10,8 @@ const labels: Record<AuthMethod, string> = {
 }
 
 function configuredMethods(): AuthMethod[] {
-  const configured = process.env.NEXT_PUBLIC_AUTH_METHODS?.trim()
-  const values = (configured || 'email,microsoft,google,apple')
+  const configured = publicEnv.authMethods
+  const values = configured
     .split(',')
     .map((value) => value.trim().toLowerCase())
     .filter((value): value is AuthMethod => value in labels)

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PublicPageIntro, PublicShell } from '@/components/public/public-shell'
 import { platformQuery } from '@/lib/db/client'
+import { formatDateTime } from '@/lib/format/locale'
 
 export const dynamic='force-dynamic'
 
@@ -14,7 +15,7 @@ export default async function StatusPage() {
       <main className="public-main public-main-narrow">
         <PublicPageIntro eyebrow="Systemstatus" title="Betrieb von Binso One." description={active.length?'Aktuell bestehen gemeldete Betriebsereignisse.':'Aktuell sind keine öffentlichen Betriebsstörungen gemeldet.'} />
         <section className="public-status-card"><i /><div><strong>{active.length?'Betriebsereignis aktiv':'Alle Systeme ohne gemeldete Störung'}</strong><p>Der technische Health-Endpunkt bleibt zusätzlich verfügbar.</p></div><Link href="/api/health">Health Check öffnen →</Link></section>
-        {incidents.map(i=><section className="public-status-card" key={i.id}><div><strong>{i.title}</strong><p>{i.public_message}</p><small>{i.severity} · {i.status} · {i.started_at.toLocaleString('de-CH')}</small></div></section>)}
+        {incidents.map(i=><section className="public-status-card" key={i.id}><div><strong>{i.title}</strong><p>{i.public_message}</p><small>{i.severity} · {i.status} · {formatDateTime(i.started_at)}</small></div></section>)}
       </main>
     </PublicShell>
   )

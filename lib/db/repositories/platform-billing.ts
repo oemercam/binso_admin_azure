@@ -23,6 +23,7 @@ type TenantRow = {
   cancel_at_period_end: boolean
   scheduled_plan: SubscriptionPlan | null
   billing_provider: 'manual' | 'stripe'
+  is_demo: boolean
 }
 
 type SignupRow = {
@@ -31,6 +32,7 @@ type SignupRow = {
   owner_name: string
   email: string
   plan: SubscriptionPlan
+  signup_mode: SignupRequest['mode']
   status: SignupRequest['status']
   created_at: Date
 }
@@ -44,7 +46,7 @@ export async function listPlatformTenants(): Promise<PlatformTenant[]> {
             case when s.status = 'active' then s.unit_amount_chf else 0 end::text as monthly_revenue_chf,
             pt.created_at, pt.last_active_at, pt.storage_mb,
             s.trial_until, s.current_period_end, s.cancel_at_period_end,
-            s.scheduled_plan, s.billing_provider
+            s.scheduled_plan, s.billing_provider, o.is_demo
        from platform_tenants pt
        join organizations o on o.id = pt.organization_id
        join organization_subscriptions s on s.organization_id = o.id
@@ -52,7 +54,7 @@ export async function listPlatformTenants(): Promise<PlatformTenant[]> {
       group by pt.id, o.id, o.name, pt.owner_name, pt.owner_email, s.plan, s.status,
                pt.platform_status, s.seats, pt.created_at, pt.last_active_at, pt.storage_mb,
                s.unit_amount_chf, s.trial_until, s.current_period_end, s.cancel_at_period_end,
-               s.scheduled_plan, s.billing_provider
+               s.scheduled_plan, s.billing_provider, o.is_demo
       order by pt.created_at desc`,
   )
   return result.rows.map((row) => ({
@@ -62,6 +64,7 @@ export async function listPlatformTenants(): Promise<PlatformTenant[]> {
     ownerName: row.owner_name,
     ownerEmail: row.owner_email,
     plan: row.plan,
+    mode: row.is_demo ? 'demo' : 'trial',
     status: row.platform_status,
     subscriptionStatus: row.subscription_status,
     seats: row.seats,
@@ -80,7 +83,7 @@ export async function listPlatformTenants(): Promise<PlatformTenant[]> {
 
 export async function listPlatformSignups(): Promise<SignupRequest[]> {
   const result = await platformQuery<SignupRow>(
-    `select id, company_name, owner_name, email, plan, status, created_at
+    `select id, company_name, owner_name, email, plan, signup_mode, status, created_at
        from signup_requests
       order by created_at desc
       limit 100`,
@@ -91,6 +94,7 @@ export async function listPlatformSignups(): Promise<SignupRequest[]> {
     ownerName: row.owner_name,
     email: row.email,
     plan: row.plan,
+    mode: row.signup_mode ?? 'trial',
     status: row.status,
     createdAt: row.created_at.toISOString(),
   }))

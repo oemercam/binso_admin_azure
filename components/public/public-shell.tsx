@@ -35,8 +35,8 @@ export function PublicHeader() {
 
 export function PublicFooter() {
   return (
-    <footer className="public-footer v78-public-footer">
-      <div className="public-footer-grid v78-footer-grid">
+    <footer className="public-footer v78-public-footer v782-public-footer">
+      <div className="public-footer-grid v782-footer-grid">
         <div className="public-footer-brand">
           <BrandLink />
           <p>{publicSite.footerDescription}</p>
@@ -47,13 +47,19 @@ export function PublicFooter() {
         <div><strong>Zugang</strong>{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
         <div><strong>Rechtliches</strong>{publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}<CookieSettingsButton /></div>
       </div>
-      <div className="public-footer-bottom"><span>© {new Date().getFullYear()} {appIdentity.company}</span></div>
+      <div className="public-footer-bottom v782-footer-bottom">
+        <span>© {new Date().getFullYear()} {appIdentity.company}</span>
+        <div>
+          {publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+          {publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+        </div>
+      </div>
     </footer>
   )
 }
 
 export function PublicShell({ children, compact = false, light = true }: { children: ReactNode; compact?: boolean; light?: boolean }) {
-  const classes = ['public-site', 'public-site-v78', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
+  const classes = ['public-site', 'public-site-v78', 'public-site-v782', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
   return <div className={classes}><PublicHeader />{children}<PublicFooter /><CookieConsent /></div>
 }
 
@@ -65,7 +71,7 @@ export function PublicCta() {
   return (
     <section className="public-final-cta v78-final-cta">
       <div><span>Bereit für den nächsten Schritt?</span><h2>Teste Binso One 14 Tage und richte nur das ein, was du wirklich brauchst.</h2></div>
-      <div className="public-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="button secondary" href="/pricing">Preise ansehen</Link></div>
+      <div className="public-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="button secondary" href="/register?mode=demo">Produktdemo starten</Link><Link className="v79-final-pricing-link" href="/pricing">Preise ansehen →</Link></div>
     </section>
   )
 }

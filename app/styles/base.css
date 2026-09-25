@@ -1,0 +1,7 @@
+html{min-width:320px;overflow-x:hidden}
+body{min-width:320px;overflow-x:hidden;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+img,svg,video,canvas{max-width:100%}
+button,a,input,select,textarea{box-sizing:border-box}
+button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
+:where(button,.button,.icon-button,.topbar-icon,.avatar-button){min-height:var(--ui-touch)}
+:where(.page,.app-main,.public-main,.form-grid,.detail-grid,.settings-grid,.pricing-grid)>*{min-width:0}

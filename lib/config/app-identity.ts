@@ -1,4 +1,5 @@
 import packageJson from '@/package.json'
+import { publicEnv } from '@/lib/config/public-env'
 
 export const appIdentity = {
   name: 'Binso One',
@@ -18,7 +19,7 @@ export const appIdentity = {
     country: 'Schweiz',
   },
   version: packageJson.version,
-  build: process.env.NEXT_PUBLIC_BUILD_ID?.trim() || 'local',
-  buildDate: process.env.NEXT_PUBLIC_BUILD_DATE?.trim() || '',
-  environment: process.env.NEXT_PUBLIC_APP_ENV?.trim() || process.env.NODE_ENV || 'development',
+  build: publicEnv.buildId || 'local',
+  buildDate: publicEnv.buildDate,
+  environment: publicEnv.appEnvironment,
 } as const
