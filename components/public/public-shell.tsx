@@ -17,7 +17,7 @@ function BrandLink() {
 
 export function PublicHeader() {
   return (
-    <header className="public-header">
+    <header className="public-header v78-public-header">
       <div className="public-header-inner">
         <BrandLink />
         <nav className="public-nav" aria-label="Hauptnavigation">
@@ -35,67 +35,37 @@ export function PublicHeader() {
 
 export function PublicFooter() {
   return (
-    <footer className="public-footer">
-      <div className="public-footer-grid">
+    <footer className="public-footer v78-public-footer">
+      <div className="public-footer-grid v78-footer-grid">
         <div className="public-footer-brand">
           <BrandLink />
           <p>{publicSite.footerDescription}</p>
           <small>Ein Produkt der {appIdentity.company}, {appIdentity.address.city}.</small>
         </div>
-        <div>
-          <strong>Produkt</strong>
-          {publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-        </div>
-        <div>
-          <strong>Hilfe</strong>
-          {publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-        </div>
-        <div>
-          <strong>Rechtliches</strong>
-          {publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-          <CookieSettingsButton />
-        </div>
+        <div><strong>Produkt</strong>{publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
+        <div><strong>Hilfe</strong>{publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
+        <div><strong>Zugang</strong>{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
+        <div><strong>Rechtliches</strong>{publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}<CookieSettingsButton /></div>
       </div>
-      <div className="public-footer-bottom">
-        <span>© {new Date().getFullYear()} {appIdentity.company}</span>
-      </div>
+      <div className="public-footer-bottom"><span>© {new Date().getFullYear()} {appIdentity.company}</span></div>
     </footer>
   )
 }
 
 export function PublicShell({ children, compact = false, light = true }: { children: ReactNode; compact?: boolean; light?: boolean }) {
-  const classes = ['public-site', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
-  return (
-    <div className={classes}>
-      <PublicHeader />
-      {children}
-      <PublicFooter />
-      <CookieConsent />
-    </div>
-  )
+  const classes = ['public-site', 'public-site-v78', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
+  return <div className={classes}><PublicHeader />{children}<PublicFooter /><CookieConsent /></div>
 }
 
 export function PublicPageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return (
-    <div className="public-page-intro">
-      <span>{eyebrow}</span>
-      <h1>{title}</h1>
-      <p>{description}</p>
-    </div>
-  )
+  return <div className="public-page-intro v78-page-intro"><span>{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>
 }
 
 export function PublicCta() {
   return (
-    <section className="public-final-cta">
-      <div>
-        <span>Bereit für den nächsten Schritt?</span>
-        <h2>Erstelle dein Konto und richte Binso One in wenigen kurzen Schritten ein.</h2>
-      </div>
-      <div className="public-final-cta-actions">
-        <Link className="button primary" href="/register">14 Tage testen</Link>
-        <Link className="button secondary" href="/pricing">Preise ansehen</Link>
-      </div>
+    <section className="public-final-cta v78-final-cta">
+      <div><span>Bereit für den nächsten Schritt?</span><h2>Teste Binso One 14 Tage und richte nur das ein, was du wirklich brauchst.</h2></div>
+      <div className="public-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="button secondary" href="/pricing">Preise ansehen</Link></div>
     </section>
   )
 }

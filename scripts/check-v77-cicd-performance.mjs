@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8')
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 
-assert.equal(packageJson.version, '0.77.0')
+assert.ok(['0.77.0', '0.78.0'].includes(packageJson.version))
 assert.ok(packageJson.scripts['v77:check'])
 assert.match(packageJson.scripts.verify, /v77:check/)
 

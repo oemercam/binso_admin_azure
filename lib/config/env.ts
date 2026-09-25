@@ -16,4 +16,5 @@ export const env = {
   appName: process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Binso One',
   vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || '',
   authProviderName: process.env.AUTH_PROVIDER_NAME?.trim() || 'aad',
+  authAdminProviderName: process.env.AUTH_ADMIN_PROVIDER_NAME?.trim() || 'aad',
 } as const

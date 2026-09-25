@@ -142,6 +142,7 @@ jobs:
           pnpm run v75:check
           pnpm run v76:check
           pnpm run v77:check
+          pnpm run v78:check
           pnpm run language:check
           echo "PRODUCT_CHECK_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Behavioral regression tests
@@ -545,7 +546,7 @@ jobs:
           PROD_JSON="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod -o json)"
           STAGING_JSON="$(az webapp config appsettings list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --slot "$STAGING_SLOT" -o json)"
           REQUIRED=(DATABASE_URL DATABASE_SSL AUTH_MODE AUTH_PROVIDER_NAME INTERNAL_JOB_SECRET)
-          OPTIONAL=(EMAIL_DELIVERY_MODE GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PRICE_STARTER STRIPE_PRICE_BUSINESS STRIPE_PRICE_PROFESSIONAL STRIPE_PRICE_ENTERPRISE PUSH_SUBSCRIPTION_ENCRYPTION_KEY PLATFORM_DATABASE_URL PLATFORM_ROLE_SOURCE BINSO_OPERATOR_HOST BINSO_PUBLIC_HOST)
+          OPTIONAL=(AUTH_ADMIN_PROVIDER_NAME EMAIL_DELIVERY_MODE GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PRICE_STARTER STRIPE_PRICE_BUSINESS STRIPE_PRICE_PROFESSIONAL STRIPE_PRICE_ENTERPRISE PUSH_SUBSCRIPTION_ENCRYPTION_KEY PLATFORM_DATABASE_URL PLATFORM_ROLE_SOURCE BINSO_OPERATOR_HOST BINSO_PUBLIC_HOST)
           sync_if_missing() {
             local KEY="$1"
             local MUST="$2"

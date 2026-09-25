@@ -2,28 +2,27 @@ import { appIdentity } from './app-identity'
 
 export const publicSite = {
   primaryNavigation: [
-    { href: '/', label: 'Startseite' },
     { href: '/features', label: 'Funktionen' },
-    { href: '/how-it-works', label: 'So funktioniert es' },
+    { href: '/how-it-works', label: 'Ablauf' },
     { href: '/pricing', label: 'Preise' },
     { href: '/security', label: 'Sicherheit' },
-    { href: '/faq', label: 'FAQ' },
-    { href: '/contact', label: 'Kontakt' },
   ],
   productNavigation: [
     { href: '/features', label: 'Funktionen' },
     { href: '/how-it-works', label: 'So funktioniert es' },
     { href: '/pricing', label: 'Preise' },
     { href: '/security', label: 'Sicherheit' },
-    { href: '/status', label: 'Systemstatus' },
   ],
   helpNavigation: [
-    { href: '/help', label: 'Hilfe' },
     { href: '/faq', label: 'FAQ' },
-    { href: '/support', label: 'Support' },
     { href: '/contact', label: 'Kontakt' },
-    { href: '/sign-in', label: 'Anmelden' },
-    { href: '/register', label: 'Registrieren' },
+    { href: '/support', label: 'Support' },
+    { href: '/status', label: 'Systemstatus' },
+  ],
+  accessNavigation: [
+    { href: '/sign-in', label: 'Kunden-Login' },
+    { href: '/register', label: 'Konto erstellen' },
+    { href: '/admin-access', label: 'Admin-Zugang' },
   ],
   legalNavigation: [
     { href: '/legal/terms', label: 'AGB' },

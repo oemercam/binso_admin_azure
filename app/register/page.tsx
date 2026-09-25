@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { Input, Select } from '@/components/ui/form-controls'
 import { selfServicePlanDefinitions } from '@/lib/data/plans'
-import { signInUrl } from '@/lib/auth/urls'
+import { customerSignInUrl } from '@/lib/auth/urls'
 import { PublicShell } from '@/components/public/public-shell'
 import type { AppUser, OrganizationMembership, SignupRequest, SubscriptionPlan } from '@/types/domain'
 
@@ -109,10 +109,10 @@ function RegisterForm() {
               </div>
             </div>
             <div className="register-start-flow">
-              <div className="register-start-step"><b>01</b><span><strong>Mit Microsoft anmelden</strong><small>Deine Identität wird sicher bestätigt. Binso One speichert kein eigenes Passwort.</small></span></div>
+              <div className="register-start-step"><b>01</b><span><strong>Kundenkonto öffnen</strong><small>Die Identität wird über den konfigurierten Kunden-Login bestätigt. Binso One speichert kein eigenes Passwort.</small></span></div>
               <div className="register-start-step"><b>02</b><span><strong>Unternehmen bestätigen</strong><small>Firmenname, Kontakt und geschäftliche E-Mail genügen für den Einstieg.</small></span></div>
               <div className="register-start-step"><b>03</b><span><strong>Binso One starten</strong><small>Weitere Angaben kannst du später ergänzen, wenn du sie wirklich brauchst.</small></span></div>
-              <a className="button primary register-entry-primary" href={signInUrl(returnTo)}>Mit Microsoft weiter</a>
+              <a className="button primary register-entry-primary" href={customerSignInUrl(returnTo)}>Konto erstellen</a>
               <p className="auth-register-prompt">Bereits registriert? <a href="/sign-in">Anmelden</a></p>
               <small className="register-privacy-note">Mit dem Start gelten unsere <a href="/legal/terms">AGB</a> und die <a href="/legal/privacy">Datenschutzerklärung</a>.</small>
             </div>
@@ -135,7 +135,7 @@ function RegisterForm() {
           <form className="public-form" onSubmit={submit}>
           <label><span>Unternehmen *</span><Input autoComplete="organization" value={companyName} onChange={(event) => setCompanyName(event.target.value)} required /></label>
           <label><span>Vor- und Nachname *</span><Input autoComplete="name" value={ownerName} onChange={(event) => setOwnerName(event.target.value)} required /></label>
-          <label><span>Geschäftliche E-Mail *</span><Input type="email" autoComplete="email" value={email} readOnly required /><small>Aus deinem angemeldeten Microsoft-Konto.</small></label>
+          <label><span>Geschäftliche E-Mail *</span><Input type="email" autoComplete="email" value={email} readOnly required /><small>Aus deinem bestätigten Kundenkonto.</small></label>
           <label><span>Plan</span><Select value={plan} onChange={(event) => setPlan(event.target.value as SubscriptionPlan)}>{selfServicePlanDefinitions.map((item) => <option key={item.id} value={item.id}>{item.name}{item.monthlyPriceChf ? ` · CHF ${item.monthlyPriceChf}` : ''}</option>)}</Select></label>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
           <button className="button primary" type="submit" disabled={submitting}>{submitting ? 'Wird gespeichert…' : 'Weiter zur Einrichtung'}</button>
