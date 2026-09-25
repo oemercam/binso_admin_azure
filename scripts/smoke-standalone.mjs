@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+﻿import { spawn } from 'node:child_process'
 import { resolve, join, basename } from 'node:path'
 import { cpSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { createRequire } from 'node:module'
 import assert from 'node:assert/strict'
 
 const source = resolve(process.argv[2] || '.next/standalone')
-const root = mkdtempSync(join(tmpdir(), 'binso-v69-smoke-'))
+const root = mkdtempSync(join(tmpdir(), 'binso-v76-smoke-'))
 
 cpSync(source, root, {
   recursive: true,
@@ -77,6 +77,9 @@ try {
   assert.ok(ready, `Standalone did not become ready: ${log}`)
 
   for (const path of [
+    '/',
+    '/sign-in',
+    '/register',
     '/offline',
     '/manifest.webmanifest',
     '/sw.js',
@@ -84,10 +87,17 @@ try {
   ]) {
     const response = await fetch(
       `http://127.0.0.1:${port}${path}`,
-      { signal: AbortSignal.timeout(5000) },
+      {
+        redirect: 'manual',
+        signal: AbortSignal.timeout(5000),
+      },
     )
 
-    assert.equal(response.status, 200, path)
+    assert.equal(
+      response.status,
+      200,
+      `${path} must be reachable, received ${response.status}`,
+    )
   }
 
   const signInPage = await fetch(
@@ -98,16 +108,24 @@ try {
     },
   )
 
-  assert.ok(
-    [307, 308].includes(signInPage.status),
-    `/sign-in must redirect, received ${signInPage.status}`,
+  assert.equal(
+    signInPage.status,
+    200,
+    `/sign-in must render the V76 login page, received ${signInPage.status}`,
   )
 
-  const signInLocation = signInPage.headers.get('location') ?? ''
+  const signInHtml = await signInPage.text()
 
-  assert.ok(
-    signInLocation.includes('/api/auth/login?returnTo='),
-    `/sign-in must redirect through the canonical login route, received ${signInLocation}`,
+  assert.match(
+    signInHtml,
+    /Mit Microsoft anmelden/,
+    '/sign-in must expose the Microsoft login action',
+  )
+
+  assert.match(
+    signInHtml,
+    /\/api\/auth\/login\?returnTo=/,
+    '/sign-in must use the canonical login route',
   )
 
   const loginRoute = await fetch(
@@ -133,12 +151,15 @@ try {
 
   const protectedPage = await fetch(
     `http://127.0.0.1:${port}/dashboard`,
-    { redirect: 'manual' },
+    {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(5000),
+    },
   )
 
   assert.ok(
     [307, 308].includes(protectedPage.status),
-    'Unauthenticated dashboard must redirect',
+    `Unauthenticated dashboard must redirect, received ${protectedPage.status}`,
   )
 
   console.log('Isolated standalone HTTP smoke test passed.')
@@ -151,7 +172,7 @@ try {
 
   if (
     resolve(root).startsWith(resolve(tmpdir())) &&
-    basename(root).startsWith('binso-v69-smoke-')
+    basename(root).startsWith('binso-v76-smoke-')
   ) {
     rmSync(root, { recursive: true, force: true })
   }
