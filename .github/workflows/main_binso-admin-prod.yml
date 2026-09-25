@@ -3,7 +3,9 @@ name: Build and deploy Binso One to Azure
 on:
   push:
     branches: [main, v69-production-completion]
+
   pull_request:
+
   workflow_dispatch:
     inputs:
       deploy_production:
@@ -21,8 +23,10 @@ jobs:
     name: Isolated PostgreSQL migrations and RLS
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+
     permissions:
       contents: read
+
     services:
       postgres:
         image: postgres:17
@@ -36,15 +40,20 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: pnpm/action-setup@v6
         with:
           version: 10.17.1
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+
       - run: pnpm install --frozen-lockfile
+
       - name: Apply and repeat migrations
         run: |
           pnpm db:migrate
@@ -54,12 +63,15 @@ jobs:
           DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           DATABASE_TEST_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           DATABASE_SSL: 'false'
+
   build:
     name: Quality, build and package
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+
     permissions:
       contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -93,7 +105,26 @@ jobs:
         run: pnpm lint
 
       - name: Product checks
-        run: pnpm run security:check && pnpm run architecture:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check
+        run: >
+          pnpm run security:check &&
+          pnpm run architecture:check &&
+          pnpm run design-system:check &&
+          pnpm run actions:check &&
+          pnpm run process:check &&
+          pnpm run mobile-ui:check &&
+          pnpm run product:simplicity-check &&
+          pnpm run saas:check &&
+          pnpm run multitenant:check &&
+          pnpm run data-foundation:check &&
+          pnpm run auth-membership:check &&
+          pnpm run customer-auth:check &&
+          pnpm run registration-onboarding:check &&
+          pnpm run subscription-billing:check &&
+          pnpm run stripe-payment:check &&
+          pnpm run saas:product-check &&
+          pnpm run platform:check &&
+          pnpm run go-live:check &&
+          pnpm run platform-foundation:check
 
       - name: Behavioral regression tests
         run: pnpm test
@@ -111,6 +142,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           (
             cd deploy-root
             node -e "console.log(require.resolve('@swc/helpers/_/_interop_require_default'))"
@@ -122,11 +154,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           rm -f binso-one.zip
+
           (
             cd deploy-root
             zip -qry "$GITHUB_WORKSPACE/binso-one.zip" .
           )
+
           unzip -l binso-one.zip | grep -F 'node_modules/next/package.json'
           unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
           unzip -l binso-one.zip | grep -F 'server.js'
@@ -142,25 +177,31 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-
   e2e:
     name: Critical E2E
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [build]
+
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: pnpm/action-setup@v6
         with:
           version: 10.17.1
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
+
       - run: pnpm exec playwright install --with-deps chromium
+
       - run: pnpm test:e2e --project=desktop-chromium
         env:
           AUTH_MODE: local
@@ -175,8 +216,10 @@ jobs:
     timeout-minutes: 10
     needs: [build, database-test, e2e]
     environment: production
+
     permissions:
       contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -209,10 +252,20 @@ jobs:
     timeout-minutes: 30
     needs: [build, migrate]
     environment: production
+
     permissions:
       id-token: write
       contents: read
+
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
       - name: Download deployment artifact
         uses: actions/download-artifact@v8
         with:
@@ -231,29 +284,51 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          RESOURCE_GROUP="$(az webapp list --query "[?name=='binso-admin-prod'].resourceGroup | [0]" -o tsv)"
+
+          RESOURCE_GROUP="$(az webapp list \
+            --query "[?name=='binso-admin-prod'].resourceGroup | [0]" \
+            -o tsv)"
+
           test -n "$RESOURCE_GROUP"
+
           echo "resource_group=$RESOURCE_GROUP" >> "$GITHUB_OUTPUT"
 
       - name: Require staging slot
         shell: bash
         run: |
           set -euo pipefail
+
           SLOT="${{ vars.BINSO_ONE_STAGING_SLOT || 'staging' }}"
-          FOUND="$(az webapp deployment slot list --resource-group "${{ steps.app.outputs.resource_group }}" --name binso-admin-prod --query "[?name=='$SLOT'].name | [0]" -o tsv)"
-          test "$FOUND" = "$SLOT" || { echo "Required App Service staging slot '$SLOT' is missing."; exit 1; }
+
+          FOUND="$(az webapp deployment slot list \
+            --resource-group "${{ steps.app.outputs.resource_group }}" \
+            --name binso-admin-prod \
+            --query "[?name=='$SLOT'].name | [0]" \
+            -o tsv)"
+
+          test "$FOUND" = "$SLOT" || {
+            echo "Required App Service staging slot '$SLOT' is missing."
+            exit 1
+          }
+
           echo "STAGING_SLOT=$SLOT" >> "$GITHUB_ENV"
 
       - name: Configure staging slot runtime
         shell: bash
         run: |
           set -euo pipefail
+
           az webapp config appsettings set \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
             --slot "$STAGING_SLOT" \
-            --settings WEBSITE_RUN_FROM_PACKAGE=1 SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false BUILD_FLAGS=Off \
+            --settings \
+              WEBSITE_RUN_FROM_PACKAGE=1 \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+              BUILD_FLAGS=Off \
             --output none
+
           az webapp config set \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
@@ -267,7 +342,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           test -f deploy/binso-one.zip
+
           az webapp deploy \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
@@ -285,13 +362,16 @@ jobs:
           STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
         run: |
           set -euo pipefail
+
           test -n "$STAGING_URL"
+
           node scripts/smoke-url.mjs "$STAGING_URL"
 
       - name: Swap validated staging slot to production
         shell: bash
         run: |
           set -euo pipefail
+
           az webapp deployment slot swap \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
@@ -305,25 +385,38 @@ jobs:
           BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
         run: |
           set -euo pipefail
+
           test -n "$BASE_URL"
+
           HEALTHY=false
+
           for attempt in $(seq 1 30); do
-            STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$BASE_URL/api/health" || true)"
+            STATUS="$(curl \
+              -sS \
+              -o /tmp/health.json \
+              -w '%{http_code}' \
+              "$BASE_URL/api/health" \
+              || true)"
+
             if [ "$STATUS" = "200" ]; then
               cat /tmp/health.json
               HEALTHY=true
               break
             fi
+
             echo "Production health check attempt $attempt returned HTTP $STATUS"
             sleep 10
           done
+
           if [ "$HEALTHY" != "true" ]; then
             echo "Production health failed after swap. Rolling back to previous slot content."
+
             az webapp deployment slot swap \
               --resource-group "${{ steps.app.outputs.resource_group }}" \
               --name binso-admin-prod \
               --slot "$STAGING_SLOT" \
               --target-slot production \
               --output none
+
             exit 1
           fi
