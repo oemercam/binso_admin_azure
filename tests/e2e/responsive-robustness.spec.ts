@@ -124,7 +124,7 @@ test('V80 desktop public navigation and balanced hero remain visible at 1440x900
   await expectNoViewportOverflow(page, '1440px V80 landing')
 })
 
-test('V80 mobile public navigation opens cleanly and product visual stays compact at 390x844', async ({ page }) => {
+test('V81.4 mobile public navigation and mockup content order stay exact at 390x844', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.v80-desktop-nav')).toBeHidden()
@@ -138,5 +138,16 @@ test('V80 mobile public navigation opens cleanly and product visual stays compac
   const box = await visual.boundingBox()
   expect(box).not.toBeNull()
   if (box) expect(box.height, 'hero visual must stay compact on mobile').toBeLessThan(360)
-  await expectNoViewportOverflow(page, '390px V80 landing')
+
+  const firstRowCopy = page.locator('.v81-row').first().locator('.v81-row-copy')
+  const firstRowVisual = page.locator('.v81-row').first().locator('.v81-row-visual')
+  const copyBox = await firstRowCopy.boundingBox()
+  const rowVisualBox = await firstRowVisual.boundingBox()
+  expect(copyBox).not.toBeNull()
+  expect(rowVisualBox).not.toBeNull()
+  if (copyBox && rowVisualBox) expect(copyBox.y + copyBox.height, 'mobile mockup requires copy before the product image').toBeLessThan(rowVisualBox.y + 2)
+
+  const screenshot = page.locator('.v81-row').first().locator('.marketing-real-screenshot img')
+  await expect(screenshot).toHaveAttribute('src', /orders-desktop\.png$/)
+  await expectNoViewportOverflow(page, '390px V81.4 landing')
 })
