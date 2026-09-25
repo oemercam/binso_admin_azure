@@ -1,8 +1,0 @@
-import { getPlatformSession } from '@/lib/auth/server'
-import { listPlatformOperators, upsertPlatformOperator } from '@/lib/db/repositories/platform-operators'
-import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import type { PlatformRole } from '@/types/domain'
-const roles=new Set<PlatformRole>(['platform_owner','platform_admin','platform_support','platform_billing','platform_auditor'])
-function canManage(role?:PlatformRole){return role==='platform_owner'||role==='platform_admin'}
-export async function GET(){const s=await getPlatformSession();if(!s||!canManage(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');return apiJson({operators:await listPlatformOperators(),roleSource:process.env.PLATFORM_ROLE_SOURCE||'hybrid'})}
-export async function PUT(request:Request){try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}const s=await getPlatformSession();if(!s||!canManage(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');const b=await readJsonBody<{userId?:string;email?:string;role?:PlatformRole;status?:'active'|'suspended';reason?:string}>(request,8192).catch(()=>null);const email=b?.email?.trim().toLowerCase()??'';const reason=b?.reason?.trim()??'';if(!b?.userId||!email.endsWith('@binso.ch')||!b.role||!roles.has(b.role)||!b.status||reason.length<3)return apiError(422,'validation','Operatorangaben oder Änderungsgrund ungültig.');await upsertPlatformOperator({userId:b.userId,email,role:b.role,status:b.status,actorUserId:s.user.id,actorEmail:s.user.email,reason});return apiJson({ok:true})}

@@ -1,4 +1,0 @@
-'use client'
-import { useState } from 'react'
-import { Textarea } from '@/components/ui/form-controls'
-export function PlatformCustomerNoteForm({organizationId}:{organizationId:string}){const[note,setNote]=useState('');const[saving,setSaving]=useState(false);async function save(){const value=note.trim();if(!value||saving)return;setSaving(true);try{const r=await fetch(`/api/platform/customers/${encodeURIComponent(organizationId)}/notes`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({note:value})});if(r.ok){setNote('');location.reload()}}finally{setSaving(false)}}return <div className="settings-section"><h2>Interne Notiz</h2><Textarea value={note} onChange={e=>setNote(e.target.value)} rows={3} placeholder="Nur für Binso-Operatoren sichtbar"/><button type="button" className="button primary" disabled={saving||!note.trim()} onClick={()=>void save()}>{saving?'Speichern…':'Notiz speichern'}</button></div>}
