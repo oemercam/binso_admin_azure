@@ -10,6 +10,7 @@ import { useCurrentUser } from '@/components/state/current-user'
 import { useFeedback } from '@/components/ui/feedback'
 import type { Customer, CustomerContact, DataExportJob, Employee, ImportJob } from '@/types/domain'
 import { csv, parseCsv, importNumber } from '@/lib/format/csv'
+import { DataLifecycleCard } from '@/components/data-lifecycle-card'
 
 
 function download(name: string, content: string, type: string) {
@@ -110,6 +111,7 @@ export default function DataPage() {
         </div>
         {store.exportJobs.slice(0, 5).map((job) => <SettingsValueRow key={job.id} title={`${job.scope} · ${job.format}`} value={job.status} description={job.createdAt} />)}
       </SettingsSection>
+      <DataLifecycleCard />
       {importOpen && <StandardFormSheet open title={<>CSV importieren</>} description={<>Kopfzeilen werden über Feldnamen zugeordnet. Ungültige Zeilen werden gezählt und übersprungen.</>} onClose={() => setImportOpen(false)} onSubmit={runImport} formId="data-import" footer={<><button type="button" className="button secondary" onClick={() => setImportOpen(false)}>Abbrechen</button><button type="submit" form="data-import" className="button primary" disabled={!file || entityType === 'invoices'}>Importieren</button></>}>
         <div className="form-grid">
           <label className="full"><span>CSV-Datei *</span><Input type="file" accept=".csv,text/csv" onChange={(event) => setFile(event.target.files?.[0] ?? null)} required /></label>

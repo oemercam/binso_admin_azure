@@ -1,5 +1,5 @@
 import 'server-only'
-import { query, withTransaction } from '@/lib/db/client'
+import { platformQuery, query, withPlatformTransaction, withTransaction } from '@/lib/db/client'
 import { getPlan } from '@/lib/data/plans'
 import type { PlatformTenant, SignupRequest, SubscriptionPlan, SubscriptionStatus } from '@/types/domain'
 
@@ -36,7 +36,7 @@ type SignupRow = {
 }
 
 export async function listPlatformTenants(): Promise<PlatformTenant[]> {
-  const result = await query<TenantRow>(
+  const result = await platformQuery<TenantRow>(
     `select pt.id as tenant_id, o.id as organization_id, o.name as company_name,
             pt.owner_name, pt.owner_email, s.plan, s.status as subscription_status,
             pt.platform_status, s.seats,
@@ -79,7 +79,7 @@ export async function listPlatformTenants(): Promise<PlatformTenant[]> {
 }
 
 export async function listPlatformSignups(): Promise<SignupRequest[]> {
-  const result = await query<SignupRow>(
+  const result = await platformQuery<SignupRow>(
     `select id, company_name, owner_name, email, plan, status, created_at
        from signup_requests
       order by created_at desc
@@ -104,7 +104,7 @@ export async function updatePlatformSubscription(input: {
   status: PlatformTenant['status']
   reason: string
 }) {
-  return withTransaction(async (client) => {
+  return withPlatformTransaction(async (client) => {
     const currentResult = await client.query<{
       organization_id: string
       subscription_id: string

@@ -68,6 +68,22 @@ export async function saveTenantBusinessState(input: {
     await client.query(`insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, detail)
       values ($1,$2,$3,'business.saved','business_state',$4)`,
       [input.organizationId, input.userId, input.actor.email, `Version ${nextVersion}`])
+
+    const milestoneSources: Array<[string, string]> = [
+      ['first_customer','customers'],
+      ['first_quote','quotes'],
+      ['first_order','orders'],
+      ['first_time_entry','timeEntries'],
+      ['first_invoice','invoices'],
+      ['first_payment','payments'],
+    ]
+    for (const [milestone, key] of milestoneSources) {
+      const value = state[key]
+      if (Array.isArray(value) && value.length > 0) {
+        await client.query(`insert into organization_milestones(organization_id,milestone,source) values($1,$2,'business_state') on conflict do nothing`, [input.organizationId, milestone])
+      }
+    }
+
     return { saved: true as const, conflict: false as const, version: nextVersion }
   })
 }

@@ -1,0 +1,6 @@
+import { getPlatformSession } from '@/lib/auth/server'
+import { listPlatformLifecycleRequests, updatePlatformLifecycleRequest } from '@/lib/db/repositories/data-lifecycle'
+import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
+function allowed(role?:string){return !!role&&['platform_owner','platform_admin','platform_auditor'].includes(role)}
+export async function GET(){const s=await getPlatformSession();if(!s||!allowed(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');return apiJson({requests:await listPlatformLifecycleRequests()})}
+export async function PATCH(request:Request){try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}const s=await getPlatformSession();if(!s||!['platform_owner','platform_admin'].includes(s.user.platformRole??''))return apiError(403,'forbidden','Keine Plattformberechtigung.');const b=await readJsonBody<{id?:string;status?:'approved'|'processing'|'completed'|'rejected'|'cancelled'}>(request,4096).catch(()=>null);if(!b?.id||!b.status)return apiError(422,'validation','Anfrage ist ungültig.');try{return apiJson(await updatePlatformLifecycleRequest({id:b.id,status:b.status,actorUserId:s.user.id,actorEmail:s.user.email}))}catch{return apiError(404,'not_found','Anfrage nicht gefunden.')}}

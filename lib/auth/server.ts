@@ -4,9 +4,10 @@ import { redirect } from 'next/navigation'
 import { env } from '@/lib/config/env'
 import type { Session } from './types'
 import type { PlatformRole, Role } from '@/types/domain'
-import { isDatabaseConfigured } from '@/lib/db/client'
+import { isDatabaseConfigured, isPlatformDatabaseConfigured } from '@/lib/db/client'
 import { findAccessibleMembership } from '@/lib/db/repositories/memberships'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
+import { findPlatformOperatorAssignment } from '@/lib/db/repositories/platform-operators'
 export { signInUrl, signOutUrl } from './urls'
 
 type AzureClientPrincipal = {
@@ -126,12 +127,28 @@ export async function requirePlatformRole(...allowed: PlatformRole[]): Promise<N
 
 export async function getPlatformSession(): Promise<Session> {
   const session = await getSession()
-  if (!session?.user.platformRole) return null
-  // Operator access is reserved for official Binso identities. Entra single-tenant and MFA remain Azure configuration requirements.
+  if (!session) return null
+
+  // Entra/App Service Authentication proves identity and access eligibility. Functional
+  // operator roles can then come from the application database without requiring an
+  // Entra application-role claim on every operator account.
   if (!session.user.email.toLowerCase().endsWith('@binso.ch')) return null
+
   if (isDatabaseConfigured()) {
     const account = await upsertAuthenticatedUser({ id: session.user.id, email: session.user.email, displayName: session.user.name })
     if (account.status !== 'active') return null
   } else if (process.env.NODE_ENV === 'production') return null
+
+  const roleSource = (process.env.PLATFORM_ROLE_SOURCE || 'hybrid').trim().toLowerCase()
+  if ((roleSource === 'database' || roleSource === 'hybrid') && isPlatformDatabaseConfigured()) {
+    const assignment = await findPlatformOperatorAssignment(session.user.id, session.user.email)
+    if (assignment) {
+      if (assignment.status !== 'active') return null
+      return { ...session, user: { ...session.user, platformRole: assignment.role } }
+    }
+    if (roleSource === 'database') return null
+  }
+
+  if (!session.user.platformRole) return null
   return session
 }

@@ -11,6 +11,7 @@ export type SupportCaseStatus = 'open' | 'in_progress' | 'waiting_for_customer' 
 export type SupportCaseCategory = 'usage' | 'technical' | 'billing' | 'account' | 'other'
 export type SupportCaseType = 'support' | 'feedback' | 'feature_request' | 'billing'
 export type SupportCaseClassification = 'blocker' | 'friction' | 'request'
+export type SupportCasePriority = 'low' | 'normal' | 'high' | 'urgent'
 
 export type SupportCase = {
   id: string
@@ -20,6 +21,11 @@ export type SupportCase = {
   caseType: SupportCaseType
   category: SupportCaseCategory
   classification?: SupportCaseClassification
+  priority: SupportCasePriority
+  assignedToUserId?: string
+  firstResponseAt?: string
+  resolvedAt?: string
+  mergedIntoCaseId?: string
   isPilotRelated: boolean
   subject: string
   status: SupportCaseStatus
@@ -37,6 +43,7 @@ export type SupportMessage = {
   caseId: string
   authorType: 'customer' | 'operator'
   authorUserId: string
+  visibility: 'customer' | 'internal'
   message: string
   createdAt: string
 }

@@ -6,7 +6,7 @@ import { findActiveMembershipsForUser } from '@/lib/db/repositories/memberships'
 import { cancelOpenSignup, findOpenSignupForUser, saveRegistration } from '@/lib/db/repositories/registration'
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import type { SubscriptionPlan } from '@/types/domain'
-import { enforceRateLimit } from '@/lib/http/rate-limit'
+import { enforceDistributedRateLimit } from '@/lib/http/rate-limit'
 
 const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional'])
 
@@ -24,7 +24,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const rate = enforceRateLimit(request, 'registration', 8, 15 * 60_000)
+  const rate = await enforceDistributedRateLimit(request, 'registration', 8, 15 * 60_000)
   if (!rate.allowed) return NextResponse.json({ error: 'Zu viele Registrierungsversuche. Bitte später erneut versuchen.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfterSeconds) } })
   try { requireSameOrigin(request) } catch { return NextResponse.json({ error: 'Ungültige Anfragequelle.' }, { status: 403 }) }
   const session = await getSession()

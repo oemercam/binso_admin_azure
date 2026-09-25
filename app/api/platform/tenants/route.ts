@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireSameOrigin } from '@/lib/http/server-api'
 import { getPlatformSession } from '@/lib/auth/server'
-import { isDatabaseConfigured } from '@/lib/db/client'
+import { isPlatformDatabaseConfigured } from '@/lib/db/client'
 import { listPlatformSignups, listPlatformTenants, updatePlatformSubscription } from '@/lib/db/repositories/platform-billing'
 import type { PlatformTenantStatus, SubscriptionPlan } from '@/types/domain'
 
@@ -20,7 +20,7 @@ export async function GET() {
   const session = await getPlatformSession()
   if (!session) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 })
   if (!canReadPlatform(session.user.platformRole)) return NextResponse.json({ error: 'Keine Berechtigung.' }, { status: 403 })
-  if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
+  if (!isPlatformDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
 
   const [tenants, signups] = await Promise.all([listPlatformTenants(), listPlatformSignups()])
   return NextResponse.json({ tenants, signups, canManage: canManagePlatform(session.user.platformRole) })
@@ -31,7 +31,7 @@ export async function PATCH(request: Request) {
   const session = await getPlatformSession()
   if (!session) return NextResponse.json({ error: 'Nicht angemeldet.' }, { status: 401 })
   if (!canManagePlatform(session.user.platformRole)) return NextResponse.json({ error: 'Keine Berechtigung.' }, { status: 403 })
-  if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
+  if (!isPlatformDatabaseConfigured()) return NextResponse.json({ error: 'Datenbank ist nicht konfiguriert.' }, { status: 503 })
 
   const body = await request.json().catch(() => null) as null | { tenantId?: string; plan?: SubscriptionPlan; status?: PlatformTenantStatus; reason?: string }
   const tenantId = body?.tenantId?.trim() ?? ''

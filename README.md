@@ -40,3 +40,8 @@ V69-Bestandsaufnahme: `docs/V69-INVENTORY-AND-PLAN.md`. Aktueller Review, Implem
 
 
 V72 Produktvereinfachung und DevSecOps-Basis: `docs/V72-PRODUCT-SIMPLICITY-DEVSECOPS.md`, `docs/development.md`, `docs/testing.md`, `docs/deployment.md` und `docs/security.md`.
+
+## V75 Complete Production Foundation
+
+V75 bündelt Operator-Portal, DB-Rollentrennung, Staging-Härtung, Support/Feedback, Pilot, Leads, Help Center, Analytics, Billing-Reconciliation, Daten-Lifecycle, Incidents und Release-Historie in einem Stand. Details und die verbleibenden externen Azure/Entra/DB-Schritte stehen in `docs/V75-COMPLETE-PRODUCTION-FOUNDATION.md`.
+

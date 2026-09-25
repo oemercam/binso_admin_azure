@@ -53,9 +53,12 @@ export async function processMailOutbox() {
       await withTenantTransaction({ organizationId: row.organization_id, userId: 'system' }, async client => {
         await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [row.organization_id])
         const record = await client.query<{ state: Record<string, unknown> }>('select state from tenant_business_state where organization_id=$1 for update', [row.organization_id])
-        const access = await client.query(`select 1 from platform_tenants pt join organization_subscriptions s on s.organization_id=pt.organization_id where pt.organization_id=$1 and (pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now()))`, [row.organization_id])
+        const access = await client.query<{is_demo:boolean}>(`select o.is_demo from platform_tenants pt join organization_subscriptions s on s.organization_id=pt.organization_id join organizations o on o.id=pt.organization_id where pt.organization_id=$1 and (pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now()))`, [row.organization_id])
         if (!access.rowCount) {
           await client.query("update mail_outbox set status='cancelled',last_error='Organisation ist nicht aktiv.',updated_at=now() where id=$1", [row.id]); return
+        }
+        if (access.rows[0]?.is_demo) {
+          await client.query("update mail_outbox set status='cancelled',last_error='Demo-Organisation: externer Versand unterdrückt.',updated_at=now() where id=$1", [row.id]); return
         }
         if (mail.kind !== 'invitation') {
           const state = record.rows[0]?.state

@@ -18,6 +18,7 @@ export const publicSite = {
     { href: '/status', label: 'Systemstatus' },
   ],
   helpNavigation: [
+    { href: '/help', label: 'Hilfe' },
     { href: '/faq', label: 'FAQ' },
     { href: '/support', label: 'Support' },
     { href: '/contact', label: 'Kontakt' },

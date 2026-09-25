@@ -43,6 +43,9 @@ try{
   await client.query(`insert into platform_tenants(organization_id,owner_name,owner_email,platform_status,seats,monthly_revenue_chf,storage_mb,last_active_at) values($1,'Demo Marketing',$2,'active',10,0,0,now()) on conflict(organization_id) do update set owner_name=excluded.owner_name,owner_email=excluded.owner_email,platform_status='active',last_active_at=now()`,[DEMO_ORG_ID,DEMO_EMAIL])
   await client.query(`insert into company_profile(organization_id,name,address,zip,city,country,email,iban) values($1,'Binso Demo AG','Demoallee 10','3000','Bern','Schweiz',$2,'') on conflict(organization_id) do update set name=excluded.name,address=excluded.address,zip=excluded.zip,city=excluded.city,country=excluded.country,email=excluded.email`,[DEMO_ORG_ID,DEMO_EMAIL])
   await client.query(`insert into tenant_business_state(organization_id,state,version,updated_by,updated_at) values($1,$2::jsonb,1,$3,now()) on conflict(organization_id) do update set state=excluded.state,version=tenant_business_state.version+1,updated_by=excluded.updated_by,updated_at=now()`,[DEMO_ORG_ID,JSON.stringify(state),DEMO_USER_ID])
+  for (const milestone of ['onboarding_completed','first_customer','first_quote','first_order','first_time_entry','first_invoice']) {
+    await client.query(`insert into organization_milestones(organization_id,milestone,source) values($1,$2,'demo_seed') on conflict do nothing`,[DEMO_ORG_ID,milestone])
+  }
   await client.query('commit')
   console.log(`Demo tenant ready: Binso Demo AG (${DEMO_ORG_ID}) for ${DEMO_EMAIL}`)
 }catch(error){await client.query('rollback');throw error}finally{await client.end()}

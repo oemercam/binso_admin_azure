@@ -1,5 +1,5 @@
 import { getPlatformSession } from '@/lib/auth/server'
-import { isDatabaseConfigured, query } from '@/lib/db/client'
+import { isPlatformDatabaseConfigured, platformQuery } from '@/lib/db/client'
 import { apiError, apiJson, requestId } from '@/lib/http/server-api'
 
 export async function GET(request: Request) {
@@ -7,11 +7,11 @@ export async function GET(request: Request) {
   const session = await getPlatformSession()
   if (!session) return apiError(401, 'unauthorized', 'Anmeldung erforderlich.', id)
   if (!session.user.platformRole) return apiError(403, 'forbidden', 'Keine Plattformberechtigung.', id)
-  if (!isDatabaseConfigured()) return apiJson({ database: 'not_configured', webhookFailures24h: 0, applicationErrors24h: 0, pendingSignups: 0, activeTenants: 0, measuredAt: new Date().toISOString() }, undefined, id)
+  if (!isPlatformDatabaseConfigured()) return apiJson({ database: 'not_configured', webhookFailures24h: 0, applicationErrors24h: 0, pendingSignups: 0, activeTenants: 0, measuredAt: new Date().toISOString() }, undefined, id)
 
   const started = performance.now()
   try {
-    const result = await query<{
+    const result = await platformQuery<{
       webhook_failures: string
       application_errors: string
       pending_signups: string

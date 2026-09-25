@@ -1,21 +1,14 @@
+'use client'
+import { useCallback,useEffect,useMemo,useState } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
-import { requirePlatformRole } from '@/lib/auth/server'
-import { listPlatformLeads } from '@/lib/db/repositories/platform-leads'
+import { Input,Select,Textarea } from '@/components/ui/form-controls'
+import type { PlatformLead } from '@/lib/db/repositories/platform-leads'
 
-export default async function PlatformLeadsPage() {
-  await requirePlatformRole('platform_owner','platform_admin','platform_support')
-  const leads = await listPlatformLeads()
-  return (
-    <section className="page apple-page">
-      <PageHeader title="Anfragen" description="Kontakt-, Pilot- und Vertriebsanfragen von der öffentlichen Website." />
-      <div className="data-list compact-overview-list">
-        {leads.length ? leads.map(lead => (
-          <div className="data-row compact-overview-row" key={lead.id}>
-            <span className="primary-cell"><strong>{lead.company ? `${lead.company} · ` : ''}{lead.name}</strong><small>{lead.email} · {lead.topic} · {lead.status}</small></span>
-            <span>{new Intl.DateTimeFormat('de-CH').format(new Date(lead.createdAt))}</span>
-          </div>
-        )) : <div className="list-empty">Noch keine öffentlichen Anfragen.</div>}
-      </div>
-    </section>
-  )
+export default function Page(){
+  const[leads,setLeads]=useState<PlatformLead[]>([]);const[selected,setSelected]=useState<PlatformLead|null>(null);const[q,setQ]=useState('');const[status,setStatus]=useState<PlatformLead['status']>('new');const[notes,setNotes]=useState('')
+  const load=useCallback(()=>fetch('/api/platform/leads',{cache:'no-store'}).then(r=>r.json()).then(j=>setLeads(j.leads??[])),[]);useEffect(()=>{void load()},[load]);
+  const filtered=useMemo(()=>leads.filter(l=>`${l.name} ${l.company??''} ${l.email} ${l.topic} ${l.status}`.toLowerCase().includes(q.trim().toLowerCase())),[leads,q])
+  function open(l:PlatformLead){setSelected(l);setStatus(l.status);setNotes(l.internalNotes??'')}
+  async function save(){if(!selected)return;const r=await fetch('/api/platform/leads',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({id:selected.id,status,internalNotes:notes})});if(r.ok){await load();setSelected(null)}}
+  return <section className="page apple-page"><PageHeader title="Anfragen" description="Kontakt-, Pilot- und Vertriebsanfragen mit einfachem Qualifizierungsprozess."/><div className="module-toolbar"><label className="search-field"><Input value={q} onChange={e=>setQ(e.target.value)} placeholder="Firma, Name oder E-Mail suchen"/></label><span className="toolbar-meta">{filtered.length} Anfragen</span></div><div className="data-list compact-overview-list">{filtered.map(l=><button type="button" className="data-row compact-overview-row" key={l.id} onClick={()=>open(l)}><span className="primary-cell"><strong>{l.company?`${l.company} · `:''}{l.name}</strong><small>{l.email} · {l.topic}</small></span><span>{l.status}</span><span className="row-disclosure">›</span></button>)}</div>{selected&&<div className="settings-section"><h2>{selected.company??selected.name}</h2><p>{selected.message}</p><label><span>Status</span><Select value={status} onChange={e=>setStatus(e.target.value as PlatformLead['status'])}><option value="new">Neu</option><option value="contacted">Kontaktiert</option><option value="qualified">Qualifiziert</option><option value="pilot">Pilot</option><option value="converted">Konvertiert</option><option value="closed">Geschlossen</option></Select></label><label><span>Interne Notiz</span><Textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={4}/></label><div className="module-toolbar"><button className="button secondary" onClick={()=>setSelected(null)}>Schliessen</button><button className="button primary" onClick={()=>void save()}>Speichern</button></div></div>}</section>
 }

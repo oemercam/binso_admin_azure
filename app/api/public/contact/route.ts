@@ -1,5 +1,5 @@
 import { query } from '@/lib/db/client'
-import { enforceRateLimit } from '@/lib/http/rate-limit'
+import { enforceDistributedRateLimit } from '@/lib/http/rate-limit'
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
 
 const topics = new Set(['general','sales','pilot','partnership'])
@@ -7,7 +7,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function POST(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.') }
-  const limit = enforceRateLimit(request, 'public-contact', 5, 15 * 60_000)
+  const limit = await enforceDistributedRateLimit(request, 'public-contact', 5, 15 * 60_000)
   if (!limit.allowed) return apiError(429, 'rate_limited', `Zu viele Anfragen. Bitte in ${limit.retryAfterSeconds} Sekunden erneut versuchen.`)
 
   const body = await readJsonBody<{name?:string;company?:string;email?:string;topic?:string;message?:string}>(request, 12_000).catch(() => null)

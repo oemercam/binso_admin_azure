@@ -4,7 +4,7 @@ import { inviteOrganizationMember, listOrganizationMembers, updateOrganizationMe
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
 import type { Role } from '@/types/domain'
 import { graphMailConfigured } from '@/lib/email/graph'
-import { enforceRateLimit } from '@/lib/http/rate-limit'
+import { enforceDistributedRateLimit } from '@/lib/http/rate-limit'
 
 const roles = new Set<Role>(['owner','admin','finance','employee'])
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const id = requestId(request)
-  const rate = enforceRateLimit(request, 'member-invite', 20, 15 * 60_000)
+  const rate = await enforceDistributedRateLimit(request, 'member-invite', 20, 15 * 60_000)
   if (!rate.allowed) return apiError(429, 'rate_limited', 'Zu viele Einladungen. Bitte später erneut versuchen.', id)
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
