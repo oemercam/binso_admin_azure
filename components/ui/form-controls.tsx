@@ -52,6 +52,7 @@ type SelectProps = {
   className?: string
   'aria-label'?: string
   title?: string
+  name?: string
 }
 
 function flattenOptions(children: ReactNode): Option[] {
@@ -91,6 +92,7 @@ export function Select({
   className = '',
   'aria-label': ariaLabel,
   title,
+  name,
 }: SelectProps) {
   const options = useMemo(() => flattenOptions(children), [children])
   const initialValue = value == null ? String(defaultValue ?? options[0]?.value ?? '') : String(value)
@@ -148,6 +150,7 @@ export function Select({
 
   return (
     <div ref={rootRef} className={`ui-select ${className}`.trim()}>
+      {name ? <input type="hidden" name={name} value={currentValue} disabled={disabled} /> : null}
       <button
         id={labelId}
         type="button"

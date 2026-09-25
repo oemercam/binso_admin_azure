@@ -26,7 +26,9 @@ try {
   const caseNumber = `BS-${(await client.query("select nextval('support_case_number_seq')::text as n")).rows[0].n}`
   const support = await client.query("insert into support_cases(case_number,organization_id,created_by_user_id,case_type,category,subject) values($1,$2,'user-a','feedback','usage','RLS feedback') returning id", [caseNumber,a])
   assert.equal(support.rowCount, 1)
+  await client.query('savepoint cross_tenant_write')
   await assert.rejects(client.query("insert into support_cases(case_number,organization_id,created_by_user_id,case_type,category,subject) values($1,$2,'user-a','support','technical','Cross tenant')", [`${caseNumber}-x`,b]), error => error.code === '42501')
+  await client.query('rollback to savepoint cross_tenant_write')
   await client.query('reset role')
   const mail = [a, 'test-key', 'invoice', 'invoice-1', 'test@example.invalid', 'Test', 'Test', 'test']
   await client.query('insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,created_by) values ($1,$2,$3,$4,$5,$6,$7,$8)', mail)
