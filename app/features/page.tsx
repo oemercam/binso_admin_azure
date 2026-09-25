@@ -10,13 +10,13 @@ const screenshotNames = new Set(['customers', 'quotes', 'orders', 'time', 'invoi
 export default function FeaturesPage() {
   return (
     <PublicShell>
-      <main className="v80-main v80-subpage">
-        <PublicPageIntro eyebrow="Funktionen" title="Alles, was deinen Arbeitsablauf verbindet." description="Vom Kunden über Angebot und Auftrag bis zur Rechnung. Klar aufgebaut und ohne unnötig grosse Produktbilder." />
-        <section className="v80-showcases v80-feature-page">
+      <main className="v80-main v812-page">
+        <PublicPageIntro eyebrow="Funktionen" title="Alles, was deinen Arbeitsablauf verbindet." description="Vom Kunden über Angebot und Auftrag bis zur Rechnung. Klar aufgebaut, schnell erfassbar und ohne unnötigen Ballast." />
+        <section className="v812-showcases">
           {marketingFeatures.map((feature, index) => (
-            <article className={`v80-split ${index % 2 ? 'is-reversed' : ''}`} key={feature.id}>
-              <div className="v80-split-copy"><span>{String(index + 1).padStart(2, '0')}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
-              {screenshotNames.has(feature.id) ? <div className="v80-visual"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} desktopOnly /></div> : <div className="v80-simple-card"><span>Rollen</span><strong>Zugriff passend zur Aufgabe.</strong><p>Berechtigungen werden serverseitig und nachvollziehbar gesteuert.</p></div>}
+            <article className={`v80-split v812-split ${index % 2 ? 'is-reversed' : ''}`} key={feature.id}>
+              <div className="v812-copy"><span className="v80-eyebrow">{String(index + 1).padStart(2, '0')} · {feature.title}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
+              {screenshotNames.has(feature.id) ? <div className="v812-visual"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} desktopOnly /></div> : <div className="v812-info-visual"><span>Rollen und Rechte</span><strong>Zugriff passend zur Aufgabe.</strong><p>Berechtigungen werden serverseitig und nachvollziehbar gesteuert.</p></div>}
             </article>
           ))}
         </section>

@@ -61,14 +61,20 @@ export function PublicShell({ children, compact = false }: { children: ReactNode
 }
 
 export function PublicPageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return <div className="v80-page-intro"><span className="v80-eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>
+  return (
+    <section className="v812-page-intro">
+      <span className="v80-eyebrow">{eyebrow}</span>
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </section>
+  )
 }
 
 export function PublicCta() {
   return (
-    <section className="v80-final-cta">
-      <div><span className="v80-eyebrow">Bereit für den nächsten Schritt?</span><h2>Einfach starten und nur ergänzen, was dein Team wirklich braucht.</h2><p>30 Tage testen, ohne beim Einstieg Zahlungsdaten zu hinterlegen.</p></div>
-      <div className="v80-final-cta-actions"><Link className="button primary" href="/register">30 Tage kostenlos testen</Link><Link className="v80-text-link" href="/pricing">Preise ansehen →</Link></div>
+    <section className="v812-cta" aria-label="Binso One kostenlos testen">
+      <div><span className="v80-eyebrow">Bereit für Binso One?</span><h2>Einfach starten. Erfolgreicher arbeiten.</h2><p>30 Tage kostenlos testen. Keine Zahlungsdaten beim Start.</p></div>
+      <div className="v812-cta-actions"><Link className="button primary" href="/register">30 Tage kostenlos testen</Link><Link className="button secondary" href="/register?mode=demo">Demo ansehen</Link></div>
     </section>
   )
 }

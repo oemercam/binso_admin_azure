@@ -11,7 +11,7 @@ const css = readFileSync('app/styles/marketing-v80.css', 'utf8')
 const standardized = readFileSync('app/standardized-ui.css', 'utf8')
 const responsiveTests = readFileSync('tests/e2e/responsive-robustness.spec.ts', 'utf8')
 
-assert.equal(pkg.version, '0.81.0')
+assert.equal(pkg.version, '0.81.2')
 assert.match(shell, /public-site-v80/)
 assert.match(shell, /v80-desktop-nav/)
 assert.match(shell, /v80-footer-main/)

@@ -57,3 +57,7 @@ V77 parallelisiert Quality, Build, PostgreSQL und Critical E2E, ergänzt Next.js
 ## V78 – Public Site, echte Produktansichten und getrennte Zugänge
 
 V78 ersetzt illustrierte Demo-Ansichten im öffentlichen Auftritt durch echte Screenshots der Binso-One-Anwendung, modernisiert Landingpage, Funktionen und Ablauf und bereinigt Navigation und Footer. `/sign-in` ist der Kunden-Login; der interne Microsoft-Zugang für Binso befindet sich getrennt unter `/admin-access`. Die Provider sind über `AUTH_PROVIDER_NAME` und `AUTH_ADMIN_PROVIDER_NAME` unabhängig konfigurierbar. Details: `docs/V78-PUBLIC-SITE-REDESIGN.md`.
+
+## V81.2 – Complete Public Mockup System
+
+V81.2 vereinheitlicht die gesamte öffentliche Binso-One-Website und die Pre-App-Zugänge nach dem freigegebenen Mockup-System. Landingpage, Funktionen, Preise, FAQ, Kontakt, Ablauf, Sicherheit, Status, Hilfe, Registrierung, Kunden-Login, Admin-Zugang und Legal-Seiten verwenden denselben kompakten Header, dieselben Proportionen, Typografie, Abstände, Mobile-Navigation und Footer. Die authentifizierte Kunden-App unter `app/(app)` bleibt optisch unverändert. Details: `docs/V81.2-COMPLETE-PUBLIC-MOCKUP.md`.
