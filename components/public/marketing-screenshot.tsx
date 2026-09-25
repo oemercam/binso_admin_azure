@@ -14,7 +14,7 @@ const altByName: Record<MarketingScreenshotName, string> = {
   login: 'Binso One Anmeldeseite',
 }
 
-export function MarketingScreenshot({ name, priority = false, className = '' }: { name: MarketingScreenshotName; priority?: boolean; className?: string }) {
+export function MarketingScreenshot({ name, priority = false, className = '', desktopOnly = false }: { name: MarketingScreenshotName; priority?: boolean; className?: string; desktopOnly?: boolean }) {
   const desktop = `/marketing/screenshots/${name}-desktop.png`
   const mobile = `/marketing/screenshots/${name}-mobile.png`
   const desktopExists = existsSync(join(process.cwd(), 'public', desktop))
@@ -22,12 +22,10 @@ export function MarketingScreenshot({ name, priority = false, className = '' }: 
   if (!desktopExists) return null
   return (
     <picture className={`marketing-real-screenshot ${className}`.trim()}>
-      {mobileExists ? <source media="(max-width: 720px)" srcSet={mobile} /> : null}
+      {!desktopOnly && mobileExists ? <source media="(max-width: 720px)" srcSet={mobile} /> : null}
       <img src={desktop} alt={altByName[name]} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} />
     </picture>
   )
 }
 
-export function MarketingDashboardScreenshot() {
-  return <MarketingScreenshot name="dashboard" />
-}
+export function MarketingDashboardScreenshot() { return <MarketingScreenshot name="dashboard" /> }

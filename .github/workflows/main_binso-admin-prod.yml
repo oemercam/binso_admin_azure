@@ -145,6 +145,7 @@ jobs:
           pnpm run v77:check
           pnpm run v78:check
           pnpm run v79:check
+          pnpm run v80:check
           pnpm run language:check
           echo "PRODUCT_CHECK_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Behavioral regression tests

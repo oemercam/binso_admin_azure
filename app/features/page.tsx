@@ -10,13 +10,13 @@ const screenshotNames = new Set(['customers', 'quotes', 'orders', 'time', 'invoi
 export default function FeaturesPage() {
   return (
     <PublicShell>
-      <main className="public-main v78-subpage v782-features-page">
-        <PublicPageIntro eyebrow="Funktionen" title="Alles, was deinen Arbeitsablauf verbindet." description="Vom Kunden über Angebot und Auftrag bis zur Rechnung. Die Bereiche sind so aufgebaut, dass Informationen im nächsten Schritt weiterverwendet werden können." />
-        <section className="v78-feature-showcase v78-feature-showcase-page v782-feature-showcase-page">
+      <main className="v80-main v80-subpage">
+        <PublicPageIntro eyebrow="Funktionen" title="Alles, was deinen Arbeitsablauf verbindet." description="Vom Kunden über Angebot und Auftrag bis zur Rechnung. Klar aufgebaut und ohne unnötig grosse Produktbilder." />
+        <section className="v80-showcases v80-feature-page">
           {marketingFeatures.map((feature, index) => (
-            <article className="v78-feature-row" key={feature.id}>
-              <div className="v78-feature-copy"><span>{String(index + 1).padStart(2, '0')}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
-              {screenshotNames.has(feature.id) ? <div className="v78-feature-shot v782-feature-shot"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} /></div> : <div className="v78-feature-text-card"><span>Mitarbeitende</span><strong>Rollen passend zur Aufgabe.</strong><p>Zugriffe werden serverseitig über Rollen und Berechtigungen gesteuert.</p></div>}
+            <article className={`v80-split ${index % 2 ? 'is-reversed' : ''}`} key={feature.id}>
+              <div className="v80-split-copy"><span>{String(index + 1).padStart(2, '0')}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
+              {screenshotNames.has(feature.id) ? <div className="v80-visual"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} desktopOnly /></div> : <div className="v80-simple-card"><span>Rollen</span><strong>Zugriff passend zur Aufgabe.</strong><p>Berechtigungen werden serverseitig und nachvollziehbar gesteuert.</p></div>}
             </article>
           ))}
         </section>

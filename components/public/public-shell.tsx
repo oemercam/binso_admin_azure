@@ -8,24 +8,24 @@ import { CookieConsent, CookieSettingsButton } from './cookie-consent'
 
 function BrandLink() {
   return (
-    <Link className="public-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
+    <Link className="v80-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
       <BinsoLogo />
-      <span className="public-product-name">ONE</span>
+      <span>ONE</span>
     </Link>
   )
 }
 
 export function PublicHeader() {
   return (
-    <header className="public-header v78-public-header">
-      <div className="public-header-inner">
+    <header className="v80-header">
+      <div className="v80-header-inner">
         <BrandLink />
-        <nav className="public-nav" aria-label="Hauptnavigation">
+        <nav className="v80-desktop-nav" aria-label="Hauptnavigation">
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
-        <div className="public-header-actions">
-          <Link className="public-login-link" href="/sign-in">Anmelden</Link>
-          <Link className="button primary public-cta" href="/register">14 Tage testen</Link>
+        <div className="v80-header-actions">
+          <Link className="v80-login" href="/sign-in">Anmelden</Link>
+          <Link className="button primary v80-header-cta" href="/register">14 Tage testen</Link>
           <PublicMobileMenu />
         </div>
       </div>
@@ -35,43 +35,40 @@ export function PublicHeader() {
 
 export function PublicFooter() {
   return (
-    <footer className="public-footer v78-public-footer v782-public-footer">
-      <div className="public-footer-grid v782-footer-grid">
-        <div className="public-footer-brand">
+    <footer className="v80-footer">
+      <div className="v80-footer-main">
+        <div className="v80-footer-brand">
           <BrandLink />
           <p>{publicSite.footerDescription}</p>
-          <small>Ein Produkt der {appIdentity.company}, {appIdentity.address.city}.</small>
+          <small>{appIdentity.company} · {appIdentity.address.city}</small>
         </div>
-        <div><strong>Produkt</strong>{publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
-        <div><strong>Hilfe</strong>{publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
-        <div><strong>Zugang</strong>{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
-        <div><strong>Rechtliches</strong>{publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}<CookieSettingsButton /></div>
+        <nav className="v80-footer-group" aria-label="Produkt"><strong>Produkt</strong>{publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
+        <nav className="v80-footer-group" aria-label="Hilfe"><strong>Hilfe</strong>{publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
+        <nav className="v80-footer-group" aria-label="Zugang"><strong>Zugang</strong>{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
+        <nav className="v80-footer-group" aria-label="Rechtliches"><strong>Rechtliches</strong>{publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}<CookieSettingsButton /></nav>
       </div>
-      <div className="public-footer-bottom v782-footer-bottom">
+      <div className="v80-footer-bottom">
         <span>© {new Date().getFullYear()} {appIdentity.company}</span>
-        <div>
-          {publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-          {publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-        </div>
+        <div>{publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
       </div>
     </footer>
   )
 }
 
-export function PublicShell({ children, compact = false, light = true }: { children: ReactNode; compact?: boolean; light?: boolean }) {
-  const classes = ['public-site', 'public-site-v78', 'public-site-v782', compact ? 'public-site-compact' : '', light ? 'public-site-light' : ''].filter(Boolean).join(' ')
+export function PublicShell({ children, compact = false }: { children: ReactNode; compact?: boolean; light?: boolean }) {
+  const classes = ['public-site-v80', compact ? 'public-site-v80-compact' : ''].filter(Boolean).join(' ')
   return <div className={classes}><PublicHeader />{children}<PublicFooter /><CookieConsent /></div>
 }
 
 export function PublicPageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return <div className="public-page-intro v78-page-intro"><span>{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>
+  return <div className="v80-page-intro"><span className="v80-eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>
 }
 
 export function PublicCta() {
   return (
-    <section className="public-final-cta v78-final-cta">
-      <div><span>Bereit für den nächsten Schritt?</span><h2>Teste Binso One 14 Tage und richte nur das ein, was du wirklich brauchst.</h2></div>
-      <div className="public-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="button secondary" href="/register?mode=demo">Produktdemo starten</Link><Link className="v79-final-pricing-link" href="/pricing">Preise ansehen →</Link></div>
+    <section className="v80-final-cta">
+      <div><span className="v80-eyebrow">Bereit für den nächsten Schritt?</span><h2>Starte schlank und ergänze nur, was dein Team wirklich braucht.</h2><p>14 Tage testen, ohne beim Einstieg unnötige Angaben auszufüllen.</p></div>
+      <div className="v80-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="v80-text-link" href="/pricing">Preise ansehen →</Link></div>
     </section>
   )
 }

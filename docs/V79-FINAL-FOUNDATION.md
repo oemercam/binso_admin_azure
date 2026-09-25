@@ -73,3 +73,7 @@ Tablet widths now keep swipe-pricing containers within their parent width and co
 - Desktop keeps the split brand/login composition; mobile collapses to one clean login surface with safe-area aware spacing.
 - The login cards no longer inherit the legacy boxed `v78-login-card` presentation.
 - Responsive E2E coverage now validates `/sign-in` and `/admin-access` at phone, tablet and desktop widths.
+
+
+## V80.1 mobile public navigation hardening
+The V80 mobile navigation now uses the rendered `aria-hidden` state as the CSS source of truth for visibility. This removes transition/visibility race conditions in Chromium, keeps the full-screen mobile menu deterministic, and preserves body scroll locking while the menu is open.

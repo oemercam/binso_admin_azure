@@ -106,3 +106,35 @@ for (const viewport of [
     })
   }
 }
+
+test('V80 desktop public navigation and balanced hero remain visible at 1440x900', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await expect(page.locator('.v80-desktop-nav')).toBeVisible()
+  await expect(page.locator('.v80-header-actions .v80-login')).toBeVisible()
+  await expect(page.locator('.v80-header-cta')).toBeVisible()
+  const visual = page.locator('.v80-hero-visual')
+  await expect(visual).toBeVisible()
+  const box = await visual.boundingBox()
+  expect(box).not.toBeNull()
+  if (box) expect(box.height, 'hero visual must not dominate the desktop viewport').toBeLessThan(620)
+  await expect(page.locator('.v80-footer')).toBeVisible()
+  await expectNoViewportOverflow(page, '1440px V80 landing')
+})
+
+test('V80 mobile public navigation opens cleanly and product visual stays compact at 390x844', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await expect(page.locator('.v80-desktop-nav')).toBeHidden()
+  const trigger = page.locator('.v80-menu-trigger')
+  await expect(trigger).toBeVisible()
+  await trigger.click()
+  await expect(page.locator('.v80-mobile-menu-panel')).toBeVisible()
+  await expect(page.locator('.v80-mobile-primary a')).toHaveCount(4)
+  await trigger.click()
+  const visual = page.locator('.v80-hero-visual')
+  const box = await visual.boundingBox()
+  expect(box).not.toBeNull()
+  if (box) expect(box.height, 'hero visual must stay compact on mobile').toBeLessThan(360)
+  await expectNoViewportOverflow(page, '390px V80 landing')
+})

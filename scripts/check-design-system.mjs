@@ -65,8 +65,9 @@ if (!publicShell.includes("from '@/lib/config/public-site'")) throw new Error('P
 
 if (!publicShell.includes('<BinsoLogo />')) throw new Error('Public header must use the canonical original Binso logo')
 if (publicShell.includes('<span>One</span>')) throw new Error('Public header must not reconstruct the logo with separate text')
-if (!publicShell.includes("light ? 'public-site-light'")) throw new Error('Public shell must support the fixed light landing mode')
-if (!appUi.includes('.public-site-light{')) throw new Error('Fixed light public landing theme is missing')
+const marketingV80 = readFileSync(join(root, 'app/styles/marketing-v80.css'), 'utf8')
+if (!publicShell.includes('public-site-v80')) throw new Error('Public shell must use the scoped V80 public website system')
+if (!marketingV80.includes('.v80-header') || !marketingV80.includes('.v80-mobile-menu-panel') || !marketingV80.includes('.v80-footer')) throw new Error('V80 public navigation/footer system is incomplete')
 
 const hardCodedContactPattern = /Weissbadstrasse 8b|\+41 58 510 77 58|oemer\.cam@binso\.ch/
 for (const [name, source] of [['contact', contact], ['imprint', imprint], ['privacy', privacy]]) {
@@ -94,4 +95,4 @@ for (const obsolete of ['.public-hero-preview{', '.preview-window-head{', '.publ
   if (appUi.includes(obsolete)) throw new Error(`Obsolete public style remains: ${obsolete}`)
 }
 
-console.log('Design-system checks passed (tokens, public/auth ownership, original logo, unified light public site, spacious marketing sections, modern onboarding/security, mobile pricing carousel, cookie consent, centralized brand/contact/navigation).')
+console.log('Design-system checks passed (tokens, public/auth ownership, original logo, scoped V80 public navigation/footer, restrained marketing visuals, cookie consent, centralized brand/contact/navigation).')
