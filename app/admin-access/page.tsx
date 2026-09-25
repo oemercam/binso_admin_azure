@@ -7,9 +7,11 @@ import { BinsoLogo } from '@/components/ui/binso-logo'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminAccessPage() {
+export default async function AdminAccessPage({ searchParams }: { searchParams: Promise<{ preview?: string }> }) {
+  const params = await searchParams
+  const preview = env.authMode === 'local' && params.preview === '1'
   const session = await getSession()
-  if (session?.user.platformRole) redirect('/platform')
+  if (session?.user.platformRole && !preview) redirect('/platform')
   return (
     <main className="entry-auth-page v78-admin-login">
       <section className="entry-auth-brand-panel admin"><Link className="entry-auth-brand" href="/" aria-label="Binso One Startseite"><BinsoLogo /><span>ONE</span></Link><div className="entry-auth-brand-copy"><span>Binso GmbH</span><h1>Interner Admin-Zugang.</h1><p>Dieser Zugang ist ausschliesslich für berechtigte Binso-Mitarbeitende und die Plattformverwaltung vorgesehen.</p></div><div className="entry-auth-points"><span>Interner Zugang</span><span>Microsoft-Anmeldung</span><span>Plattformrollen erforderlich</span></div></section>

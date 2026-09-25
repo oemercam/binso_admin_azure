@@ -3,6 +3,7 @@
 @import './styles/base.css';
 @import './styles/app-shell.css';
 @import './styles/public.css';
+@import './styles/auth.css';
 @import './styles/pricing.css';
 @import './styles/forms.css';
 @import './styles/data.css';

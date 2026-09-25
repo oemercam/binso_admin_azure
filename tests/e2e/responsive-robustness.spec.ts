@@ -73,3 +73,36 @@ for (const viewport of viewports) {
     }
   })
 }
+
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
+  { width: 768, height: 1024 },
+  { width: 1440, height: 900 },
+] as const) {
+  for (const route of ['/sign-in', '/admin-access'] as const) {
+    test(`${route} keeps the canonical auth layout at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+      test.setTimeout(30_000)
+      await page.setViewportSize(viewport)
+      await page.goto(`${route}?preview=1`, { waitUntil: 'domcontentloaded' })
+
+      await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}\\?preview=1$`))
+      const panel = page.locator('.entry-auth-login-panel')
+      const card = page.locator('.entry-auth-card')
+      await expect(panel).toBeVisible()
+      await expect(card).toBeVisible()
+      await expectNoViewportOverflow(page, `${viewport.width}px ${route}`)
+
+      const cardBox = await card.boundingBox()
+      expect(cardBox).not.toBeNull()
+      if (cardBox) {
+        expect(cardBox.x, `${route} card left edge`).toBeGreaterThanOrEqual(0)
+        expect(cardBox.x + cardBox.width, `${route} card right edge`).toBeLessThanOrEqual(viewport.width + 1)
+      }
+
+      const brandPanel = page.locator('.entry-auth-brand-panel')
+      if (viewport.width <= 720) await expect(brandPanel).toBeHidden()
+      else await expect(brandPanel).toBeVisible()
+    })
+  }
+}

@@ -18,6 +18,7 @@ const required = [
   'app/styles/base.css',
   'app/styles/app-shell.css',
   'app/styles/public.css',
+  'app/styles/auth.css',
   'app/styles/pricing.css',
   'app/styles/forms.css',
   'app/styles/data.css',
@@ -36,7 +37,7 @@ const adminLayout = readFileSync('app/admin-access/layout.tsx', 'utf8')
 const platformLayout = readFileSync('app/(app)/platform/layout.tsx', 'utf8')
 const serviceWorker = readFileSync('public/sw.js', 'utf8')
 const rootLayout = readFileSync('app/layout.tsx', 'utf8')
-const ui = ['app/standardized-ui.css','app/styles/tokens.css','app/styles/base.css','app/styles/app-shell.css','app/styles/public.css','app/styles/pricing.css','app/styles/forms.css','app/styles/data.css','app/styles/overlays.css'].map((file)=>readFileSync(file,'utf8')).join('\n')
+const ui = ['app/standardized-ui.css','app/styles/tokens.css','app/styles/base.css','app/styles/app-shell.css','app/styles/public.css','app/styles/auth.css','app/styles/pricing.css','app/styles/forms.css','app/styles/data.css','app/styles/overlays.css'].map((file)=>readFileSync(file,'utf8')).join('\n')
 const legacyUi = readFileSync('app/app-ui.css', 'utf8')
 const publicSite = readFileSync('lib/config/public-site.ts', 'utf8')
 const navItems = readFileSync('components/navigation/nav-items.ts', 'utf8')
@@ -141,7 +142,7 @@ const invariants = [
   [serverApi.includes('PRODUCT_LIMITS.defaultApiBodyBytes'), 'bounded API body size must use central product limits'],
   [apiClient.includes('apiErrorMessage') && apiClient.includes('correlationId') && apiClient.includes('jsonBody'), 'browser API requests must use the central typed client contract'],
   [statusPresentation.includes('STATUS_PRESENTATIONS') && statusBadge.includes("@/lib/status/presentation"), 'status labels and tones must have one presentation source'],
-  [standardizedUi.includes("./styles/forms.css") && standardizedUi.includes("./styles/data.css") && standardizedUi.includes("./styles/overlays.css"), 'form, data and overlay CSS ownership must be centralized'],
+  [standardizedUi.includes("./styles/auth.css") && standardizedUi.includes("./styles/forms.css") && standardizedUi.includes("./styles/data.css") && standardizedUi.includes("./styles/overlays.css"), 'auth, form, data and overlay CSS ownership must be centralized'],
   [centralizedClientSurfaces.every((file) => !readFileSync(file, 'utf8').includes('fetch(')), 'standardized customer/platform surfaces must use apiRequest instead of ad-hoc fetch'],
   [rawFetchViolations.length === 0, `ordinary runtime fetch calls must use apiRequest; violations: ${rawFetchViolations.join(', ')}`],
   [runtimeSources.every((file) => !relativePath(file).startsWith('app/api/') || !readFileSync(file,'utf8').includes('NextResponse.json')), 'API JSON responses must use the central server API helper'],

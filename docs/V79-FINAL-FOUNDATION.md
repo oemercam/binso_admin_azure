@@ -67,3 +67,9 @@ Reusable `StatusBadge` derives labels and semantic tones from `lib/status/presen
 
 ### V79.6 responsive hardening
 Tablet widths now keep swipe-pricing containers within their parent width and collapse the five-part public footer before its intrinsic minimum columns can exceed the viewport. The 720 px single-column footer remains unchanged.
+
+## V79.7 authentication presentation hardening
+- Customer login and Binso admin login now share one canonical `app/styles/auth.css` presentation layer loaded after legacy UI CSS.
+- Desktop keeps the split brand/login composition; mobile collapses to one clean login surface with safe-area aware spacing.
+- The login cards no longer inherit the legacy boxed `v78-login-card` presentation.
+- Responsive E2E coverage now validates `/sign-in` and `/admin-access` at phone, tablet and desktop widths.

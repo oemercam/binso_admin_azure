@@ -81,7 +81,7 @@ for (const file of files.filter((file) => /\.(?:ts|tsx)$/.test(file))) {
 }
 
 const standardized = readFileSync('app/standardized-ui.css', 'utf8')
-for (const css of ['tokens.css', 'base.css', 'app-shell.css', 'public.css', 'pricing.css', 'forms.css', 'data.css', 'overlays.css']) {
+for (const css of ['tokens.css', 'base.css', 'app-shell.css', 'public.css', 'auth.css', 'pricing.css', 'forms.css', 'data.css', 'overlays.css']) {
   if (!standardized.includes(`./styles/${css}`)) fail(`app/standardized-ui.css: missing ${css}`)
 }
 
