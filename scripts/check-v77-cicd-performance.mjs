@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+
+const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8')
+const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
+
+assert.equal(packageJson.version, '0.77.0')
+assert.ok(packageJson.scripts['v77:check'])
+assert.match(packageJson.scripts.verify, /v77:check/)
+
+assert.match(workflow, /name: Quality and regression checks/)
+assert.match(workflow, /name: Build and package/)
+assert.match(workflow, /name: Critical E2E/)
+assert.doesNotMatch(workflow, /e2e:\s*[\s\S]*?needs:\s*\[build\]/)
+assert.match(workflow, /path: \.next\/cache/)
+assert.match(workflow, /playwright-chromium-1\.51\.1/)
+assert.match(workflow, /pnpm install --frozen-lockfile --prod/)
+assert.match(workflow, /name: Reuse validated push artifact/)
+assert.match(workflow, /event=push/)
+assert.match(workflow, /status=success/)
+assert.match(workflow, /head_sha=\"\$GITHUB_SHA\"/)
+assert.match(workflow, /artifact-metadata\.json/)
+assert.match(workflow, /sha256sum -c binso-one\.zip\.sha256/)
+assert.match(workflow, /needs: \[validated-artifact\]/)
+assert.match(workflow, /needs: \[validated-artifact, migrate\]/)
+assert.match(workflow, /v76:check/)
+assert.match(workflow, /v77:check/)
+assert.match(workflow, /language:check/)
+assert.match(workflow, /Build performance summary/)
+assert.match(workflow, /Deployment performance summary/)
+
+assert.match(workflow, /database-test:\n    if: github\.event_name != 'workflow_dispatch'/)
+assert.match(workflow, /quality:\n    if: github\.event_name != 'workflow_dispatch'/)
+assert.match(workflow, /build:\n    if: github\.event_name != 'workflow_dispatch'/)
+assert.match(workflow, /e2e:\n    if: github\.event_name != 'workflow_dispatch'/)
+assert.match(workflow, /run-id: \$\{\{ needs\.validated-artifact\.outputs\.source_run_id \}\}/)
+assert.match(workflow, /DEPLOY_ZIP_BYTES/)
+assert.match(workflow, /AZURE_DEPLOY_SECONDS/)
+assert.match(workflow, /cancel-in-progress: \$\{\{ github\.event_name != 'workflow_dispatch' \}\}/)
+
+console.log('V77 CI/CD performance checks passed.')

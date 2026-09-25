@@ -49,3 +49,7 @@ V75 bündelt Operator-Portal, DB-Rollentrennung, Staging-Härtung, Support/Feedb
 ## V76 – Public Entry UX
 
 V76 überarbeitet Landingpage, Login, Registrierung und Onboarding, ohne die Darstellung der authentifizierten Binso-One-Kundenanwendung zu verändern. Die Einrichtung ist auf drei kurze Schritte reduziert. Marketing-Screenshots können mit `pnpm marketing:screenshots` direkt aus der echten Anwendung erzeugt werden. Details: `docs/V76-PUBLIC-ENTRY-UX.md`.
+
+## V77 – CI/CD Performance
+
+V77 parallelisiert Quality, Build, PostgreSQL und Critical E2E, ergänzt Next.js- und Playwright-Caches und schreibt Build-, Artefakt- und Azure-Deploy-Zeiten direkt in die GitHub Step Summary. Produktionskontrollen, Staging-Slot, Healthchecks und Rollback bleiben erhalten. Details: `docs/V77-CICD-PERFORMANCE.md`.

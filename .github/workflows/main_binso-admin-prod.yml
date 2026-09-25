@@ -13,11 +13,12 @@ on:
         default: false
 
 concurrency:
-  group: binso-one-production
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'workflow_dispatch' && 'binso-one-production' || format('binso-one-ci-{0}', github.ref) }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   database-test:
+    if: github.event_name != 'workflow_dispatch'
     name: Isolated PostgreSQL migrations and RLS
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -44,20 +45,129 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - run: pnpm install --frozen-lockfile
-      - name: Apply and repeat migrations
+          cache: pnpm
+      - name: Install dependencies
+        shell: bash
         run: |
+          START=$(date +%s)
+          pnpm install --frozen-lockfile
+          echo "DB_INSTALL_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Apply and repeat migrations
+        shell: bash
+        run: |
+          START=$(date +%s)
           pnpm db:migrate
           pnpm db:migrate
           pnpm run test:integration:db
+          echo "DB_TEST_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
         env:
           DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           PLATFORM_DATABASE_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           DATABASE_TEST_URL: postgresql://postgres:local-test-only@127.0.0.1:5432/binso_v69_test
           DATABASE_SSL: 'false'
+      - name: Database performance summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '### PostgreSQL CI performance'
+            echo '| Metric | Seconds |'
+            echo '| --- | ---: |'
+            echo "| Dependency install | ${DB_INSTALL_SECONDS:-n/a} |"
+            echo "| Migration + RLS test | ${DB_TEST_SECONDS:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  quality:
+    if: github.event_name != 'workflow_dispatch'
+    name: Quality and regression checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.17.1
+          run_install: false
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm install --frozen-lockfile
+          echo "QUALITY_INSTALL_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Typecheck
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm typecheck
+          echo "TYPECHECK_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Lint
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm lint
+          echo "LINT_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Product checks
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm run security:check
+          pnpm run architecture:check
+          pnpm run design-system:check
+          pnpm run actions:check
+          pnpm run process:check
+          pnpm run mobile-ui:check
+          pnpm run product:simplicity-check
+          pnpm run saas:check
+          pnpm run multitenant:check
+          pnpm run data-foundation:check
+          pnpm run auth-membership:check
+          pnpm run customer-auth:check
+          pnpm run registration-onboarding:check
+          pnpm run subscription-billing:check
+          pnpm run stripe-payment:check
+          pnpm run saas:product-check
+          pnpm run platform:check
+          pnpm run go-live:check
+          pnpm run platform-foundation:check
+          pnpm run v74:check
+          pnpm run v75:check
+          pnpm run v76:check
+          pnpm run v77:check
+          pnpm run language:check
+          echo "PRODUCT_CHECK_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Behavioral regression tests
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm test
+          echo "REGRESSION_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Quality performance summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '### Quality CI performance'
+            echo '| Metric | Seconds |'
+            echo '| --- | ---: |'
+            echo "| Dependency install | ${QUALITY_INSTALL_SECONDS:-n/a} |"
+            echo "| Typecheck | ${TYPECHECK_SECONDS:-n/a} |"
+            echo "| Lint | ${LINT_SECONDS:-n/a} |"
+            echo "| Product checks | ${PRODUCT_CHECK_SECONDS:-n/a} |"
+            echo "| Regression tests | ${REGRESSION_SECONDS:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build:
-    name: Quality, build and package
+    if: github.event_name != 'workflow_dispatch'
+    name: Build and package
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -76,49 +186,39 @@ jobs:
           node-version: 24
           cache: pnpm
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm install --frozen-lockfile
+          echo "BUILD_INSTALL_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('app/**/*', 'components/**/*', 'lib/**/*', 'modules/**/*', 'next.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml') }}-
       - name: Set build metadata
         shell: bash
         run: |
           echo "NEXT_PUBLIC_BUILD_ID=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_APP_ENV=production" >> "$GITHUB_ENV"
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Lint
-        run: pnpm lint
-      - name: Product checks
-        run: >
-          pnpm run security:check &&
-          pnpm run architecture:check &&
-          pnpm run design-system:check &&
-          pnpm run actions:check &&
-          pnpm run process:check &&
-          pnpm run mobile-ui:check &&
-          pnpm run product:simplicity-check &&
-          pnpm run saas:check &&
-          pnpm run multitenant:check &&
-          pnpm run data-foundation:check &&
-          pnpm run auth-membership:check &&
-          pnpm run customer-auth:check &&
-          pnpm run registration-onboarding:check &&
-          pnpm run subscription-billing:check &&
-          pnpm run stripe-payment:check &&
-          pnpm run saas:product-check &&
-          pnpm run platform:check &&
-          pnpm run go-live:check &&
-          pnpm run platform-foundation:check &&
-          pnpm run v74:check &&
-          pnpm run v75:check
-      - name: Behavioral regression tests
-        run: pnpm test
       - name: Build
-        run: pnpm build
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm build
+          echo "BUILD_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
       - name: Materialize complete standalone runtime
-        run: pnpm deployment:prepare deploy-root
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm deployment:prepare deploy-root
+          echo "STANDALONE_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Verify isolated standalone runtime dependencies
         shell: bash
         run: |
@@ -133,6 +233,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          START=$(date +%s)
           rm -f binso-one.zip
           (
             cd deploy-root
@@ -141,21 +242,57 @@ jobs:
           unzip -l binso-one.zip | grep -F 'node_modules/next/package.json'
           unzip -l binso-one.zip | grep -F 'node_modules/@swc/helpers/esm/_interop_require_default.js'
           unzip -l binso-one.zip | grep -F 'server.js'
+          echo "PACKAGE_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+          echo "DEPLOY_ROOT_BYTES=$(du -sb deploy-root | cut -f1)" >> "$GITHUB_ENV"
+          echo "DEPLOY_ZIP_BYTES=$(stat -c%s binso-one.zip)" >> "$GITHUB_ENV"
       - name: Smoke test isolated artifact
-        run: node scripts/smoke-standalone.mjs deploy-root
+        shell: bash
+        run: |
+          START=$(date +%s)
+          node scripts/smoke-standalone.mjs deploy-root
+          echo "SMOKE_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Create deployment artifact metadata
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum binso-one.zip > binso-one.zip.sha256
+          printf '{"commitSha":"%s","buildId":"%s","sourceRunId":"%s"}\n' \
+            "$GITHUB_SHA" "${GITHUB_SHA::12}" "$GITHUB_RUN_ID" > artifact-metadata.json
       - name: Upload deployment artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v7
         with:
           name: binso-one
-          path: binso-one.zip
+          path: |
+            binso-one.zip
+            binso-one.zip.sha256
+            artifact-metadata.json
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 2
+      - name: Build performance summary
+        if: always()
+        shell: bash
+        run: |
+          mib() { awk -v b="${1:-0}" 'BEGIN { printf "%.1f", b / 1048576 }'; }
+          {
+            echo '### Build and artifact performance'
+            echo '| Metric | Value |'
+            echo '| --- | ---: |'
+            echo "| Dependency install | ${BUILD_INSTALL_SECONDS:-n/a} s |"
+            echo "| Next.js build | ${BUILD_SECONDS:-n/a} s |"
+            echo "| Standalone materialization | ${STANDALONE_SECONDS:-n/a} s |"
+            echo "| ZIP packaging | ${PACKAGE_SECONDS:-n/a} s |"
+            echo "| Artifact smoke test | ${SMOKE_SECONDS:-n/a} s |"
+            echo "| Standalone size | $(mib "${DEPLOY_ROOT_BYTES:-0}") MiB |"
+            echo "| Deployment ZIP size | $(mib "${DEPLOY_ZIP_BYTES:-0}") MiB |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   e2e:
+    if: github.event_name != 'workflow_dispatch'
     name: Critical E2E
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    needs: [build]
     permissions:
       contents: read
     steps:
@@ -167,21 +304,129 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e --project=desktop-chromium
+      - name: Install dependencies
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm install --frozen-lockfile
+          echo "E2E_INSTALL_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Restore Playwright Chromium cache
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-1.51.1
+      - name: Install Playwright system dependencies
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm exec playwright install-deps chromium
+          echo "PLAYWRIGHT_DEPS_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm exec playwright install chromium
+          echo "PLAYWRIGHT_BROWSER_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
+      - name: Run critical E2E
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm test:e2e --project=desktop-chromium
+          echo "E2E_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
         env:
           AUTH_MODE: local
           ALLOW_LOCAL_AUTH: 'true'
           DATABASE_URL: ''
           NEXT_PUBLIC_APP_ENV: e2e
+      - name: E2E performance summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '### E2E performance'
+            echo '| Metric | Seconds |'
+            echo '| --- | ---: |'
+            echo "| Dependency install | ${E2E_INSTALL_SECONDS:-n/a} |"
+            echo "| Playwright system dependencies | ${PLAYWRIGHT_DEPS_SECONDS:-n/a} |"
+            echo "| Chromium download | ${PLAYWRIGHT_BROWSER_SECONDS:-cache-hit} |"
+            echo "| Critical E2E | ${E2E_SECONDS:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+
+  validated-artifact:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
+    name: Reuse validated push artifact
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      source_run_id: ${{ steps.source.outputs.run_id }}
+    steps:
+      - name: Resolve successful push run for exact commit
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RUN_ID="$(gh api --method GET \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/main_binso-admin-prod.yml/runs" \
+            -f head_sha="$GITHUB_SHA" \
+            -f branch=main \
+            -f event=push \
+            -f status=success \
+            -f per_page=20 \
+            --jq '.workflow_runs[0].id // empty')"
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful push CI run exists for exact commit $GITHUB_SHA."
+            echo "Run the normal push CI successfully before Production deployment."
+            exit 1
+          fi
+          echo "Using validated push run $RUN_ID for commit $GITHUB_SHA"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+      - name: Download validated immutable artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: binso-one
+          path: validated-artifact
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.source.outputs.run_id }}
+      - name: Verify artifact commit and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f validated-artifact/binso-one.zip
+          test -f validated-artifact/binso-one.zip.sha256
+          test -f validated-artifact/artifact-metadata.json
+          test "$(jq -r '.commitSha' validated-artifact/artifact-metadata.json)" = "$GITHUB_SHA"
+          (
+            cd validated-artifact
+            sha256sum -c binso-one.zip.sha256
+          )
+          echo "Validated immutable artifact from push run ${{ steps.source.outputs.run_id }}."
+      - name: Artifact reuse summary
+        shell: bash
+        run: |
+          SIZE="$(stat -c%s validated-artifact/binso-one.zip)"
+          MIB="$(awk -v b="$SIZE" 'BEGIN { printf "%.1f", b / 1048576 }')"
+          {
+            echo '### Production artifact reuse'
+            echo "- Commit: \`$GITHUB_SHA\`"
+            echo "- Validated push run: \`${{ steps.source.outputs.run_id }}\`"
+            echo "- Artifact size: ${MIB} MiB"
+            echo '- Build, Quality, PostgreSQL CI and E2E are not repeated in the manual deployment run.'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   migrate:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
     name: Migrate production database
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [build, database-test, e2e]
+    needs: [validated-artifact]
     environment: production
     permissions:
       contents: read
@@ -198,24 +443,44 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install production migration dependencies
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm install --frozen-lockfile --prod
+          echo "MIGRATE_INSTALL_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Apply database migrations
-        run: pnpm db:migrate
+        shell: bash
+        run: |
+          START=$(date +%s)
+          pnpm db:migrate
+          echo "MIGRATE_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           PLATFORM_DATABASE_URL: ${{ secrets.PLATFORM_DATABASE_URL || secrets.DATABASE_URL }}
           DATABASE_SSL: 'true'
+      - name: Migration performance summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '### Production migration performance'
+            echo '| Metric | Seconds |'
+            echo '| --- | ---: |'
+            echo "| Production-only dependency install | ${MIGRATE_INSTALL_SECONDS:-n/a} |"
+            echo "| Database migration | ${MIGRATE_SECONDS:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/main'
     name: Deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    needs: [build, migrate]
+    needs: [validated-artifact, migrate]
     environment: production
     permissions:
       id-token: write
+      actions: read
       contents: read
     steps:
       - name: Checkout
@@ -224,11 +489,22 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 24
-      - name: Download deployment artifact
+      - name: Download validated deployment artifact
         uses: actions/download-artifact@v8
         with:
           name: binso-one
           path: deploy
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.validated-artifact.outputs.source_run_id }}
+      - name: Re-verify deployment artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq -r '.commitSha' deploy/artifact-metadata.json)" = "$GITHUB_SHA"
+          (
+            cd deploy
+            sha256sum -c binso-one.zip.sha256
+          )
       - name: Azure login (OIDC)
         uses: azure/login@v3
         with:
@@ -322,6 +598,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          START=$(date +%s)
           test -f deploy/binso-one.zip
           az webapp deploy \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
@@ -333,13 +610,16 @@ jobs:
             --restart true \
             --async false \
             --output json
+          echo "AZURE_DEPLOY_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Verify staging health and smoke
         shell: bash
         env:
           STAGING_URL: ${{ vars.BINSO_ONE_STAGING_URL }}
         run: |
           set -euo pipefail
+          START=$(date +%s)
           node scripts/smoke-url.mjs "$STAGING_URL"
+          echo "STAGING_SMOKE_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Record healthy staging release
         continue-on-error: true
         shell: bash
@@ -354,18 +634,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          START=$(date +%s)
           az webapp deployment slot swap \
             --resource-group "${{ steps.app.outputs.resource_group }}" \
             --name binso-admin-prod \
             --slot "$STAGING_SLOT" \
             --target-slot production \
             --output none
+          echo "SLOT_SWAP_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Verify production health or rollback swap
         shell: bash
         env:
           BASE_URL: ${{ vars.BINSO_ONE_BASE_URL }}
         run: |
           set -euo pipefail
+          START=$(date +%s)
           test -n "$BASE_URL"
           HEALTHY=false
           for attempt in $(seq 1 30); do
@@ -378,6 +661,7 @@ jobs:
             echo "Production health check attempt $attempt returned HTTP $STATUS"
             sleep 10
           done
+          echo "PRODUCTION_HEALTH_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
           if [ "$HEALTHY" != "true" ]; then
             echo "Production health failed after swap. Rolling back to previous slot content."
             az webapp deployment slot swap \
@@ -398,3 +682,16 @@ jobs:
           curl --fail-with-body --silent --show-error -X POST "${BASE_URL%/}/api/internal/release-event" \
             -H "Authorization: Bearer $JOB_SECRET" -H 'Content-Type: application/json' \
             --data "{\"buildId\":\"${GITHUB_SHA::12}\",\"environment\":\"production\",\"status\":\"healthy\",\"commitSha\":\"$GITHUB_SHA\"}"
+      - name: Deployment performance summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '### Azure deployment performance'
+            echo '| Metric | Seconds |'
+            echo '| --- | ---: |'
+            echo "| Staging ZIP deployment | ${AZURE_DEPLOY_SECONDS:-n/a} |"
+            echo "| Staging smoke | ${STAGING_SMOKE_SECONDS:-n/a} |"
+            echo "| Slot swap | ${SLOT_SWAP_SECONDS:-n/a} |"
+            echo "| Production health | ${PRODUCTION_HEALTH_SECONDS:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
