@@ -16,7 +16,7 @@ export async function getPlatformCustomerDetail(organizationId:string){
     platformQuery<SubscriptionEventRow>(`select id,source,event_type,previous_plan,new_plan,previous_status,new_status,detail,created_at from subscription_events where organization_id=$1 order by created_at desc limit 100`,[organizationId]),
     platformQuery<SupportRow>(`select id,case_number,case_type,subject,status,priority,updated_at from support_cases where organization_id=$1 order by updated_at desc limit 50`,[organizationId]),
     platformQuery<AuditRow>(`select id,actor_email,action,detail,created_at from platform_audit_events where tenant_id=(select id from platform_tenants where organization_id=$1) order by created_at desc limit 100`,[organizationId]),
-    platformQuery<NoteRow>(`select id,author_email,note,created_at from platform_internal_notes where organization_id=$1 order by created_at desc limit 100`,[organizationId]),
+    platformQuery<NoteRow>(`select id,author_email,note,created_at from platform_internal_notes where tenant_id=$1 order by created_at desc limit 100`,[organizationId]),
     platformQuery<UsageRow>(`select metric,value,period,updated_at from organization_usage_counters where organization_id=$1 order by period desc,metric`,[organizationId]),
   ])
   if(!org.rows[0]) return null
@@ -24,7 +24,7 @@ export async function getPlatformCustomerDetail(organizationId:string){
 }
 
 export async function addPlatformCustomerNote(input:{organizationId:string;actorUserId:string;actorEmail:string;note:string}){
-  const r=await platformQuery<NoteRow>(`insert into platform_internal_notes(organization_id,author_user_id,author_email,note) values($1,$2,$3,$4) returning id,author_email,note,created_at`,[input.organizationId,input.actorUserId,input.actorEmail,input.note])
+  const r=await platformQuery<NoteRow>(`insert into platform_internal_notes(tenant_id,author_user_id,author_email,note) values($1,$2,$3,$4) returning id,author_email,note,created_at`,[input.organizationId,input.actorUserId,input.actorEmail,input.note])
   await platformQuery(`insert into platform_audit_events(actor_user_id,actor_email,action,tenant_id,detail) select $1,$2,'tenant.internal_note.added',pt.id,'Internal note added' from platform_tenants pt where pt.organization_id=$3`,[input.actorUserId,input.actorEmail,input.organizationId])
   return r.rows[0]
 }

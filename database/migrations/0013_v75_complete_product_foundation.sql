@@ -14,16 +14,9 @@ create table if not exists platform_operator_assignments (
 );
 create unique index if not exists uq_platform_operator_email_ci on platform_operator_assignments(lower(email));
 
--- Operator/customer detail notes stay separate from tenant business content.
-create table if not exists platform_internal_notes (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references organizations(id) on delete cascade,
-  author_user_id text not null,
-  author_email text not null,
-  note text not null check (char_length(note) between 1 and 4000),
-  created_at timestamptz not null default now()
-);
-create index if not exists idx_platform_internal_notes_org_created on platform_internal_notes(organization_id, created_at desc);
+-- Operator/customer detail notes already exist since V73 with tenant_id.
+-- Keep that column for backward compatibility because production migrations run before the slot swap.
+create index if not exists idx_platform_internal_notes_tenant_created on platform_internal_notes(tenant_id, created_at desc);
 
 -- Support/feedback workflow maturity.
 alter table support_cases add column if not exists priority text not null default 'normal'
