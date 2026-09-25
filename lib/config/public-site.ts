@@ -4,9 +4,9 @@ import { ROUTES } from '@/lib/navigation/routes'
 export const publicSite = {
   primaryNavigation: [
     { href: ROUTES.public.features, label: 'Funktionen' },
-    { href: ROUTES.public.howItWorks, label: 'So funktioniert es' },
     { href: ROUTES.public.pricing, label: 'Preise' },
     { href: ROUTES.public.faq, label: 'FAQ' },
+    { href: ROUTES.public.contact, label: 'Kontakt' },
   ],
   productNavigation: [
     { href: ROUTES.public.features, label: 'Funktionen' },

@@ -10,7 +10,7 @@ const marketing = readFileSync('lib/config/marketing-content.ts', 'utf8')
 const language = readFileSync('lib/config/product-language.ts', 'utf8')
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 
-assert.ok(['0.76.0', '0.77.0', '0.78.0', '0.79.0', '0.80.0'].includes(packageJson.version))
+assert.ok(['0.76.0', '0.77.0', '0.78.0', '0.79.0', '0.80.0', '0.81.0'].includes(packageJson.version))
 assert.match(landing, /(?:public-landing-v(?:76|78)|v80-main)/)
 assert.match(landing, /Marketing(?:Dashboard)?Screenshot/)
 assert.match(signIn, /entry-auth-page/)

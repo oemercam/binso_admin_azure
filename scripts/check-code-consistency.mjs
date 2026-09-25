@@ -95,7 +95,7 @@ if (!appShellCss.includes('left:50%!important') || !appShellCss.includes('transl
 if (!appShellCss.includes('var(--ui-safe-bottom)')) fail('mobile pill must respect bottom safe area')
 
 const product = readFileSync('lib/config/product.ts', 'utf8')
-for (const marker of ['TRIAL_DAYS = 14', 'DEMO_ACCESS_HOURS = 24', 'MIN_TOUCH_TARGET_PX = 44', 'defaultApiBodyBytes']) {
+for (const marker of ['TRIAL_DAYS = 30', 'DEMO_ACCESS_HOURS = 24', 'MIN_TOUCH_TARGET_PX = 44', 'defaultApiBodyBytes']) {
   if (!product.includes(marker)) fail(`lib/config/product.ts: missing ${marker}`)
 }
 

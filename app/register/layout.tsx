@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 export const metadata: Metadata = {
   manifest: '/customer-manifest.webmanifest',
   title: 'Registrieren',
-  description: 'Binso One 14 Tage kostenlos testen und das Unternehmen in wenigen Schritten einrichten.',
+  description: 'Binso One 30 Tage kostenlos testen und das Unternehmen in wenigen Schritten einrichten.',
   robots: {
     index: false,
     follow: false,

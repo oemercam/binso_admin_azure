@@ -25,7 +25,7 @@ for (const path of [
 assertAny(['app/opengraph-image.tsx', 'app/opengraph-image.png'], 'OpenGraph image route')
 
 assertIncludes('app/page.tsx', 'Schweizer Dienstleistungsunternehmen')
-assertIncludes('app/page.tsx', '14 Tage kostenlos testen')
+assertIncludes('app/page.tsx', '30 Tage kostenlos testen')
 assertIncludes('app/layout.tsx', 'metadataBase')
 assertIncludes('app/layout.tsx', 'publicBaseUrl')
 assertIncludes('lib/config/public-site.ts', 'ROUTES.public.contact')

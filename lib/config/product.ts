@@ -1,6 +1,6 @@
 export const PRODUCT_LOCALE = 'de-CH' as const
 export const PRODUCT_CURRENCY = 'CHF' as const
-export const TRIAL_DAYS = 14
+export const TRIAL_DAYS = 30
 export const DEMO_ACCESS_HOURS = 24
 export const DEFAULT_PAGE_SIZE = 25
 export const MAX_TEXT_LENGTH = 2_000

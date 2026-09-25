@@ -521,7 +521,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         plan: input.plan,
         status: 'trial',
         seats: plan.includedUsers,
-        trialUntil: new Date(Date.now() + 14 * 86400000).toISOString(),
+        trialUntil: new Date(Date.now() + 30 * 86400000).toISOString(),
       }
       setState((current) => ({
         ...current,

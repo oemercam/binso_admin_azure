@@ -10,7 +10,6 @@ function BrandLink() {
   return (
     <Link className="v80-brand" href="/" aria-label={`${appIdentity.name} Startseite`}>
       <BinsoLogo />
-      <span>ONE</span>
     </Link>
   )
 }
@@ -24,8 +23,9 @@ export function PublicHeader() {
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="v80-header-actions">
-          <Link className="v80-login" href="/sign-in">Anmelden</Link>
-          <Link className="button primary v80-header-cta" href="/register">14 Tage testen</Link>
+          <Link className="v80-login" href="/sign-in">Kundenlogin</Link>
+          <Link className="v80-admin-link" href="/admin-access">Admin-Zugang</Link>
+          <Link className="button primary v80-header-cta" href="/register">30 Tage kostenlos testen</Link>
           <PublicMobileMenu />
         </div>
       </div>
@@ -67,8 +67,8 @@ export function PublicPageIntro({ eyebrow, title, description }: { eyebrow: stri
 export function PublicCta() {
   return (
     <section className="v80-final-cta">
-      <div><span className="v80-eyebrow">Bereit für den nächsten Schritt?</span><h2>Starte schlank und ergänze nur, was dein Team wirklich braucht.</h2><p>14 Tage testen, ohne beim Einstieg unnötige Angaben auszufüllen.</p></div>
-      <div className="v80-final-cta-actions"><Link className="button primary" href="/register">14 Tage testen</Link><Link className="v80-text-link" href="/pricing">Preise ansehen →</Link></div>
+      <div><span className="v80-eyebrow">Bereit für den nächsten Schritt?</span><h2>Einfach starten und nur ergänzen, was dein Team wirklich braucht.</h2><p>30 Tage testen, ohne beim Einstieg Zahlungsdaten zu hinterlegen.</p></div>
+      <div className="v80-final-cta-actions"><Link className="button primary" href="/register">30 Tage kostenlos testen</Link><Link className="v80-text-link" href="/pricing">Preise ansehen →</Link></div>
     </section>
   )
 }

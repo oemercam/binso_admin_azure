@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.ok(['0.78.0', '0.79.0', '0.80.0'].includes(packageJson.version))
+assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0'].includes(packageJson.version))
 
 const required = [
   'app/admin-access/page.tsx',
@@ -21,7 +21,7 @@ const admin = readFileSync('app/admin-access/page.tsx', 'utf8')
 const landing = readFileSync('app/page.tsx', 'utf8')
 const authRoute = readFileSync('app/api/auth/login/route.ts', 'utf8')
 
-assert.match(shell, /href="\/sign-in">Anmelden/)
+assert.match(shell, /href="\/sign-in">Kundenlogin/)
 assert.match(navigation, /Admin-Zugang/)
 assert.match(navigation, /Kunden-Login/)
 assert.doesNotMatch(navigation, /primaryNavigation:[\s\S]*?Startseite/)

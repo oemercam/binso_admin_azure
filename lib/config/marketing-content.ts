@@ -67,6 +67,6 @@ export const marketingFaq = [
 
 export const publicValuePoints = [
   'Für Schweizer Dienstleistungsunternehmen',
-  '14 Tage testen ohne Zahlungsdaten',
+  '30 Tage testen ohne Zahlungsdaten',
   'Desktop, Mobile und PWA',
 ] as const

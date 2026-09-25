@@ -112,7 +112,7 @@ function RegisterForm() {
               <h1>{demoMode ? 'Binso One mit Beispieldaten ausprobieren.' : 'Einfach starten. Den Rest später ergänzen.'}</h1>
               <p>{demoMode ? 'Melde dich mit deinem Kundenkonto an. Danach führen wir dich kurz durch die Einrichtung und öffnen einen isolierten Demo-Arbeitsbereich mit fiktiven Daten.' : 'Erstelle deinen Zugang und bestätige nur die wichtigsten Angaben. Die Einrichtung danach dauert nur wenige Minuten.'}</p>
               <div className="register-start-facts" aria-label={demoMode ? 'Eigenschaften der Produktdemo' : 'Vorteile der Testphase'}>
-                {demoMode ? <><span>Fiktive Beispieldaten</span><span>Keine Abrechnung</span><span>24 Stunden verfügbar</span></> : <><span>14 Tage kostenlos testen</span><span>Keine Zahlungsdaten beim Start</span><span>Desktop, Mobile und PWA</span></>}
+                {demoMode ? <><span>Fiktive Beispieldaten</span><span>Keine Abrechnung</span><span>24 Stunden verfügbar</span></> : <><span>30 Tage kostenlos testen</span><span>Keine Zahlungsdaten beim Start</span><span>Desktop, Mobile und PWA</span></>}
               </div>
             </div>
             <div className="register-start-flow">
