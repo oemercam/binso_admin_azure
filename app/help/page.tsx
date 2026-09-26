@@ -6,7 +6,13 @@ import { PublicPageIntro, PublicShell } from '@/components/public/public-shell'
 export const dynamic='force-dynamic'
 export default async function HelpPage({searchParams}:{searchParams:Promise<{q?:string}>}) {
   const {q=''}=await searchParams
-  const articles=await listPublishedHelpArticles(q)
+  let articles: Awaited<ReturnType<typeof listPublishedHelpArticles>> = []
+  try {
+    articles = await listPublishedHelpArticles(q)
+  } catch {
+    // Public help must remain renderable even when the optional help-center DB is unavailable.
+    articles = []
+  }
   return (
     <PublicShell>
       <main className="v80-main v812-page">

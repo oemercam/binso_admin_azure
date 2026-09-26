@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.81.6",
+  "version": "0.81.13",
   "private": true,
   "scripts": {
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "architecture:check": "node scripts/check-architecture.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run consistency:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run v74:check && pnpm run v75:check && pnpm run v76:check && pnpm run v77:check && pnpm run language:check && pnpm run v78:check && pnpm run v79:check && pnpm run v80:check && pnpm build",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm run security:check && pnpm run architecture:check && pnpm run consistency:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run v74:check && pnpm run v75:check && pnpm run v76:check && pnpm run v77:check && pnpm run language:check && pnpm run v78:check && pnpm run v79:check && pnpm run v80:check && pnpm run v819:check && pnpm run v8110:check && pnpm run v8111:check && pnpm build && pnpm run v81.12:check && pnpm run v81.13:check",
     "build:turbo": "next build",
     "actions:check": "node scripts/check-actions.mjs",
     "process:check": "node scripts/check-process.mjs",
@@ -50,7 +50,12 @@
     "v78:check": "node scripts/check-v78-public-site.mjs",
     "v79:check": "node scripts/check-v79-foundation.mjs",
     "consistency:check": "node scripts/check-code-consistency.mjs",
-    "v80:check": "node scripts/check-v80-public-redesign.mjs"
+    "v80:check": "node scripts/check-v80-public-redesign.mjs",
+    "v819:check": "node scripts/check-v819-public-visual.mjs",
+    "v8110:check": "node scripts/check-v8110-public-visual-fixes.mjs",
+    "v8111:check": "node scripts/check-v8111-public-e2e-reliability.mjs",
+    "v81.12:check": "node scripts/check-v81-12-register-shell.mjs",
+    "v81.13:check": "node scripts/check-v81-13-public-route-qa.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",

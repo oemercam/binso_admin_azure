@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.6', '0.81.5'].includes(packageJson.version))
+assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.6', '0.81.7', '0.81.8', '0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13', '0.81.5'].includes(packageJson.version))
 
 const required = [
   'app/admin-access/page.tsx',

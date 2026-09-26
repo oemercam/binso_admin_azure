@@ -96,7 +96,18 @@ function RegisterForm() {
     }
   }
 
-  if (loading) return null
+  if (loading) {
+    return (
+      <PublicShell light>
+        <main className="public-main register-entry register-entry-v706" aria-busy="true">
+          <section className="register-loading-state" aria-label="Registrierung wird geladen">
+            <span className="public-eyebrow">Binso One</span>
+            <h1>Registrierung wird vorbereitet.</h1>
+          </section>
+        </main>
+      </PublicShell>
+    )
+  }
 
   if (!sessionState?.authenticated) {
     const query = new URLSearchParams()
@@ -155,6 +166,19 @@ function RegisterForm() {
   )
 }
 
+function RegisterLoadingShell() {
+  return (
+    <PublicShell light>
+      <main className="public-main register-entry register-entry-v706" aria-busy="true">
+        <section className="register-loading-state" aria-label="Registrierung wird geladen">
+          <span className="public-eyebrow">Binso One</span>
+          <h1>Registrierung wird vorbereitet.</h1>
+        </section>
+      </main>
+    </PublicShell>
+  )
+}
+
 export default function RegisterPage() {
-  return <Suspense fallback={null}><RegisterForm /></Suspense>
+  return <Suspense fallback={<RegisterLoadingShell />}><RegisterForm /></Suspense>
 }

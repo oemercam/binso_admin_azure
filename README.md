@@ -61,3 +61,11 @@ V78 ersetzt illustrierte Demo-Ansichten im öffentlichen Auftritt durch echte Sc
 ## V81.2 – Complete Public Mockup System
 
 V81.2 vereinheitlicht die gesamte öffentliche Binso-One-Website und die Pre-App-Zugänge nach dem freigegebenen Mockup-System. Landingpage, Funktionen, Preise, FAQ, Kontakt, Ablauf, Sicherheit, Status, Hilfe, Registrierung, Kunden-Login, Admin-Zugang und Legal-Seiten verwenden denselben kompakten Header, dieselben Proportionen, Typografie, Abstände, Mobile-Navigation und Footer. Die authentifizierte Kunden-App unter `app/(app)` bleibt optisch unverändert. Details: `docs/V81.2-COMPLETE-PUBLIC-MOCKUP.md`.
+
+
+## V81.8
+Public/pre-app responsive standardisation across web, mobile and PWA.
+
+
+## V81.13
+Public-route visual QA now uses the canonical local preview mode for sign-in and admin-access so the complete PublicShell is tested instead of intentional authenticated redirects.

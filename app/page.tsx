@@ -45,7 +45,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="v816-feature v816-soft">
+        <section className="v816-feature v816-soft v817-time-section">
           <div className="v816-inner v816-feature-grid v816-feature-reverse">
             <div className="v816-feature-copy">
               <div className="v816-label"><span>◷</span><small>Zeiterfassung</small></div>
@@ -53,7 +53,19 @@ export default function HomePage() {
               <p>Erfasse deine Arbeitszeit flexibel – per Timer, manuell oder unterwegs. Behalte Budgets und Verrechenbarkeit jederzeit im Blick.</p>
               <Link href="/features">Mehr zur Zeiterfassung <span>→</span></Link>
             </div>
-            <div className="v816-product-shot"><MarketingScreenshot name="time-mockup" desktopOnly /></div>
+            <div className="v817-time-visual" aria-label="Übersicht zur Zeiterfassung">
+              <div className="v817-time-card v817-time-primary">
+                <div className="v817-time-head"><span>Heute</span><strong>06:42 h</strong></div>
+                <div className="v817-time-progress"><i /></div>
+                <div className="v817-time-meta"><span>Projekt Alpha</span><span>75 %</span></div>
+              </div>
+              <div className="v817-time-grid">
+                <div className="v817-time-card"><small>Diese Woche</small><strong>32:15 h</strong><span>4 Tage erfasst</span></div>
+                <div className="v817-time-card"><small>Verrechenbar</small><strong>82 %</strong><span>+6 % zum Vormonat</span></div>
+                <div className="v817-time-card"><small>Budget</small><strong>68 %</strong><span>im geplanten Rahmen</span></div>
+                <div className="v817-time-card v817-mini-chart"><small>Auslastung</small><div><i /><i /><i /><i /><i /></div><span>stabil</span></div>
+              </div>
+            </div>
           </div>
         </section>
 

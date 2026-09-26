@@ -14,7 +14,7 @@ const viewports = [
   { width: 1920, height: 1080 },
 ] as const
 
-const publicRoutes = ['/', '/features', '/pricing', '/faq', '/sign-in', '/register', '/admin-access']
+const publicRoutes = ['/', '/features', '/pricing', '/faq', '/contact', '/how-it-works', '/security', '/status', '/help', '/support', '/legal/privacy', '/legal/terms', '/legal/imprint', '/sign-in', '/register', '/register?mode=demo', '/admin-access']
 const appRoutes = ['/dashboard', '/customers', '/quotes', '/orders', '/time', '/invoices', '/employees', '/settings']
 const routes = [...publicRoutes, ...appRoutes]
 
@@ -124,7 +124,7 @@ test('V80 desktop public navigation and balanced hero remain visible at 1440x900
   await expectNoViewportOverflow(page, '1440px V80 landing')
 })
 
-test('V81.6 mobile public reconstruction keeps mockup content order at 390x844', async ({ page }) => {
+test('V81.8 mobile public layout keeps calm mockup content order at 390x844', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.v80-desktop-nav')).toBeHidden()
@@ -149,5 +149,149 @@ test('V81.6 mobile public reconstruction keeps mockup content order at 390x844',
 
   const screenshot = page.locator('.v816-feature').first().locator('.marketing-real-screenshot img')
   await expect(screenshot).toHaveAttribute('src', /orders-mockup-desktop\.png$/)
-  await expectNoViewportOverflow(page, '390px V81.6 landing')
+
+  const timeVisual = page.locator('.v817-time-visual')
+  await expect(timeVisual).toBeVisible()
+  await expect(page.locator('.v817-time-section .marketing-real-screenshot')).toHaveCount(0)
+  await expect(page.locator('.v817-time-grid .v817-time-card')).toHaveCount(4)
+
+  await expectNoViewportOverflow(page, '390px V81.8 landing')
+})
+
+test('V81.10 public subpages use the same headline scale as the landing at 1440px', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  const landingSize = Number.parseFloat(await page.locator('.v816-hero-copy h1').evaluate((el) => getComputedStyle(el).fontSize))
+  for (const route of ['/features', '/pricing', '/faq', '/contact', '/how-it-works', '/security', '/status', '/help'] as const) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' })
+    const title = page.locator('.v812-page-intro h1')
+    await expect(title).toBeVisible()
+    const size = Number.parseFloat(await title.evaluate((el) => getComputedStyle(el).fontSize))
+    expect(Math.abs(size - landingSize), `${route} title must match landing typography`).toBeLessThanOrEqual(1)
+    await expectNoViewportOverflow(page, `1440px ${route}`)
+  }
+})
+
+test('V81.10 public titles match landing typography at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  const landingSize = Number.parseFloat(await page.locator('.v816-hero-copy h1').evaluate((el) => getComputedStyle(el).fontSize))
+  for (const route of ['/features', '/pricing', '/faq', '/contact', '/how-it-works', '/security', '/status', '/help'] as const) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' })
+    const title = page.locator('.v812-page-intro h1')
+    await expect(title).toBeVisible()
+    const size = Number.parseFloat(await title.evaluate((el) => getComputedStyle(el).fontSize))
+    expect(Math.abs(size - landingSize), `${route} mobile title must match landing typography`).toBeLessThanOrEqual(1)
+  }
+})
+
+test('V81.10 registration keeps public shell visible during bootstrap', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/register?mode=demo', { waitUntil: 'domcontentloaded' })
+  await expect(page.locator('.v80-header')).toBeVisible()
+  await expect(page.locator('.v80-footer')).toBeVisible()
+})
+
+test('V81.8 demo registration steps stay readable and contained on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/register?mode=demo', { waitUntil: 'domcontentloaded' })
+  const title = page.locator('.register-start-copy h1')
+  const flow = page.locator('.register-start-flow')
+  const steps = flow.locator('.register-start-step')
+  await expect(title).toBeVisible()
+  await expect(flow).toBeVisible()
+  await expect(steps).toHaveCount(3)
+  for (const step of await steps.all()) {
+    const box = await step.boundingBox()
+    expect(box).not.toBeNull()
+    if (box) {
+      expect(box.x).toBeGreaterThanOrEqual(0)
+      expect(box.x + box.width).toBeLessThanOrEqual(390)
+    }
+  }
+  await expectNoViewportOverflow(page, '390px demo registration')
+})
+
+
+test('V81.13 all public pages keep visual system at desktop and mobile sizes', async ({ page }) => {
+  const checks = [
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1440, height: 900 },
+  ] as const
+  const routes = ['/features','/pricing','/faq','/contact','/how-it-works','/security','/status','/help','/sign-in?preview=1','/admin-access?preview=1','/register','/register?mode=demo'] as const
+
+  for (const viewport of checks) {
+    await page.setViewportSize(viewport)
+    for (const route of routes) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' })
+      if (route.includes('preview=1')) await expect(page).toHaveURL(new RegExp(route.replace('/', '\\/').replace('?', '\\?')))
+      await expect(page.locator('.v80-header'), `${route} must render the public header`).toBeVisible()
+      await expect(page.locator('.v80-footer'), `${route} must render the public footer`).toBeVisible()
+      await expectNoViewportOverflow(page, `V81.13 ${viewport.width}px ${route}`)
+
+      const title = page.locator('.v812-page-intro h1, .v812-auth-copy h1, .register-start-copy h1').first()
+      if (await title.count()) {
+        await expect(title).toBeVisible()
+        const style = await title.evaluate((el) => {
+          const s = getComputedStyle(el)
+          return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight), weight: Number.parseInt(s.fontWeight, 10) }
+        })
+        expect(style.size, `${route} title too small`).toBeGreaterThanOrEqual(viewport.width <= 360 ? 33 : viewport.width <= 560 ? 36 : viewport.width <= 820 ? 39 : 42)
+        expect(style.lineHeight / style.size, `${route} title line-height`).toBeLessThanOrEqual(1.08)
+        expect(style.weight, `${route} title weight`).toBeGreaterThanOrEqual(700)
+      }
+    }
+  }
+})
+
+test('V81.9 mobile demo steps and graphics remain readable at 320 and 390', async ({ page }) => {
+  for (const width of [320, 390] as const) {
+    await page.setViewportSize({ width, height: width === 320 ? 568 : 844 })
+    await page.goto('/register?mode=demo', { waitUntil: 'domcontentloaded' })
+    const flow = page.locator('.register-start-flow')
+    await expect(flow).toBeVisible()
+    const steps = flow.locator('.register-start-step')
+    await expect(steps).toHaveCount(3)
+    for (const step of await steps.all()) {
+      const box = await step.boundingBox()
+      expect(box).not.toBeNull()
+      if (box) {
+        expect(box.x).toBeGreaterThanOrEqual(0)
+        expect(box.x + box.width).toBeLessThanOrEqual(width + 1)
+        expect(box.height).toBeGreaterThan(40)
+      }
+      await expect(step.locator('strong')).toBeVisible()
+      await expect(step.locator('small')).toBeVisible()
+    }
+    await expectNoViewportOverflow(page, `V81.9 demo ${width}`)
+
+    await page.goto('/security', { waitUntil: 'domcontentloaded' })
+    const flowItems = page.locator('.v812-flow span')
+    await expect(flowItems).toHaveCount(5)
+    for (const item of await flowItems.all()) await expect(item).toBeVisible()
+    await expectNoViewportOverflow(page, `V81.9 security flow ${width}`)
+  }
+})
+
+test('V81.9 public imagery stays compact and consistently framed', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }] as const) {
+    await page.setViewportSize(viewport)
+    for (const route of ['/features','/how-it-works'] as const) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' })
+      const visuals = page.locator('.v812-visual')
+      const count = await visuals.count()
+      expect(count).toBeGreaterThan(0)
+      for (let index = 0; index < count; index += 1) {
+        const visual = visuals.nth(index)
+        const box = await visual.boundingBox()
+        expect(box).not.toBeNull()
+        if (box) {
+          expect(box.width).toBeLessThanOrEqual(viewport.width)
+          expect(box.height, `${route} visual ${index} is too tall`).toBeLessThan(viewport.width <= 820 ? 330 : 380)
+        }
+      }
+      await expectNoViewportOverflow(page, `V81.9 imagery ${viewport.width}px ${route}`)
+    }
+  }
 })
