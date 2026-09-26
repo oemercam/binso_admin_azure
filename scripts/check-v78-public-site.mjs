@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.5'].includes(packageJson.version))
+assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.6', '0.81.5'].includes(packageJson.version))
 
 const required = [
   'app/admin-access/page.tsx',
@@ -32,7 +32,7 @@ assert.match(admin, /Mit Microsoft anmelden/)
 assert.match(admin, /adminSignInUrl/)
 assert.match(authRoute, /audience === 'admin'/)
 assert.match(authRoute, /authAdminProviderName/)
-assert.match(landing, /MarketingScreenshot name="dashboard" priority/)
+assert.match(landing, /MarketingScreenshot name="dashboard(?:-mockup)?" priority/)
 assert.match(readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8'), /pnpm run v78:check/)
 assert.doesNotMatch(landing, /DashboardProductVisual/)
 
