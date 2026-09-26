@@ -115,3 +115,7 @@ Root document scrolling is canonical for sticky headers, and E2E coverage follow
 
 ## V81.19.3
 CI compatibility fix: architecture scans now tolerate optional source-root directories that are absent after a Git checkout.
+
+
+## V81.19.4
+Legacy V79 responsive regression validation now recognises the canonical `.mobile-primary-nav` introduced by the simplified product navigation. Runtime behaviour is unchanged.
