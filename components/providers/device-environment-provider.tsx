@@ -108,7 +108,6 @@ export function DeviceEnvironmentProvider({ children }: { children: ReactNode })
     window.addEventListener('resize', update, { passive: true })
     window.addEventListener('orientationchange', update, { passive: true })
     visual?.addEventListener('resize', update, { passive: true })
-    visual?.addEventListener('scroll', update, { passive: true })
     media.forEach((query) => query.addEventListener('change', update))
 
     return () => {
@@ -116,7 +115,6 @@ export function DeviceEnvironmentProvider({ children }: { children: ReactNode })
       window.removeEventListener('resize', update)
       window.removeEventListener('orientationchange', update)
       visual?.removeEventListener('resize', update)
-      visual?.removeEventListener('scroll', update)
       media.forEach((query) => query.removeEventListener('change', update))
     }
   }, [])

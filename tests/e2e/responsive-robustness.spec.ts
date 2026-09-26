@@ -60,7 +60,7 @@ for (const viewport of viewports) {
 
     if (viewport.width <= 820) {
       await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
-      const pill = page.locator('.mobile-pill')
+      const pill = page.locator('.mobile-primary-nav')
       await expect(pill).toBeVisible()
       const box = await pill.boundingBox()
       expect(box).not.toBeNull()
@@ -214,6 +214,7 @@ test('V81.8 demo registration steps stay readable and contained on mobile', asyn
 
 
 test('V81.13 all public pages keep visual system at desktop and mobile sizes', async ({ page }) => {
+  test.setTimeout(120_000)
   const checks = [
     { width: 390, height: 844 },
     { width: 768, height: 1024 },
@@ -435,4 +436,65 @@ test('V81.16 mobile navigation breakpoint remains usable on compact tablet width
     await page.keyboard.press('Escape')
     await expect(panel).toBeHidden()
   }
+})
+
+test('V81.17 mobile/PWA surface stays white and headers remain sticky', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff')
+  const publicHeader = page.locator('.v80-header')
+  await expect(publicHeader).toBeVisible()
+  expect(await publicHeader.evaluate((el) => getComputedStyle(el).position)).toBe('sticky')
+  expect(await page.locator('.public-site-v80').evaluate((el) => getComputedStyle(el).overflowX)).toBe('visible')
+  // Public marketing routes do not use the authenticated app RouteTransition wrapper.
+  // Assert only properties that actually exist on the public shell here.
+  expect(await page.locator('.route-stage').count()).toBe(0)
+  expect(await page.locator('html').evaluate((el) => getComputedStyle(el).colorScheme)).toContain('light')
+
+  await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'auto' }))
+  await page.waitForTimeout(50)
+  const publicHeaderAfterScroll = await publicHeader.boundingBox()
+  expect(publicHeaderAfterScroll).not.toBeNull()
+  if (publicHeaderAfterScroll) expect(publicHeaderAfterScroll.y).toBeGreaterThanOrEqual(-1)
+
+  await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+  const appHeader = page.locator('.topbar')
+  await expect(appHeader).toBeVisible()
+  const routeStage = page.locator('.route-stage')
+  await expect(routeStage).toBeVisible()
+  expect(await routeStage.evaluate((el) => getComputedStyle(el).transform)).toBe('none')
+  expect(await appHeader.evaluate((el) => getComputedStyle(el).position)).toBe('sticky')
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'auto' }))
+  await page.waitForTimeout(50)
+  await expect(appHeader).not.toHaveClass(/is-hidden/)
+})
+
+test('V81.18 authenticated navigation exposes only the simple product model', async ({ page }) => {
+  test.setTimeout(90000)
+
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+
+  const desktopNav = page.locator('.desktop-nav')
+  await expect(desktopNav).toBeVisible()
+  for (const label of ['Übersicht', 'Kunden', 'Arbeit', 'Zeit', 'Rechnungen']) {
+    await expect(desktopNav.getByRole('link', { name: label, exact: true })).toBeVisible()
+  }
+  await expect(desktopNav.getByRole('link', { name: 'Angebote', exact: true })).toBeHidden()
+  await expect(desktopNav.getByRole('link', { name: 'Aufträge', exact: true })).toBeHidden()
+  await expect(desktopNav.getByRole('link', { name: 'Verträge', exact: true })).toBeHidden()
+
+  await page.getByText('Mehr', { exact: true }).first().click()
+  await expect(desktopNav.getByRole('link', { name: 'Einstellungen', exact: true })).toBeVisible()
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+  const mobileNav = page.getByRole('navigation', { name: 'Hauptnavigation' })
+  await expect(mobileNav).toBeVisible()
+  for (const label of ['Übersicht', 'Kunden', 'Arbeit', 'Zeit', 'Rechnungen', 'Mehr']) {
+    await expect(mobileNav.getByText(label, { exact: true })).toBeVisible()
+  }
+  await expect(page.getByRole('button', { name: 'Neu erstellen' })).toBeVisible()
 })

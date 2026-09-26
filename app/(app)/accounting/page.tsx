@@ -71,8 +71,8 @@ export default function AccountingPage() {
   return (
     <section className="page apple-page">
       <PageHeader
-        title="Buchhaltung"
-        description="Offene Posten, Lieferantenrechnungen und Zahlungen bearbeiten."
+        title="Offene Posten"
+        description="Lieferantenrechnungen, Debitoren und Zahlungen bearbeiten."
         action={
           <button
             className="button primary page-primary-action"
@@ -97,7 +97,7 @@ export default function AccountingPage() {
         <div className="section-title">
           <div>
             <h2>Zu erledigen</h2>
-            <p>Die nächsten Aufgaben in der Buchhaltung</p>
+            <p>Die nächsten finanziellen Aufgaben</p>
           </div>
           <button type="button" className="button secondary section-action" onClick={exportCsv}>
             <Icon name="download" size={15}/>

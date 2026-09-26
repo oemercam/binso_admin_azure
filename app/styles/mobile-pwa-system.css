@@ -1,0 +1,251 @@
+/* V81.17 — canonical Mobile/PWA UX layer.
+   Imported last. Owns safe areas, sticky chrome, native scrolling, short motion,
+   standalone white surfaces and touch behaviour across public + authenticated UI. */
+
+:root{
+  --pwa-white:#fff;
+  --pwa-header-bg:#fff;
+  --pwa-motion-fast:140ms;
+  --pwa-motion-page:160ms;
+  --pwa-safe-top:env(safe-area-inset-top,0px);
+  --pwa-safe-right:env(safe-area-inset-right,0px);
+  --pwa-safe-bottom:env(safe-area-inset-bottom,0px);
+  --pwa-safe-left:env(safe-area-inset-left,0px);
+}
+
+html{
+  min-height:100%;
+  background:var(--pwa-white);
+  -webkit-text-size-adjust:100%;
+  overflow-x:clip;
+  overflow-y:auto;
+}
+body{
+  min-height:100%;
+  margin:0;
+  background:var(--pwa-white);
+  overflow:visible;
+}
+
+/* One native vertical scroll owner. Keep body out of the scroll-container chain so sticky
+   public/app headers remain attached to the document viewport in Chromium and iOS Safari. */
+html,body{scroll-behavior:auto;overscroll-behavior-x:none}
+.app-frame,.app-shell,.app-main,.route-stage,.public-site-v80{overflow-y:visible}
+.app-main,.route-stage,.public-site-v80{min-width:0}
+
+/* Short, compositor-friendly route motion only. */
+.route-stage{
+  animation:pwa-page-enter var(--pwa-motion-page) cubic-bezier(.2,.8,.2,1) both!important;
+  will-change:auto;
+}
+@keyframes pwa-page-enter{
+  from{opacity:.86}
+  to{opacity:1}
+}
+
+/* Non-blocking PWA cold-start mark. Root layout persists, so this does not replay on client navigation. */
+.app-cold-start{display:none;pointer-events:none;user-select:none}
+@media(display-mode:standalone){
+  html{color-scheme:light!important;background:#fff!important}
+  body{background:#fff!important}
+  .app-cold-start{
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    display:grid;
+    place-items:center;
+    padding:var(--pwa-safe-top) var(--pwa-safe-right) var(--pwa-safe-bottom) var(--pwa-safe-left);
+    background:#fff;
+    animation:pwa-splash-out 720ms ease-out both;
+  }
+  .app-cold-start img{
+    width:min(168px,42vw);
+    height:auto;
+    opacity:0;
+    transform:translateY(4px) scale(.985);
+    animation:pwa-splash-logo 560ms cubic-bezier(.2,.8,.2,1) 60ms both;
+  }
+}
+@keyframes pwa-splash-logo{
+  0%{opacity:0;transform:translateY(4px) scale(.985)}
+  32%,72%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-2px) scale(1)}
+}
+@keyframes pwa-splash-out{
+  0%,76%{opacity:1;visibility:visible}
+  100%{opacity:0;visibility:hidden}
+}
+
+/* Authenticated app chrome: sticky and always reachable; no scroll-to-hide logic. */
+.app-frame{
+  min-height:100svh;
+  min-height:100dvh;
+  padding-top:0!important;
+  background:var(--bg);
+}
+.topbar{
+  position:sticky!important;
+  top:0!important;
+  inset:auto!important;
+  z-index:var(--ui-z-header)!important;
+  transform:none!important;
+  min-height:58px;
+  height:58px;
+  background:var(--header-background)!important;
+  border-bottom:1px solid var(--line)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  transition:background-color var(--pwa-motion-fast) ease,border-color var(--pwa-motion-fast) ease!important;
+}
+.topbar.is-hidden{transform:none!important}
+.app-shell{min-height:calc(100dvh - 58px)}
+
+/* Public/pre-app header uses the same sticky rule and avoids permanent blur. */
+.public-site-v80 .v80-header{
+  position:sticky!important;
+  top:0!important;
+  z-index:var(--ui-z-header)!important;
+  background:#fff!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+}
+
+/* Safe-area ownership on compact/mobile browser surfaces. */
+@media(max-width:820px){
+  html{color-scheme:light!important;background:#fff!important}
+  html[data-theme="dark"]{color-scheme:light!important}
+  body{background:#fff!important;overscroll-behavior-y:auto!important}
+
+  .app-frame,.app-shell,.app-main,.route-stage{background:#fff}
+  .app-frame{min-height:100svh;min-height:100dvh}
+  .topbar{
+    box-sizing:content-box!important;
+    min-height:var(--app-mobile-header-height)!important;
+    height:var(--app-mobile-header-height)!important;
+    padding-top:var(--pwa-safe-top)!important;
+    padding-left:max(var(--app-mobile-gutter),var(--pwa-safe-left))!important;
+    padding-right:max(var(--app-mobile-gutter),var(--pwa-safe-right))!important;
+    background:#fff!important;
+  }
+  .app-shell{min-height:calc(100dvh - var(--app-mobile-header-height) - var(--pwa-safe-top))}
+  .app-main{
+    padding-left:max(var(--app-mobile-gutter),var(--pwa-safe-left))!important;
+    padding-right:max(var(--app-mobile-gutter),var(--pwa-safe-right))!important;
+    padding-bottom:calc(116px + var(--pwa-safe-bottom))!important;
+  }
+
+  .app-demo-notice{
+    top:calc(var(--app-mobile-header-height) + var(--pwa-safe-top))!important;
+    padding-left:max(16px,var(--pwa-safe-left))!important;
+    padding-right:max(16px,var(--pwa-safe-right))!important;
+  }
+
+  .public-site-v80{background:#fff!important;min-height:100dvh}
+  .public-site-v80 .v80-header{
+    box-sizing:content-box!important;
+    padding-top:var(--pwa-safe-top)!important;
+    background:#fff!important;
+  }
+  .public-site-v80 .v80-header-inner{height:64px!important;min-height:64px!important}
+
+  /* Portalled public menu sits below header content + safe top. */
+  body>.v80-mobile-menu-panel{
+    top:calc(64px + var(--pwa-safe-top))!important;
+    height:calc(100dvh - 64px - var(--pwa-safe-top))!important;
+    max-height:calc(100dvh - 64px - var(--pwa-safe-top))!important;
+    padding-left:max(var(--public-gutter),var(--pwa-safe-left))!important;
+    padding-right:max(var(--public-gutter),var(--pwa-safe-right))!important;
+    padding-bottom:max(24px,var(--pwa-safe-bottom))!important;
+    background:#fff!important;
+    overscroll-behavior:contain;
+  }
+
+  /* Bottom navigation always clears the Home Indicator. */
+  .mobile-pill{
+    bottom:calc(10px + max(var(--pwa-safe-bottom),8px))!important;
+    width:min(350px,calc(100vw - 28px - var(--pwa-safe-left) - var(--pwa-safe-right)))!important;
+    box-shadow:0 8px 24px rgba(17,18,20,.12)!important;
+  }
+
+  /* Safe-area complete overlays and sheets. */
+  .app-sheet-backdrop,.dialog-backdrop,.modal-backdrop{
+    padding-left:var(--pwa-safe-left)!important;
+    padding-right:var(--pwa-safe-right)!important;
+    padding-top:var(--pwa-safe-top)!important;
+    padding-bottom:var(--pwa-safe-bottom)!important;
+  }
+  .app-sheet-fullscreen{
+    min-height:100dvh!important;
+    height:100dvh!important;
+    padding-top:var(--pwa-safe-top)!important;
+    padding-bottom:var(--pwa-safe-bottom)!important;
+    background:#fff!important;
+  }
+  .app-sheet-bottom{max-height:min(88dvh,900px)!important}
+  .app-sheet-footer{padding-bottom:max(var(--pwa-safe-bottom),12px)!important}
+  .toast-region,.feedback-stack{
+    padding-left:max(12px,var(--pwa-safe-left));
+    padding-right:max(12px,var(--pwa-safe-right));
+    padding-bottom:max(12px,var(--pwa-safe-bottom));
+  }
+
+  /* iOS form zoom prevention without visually inflating controls. */
+  :where(input,select,textarea){font-size:16px}
+}
+
+/* Installed app remains a white system surface even when the OS is dark. */
+@media(display-mode:standalone){
+  html,body,.app-frame,.app-shell,.public-site-v80{background:#fff!important}
+  html[data-theme="dark"]{color-scheme:light!important}
+  .topbar,.public-site-v80 .v80-header{background:#fff!important}
+  .mobile-pill{bottom:calc(10px + max(var(--pwa-safe-bottom),8px))!important}
+}
+
+/* Touch microinteractions stay subtle and never create layout work. */
+:where(button,.button,.icon-button,.navigation-item,.mobile-pill a,.v80-menu-trigger){
+  transition-property:transform,opacity,background-color,border-color,color;
+  transition-duration:var(--pwa-motion-fast);
+  transition-timing-function:ease;
+}
+@media(hover:none) and (pointer:coarse){
+  :where(button,.button,.icon-button,.navigation-item,.v80-menu-trigger):active{transform:scale(.985)}
+  .mobile-pill .pill-add:active{transform:translate(-50%,-50%) scale(.97)!important}
+}
+
+/* Images never force unexpected reflow after decode. */
+.marketing-real-screenshot{display:block;width:100%;max-width:100%}
+.marketing-real-screenshot>img{display:block;width:100%;height:auto;max-width:100%}
+
+/* Skeletons are intentionally calm. */
+.ui-skeleton{animation-duration:1.45s!important}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+  .route-stage{animation:none!important;transform:none!important}
+  .app-cold-start{display:none!important}
+}
+
+
+/* V81.19.2 — root scroll ownership fix.
+   The document root owns vertical scrolling; body stays overflow:visible. This avoids body
+   becoming a non-scrolling sticky ancestor while window/documentElement is actually scrolled. */
+
+/* V81.17.1 — sticky-header containment fix.
+   Sticky chrome must not sit inside an overflow-clipped or transformed ancestor.
+   Horizontal clipping belongs to the viewport/root, not the public app shell. */
+.public-site-v80{
+  overflow-x:visible!important;
+}
+.route-stage{
+  transform:none!important;
+}
+.public-site-v80 .v80-header,
+.topbar{
+  align-self:stretch;
+}

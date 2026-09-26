@@ -38,7 +38,7 @@ test('mobile core navigation remains usable', async ({ page }, testInfo) => {
   await page.goto('/dashboard')
 
   await expect(
-    page.getByRole('navigation', { name: 'Mobile Navigation' }),
+    page.getByRole('navigation', { name: 'Hauptnavigation' }),
   ).toBeVisible()
 
   await page.getByRole('button', { name: 'Neu erstellen' }).click()

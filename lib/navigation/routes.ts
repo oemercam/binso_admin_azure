@@ -23,6 +23,7 @@ export const ROUTES = {
   app: {
     dashboard: '/dashboard',
     customers: '/customers',
+    work: '/work',
     quotes: '/quotes',
     orders: '/orders',
     time: '/time',

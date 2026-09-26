@@ -1,9 +1,11 @@
 'use client'
 
+import Link from 'next/link'
 import { Textarea, Input } from '@/components/ui/form-controls'
 
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
+import { Icon } from '@/components/ui/icon'
 import { ThemeControl } from '@/components/settings/theme-control'
 import { PushSettings } from '@/components/pwa/push-settings'
 import { StandardFormSheet } from '@/components/ui/sheet-system'
@@ -11,6 +13,7 @@ import { ResponsiveOverlay } from '@/components/ui/responsive-overlay'
 import { SettingsSection, SettingsSelectRow, SettingsToggleRow, SettingsValueRow } from '@/components/settings/settings-row'
 import { useFeedback } from '@/components/ui/feedback'
 import { useBusinessStore } from '@/components/state/business-store'
+import { useCurrentUser } from '@/components/state/current-user'
 import type { DocumentTemplates } from '@/types/domain'
 import { appIdentity } from '@/lib/config/app-identity'
 
@@ -32,6 +35,9 @@ type Editor =
 
 export default function SettingsPage() {
   const store = useBusinessStore()
+  const user = useCurrentUser()
+  const enabledFeatures = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
+  const canUseAutomationSettings = enabledFeatures.has('reminders') || enabledFeatures.has('automations')
   const [tab, setTab] = useState<Tab>('general')
   const [company, setCompany] = useState(store.companyProfile)
   const [templates, setTemplates] = useState(store.documentTemplates)
@@ -118,13 +124,21 @@ export default function SettingsPage() {
 
   return (
     <section className="page apple-page settings-page">
-      <PageHeader title="Einstellungen" description="Unternehmensdaten, Dokumente, Prozesse und Darstellung konfigurieren." />
+      <PageHeader title="Einstellungen" description="Unternehmen, Konto und seltene Konfigurationen an einem Ort." />
+
+      <SettingsSection title="Verwaltung" description="Bereiche, die du nicht täglich brauchst.">
+        <div className="settings-entry-links">
+          <Link className="settings-entry-link" href="/account"><span><Icon name="user" size={17}/></span><span><strong>Mein Konto</strong><small>Persönliche Daten, Sprache und Sicherheit</small></span><Icon name="chevron" size={15}/></Link>
+          {['owner', 'admin'].includes(user.role) ? <Link className="settings-entry-link" href="/organization"><span><Icon name="building" size={17}/></span><span><strong>Organisation und Abo</strong><small>Benutzer, Rollen, Abonnement und Produktzugriff</small></span><Icon name="chevron" size={15}/></Link> : null}
+          {['owner', 'admin'].includes(user.role) && (enabledFeatures.has('imports') || enabledFeatures.has('exports')) ? <Link className="settings-entry-link" href="/data"><span><Icon name="download" size={17}/></span><span><strong>Daten</strong><small>{enabledFeatures.has('imports') ? 'Import, Export und Daten-Lifecycle' : 'Export und Daten-Lifecycle'}</small></span><Icon name="chevron" size={15}/></Link> : null}
+        </div>
+      </SettingsSection>
 
 
       <div className="settings-toolbar desktop-settings-tabs" role="tablist" aria-label="Einstellungen">
         <TabButton active={tab === 'general'} onClick={() => setTab('general')}>Allgemein</TabButton>
         <TabButton active={tab === 'mail'} onClick={() => setTab('mail')}>E-Mail und Versand</TabButton>
-        <TabButton active={tab === 'automation'} onClick={() => setTab('automation')}>Automationen</TabButton>
+        {canUseAutomationSettings ? <TabButton active={tab === 'automation'} onClick={() => setTab('automation')}>Automationen</TabButton> : null}
         <TabButton active={tab === 'documents'} onClick={() => setTab('documents')}>Dokumente</TabButton>
         <TabButton active={tab === 'appearance'} onClick={() => setTab('appearance')}>Darstellung</TabButton>
       </div>
@@ -132,7 +146,7 @@ export default function SettingsPage() {
       <nav className={mobileDetail ? 'settings-mobile-hub detail-open' : 'settings-mobile-hub'} aria-label="Einstellungsbereiche">
         <SettingsHubRow title="Allgemein" meta="Unternehmensdaten und Workflow" onClick={() => { setTab('general'); setMobileDetail(true) }} />
         <SettingsHubRow title="E-Mail und Versand" meta={mailReady ? 'Absender vollständig' : 'Konfiguration unvollständig'} onClick={() => { setTab('mail'); setMobileDetail(true) }} />
-        <SettingsHubRow title="Automationen" meta="Mahnungen, Lohn und Benachrichtigungen" onClick={() => { setTab('automation'); setMobileDetail(true) }} />
+        {canUseAutomationSettings ? <SettingsHubRow title="Automationen" meta="Mahnungen, Lohn und Benachrichtigungen" onClick={() => { setTab('automation'); setMobileDetail(true) }} /> : null}
         <SettingsHubRow title="Dokumente" meta="Rechnung, Angebot und Mahnung" onClick={() => { setTab('documents'); setMobileDetail(true) }} />
         <SettingsHubRow title="Darstellung" meta="Theme und Push" onClick={() => { setTab('appearance'); setMobileDetail(true) }} />
       </nav>
@@ -208,7 +222,7 @@ export default function SettingsPage() {
           </>
         )}
 
-        {tab === 'automation' && (
+        {tab === 'automation' && canUseAutomationSettings && (
           <>
             <div className="integration-banner"><strong>Vertragsentwürfe und aktivierte Mahnungen werden vom Scheduler verarbeitet.</strong><span>Ausführung benötigt einen aktivierten Scheduler; E-Mail-Versand zusätzlich Microsoft Graph.</span></div>
 

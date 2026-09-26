@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { versionAtLeast } from './version-check.mjs'
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.equal(pkg.version, '0.81.16.5')
+assert.ok(versionAtLeast(pkg.version, '0.81.16.5'))
 assert.ok(versionAtLeast(pkg.version, '0.81.16'))
 assert.ok(versionAtLeast('0.81.16.5', '0.81.16'))
 assert.ok(versionAtLeast('0.82.0', '0.81.16'))

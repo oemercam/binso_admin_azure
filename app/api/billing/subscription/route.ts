@@ -3,7 +3,7 @@ import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
 import { getOrganizationSubscription, requestSubscriptionChange } from '@/lib/db/repositories/platform-billing'
 import type { SubscriptionPlan } from '@/types/domain'
 
-const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional', 'enterprise'])
+const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional'])
 
 export async function GET() {
   const context = await resolveAuthorizedTenantContext(undefined, 'subscription.read')

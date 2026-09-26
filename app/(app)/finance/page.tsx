@@ -1,6 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { PageHeader } from '@/components/ui/page-header'
+import { Icon } from '@/components/ui/icon'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { useBusinessStore } from '@/components/state/business-store'
 import { effectiveInvoiceStatus, invoiceOpenAmount } from '@/modules/invoices/status'
@@ -10,6 +12,7 @@ const chf = (value: number) => formatChf(value, { maximumFractionDigits: 0 })
 
 export default function FinancePage() {
   const store = useBusinessStore()
+  const enabledFeatures = new Set(store.entitlements.find((item) => item.organizationId === store.currentOrganizationId)?.features ?? [])
   const deliveredRevenue = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.salesRate, 0)
   const internalCost = store.timeEntries.reduce((sum, entry) => sum + entry.hours * entry.internalCostRate, 0)
   const supplierCost = store.supplierInvoices.reduce((sum, invoice) => sum + invoice.netAmount, 0)
@@ -23,6 +26,10 @@ export default function FinancePage() {
   return (
     <section className="page apple-page">
       <PageHeader title="Finanzen" description="Umsatz, Kosten, Marge und offene Positionen auswerten." />
+      <div className="finance-entry">
+        {enabledFeatures.has('accounting') ? <Link href="/accounting"><Icon name="accounting" size={18}/><span><strong>Offene Posten und Kosten</strong><small>Lieferantenrechnungen, Debitoren und Zahlungen bearbeiten.</small></span><Icon name="chevron" size={15}/></Link> : null}
+        <Link href="/invoices"><Icon name="invoices" size={18}/><span><strong>Kundenrechnungen</strong><small>Rechnungen, Zahlungen und Mahnungen verwalten.</small></span><Icon name="chevron" size={15}/></Link>
+      </div>
       <div className="metric-strip mobile-kpi-4">
         <div className="metric"><span>Geleisteter Umsatz</span><strong>{chf(deliveredRevenue)}</strong><small>aus erfassten Zeiten</small></div>
         <div className="metric"><span>Offene Forderungen</span><strong>{chf(open)}</strong><small className="tone-warning">noch nicht bezahlt</small></div>

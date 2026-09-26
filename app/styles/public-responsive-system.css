@@ -51,8 +51,8 @@
   background:rgba(255,255,255,.97)!important;
   border-bottom:1px solid var(--public-line)!important;
   box-shadow:none!important;
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 .public-site-v80 .v80-header-inner{
   width:min(var(--public-shell-max),calc(100% - (2 * var(--public-gutter))))!important;

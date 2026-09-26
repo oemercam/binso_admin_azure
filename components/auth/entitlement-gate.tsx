@@ -2,10 +2,12 @@
 
 import { usePathname } from 'next/navigation'
 import { useBusinessStore } from '@/components/state/business-store'
+import Link from 'next/link'
 import { PageHeader } from '@/components/ui/page-header'
 import type { OrganizationFeature } from '@/types/domain'
 
-const routeFeatures: Array<{ prefix: string; anyOf: OrganizationFeature[] }> = [
+export const routeFeatures: Array<{ prefix: string; anyOf: OrganizationFeature[] }> = [
+  { prefix: '/work', anyOf: ['quotes', 'orders', 'contracts'] },
   { prefix: '/contacts', anyOf: ['crm'] },
   { prefix: '/customers', anyOf: ['crm'] },
   { prefix: '/quotes', anyOf: ['quotes'] },
@@ -31,8 +33,11 @@ export function EntitlementGate({ children }: { children: React.ReactNode }) {
 
   return (
     <section className="page apple-page">
-      <PageHeader title="Modul nicht verfügbar" description="Dieses Modul ist in deinem aktuellen Binso-One-Plan nicht aktiviert." />
-      <div className="list-empty">Den Produktzugriff kannst du als Inhaber unter Organisation und Abonnement prüfen.</div>
+      <PageHeader title="In deinem Abo nicht enthalten" description="Dieser Bereich gehört zu einem höheren Binso-One-Abo." />
+      <div className="list-empty">
+        <p>Deine sichtbare Navigation zeigt nur Funktionen, die in deinem aktuellen Abo enthalten sind.</p>
+        <Link className="button secondary" href="/organization">Abo ansehen</Link>
+      </div>
     </section>
   )
 }

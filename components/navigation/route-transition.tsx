@@ -87,7 +87,6 @@ export function RouteTransition({ children }: { children: ReactNode }) {
     const first = window.requestAnimationFrame(() => {
       second = window.requestAnimationFrame(() => {
         window.scrollTo({ top: targetY, left: 0, behavior: 'auto' })
-        window.dispatchEvent(new CustomEvent('binso:scroll-positioned', { detail: { y: targetY, restored: restore } }))
       })
     })
 

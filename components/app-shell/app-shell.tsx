@@ -8,7 +8,6 @@ import { MobilePillNav } from '@/components/navigation/mobile-pill-nav'
 import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Icon } from '@/components/ui/icon'
 import { AppOverlays } from '@/components/shared/app-overlays'
-import { useHeaderVisibility } from '@/hooks/use-header-visibility'
 
 export function AppShell({
   user,
@@ -23,11 +22,10 @@ export function AppShell({
   const [quickOpen, setQuickOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
-  const mobileHeaderHidden = useHeaderVisibility()
 
   return (
     <div className="app-frame">
-      <header className={mobileHeaderHidden ? 'topbar is-hidden' : 'topbar'}>
+      <header className="topbar">
         <div className="topbar-brand">
           <BinsoLogo />
         </div>
@@ -39,6 +37,14 @@ export function AppShell({
         </button>
 
         <div className="topbar-actions">
+          <button className="topbar-icon topbar-mobile-search" aria-label="Suche öffnen" onClick={() => { setSearchOpen(true); setNotificationsOpen(false); setProfileOpen(false); setQuickOpen(false) }}>
+            <Icon name="search" size={17} />
+          </button>
+
+          <button className="topbar-icon topbar-create" aria-label="Neu erstellen" onClick={() => { setQuickOpen(true); setNotificationsOpen(false); setProfileOpen(false) }}>
+            <Icon name="plus" size={18} />
+          </button>
+
           <button className="topbar-icon" aria-label="Benachrichtigungen" onClick={() => { setNotificationsOpen((current) => !current); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="bell" size={17} />
             <i />
@@ -61,11 +67,7 @@ export function AppShell({
         <main className="app-main">{children}</main>
       </div>
 
-      <MobilePillNav
-        user={user}
-        onSearch={() => setSearchOpen(true)}
-        onQuick={() => setQuickOpen(true)}
-      />
+      <MobilePillNav user={user} />
 
       <AppOverlays
         user={user}

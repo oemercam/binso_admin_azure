@@ -15,7 +15,13 @@ type ThemeContextValue = {
 const STORAGE_KEY = 'binso-theme'
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
+function isLightAppSurface() {
+  if (typeof window === 'undefined') return true
+  return window.matchMedia('(display-mode: standalone)').matches || window.innerWidth <= 820
+}
+
 function resolveTheme(preference: ThemePreference): ResolvedTheme {
+  if (isLightAppSurface()) return 'light'
   if (preference === 'light' || preference === 'dark') return preference
   if (typeof window === 'undefined') return 'light'
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -24,9 +30,9 @@ function resolveTheme(preference: ThemePreference): ResolvedTheme {
 function applyTheme(theme: ResolvedTheme) {
   const root = document.documentElement
   root.dataset.theme = theme
-  root.style.colorScheme = theme
+  root.style.colorScheme = isLightAppSurface() ? 'light' : theme
   document.querySelectorAll('meta[name="theme-color"]').forEach((element) => {
-    element.setAttribute('content', theme === 'dark' ? '#0b0c0e' : '#ffffff')
+    element.setAttribute('content', '#ffffff')
   })
 }
 
@@ -47,18 +53,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     })
 
     const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const standalone = window.matchMedia('(display-mode: standalone)')
     const listener = () => {
       const current = readStorage(STORAGE_KEY)
-      if (current && current !== 'system') return
-      const next = media.matches ? 'dark' : 'light'
+      const currentPreference: ThemePreference = current === 'light' || current === 'dark' || current === 'system' ? current : 'system'
+      const next = resolveTheme(currentPreference)
       setResolvedTheme(next)
       applyTheme(next)
     }
 
     media.addEventListener('change', listener)
+    standalone.addEventListener('change', listener)
+    window.addEventListener('resize', listener, { passive: true })
     return () => {
       cancelled = true
       media.removeEventListener('change', listener)
+      standalone.removeEventListener('change', listener)
+      window.removeEventListener('resize', listener)
     }
   }, [])
 

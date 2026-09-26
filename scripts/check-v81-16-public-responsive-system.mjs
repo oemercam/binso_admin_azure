@@ -17,8 +17,10 @@ const requiredTokens = [
 ]
 for (const token of requiredTokens) if (!tokens.includes(token)) throw new Error(`Missing public token ${token}`)
 
-if (!standardized.trimEnd().endsWith("@import './styles/public-responsive-system.css';")) {
-  throw new Error('Canonical public responsive system must be imported last')
+const publicImport = standardized.indexOf("@import './styles/public-responsive-system.css';")
+const pwaImport = standardized.indexOf("@import './styles/mobile-pwa-system.css';")
+if (publicImport < 0 || (pwaImport >= 0 && pwaImport < publicImport)) {
+  throw new Error('Canonical public responsive system must load before the final Mobile/PWA ownership layer')
 }
 for (const selector of ['.v80-header-inner', '.v816-hero-copy h1', '.v812-page-intro h1', '.v80-footer-main', '@media(max-width:960px)', '@media(display-mode:standalone)']) {
   if (!canonical.includes(selector)) throw new Error(`Canonical responsive layer missing ${selector}`)
