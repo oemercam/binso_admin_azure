@@ -1,10 +1,13 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const root = process.cwd()
 const sourceRoots = ['app', 'components', 'lib', 'hooks', 'modules', 'types']
 const files = []
-for (const base of sourceRoots) walk(join(root, base))
+for (const base of sourceRoots) {
+  const directory = join(root, base)
+  if (existsSync(directory)) walk(directory)
+}
 
 function walk(dir) {
   for (const name of readdirSync(dir)) {

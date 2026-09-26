@@ -111,3 +111,7 @@ Desktop navigation `<details>` TypeScript compatibility fix; subscription simpli
 
 ## V81.19.2
 Root document scrolling is canonical for sticky headers, and E2E coverage follows the simplified mobile primary navigation introduced in V81.18.
+
+
+## V81.19.3
+CI compatibility fix: architecture scans now tolerate optional source-root directories that are absent after a Git checkout.
