@@ -9,7 +9,7 @@ const e2e = readFileSync('tests/e2e/responsive-robustness.spec.ts','utf8')
 const config = readFileSync('lib/config/public-site.ts','utf8')
 const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8')
 
-assert.ok(['0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13'].includes(pkg.version))
+assert.ok(['0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13', '0.81.14', '0.81.15', '0.81.16'].includes(pkg.version))
 assert.match(pkg.scripts.verify,/v819:check/)
 assert.ok(css.includes('V81.9 — exhaustive public visual QA'))
 for (const token of ['--v819-content','--v819-h1','--v819-h2','@media(max-width:820px)','@media(max-width:560px)','@media(max-width:360px)','@media(display-mode:standalone)']) assert.ok(css.includes(token), `missing ${token}`)

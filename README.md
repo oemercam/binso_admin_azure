@@ -1,3 +1,11 @@
+# Binso One V81.16.2
+
+V81.16.2 keeps the canonical public responsive system and fixes React lint violations in the public mobile navigation.
+
+## V81.15
+
+Mobile public navigation reliability fix.
+
 # Binso One
 
 Binso One ist die von Binso GmbH entwickelte und betriebene SaaS-Plattform für Schweizer Dienstleistungsunternehmen.
@@ -69,3 +77,11 @@ Public/pre-app responsive standardisation across web, mobile and PWA.
 
 ## V81.13
 Public-route visual QA now uses the canonical local preview mode for sign-in and admin-access so the complete PublicShell is tested instead of intentional authenticated redirects.
+
+
+## V81.14
+Public desktop footer spacing and alignment refined; mobile/PWA behaviour unchanged.
+
+
+## V81.16.4
+Responsive regression fixes for canonical H1 scaling, mobile/tablet menu closed state and exhaustive viewport-matrix timeout.

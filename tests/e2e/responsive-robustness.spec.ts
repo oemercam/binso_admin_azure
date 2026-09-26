@@ -295,3 +295,144 @@ test('V81.9 public imagery stays compact and consistently framed', async ({ page
     }
   }
 })
+
+test('V81.14 desktop footer stays compact and visually grouped', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  const footer = page.locator('.v80-footer-main')
+  await expect(footer).toBeVisible()
+  const footerBox = await footer.boundingBox()
+  expect(footerBox).not.toBeNull()
+  if (footerBox) {
+    expect(footerBox.width).toBeLessThanOrEqual(982)
+    expect(footerBox.x).toBeGreaterThan(180)
+  }
+
+  const brand = page.locator('.v80-footer-brand')
+  const groups = page.locator('.v80-footer-group')
+  await expect(groups).toHaveCount(4)
+  const brandBox = await brand.boundingBox()
+  const firstGroupBox = await groups.first().boundingBox()
+  const lastGroupBox = await groups.last().boundingBox()
+  expect(brandBox).not.toBeNull()
+  expect(firstGroupBox).not.toBeNull()
+  expect(lastGroupBox).not.toBeNull()
+  if (brandBox && firstGroupBox && lastGroupBox && footerBox) {
+    expect(firstGroupBox.x - (brandBox.x + brandBox.width), 'product links should stay close to brand').toBeLessThanOrEqual(40)
+    expect(lastGroupBox.x + lastGroupBox.width, 'legal links must remain inside compact footer').toBeLessThanOrEqual(footerBox.x + footerBox.width + 1)
+  }
+  await expectNoViewportOverflow(page, 'V81.14 desktop footer')
+})
+
+
+test('V81.15 mobile public navigation opens, closes and stays above content', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  const trigger = page.locator('.v80-menu-trigger')
+  await expect(trigger).toBeVisible()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+  await trigger.click()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+  const panel = page.locator('body > #public-mobile-navigation')
+  await expect(panel).toBeVisible()
+  await expect(panel.locator('.v80-mobile-primary a')).toHaveCount(4)
+  await expect(panel.getByText('30 Tage kostenlos testen')).toBeVisible()
+
+  const box = await panel.boundingBox()
+  expect(box).not.toBeNull()
+  if (box) {
+    expect(box.x).toBeGreaterThanOrEqual(0)
+    expect(box.x + box.width).toBeLessThanOrEqual(391)
+    expect(box.y).toBeGreaterThanOrEqual(60)
+  }
+
+  await page.keyboard.press('Escape')
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  await expect(panel).toBeHidden()
+
+  await trigger.click()
+  await panel.getByRole('link', { name: 'Preise' }).click()
+  await expect(page).toHaveURL(/\/pricing$/)
+  await expect(page.locator('.v80-menu-trigger')).toHaveAttribute('aria-expanded', 'false')
+  await expectNoViewportOverflow(page, 'V81.15 mobile navigation')
+})
+
+test('V81.16 public layout matrix stays clean across 320, 360, 390, 430, 768, 834, 1024, 1440, 1920', async ({ page }) => {
+  test.setTimeout(180_000)
+  const viewports = [
+    { width: 320, height: 568 },
+    { width: 360, height: 800 },
+    { width: 390, height: 844 },
+    { width: 430, height: 932 },
+    { width: 768, height: 1024 },
+    { width: 834, height: 1112 },
+    { width: 1024, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ] as const
+  const routes = ['/', '/features', '/pricing', '/contact', '/register?mode=demo', '/sign-in?preview=1'] as const
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport)
+    for (const route of routes) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' })
+      await expect(page.locator('.v80-header'), `${route} header at ${viewport.width}px`).toBeVisible()
+      await expect(page.locator('.v80-footer'), `${route} footer at ${viewport.width}px`).toBeVisible()
+      await expectNoViewportOverflow(page, `V81.16 ${viewport.width}px ${route}`)
+
+      const shell = page.locator('.public-site-v80')
+      await expect(shell).toBeVisible()
+      const family = await shell.evaluate((el) => getComputedStyle(el).fontFamily)
+      expect(family.length, `${route} font family at ${viewport.width}px`).toBeGreaterThan(0)
+
+      const title = page.locator('.v816-hero-copy h1, .v812-page-intro h1, .v812-auth-copy h1, .register-start-copy h1').first()
+      if (await title.count()) {
+        await expect(title).toBeVisible()
+        const style = await title.evaluate((el) => {
+          const s = getComputedStyle(el)
+          return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight) }
+        })
+        expect(style.size, `${route} H1 too small at ${viewport.width}px`).toBeGreaterThanOrEqual(33)
+        expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(51)
+        expect(style.lineHeight / style.size, `${route} H1 line-height at ${viewport.width}px`).toBeLessThanOrEqual(1.08)
+      }
+
+      const main = page.locator('.v816-inner, .v80-main.v812-page, .v80-main.v812-auth-page, .register-entry-v706').first()
+      if (await main.count()) {
+        const box = await main.boundingBox()
+        expect(box).not.toBeNull()
+        if (box) {
+          expect(box.x, `${route} left gutter at ${viewport.width}px`).toBeGreaterThanOrEqual(viewport.width <= 360 ? 14 : 15)
+          expect(viewport.width - (box.x + box.width), `${route} right gutter at ${viewport.width}px`).toBeGreaterThanOrEqual(viewport.width <= 360 ? 14 : 15)
+        }
+      }
+
+      if (viewport.width <= 960) {
+        await expect(page.locator('.v80-menu-trigger'), `mobile/tablet menu at ${viewport.width}px`).toBeVisible()
+        await expect(page.locator('.v80-desktop-nav'), `desktop nav hidden at ${viewport.width}px`).toBeHidden()
+      } else {
+        await expect(page.locator('.v80-desktop-nav'), `desktop nav at ${viewport.width}px`).toBeVisible()
+      }
+    }
+  }
+})
+
+test('V81.16 mobile navigation breakpoint remains usable on compact tablet widths', async ({ page }) => {
+  for (const width of [768, 834, 912, 960] as const) {
+    await page.setViewportSize({ width, height: 1024 })
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    const trigger = page.locator('.v80-menu-trigger')
+    await expect(trigger).toBeVisible()
+    await expect(trigger).toBeEnabled()
+    await expect(trigger).toHaveAttribute('data-hydrated', 'true')
+    await trigger.click()
+    const panel = page.locator('body > #public-mobile-navigation')
+    await expect(panel).toBeVisible()
+    await expect(panel.getByRole('link', { name: 'Funktionen' })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(panel).toBeHidden()
+  }
+})

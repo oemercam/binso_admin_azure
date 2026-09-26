@@ -1,0 +1,242 @@
+/* V81.16 — canonical public responsive system.
+   This file is intentionally imported last and is the active source of truth for
+   public/pre-app typography, geometry, spacing and responsive behaviour.
+   Legacy marketing CSS remains only as a compatibility base for existing class names. */
+
+.public-site-v80{
+  --v816-max:var(--public-content-max);
+  --v816-gutter:var(--public-gutter);
+  --v816-blue:var(--public-blue);
+  --v816-ink:var(--public-ink);
+  --v816-copy:var(--public-copy);
+  --v816-line:var(--public-line);
+  --v816-soft:var(--public-soft);
+  --v819-content:var(--public-content-max);
+  --v819-reading:var(--public-reading-max);
+  --v819-gutter:var(--public-gutter);
+  --v819-h1:var(--public-h1);
+  --v819-h2:var(--public-h2);
+  --v819-body:var(--public-body);
+  --v819-small:var(--public-small);
+  --v819-radius:var(--public-radius);
+  --v8110-title:var(--public-h1);
+  min-height:100dvh;
+  background:#fff;
+  color:var(--public-ink);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.public-site-v80 *,body>.v80-mobile-menu-panel *{box-sizing:border-box}
+.public-site-v80 :where(img,svg,video,canvas){display:block;max-width:100%;height:auto}
+.public-site-v80 :where(h1,h2,h3,p){overflow-wrap:break-word}
+.public-site-v80 :where(a,button,input,select,textarea){font-family:inherit}
+
+/* Canonical shell widths. */
+.public-site-v80 .v816-inner,
+.public-site-v80 .v80-main.v812-page,
+.public-site-v80 .v80-main.v812-auth-page,
+.public-site-v80 .register-entry-v706,
+.public-site-v80 .v80-subpage,
+.public-site-v80 .public-main.public-main-narrow{
+  width:min(var(--public-content-max),calc(100% - (2 * var(--public-gutter))))!important;
+  max-width:100%;
+  margin-inline:auto!important;
+  min-width:0;
+}
+
+/* Header / navigation. */
+.public-site-v80 .v80-header{
+  min-height:64px!important;
+  background:rgba(255,255,255,.97)!important;
+  border-bottom:1px solid var(--public-line)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.public-site-v80 .v80-header-inner{
+  width:min(var(--public-shell-max),calc(100% - (2 * var(--public-gutter))))!important;
+  height:64px!important;
+  gap:24px!important;
+}
+.public-site-v80 .v80-brand{gap:6px!important}
+.public-site-v80 .v80-brand .binso-logo-image{height:22px!important}
+.public-site-v80 .v80-brand:after{font-size:17px!important;line-height:1!important;font-weight:430!important}
+.public-site-v80 .v80-desktop-nav{gap:clamp(18px,2vw,30px)!important}
+.public-site-v80 .v80-desktop-nav a,
+.public-site-v80 .v80-login,
+.public-site-v80 .v80-admin-link{
+  font-size:var(--public-nav)!important;
+  line-height:1.2!important;
+  font-weight:550!important;
+}
+.public-site-v80 .v80-header-actions{gap:14px!important}
+.public-site-v80 .v80-header-cta{min-height:40px!important;padding-inline:15px!important;font-size:12px!important;border-radius:8px!important}
+
+/* Landing typography and spacing. */
+.public-site-v80 .v816-hero-grid{gap:clamp(28px,4vw,48px)!important;min-height:0!important;padding:clamp(34px,5vw,54px) 0!important}
+.public-site-v80 .v816-hero-copy h1,
+.public-site-v80 .v812-page-intro h1,
+.public-site-v80 .v812-auth-copy h1,
+.public-site-v80 .register-start-copy h1,
+.public-site-v80 .v812-help-article h1,
+.public-site-v80 .register-loading-state h1{
+  margin-top:10px!important;
+  max-width:var(--public-reading-max)!important;
+  font-size:var(--public-h1)!important;
+  line-height:1!important;
+  letter-spacing:-.05em!important;
+  font-weight:760!important;
+  color:var(--public-ink)!important;
+}
+.public-site-v80 .v816-hero-copy h1{margin-top:0!important}
+.public-site-v80 .v816-hero-copy p,
+.public-site-v80 .v812-page-intro p,
+.public-site-v80 .v812-auth-copy>p,
+.public-site-v80 .register-start-copy>p,
+.public-site-v80 .v812-help-summary{
+  color:var(--public-copy)!important;
+  font-size:var(--public-body)!important;
+  line-height:1.6!important;
+}
+.public-site-v80 .v80-eyebrow,
+.public-site-v80 .public-eyebrow,
+.public-site-v80 .v816-label small{
+  font-size:var(--public-eyebrow)!important;
+  line-height:1.35!important;
+  font-weight:700!important;
+  letter-spacing:.09em!important;
+}
+.public-site-v80 .v812-page-intro{max-width:var(--public-reading-max)!important;padding:var(--public-section-y) 0 clamp(22px,3vw,30px)!important}
+.public-site-v80 .v812-page-intro p{max-width:620px!important;margin-top:14px!important}
+
+/* Landing feature rhythm: consistent text scale, generous but compact whitespace. */
+.public-site-v80 .v816-feature-grid,
+.public-site-v80 .v816-feature-reverse{gap:clamp(28px,4vw,44px)!important;padding:clamp(24px,3.5vw,36px) 0!important;min-height:0!important}
+.public-site-v80 .v816-feature-copy h2,
+.public-site-v80 .v812-copy h2{font-size:var(--public-h2)!important;line-height:1.08!important;letter-spacing:-.04em!important}
+.public-site-v80 .v816-feature-copy p,
+.public-site-v80 .v812-copy p{font-size:var(--public-body)!important;line-height:1.58!important}
+.public-site-v80 .v816-feature-copy>a,
+.public-site-v80 .v81-text-link{font-size:var(--public-small)!important}
+.public-site-v80 .v816-product-shot,
+.public-site-v80 .v817-time-card,
+.public-site-v80 .v812-visual,
+.public-site-v80 .v812-info-visual,
+.public-site-v80 .v812-auth-card,
+.public-site-v80 .v812-form-card,
+.public-site-v80 .register-start-flow,
+.public-site-v80 .register-form-panel,
+.public-site-v80 .v812-plan-card,
+.public-site-v80 .public-support-grid article{
+  border-radius:var(--public-radius)!important;
+  border-color:var(--public-line)!important;
+  box-shadow:var(--public-shadow)!important;
+}
+
+/* Subpages and forms. */
+.public-site-v80 .v812-split,
+.public-site-v80 .v812-split.is-reversed{gap:clamp(28px,4vw,42px)!important;padding:clamp(26px,3.5vw,36px) 0!important}
+.public-site-v80 .v812-copy{max-width:440px!important}
+.public-site-v80 .v812-visual,.public-site-v80 .v812-info-visual{max-width:510px!important;min-width:0!important}
+.public-site-v80 .v812-auth-page,.public-site-v80 .register-entry-v706{padding:var(--public-section-y) 0 clamp(44px,6vw,64px)!important}
+.public-site-v80 .v812-auth-layout,.public-site-v80 .register-start-layout,.public-site-v80 .register-form-layout{gap:clamp(32px,5vw,54px)!important}
+.public-site-v80 .v812-auth-card,.public-site-v80 .v812-form-card,.public-site-v80 .register-start-flow,.public-site-v80 .register-form-panel{padding:clamp(18px,2.5vw,24px)!important}
+.public-site-v80 :where(input,select,textarea){min-height:var(--public-control);font-size:16px}
+.public-site-v80 textarea{min-height:120px}
+.public-site-v80 .button,
+.public-site-v80 .v816-button{min-height:var(--public-control);font-size:12px}
+.public-site-v80 .v812-plan-head h2,.public-site-v80 .v812-auth-card h2,.public-site-v80 .v812-inline-cta h2,.public-site-v80 .v812-cta h2{font-size:var(--public-h3)!important;line-height:1.15!important}
+.public-site-v80 .v812-plan-card>p,.public-site-v80 .v812-auth-card>p,.public-site-v80 .public-support-grid p{font-size:var(--public-small)!important;line-height:1.55!important}
+.public-site-v80 .v812-plan-card>ul li{font-size:var(--public-small)!important;line-height:1.45!important}
+.public-site-v80 .register-start-step strong{font-size:13px!important;line-height:1.35!important}
+.public-site-v80 .register-start-step small,.public-site-v80 .auth-register-prompt,.public-site-v80 .register-privacy-note{font-size:11px!important;line-height:1.5!important}
+
+/* Footer: compact, left-aligned and readable on desktop. */
+.public-site-v80 .v80-footer{border-top:1px solid var(--public-line)!important}
+.public-site-v80 .v80-footer-main,
+.public-site-v80 .v80-footer-bottom{width:min(var(--public-content-max),calc(100% - (2 * var(--public-gutter))))!important}
+.public-site-v80 .v80-footer-main{grid-template-columns:minmax(230px,280px) repeat(4,minmax(105px,1fr))!important;column-gap:24px!important;row-gap:0!important;padding:32px 0 24px!important}
+.public-site-v80 .v80-footer-brand{max-width:270px!important;padding-right:8px!important}
+.public-site-v80 .v80-footer-brand p{max-width:255px!important;margin:10px 0 6px!important;font-size:12px!important;line-height:1.55!important}
+.public-site-v80 .v80-footer-brand small{font-size:11px!important}
+.public-site-v80 .v80-footer-group{gap:4px!important;align-items:flex-start!important;min-width:0!important}
+.public-site-v80 .v80-footer-group strong{margin-bottom:7px!important;font-size:11px!important;letter-spacing:.08em!important}
+.public-site-v80 .v80-footer-group a,.public-site-v80 .v80-footer-group button{min-height:28px!important;width:auto!important;max-width:100%!important;font-size:12px!important;line-height:1.35!important;text-align:left!important}
+.public-site-v80 .v80-footer-bottom{align-items:center!important;padding:14px 0 calc(16px + var(--ui-safe-bottom))!important;font-size:11px!important}
+.public-site-v80 .v80-footer-bottom>div{gap:10px 16px!important;flex-wrap:wrap!important;justify-content:flex-end!important}
+
+/* Tablet: use mobile navigation before desktop navigation becomes cramped. */
+@media(max-width:960px){
+  .public-site-v80 .v80-header{padding-top:var(--ui-safe-top)!important}
+  .public-site-v80 .v80-header-inner{grid-template-columns:1fr auto!important;height:64px!important}
+  .public-site-v80 .v80-desktop-nav,
+  .public-site-v80 .v80-login,
+  .public-site-v80 .v80-admin-link,
+  .public-site-v80 .v80-header-cta{display:none!important}
+  .public-site-v80 .v80-mobile-menu{display:block!important}
+  body>.v80-mobile-menu-panel{
+    display:none!important;
+    inset:calc(64px + var(--ui-safe-top)) 0 0 0!important;
+    padding:14px max(var(--public-gutter),var(--ui-safe-right)) calc(24px + var(--ui-safe-bottom)) max(var(--public-gutter),var(--ui-safe-left))!important;
+  }
+  body>.v80-mobile-menu-panel.is-open,
+  body>.v80-mobile-menu-panel[aria-hidden="false"]{display:block!important}
+  body>.v80-mobile-menu-panel .v80-mobile-primary a{min-height:56px!important;font-size:18px!important}
+  body>.v80-mobile-menu-panel .v80-mobile-meta a,
+  body>.v80-mobile-menu-panel .v80-mobile-access>a{min-height:44px!important;font-size:13px!important}
+  .public-site-v80 .v816-hero-grid{grid-template-columns:1fr!important;gap:28px!important}
+  .public-site-v80 .v816-hero-copy{max-width:680px!important}
+  .public-site-v80 .v816-laptop{max-width:620px!important;justify-self:start!important}
+  .public-site-v80 .v816-feature-grid,.public-site-v80 .v816-feature-reverse{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:20px!important}
+  .public-site-v80 .v816-feature-copy{order:1!important;width:100%!important;max-width:none!important}
+  .public-site-v80 .v816-product-shot,.public-site-v80 .v817-time-visual,.public-site-v80 .v816-integration-map{order:2!important;width:100%!important;max-width:100%!important}
+  .public-site-v80 .v812-split,.public-site-v80 .v812-split.is-reversed{grid-template-columns:1fr!important;gap:20px!important}
+  .public-site-v80 .v812-split .v812-copy,.public-site-v80 .v812-split.is-reversed .v812-copy{order:1!important;grid-column:auto!important;grid-row:auto!important;max-width:none!important}
+  .public-site-v80 .v812-split .v812-visual,.public-site-v80 .v812-split.is-reversed .v812-visual,.public-site-v80 .v812-info-visual{order:2!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:100%!important;justify-self:stretch!important}
+  .public-site-v80 .v812-auth-layout,.public-site-v80 .register-start-layout,.public-site-v80 .register-form-layout{grid-template-columns:1fr!important;gap:28px!important}
+  .public-site-v80 .v812-contact-layout,.public-site-v80 .v812-faq-grid,.public-site-v80 .v812-security-grid{grid-template-columns:1fr!important;gap:24px!important}
+  .public-site-v80 .v812-pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .public-site-v80 .v812-plan-card:last-child{grid-column:1/-1!important}
+  .public-site-v80 .v80-footer-main{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 20px!important}
+  .public-site-v80 .v80-footer-brand{grid-column:1/-1!important;max-width:440px!important;padding-bottom:16px!important;border-bottom:1px solid var(--public-line)!important}
+}
+@media(min-width:961px){
+  .public-site-v80 .v80-mobile-menu{display:none!important}
+  body>.v80-mobile-menu-panel{display:none!important}
+}
+
+/* Mobile / small phones. */
+@media(max-width:640px){
+  .public-site-v80 .v816-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .public-site-v80 .v816-button{width:100%!important;justify-content:center!important;min-height:46px!important}
+  .public-site-v80 .v816-trust{display:none!important}
+  .public-site-v80 .v812-pricing-grid{grid-template-columns:1fr!important}
+  .public-site-v80 .v812-plan-card:last-child{grid-column:auto!important}
+  .public-site-v80 .v812-inline-cta,.public-site-v80 .v812-cta{grid-template-columns:1fr!important;padding:20px!important}
+  .public-site-v80 .v812-cta-actions{display:grid!important;grid-template-columns:1fr!important;width:100%!important}
+  .public-site-v80 .v812-cta-actions .button{width:100%!important}
+  .public-site-v80 .v812-flow{grid-template-columns:1fr!important;gap:8px!important}
+  .public-site-v80 .v812-flow b{display:none!important}
+  .public-site-v80 .v812-help-search{grid-template-columns:1fr!important}
+  .public-site-v80 .v812-help-search .button{width:100%!important}
+  .public-site-v80 .v80-footer-bottom{flex-direction:column!important;align-items:flex-start!important;gap:8px!important}
+  .public-site-v80 .v80-footer-bottom>div{justify-content:flex-start!important}
+}
+
+@media(max-width:420px){
+  .public-site-v80 .v80-brand .binso-logo-image{height:20px!important}
+  .public-site-v80 .v80-brand:after{font-size:15px!important}
+  .public-site-v80 .v812-page-intro{padding-top:30px!important}
+  .public-site-v80 .v816-integration-map{height:180px!important}
+  .public-site-v80 .register-start-flow,.public-site-v80 .register-form-panel,.public-site-v80 .v812-auth-card,.public-site-v80 .v812-form-card{padding:18px!important}
+  .public-site-v80 .v80-footer-main{gap:20px 16px!important;padding-top:28px!important}
+}
+
+/* Installed PWA: explicit safe-area ownership in addition to viewport-fit=cover. */
+@media(display-mode:standalone){
+  .public-site-v80{padding-left:var(--ui-safe-left);padding-right:var(--ui-safe-right)}
+  .public-site-v80 .v80-header{padding-top:var(--ui-safe-top)!important}
+  body>.v80-mobile-menu-panel{padding-bottom:calc(24px + var(--ui-safe-bottom))!important}
+  .public-site-v80 .v80-footer-bottom{padding-bottom:calc(16px + var(--ui-safe-bottom))!important}
+}
