@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const pkg = JSON.parse(readFileSync('package.json','utf8'))
 const spec = readFileSync('tests/e2e/responsive-robustness.spec.ts','utf8')
 const signIn = readFileSync('app/sign-in/page.tsx','utf8')
 const admin = readFileSync('app/admin-access/page.tsx','utf8')
 
-assert.ok(['0.81.13','0.81.14', '0.81.15', '0.81.16'].includes(pkg.version))
+assertVersionAtLeast(assert, pkg.version, '0.81.13')
 assert.match(spec, /\/sign-in\?preview=1/)
 assert.match(spec, /\/admin-access\?preview=1/)
 assert.match(spec, /V81\.13 all public pages keep visual system/)

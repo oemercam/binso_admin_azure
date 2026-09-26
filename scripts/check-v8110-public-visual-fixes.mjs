@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const pkg=JSON.parse(readFileSync('package.json','utf8'))
 const css=readFileSync('app/styles/marketing-v80.css','utf8')
 const register=readFileSync('app/register/page.tsx','utf8')
 const e2e=readFileSync('tests/e2e/responsive-robustness.spec.ts','utf8')
 
-assert.ok(['0.81.10','0.81.11', '0.81.12', '0.81.13', '0.81.14', '0.81.15', '0.81.16'].includes(pkg.version))
+assertVersionAtLeast(assert, pkg.version, '0.81.10')
 assert.match(css,/--v8110-title:50px/)
 assert.match(css,/\.v816-hero-copy h1,[\s\S]*\.v812-page-intro h1/)
 assert.match(css,/\.v812-showcases\{[\s\S]*margin-inline:0!important/)

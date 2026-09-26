@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const landing = readFileSync('app/page.tsx', 'utf8')
 const signIn = readFileSync('app/sign-in/page.tsx', 'utf8')
@@ -10,7 +11,7 @@ const marketing = readFileSync('lib/config/marketing-content.ts', 'utf8')
 const language = readFileSync('lib/config/product-language.ts', 'utf8')
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 
-assert.ok(['0.76.0', '0.77.0', '0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.6', '0.81.7', '0.81.8', '0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13', '0.81.14', '0.81.15', '0.81.16', '0.81.5'].includes(packageJson.version))
+assertVersionAtLeast(assert, packageJson.version, '0.76.0')
 assert.match(landing, /(?:public-landing-v(?:76|78)|v80-main|v816-home)/)
 assert.match(landing, /Marketing(?:Dashboard)?Screenshot/)
 assert.match(signIn, /entry-auth-page/)

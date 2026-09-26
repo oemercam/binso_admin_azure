@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
 const shell = readFileSync('components/public/public-shell.tsx', 'utf8')
@@ -11,7 +12,7 @@ const css = readFileSync('app/styles/marketing-v80.css', 'utf8')
 const standardized = readFileSync('app/standardized-ui.css', 'utf8')
 const responsiveTests = readFileSync('tests/e2e/responsive-robustness.spec.ts', 'utf8')
 
-assert.ok(['0.81.2', '0.81.4', '0.81.6', '0.81.7', '0.81.8', '0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13', '0.81.14', '0.81.15', '0.81.16', '0.81.5'].includes(pkg.version))
+assertVersionAtLeast(assert, pkg.version, '0.81.2')
 assert.match(shell, /public-site-v80/)
 assert.match(shell, /v80-desktop-nav/)
 assert.match(shell, /v80-footer-main/)

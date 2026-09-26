@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.ok(['0.78.0', '0.79.0', '0.80.0', '0.81.0', '0.81.2', '0.81.4', '0.81.6', '0.81.7', '0.81.8', '0.81.9', '0.81.10', '0.81.11', '0.81.12', '0.81.13', '0.81.14', '0.81.15', '0.81.16', '0.81.5'].includes(packageJson.version))
+assertVersionAtLeast(assert, packageJson.version, '0.78.0')
 
 const required = [
   'app/admin-access/page.tsx',

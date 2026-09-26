@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.81.16.4",
+  "version": "0.81.16.5",
   "private": true,
   "scripts": {
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",
@@ -61,7 +61,8 @@
     "v81.16:check": "node scripts/check-v81-16-public-responsive-system.mjs",
     "v81.16.2:check": "node scripts/check-v81-16-2-mobile-menu-lint.mjs",
     "v81.16.3:check": "node scripts/check-v81-16-3-responsive-regressions.mjs",
-    "v81.16.4:check": "node scripts/check-v81-16-4-mobile-menu-hydration.mjs"
+    "v81.16.4:check": "node scripts/check-v81-16-4-mobile-menu-hydration.mjs",
+    "v81.16.5:check": "node scripts/check-v81-16-5-version-compatibility.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",
