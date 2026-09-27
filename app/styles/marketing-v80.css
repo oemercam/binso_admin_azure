@@ -1193,3 +1193,128 @@ html body .public-site-v80 main.v812-page
   object-fit: contain !important;
   object-position: top left !important;
 }
+
+/* V82.0.6 PRICING BADGE POSITIONING */
+/* V82.0.6 PRICING BADGE POSITIONING
+   Clean, compact plan labels with a restrained recommended animation. */
+
+.public-site-v80 .v812-plan-head {
+  position: relative !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  min-height: 48px !important;
+}
+
+.public-site-v80 .v812-plan-head > div {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.public-site-v80 .pricing-plan-badge {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: max-content !important;
+  min-height: 22px !important;
+  margin: 0 0 7px 0 !important;
+  padding: 0 9px !important;
+  overflow: hidden !important;
+  border: 1px solid #e0e7ef !important;
+  border-radius: 999px !important;
+  background: #f7f9fb !important;
+  color: #657185 !important;
+  font-size: 7.5px !important;
+  line-height: 1 !important;
+  font-weight: 780 !important;
+  letter-spacing: .105em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  isolation: isolate !important;
+}
+
+.public-site-v80 .v812-plan-card.recommended .pricing-plan-badge {
+  border-color: #9acbff !important;
+  background: linear-gradient(
+    100deg,
+    #eaf5ff 0%,
+    #f8fcff 44%,
+    #dceeff 72%,
+    #eaf5ff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  color: #176fbd !important;
+  animation: v8206-pricing-badge-shift 5.5s ease-in-out infinite !important;
+}
+
+.public-site-v80 .v812-plan-card.recommended .pricing-plan-badge::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -30% !important;
+  bottom: -30% !important;
+  left: -45% !important;
+  width: 32% !important;
+  z-index: -1 !important;
+  transform: skewX(-18deg) !important;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.78),
+    transparent
+  ) !important;
+  animation: v8206-pricing-badge-sheen 5.5s ease-in-out infinite !important;
+}
+
+.public-site-v80 .v812-plan-head h2 {
+  margin: 0 !important;
+}
+
+.public-site-v80 .v812-plan-card.recommended {
+  position: relative !important;
+  overflow: hidden !important;
+  border-color: #a8d2ff !important;
+  background:
+    linear-gradient(180deg, rgba(239,248,255,.92) 0, #fff 112px) !important;
+}
+
+@keyframes v8206-pricing-badge-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes v8206-pricing-badge-sheen {
+  0%, 58%, 100% {
+    left: -45%;
+    opacity: 0;
+  }
+  66% {
+    opacity: .9;
+  }
+  82% {
+    left: 125%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-site-v80 .v812-plan-card.recommended .pricing-plan-badge,
+  .public-site-v80 .v812-plan-card.recommended .pricing-plan-badge::after {
+    animation: none !important;
+  }
+}
+
+@media(max-width:560px) {
+  .public-site-v80 .v812-plan-head {
+    min-height: 46px !important;
+  }
+
+  .public-site-v80 .pricing-plan-badge {
+    min-height: 21px !important;
+    margin-bottom: 7px !important;
+    padding: 0 8px !important;
+    font-size: 7px !important;
+  }
+}
