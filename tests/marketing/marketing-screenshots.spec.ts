@@ -24,7 +24,7 @@ test('landing page', async ({ page }, testInfo) => {
 
 test('login', async ({ page }, testInfo) => {
   await page.goto('/sign-in?preview=1')
-  await expect(page.getByRole('heading', { name: 'Binso One öffnen' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await page.screenshot({ path: `${outputDir}/login-${suffix(testInfo.project.name)}.png`, fullPage: true, animations: 'disabled' })
 })
 

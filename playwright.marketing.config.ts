@@ -25,6 +25,6 @@ export default defineConfig({
   },
   projects: [
     { name: 'marketing-desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1100 } } },
-    { name: 'marketing-mobile', use: { ...devices['iPhone 15 Pro'] } },
+    { name: 'marketing-mobile', use: { ...devices['iPhone 15 Pro'], browserName: 'chromium' } },
   ],
 })
