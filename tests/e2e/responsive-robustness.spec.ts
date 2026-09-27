@@ -148,7 +148,7 @@ test('V81.8 mobile public layout keeps calm mockup content order at 390x844', as
   if (copyBox && rowVisualBox) expect(copyBox.y + copyBox.height, 'mobile mockup requires copy before the product image').toBeLessThan(rowVisualBox.y + 2)
 
   const screenshot = page.locator('.v816-feature').first().locator('.marketing-real-screenshot img')
-  await expect(screenshot).toHaveAttribute('src', /orders-mockup-desktop\.png$/)
+  await expect(screenshot).toHaveAttribute('src', /orders-desktop\.png$/)
 
   const timeVisual = page.locator('.v817-time-visual')
   await expect(timeVisual).toBeVisible()
@@ -275,24 +275,68 @@ test('V81.9 mobile demo steps and graphics remain readable at 320 and 390', asyn
   }
 })
 
-test('V81.9 public imagery stays compact and consistently framed', async ({ page }) => {
+test('V82.0.6 public imagery uses raw product screenshots without mockup framing', async ({ page }) => {
   for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }] as const) {
     await page.setViewportSize(viewport)
-    for (const route of ['/features','/how-it-works'] as const) {
+
+    for (const route of ['/features', '/how-it-works'] as const) {
       await page.goto(route, { waitUntil: 'domcontentloaded' })
+
       const visuals = page.locator('.v812-visual')
       const count = await visuals.count()
+
       expect(count).toBeGreaterThan(0)
+
       for (let index = 0; index < count; index += 1) {
         const visual = visuals.nth(index)
+        const screenshot = visual.locator('.marketing-real-screenshot')
+        const image = screenshot.locator('img')
+
+        await expect(image).toBeVisible()
+
         const box = await visual.boundingBox()
         expect(box).not.toBeNull()
+
         if (box) {
-          expect(box.width).toBeLessThanOrEqual(viewport.width)
-          expect(box.height, `${route} visual ${index} is too tall`).toBeLessThan(viewport.width <= 820 ? 330 : 380)
+          expect(box.x).toBeGreaterThanOrEqual(0)
+          expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1)
         }
+
+        const visualStyle = await visual.evaluate((element) => {
+          const style = getComputedStyle(element)
+          return {
+            paddingTop: style.paddingTop,
+            paddingRight: style.paddingRight,
+            paddingBottom: style.paddingBottom,
+            paddingLeft: style.paddingLeft,
+            borderRadius: style.borderRadius,
+            boxShadow: style.boxShadow,
+            backgroundColor: style.backgroundColor,
+          }
+        })
+
+        expect(visualStyle.paddingTop).toBe('0px')
+        expect(visualStyle.paddingRight).toBe('0px')
+        expect(visualStyle.paddingBottom).toBe('0px')
+        expect(visualStyle.paddingLeft).toBe('0px')
+        expect(visualStyle.borderRadius).toBe('0px')
+        expect(visualStyle.boxShadow).toBe('none')
+
+        const imageStyle = await image.evaluate((element) => {
+          const style = getComputedStyle(element)
+          return {
+            borderRadius: style.borderRadius,
+            boxShadow: style.boxShadow,
+            objectFit: style.objectFit,
+          }
+        })
+
+        expect(imageStyle.borderRadius).toBe('0px')
+        expect(imageStyle.boxShadow).toBe('none')
+        expect(imageStyle.objectFit).toBe('contain')
       }
-      await expectNoViewportOverflow(page, `V81.9 imagery ${viewport.width}px ${route}`)
+
+      await expectNoViewportOverflow(page, `V82.0.6 raw imagery ${viewport.width}px ${route}`)
     }
   }
 })

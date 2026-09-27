@@ -27,7 +27,7 @@ export default function HomePage() {
               <div className="v816-trust"><span>Keine Kreditkarte nötig</span><span>In 2 Minuten startklar</span><span>Schweizer Datenstandort</span></div>
             </div>
             <div className="v816-laptop" aria-label="Binso One Produktansicht">
-              <div className="v816-laptop-screen"><MarketingScreenshot name="dashboard-mockup" priority desktopOnly /></div>
+              <div className="v816-laptop-screen"><MarketingScreenshot name="dashboard" priority desktopOnly /></div>
               <div className="v816-laptop-base" aria-hidden="true" />
             </div>
           </div>
@@ -35,7 +35,7 @@ export default function HomePage() {
 
         <section className="v816-feature">
           <div className="v816-inner v816-feature-grid">
-            <div className="v816-product-shot"><MarketingScreenshot name="orders-mockup" desktopOnly /></div>
+            <div className="v816-product-shot"><MarketingScreenshot name="orders" desktopOnly /></div>
             <div className="v816-feature-copy">
               <div className="v816-label"><span>▰</span><small>Projektmanagement</small></div>
               <h2>Projekte im Griff.<br />Von der Idee bis zur Rechnung.</h2>
@@ -71,7 +71,7 @@ export default function HomePage() {
 
         <section className="v816-feature">
           <div className="v816-inner v816-feature-grid">
-            <div className="v816-product-shot"><MarketingScreenshot name="invoices-mockup" desktopOnly /></div>
+            <div className="v816-product-shot"><MarketingScreenshot name="invoices" desktopOnly /></div>
             <div className="v816-feature-copy">
               <div className="v816-label"><span>▥</span><small>Abrechnung &amp; Finanzen</small></div>
               <h2>Schnell zur Rechnung. Alles im Blick.</h2>

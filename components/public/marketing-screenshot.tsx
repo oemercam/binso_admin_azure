@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-export type MarketingScreenshotName = 'dashboard' | 'customers' | 'quotes' | 'orders' | 'time' | 'invoices' | 'landing' | 'login' | 'dashboard-mockup' | 'orders-mockup' | 'time-mockup' | 'invoices-mockup'
+export type MarketingScreenshotName = 'dashboard' | 'customers' | 'quotes' | 'orders' | 'time' | 'invoices' | 'landing' | 'login'
 
 
 const screenshotDimensions: Record<string, { width: number; height: number }> = {
@@ -21,10 +21,6 @@ const screenshotDimensions: Record<string, { width: number; height: number }> = 
   'landing-mobile.png': { width: 1179, height: 24654 },
   'login-desktop.png': { width: 1440, height: 1100 },
   'login-mobile.png': { width: 1179, height: 1977 },
-  'dashboard-mockup-desktop.png': { width: 1440, height: 900 },
-  'orders-mockup-desktop.png': { width: 1440, height: 640 },
-  'time-mockup-desktop.png': { width: 1440, height: 640 },
-  'invoices-mockup-desktop.png': { width: 1440, height: 640 },
 }
 
 const altByName: Record<MarketingScreenshotName, string> = {
@@ -36,10 +32,6 @@ const altByName: Record<MarketingScreenshotName, string> = {
   invoices: 'Rechnungsübersicht der echten Binso One Anwendung',
   landing: 'Öffentliche Binso One Startseite',
   login: 'Binso One Anmeldeseite',
-  'dashboard-mockup': 'Binso One Dashboard',
-  'orders-mockup': 'Binso One Projektübersicht',
-  'time-mockup': 'Binso One Zeiterfassung',
-  'invoices-mockup': 'Binso One Rechnungsübersicht',
 }
 
 export function MarketingScreenshot({ name, priority = false, className = '', desktopOnly = false }: { name: MarketingScreenshotName; priority?: boolean; className?: string; desktopOnly?: boolean }) {
