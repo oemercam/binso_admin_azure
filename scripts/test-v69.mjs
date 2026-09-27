@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import ts from 'typescript'
+import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 async function module(file) {
-  const code = ts.transpileModule(readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText
-  return import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`)
+  return import(pathToFileURL(resolve(file)).href)
 }
+
 const policy = await module('lib/auth/business-state-policy.ts')
 const employee = { role: 'employee', email: 'employee@example.test', userId: 'u1' }
 const state = {
@@ -36,7 +36,7 @@ assert.throws(() => policy.mergeAuthorizedState(state, { timeEntries: [{ ...visi
 assert.throws(() => policy.mergeAuthorizedState(state, { customers: [{ id: 'modified' }] }, { ...employee, role: 'finance' }))
 assert.throws(() => policy.mergeAuthorizedState(state, { invoices: [{ id: 'new' }] }, { ...employee, role: 'owner', features: ['crm'] }))
 assert.equal(policy.mergeAuthorizedState(state, { auditEvents: [{ actorUserId: 'forged' }] }, { ...employee, role: 'owner' }).auditEvents, undefined)
-const issued = { id: 'i1', number: 'RE-2026-001', status: 'sent', amount: 100, lines: [{ quantity: 1, unitPrice: 100, vatRate: 0 }] }
+const issued = { id: 'i1', number: 'RE-2026-001', status: 'sent', subtotal: 100, vatAmount: 0, amount: 100, lines: [{ quantity: 1, unitPrice: 100, vatRate: 0 }] }
 assert.throws(() => policy.validateFinancialChanges({ invoices: [issued] }, { invoices: [{ ...issued, amount: 1 }] }))
 assert.throws(() => policy.validateFinancialChanges({ invoices: [issued] }, { invoices: [] }))
 assert.throws(() => policy.validateFinancialChanges({ invoices: [issued] }, { invoices: [issued, { ...issued, id: 'i2', status: 'draft' }] }))

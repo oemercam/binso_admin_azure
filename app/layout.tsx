@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
-import { Inter, Josefin_Sans } from 'next/font/google'
+import '@fontsource-variable/inter'
+import '@fontsource-variable/josefin-sans'
 import './globals.css'
 import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'
@@ -55,20 +56,6 @@ export const viewport: Viewport = {
 }
 
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['400','500','600','700'],
-})
-
-const josefinSans = Josefin_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-josefin',
-  weight: ['500','600'],
-})
-
 const themeBoot = `(()=>{try{const appLike=matchMedia('(display-mode:standalone)').matches||innerWidth<=820;const t=localStorage.getItem('binso-theme')||'system';const d=!appLike&&(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme:dark)').matches));document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.style.colorScheme=appLike?'light':(d?'dark':'light')}catch{document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light'}})()`
 
 export default function RootLayout({
@@ -82,7 +69,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
       </head>
 
-      <body className={`${inter.variable} ${josefinSans.variable}`}>
+      <body>
         <div className="app-cold-start" aria-hidden="true">
           <AppLogo />
         </div>

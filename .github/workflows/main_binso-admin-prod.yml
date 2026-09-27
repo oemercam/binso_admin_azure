@@ -341,7 +341,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-chromium-1.51.1
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright system dependencies
         shell: bash
         run: |
@@ -349,7 +349,6 @@ jobs:
           pnpm exec playwright install-deps chromium
           echo "PLAYWRIGHT_DEPS_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Install Playwright Chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           START=$(date +%s)
