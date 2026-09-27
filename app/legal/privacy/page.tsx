@@ -8,7 +8,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage title="Datenschutzerklärung" description="Informationen zur Bearbeitung personenbezogener Daten im Zusammenhang mit Binso One. Stand: 24. September 2026.">
       <h2>1. Verantwortliche Stelle</h2>
-      <p>{appIdentity.company}, {appIdentity.address.street}, {appIdentity.address.postalCode} {appIdentity.address.city}, {appIdentity.address.country}. Datenschutzanfragen können an <a href={`mailto:${appIdentity.supportEmail}`}>{appIdentity.supportEmail}</a> gerichtet werden.</p>
+      <p>{appIdentity.company}, {appIdentity.address.street}, {appIdentity.address.postalCode} {appIdentity.address.city}, {appIdentity.address.country}. {appIdentity.contacts.privacy ? <>Datenschutzanfragen können an <a href={`mailto:${appIdentity.contacts.privacy}`}>{appIdentity.contacts.privacy}</a> gerichtet werden.</> : <>Datenschutzanfragen können über das <a href="/contact">Kontaktformular</a> eingereicht werden. Die dedizierte Datenschutzadresse wird erst nach produktiver Einrichtung veröffentlicht.</>}</p>
       <h2>2. Welche Daten wir bearbeiten</h2>
       <p>Je nach Nutzung bearbeiten wir insbesondere Konto- und Kontaktdaten, Organisations- und Geschäftsdaten, Rollen und Berechtigungen, von Nutzenden erfasste Kunden- und Auftragsdaten, Dokument- und Abrechnungsinformationen sowie technische Protokoll- und Sicherheitsdaten.</p>
       <h2>3. Zwecke der Bearbeitung</h2>

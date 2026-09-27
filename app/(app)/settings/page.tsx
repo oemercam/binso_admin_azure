@@ -169,7 +169,7 @@ export default function SettingsPage() {
               <SettingsValueRow title="Anwendung" value={appIdentity.name} description={appIdentity.company} />
               <SettingsValueRow title="Version" value={appIdentity.version} description={`Build ${appIdentity.build}`} />
               <SettingsValueRow title="Umgebung" value={appIdentity.environment} description={appIdentity.buildDate ? `Stand ${appIdentity.buildDate}` : 'Lokaler/ungekennzeichneter Build'} />
-              <SettingsValueRow title="Support" value={appIdentity.supportEmail} description={appIdentity.website} />
+              <SettingsValueRow title="Support" value={appIdentity.contacts.support || "Kontaktformular"} description={appIdentity.website} />
             </SettingsSection>
 
             <SettingsSection title="Workflow-Regeln" description="Binäre Regeln können direkt ein- oder ausgeschaltet werden.">

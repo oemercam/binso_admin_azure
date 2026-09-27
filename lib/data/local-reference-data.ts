@@ -272,7 +272,7 @@ export const supplierInvoices: SupplierInvoice[] = [
 export const employees: Employee[] = [
   {
     organizationId: DEFAULT_ORGANIZATION_ID,
-    id: 'emp-001', name: 'Ömer Cam', role: 'owner', email: 'oemer.cam@binso.ch', employmentType: 'salary', status: 'active',
+    id: 'emp-001', name: 'Ömer Cam', role: 'owner', email: 'oemer.cam@example.ch', employmentType: 'salary', status: 'active',
     targetHours: 168, bookedHours: 124.5, billableHours: 112, utilisation: 67, internalCostRate: 105,
   },
   {

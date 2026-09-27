@@ -1,0 +1,2 @@
+# Final Quality Scorecard
+Target >= 9/10 where evidence supports it. This file intentionally does not invent scores. Technical categories are evidenced through CI/build/tests/checks; operational categories remain partial until external evidence exists. Backup/Recovery cannot be rated 9 without configured backup + monitoring + restore procedure + tested restore. Legal technical readiness remains separate from legal approval. ISO readiness is not certification.

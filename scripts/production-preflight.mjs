@@ -57,6 +57,15 @@ required('STRIPE_WEBHOOK_SECRET')
 required('STRIPE_PRICE_STARTER')
 required('STRIPE_PRICE_BUSINESS')
 required('STRIPE_PRICE_PROFESSIONAL')
+const stripeSecret = process.env.STRIPE_SECRET_KEY?.trim() || ''
+if (process.env.ENFORCE_LIVE_STRIPE_IN_PRODUCTION?.toLowerCase() === 'true' && stripeSecret.startsWith('sk_test_')) fail('Stripe test-mode key is not allowed when ENFORCE_LIVE_STRIPE_IN_PRODUCTION=true.')
+const roleContactsEnabled = process.env.NEXT_PUBLIC_ROLE_CONTACTS_ENABLED?.toLowerCase() === 'true'
+if (roleContactsEnabled) {
+  for (const name of ['NEXT_PUBLIC_CONTACT_GENERAL','NEXT_PUBLIC_CONTACT_SUPPORT','NEXT_PUBLIC_CONTACT_PRIVACY','NEXT_PUBLIC_CONTACT_SECURITY','NEXT_PUBLIC_CONTACT_SALES','NEXT_PUBLIC_CONTACT_BILLING','NEXT_PUBLIC_CONTACT_LEGAL']) {
+    const value = required(name).toLowerCase()
+    if (value === 'oemer.cam@binso.ch') fail(`${name} must not use a personal owner address.`)
+  }
+}
 required('INTERNAL_JOB_SECRET')
 if ((process.env.INTERNAL_JOB_SECRET?.trim().length ?? 0) < 32) fail('INTERNAL_JOB_SECRET must contain at least 32 characters.')
 if (process.env.DATABASE_SSL?.toLowerCase() === 'false') fail('DATABASE_SSL must not be disabled in production.')
