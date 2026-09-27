@@ -1,5 +1,5 @@
 /* V82.0 canonical typography system.
-   Brand voice: Josefin Sans. Product/readability: Inter. */
+   Brand voice: Plus Jakarta Sans. Product/readability: Inter. */
 
 html,body,button,input,select,textarea{font-family:var(--font-ui)}
 body{font-size:var(--type-body);line-height:1.55}
