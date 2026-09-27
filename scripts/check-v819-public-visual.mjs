@@ -42,6 +42,6 @@ for (const image of [
 ]) assert.ok(!existsSync(`public/marketing/screenshots/${image}`), `legacy marketing mockup must be removed: ${image}`)
 assert.match(e2e,/V81\.(?:9|13) all public pages keep visual system/)
 assert.match(e2e,/V81\.9 mobile demo steps and graphics remain readable/)
-assert.match(e2e,/V81\.9 public imagery stays compact/)
+assert.match(e2e,/V82\.0\.6 public imagery uses raw product screenshots without mockup framing/)
 assert.match(workflow,/pnpm run v819:check/)
 console.log('V81.9 public visual QA checks passed (typography, navigation, imagery, graphics, forms, mobile and PWA CSS).')
