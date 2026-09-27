@@ -55,9 +55,17 @@ A push to main performs the full GitHub validation workflow and creates the immu
 
 A successful push does not automatically deploy Production.
 
+During active development, validated change sets may be deployed frequently to Production so that the real Azure-hosted application can be verified on desktop, browser, mobile and PWA under production runtime conditions.
+
+Production deployment is still never automatic.
+
 ## Production
 
-Production deployment remains manual.
+Production deployment remains explicit and manual.
+
+Frequent Production validation during active development does not bypass any Production quality, artifact, migration, staging, smoke, health or rollback controls.
+
+During the current active development phase, frequent Production deployments are an intentional validation strategy after a change set has passed the required local and GitHub CI checks.
 
 Requirements:
 
@@ -106,3 +114,5 @@ Git commits and GitHub Actions provide the authoritative technical history.
 The absence of a dedicated Development environment must never weaken the Production deployment gates.
 
 Production deployment remains explicit and manual.
+
+Frequent Production validation during active development does not bypass any Production quality, artifact, migration, staging, smoke, health or rollback controls.
