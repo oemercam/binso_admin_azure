@@ -16,7 +16,7 @@ export default function FeaturesPage() {
           {marketingFeatures.map((feature, index) => (
             <article className={`v80-split v812-split ${index % 2 ? 'is-reversed' : ''}`} key={feature.id}>
               <div className="v812-copy"><span className="v80-eyebrow">{String(index + 1).padStart(2, '0')} · {feature.title}</span><h2>{feature.title}</h2><p>{feature.description}</p><strong>{feature.benefit}</strong></div>
-              {screenshotNames.has(feature.id) ? <div className="v812-visual"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} desktopOnly /></div> : <div className="v812-info-visual"><span>Rollen und Rechte</span><strong>Zugriff passend zur Aufgabe.</strong><p>Berechtigungen werden serverseitig und nachvollziehbar gesteuert.</p></div>}
+              {screenshotNames.has(feature.id) ? <div className="v812-visual"><MarketingScreenshot name={feature.id as 'customers' | 'quotes' | 'orders' | 'time' | 'invoices'} /></div> : <div className="v812-info-visual"><span>Rollen und Rechte</span><strong>Zugriff passend zur Aufgabe.</strong><p>Berechtigungen werden serverseitig und nachvollziehbar gesteuert.</p></div>}
             </article>
           ))}
         </section>

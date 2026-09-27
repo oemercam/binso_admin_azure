@@ -5,22 +5,29 @@ export type MarketingScreenshotName = 'dashboard' | 'customers' | 'quotes' | 'or
 
 
 const screenshotDimensions: Record<string, { width: number; height: number }> = {
-  'dashboard-desktop.png': { width: 1440, height: 1243 },
-  'dashboard-mobile.png': { width: 1179, height: 2586 },
-  'customers-desktop.png': { width: 1440, height: 1131 },
-  'customers-mobile.png': { width: 1179, height: 1977 },
-  'quotes-desktop.png': { width: 1440, height: 1131 },
-  'quotes-mobile.png': { width: 1179, height: 1977 },
-  'orders-desktop.png': { width: 1440, height: 1131 },
-  'orders-mobile.png': { width: 1179, height: 1977 },
-  'time-desktop.png': { width: 1440, height: 1131 },
-  'time-mobile.png': { width: 1179, height: 3021 },
-  'invoices-desktop.png': { width: 1440, height: 1131 },
-  'invoices-mobile.png': { width: 1179, height: 1977 },
-  'landing-desktop.png': { width: 1440, height: 6202 },
-  'landing-mobile.png': { width: 1179, height: 24654 },
-  'login-desktop.png': { width: 1440, height: 1100 },
-  'login-mobile.png': { width: 1179, height: 1977 },
+  'dashboard-desktop.png': { width: 1178, height: 327 },
+  'dashboard-mobile.png': { width: 1083, height: 192 },
+
+  'customers-desktop.png': { width: 1178, height: 241 },
+  'customers-mobile.png': { width: 1083, height: 519 },
+
+  'quotes-desktop.png': { width: 1178, height: 173 },
+  'quotes-mobile.png': { width: 1083, height: 345 },
+
+  'orders-desktop.png': { width: 1178, height: 241 },
+  'orders-mobile.png': { width: 1083, height: 519 },
+
+  'time-desktop.png': { width: 1178, height: 420 },
+  'time-mobile.png': { width: 1083, height: 1680 },
+
+  'invoices-desktop.png': { width: 1178, height: 241 },
+  'invoices-mobile.png': { width: 1083, height: 519 },
+
+  'landing-desktop.png': { width: 1430, height: 520 },
+  'landing-mobile.png': { width: 1179, height: 1602 },
+
+  'login-desktop.png': { width: 330, height: 309 },
+  'login-mobile.png': { width: 1083, height: 885 },
 }
 
 const altByName: Record<MarketingScreenshotName, string> = {

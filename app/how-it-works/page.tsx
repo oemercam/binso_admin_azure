@@ -15,7 +15,7 @@ export default function HowItWorksPage() {
           {marketingFlow.slice(0,5).map(([number,title,description], index) => (
             <article className={`v812-split ${index % 2 ? 'is-reversed' : ''}`} key={number}>
               <div className="v812-copy"><span className="v80-eyebrow">{number}</span><h2>{title}</h2><p>{description}</p><strong>Ein Schritt. Klar im Prozess.</strong></div>
-              <div className="v812-visual"><MarketingScreenshot name={screens[index]} desktopOnly /></div>
+              <div className="v812-visual"><MarketingScreenshot name={screens[index]} /></div>
             </article>
           ))}
         </section>

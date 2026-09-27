@@ -1318,3 +1318,97 @@ html body .public-site-v80 main.v812-page
     font-size: 7px !important;
   }
 }
+
+/* V82.0.6 FOCUSED MARKETING SCREENSHOT SIZING */
+/* V82.0.6 FOCUSED MARKETING SCREENSHOT SIZING
+   Screenshots show only the relevant product area and must not dominate
+   desktop, mobile or PWA layouts. No frames, cards or decorative shells. */
+
+/* Landing hero */
+.public-site-v80 .v816-laptop {
+  width: min(100%, 390px) !important;
+  max-width: 390px !important;
+  justify-self: center !important;
+}
+
+/* Product feature screenshots on landing page */
+.public-site-v80 .v816-product-shot,
+.public-site-v80 .v816-feature-reverse .v816-product-shot {
+  width: min(100%, 390px) !important;
+  max-width: 390px !important;
+  justify-self: center !important;
+}
+
+/* Product screenshots on Funktionen / So funktioniert es */
+.public-site-v80 .v812-visual,
+.public-site-v80 .v812-split.is-reversed .v812-visual {
+  width: min(100%, 430px) !important;
+  max-width: 430px !important;
+  justify-self: center !important;
+}
+
+/* The image itself must follow the focused size, never expand beyond it */
+.public-site-v80 .marketing-real-screenshot {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.public-site-v80 .marketing-real-screenshot img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: top left !important;
+}
+
+/* Mobile / PWA: deliberately smaller than the available screen width */
+@media(max-width:820px) {
+  .public-site-v80 .v816-laptop {
+    width: min(88%, 340px) !important;
+    max-width: 340px !important;
+    justify-self: center !important;
+    margin-inline: auto !important;
+  }
+
+  .public-site-v80 .v816-product-shot,
+  .public-site-v80 .v816-feature-reverse .v816-product-shot {
+    width: min(88%, 330px) !important;
+    max-width: 330px !important;
+    justify-self: center !important;
+    margin-inline: auto !important;
+  }
+
+  .public-site-v80 .v812-visual,
+  .public-site-v80 .v812-split.is-reversed .v812-visual {
+    width: min(88%, 330px) !important;
+    max-width: 330px !important;
+    justify-self: center !important;
+    margin-inline: auto !important;
+  }
+}
+
+/* Small phones */
+@media(max-width:390px) {
+  .public-site-v80 .v816-laptop,
+  .public-site-v80 .v816-product-shot,
+  .public-site-v80 .v816-feature-reverse .v816-product-shot,
+  .public-site-v80 .v812-visual,
+  .public-site-v80 .v812-split.is-reversed .v812-visual {
+    width: 86% !important;
+    max-width: 310px !important;
+  }
+}
+
+/* Installed PWA uses exactly the same compact presentation */
+@media(display-mode:standalone) and (max-width:820px) {
+  .public-site-v80 .v816-laptop,
+  .public-site-v80 .v816-product-shot,
+  .public-site-v80 .v816-feature-reverse .v816-product-shot,
+  .public-site-v80 .v812-visual,
+  .public-site-v80 .v812-split.is-reversed .v812-visual {
+    width: min(86%, 320px) !important;
+    max-width: 320px !important;
+    margin-inline: auto !important;
+  }
+}
