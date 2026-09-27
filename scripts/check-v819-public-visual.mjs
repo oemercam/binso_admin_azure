@@ -19,7 +19,27 @@ for (const label of ['Funktionen','Preise','FAQ','Kontakt']) assert.ok(config.in
 assert.match(shell,/v80-desktop-nav/)
 assert.match(shell,/PublicMobileMenu/)
 assert.match(register,/register-start-step/)
-for (const image of ['dashboard-mockup-desktop.png','orders-mockup-desktop.png','invoices-mockup-desktop.png']) assert.ok(existsSync(`public/marketing/screenshots/${image}`), `missing marketing crop ${image}`)
+for (const image of [
+  'dashboard-desktop.png',
+  'dashboard-mobile.png',
+  'customers-desktop.png',
+  'customers-mobile.png',
+  'quotes-desktop.png',
+  'quotes-mobile.png',
+  'orders-desktop.png',
+  'orders-mobile.png',
+  'time-desktop.png',
+  'time-mobile.png',
+  'invoices-desktop.png',
+  'invoices-mobile.png',
+]) assert.ok(existsSync(`public/marketing/screenshots/${image}`), `missing raw marketing screenshot ${image}`)
+
+for (const image of [
+  'dashboard-mockup-desktop.png',
+  'orders-mockup-desktop.png',
+  'time-mockup-desktop.png',
+  'invoices-mockup-desktop.png',
+]) assert.ok(!existsSync(`public/marketing/screenshots/${image}`), `legacy marketing mockup must be removed: ${image}`)
 assert.match(e2e,/V81\.(?:9|13) all public pages keep visual system/)
 assert.match(e2e,/V81\.9 mobile demo steps and graphics remain readable/)
 assert.match(e2e,/V81\.9 public imagery stays compact/)
