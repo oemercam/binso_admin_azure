@@ -59,7 +59,7 @@ export async function PUT(request: Request) {
   try { requireSameOrigin(request) } catch { return apiError(403, 'invalid_origin', 'Ungültige Anfragequelle.', id) }
   if (!isDatabaseConfigured()) return apiError(503, 'database_unavailable', 'Datenbank ist nicht konfiguriert.', id)
 
-  let body: { organizationId?: string; expectedVersion?: number; state?: Record<string, unknown> }
+  let body: { organizationId?: string; expectedVersion?: number; state?: Record<string, unknown>; idempotencyKey?: string }
   try {
     body = await readJsonBody(request, PRODUCT_LIMITS.businessStateBodyBytes)
   } catch (cause) {
@@ -68,17 +68,19 @@ export async function PUT(request: Request) {
 
   const context = await resolveTenantContext(body.organizationId)
   if (!context) return apiError(403, 'tenant_forbidden', 'Keine Berechtigung für diese Organisation.', id)
-  if (!body.state || typeof body.state !== 'object' || Array.isArray(body.state) || !Number.isSafeInteger(body.expectedVersion) || Number(body.expectedVersion) < 0) {
+  if (!body.state || typeof body.state !== 'object' || Array.isArray(body.state) || !Number.isSafeInteger(body.expectedVersion) || Number(body.expectedVersion) < 0 || (body.idempotencyKey !== undefined && !/^[a-zA-Z0-9:_-]{1,160}$/.test(body.idempotencyKey))) {
     return apiError(422, 'validation', 'Version oder Geschäftsdaten fehlen.', id)
   }
 
   try {
     const state = sanitizeTenantState(body.state, context.organizationId)
-    const result = await saveTenantBusinessState({ organizationId: context.organizationId, userId: context.userId, expectedVersion: Number(body.expectedVersion), state, actor: { role: context.membership.role, email: context.email, userId: context.userId } })
+    const result = await saveTenantBusinessState({ organizationId: context.organizationId, userId: context.userId, expectedVersion: Number(body.expectedVersion), state, actor: { role: context.membership.role, email: context.email, userId: context.userId }, idempotencyKey: body.idempotencyKey })
     if (!result.saved) return apiJson({ error: { code: 'version_conflict', message: 'Die Daten wurden zwischenzeitlich geändert.' }, version: result.version }, { status: 409 }, id)
     return apiJson({ ok: true, version: result.version }, undefined, id)
   } catch (cause) {
-    if (cause instanceof Error && ['state_forbidden', 'state_invalid'].includes(cause.message)) return apiError(403, cause.message, 'Diese Änderung ist nicht erlaubt. Bitte Daten neu laden.', id)
+    if (cause instanceof Error && cause.message === 'state_forbidden') return apiError(403, 'forbidden', 'Diese Änderung ist nicht erlaubt. Bitte Daten neu laden.', id)
+    if (cause instanceof Error && ['state_invalid','financial_total_invalid'].includes(cause.message)) return apiError(422, 'validation_error', 'Geschäftsdaten oder finanzielle Totale sind ungültig.', id)
+    if (cause instanceof Error && ['quote_transition_invalid','order_transition_invalid','invoice_transition_invalid','idempotency_conflict'].includes(cause.message)) return apiError(409, 'conflict', 'Der Datensatz wurde zwischenzeitlich geändert oder der Statuswechsel ist nicht erlaubt.', id)
     if (cause instanceof Error && cause.message === 'too_many_records') return apiError(413, 'too_many_records', 'Zu viele Datensätze in einer Speicherung.', id)
     await recordApplicationEvent({ severity: 'error', area: 'business-state', code: 'write_failed', message: cause instanceof Error ? cause.message : 'Unknown error', organizationId: context.organizationId, userId: context.userId, requestId: id })
     return apiError(500, 'state_write_failed', 'Geschäftsdaten konnten nicht gespeichert werden.', id)

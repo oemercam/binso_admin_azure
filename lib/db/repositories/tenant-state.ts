@@ -1,7 +1,9 @@
 import 'server-only'
 import { withTenantTransaction } from '@/lib/db/tenant'
-import { mergeAuthorizedState, validateFinancialChanges, type StateActor } from '@/lib/auth/business-state-policy'
+import { mergeAuthorizedState, validateBusinessRelations, validateFinancialChanges, type StateActor } from '@/lib/auth/business-state-policy'
 import type { Role } from '@/types/domain'
+import { hasNormalizedCoreState, loadNormalizedCoreState, persistNormalizedCoreState, removeNormalizedCoreFromLegacyState } from '@/lib/db/repositories/normalized-business-state'
+import { claimIdempotency, completeIdempotency, requestHash } from '@/lib/db/repositories/idempotency'
 
 export type TenantStateRecord = {
   state: Record<string, unknown>
@@ -18,9 +20,13 @@ export async function getTenantBusinessState(context: { organizationId: string; 
       [context.organizationId],
     )
     const row = result.rows[0]
+    const legacyState = row?.state ?? {}
+    const normalized = await hasNormalizedCoreState(client, context.organizationId)
+      ? await loadNormalizedCoreState(client, context.organizationId)
+      : {}
     return row
-      ? { state: row.state ?? {}, version: Number(row.version), updatedAt: row.updated_at.toISOString() }
-      : { state: {}, version: 0, updatedAt: null }
+      ? { state: { ...legacyState, ...normalized }, version: Number(row.version), updatedAt: row.updated_at.toISOString() }
+      : { state: normalized, version: 0, updatedAt: null }
   })
 }
 
@@ -30,9 +36,15 @@ export async function saveTenantBusinessState(input: {
   expectedVersion: number
   state: Record<string, unknown>
   actor: StateActor
+  idempotencyKey?: string
 }) {
   return withTenantTransaction({ organizationId: input.organizationId, userId: input.userId }, async (client) => {
     await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [input.organizationId])
+    const idempotencyHash = input.idempotencyKey ? requestHash({ expectedVersion: input.expectedVersion, state: input.state }) : null
+    if (input.idempotencyKey && idempotencyHash) {
+      const previous = await claimIdempotency(client, { organizationId: input.organizationId, operation: 'business-state.save', key: input.idempotencyKey, requestHash: idempotencyHash, userId: input.userId })
+      if (previous && typeof previous === 'object') return previous as { saved: boolean; conflict: boolean; version: number }
+    }
     const access = await client.query<{ role: Role; features: string[] }>(`select m.role,e.features from organization_memberships m
       join organization_entitlements e on e.organization_id=m.organization_id
       join organizations o on o.id=m.organization_id and o.status in ('active','grace_period')
@@ -48,11 +60,20 @@ export async function saveTenantBusinessState(input: {
     )
     const currentVersion = current.rows[0] ? Number(current.rows[0].version) : 0
     if (currentVersion !== input.expectedVersion) {
-      return { saved: false as const, conflict: true as const, version: currentVersion }
+      const conflictResult = { saved: false as const, conflict: true as const, version: currentVersion }
+      if (input.idempotencyKey) await completeIdempotency(client, { organizationId: input.organizationId, operation: 'business-state.save', key: input.idempotencyKey, response: conflictResult })
+      return conflictResult
     }
 
-    const state = mergeAuthorizedState(current.rows[0]?.state ?? {}, input.state, input.actor)
-    validateFinancialChanges(current.rows[0]?.state ?? {}, state)
+    const previousNormalized = await hasNormalizedCoreState(client, input.organizationId)
+      ? await loadNormalizedCoreState(client, input.organizationId)
+      : {}
+    const previousState = { ...(current.rows[0]?.state ?? {}), ...previousNormalized }
+    const state = mergeAuthorizedState(previousState, input.state, input.actor)
+    validateFinancialChanges(previousState, state)
+    validateBusinessRelations(state)
+    await persistNormalizedCoreState(client, input.organizationId, state)
+    const legacyState = removeNormalizedCoreFromLegacyState(state)
     const nextVersion = currentVersion + 1
     await client.query(
       `insert into tenant_business_state (organization_id, state, version, updated_by, updated_at)
@@ -62,7 +83,7 @@ export async function saveTenantBusinessState(input: {
              version = excluded.version,
              updated_by = excluded.updated_by,
              updated_at = now()`,
-      [input.organizationId, JSON.stringify(state), nextVersion, input.userId],
+      [input.organizationId, JSON.stringify(legacyState), nextVersion, input.userId],
     )
 
     await client.query(`insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, detail)
@@ -84,6 +105,8 @@ export async function saveTenantBusinessState(input: {
       }
     }
 
-    return { saved: true as const, conflict: false as const, version: nextVersion }
+    const savedResult = { saved: true as const, conflict: false as const, version: nextVersion }
+    if (input.idempotencyKey) await completeIdempotency(client, { organizationId: input.organizationId, operation: 'business-state.save', key: input.idempotencyKey, response: savedResult })
+    return savedResult
   })
 }

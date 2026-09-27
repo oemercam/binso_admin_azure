@@ -397,7 +397,7 @@ test('V81.16 public layout matrix stays clean across 320, 360, 390, 430, 768, 83
           return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight) }
         })
         expect(style.size, `${route} H1 too small at ${viewport.width}px`).toBeGreaterThanOrEqual(33)
-        expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(51)
+        expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(52)
         expect(style.lineHeight / style.size, `${route} H1 line-height at ${viewport.width}px`).toBeLessThanOrEqual(1.08)
       }
 

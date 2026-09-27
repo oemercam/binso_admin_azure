@@ -1,13 +1,24 @@
 import type { Invoice, InvoiceLine } from '@/types/domain'
+import { addMinor, fromMinorUnits, lineTotalMinor, toMinorUnits } from '@/modules/shared/money'
 
 export function roundMoney(value: number) {
-  return Math.round((value + Number.EPSILON) * 100) / 100
+  return fromMinorUnits(toMinorUnits(value))
 }
 
 export function calculateInvoiceTotals(lines: InvoiceLine[]) {
-  const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0))
-  const vatAmount = roundMoney(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice * (line.vatRate / 100), 0))
-  return { subtotal, vatAmount, amount: roundMoney(subtotal + vatAmount) }
+  const totals = lines.map((line) => lineTotalMinor({ quantity: line.quantity, unitPrice: line.unitPrice, vatRate: line.vatRate }))
+  const subtotalMinor = addMinor(...totals.map((line) => line.netMinor))
+  const vatMinor = addMinor(...totals.map((line) => line.vatMinor))
+  return {
+    subtotal: fromMinorUnits(subtotalMinor),
+    vatAmount: fromMinorUnits(vatMinor),
+    amount: fromMinorUnits(addMinor(subtotalMinor, vatMinor)),
+  }
+}
+
+export function calculateOutstandingAmount(invoice: Pick<Invoice, 'amount'|'paidAmount'|'creditedAmount'>) {
+  const dueMinor = addMinor(toMinorUnits(invoice.amount), -toMinorUnits(invoice.paidAmount), -toMinorUnits(invoice.creditedAmount ?? 0))
+  return fromMinorUnits(Math.max(0, dueMinor))
 }
 
 export function recalculateInvoice(invoice: Invoice): Invoice {

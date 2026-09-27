@@ -5,6 +5,8 @@ import { query } from '@/lib/db/client'
 import { sendGraphMail } from '@/lib/email/graph'
 import { renderEmailDocument } from '@/modules/documents/email-document'
 import type { CompanyProfile, Invoice, Quote } from '@/types/domain'
+import { hasNormalizedCoreState, loadNormalizedCoreState } from '@/lib/db/repositories/normalized-business-state'
+import { calculateOutstandingAmount } from '@/modules/invoices/calculations'
 
 export type DocumentMailKind = 'quote' | 'invoice' | 'reminder'
 export async function enqueueDocument(client: PoolClient, input: { organizationId: string; userId: string; kind: DocumentMailKind; entityId: string; to: string; key: string; state: Record<string, unknown> }) {
@@ -15,7 +17,7 @@ export async function enqueueDocument(client: PoolClient, input: { organizationI
   if (input.kind === 'quote' ? !['draft', 'sent'].includes(document.status) : ['cancelled', 'paid'].includes(document.status)) throw new Error('Dokument kann nicht versendet werden.')
   if (input.kind === 'reminder') {
     const invoice = document as Invoice
-    if (invoice.status === 'draft' || invoice.due >= new Date().toISOString().slice(0, 10) || invoice.amount - invoice.paidAmount - (invoice.creditedAmount ?? 0) <= 0) throw new Error('Keine offene überfällige Rechnung.')
+    if (invoice.status === 'draft' || invoice.due >= new Date().toISOString().slice(0, 10) || calculateOutstandingAmount(invoice) <= 0) throw new Error('Keine offene überfällige Rechnung.')
   }
   const html = renderEmailDocument(input.kind, document, input.state.companyProfile as CompanyProfile)
   const title = input.kind === 'quote' ? 'Angebot' : input.kind === 'invoice' ? 'Rechnung' : 'Zahlungserinnerung'
@@ -35,7 +37,8 @@ export async function queueDocument(input: { organizationId: string; userId: str
     await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [input.organizationId])
     const state = await client.query<{ state: Record<string, unknown>; version: string }>('select state, version::text from tenant_business_state where organization_id=$1 for update', [input.organizationId])
     if (Number(state.rows[0]?.version) !== input.expectedVersion) throw new Error('Die Daten wurden geändert. Bitte neu laden.')
-    return enqueueDocument(client, { ...input, state: state.rows[0].state })
+    const normalized = await hasNormalizedCoreState(client, input.organizationId) ? await loadNormalizedCoreState(client, input.organizationId) : {}
+    return enqueueDocument(client, { ...input, state: { ...(state.rows[0]?.state ?? {}), ...normalized } })
   })
 }
 
@@ -53,6 +56,8 @@ export async function processMailOutbox() {
       await withTenantTransaction({ organizationId: row.organization_id, userId: 'system' }, async client => {
         await client.query('select pg_advisory_xact_lock(hashtextextended($1, 0))', [row.organization_id])
         const record = await client.query<{ state: Record<string, unknown> }>('select state from tenant_business_state where organization_id=$1 for update', [row.organization_id])
+        const normalized = await hasNormalizedCoreState(client, row.organization_id) ? await loadNormalizedCoreState(client, row.organization_id) : {}
+        const canonicalState = { ...(record.rows[0]?.state ?? {}), ...normalized }
         const access = await client.query<{is_demo:boolean}>(`select o.is_demo from platform_tenants pt join organization_subscriptions s on s.organization_id=pt.organization_id join organizations o on o.id=pt.organization_id where pt.organization_id=$1 and (pt.platform_status in ('active','past_due') or (pt.platform_status='trial' and s.trial_until>now()))`, [row.organization_id])
         if (!access.rowCount) {
           await client.query("update mail_outbox set status='cancelled',last_error='Organisation ist nicht aktiv.',updated_at=now() where id=$1", [row.id]); return
@@ -61,9 +66,9 @@ export async function processMailOutbox() {
           await client.query("update mail_outbox set status='cancelled',last_error='Demo-Organisation: externer Versand unterdrückt.',updated_at=now() where id=$1", [row.id]); return
         }
         if (mail.kind !== 'invitation') {
-          const state = record.rows[0]?.state
+          const state = canonicalState
           const doc = (state?.[mail.kind === 'quote' ? 'quotes' : 'invoices'] as Array<Invoice | Quote> | undefined)?.find(item => item.id === mail.entity_id)
-          if (!state || !doc || ['cancelled','paid','accepted','declined','revised'].includes(doc.status) || renderEmailDocument(mail.kind as DocumentMailKind, doc, state.companyProfile as CompanyProfile) !== mail.attachment_html) {
+          if (!doc || ['cancelled','paid','accepted','declined','revised'].includes(doc.status) || renderEmailDocument(mail.kind as DocumentMailKind, doc, state.companyProfile as CompanyProfile) !== mail.attachment_html) {
             await client.query("update mail_outbox set status='cancelled',last_error='Dokument wurde zwischenzeitlich geändert. Versand neu einplanen.',updated_at=now() where id=$1", [row.id]); return
           }
         } else {
@@ -73,12 +78,22 @@ export async function processMailOutbox() {
         const result = await sendGraphMail({ to: mail.recipient, subject: mail.subject, text: mail.body, htmlAttachment: mail.attachment_html ?? undefined })
         await client.query("update mail_outbox set status='accepted', provider_request_id=$2, updated_at=now() where id=$1", [row.id, result.requestId])
         if (record.rows[0] && mail.kind !== 'invitation') {
-          const state = record.rows[0].state
+          const now = new Date().toISOString()
+          const legacyState = record.rows[0].state
           const key = mail.kind === 'quote' ? 'quotes' : 'invoices'
-          const docs = state[key] as Array<Invoice | Quote>
-          state[key] = docs.map(doc => doc.id !== mail.entity_id ? doc : { ...doc, sentTo: mail.recipient,
-            ...(mail.kind === 'reminder' ? { lastReminderAt: new Date().toISOString(), reminderLevel: Math.min(3, ((doc as Invoice).reminderLevel ?? 0) + 1) } : { sentAt: new Date().toISOString(), status: doc.status === 'draft' ? 'sent' : doc.status }) })
-          await client.query("update tenant_business_state set state=$2::jsonb,version=version+1,updated_by='system',updated_at=now() where organization_id=$1", [row.organization_id, JSON.stringify(state)])
+          const legacyDocs = Array.isArray(legacyState[key]) ? legacyState[key] as Array<Invoice | Quote> : null
+          if (legacyDocs) {
+            legacyState[key] = legacyDocs.map(doc => doc.id !== mail.entity_id ? doc : { ...doc, sentTo: mail.recipient,
+              ...(mail.kind === 'reminder' ? { lastReminderAt: now, reminderLevel: Math.min(3, ((doc as Invoice).reminderLevel ?? 0) + 1) } : { sentAt: now, status: doc.status === 'draft' ? 'sent' : doc.status }) })
+          }
+          if (mail.kind === 'quote') {
+            await client.query(`update quotes set email_to=$3,sent_at=$4,status=case when status='draft' then 'sent' else status end where organization_id=$1 and external_id=$2`, [row.organization_id, mail.entity_id, mail.recipient, now])
+          } else if (mail.kind === 'reminder') {
+            await client.query(`update invoices set email_to=$3,last_reminder_at=$4,reminder_level=least(3,reminder_level+1) where organization_id=$1 and external_id=$2`, [row.organization_id, mail.entity_id, mail.recipient, now])
+          } else {
+            await client.query(`update invoices set email_to=$3,sent_at=$4,status=case when status='draft' then 'sent' else status end where organization_id=$1 and external_id=$2`, [row.organization_id, mail.entity_id, mail.recipient, now])
+          }
+          await client.query("update tenant_business_state set state=$2::jsonb,version=version+1,updated_by='system',updated_at=now() where organization_id=$1", [row.organization_id, JSON.stringify(legacyState)])
         }
         await client.query(`insert into audit_events (organization_id,actor_user_id,actor_name,action,entity_type,entity_id) values ($1,'system','System','mail.accepted','mail_outbox',$2)`, [row.organization_id, row.id])
         accepted++

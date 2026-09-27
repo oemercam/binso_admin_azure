@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from 'node:util'
 import type { Role } from '@/types/domain'
+import { addMinor, lineTotalMinor, multiplyMinor, toMinorUnits } from '@/modules/shared/money'
 
 type State = Record<string, unknown>
 type Row = Record<string, unknown>
@@ -118,7 +119,155 @@ export function validateFinancialChanges(current: State, next: State) {
       if (prior && isDeepStrictEqual(prior, row)) continue
       if (!Array.isArray(row.lines) || !row.lines.length || typeof row.amount !== 'number' || !Number.isFinite(row.amount) || row.amount < 0) throw new Error('state_invalid')
       if (!(row.lines as Row[]).every(line => typeof line.quantity === 'number' && Number.isFinite(line.quantity) && line.quantity > 0 && typeof line.unitPrice === 'number' && Number.isFinite(line.unitPrice) && line.unitPrice >= 0 && (line.vatRate === undefined || typeof line.vatRate === 'number' && Number.isFinite(line.vatRate) && line.vatRate >= 0 && line.vatRate <= 100))) throw new Error('state_invalid')
+      const financialLines = row.lines as Row[]
+      if (key === 'quotes') {
+        const expectedMinor = addMinor(...financialLines.map(line => multiplyMinor(toMinorUnits(Number(line.unitPrice)), Number(line.quantity))))
+        if (toMinorUnits(Number(row.amount)) !== expectedMinor) throw new Error('financial_total_invalid')
+      } else {
+        const totals = financialLines.map(line => lineTotalMinor({ quantity: Number(line.quantity), unitPrice: Number(line.unitPrice), vatRate: Number(line.vatRate ?? 0) }))
+        const subtotalMinor = addMinor(...totals.map(item => item.netMinor))
+        const vatMinor = addMinor(...totals.map(item => item.vatMinor))
+        const amountMinor = addMinor(subtotalMinor, vatMinor)
+        if (typeof row.subtotal !== 'number' || typeof row.vatAmount !== 'number') throw new Error('financial_total_invalid')
+        if (toMinorUnits(row.subtotal) !== subtotalMinor || toMinorUnits(row.vatAmount) !== vatMinor || toMinorUnits(Number(row.amount)) !== amountMinor) throw new Error('financial_total_invalid')
+        if (typeof row.paidAmount === 'number' && (toMinorUnits(row.paidAmount) < 0 || toMinorUnits(row.paidAmount) > amountMinor)) throw new Error('financial_total_invalid')
+      }
       if (key === 'invoices' && (!prior || prior.number !== row.number) && proposed.some(other => other.id !== row.id && other.number === row.number)) throw new Error('state_invalid')
     }
   }
 }
+function objectValue(value: unknown): Row {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Row : {}
+}
+
+/** Server-side referential/business invariants for the compatibility state API. */
+export function validateBusinessRelations(next: State) {
+  const byId = (key: string) => new Map(rows(next, key).map(row => [String(row.id), row]))
+  const customers = byId('customers')
+  const quotes = byId('quotes')
+  const orders = byId('orders')
+  const contracts = byId('contracts')
+  const times = byId('timeEntries')
+  const expenses = byId('expenses')
+  const invoices = byId('invoices')
+  const suppliers = byId('suppliers')
+
+  const appSettings = objectValue(next.appSettings)
+  const workflow = objectValue(appSettings.workflow)
+  const requireAcceptedQuote = workflow.requireQuoteAcceptanceBeforeOrder === true
+
+  for (const contact of rows(next, 'customerContacts')) if (!customers.has(String(contact.customerId))) throw new Error('state_invalid')
+  for (const quote of rows(next, 'quotes')) if (!customers.has(String(quote.customerId))) throw new Error('state_invalid')
+  for (const contract of rows(next, 'contracts')) if (!customers.has(String(contract.customerId))) throw new Error('state_invalid')
+
+  for (const order of rows(next, 'orders')) {
+    const customer = customers.get(String(order.customerId))
+    if (!customer) throw new Error('state_invalid')
+    if (order.contractId) {
+      const contract = contracts.get(String(order.contractId))
+      if (!contract || contract.customerId !== order.customerId) throw new Error('state_invalid')
+    }
+    if (order.sourceQuoteId) {
+      const quote = quotes.get(String(order.sourceQuoteId))
+      if (!quote || quote.customerId !== order.customerId || (requireAcceptedQuote && quote.status !== 'accepted')) throw new Error('state_invalid')
+    }
+  }
+
+  for (const entry of rows(next, 'timeEntries')) {
+    const order = orders.get(String(entry.orderId))
+    if (!order || order.customerId !== entry.customerId || typeof entry.hours !== 'number' || !Number.isFinite(entry.hours) || entry.hours <= 0 || entry.hours > 24) throw new Error('state_invalid')
+    if (entry.invoicedInvoiceId) {
+      const invoice = invoices.get(String(entry.invoicedInvoiceId))
+      if (!invoice || invoice.customerId !== entry.customerId || (invoice.orderId && invoice.orderId !== entry.orderId)) throw new Error('state_invalid')
+    }
+  }
+
+  for (const expense of rows(next, 'expenses')) {
+    if (!customers.has(String(expense.customerId))) throw new Error('state_invalid')
+    if (expense.orderId) {
+      const order = orders.get(String(expense.orderId))
+      if (!order || order.customerId !== expense.customerId) throw new Error('state_invalid')
+    }
+    if (expense.contractId) {
+      const contract = contracts.get(String(expense.contractId))
+      if (!contract || contract.customerId !== expense.customerId) throw new Error('state_invalid')
+    }
+    if (expense.invoicedInvoiceId) {
+      const invoice = invoices.get(String(expense.invoicedInvoiceId))
+      if (!invoice || invoice.customerId !== expense.customerId) throw new Error('state_invalid')
+    }
+  }
+
+  const usedTimes = new Map<string, string>()
+  const usedExpenses = new Map<string, string>()
+  for (const invoice of rows(next, 'invoices')) {
+    if (!customers.has(String(invoice.customerId))) throw new Error('state_invalid')
+    if (invoice.orderId) {
+      const order = orders.get(String(invoice.orderId))
+      if (!order || order.customerId !== invoice.customerId) throw new Error('state_invalid')
+    }
+    if (invoice.contractId) {
+      const contract = contracts.get(String(invoice.contractId))
+      if (!contract || contract.customerId !== invoice.customerId) throw new Error('state_invalid')
+    }
+    if (invoice.sourceQuoteId) {
+      const quote = quotes.get(String(invoice.sourceQuoteId))
+      if (!quote || quote.customerId !== invoice.customerId || quote.status !== 'accepted') throw new Error('state_invalid')
+    }
+    if (invoice.status === 'cancelled') continue
+    for (const line of Array.isArray(invoice.lines) ? invoice.lines as Row[] : []) {
+      for (const sourceId of Array.isArray(line.sourceTimeEntryIds) ? line.sourceTimeEntryIds : []) {
+        const id = String(sourceId)
+        const entry = times.get(id)
+        if (!entry || entry.customerId !== invoice.customerId || (invoice.orderId && entry.orderId !== invoice.orderId) || entry.billable !== true || entry.approved !== true) throw new Error('state_invalid')
+        const priorInvoice = usedTimes.get(id)
+        if (priorInvoice && priorInvoice !== invoice.id) throw new Error('state_invalid')
+        usedTimes.set(id, String(invoice.id))
+      }
+      for (const sourceId of Array.isArray(line.sourceExpenseIds) ? line.sourceExpenseIds : []) {
+        const id = String(sourceId)
+        const expense = expenses.get(id)
+        if (!expense || expense.customerId !== invoice.customerId || (invoice.orderId && expense.orderId && expense.orderId !== invoice.orderId) || expense.billable !== true) throw new Error('state_invalid')
+        const priorInvoice = usedExpenses.get(id)
+        if (priorInvoice && priorInvoice !== invoice.id) throw new Error('state_invalid')
+        usedExpenses.set(id, String(invoice.id))
+      }
+    }
+  }
+
+  const paymentTotals = new Map<string, number[]>()
+  for (const payment of rows(next, 'payments')) {
+    const invoice = invoices.get(String(payment.invoiceId))
+    if (!invoice || typeof payment.amount !== 'number' || !Number.isFinite(payment.amount) || payment.amount <= 0) throw new Error('state_invalid')
+    const list = paymentTotals.get(String(payment.invoiceId)) ?? []
+    list.push(toMinorUnits(payment.amount))
+    paymentTotals.set(String(payment.invoiceId), list)
+  }
+  for (const [invoiceId, amounts] of paymentTotals) {
+    const invoice = invoices.get(invoiceId)!
+    const maximum = addMinor(toMinorUnits(Number(invoice.amount)), -toMinorUnits(Number(invoice.creditedAmount ?? 0)))
+    const booked = addMinor(...amounts)
+    if (booked > maximum || toMinorUnits(Number(invoice.paidAmount ?? 0)) !== booked) throw new Error('financial_total_invalid')
+  }
+
+  const creditTotals = new Map<string, number[]>()
+  for (const credit of rows(next, 'creditNotes')) {
+    const invoice = invoices.get(String(credit.invoiceId))
+    if (!invoice || invoice.customerId !== credit.customerId || typeof credit.amount !== 'number' || !Number.isFinite(credit.amount) || credit.amount <= 0) throw new Error('state_invalid')
+    const list = creditTotals.get(String(credit.invoiceId)) ?? []
+    list.push(toMinorUnits(credit.amount))
+    creditTotals.set(String(credit.invoiceId), list)
+  }
+  for (const [invoiceId, amounts] of creditTotals) {
+    const invoice = invoices.get(invoiceId)!
+    const credited = addMinor(...amounts)
+    const total = toMinorUnits(Number(invoice.amount))
+    const paid = toMinorUnits(Number(invoice.paidAmount ?? 0))
+    if (credited > total || addMinor(credited, paid) > total || toMinorUnits(Number(invoice.creditedAmount ?? 0)) !== credited) throw new Error('financial_total_invalid')
+  }
+  for (const supplierInvoice of rows(next, 'supplierInvoices')) {
+    if (!suppliers.has(String(supplierInvoice.supplierId))) throw new Error('state_invalid')
+    if (supplierInvoice.orderId && !orders.has(String(supplierInvoice.orderId))) throw new Error('state_invalid')
+  }
+}
+

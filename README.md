@@ -119,3 +119,12 @@ CI compatibility fix: architecture scans now tolerate optional source-root direc
 
 ## V81.19.4
 Legacy V79 responsive regression validation now recognises the canonical `.mobile-primary-nav` introduced by the simplified product navigation. Runtime behaviour is unchanged.
+
+## V82.0 production architecture
+
+V82.0 adds the controlled normalized PostgreSQL strangler for core business records, tenant-scoped external IDs/RLS, server-side pagination, atomic document counters, idempotency primitives, deterministic minor-unit money helpers and the new Binso typography system (Josefin Sans for brand headings, Inter for product UI). See `docs/V82.0-PRODUCTION-ARCHITECTURE-AND-TYPOGRAPHY.md` before running the optional production backfill.
+
+
+## V82.0.1
+
+Maintenance correction for zero-warning lint compliance after the V82.0 architecture rollout. See `docs/V82.0.1-LINT-CORRECTIONS.md`.

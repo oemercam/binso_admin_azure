@@ -412,7 +412,7 @@ export function BusinessStoreProvider({ children, user, bootstrap, databaseConfi
         const response = await fetch('/api/business/state', {
           method: 'PUT',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ organizationId, expectedVersion, state: snapshot }),
+          body: JSON.stringify({ organizationId, expectedVersion, idempotencyKey: `business-state:${organizationId}:${expectedVersion}`, state: snapshot }),
         })
         const result = await response.json().catch(() => ({})) as { version?: number }
         if (response.ok && typeof result.version === 'number') {

@@ -34,6 +34,19 @@
   --ui-h1-size:clamp(2.35rem,5.2vw,5.5rem);
   --ui-h2-size:clamp(1.9rem,3.6vw,3.8rem);
   --ui-h3-size:clamp(1.2rem,1.5vw,1.65rem);
+
+  /* V82 canonical application typography roles. */
+  --type-page-title:24px;
+  --type-section-title:16px;
+  --type-card-title:14px;
+  --type-body:14px;
+  --type-small:13px;
+  --type-caption:12px;
+  --type-nav:13px;
+  --type-button:13px;
+  --type-table:13px;
+  --type-table-head:12px;
+  --type-input:14px;
 }
 
 /* V81.16 canonical public responsive tokens.
@@ -44,12 +57,12 @@
   --public-reading-max:690px;
   --public-gutter:clamp(16px,3vw,28px);
   --public-section-y:clamp(24px,4vw,44px);
-  --public-h1:clamp(34px,calc(29px + 2vw),50px);
-  --public-h2:clamp(24px,calc(21px + .45vw),28px);
+  --public-h1:clamp(36px,calc(30px + 1.8vw),52px);
+  --public-h2:clamp(24px,calc(21px + .55vw),30px);
   --public-h3:clamp(18px,calc(17px + .2vw),20px);
-  --public-body:clamp(14px,calc(13px + .15vw),15px);
-  --public-small:12px;
-  --public-caption:11px;
+  --public-body:clamp(14px,calc(13.5px + .18vw),16px);
+  --public-small:13px;
+  --public-caption:12px;
   --public-nav:13px;
   --public-eyebrow:11px;
   --public-control:44px;

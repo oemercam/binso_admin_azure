@@ -1,8 +1,9 @@
 import type { Quote, QuoteLine } from '@/types/domain'
-import { roundMoney } from '@/modules/invoices/calculations'
+import { addMinor, fromMinorUnits, multiplyMinor, toMinorUnits } from '@/modules/shared/money'
 
 export function calculateQuoteAmount(lines: QuoteLine[]) {
-  return roundMoney(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0))
+  const totalMinor = addMinor(...lines.map((line) => multiplyMinor(toMinorUnits(line.unitPrice), line.quantity)))
+  return fromMinorUnits(totalMinor)
 }
 
 export function recalculateQuote(quote: Quote): Quote {
