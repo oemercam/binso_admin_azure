@@ -8,7 +8,7 @@ const checks = [
   ['route changes close menu without effect-driven setOpen', menu.includes('openOnPathname === pathname') && !menu.includes('useEffect(() => setOpen')],
   ['mobile menu still portals to document.body', menu.includes('createPortal(panel, document.body)')],
   ['escape closes menu', menu.includes("event.key === 'Escape'")],
-  ['body scroll is restored', menu.includes('previousOverflow')],
+  ['body scroll is restored', menu.includes('previousRootOverflow') && menu.includes('previousBodyOverflow')],
 ]
 
 const failed = checks.filter(([, ok]) => !ok)

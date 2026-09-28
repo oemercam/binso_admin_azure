@@ -23,8 +23,7 @@ export function PublicHeader() {
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="v80-header-actions">
-          <Link className="v80-login" href="/sign-in">Kundenlogin</Link>
-          <Link className="v80-admin-link" href="/admin-access">Admin-Zugang</Link>
+          <Link className="v80-login" href="/sign-in">Anmelden</Link>
           <Link className="button primary v80-header-cta" href="/register">30 Tage kostenlos testen</Link>
           <PublicMobileMenu />
         </div>
@@ -43,13 +42,12 @@ export function PublicFooter() {
           <small>{appIdentity.company} · {appIdentity.address.city}</small>
         </div>
         <nav className="v80-footer-group" aria-label="Produkt"><strong>Produkt</strong>{publicSite.productNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
-        <nav className="v80-footer-group" aria-label="Hilfe"><strong>Hilfe</strong>{publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
-        <nav className="v80-footer-group" aria-label="Zugang"><strong>Zugang</strong>{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
+        <nav className="v80-footer-group" aria-label="Hilfe"><strong>Support</strong>{publicSite.helpNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</nav>
         <nav className="v80-footer-group" aria-label="Rechtliches"><strong>Rechtliches</strong>{publicSite.legalNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}<CookieSettingsButton /></nav>
       </div>
       <div className="v80-footer-bottom">
         <span>© {new Date().getFullYear()} {appIdentity.company}</span>
-        <div>{publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
+        <div>{publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
       </div>
     </footer>
   )

@@ -5,7 +5,6 @@ import { getSession } from '@/lib/auth/server'
 import { customerSignInUrl } from '@/lib/auth/urls'
 import { publicMetadata } from '@/lib/config/seo'
 import { PublicShell } from '@/components/public/public-shell'
-import { MarketingScreenshot } from '@/components/public/marketing-screenshot'
 
 export const dynamic = 'force-dynamic'
 export const metadata = publicMetadata({ title: 'Kunden-Login', description: 'Als Kunde sicher bei Binso One anmelden.', path: '/sign-in' })
@@ -19,9 +18,15 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   return (
     <PublicShell compact>
       <main className="v80-main v812-auth-page entry-auth-page">
-        <section className="v812-auth-layout">
-          <div className="v812-auth-copy"><span className="v80-eyebrow">Kundenlogin</span><h1>Willkommen zurück.</h1><p>Melde dich sicher an und öffne deinen Binso One Arbeitsbereich.</p><div className="v812-auth-visual"><MarketingScreenshot name="dashboard" desktopOnly /></div></div>
-          <div className="v812-auth-card"><span className="v80-eyebrow">Binso One</span><h2>Bei Binso One anmelden</h2><p>Melde dich mit deiner E-Mail-Adresse und deinem Passwort an. Passwort vergessen? Die Wiederherstellung erfolgt sicher über Microsoft Entra External ID.</p>{env.authMode === 'azure' ? <a className="button primary" href={customerSignInUrl('/post-login')}>Mit E-Mail anmelden</a> : <a className="button primary" href="/post-login">Lokale Demo öffnen</a>}<div className="v812-divider"><span>oder</span></div><p>Noch kein Konto? <Link href="/register?mode=trial">30 Tage kostenlos testen</Link> oder <Link href="/register?mode=demo">Demo starten</Link>.</p><small>Du arbeitest bei Binso? <Link href="/admin-access">Admin-Zugang</Link></small></div>
+        <section className="v812-auth-layout v820-signin-layout">
+          <div className="v812-auth-card v820-signin-card">
+            <span className="v80-eyebrow">Kunden-Login</span>
+            <h1>Anmelden</h1>
+            <p>Melde dich mit deinem verifizierten Kundenkonto an. Passwort und Wiederherstellung werden sicher über Microsoft Entra External ID verwaltet.</p>
+            {env.authMode === 'azure' ? <a className="button primary" href={customerSignInUrl('/post-login')}>Mit E-Mail anmelden</a> : <a className="button primary" href="/post-login">Lokale Demo öffnen</a>}
+            <div className="v820-signin-links"><span>Noch kein Konto?</span><Link href="/register?mode=trial">30 Tage kostenlos testen</Link><Link href="/register?mode=demo">Demo ansehen</Link></div>
+            <small>Interner Zugang für Binso Mitarbeitende: <Link href="/admin-access">Admin-Zugang</Link></small>
+          </div>
         </section>
       </main>
     </PublicShell>

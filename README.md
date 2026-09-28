@@ -136,3 +136,13 @@ Der öffentliche Kunden-Onboarding-Flow unterstützt drei getrennte Modi: Produk
 ## V82.0.7 – Production Hardening
 
 V82.0.7 härtet Self-Service und Billing für den Real-Customer-Betrieb: kontrollierte DB-Unavailable-Antworten im E2E-/Fehlerfall, Correlation IDs, Billing-Rate-Limits, redigierte Provider-Fehler, Stripe-Webhook-Härtung, konsistente 30-Tage-Trial-Logik und zusätzliche Self-Service-Acceptance-E2E. Details: `docs/V82.0.7-PRODUCTION-HARDENING.md`.
+
+
+## V82.0.8 – Typography und Mobile Navigation
+
+V82.0.8 vereinheitlicht die öffentliche und interne Typografie auf Inter, reduziert die Dominanz grosser Marketing-Überschriften und entfernt Plus Jakarta Sans aus der Runtime. Die mobile öffentliche Navigation sperrt beim Öffnen den Seitenscroll vollständig; Header, Logo und Schliesskontrolle bleiben fix sichtbar, während ausschliesslich das Navigationspanel scrollt.
+
+
+## V82.0.9 – Ruhiger Public-Auftritt
+
+V82.0.9 reduziert den öffentlichen Auftritt auf echte Produktinhalte und verifizierbare Aussagen. Platzhalter-Referenzen und nicht freigegebene Testimonials wurden entfernt, die Integrationsdarstellung durch einen sachlichen Datenfluss ersetzt, Header und Footer vereinfacht und der Kunden-Login als kompakte moderne Zugangsfläche neu gestaltet. Öffentliche Überschriften bleiben Inter SemiBold, sind aber nochmals ruhiger skaliert.

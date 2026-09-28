@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.82.0.7",
+  "version": "0.82.0.9",
   "private": true,
   "scripts": {
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",

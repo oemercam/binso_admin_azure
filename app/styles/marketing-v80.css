@@ -932,7 +932,7 @@
     width:min(980px,calc(100% - (2 * var(--v819-gutter))))!important;
   }
   .public-site-v80 .v80-footer-main{
-    grid-template-columns:minmax(250px,300px) repeat(4,minmax(110px,1fr))!important;
+    grid-template-columns:minmax(250px,300px) repeat(3,minmax(110px,1fr))!important;
     column-gap:24px!important;
     row-gap:0!important;
     align-items:start!important;

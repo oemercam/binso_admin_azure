@@ -88,10 +88,8 @@ for (const viewport of [
 
       await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}\\?preview=1$`))
       const layout = page.locator('.v812-auth-layout')
-      const copy = page.locator('.v812-auth-copy')
       const card = page.locator('.v812-auth-card')
       await expect(layout).toBeVisible()
-      await expect(copy).toBeVisible()
       await expect(card).toBeVisible()
       await expectNoViewportOverflow(page, `${viewport.width}px ${route}`)
 
@@ -103,8 +101,29 @@ for (const viewport of [
       }
 
       const layoutColumns = await layout.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
-      if (viewport.width <= 820) expect(layoutColumns, `${route} must stack on compact screens`).toBe(1)
-      else expect(layoutColumns, `${route} must use the mockup two-column layout on desktop`).toBeGreaterThanOrEqual(2)
+      if (route === '/sign-in') {
+        await expect(page.locator('.v820-signin-card')).toBeVisible()
+        await expect(page.locator('.v812-auth-copy')).toHaveCount(0)
+        expect(layoutColumns, 'customer sign-in intentionally uses one focused column').toBe(1)
+        if (cardBox && viewport.width > 820) {
+          expect(cardBox.width, 'customer sign-in stays compact on desktop').toBeLessThanOrEqual(430)
+          const signInMainBox = await page.locator('.entry-auth-page').boundingBox()
+          expect(signInMainBox, 'customer sign-in main surface is measurable').not.toBeNull()
+          if (signInMainBox) {
+            expect(
+              Math.abs(
+                (cardBox.x + cardBox.width / 2) -
+                (signInMainBox.x + signInMainBox.width / 2),
+              ),
+              'customer sign-in stays centred inside the actual page surface',
+            ).toBeLessThanOrEqual(2)
+          }
+        }
+      } else {
+        await expect(page.locator('.v812-auth-copy')).toBeVisible()
+        if (viewport.width <= 820) expect(layoutColumns, `${route} must stack on compact screens`).toBe(1)
+        else expect(layoutColumns, `${route} keeps the two-column admin explanation on desktop`).toBeGreaterThanOrEqual(2)
+      }
     })
   }
 }
@@ -231,16 +250,16 @@ test('V81.13 all public pages keep visual system at desktop and mobile sizes', a
       await expect(page.locator('.v80-footer'), `${route} must render the public footer`).toBeVisible()
       await expectNoViewportOverflow(page, `V81.13 ${viewport.width}px ${route}`)
 
-      const title = page.locator('.v812-page-intro h1, .v812-auth-copy h1, .register-start-copy h1').first()
+      const title = page.locator('.v812-page-intro h1, .v812-auth-copy h1, .v820-signin-card h1, .register-start-copy h1').first()
       if (await title.count()) {
         await expect(title).toBeVisible()
         const style = await title.evaluate((el) => {
           const s = getComputedStyle(el)
           return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight), weight: Number.parseInt(s.fontWeight, 10) }
         })
-        expect(style.size, `${route} title too small`).toBeGreaterThanOrEqual(viewport.width <= 360 ? 33 : viewport.width <= 560 ? 36 : viewport.width <= 820 ? 39 : 42)
+        expect(style.size, `${route} title too small`).toBeGreaterThanOrEqual(route.startsWith('/sign-in') ? 30 : viewport.width <= 360 ? 31 : viewport.width <= 560 ? 33 : viewport.width <= 820 ? 34 : 36)
         expect(style.lineHeight / style.size, `${route} title line-height`).toBeLessThanOrEqual(1.08)
-        expect(style.weight, `${route} title weight`).toBeGreaterThanOrEqual(700)
+        expect(style.weight, `${route} title weight`).toBeGreaterThanOrEqual(600)
       }
     }
   }
@@ -356,7 +375,7 @@ test('V81.14 desktop footer stays compact and visually grouped', async ({ page }
 
   const brand = page.locator('.v80-footer-brand')
   const groups = page.locator('.v80-footer-group')
-  await expect(groups).toHaveCount(4)
+  await expect(groups).toHaveCount(3)
   const brandBox = await brand.boundingBox()
   const firstGroupBox = await groups.first().boundingBox()
   const lastGroupBox = await groups.last().boundingBox()
@@ -364,7 +383,7 @@ test('V81.14 desktop footer stays compact and visually grouped', async ({ page }
   expect(firstGroupBox).not.toBeNull()
   expect(lastGroupBox).not.toBeNull()
   if (brandBox && firstGroupBox && lastGroupBox && footerBox) {
-    expect(firstGroupBox.x - (brandBox.x + brandBox.width), 'product links should stay close to brand').toBeLessThanOrEqual(40)
+    expect(firstGroupBox.x - (brandBox.x + brandBox.width), 'product links should stay close to brand').toBeLessThanOrEqual(72)
     expect(lastGroupBox.x + lastGroupBox.width, 'legal links must remain inside compact footer').toBeLessThanOrEqual(footerBox.x + footerBox.width + 1)
   }
   await expectNoViewportOverflow(page, 'V81.14 desktop footer')
@@ -385,6 +404,15 @@ test('V81.15 mobile public navigation opens, closes and stays above content', as
   await expect(panel).toBeVisible()
   await expect(panel.locator('.v80-mobile-primary a')).toHaveCount(4)
   await expect(panel.getByText('30 Tage kostenlos testen')).toBeVisible()
+  await expect(page.locator('html')).toHaveClass(/public-mobile-menu-open/)
+  await expect(page.locator('body')).toHaveClass(/public-mobile-menu-open/)
+  expect(await page.locator('.v80-header').evaluate((el) => getComputedStyle(el).position)).toBe('fixed')
+
+  const scrollBefore = await page.evaluate(() => window.scrollY)
+  await page.mouse.wheel(0, 900)
+  await page.waitForTimeout(120)
+  const scrollAfter = await page.evaluate(() => window.scrollY)
+  expect(scrollAfter, 'page content must not scroll behind the open mobile navigation').toBe(scrollBefore)
 
   const box = await panel.boundingBox()
   expect(box).not.toBeNull()
@@ -397,6 +425,8 @@ test('V81.15 mobile public navigation opens, closes and stays above content', as
   await page.keyboard.press('Escape')
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')
   await expect(panel).toBeHidden()
+  await expect(page.locator('html')).not.toHaveClass(/public-mobile-menu-open/)
+  await expect(page.locator('body')).not.toHaveClass(/public-mobile-menu-open/)
 
   await trigger.click()
   await panel.getByRole('link', { name: 'Preise' }).click()
@@ -433,19 +463,19 @@ test('V81.16 public layout matrix stays clean across 320, 360, 390, 430, 768, 83
       const family = await shell.evaluate((el) => getComputedStyle(el).fontFamily)
       expect(family.length, `${route} font family at ${viewport.width}px`).toBeGreaterThan(0)
 
-      const title = page.locator('.v816-hero-copy h1, .v812-page-intro h1, .v812-auth-copy h1, .register-start-copy h1').first()
+      const title = page.locator('.v816-hero-copy h1, .v812-page-intro h1, .v812-auth-copy h1, .v820-signin-card h1, .register-start-copy h1').first()
       if (await title.count()) {
         await expect(title).toBeVisible()
         const style = await title.evaluate((el) => {
           const s = getComputedStyle(el)
           return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight) }
         })
-        expect(style.size, `${route} H1 too small at ${viewport.width}px`).toBeGreaterThanOrEqual(33)
+        expect(style.size, `${route} H1 too small at ${viewport.width}px`).toBeGreaterThanOrEqual(route.startsWith('/sign-in') ? 30 : 31)
         expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(52)
         expect(style.lineHeight / style.size, `${route} H1 line-height at ${viewport.width}px`).toBeLessThanOrEqual(1.08)
       }
 
-      const main = page.locator('.v816-inner, .v80-main.v812-page, .v80-main.v812-auth-page, .register-entry-v706').first()
+      const main = route.startsWith('/sign-in') ? page.locator('.v820-signin-layout') : page.locator('.v816-inner, .v80-main.v812-page, .register-entry-v706').first()
       if (await main.count()) {
         const box = await main.boundingBox()
         expect(box).not.toBeNull()

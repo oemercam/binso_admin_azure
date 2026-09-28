@@ -5,7 +5,7 @@ const css = fs.readFileSync('app/styles/public-responsive-system.css', 'utf8')
 const e2e = fs.readFileSync('tests/e2e/responsive-robustness.spec.ts', 'utf8')
 
 const h1Token = tokens.match(/--public-h1:\s*clamp\((\d+(?:\.\d+)?)px,\s*calc\([^)]*\),\s*(\d+(?:\.\d+)?)px\);/)
-const fluidH1Valid = Boolean(h1Token && Number(h1Token[1]) >= 34 && Number(h1Token[2]) >= 50)
+const fluidH1Valid = Boolean(h1Token && Number(h1Token[1]) >= 34 && Number(h1Token[2]) >= 48)
 
 const checks = [
   ['fluid H1 clears 390px minimum without a breakpoint jump', fluidH1Valid],

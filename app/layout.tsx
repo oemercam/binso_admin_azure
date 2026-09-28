@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import '@fontsource-variable/inter'
-import '@fontsource-variable/plus-jakarta-sans'
 import './globals.css'
 import './documents.css'
 import { AppProviders } from '@/components/providers/app-providers'

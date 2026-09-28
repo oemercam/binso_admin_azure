@@ -22,14 +22,23 @@ export function PublicMobileMenu() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpenOnPathname(null)
     }
-    const previousOverflow = document.body.style.overflow
+    const root = document.documentElement
+    const body = document.body
+    const previousRootOverflow = root.style.overflow
+    const previousBodyOverflow = body.style.overflow
 
     document.addEventListener('keydown', onKeyDown)
-    document.body.style.overflow = 'hidden'
+    root.classList.add('public-mobile-menu-open')
+    body.classList.add('public-mobile-menu-open')
+    root.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
 
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previousOverflow
+      root.classList.remove('public-mobile-menu-open')
+      body.classList.remove('public-mobile-menu-open')
+      root.style.overflow = previousRootOverflow
+      body.style.overflow = previousBodyOverflow
     }
   }, [open])
 
@@ -59,10 +68,10 @@ export function PublicMobileMenu() {
         <div className="v80-mobile-meta">
           <Link href="/security" onClick={close}>Sicherheit</Link>
           <Link href="/contact" onClick={close}>Kontakt</Link>
+          <Link href="/admin-access" onClick={close}>Admin-Zugang</Link>
         </div>
         <div className="v80-mobile-access">
-          <Link href="/sign-in" onClick={close}>Kundenlogin</Link>
-          <Link href="/admin-access" onClick={close}>Admin-Zugang</Link>
+          <Link href="/sign-in" onClick={close}>Anmelden</Link>
           <Link className="button primary" href="/register" onClick={close}>30 Tage kostenlos testen</Link>
         </div>
       </nav>

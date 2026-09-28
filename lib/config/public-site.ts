@@ -19,7 +19,7 @@ export const publicSite = {
     { href: ROUTES.public.security, label: 'Sicherheit' },
   ],
   accessNavigation: [
-    { href: ROUTES.auth.signIn, label: 'Kunden-Login' },
+    { href: ROUTES.auth.signIn, label: 'Anmelden' },
     { href: ROUTES.auth.register, label: 'Konto erstellen' },
   ],
   adminNavigation: [

@@ -9,7 +9,6 @@ export const metadata = publicMetadata({
   path: '/',
 })
 
-const references = ['Referenz 01', 'Referenz 02', 'Referenz 03', 'Referenz 04', 'Referenz 05', 'Referenz 06'] as const
 
 export default function HomePage() {
   return (
@@ -84,42 +83,29 @@ export default function HomePage() {
         <section className="v816-feature v816-soft">
           <div className="v816-inner v816-feature-grid v816-feature-reverse">
             <div className="v816-feature-copy">
-              <div className="v816-label"><span>↗</span><small>Integrationen</small></div>
-              <h2>Deine Tools. Nahtlos verbunden.</h2>
-              <p>Binso One lässt sich einfach in deine bestehende Tool-Landschaft integrieren – über direkte Schnittstellen und bewährte Partner.</p>
-              <Link href="/features">Mehr zu Integrationen <span>→</span></Link>
+              <div className="v816-label"><span>↗</span><small>Datenfluss</small></div>
+              <h2>Daten bewegen. Strukturiert und nachvollziehbar.</h2>
+              <p>CSV-Import und Datenexport helfen dir, Informationen sauber weiterzuverwenden. Weitere Schnittstellen werden nur dort angezeigt, wo sie produktiv verfügbar und konfiguriert sind.</p>
+              <Link href="/features">Mehr zu Daten und Automationen <span>→</span></Link>
             </div>
-            <div className="v816-integration-map" aria-label="Integrationsübersicht">
-              <span className="v816-tool t1">API</span><span className="v816-tool t2">CSV</span><span className="v816-tool t3">DMS</span>
-              <strong>B1</strong>
-              <span className="v816-tool t4">ERP</span><span className="v816-tool t5">CRM</span><span className="v816-tool t6">…</span>
+            <div className="v820-data-flow" aria-label="Datenfluss in Binso One">
+              <div><small>Import</small><strong>CSV</strong><span>Strukturierte Daten übernehmen</span></div>
+              <div><small>Export</small><strong>Daten</strong><span>Informationen weiterverwenden</span></div>
+              <div><small>Erweiterung</small><strong>Nach Bedarf</strong><span>Nur verfügbare Schnittstellen</span></div>
             </div>
           </div>
         </section>
 
-        <section className="v816-lower">
+        <section className="v816-lower v820-clean-lower">
           <div className="v816-inner">
-            <div className="v816-reference-strip">
-              <div>
-                <small>Unternehmen vertrauen auf Binso One.</small>
-                <div className="v816-reference-logos">{references.map((item) => <span key={item}>{item}</span>)}</div>
-              </div>
-              <div className="v816-badges"><span><b>CH</b><small>Schweizer Fokus</small></span><span><b>30</b><small>Tage testen</small></span><span><b>✓</b><small>Klare Prozesse</small></span></div>
+            <div className="v820-proof-strip">
+              <div><span className="v80-eyebrow">Für Schweizer Dienstleistungsunternehmen</span><h2>Weniger Administration. Mehr Zeit für die eigentliche Arbeit.</h2></div>
+              <div className="v820-proof-facts"><span><strong>30 Tage</strong><small>kostenlos testen</small></span><span><strong>Ohne Karte</strong><small>beim Start</small></span><span><strong>Web und PWA</strong><small>für den Arbeitsalltag</small></span></div>
             </div>
 
-            <div className="v816-testimonials">
-              <h2>Das sagen unsere Kundinnen und Kunden.</h2>
-              <div className="v816-testimonial-grid">
-                <article><div className="v816-avatar">01</div><p>«Binso One bringt Projekte, Zeiten und Abrechnung an einem Ort zusammen. Das macht den Arbeitsalltag spürbar übersichtlicher.»</p><strong>Referenz nach Freigabe</strong><small>Schweizer Dienstleistungsunternehmen</small></article>
-                <article><div className="v816-avatar">02</div><p>«Intuitiv, modern und auf klare Abläufe ausgerichtet. Unser Team findet die wichtigen Funktionen schnell.»</p><strong>Referenz nach Freigabe</strong><small>Beratung und Services</small></article>
-                <article><div className="v816-avatar">03</div><p>«Zeiterfassung, Projekte und Rechnungen greifen sauber ineinander. Genau das reduziert unnötige Administration.»</p><strong>Referenz nach Freigabe</strong><small>Agentur und Projektgeschäft</small></article>
-              </div>
-            </div>
-
-            <div className="v816-price-cta">
-              <div><h2>Ein Plan, der zu dir passt.</h2><p>Transparente Preise, keine versteckten Kosten.</p></div>
-              <div className="v816-bars"><i /><i /><i /><i /></div>
-              <div className="v816-actions"><Link className="v816-button v816-button-primary" href="/pricing">Zu den Preisen →</Link><Link className="v816-button v816-button-secondary" href="/register?mode=demo"><span className="v816-play">▶</span> Demo ansehen</Link></div>
+            <div className="v816-price-cta v820-final-cta">
+              <div><span className="v80-eyebrow">Bereit zum Start?</span><h2>Binso One in Ruhe ausprobieren.</h2><p>Starte kostenlos oder sieh dir zuerst die Produktdemo mit Beispieldaten an.</p></div>
+              <div className="v816-actions"><Link className="v816-button v816-button-primary" href="/register?mode=trial">30 Tage kostenlos testen →</Link><Link className="v816-button v816-button-secondary" href="/register?mode=demo">Demo ansehen</Link></div>
             </div>
           </div>
         </section>
