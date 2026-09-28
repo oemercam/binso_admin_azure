@@ -24,8 +24,8 @@ export function PublicHeader() {
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="v80-header-actions">
-          <LanguageSelector compact className="public-language-selector" />
           <Link className="v80-login" href="/sign-in">Anmelden</Link>
+          <LanguageSelector compact className="public-language-selector" />
           <Link className="button primary v80-header-cta" href="/register">30 Tage kostenlos testen</Link>
           <PublicMobileMenu />
         </div>

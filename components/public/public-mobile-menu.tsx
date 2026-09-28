@@ -53,28 +53,39 @@ export function PublicMobileMenu() {
       aria-hidden={!open}
     >
       <nav aria-label="Mobile Navigation">
-        <div className="v80-mobile-primary">
-          {publicSite.primaryNavigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={pathname === item.href ? 'active' : ''}
-              onClick={close}
-            >
-              {item.label}
-              <span>→</span>
-            </Link>
-          ))}
+        <div className="v823-mobile-account">
+          <Link className="v823-mobile-login" href="/sign-in" onClick={close}>Anmelden</Link>
+          <Link className="button primary v823-mobile-trial" href="/register" onClick={close}>30 Tage kostenlos testen</Link>
         </div>
-        <div className="v80-mobile-meta">
+
+        <div className="v823-mobile-section">
+          <span className="v823-mobile-label">Produkt</span>
+          <div className="v80-mobile-primary">
+            {publicSite.primaryNavigation.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={pathname === item.href ? 'active' : ''}
+                onClick={close}
+              >
+                {item.label}
+                <span aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="v823-mobile-section v823-mobile-service">
+          <span className="v823-mobile-label">Weitere Informationen</span>
+          <div className="v80-mobile-meta">
+            <Link href="/security" onClick={close}>Sicherheit</Link>
+            <Link href="/contact" onClick={close}>Kontakt</Link>
+          </div>
+        </div>
+
+        <div className="v823-mobile-language">
+          <span>Sprache</span>
           <LanguageSelector className="mobile-language-selector" />
-          <Link href="/security" onClick={close}>Sicherheit</Link>
-          <Link href="/contact" onClick={close}>Kontakt</Link>
-          <Link href="/admin-access" onClick={close}>Admin-Zugang</Link>
-        </div>
-        <div className="v80-mobile-access">
-          <Link href="/sign-in" onClick={close}>Anmelden</Link>
-          <Link className="button primary" href="/register" onClick={close}>30 Tage kostenlos testen</Link>
         </div>
       </nav>
     </div>
