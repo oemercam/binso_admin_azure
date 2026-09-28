@@ -8,6 +8,7 @@ import { MobilePillNav } from '@/components/navigation/mobile-pill-nav'
 import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Icon } from '@/components/ui/icon'
 import { AppOverlays } from '@/components/shared/app-overlays'
+import { LanguageSelector } from '@/components/i18n/language-selector'
 
 export function AppShell({
   user,
@@ -37,6 +38,7 @@ export function AppShell({
         </button>
 
         <div className="topbar-actions">
+          <LanguageSelector compact className="app-language-selector" />
           <button className="topbar-icon topbar-mobile-search" aria-label="Suche öffnen" onClick={() => { setSearchOpen(true); setNotificationsOpen(false); setProfileOpen(false); setQuickOpen(false) }}>
             <Icon name="search" size={17} />
           </button>

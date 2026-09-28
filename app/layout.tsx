@@ -9,6 +9,7 @@ import './app-ui.css'
 import './standardized-ui.css'
 import './styles/product-simplicity.css'
 import './styles/typography-system.css'
+import './styles/i18n.css'
 import { appIdentity } from '@/lib/config/app-identity'
 import { publicBaseUrl } from '@/lib/config/seo'
 
@@ -57,6 +58,8 @@ export const viewport: Viewport = {
 
 const themeBoot = `(()=>{try{const appLike=matchMedia('(display-mode:standalone)').matches||innerWidth<=820;const t=localStorage.getItem('binso-theme')||'system';const d=!appLike&&(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme:dark)').matches));document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.style.colorScheme=appLike?'light':(d?'dark':'light')}catch{document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light'}})()`
 
+const localeBoot = `(()=>{try{const supported=['de','fr','it','en','tr'];const stored=localStorage.getItem('binso.locale');const cookie=document.cookie.match(/(?:^|;\\s*)binso_locale=([^;]+)/)?.[1];const candidates=[stored,cookie,...(navigator.languages||[]),navigator.language];let locale='de';for(const candidate of candidates){const base=String(candidate||'').toLowerCase().replace('_','-').split('-')[0];if(supported.includes(base)){locale=base;break}}const langs={de:'de-CH',fr:'fr-CH',it:'it-CH',en:'en-CH',tr:'tr-CH'};document.documentElement.lang=langs[locale]||'de-CH';document.documentElement.dataset.locale=locale}catch{}})()`
+
 export default function RootLayout({
   children,
 }: {
@@ -66,6 +69,7 @@ export default function RootLayout({
     <html lang="de-CH" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
+        <script dangerouslySetInnerHTML={{ __html: localeBoot }} />
       </head>
 
       <body>

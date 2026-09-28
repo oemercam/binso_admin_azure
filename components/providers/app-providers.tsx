@@ -8,20 +8,25 @@ import { NetworkStatus } from '@/components/ui/network-status'
 import { PWAUpdateManager } from '@/components/pwa/pwa-update-manager'
 import { FeedbackProvider } from '@/components/ui/feedback'
 import { PersistenceFeedback } from '@/components/providers/persistence-feedback'
+import { LanguageProvider } from '@/components/i18n/language-provider'
+import { DomLocalizer } from '@/components/i18n/dom-localizer'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider>
-      <DeviceEnvironmentProvider>
-        <NetworkProvider>
-          <FeedbackProvider>
-            {children}
-            <PersistenceFeedback />
-            <NetworkStatus />
-            <PWAUpdateManager />
-          </FeedbackProvider>
-        </NetworkProvider>
-      </DeviceEnvironmentProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <DeviceEnvironmentProvider>
+          <NetworkProvider>
+            <FeedbackProvider>
+              {children}
+              <PersistenceFeedback />
+              <NetworkStatus />
+              <PWAUpdateManager />
+            </FeedbackProvider>
+          </NetworkProvider>
+        </DeviceEnvironmentProvider>
+      </ThemeProvider>
+      <DomLocalizer />
+    </LanguageProvider>
   )
 }

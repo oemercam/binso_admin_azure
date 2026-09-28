@@ -15,7 +15,7 @@ export default defineConfig({
     env: { ...process.env, AUTH_MODE: 'local', ALLOW_LOCAL_AUTH: 'true', DATABASE_URL: '', NEXT_PUBLIC_APP_ENV: 'e2e' },
   },
   projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
+    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'], locale: 'de-CH' } },
+    { name: 'mobile-chromium', use: { ...devices['Pixel 7'], locale: 'de-CH' } },
   ],
 })

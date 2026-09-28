@@ -5,7 +5,7 @@ import { getAccountProfile, updateAccountProfile } from '@/lib/db/repositories/a
 import { upsertAuthenticatedUser } from '@/lib/db/repositories/users'
 import { apiError, apiJson, readJsonBody, requestId, requireSameOrigin } from '@/lib/http/server-api'
 
-const locales = new Set(['de-CH','fr-CH','it-CH','en-CH'])
+const locales = new Set(['de-CH','fr-CH','it-CH','en-CH','tr-CH'])
 const timezones = new Set(['Europe/Zurich','Europe/Berlin','Europe/Paris','Europe/Rome','UTC'])
 
 export async function GET(request: Request) {

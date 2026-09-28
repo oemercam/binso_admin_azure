@@ -143,6 +143,13 @@ V82.0.7 härtet Self-Service und Billing für den Real-Customer-Betrieb: kontrol
 V82.0.8 vereinheitlicht die öffentliche und interne Typografie auf Inter, reduziert die Dominanz grosser Marketing-Überschriften und entfernt Plus Jakarta Sans aus der Runtime. Die mobile öffentliche Navigation sperrt beim Öffnen den Seitenscroll vollständig; Header, Logo und Schliesskontrolle bleiben fix sichtbar, während ausschliesslich das Navigationspanel scrollt.
 
 
+
+## V82.1.1 – Mehrsprachigkeit
+
+Binso One unterstützt Deutsch, Französisch, Italienisch, Englisch und Türkisch. Beim ersten Besuch wird die Browsersprache automatisch erkannt; eine manuelle Auswahl bleibt gespeichert. Über **Automatisch** kann jederzeit wieder auf die aktuelle Browsersprache zurückgeschaltet werden. Die Sprachlogik gilt für öffentliche Seiten, Authentifizierung, App, Mobile/PWA und gemeinsame UI-Komponenten. Langform-Rechtstexte behalten Deutsch als massgebende Referenzfassung und werden nicht als rechtlich gleichwertige Übersetzung ausgegeben. Details: `docs/INTERNATIONALIZATION.md`.
+
+Binso One unterstützt Deutsch, Französisch, Italienisch, Englisch und Türkisch. Beim ersten Besuch wird die Browser-Sprache erkannt; eine manuelle Auswahl über den Sprachschalter hat Vorrang und wird lokal sowie als SameSite-Cookie gespeichert. Die Sprachwahl gilt für Public-Seiten, Registrierung, Login und die angemeldete Anwendung. `html[lang]` wird passend auf `de-CH`, `fr-CH`, `it-CH`, `en-CH` oder `tr-CH` gesetzt. Die Übersetzungslogik ist zentral unter `lib/i18n/` abgelegt und wird durch `pnpm run i18n:check` sowie Playwright-E2E-Tests abgesichert.
+
 ## V82.0.9 – Ruhiger Public-Auftritt
 
 V82.0.9 reduziert den öffentlichen Auftritt auf echte Produktinhalte und verifizierbare Aussagen. Platzhalter-Referenzen und nicht freigegebene Testimonials wurden entfernt, die Integrationsdarstellung durch einen sachlichen Datenfluss ersetzt, Header und Footer vereinfacht und der Kunden-Login als kompakte moderne Zugangsfläche neu gestaltet. Öffentliche Überschriften bleiben Inter SemiBold, sind aber nochmals ruhiger skaliert.

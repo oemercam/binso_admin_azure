@@ -5,6 +5,7 @@ import { BinsoLogo } from '@/components/ui/binso-logo'
 import { appIdentity } from '@/lib/config/app-identity'
 import { publicSite } from '@/lib/config/public-site'
 import { CookieConsent, CookieSettingsButton } from './cookie-consent'
+import { LanguageSelector } from '@/components/i18n/language-selector'
 
 function BrandLink() {
   return (
@@ -23,6 +24,7 @@ export function PublicHeader() {
           {publicSite.primaryNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
         <div className="v80-header-actions">
+          <LanguageSelector compact className="public-language-selector" />
           <Link className="v80-login" href="/sign-in">Anmelden</Link>
           <Link className="button primary v80-header-cta" href="/register">30 Tage kostenlos testen</Link>
           <PublicMobileMenu />
@@ -47,7 +49,7 @@ export function PublicFooter() {
       </div>
       <div className="v80-footer-bottom">
         <span>© {new Date().getFullYear()} {appIdentity.company}</span>
-        <div>{publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
+        <div><LanguageSelector compact className="footer-language-selector" />{publicSite.footerUtilityNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.accessNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}{publicSite.adminNavigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}</div>
       </div>
     </footer>
   )

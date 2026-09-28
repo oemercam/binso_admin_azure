@@ -13,6 +13,7 @@ import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { signOutUrl } from '@/lib/auth/urls'
 import { roleLabel } from '@/lib/auth/permissions'
 import { QUICK_ACTIONS } from '@/components/navigation/action-items'
+import { LanguageSelector } from '@/components/i18n/language-selector'
 
 const quickActions = QUICK_ACTIONS
 
@@ -175,6 +176,7 @@ export function AppOverlays({
         <div className="profile-popover" role="dialog">
           <div className="profile-card-head"><span className="avatar large">{initials(user.name)}</span><span><strong>{user.name}</strong><small>{roleLabel(user.role)}</small><small>{user.email}</small></span></div>
           <div className="profile-links">
+            <div className="profile-language-row"><LanguageSelector /></div>
             <Link href="/account" onClick={() => setProfileOpen(false)}><Icon name="user" size={16} />Konto und Profil</Link>
             <Link href="/settings" onClick={() => setProfileOpen(false)}><Icon name="bell" size={16} />Benachrichtigungen</Link>
             <a href={signOutUrl()}><Icon name="logout" size={16} />Abmelden</a>

@@ -1,6 +1,6 @@
 {
   "name": "binso-one",
-  "version": "0.82.0.9",
+  "version": "0.82.1.3",
   "private": true,
   "scripts": {
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:v69",
@@ -85,17 +85,17 @@
     "master:check": "node scripts/check-master-readiness.mjs",
     "contact:check": "node scripts/check-master-readiness.mjs --scope=contact",
     "operations:check": "node scripts/check-master-readiness.mjs --scope=operations",
-    "static:check": "pnpm run security:check && pnpm run architecture:check && pnpm run consistency:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run selfservice:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run legacy-state:check && pnpm run production-hardening:check && pnpm run master:check && pnpm run v82.0:check",
+    "static:check": "pnpm run security:check && pnpm run architecture:check && pnpm run consistency:check && pnpm run design-system:check && pnpm run actions:check && pnpm run process:check && pnpm run mobile-ui:check && pnpm run product:simplicity-check && pnpm run saas:check && pnpm run multitenant:check && pnpm run data-foundation:check && pnpm run auth-membership:check && pnpm run customer-auth:check && pnpm run selfservice:check && pnpm run registration-onboarding:check && pnpm run subscription-billing:check && pnpm run stripe-payment:check && pnpm run saas:product-check && pnpm run platform:check && pnpm run go-live:check && pnpm run platform-foundation:check && pnpm run legacy-state:check && pnpm run production-hardening:check && pnpm run i18n:check && pnpm run master:check && pnpm run v82.0:check",
     "compatibility:check": "pnpm run v74:check && pnpm run v75:check && pnpm run v76:check && pnpm run v77:check && pnpm run v78:check && pnpm run v79:check && pnpm run v80:check && pnpm run v819:check && pnpm run v8110:check && pnpm run v8111:check && pnpm run v81.12:check && pnpm run v81.13:check && pnpm run v81.14:check && pnpm run v81.15:check && pnpm run v81.16:check && pnpm run v81.16.2:check && pnpm run v81.16.3:check && pnpm run v81.16.4:check && pnpm run v81.16.5:check && pnpm run v81.17:check && pnpm run v81.17.1:check && pnpm run v81.17.2:check && pnpm run v81.18:check && pnpm run v81.19:check && pnpm run v81.19.1:check && pnpm run v81.19.2:check && pnpm run v81.19.3:check && pnpm run v81.19.4:check && pnpm run language:check",
     "selfservice:check": "node scripts/check-self-service-signup.mjs",
     "production-hardening:check": "node scripts/check-production-hardening.mjs",
     "v82.0.7:check": "node scripts/check-production-hardening.mjs",
     "legacy-state:check": "node scripts/check-legacy-state-boundaries.mjs",
-    "production:acceptance": "node scripts/production-acceptance.mjs"
+    "production:acceptance": "node scripts/production-acceptance.mjs",
+    "i18n:check": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
-    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@swc/helpers": "0.5.23",
     "next": "^16.0.0",
     "pg": "^8.13.1",

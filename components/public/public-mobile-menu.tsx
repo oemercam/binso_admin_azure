@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { publicSite } from '@/lib/config/public-site'
+import { LanguageSelector } from '@/components/i18n/language-selector'
 
 const subscribeToClient = () => () => undefined
 const getClientSnapshot = () => true
@@ -66,6 +67,7 @@ export function PublicMobileMenu() {
           ))}
         </div>
         <div className="v80-mobile-meta">
+          <LanguageSelector className="mobile-language-selector" />
           <Link href="/security" onClick={close}>Sicherheit</Link>
           <Link href="/contact" onClick={close}>Kontakt</Link>
           <Link href="/admin-access" onClick={close}>Admin-Zugang</Link>
