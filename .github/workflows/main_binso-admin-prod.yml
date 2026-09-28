@@ -119,56 +119,8 @@ jobs:
         shell: bash
         run: |
           START=$(date +%s)
-          pnpm run security:check
-          pnpm run architecture:check
-          pnpm run consistency:check
-          pnpm run design-system:check
-          pnpm run actions:check
-          pnpm run process:check
-          pnpm run mobile-ui:check
-          pnpm run product:simplicity-check
-          pnpm run saas:check
-          pnpm run multitenant:check
-          pnpm run data-foundation:check
-          pnpm run auth-membership:check
-          pnpm run customer-auth:check
-          pnpm run registration-onboarding:check
-          pnpm run subscription-billing:check
-          pnpm run stripe-payment:check
-          pnpm run saas:product-check
-          pnpm run platform:check
-          pnpm run go-live:check
-          pnpm run platform-foundation:check
-          pnpm run v74:check
-          pnpm run v75:check
-          pnpm run v76:check
-          pnpm run v77:check
-          pnpm run v78:check
-          pnpm run v79:check
-          pnpm run v80:check
-          pnpm run v819:check
-          pnpm run v8110:check
-          pnpm run v8111:check
-          pnpm run v81.12:check
-          pnpm run v81.13:check
-          pnpm run v81.14:check
-          pnpm run v81.15:check
-          pnpm run v81.16:check
-          pnpm run v81.16.2:check
-          pnpm run v81.16.3:check
-          pnpm run v81.16.4:check
-          pnpm run v81.16.5:check
-          pnpm run v81.17:check
-          pnpm run v81.17.1:check
-          pnpm run v81.17.2:check
-          pnpm run v81.18:check
-          pnpm run v81.19:check
-          pnpm run v81.19.1:check
-          pnpm run v81.19.2:check
-          pnpm run v81.19.3:check
-          pnpm run v81.19.4:check
-          pnpm run v82.0:check
-          pnpm run language:check
+          pnpm run static:check
+          pnpm run compatibility:check
           echo "PRODUCT_CHECK_SECONDS=$(( $(date +%s) - START ))" >> "$GITHUB_ENV"
       - name: Behavioral regression tests
         shell: bash

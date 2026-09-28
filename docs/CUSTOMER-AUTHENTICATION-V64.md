@@ -11,9 +11,8 @@ Empfohlene produktive Identity-Plattform: Microsoft Entra External ID mit browse
 Unterstützte Standardmethoden:
 
 - E-Mail + Passwort mit E-Mail-Verifikation
-- Microsoft / Microsoft Entra ID
-- Google
-- Apple
+- E-Mail + Passwort ist der produktive Standard.
+- Microsoft, Google oder Apple können später optional als zusätzliche Provider aktiviert werden.
 - Passwort vergessen / Passwort zurücksetzen über den Identity Provider
 
 Optional kann später E-Mail-One-Time-Passcode oder Passkey aktiviert werden. Das wird nicht im Anwendungscode als eigenes Passwortsystem implementiert.
@@ -27,7 +26,7 @@ Die Anwendung speichert keine Passwörter, Passwort-Hashes, OAuth-Secrets von Ku
 1. Microsoft Entra External ID External Tenant erstellen.
 2. Sign-up/Sign-in User Flow erstellen.
 3. Lokale Anmeldung `E-Mail + Passwort` aktivieren.
-4. Social/Federated Provider aktivieren: Google, Apple und Microsoft Entra ID.
+4. Für den ersten produktiven Release nur `E-Mail + Passwort` aktivieren; weitere Provider erst nach separatem Test ergänzen.
 5. Binso-Web-App registrieren und Redirect URI gemäss External-ID-/App-Service-Konfiguration setzen.
 6. In Azure App Service → Authentifizierung einen benutzerdefinierten OpenID-Connect-Provider für External ID konfigurieren, z. B. mit Providername `external_id`.
 7. App Setting setzen:
@@ -36,13 +35,13 @@ Die Anwendung speichert keine Passwörter, Passwort-Hashes, OAuth-Secrets von Ku
 
 8. Sichtbare Methoden passend konfigurieren:
 
-   `NEXT_PUBLIC_AUTH_METHODS=email,microsoft,google,apple`
+   `NEXT_PUBLIC_AUTH_METHODS=email`
 
-Solange External ID noch nicht konfiguriert ist, bleibt `AUTH_PROVIDER_NAME=aad` als sicherer Fallback für die bestehende Microsoft-Anmeldung bestehen.
+Für Production ist `AUTH_PROVIDER_NAME=external_id` verpflichtend. `AUTH_ADMIN_PROVIDER_NAME=aad` bleibt ausschliesslich für den internen Binso-Admin-Zugang.
 
 ## Applikationsfluss
 
-`/pricing` → `/register` → `/api/auth/login` → External ID → `/register` → `/onboarding` → Stripe Checkout → `/dashboard`
+`/pricing` → Demo, kostenloser Test oder direktes Abo → `/register` → `/api/auth/login` → External ID (E-Mail-Verifikation + Passwort) → `/register` → `/onboarding` → bei direktem Abo Stripe Checkout → `/dashboard`
 
 Für bestehende Benutzer:
 

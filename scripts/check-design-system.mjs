@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { readAppUiCss } from './lib/source-bundles.mjs'
 
 const root = process.cwd()
 const globals = readFileSync(join(root, 'app/globals.css'), 'utf8')
-const appUi = readFileSync(join(root, 'app/app-ui.css'), 'utf8')
+const appUi = readAppUiCss(root)
 const identity = readFileSync(join(root, 'lib/config/app-identity.ts'), 'utf8')
 const publicSite = readFileSync(join(root, 'lib/config/public-site.ts'), 'utf8')
 const publicShell = readFileSync(join(root, 'components/public/public-shell.tsx'), 'utf8')
@@ -69,7 +70,7 @@ const marketingV80 = readFileSync(join(root, 'app/styles/marketing-v80.css'), 'u
 if (!publicShell.includes('public-site-v80')) throw new Error('Public shell must use the scoped V80 public website system')
 if (!marketingV80.includes('.v80-header') || !marketingV80.includes('.v80-mobile-menu-panel') || !marketingV80.includes('.v80-footer')) throw new Error('V80 public navigation/footer system is incomplete')
 
-const hardCodedContactPattern = /Weissbadstrasse 8b|\+41 58 510 77 58|oemer\.cam@binso\.ch/
+const hardCodedContactPattern = /Weissbadstrasse 8b|\+41 58 510 88 58|oemer\.cam@binso\.ch/
 for (const [name, source] of [['contact', contact], ['imprint', imprint], ['privacy', privacy]]) {
   if (hardCodedContactPattern.test(source)) throw new Error(`${name} page contains hard-coded contact data instead of appIdentity`)
 }

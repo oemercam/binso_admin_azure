@@ -1,21 +1,22 @@
 import { publicMetadata } from '@/lib/config/seo'
 import { LegalPage } from '@/components/public/legal-page'
+import { LEGAL_VERSION } from '@/lib/legal/legal-config'
 
-export const metadata = publicMetadata({ title: 'Cookies', description: 'Informationen zu Cookies und Einwilligung bei Binso One.', path: '/legal/cookies' })
+export const metadata = publicMetadata({ title: 'Cookies', description: 'Informationen zu Cookies und Browser-Speicherung bei Binso One.', path: '/legal/cookies' })
 
 export default function CookiesPage() {
   return (
-    <LegalPage title="Cookie-Richtlinie" description="Wie Binso One Cookies und vergleichbare Speichermechanismen verwendet. Stand: 24. September 2026.">
-      <h2>Technisch notwendige Funktionen</h2>
-      <p>Binso One benötigt technische Mechanismen für Anmeldung, Session, Sicherheit und Einstellungen. Diese Funktionen sind erforderlich, damit die Anwendung zuverlässig und sicher betrieben werden kann.</p>
-      <h2>Lokale Einstellungen</h2>
-      <p>Bestimmte Einstellungen, beispielsweise Darstellungs- oder Cookie-Präferenzen, können lokal im Browser gespeichert werden. Diese Speicherung dient nicht automatisch der Erstellung eines personenbezogenen Nutzungsprofils.</p>
-      <h2>Anmeldung</h2>
-      <p>Der eingesetzte Microsoft-basierte Identitätsdienst kann während Anmeldung und Session eigene technisch notwendige Cookies setzen. Art und Dauer können sich nach der jeweiligen Identity-Konfiguration richten.</p>
-      <h2>Statistik</h2>
-      <p>Die öffentliche Cookie-Auswahl enthält eine Kategorie für optionale Statistikfunktionen. Im aktuellen Produktstand ist keine solche Statistikfunktion aktiviert. Wird später eine optionale Analysefunktion eingeführt, soll sie erst nach entsprechender Auswahl aktiviert werden.</p>
-      <h2>Einstellungen ändern</h2>
-      <p>Die Cookie-Auswahl kann über „Cookie-Einstellungen“ im Footer erneut geöffnet werden. Browser bieten zusätzlich eigene Funktionen zum Löschen gespeicherter Cookies und Website-Daten.</p>
+    <LegalPage title="Cookie- und Speicher-Richtlinie" description={`Cookies und vergleichbare Browser-Speicherung bei Binso One. Stand: ${LEGAL_VERSION}.`}>
+      <h2>Technisch notwendige Speicherung</h2>
+      <p>Binso One verwendet technisch notwendige Cookies oder vergleichbare Mechanismen, soweit sie für Anmeldung, Session, Sicherheit und den zuverlässigen Betrieb erforderlich sind. Cookies des eingesetzten Identitätsdienstes werden durch dessen technische Konfiguration bestimmt.</p>
+      <h2>Lokaler Browser-Speicher</h2>
+      <p>Binso One verwendet lokalen Browser-Speicher unter anderem für Darstellungspräferenzen wie das Theme, die installierte PWA bzw. Build-Erkennung, Cookie-Präferenzen und – in lokalen Entwicklungs- oder Demo-Szenarien – Produktzustände. Session-Speicher kann beispielsweise für die Wiederherstellung der Scrollposition verwendet werden. Diese Speicherungen dienen nicht dazu, ein Werbeprofil zu erstellen.</p>
+      <h2>Optionale Statistik</h2>
+      <p>Die öffentliche Website enthält eine Einstellung für optionale Statistik. Im Standardzustand ist diese Funktion deaktiviert. Erst wenn eine solche Statistikfunktion produktiv eingerichtet und durch die nutzende Person entsprechend ausgewählt wurde, darf sie aktiviert werden.</p>
+      <h2>Cookie-Einstellungen</h2>
+      <p>Die Auswahl für optionale Funktionen kann über „Cookie-Einstellungen“ im Footer erneut geöffnet und geändert werden. Technisch notwendige Funktionen können nicht deaktiviert werden, wenn dadurch Anmeldung, Sicherheit oder Kernfunktionen der Anwendung nicht mehr funktionieren würden.</p>
+      <h2>Browser-Einstellungen</h2>
+      <p>Cookies und Website-Daten können zusätzlich über die Funktionen des verwendeten Browsers gelöscht oder eingeschränkt werden. Dadurch können gespeicherte Einstellungen verloren gehen oder einzelne Funktionen eingeschränkt sein.</p>
     </LegalPage>
   )
 }

@@ -28,6 +28,8 @@ export const publicSite = {
   legalNavigation: [
     { href: ROUTES.public.privacy, label: 'Datenschutz' },
     { href: ROUTES.public.terms, label: 'AGB' },
+    { href: ROUTES.public.dpa, label: 'Auftragsbearbeitung' },
+    { href: ROUTES.public.subprocessors, label: 'Unterauftragsbearbeiter' },
     { href: ROUTES.public.imprint, label: 'Impressum' },
   ],
   footerUtilityNavigation: [
@@ -45,6 +47,8 @@ export const publicSite = {
     ROUTES.public.privacy,
     ROUTES.public.cookies,
     ROUTES.public.imprint,
+    ROUTES.public.dpa,
+    ROUTES.public.subprocessors,
   ],
   footerDescription: appIdentity.description,
 } as const

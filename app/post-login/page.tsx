@@ -8,7 +8,8 @@ import { getBusinessBootstrapForUser } from '@/lib/db/repositories/business-boot
 
 export const dynamic = 'force-dynamic'
 
-export default async function PostLoginPage() {
+export default async function PostLoginPage({ searchParams }: { searchParams: Promise<{ billing?: string }> }) {
+  const params = await searchParams
   const session = await getSession()
   if (!session) redirect('/sign-in')
   if (!isDatabaseConfigured()) redirect('/dashboard')
@@ -20,7 +21,7 @@ export default async function PostLoginPage() {
   if (memberships.length > 0) {
     const bootstrap = await getBusinessBootstrapForUser(session.user.id)
     if (bootstrap) redirect('/dashboard')
-    redirect('/subscription-required')
+    redirect(params.billing === 'success' ? '/subscription-required?billing=success' : '/subscription-required')
   }
 
   const signup = await findOpenSignupForUser(session.user.id)

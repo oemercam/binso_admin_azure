@@ -17,6 +17,6 @@ export const env = {
   authDefaultRole: resolveDefaultRole(),
   appName: publicEnv.appName,
   vapidPublicKey: publicEnv.vapidPublicKey,
-  authProviderName: process.env.AUTH_PROVIDER_NAME?.trim() || 'aad',
+  authProviderName: process.env.AUTH_PROVIDER_NAME?.trim() || (publicEnv.isProduction ? 'external_id' : 'aad'),
   authAdminProviderName: process.env.AUTH_ADMIN_PROVIDER_NAME?.trim() || 'aad',
 } as const

@@ -128,3 +128,7 @@ V82.0 adds the controlled normalized PostgreSQL strangler for core business reco
 ## V82.0.1
 
 Maintenance correction for zero-warning lint compliance after the V82.0 architecture rollout. See `docs/V82.0.1-LINT-CORRECTIONS.md`.
+
+## Self-Service Registrierung
+
+Der öffentliche Kunden-Onboarding-Flow unterstützt drei getrennte Modi: Produktdemo (`mode=demo`), 30-Tage-Test (`mode=trial`) und direktes kostenpflichtiges Abo (`mode=subscription`). Kundenidentitäten werden produktiv über Microsoft Entra External ID (`AUTH_PROVIDER_NAME=external_id`) mit E-Mail-Verifikation verwaltet; Binso One speichert keine Kundenpasswörter. Der interne Binso-Admin-Zugang bleibt separat über `AUTH_ADMIN_PROVIDER_NAME=aad`. Details und Go-Live-Abnahmetests: `docs/SELF-SERVICE-REGISTRATION.md`.

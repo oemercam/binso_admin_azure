@@ -5,7 +5,7 @@ import { assertVersionAtLeast } from './version-check.mjs'
 const pkg = JSON.parse(readFileSync('package.json','utf8'))
 const css = readFileSync('app/styles/mobile-pwa-system.css','utf8')
 const e2e = readFileSync('tests/e2e/responsive-robustness.spec.ts','utf8')
-const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8')
+const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8') + readFileSync('package.json','utf8')
 
 assertVersionAtLeast(assert, pkg.version, '0.81.17.1')
 assert.match(css, /V81\.17\.1 — sticky-header containment fix/)

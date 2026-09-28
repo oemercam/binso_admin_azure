@@ -1,13 +1,13 @@
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
+import { resolveAuthorizedTenantContext, resolveMembershipContext } from '@/lib/auth/tenant-server'
 import { getOrganizationSubscription, requestSubscriptionChange } from '@/lib/db/repositories/platform-billing'
 import type { SubscriptionPlan } from '@/types/domain'
 
 const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional'])
 
 export async function GET() {
-  const context = await resolveAuthorizedTenantContext(undefined, 'subscription.read')
-  if (!context) return apiError(403, 'forbidden', 'Keine aktive Organisation.')
+  const context = await resolveMembershipContext()
+  if (!context) return apiError(403, 'forbidden', 'Keine Organisation gefunden.')
 
   const subscription = await getOrganizationSubscription(context.organizationId)
   if (!subscription) return apiError(404, 'not_found', 'Kein Abonnement gefunden.')

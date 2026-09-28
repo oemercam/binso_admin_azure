@@ -1,6 +1,7 @@
+import { readAppUiCss } from './lib/source-bundles.mjs'
 import fs from "node:fs"
 
-const css = fs.readFileSync("app/app-ui.css", "utf8")
+const css = readAppUiCss()
 const marker = "V38 — CANONICAL MOBILE/PWA PRESENTATION LAYER"
 const markerIndex = css.indexOf(marker)
 

@@ -10,7 +10,7 @@ const env=read('.env.example')
 const organization=read('app/(app)/organization/page.tsx')
 const checks=[
  ['stripe secrets server-only',stripe.includes("import 'server-only'")&&(stripe.includes('STRIPE_SECRET_KEY') || stripe.includes('serverEnv.stripeSecretKey'))&&!stripe.includes('NEXT_PUBLIC_STRIPE_SECRET')],
- ['checkout is owner scoped',checkout.includes("'billing.manage'")&&checkout.includes("mode', 'subscription")],
+ ['checkout is owner scoped',(checkout.includes("'billing.manage'") || (checkout.includes('resolveMembershipContext') && checkout.includes("membership.role !== 'owner'")))&&checkout.includes("mode', 'subscription")],
  ['checkout has tenant metadata',checkout.includes('metadata[organizationId]')&&checkout.includes('client_reference_id')],
  ['portal is owner scoped',portal.includes("'billing.manage'")&&portal.includes('/billing_portal/sessions')],
  ['webhook signature verification',webhook.includes('verifyStripeWebhook')&&stripe.includes('timingSafeEqual')&&stripe.includes('300')],

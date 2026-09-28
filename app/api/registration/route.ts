@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   const ownerName = cleanShortText(body?.ownerName ?? '', 120)
   const email = normalizeEmail(body?.email ?? '')
   const requestedPlan = body?.plan
-  const mode: SignupMode = body?.mode === 'demo' ? 'demo' : 'trial'
+  const mode: SignupMode = body?.mode === 'demo' ? 'demo' : body?.mode === 'subscription' ? 'subscription' : 'trial'
 
   if (!companyName || !ownerName || !isEmail(email) || !requestedPlan || !plans.has(requestedPlan)) {
     return apiError(422, 'validation', 'Registrierungsdaten sind unvollständig.')

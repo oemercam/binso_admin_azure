@@ -3,7 +3,7 @@ import fs from 'node:fs'
 const checks = [
   ['database/migrations/0007_subscription_lifecycle.sql', "'expired'"],
   ['app/subscription-required/page.tsx', '/api/billing/checkout'],
-  ['app/post-login/page.tsx', "redirect('/subscription-required')"],
+  ['app/post-login/page.tsx', "/subscription-required"],
   ['lib/auth/tenant-server.ts', 'resolveMembershipContext'],
   ['app/api/internal/lifecycle/route.ts', 'isInternalJobAuthorized'],
   ['lib/auth/internal-job.ts', 'serverEnv.internalJobSecret'],

@@ -7,6 +7,7 @@ import { BinsoLogo } from '@/components/ui/binso-logo'
 import { Input } from '@/components/ui/form-controls'
 import type { OrganizationMembership, SignupRequest } from '@/types/domain'
 import { apiRequest, jsonBody } from '@/lib/http/api-client'
+import { TRIAL_DAYS } from '@/lib/config/product'
 
 type Signup = SignupRequest & {
   onboardingStatus: 'not_started' | 'in_progress' | 'completed' | 'skipped'
@@ -32,6 +33,7 @@ export default function OnboardingPage() {
 
   const signup = state?.signup ?? null
   const demoMode = signup?.mode === 'demo'
+  const subscriptionMode = signup?.mode === 'subscription'
   const existing = state?.memberships?.[0]
   const progress = useMemo(() => Math.round((step / steps.length) * 100), [step])
 
@@ -110,12 +112,12 @@ export default function OnboardingPage() {
       })
       if (!saved.signup) throw new Error('Angaben konnten nicht gespeichert werden.')
 
-      const created = await apiRequest<{ organizationId?: string }>('/api/onboarding', {
+      const created = await apiRequest<{ organizationId?: string; mode?: SignupRequest['mode'] }>('/api/onboarding', {
         method: 'POST',
         body: jsonBody({ signupId: signup.id }),
       })
       if (!created.organizationId) throw new Error('Binso One konnte nicht eingerichtet werden.')
-      router.push('/dashboard?welcome=1')
+      router.push(created.mode === 'subscription' ? '/subscription-required?source=signup' : '/dashboard?welcome=1')
       router.refresh()
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Binso One konnte nicht eingerichtet werden.')
@@ -155,14 +157,14 @@ export default function OnboardingPage() {
       <section className="onboarding-entry-shell">
         <header className="onboarding-entry-header">
           <Link className="onboarding-entry-brand" href="/" aria-label="Binso One Startseite"><BinsoLogo /><span>ONE</span></Link>
-          <span>{demoMode ? 'Demo einrichten' : 'Einrichtung'}</span>
+          <span>{demoMode ? 'Demo einrichten' : subscriptionMode ? 'Abo einrichten' : 'Einrichtung'}</span>
         </header>
 
         <div className="onboarding-entry-layout">
           <aside className="onboarding-entry-context">
-            <span className="public-eyebrow">{demoMode ? 'Produktdemo' : 'Schnell startklar'}</span>
-            <h1>{demoMode ? 'Kurz einrichten. Dann direkt ausprobieren.' : 'Nur das Nötigste für den Start.'}</h1>
-            <p>{demoMode ? 'Der Demo-Arbeitsbereich wird mit fiktiven Beispieldaten gefüllt. Optionale Angaben kannst du einfach überspringen.' : 'Du kannst nichts kaputtmachen. Alle Angaben lassen sich später in Binso One ergänzen oder ändern.'}</p>
+            <span className="public-eyebrow">{demoMode ? 'Produktdemo' : subscriptionMode ? 'Abo starten' : 'Schnell startklar'}</span>
+            <h1>{demoMode ? 'Kurz einrichten. Dann direkt ausprobieren.' : subscriptionMode ? 'Kurz einrichten. Danach Abo aktivieren.' : 'Nur das Nötigste für den Start.'}</h1>
+            <p>{demoMode ? 'Der Demo-Arbeitsbereich wird mit fiktiven Beispieldaten gefüllt. Optionale Angaben kannst du einfach überspringen.' : subscriptionMode ? 'Nach diesen Angaben wechselst du zum sicheren Checkout. Geschäftsdaten werden erst nach erfolgreicher Abo-Aktivierung freigegeben.' : 'Du kannst nichts kaputtmachen. Alle Angaben lassen sich später in Binso One ergänzen oder ändern.'}</p>
             <div className="onboarding-entry-step-list" aria-label="Schritte der Einrichtung">
               {steps.map((label, index) => {
                 const number = index + 1
@@ -187,9 +189,9 @@ export default function OnboardingPage() {
                     <div><dt>Unternehmen</dt><dd>{signup.companyName}</dd></div>
                     <div><dt>Kontakt</dt><dd>{signup.ownerName}</dd></div>
                     <div><dt>E-Mail</dt><dd>{signup.email}</dd></div>
-                    <div><dt>{demoMode ? 'Zugang' : 'Plan'}</dt><dd>{demoMode ? 'Produktdemo · Business-Umfang' : signup.plan}</dd></div>
+                    <div><dt>{demoMode ? 'Zugang' : 'Plan'}</dt><dd>{demoMode ? 'Produktdemo · Business-Umfang' : `${signup.plan}${subscriptionMode ? ' · direktes Abo' : ` · ${TRIAL_DAYS} Tage Test`}`}</dd></div>
                   </dl>
-                  <Link className="onboarding-entry-edit" href={`/register?plan=${signup.plan}`}>Angaben ändern</Link>
+                  <Link className="onboarding-entry-edit" href={`/register?mode=${signup.mode}&plan=${signup.plan}`}>Angaben ändern</Link>
                 </>
               ) : null}
 
@@ -211,12 +213,12 @@ export default function OnboardingPage() {
               {step === 3 ? (
                 <>
                   <span className="onboarding-entry-kicker">Fertig</span>
-                  <h2>{demoMode ? 'Deine Produktdemo ist bereit.' : 'Binso One ist bereit.'}</h2>
-                  <p>{demoMode ? 'Wir erstellen jetzt deinen isolierten Demo-Arbeitsbereich mit fiktiven Kunden, Angebot, Auftrag, Zeiten und Rechnung. Externe Aktionen und Abrechnung bleiben deaktiviert.' : 'Wir erstellen jetzt deinen Arbeitsbereich. Danach kannst du direkt den ersten Kunden erfassen. Bankverbindung, Logo, Vorlagen und weitere Einstellungen folgen erst, wenn du sie brauchst.'}</p>
+                  <h2>{demoMode ? 'Deine Produktdemo ist bereit.' : subscriptionMode ? 'Bereit für die Abo-Aktivierung.' : 'Binso One ist bereit.'}</h2>
+                  <p>{demoMode ? 'Wir erstellen jetzt deinen isolierten Demo-Arbeitsbereich mit fiktiven Kunden, Angebot, Auftrag, Zeiten und Rechnung. Externe Aktionen und Abrechnung bleiben deaktiviert.' : subscriptionMode ? 'Wir erstellen jetzt deinen Arbeitsbereich ohne Geschäftsdatenzugriff. Anschliessend bestätigst du AGB und AVV und aktivierst das gewählte Abo im Stripe Checkout.' : 'Wir erstellen jetzt deinen Arbeitsbereich. Danach kannst du direkt den ersten Kunden erfassen. Bankverbindung, Logo, Vorlagen und weitere Einstellungen folgen erst, wenn du sie brauchst.'}</p>
                   <div className="onboarding-entry-ready-list">
-                    <span><b>✓</b>{demoMode ? 'Isolierter Demo-Arbeitsbereich' : 'Unternehmen und Zugang'}</span>
-                    <span><b>✓</b>{demoMode ? 'Fiktive Beispieldaten' : '14-tägiger Testzugang'}</span>
-                    <span><b>✓</b>{demoMode ? 'Keine Abrechnung oder externen Aktionen' : 'Einstellungen später änderbar'}</span>
+                    <span><b>✓</b>{demoMode ? 'Isolierter Demo-Arbeitsbereich' : 'Unternehmen und Owner-Zugang'}</span>
+                    <span><b>✓</b>{demoMode ? 'Fiktive Beispieldaten' : subscriptionMode ? 'Gewählter Plan für Checkout vorbereitet' : `${TRIAL_DAYS}-tägiger Testzugang`}</span>
+                    <span><b>✓</b>{demoMode ? 'Keine Abrechnung oder externen Aktionen' : subscriptionMode ? 'Datenzugriff erst nach erfolgreicher Zahlung' : 'Einstellungen später änderbar'}</span>
                   </div>
                 </>
               ) : null}
@@ -230,7 +232,7 @@ export default function OnboardingPage() {
               {step < steps.length ? (
                 <button className="button primary" type="button" disabled={saving} onClick={() => void saveStep(step + 1)}>{saving ? 'Wird gespeichert…' : step === 2 ? 'Weiter' : 'Bestätigen und weiter'}</button>
               ) : (
-                <button className="button primary" type="button" disabled={saving} onClick={() => void finish()}>{saving ? 'Wird eingerichtet…' : demoMode ? 'Produktdemo öffnen' : 'Binso One starten'}</button>
+                <button className="button primary" type="button" disabled={saving} onClick={() => void finish()}>{saving ? 'Wird eingerichtet…' : demoMode ? 'Produktdemo öffnen' : subscriptionMode ? 'Weiter zum Abo' : 'Binso One starten'}</button>
               )}
             </footer>
           </div>

@@ -2,12 +2,12 @@
 
 ## Ziel
 
-Binso One verwendet ein gemeinsames Design-System für Public Website, Authentisierung, Desktop-App, Mobile und PWA. Farben, Typografie, Abstände, Radien und Controls werden zentral über CSS Custom Properties in `app/globals.css` definiert. Fachliche Layout-Regeln der Anwendung liegen in `app/app-ui.css`. Neue Seiten dürfen keine parallelen Design-Tokens oder versionierte Stylesheets einführen.
+Binso One verwendet ein gemeinsames Design-System für Public Website, Authentisierung, Desktop-App, Mobile und PWA. Farben, Typografie, Abstände, Radien und Controls werden zentral über CSS Custom Properties in `app/globals.css` definiert. Fachliche Layout-Regeln der Anwendung werden über `app/app-ui.css` geladen und liegen modular unter `app/styles/app-ui/`. Neue Seiten dürfen keine parallelen Design-Tokens oder versionierte Stylesheets einführen.
 
 ## Verantwortlichkeiten
 
 - `app/globals.css`: globale Brand-, Farb-, Typografie-, Spacing-, Radius- und Control-Tokens sowie neutrale Basisstile.
-- `app/app-ui.css`: kanonische Komponenten- und Layoutregeln für App, Public Website und Authentisierung.
+- `app/app-ui.css`: stabiler, geordneter Entry-Point. Die kanonischen Komponenten- und Layoutregeln liegen unter `app/styles/app-ui/`.
 - `components/ui/*`: wiederverwendbare UI-Controls.
 - `components/public/*`: Public Header, Footer, Cookie Consent und Legal Layout.
 - `lib/config/app-identity.ts`: Produktname, Beschreibung und Unternehmens-Kontaktdaten.

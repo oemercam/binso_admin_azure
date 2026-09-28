@@ -35,7 +35,7 @@ assertIncludes('components/public/public-mobile-menu.tsx', 'aria-controls="publi
 assertIncludes('app/robots.ts', "'/api/'")
 assertIncludes('app/sitemap.ts', 'publicSite.sitemapRoutes')
 assertIncludes('app/register/layout.tsx', 'index: false')
-assertIncludes('.github/workflows/main_binso-admin-prod.yml', 'pnpm run v79:check')
+if (!read('.github/workflows/main_binso-admin-prod.yml').includes('pnpm run compatibility:check') || !read('package.json').includes('pnpm run v79:check')) throw new Error('V79 compatibility check must remain wired through the canonical compatibility suite')
 
 const version = JSON.parse(read('package.json')).version
 if (!/^0\.(?:7[4-9]|[89]\d)\./.test(version)) throw new Error(`Unexpected product version for public-site compatibility: ${version}`)

@@ -1,7 +1,5 @@
 'use client'
 import { apiErrorMessage } from '@/lib/http/client-errors'
-import { nextInvoiceNumber as invoiceNumber, nextQuoteNumber as quoteNumber, nextContractNumber as contractNumber, nextCreditNumber as creditNumber } from '@/modules/documents/numbering'
-import { advanceContractDate } from '@/modules/contracts/schedule'
 
 
 import {
@@ -13,293 +11,37 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import {
-  contracts as seedContracts,
-  creditNotes as seedCreditNotes,
-  customerActivities as seedCustomerActivities,
-  customerContacts as seedCustomerContacts,
-  customers as seedCustomers,
-  expenses as seedExpenses,
-  employees as seedEmployees,
-  invoices as seedInvoices,
-  orders as seedOrders,
-  payments as seedPayments,
-  quotes as seedQuotes,
-  supplierInvoices as seedSupplierInvoices,
-  suppliers as seedSuppliers,
-  timeEntries as seedTimeEntries,
-} from '@/lib/data/demo'
-import {
-  orderAssignmentRules as seedOrderAssignmentRules,
-  orderPolicies as seedOrderPolicies,
-  timeEvidence as seedTimeEvidence,
-} from '@/lib/data/order-policies'
-import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/document-defaults'
 import { defaultAppSettings } from '@/lib/data/app-settings'
+import { defaultCompanyProfile, defaultDocumentTemplates } from '@/lib/data/document-defaults'
 import { DEFAULT_ORGANIZATION_ID, defaultOrganization } from '@/lib/data/organizations'
-import { seedAuditEvents, seedEntitlements, seedExportJobs, seedImportJobs, seedMemberships, seedNumberSequences, seedSubscriptions } from '@/lib/data/saas'
 import { canTenantAction } from '@/lib/auth/access-policy'
 import { getPlan } from '@/lib/data/plans'
-import { formatDate as formatLocaleDate, formatMonthYear } from '@/lib/format/locale'
 import type {
-  AppSettings,
   BusinessBootstrap,
   AppUser,
-  CompanyProfile,
   Contract,
   CreditNote,
-  CustomerActivity,
-  Customer,
-  CustomerContact,
-  DocumentTemplates,
-  Employee,
-  Expense,
   Invoice,
   InvoiceLine,
   Order,
   Organization,
   OrganizationMembership,
   OrganizationSubscription,
-  OrganizationEntitlements,
   AuditEvent,
-  NumberSequence,
   ImportJob,
   DataExportJob,
-  Permission,
   Payment,
   Quote,
-  QuoteLine,
-  Supplier,
-  SupplierInvoice,
-  TimeEntry,
 } from '@/types/domain'
-import type { OrderPolicy } from '@/modules/orders/types'
-import type { OrderAssignmentRule } from '@/modules/workforce/types'
-import type { TimeEvidence } from '@/modules/time/types'
 import { getTimeEntryBillingEligibility } from '@/modules/time/eligibility'
 import { effectiveInvoiceStatus } from '@/modules/invoices/status'
 import { createDefaultOrderPolicy } from '@/modules/orders/defaults'
 import { readStorage, removeStorage, writeStorage } from '@/lib/browser/storage'
 
-type BusinessState = {
-  organizations: Organization[]
-  currentOrganizationId: string
-  memberships: OrganizationMembership[]
-  subscriptions: OrganizationSubscription[]
-  entitlements: OrganizationEntitlements[]
-  auditEvents: AuditEvent[]
-  numberSequences: NumberSequence[]
-  importJobs: ImportJob[]
-  exportJobs: DataExportJob[]
-  customers: Customer[]
-  contracts: Contract[]
-  expenses: Expense[]
-  creditNotes: CreditNote[]
-  customerActivities: CustomerActivity[]
-  customerContacts: CustomerContact[]
-  suppliers: Supplier[]
-  quotes: Quote[]
-  orders: Order[]
-  timeEntries: TimeEntry[]
-  invoices: Invoice[]
-  payments: Payment[]
-  supplierInvoices: SupplierInvoice[]
-  employees: Employee[]
-  timeEvidence: TimeEvidence[]
-  orderPolicies: OrderPolicy[]
-  orderAssignmentRules: OrderAssignmentRule[]
-  companyProfile: CompanyProfile
-  documentTemplates: DocumentTemplates
-  appSettings: AppSettings
-  companyProfiles: Record<string, CompanyProfile>
-  documentTemplatesByOrganization: Record<string, DocumentTemplates>
-  appSettingsByOrganization: Record<string, AppSettings>
-}
+import type { BusinessState, BusinessStore } from '@/components/state/business-store-types'
+import { addDays, advanceBillingDate, customerProcessFor, formatDate, invoiceTotals, makeActivity, mergeAppSettings, monthLabel, nextContractNumber, nextCreditNumber, nextInvoiceNumber, nextQuoteNumber, recalcInvoice, recalcQuote, round2, today } from '@/components/state/business-store-utils'
 
-type CreateInvoiceInput = {
-  customerId: string
-  orderId?: string
-  timeEntryIds: string[]
-  expenseIds?: string[]
-  extraLines?: InvoiceLine[]
-  period: string
-  kind?: Invoice['kind']
-}
-
-type CreateQuoteInput = {
-  customerId: string
-  title: string
-  validUntil: string
-  lines: QuoteLine[]
-  reference?: string
-}
-
-type CreateOrderInput = Omit<Order, 'id' | 'usedHours' | 'organizationId'>
-
-type CreateContractInput = Omit<Contract, 'id' | 'number' | 'customerName' | 'organizationId'> & { customerId: string }
-
-type BusinessStore = BusinessState & {
-  queueDocumentMail: (kind: 'quote' | 'invoice' | 'reminder', entityId: string, to: string, key: string) => Promise<void>
-  currentOrganization: Organization
-  setCurrentOrganization: (organizationId: string) => void
-  createOrganization: (input: { organizationId?: string; name: string; slug: string; ownerEmail: string; plan: OrganizationSubscription['plan'] }) => Organization
-  activeMembership: OrganizationMembership | null
-  can: (permission: Permission) => boolean
-  addMembership: (membership: OrganizationMembership) => void
-  updateMembership: (id: string, changes: Partial<OrganizationMembership>) => OrganizationMembership | null
-  appendAuditEvent: (event: Omit<AuditEvent, 'id' | 'organizationId' | 'createdAt'>) => void
-  createExportJob: (job: Omit<DataExportJob, 'id' | 'organizationId' | 'createdAt' | 'status'>) => DataExportJob
-  updateExportJob: (id: string, changes: Partial<DataExportJob>) => void
-  createImportJob: (job: Omit<ImportJob, 'id' | 'organizationId' | 'createdAt' | 'status' | 'errorCount'>) => ImportJob
-  updateImportJob: (id: string, changes: Partial<ImportJob>) => void
-  addCustomer: (customer: Customer) => void
-  updateCustomer: (id: string, changes: Partial<Customer>) => Customer | null
-  createContract: (input: CreateContractInput) => Contract | null
-  updateContract: (id: string, changes: Partial<Contract>) => Contract | null
-  addExpense: (expense: Omit<Expense, 'organizationId'>) => void
-  createOrderFromContract: (contractId: string) => Order | null
-  createInvoiceFromContract: (contractId: string, period?: string) => Invoice | null
-  createCreditNote: (invoiceId: string, amount: number, reason: string) => CreditNote | null
-  addActivityNote: (customerId: string, note: string) => void
-  addCustomerContact: (contact: Omit<CustomerContact, 'organizationId'>) => void
-  updateCustomerContact: (id: string, changes: Partial<CustomerContact>) => CustomerContact | null
-  createOrder: (input: CreateOrderInput) => Order
-  updateOrder: (id: string, changes: Partial<Order>) => Order | null
-  addEmployee: (employee: Employee) => void
-  updateEmployee: (id: string, changes: Partial<Employee>) => Employee | null
-  addSupplierInvoice: (invoice: Omit<SupplierInvoice, 'organizationId'>) => void
-  updateSupplierInvoice: (id: string, changes: Partial<SupplierInvoice>) => SupplierInvoice | null
-  addTimeEntry: (entry: Omit<TimeEntry, 'organizationId'>) => void
-  updateTimeEntry: (id: string, changes: Partial<TimeEntry>) => TimeEntry | null
-  addEvidence: (evidence: Omit<TimeEvidence, 'organizationId'>) => void
-  updateEvidence: (id: string, changes: Partial<TimeEvidence>) => TimeEvidence | null
-  updateOrderPolicy: (orderId: string, policy: OrderPolicy) => void
-  updateOrderAssignmentRule: (rule: Omit<OrderAssignmentRule, 'organizationId'>) => void
-  updateQuote: (id: string, changes: Partial<Quote>) => void
-  createQuote: (input: CreateQuoteInput) => Quote | null
-  createQuoteRevision: (quoteId: string) => Quote | null
-  sendQuote: (id: string, to: string) => Quote | null
-  createOrderFromQuote: (quoteId: string) => Order | null
-  createInvoiceFromQuote: (quoteId: string) => Invoice | null
-  createInvoiceFromTimes: (input: CreateInvoiceInput) => Invoice | null
-  updateInvoiceDraft: (id: string, changes: Partial<Invoice>) => Invoice | null
-  sendInvoice: (id: string, to: string, mode?: 'invoice' | 'reminder') => Invoice | null
-  cancelInvoice: (id: string) => Invoice | null
-  recordPayment: (invoiceId: string, amount: number, method: Payment['method'], date: string, reference?: string) => void
-  updateCompanyProfile: (changes: Partial<CompanyProfile>) => void
-  updateDocumentTemplates: (changes: Partial<DocumentTemplates>) => void
-  updateAppSettings: (changes: Partial<AppSettings>) => void
-  resetDemo: () => void
-}
-
-const STORAGE_KEY = 'business-platform-demo-v13-organizations'
-const LEGACY_STORAGE_KEYS = ['binso-admin-demo-v12-responsive', 'binso-admin-demo-v10-e2e', 'binso-admin-demo-v9', 'binso-admin-demo-v8']
-
-function scopeRecords<T extends { organizationId: string }>(items: T[], organizationId = DEFAULT_ORGANIZATION_ID): T[] {
-  return items.map((item) => ({ ...item, organizationId: item.organizationId ?? organizationId }))
-}
-
-function freshState(includeDemo = true): BusinessState {
-  return {
-    organizations: [defaultOrganization],
-    currentOrganizationId: DEFAULT_ORGANIZATION_ID,
-    memberships: includeDemo ? seedMemberships : [],
-    subscriptions: includeDemo ? seedSubscriptions : [],
-    entitlements: includeDemo ? seedEntitlements : [],
-    auditEvents: includeDemo ? seedAuditEvents : [],
-    numberSequences: includeDemo ? seedNumberSequences : [],
-    importJobs: includeDemo ? seedImportJobs : [],
-    exportJobs: includeDemo ? seedExportJobs : [],
-    customers: includeDemo ? scopeRecords(seedCustomers) : [],
-    contracts: includeDemo ? scopeRecords(seedContracts) : [],
-    expenses: includeDemo ? scopeRecords(seedExpenses) : [],
-    creditNotes: includeDemo ? scopeRecords(seedCreditNotes) : [],
-    customerActivities: includeDemo ? scopeRecords(seedCustomerActivities) : [],
-    customerContacts: includeDemo ? scopeRecords(seedCustomerContacts) : [],
-    suppliers: includeDemo ? scopeRecords(seedSuppliers) : [],
-    quotes: includeDemo ? scopeRecords(seedQuotes) : [],
-    orders: includeDemo ? scopeRecords(seedOrders) : [],
-    timeEntries: includeDemo ? scopeRecords(seedTimeEntries) : [],
-    invoices: includeDemo ? scopeRecords(seedInvoices) : [],
-    payments: includeDemo ? scopeRecords(seedPayments) : [],
-    supplierInvoices: includeDemo ? scopeRecords(seedSupplierInvoices) : [],
-    employees: includeDemo ? scopeRecords(seedEmployees) : [],
-    timeEvidence: includeDemo ? scopeRecords(seedTimeEvidence) : [],
-    orderPolicies: includeDemo ? scopeRecords(seedOrderPolicies) : [],
-    orderAssignmentRules: includeDemo ? scopeRecords(seedOrderAssignmentRules) : [],
-    companyProfile: { ...defaultCompanyProfile, organizationId: DEFAULT_ORGANIZATION_ID },
-    documentTemplates: defaultDocumentTemplates,
-    appSettings: defaultAppSettings,
-    companyProfiles: { [DEFAULT_ORGANIZATION_ID]: { ...defaultCompanyProfile, organizationId: DEFAULT_ORGANIZATION_ID } },
-    documentTemplatesByOrganization: { [DEFAULT_ORGANIZATION_ID]: defaultDocumentTemplates },
-    appSettingsByOrganization: { [DEFAULT_ORGANIZATION_ID]: defaultAppSettings },
-  }
-}
-
-function applyBootstrap(base: BusinessState, bootstrap?: BusinessBootstrap | null): BusinessState {
-  if (!bootstrap?.organizations.length) return base
-  const currentOrganizationId = bootstrap.currentOrganizationId
-  return {
-    ...base,
-    organizations: bootstrap.organizations,
-    currentOrganizationId,
-    memberships: bootstrap.memberships,
-    subscriptions: bootstrap.subscriptions,
-    entitlements: bootstrap.entitlements,
-    companyProfile: bootstrap.companyProfiles[currentOrganizationId] ?? { ...defaultCompanyProfile, organizationId: currentOrganizationId, name: bootstrap.organizations[0].name },
-    companyProfiles: { ...base.companyProfiles, ...bootstrap.companyProfiles },
-    documentTemplatesByOrganization: { ...base.documentTemplatesByOrganization, [currentOrganizationId]: base.documentTemplatesByOrganization[currentOrganizationId] ?? defaultDocumentTemplates },
-    appSettingsByOrganization: { ...base.appSettingsByOrganization, [currentOrganizationId]: base.appSettingsByOrganization[currentOrganizationId] ?? defaultAppSettings },
-  }
-}
-
-
-const TENANT_ARRAY_KEYS = [
-  'auditEvents','numberSequences','importJobs','exportJobs','customers','contracts','expenses','creditNotes',
-  'customerActivities','customerContacts','suppliers','quotes','orders','timeEntries','invoices','payments',
-  'supplierInvoices','employees','timeEvidence','orderPolicies','orderAssignmentRules',
-] as const satisfies readonly (keyof BusinessState)[]
-
-function tenantSnapshot(state: BusinessState, organizationId: string): Record<string, unknown> {
-  const snapshot: Record<string, unknown> = {}
-  for (const key of TENANT_ARRAY_KEYS) {
-    const value = state[key]
-    if (Array.isArray(value)) snapshot[key] = value.filter((item) => typeof item === 'object' && item !== null && 'organizationId' in item && (item as { organizationId: string }).organizationId === organizationId)
-  }
-  snapshot.companyProfile = state.companyProfiles[organizationId] ?? state.companyProfile
-  snapshot.documentTemplates = state.documentTemplatesByOrganization[organizationId] ?? state.documentTemplates
-  snapshot.appSettings = state.appSettingsByOrganization[organizationId] ?? state.appSettings
-  return snapshot
-}
-
-function mergeTenantSnapshot(current: BusinessState, snapshot: Record<string, unknown>, organizationId: string): BusinessState {
-  const next = { ...current }
-  for (const key of TENANT_ARRAY_KEYS) {
-    const incoming = Array.isArray(snapshot[key]) ? snapshot[key] : []
-    const existing = current[key]
-    if (!Array.isArray(existing)) continue
-    ;(next as unknown as Record<string, unknown>)[key] = [
-      ...existing.filter((item) => typeof item !== 'object' || item === null || !('organizationId' in item) || (item as { organizationId: string }).organizationId !== organizationId),
-      ...incoming,
-    ]
-  }
-  if (snapshot.companyProfile && typeof snapshot.companyProfile === 'object') {
-    const profile = { ...defaultCompanyProfile, ...(snapshot.companyProfile as Partial<CompanyProfile>), organizationId }
-    next.companyProfile = profile
-    next.companyProfiles = { ...current.companyProfiles, [organizationId]: profile }
-  }
-  if (snapshot.documentTemplates && typeof snapshot.documentTemplates === 'object') {
-    const templates = { ...defaultDocumentTemplates, ...(snapshot.documentTemplates as Partial<DocumentTemplates>) }
-    next.documentTemplates = templates
-    next.documentTemplatesByOrganization = { ...current.documentTemplatesByOrganization, [organizationId]: templates }
-  }
-  if (snapshot.appSettings && typeof snapshot.appSettings === 'object') {
-    const settings = mergeAppSettings(snapshot.appSettings as Partial<AppSettings>)
-    next.appSettings = settings
-    next.appSettingsByOrganization = { ...current.appSettingsByOrganization, [organizationId]: settings }
-  }
-  return next
-}
+import { applyBootstrap, freshState, LEGACY_STORAGE_KEYS, mergeTenantSnapshot, scopeRecords, STORAGE_KEY, tenantSnapshot } from '@/components/state/business-store-state'
 
 const BusinessContext = createContext<BusinessStore | null>(null)
 
@@ -1140,48 +882,4 @@ export function useBusinessStore() {
   const value = useContext(BusinessContext)
   if (!value) throw new Error('useBusinessStore must be used inside BusinessStoreProvider')
   return value
-}
-
-
-function customerProcessFor(customer: Customer | undefined, settings: AppSettings) {
-  return {
-    ...settings.workflow.customerProcess,
-    ...(customer?.workflowOverride ?? {}),
-  }
-}
-
-function recalcInvoice(invoice: Invoice): Invoice { return { ...invoice, ...invoiceTotals(invoice.lines) } }
-function recalcQuote(quote: Quote): Quote { return { ...quote, amount: round2(quote.lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0)) } }
-function invoiceTotals(lines: InvoiceLine[]) {
-  const subtotal = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0))
-  const vatAmount = round2(lines.reduce((sum, line) => sum + line.quantity * line.unitPrice * (line.vatRate / 100), 0))
-  return { subtotal, vatAmount, amount: round2(subtotal + vatAmount) }
-}
-function round2(value: number) { return Math.round((value + Number.EPSILON) * 100) / 100 }
-function nextInvoiceNumber(records: { number: string }[]) { return invoiceNumber(records.map(item => item.number)) }
-function nextContractNumber(records: { number: string }[]) { return contractNumber(records.map(item => item.number)) }
-function nextCreditNumber(records: { number: string }[]) { return creditNumber(records.map(item => item.number)) }
-function nextQuoteNumber(records: { number: string }[]) { return quoteNumber(records.map(item => item.number)) }
-function addDays(date: string, days: number) { const value = new Date(`${date}T12:00:00`); value.setDate(value.getDate() + days); return value.toISOString().slice(0, 10) }
-function today() { return new Date().toISOString().slice(0, 10) }
-function monthLabel(date: string) { return formatMonthYear(date) }
-function advanceBillingDate(date: string, interval: Contract['billingInterval']) { return interval === 'none' ? date : advanceContractDate(date, interval) }
-function makeActivity(organizationId: string, customerId: string, type: CustomerActivity['type'], title: string, detail?: string): CustomerActivity { return { organizationId, id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, customerId, type, title, detail, createdAt: new Date().toISOString() } }
-function formatDate(date: string) { return formatLocaleDate(date) }
-function mergeAppSettings(changes?: Partial<AppSettings>, base: AppSettings = defaultAppSettings): AppSettings {
-  return {
-    ...base,
-    ...(changes ?? {}),
-    mail: { ...base.mail, ...(changes?.mail ?? {}) },
-    reminders: { ...base.reminders, ...(changes?.reminders ?? {}) },
-    payroll: { ...base.payroll, ...(changes?.payroll ?? {}) },
-    workflow: {
-      ...base.workflow,
-      ...(changes?.workflow ?? {}),
-      customerProcess: { ...base.workflow.customerProcess, ...(changes?.workflow?.customerProcess ?? {}) },
-      employeeSettlement: { ...base.workflow.employeeSettlement, ...(changes?.workflow?.employeeSettlement ?? {}) },
-      supplierSettlement: { ...base.workflow.supplierSettlement, ...(changes?.workflow?.supplierSettlement ?? {}) },
-    },
-    notifications: { ...base.notifications, ...(changes?.notifications ?? {}) },
-  }
 }

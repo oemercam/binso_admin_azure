@@ -1,8 +1,10 @@
 import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import { resolveAuthorizedTenantContext } from '@/lib/auth/tenant-server'
+import { resolveMembershipContext } from '@/lib/auth/tenant-server'
 import { appBaseUrl, stripePost, stripePriceId } from '@/lib/billing/stripe'
 import { getBillingIdentity, saveStripeCustomer } from '@/lib/db/repositories/stripe-billing'
 import type { SubscriptionPlan } from '@/types/domain'
+import { DPA_VERSION, TERMS_VERSION } from '@/lib/legal/legal-config'
+import { recordCheckoutLegalAcceptance } from '@/lib/db/repositories/legal-acceptance'
 
 const plans = new Set<SubscriptionPlan>(['starter', 'business', 'professional'])
 
@@ -16,11 +18,12 @@ export async function POST(request: Request) {
     return apiError(403, 'forbidden', 'Ungültige Anfragequelle.')
   }
 
-  const context = await resolveAuthorizedTenantContext(undefined, 'billing.manage')
-  if (!context) return apiError(403, 'forbidden', 'Keine aktive Organisation.')
+  const context = await resolveMembershipContext()
+  if (!context || context.membership.role !== 'owner') return apiError(403, 'forbidden', 'Nur der Inhaber kann ein Abonnement aktivieren.')
 
-  const body = await readJsonBody<{ plan?: SubscriptionPlan }>(request).catch(() => null)
+  const body = await readJsonBody<{ plan?: SubscriptionPlan; acceptedTermsVersion?: string; acceptedDpaVersion?: string }>(request).catch(() => null)
   if (!body?.plan || !plans.has(body.plan)) return apiError(422, 'validation', 'Für diesen Plan ist kein Online-Checkout verfügbar.')
+  if (body.acceptedTermsVersion !== TERMS_VERSION || body.acceptedDpaVersion !== DPA_VERSION) return apiError(422, 'legal_acceptance_required', 'Bitte bestätige die aktuellen AGB und die Auftragsbearbeitungsvereinbarung.')
 
   const priceId = stripePriceId(body.plan)
   if (!priceId) return apiError(503, 'server', 'Stripe Price-ID für diesen Plan fehlt.')
@@ -53,10 +56,21 @@ export async function POST(request: Request) {
     params.set('success_url', `${baseUrl}/post-login?billing=success`)
     params.set('cancel_url', `${baseUrl}/subscription-required?billing=cancelled`)
     params.set('subscription_data[metadata][organizationId]', billing.organizationId)
+    params.set('subscription_data[metadata][termsVersion]', TERMS_VERSION)
+    params.set('subscription_data[metadata][dpaVersion]', DPA_VERSION)
     params.set('metadata[organizationId]', billing.organizationId)
+    params.set('metadata[termsVersion]', TERMS_VERSION)
+    params.set('metadata[dpaVersion]', DPA_VERSION)
 
     const session = await stripePost<StripeCheckoutSession>('/checkout/sessions', params, `checkout-${billing.organizationId}-${body.plan}`)
     if (!session.url) return apiError(502, 'server', 'Stripe hat keine Checkout-URL geliefert.')
+    await recordCheckoutLegalAcceptance({
+      organizationId: billing.organizationId,
+      subscriptionId: billing.subscriptionId,
+      actorUserId: context.userId,
+      termsVersion: TERMS_VERSION,
+      dpaVersion: DPA_VERSION,
+    })
     return apiJson({ url: session.url })
   } catch (cause) {
     return apiError(502, 'server', cause instanceof Error ? cause.message : 'Checkout konnte nicht gestartet werden.')

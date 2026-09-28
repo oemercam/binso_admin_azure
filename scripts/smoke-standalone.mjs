@@ -89,7 +89,7 @@ try {
   const signInPage = await get('/sign-in')
   assert.equal(signInPage.status, 200, `/sign-in must render the customer login page, received ${signInPage.status}`)
   const signInHtml = await signInPage.text()
-  assert.match(signInHtml, /Zum Kunden-Login/, '/sign-in must expose the customer login action')
+  assert.match(signInHtml, /Mit E-Mail anmelden/, '/sign-in must expose the email customer login action')
   assert.match(signInHtml, /audience=customer/, '/sign-in must use the customer authentication audience')
   assert.match(signInHtml, /\/admin-access/, '/sign-in must expose the separate Binso admin access')
 

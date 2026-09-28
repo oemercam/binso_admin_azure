@@ -1,8 +1,9 @@
 import fs from 'node:fs'
+import { readBusinessStoreBundle } from './lib/source-bundles.mjs'
 
 const read = (file) => fs.readFileSync(file, 'utf8')
 const domain = read('types/domain.ts')
-const store = read('components/state/business-store.tsx')
+const store = readBusinessStoreBundle()
 const schema = read('database/schema.sql')
 const nav = read('components/navigation/nav-items.ts')
 const overlays = read('components/shared/app-overlays.tsx')

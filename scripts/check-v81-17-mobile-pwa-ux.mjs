@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { assertVersionAtLeast } from './version-check.mjs'
+import { readAppUiCss } from './lib/source-bundles.mjs'
 
 const pkg = JSON.parse(readFileSync('package.json','utf8'))
 const layout = readFileSync('app/layout.tsx','utf8')
@@ -11,11 +12,11 @@ const theme = readFileSync('components/providers/theme-provider.tsx','utf8')
 const device = readFileSync('components/providers/device-environment-provider.tsx','utf8')
 const transition = readFileSync('components/navigation/route-transition.tsx','utf8')
 const screenshot = readFileSync('components/public/marketing-screenshot.tsx','utf8')
-const appUi = readFileSync('app/app-ui.css','utf8')
+const appUi = readAppUiCss()
 const publicResponsive = readFileSync('app/styles/public-responsive-system.css','utf8')
 const customerManifest = readFileSync('app/customer-manifest.webmanifest/route.ts','utf8')
 const publicManifest = readFileSync('app/manifest.ts','utf8')
-const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8')
+const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8') + readFileSync('package.json','utf8')
 const e2e = readFileSync('tests/e2e/responsive-robustness.spec.ts','utf8')
 
 assertVersionAtLeast(assert, pkg.version, '0.81.17')

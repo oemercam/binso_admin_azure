@@ -85,7 +85,7 @@ export async function createTrialOrganization(input: {
       return { organizationId: signup.organization_id, created: false, mode: signup.signup_mode ?? 'trial' }
     }
 
-    const mode: SignupMode = signup.signup_mode === 'demo' ? 'demo' : 'trial'
+    const mode: SignupMode = signup.signup_mode === 'demo' ? 'demo' : signup.signup_mode === 'subscription' ? 'subscription' : 'trial'
     const plan = getPlan(mode === 'demo' ? 'business' : signup.plan)
     const effectivePlan: SubscriptionPlan = mode === 'demo' ? 'business' : signup.plan
     const onboardingSettings = signup.onboarding_business_settings && typeof signup.onboarding_business_settings === 'object' && !Array.isArray(signup.onboarding_business_settings)
@@ -106,7 +106,9 @@ export async function createTrialOrganization(input: {
     const organizationId = organization.rows[0].id
     const accessUntil = mode === 'demo'
       ? new Date(Date.now() + DEMO_ACCESS_HOURS * 3_600_000)
-      : new Date(Date.now() + TRIAL_DAYS * 86_400_000)
+      : mode === 'subscription'
+        ? new Date()
+        : new Date(Date.now() + TRIAL_DAYS * 86_400_000)
 
     await client.query(
       `insert into organization_memberships (organization_id, user_id, email, role, role_id, status)
@@ -168,7 +170,7 @@ export async function createTrialOrganization(input: {
     await client.query(
       `insert into audit_events (organization_id, actor_user_id, actor_name, action, entity_type, entity_id, detail)
        values ($1, $2, $3, $4, 'organization', $5, $6)`,
-      [organizationId, input.userId, input.userName, mode === 'demo' ? 'organization.demo_created' : 'organization.created', organizationId, mode === 'demo' ? 'Isolated demo workspace created during onboarding' : 'Trial organisation created during onboarding'],
+      [organizationId, input.userId, input.userName, mode === 'demo' ? 'organization.demo_created' : mode === 'subscription' ? 'organization.subscription_pending_created' : 'organization.created', organizationId, mode === 'demo' ? 'Isolated demo workspace created during onboarding' : mode === 'subscription' ? 'Organisation created and waiting for paid subscription checkout' : 'Trial organisation created during onboarding'],
     )
 
     return { organizationId, created: true, mode }

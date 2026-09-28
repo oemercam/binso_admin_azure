@@ -168,7 +168,7 @@ test('authenticated product screens', async ({ page }, testInfo) => {
         '.operational-mobile-list',
       ],
       desktopMaxHeight: 420,
-      mobileMaxHeight: 560,
+      mobileMaxHeight: 280,
     },
     {
       name: 'invoices',

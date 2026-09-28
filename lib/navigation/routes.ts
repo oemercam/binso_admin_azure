@@ -12,6 +12,8 @@ export const ROUTES = {
     terms: '/legal/terms',
     cookies: '/legal/cookies',
     imprint: '/legal/imprint',
+    dpa: '/legal/dpa',
+    subprocessors: '/legal/subprocessors',
   },
   auth: {
     signIn: '/sign-in',

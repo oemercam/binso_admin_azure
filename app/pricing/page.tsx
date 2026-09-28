@@ -20,7 +20,7 @@ export default function PricingPage() {
               <strong className="v812-plan-price">CHF {plan.monthlyPriceChf}<small> / Monat</small></strong>
               <span className="v812-plan-users">{plan.includedUsers} Benutzer inklusive</span>
               <ul className="pricing-highlights">{plan.highlights.map((item) => <li key={item}>{item}</li>)}</ul>
-              <Link className="button primary" href={`/register?plan=${plan.id}`}>{TRIAL_DAYS} Tage kostenlos testen</Link>
+              <div className="pricing-plan-actions"><Link className="button primary" href={`/register?mode=trial&plan=${plan.id}`}>{TRIAL_DAYS} Tage kostenlos testen</Link><Link className="button secondary" href={`/register?mode=subscription&plan=${plan.id}`}>Direkt abonnieren</Link></div>
               <details><summary>Alle enthaltenen Funktionen</summary><ul>{plan.features.map((feature) => <li key={feature}>{FEATURE_LABELS[feature] ?? feature}</li>)}</ul></details>
             </article>
           ))}

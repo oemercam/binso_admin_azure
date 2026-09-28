@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { readAppUiCss } from './lib/source-bundles.mjs'
 
 const root = process.cwd()
 const sourceRoots = ['app', 'components', 'lib', 'hooks', 'modules', 'types']
@@ -31,7 +32,7 @@ function forbid(pattern, message, allow = () => false) {
 forbid(/\b(?:mobileNavItems|pwaNavItems|desktopNavItems)\b/, 'parallel navigation data source is forbidden')
 forbid(/(?:Pwa|PWA)(?:Menu|Navigation|Header)/, 'PWA-specific visual navigation/header component is forbidden')
 forbid(/window\.visualViewport|window\.innerHeight/, 'viewport APIs must stay in DeviceEnvironmentProvider', (f) => f === 'components/providers/device-environment-provider.tsx')
-forbid(/--app-mobile-gutter\s*:/, 'mobile gutter may only be defined in app/app-ui.css', (f) => f === 'app/app-ui.css')
+forbid(/--app-mobile-gutter\s*:/, 'mobile gutter may only be defined in the canonical app UI bundle', (f) => f.startsWith('app/styles/app-ui/'))
 forbid(/<select\b|<textarea\b|<input\b/, 'business/shared UI must use canonical form controls', (f) => f === 'components/ui/form-controls.tsx')
 forbid(/(?:>\s*[×X]\s*<|name=["']close["'])/, 'raw close/remove controls are forbidden', (f) => f === 'components/ui/close-button.tsx')
 forbid(/\/brand\/(?:logo|icon)-black\.svg/, 'app identity assets must be rendered through AppLogo', (f) => f === 'components/ui/binso-logo.tsx' || f === 'components/documents/business-document.tsx')
@@ -47,13 +48,13 @@ for (const nav of ['components/navigation/desktop-nav.tsx', 'components/navigati
 const appShell = readFileSync(join(root, 'components/app-shell/app-shell.tsx'), 'utf8')
 if (!appShell.includes('<MobilePillNav')) failures.push('AppShell: MobilePillNav must remain the shared mobile/PWA entry point')
 
-const css = readFileSync(join(root, 'app/app-ui.css'), 'utf8')
+const css = readAppUiCss(root)
 for (const selector of ['mobile-menu-sheet', 'mobile-menu-nav', 'navigation-item-mobile', 'ui-overlay-control']) {
   const pattern = new RegExp(`\\.${selector}\\s*\\{`, 'g')
   const count = (css.match(pattern) || []).length
-  if (count !== 1) failures.push(`app/app-ui.css: expected exactly one canonical .${selector} definition, found ${count}`)
+  if (count !== 1) failures.push(`app UI bundle: expected exactly one canonical .${selector} definition, found ${count}`)
 }
-if ((css.match(/--app-mobile-gutter\s*:/g) || []).length !== 1) failures.push('app/app-ui.css: --app-mobile-gutter must have one declaration')
+if ((css.match(/--app-mobile-gutter\s*:/g) || []).length !== 1) failures.push('app UI bundle: --app-mobile-gutter must have one declaration')
 
 if (failures.length) {
   console.error(`Architecture checks failed (${failures.length}):`)

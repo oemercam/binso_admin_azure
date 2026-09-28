@@ -16,7 +16,7 @@ const settings = readFileSync('app/(app)/settings/page.tsx', 'utf8')
 const quick = readFileSync('components/navigation/action-items.ts', 'utf8')
 const css = readFileSync('app/styles/product-simplicity.css', 'utf8')
 const routes = readFileSync('lib/navigation/routes.ts', 'utf8')
-const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8')
+const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8') + readFileSync('package.json', 'utf8')
 const e2e = readFileSync('tests/e2e/responsive-robustness.spec.ts', 'utf8')
 
 for (const label of ['Übersicht', 'Kunden', 'Arbeit', 'Zeit', 'Rechnungen']) {

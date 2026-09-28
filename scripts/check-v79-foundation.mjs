@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { readAppUiCss } from './lib/source-bundles.mjs'
 
 const required = [
   'lib/config/product.ts',
@@ -38,7 +39,7 @@ const platformLayout = readFileSync('app/(app)/platform/layout.tsx', 'utf8')
 const serviceWorker = readFileSync('public/sw.js', 'utf8')
 const rootLayout = readFileSync('app/layout.tsx', 'utf8')
 const ui = ['app/standardized-ui.css','app/styles/tokens.css','app/styles/base.css','app/styles/app-shell.css','app/styles/public.css','app/styles/auth.css','app/styles/pricing.css','app/styles/forms.css','app/styles/data.css','app/styles/overlays.css'].map((file)=>readFileSync(file,'utf8')).join('\n')
-const legacyUi = readFileSync('app/app-ui.css', 'utf8')
+const legacyUi = readAppUiCss()
 const publicSite = readFileSync('lib/config/public-site.ts', 'utf8')
 const navItems = readFileSync('components/navigation/nav-items.ts', 'utf8')
 const pricing = readFileSync('app/pricing/page.tsx', 'utf8')

@@ -3,11 +3,12 @@ import { readFileSync } from 'node:fs'
 import { assertVersionAtLeast } from './version-check.mjs'
 
 const workflow = readFileSync('.github/workflows/main_binso-admin-prod.yml', 'utf8')
+const qualityWiring = workflow + readFileSync('package.json', 'utf8')
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 
 assertVersionAtLeast(assert, packageJson.version, '0.77.0')
 assert.ok(packageJson.scripts['v77:check'])
-assert.match(packageJson.scripts.verify, /v77:check/)
+assert.match(packageJson.scripts.verify, /compatibility:check/)
 
 assert.match(workflow, /name: Quality and regression checks/)
 assert.match(workflow, /name: Build and package/)
@@ -24,9 +25,9 @@ assert.match(workflow, /artifact-metadata\.json/)
 assert.match(workflow, /sha256sum -c binso-one\.zip\.sha256/)
 assert.match(workflow, /needs: \[validated-artifact\]/)
 assert.match(workflow, /needs: \[validated-artifact, migrate\]/)
-assert.match(workflow, /v76:check/)
-assert.match(workflow, /v77:check/)
-assert.match(workflow, /language:check/)
+assert.match(qualityWiring, /v76:check/)
+assert.match(qualityWiring, /v77:check/)
+assert.match(qualityWiring, /language:check/)
 assert.match(workflow, /Build performance summary/)
 assert.match(workflow, /Deployment performance summary/)
 

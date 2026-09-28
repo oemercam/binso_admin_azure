@@ -261,7 +261,7 @@ export type UsageCounter = {
   updatedAt: string
 }
 
-export type SignupMode = 'trial' | 'demo'
+export type SignupMode = 'trial' | 'subscription' | 'demo'
 
 export type SignupRequest = {
   id: string

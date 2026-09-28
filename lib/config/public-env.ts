@@ -9,6 +9,6 @@ export const publicEnv = {
   appEnvironment: process.env.NEXT_PUBLIC_APP_ENV?.trim() || process.env.NODE_ENV || 'development',
   vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || '',
   optionalAnalytics: bool(process.env.NEXT_PUBLIC_OPTIONAL_ANALYTICS),
-  authMethods: process.env.NEXT_PUBLIC_AUTH_METHODS?.trim() || 'email,microsoft,google,apple',
+  authMethods: process.env.NEXT_PUBLIC_AUTH_METHODS?.trim() || 'email',
   isProduction: process.env.NODE_ENV === 'production',
 } as const
