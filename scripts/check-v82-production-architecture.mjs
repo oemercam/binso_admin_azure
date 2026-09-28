@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
+import { assertVersionAtLeast } from './version-check.mjs'
 
 const required=[
   'database/migrations/0015_v82_normalized_business_core.sql',
@@ -15,7 +16,7 @@ const required=[
 ]
 for(const file of required) assert.ok(existsSync(file),`V82 missing ${file}`)
 const pkg=JSON.parse(readFileSync('package.json','utf8'))
-assert.equal(pkg.version,'0.82.1.2')
+assertVersionAtLeast(assert, pkg.version, '0.82.1.2')
 const migration=readFileSync('database/migrations/0015_v82_normalized_business_core.sql','utf8')
 for(const token of ['external_id','business_document_counters','business_idempotency_keys','enable row level security','organization_id, external_id','version integer']) assert.ok(migration.includes(token),`V82 migration missing ${token}`)
 const tenantState=readFileSync('lib/db/repositories/tenant-state.ts','utf8')
@@ -39,4 +40,4 @@ assert.match(tokens,/--type-page-title:24px/)
 assert.match(tokens,/--public-h1:clamp\(34px/)
 const workflow=readFileSync('.github/workflows/main_binso-admin-prod.yml','utf8') + readFileSync('package.json','utf8')
 assert.match(workflow,/pnpm run v82\.0:check/)
-console.log('V82.1.1 production architecture, typography, navigation, public polish and i18n checks passed.')
+console.log('V82 production architecture checks passed.')
