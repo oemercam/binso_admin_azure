@@ -10,6 +10,8 @@ export const MIN_TOUCH_TARGET_PX = 44
 export const PRODUCT_LIMITS = {
   registrationAttempts: 8,
   registrationWindowMs: 15 * 60_000,
+  billingActionAttempts: 10,
+  billingActionWindowMs: 10 * 60_000,
   apiBodyTinyBytes: 2_048,
   apiBodySmallBytes: 4_096,
   apiBodyMediumBytes: 8_192,

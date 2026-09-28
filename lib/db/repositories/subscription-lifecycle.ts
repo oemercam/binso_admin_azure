@@ -2,6 +2,7 @@ import 'server-only'
 import { withTransaction } from '@/lib/db/client'
 import { getPlan } from '@/lib/data/plans'
 import type { SubscriptionPlan } from '@/types/domain'
+import { TRIAL_DAYS } from '@/lib/config/product'
 
 export async function expireTrials() {
   return withTransaction(async (client) => {
@@ -44,7 +45,7 @@ export async function expireTrials() {
           row.subscription_id,
           row.previous_status,
           row.is_demo ? 'demo.expired' : 'trial.expired',
-          row.is_demo ? '24-hour demo access expired' : '14-day trial expired',
+          row.is_demo ? '24-hour demo access expired' : `${TRIAL_DAYS}-day trial expired`,
         ],
       )
     }

@@ -132,3 +132,7 @@ Maintenance correction for zero-warning lint compliance after the V82.0 architec
 ## Self-Service Registrierung
 
 Der öffentliche Kunden-Onboarding-Flow unterstützt drei getrennte Modi: Produktdemo (`mode=demo`), 30-Tage-Test (`mode=trial`) und direktes kostenpflichtiges Abo (`mode=subscription`). Kundenidentitäten werden produktiv über Microsoft Entra External ID (`AUTH_PROVIDER_NAME=external_id`) mit E-Mail-Verifikation verwaltet; Binso One speichert keine Kundenpasswörter. Der interne Binso-Admin-Zugang bleibt separat über `AUTH_ADMIN_PROVIDER_NAME=aad`. Details und Go-Live-Abnahmetests: `docs/SELF-SERVICE-REGISTRATION.md`.
+
+## V82.0.7 – Production Hardening
+
+V82.0.7 härtet Self-Service und Billing für den Real-Customer-Betrieb: kontrollierte DB-Unavailable-Antworten im E2E-/Fehlerfall, Correlation IDs, Billing-Rate-Limits, redigierte Provider-Fehler, Stripe-Webhook-Härtung, konsistente 30-Tage-Trial-Logik und zusätzliche Self-Service-Acceptance-E2E. Details: `docs/V82.0.7-PRODUCTION-HARDENING.md`.

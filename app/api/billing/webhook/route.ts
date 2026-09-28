@@ -1,8 +1,9 @@
-import { apiError, apiJson, readTextBody } from '@/lib/http/server-api'
-import { query } from '@/lib/db/client'
+import { apiError, apiJson, readTextBody, requestId } from '@/lib/http/server-api'
+import { isDatabaseConfigured, query } from '@/lib/db/client'
 import { verifyStripeWebhook } from '@/lib/billing/stripe'
 import { applyStripeSubscription, completeWebhookEvent, findOrganizationByStripeCustomer, registerWebhookEvent } from '@/lib/db/repositories/stripe-billing'
 import { PRODUCT_LIMITS } from '@/lib/config/product'
+import { logError, logInfo } from '@/lib/logging/server'
 
 type StripeEvent = {
   id: string
@@ -21,25 +22,30 @@ function metadataOrganizationId(object: Record<string, unknown>) {
 }
 
 export async function POST(request: Request) {
+  const correlationId = requestId(request)
   let rawBody: string
   try {
     rawBody = await readTextBody(request, PRODUCT_LIMITS.stripeWebhookBodyBytes)
   } catch {
-    return apiError(413, 'validation', 'Payload zu gross.')
+    return apiError(413, 'validation', 'Payload zu gross.', correlationId)
   }
 
   if (!verifyStripeWebhook(rawBody, request.headers.get('stripe-signature'))) {
-    return apiError(400, 'validation', 'Ungültige Stripe-Signatur.')
+    return apiError(400, 'validation', 'Ungültige Stripe-Signatur.', correlationId)
+  }
+  if (!isDatabaseConfigured()) {
+    logError('billing.webhook.database_unavailable', new Error('DATABASE_URL is not configured'), { correlationId })
+    return apiError(503, 'service_unavailable', 'Webhook-Verarbeitung ist derzeit nicht verfügbar.', correlationId)
   }
 
   let event: StripeEvent
   try {
     event = JSON.parse(rawBody) as StripeEvent
   } catch {
-    return apiError(400, 'validation', 'Ungültiges Event.')
+    return apiError(400, 'validation', 'Ungültiges Event.', correlationId)
   }
   if (!event || typeof event.id !== 'string' || typeof event.type !== 'string' || !event.data?.object) {
-    return apiError(400, 'validation', 'Ungültiges Event.')
+    return apiError(400, 'validation', 'Ungültiges Event.', correlationId)
   }
 
   const object = event.data.object
@@ -59,8 +65,9 @@ export async function POST(request: Request) {
       "select status from billing_webhook_events where provider='stripe' and external_event_id=$1",
       [event.id],
     )
-    if (existing.rows[0]?.status === 'received') return apiError(503, 'server', 'Event wird verarbeitet.')
-    return apiJson({ received: true, duplicate: true })
+    if (existing.rows[0]?.status === 'received') return apiError(503, 'server', 'Event wird verarbeitet.', correlationId)
+    logInfo('billing.webhook.duplicate', { correlationId, eventType: event.type, organizationId: organizationId ?? undefined })
+    return apiJson({ received: true, duplicate: true }, undefined, correlationId)
   }
 
   try {
@@ -79,35 +86,42 @@ export async function POST(request: Request) {
         eventId: event.id,
       })
       await completeWebhookEvent(event.id, 'processed')
-      return apiJson({ received: true })
+      logInfo('billing.webhook.processed', { correlationId, eventType: event.type, organizationId })
+      return apiJson({ received: true }, undefined, correlationId)
     }
 
     if (event.type === 'checkout.session.completed') {
       await completeWebhookEvent(event.id, 'processed')
-      return apiJson({ received: true })
+      logInfo('billing.webhook.processed', { correlationId, eventType: event.type, organizationId: organizationId ?? undefined })
+      return apiJson({ received: true }, undefined, correlationId)
     }
 
     if (['invoice.payment_failed', 'invoice.paid'].includes(event.type) && organizationId) {
       const parent = object.parent as { subscription_details?: { subscription?: string } } | undefined
       const subscriptionId = stringValue(object.subscription) ?? parent?.subscription_details?.subscription
       if (subscriptionId) {
+        // applyStripeSubscription always reloads the authoritative current Stripe subscription
+        // state while holding the local subscription lock, so out-of-order invoice events cannot
+        // downgrade a newer active state.
         await applyStripeSubscription({
           organizationId,
           stripeSubscriptionId: subscriptionId,
           stripeCustomerId: customerId,
-          stripeStatus: 'past_due',
+          stripeStatus: event.type === 'invoice.paid' ? 'active' : 'past_due',
           eventId: event.id,
         })
       }
       await completeWebhookEvent(event.id, 'processed')
-      return apiJson({ received: true })
+      logInfo('billing.webhook.processed', { correlationId, eventType: event.type, organizationId })
+      return apiJson({ received: true }, undefined, correlationId)
     }
 
     await completeWebhookEvent(event.id, 'ignored')
-    return apiJson({ received: true, ignored: true })
+    return apiJson({ received: true, ignored: true }, undefined, correlationId)
   } catch (cause) {
-    const message = cause instanceof Error ? cause.message : 'Webhook-Verarbeitung fehlgeschlagen.'
-    await completeWebhookEvent(event.id, 'failed', message)
-    return apiError(500, 'server', message)
+    const internalMessage = cause instanceof Error ? cause.message : 'Webhook-Verarbeitung fehlgeschlagen.'
+    await completeWebhookEvent(event.id, 'failed', internalMessage.slice(0, 500))
+    logError('billing.webhook.failed', cause, { correlationId, eventType: event.type, organizationId: organizationId ?? undefined })
+    return apiError(500, 'server', 'Webhook-Verarbeitung fehlgeschlagen.', correlationId)
   }
 }
