@@ -44,15 +44,14 @@ function writeLocaleCookie(locale: Locale) {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, updateLocale] = useState<Locale>(DEFAULT_LOCALE)
-  const [automatic, setAutomatic] = useState(true)
+  const initialState = useMemo(() => resolveInitialLocale(), [])
+
+  const [locale, updateLocale] = useState<Locale>(initialState.locale)
+  const [automatic, setAutomatic] = useState(initialState.automatic)
 
   useEffect(() => {
-    const initial = resolveInitialLocale()
-    updateLocale(initial.locale)
-    setAutomatic(initial.automatic)
-    writeLocaleCookie(initial.locale)
-  }, [])
+    writeLocaleCookie(locale)
+  }, [locale])
 
   const setLocale = useCallback((next: Locale) => {
     updateLocale(next)
