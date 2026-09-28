@@ -149,7 +149,7 @@ test('V82.2 landing tells one clear product story on mobile', async ({ page }) =
 
   await expect(page.locator('.v80-desktop-nav')).toBeHidden()
   await expect(page.locator('.v80-menu-trigger')).toBeVisible()
-  await expect(page.locator('.v822-hero-copy h1')).toHaveText('Dein Unternehmen. Eine Plattform.')
+  await expect(page.locator('.v822-hero-copy h1')).toHaveText('Geschäft führen. Einfacher.')
 
   const heroVisual = page.locator('.v822-hero-product')
   await expect(heroVisual).toBeVisible()
@@ -169,36 +169,43 @@ test('V82.2 landing tells one clear product story on mobile', async ({ page }) =
   await expect(page.getByText('+6 % zum Vormonat')).toHaveCount(0)
 
   for (const label of ['Kunde', 'Angebot', 'Auftrag', 'Zeit', 'Rechnung']) {
-    await expect(page.locator('.v822-flow').getByText(label, { exact: true })).toBeVisible()
+    await expect(page.locator('.v822-flow .v823-flow-label').getByText(label, { exact: true })).toBeVisible()
   }
 
   await expectNoViewportOverflow(page, '390px V82.2 landing')
 })
 
-test('V81.10 public subpages use the same headline scale as the landing at 1440px', async ({ page }) => {
+test('V82.3 public subpages keep a calmer headline scale than the landing at 1440px', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   const landingSize = Number.parseFloat(await page.locator('.v816-hero-copy h1').evaluate((el) => getComputedStyle(el).fontSize))
+  expect(landingSize, 'landing hero should remain the strongest public headline').toBeGreaterThan(52)
+  expect(landingSize, 'landing hero should remain contained').toBeLessThanOrEqual(70)
   for (const route of ['/features', '/pricing', '/faq', '/contact', '/how-it-works', '/security', '/status', '/help'] as const) {
     await page.goto(route, { waitUntil: 'domcontentloaded' })
     const title = page.locator('.v812-page-intro h1')
     await expect(title).toBeVisible()
     const size = Number.parseFloat(await title.evaluate((el) => getComputedStyle(el).fontSize))
-    expect(Math.abs(size - landingSize), `${route} title must match landing typography`).toBeLessThanOrEqual(1)
+    expect(size, `${route} title should stay below the landing hero`).toBeLessThan(landingSize)
+    expect(size, `${route} title should remain readable`).toBeGreaterThanOrEqual(31)
+    expect(size, `${route} title should remain contained`).toBeLessThanOrEqual(52)
     await expectNoViewportOverflow(page, `1440px ${route}`)
   }
 })
 
-test('V81.10 public titles match landing typography at 390px', async ({ page }) => {
+test('V82.3 public titles remain readable and visually subordinate at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   const landingSize = Number.parseFloat(await page.locator('.v816-hero-copy h1').evaluate((el) => getComputedStyle(el).fontSize))
+  expect(landingSize, 'mobile landing hero should remain readable').toBeGreaterThanOrEqual(40)
+  expect(landingSize, 'mobile landing hero should remain contained').toBeLessThanOrEqual(54)
   for (const route of ['/features', '/pricing', '/faq', '/contact', '/how-it-works', '/security', '/status', '/help'] as const) {
     await page.goto(route, { waitUntil: 'domcontentloaded' })
     const title = page.locator('.v812-page-intro h1')
     await expect(title).toBeVisible()
     const size = Number.parseFloat(await title.evaluate((el) => getComputedStyle(el).fontSize))
-    expect(Math.abs(size - landingSize), `${route} mobile title must match landing typography`).toBeLessThanOrEqual(1)
+    expect(size, `${route} mobile title should remain readable`).toBeGreaterThanOrEqual(31)
+    expect(size, `${route} mobile title should remain contained`).toBeLessThanOrEqual(landingSize)
   }
 })
 
@@ -468,8 +475,9 @@ test('V81.16 public layout matrix stays clean across 320, 360, 390, 430, 768, 83
           const s = getComputedStyle(el)
           return { size: Number.parseFloat(s.fontSize), lineHeight: Number.parseFloat(s.lineHeight) }
         })
+        const isLandingHero = route === '/'
         expect(style.size, `${route} H1 too small at ${viewport.width}px`).toBeGreaterThanOrEqual(route.startsWith('/sign-in') ? 30 : 31)
-        expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(52)
+        expect(style.size, `${route} H1 too large at ${viewport.width}px`).toBeLessThanOrEqual(isLandingHero && viewport.width > 960 ? 70 : 54)
         expect(style.lineHeight / style.size, `${route} H1 line-height at ${viewport.width}px`).toBeLessThanOrEqual(1.08)
       }
 

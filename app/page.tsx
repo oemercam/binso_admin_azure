@@ -80,7 +80,7 @@ export default function HomePage() {
             <ol className="v822-flow v823-flow" aria-label="Ein klarer Ablauf für dein Unternehmen.">
               {workflow.map((step, index) => (
                 <li key={step}>
-                  <span><small>{String(index + 1).padStart(2, '0')}</small>{step}</span>
+                  <span><small>{String(index + 1).padStart(2, '0')}</small><span className="v823-flow-label">{step}</span></span>
                   {index < workflow.length - 1 ? <b aria-hidden="true">→</b> : null}
                 </li>
               ))}
