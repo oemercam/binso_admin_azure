@@ -8,7 +8,7 @@ type LanguageContextValue = {
   locale: Locale
   automatic: boolean
   setLocale: (locale: Locale) => void
-  useBrowserLocale: () => void
+  resetToBrowserLocale: () => void
   t: (source: string) => string
   formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string
   formatDate: (value: Date | string | number, options?: Intl.DateTimeFormatOptions) => string
@@ -61,7 +61,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     writeLocaleCookie(next)
   }, [])
 
-  const useBrowserLocale = useCallback(() => {
+  const resetToBrowserLocale = useCallback(() => {
     const next = browserLocale()
     updateLocale(next)
     setAutomatic(true)
@@ -80,11 +80,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     locale,
     automatic,
     setLocale,
-    useBrowserLocale,
+    resetToBrowserLocale,
     t: (source) => translateSourceText(source, locale),
     formatNumber: (number, options) => new Intl.NumberFormat(localeMeta[locale].intl, options).format(number),
     formatDate: (input, options) => new Intl.DateTimeFormat(localeMeta[locale].intl, options).format(new Date(input)),
-  }), [automatic, locale, setLocale, useBrowserLocale])
+  }), [automatic, locale, resetToBrowserLocale, setLocale])
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }

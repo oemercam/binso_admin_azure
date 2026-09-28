@@ -157,25 +157,45 @@ for (const viewport of viewports) {
         ).toBeLessThanOrEqual(viewport.width + 1)
 
         if (viewport.width <= 820) {
+          const landingWideVisual = route === '/' && await screenshot.evaluate((element) =>
+            Boolean(element.closest('.v822-hero-product, .v822-product-stage, .v822-scene-wide'))
+          )
+
+          const maxCompactWidth =
+            landingWideVisual && viewport.width > 640
+              ? viewport.width - 32
+              : 360
+
+          const maxCompactHeight =
+            landingWideVisual && viewport.width > 640
+              ? 620
+              : 420
+
           expect(
             box.width,
-            `${route}: screenshot ${index} dominates mobile width`
-          ).toBeLessThanOrEqual(360)
+            `${route}: screenshot ${index} dominates compact width`
+          ).toBeLessThanOrEqual(maxCompactWidth)
 
           expect(
             box.height,
-            `${route}: screenshot ${index} dominates mobile viewport`
-          ).toBeLessThanOrEqual(420)
+            `${route}: screenshot ${index} dominates compact viewport`
+          ).toBeLessThanOrEqual(maxCompactHeight)
         } else {
+          const landingWideVisual = await screenshot.evaluate((element) =>
+            Boolean(element.closest('.v822-hero-product, .v822-product-stage, .v822-scene-wide'))
+          )
+          const maxDesktopWidth = route === '/' && landingWideVisual ? 1000 : 460
+          const maxDesktopHeight = route === '/' && landingWideVisual ? 620 : 540
+
           expect(
             box.width,
             `${route}: screenshot ${index} too large on desktop`
-          ).toBeLessThanOrEqual(460)
+          ).toBeLessThanOrEqual(maxDesktopWidth)
 
           expect(
             box.height,
             `${route}: screenshot ${index} too tall on desktop`
-          ).toBeLessThanOrEqual(540)
+          ).toBeLessThanOrEqual(maxDesktopHeight)
         }
 
         const style = await screenshot.evaluate((element) => {

@@ -5,7 +5,7 @@ import { localeMeta, SUPPORTED_LOCALES, type Locale } from '@/lib/i18n/config'
 import { useLanguage } from './language-provider'
 
 export function LanguageSelector({ compact = false, className = '' }: { compact?: boolean; className?: string }) {
-  const { locale, automatic, setLocale, useBrowserLocale, t } = useLanguage()
+  const { locale, automatic, setLocale, resetToBrowserLocale, t } = useLanguage()
   const [open, setOpen] = useState(false)
 
   return (
@@ -28,7 +28,7 @@ export function LanguageSelector({ compact = false, className = '' }: { compact?
             role="option"
             data-locale="auto"
             aria-selected={automatic}
-            onClick={() => { useBrowserLocale(); setOpen(false) }}
+            onClick={() => { resetToBrowserLocale(); setOpen(false) }}
           >
             <span>{t('Automatisch')}</span>
             <small>AUTO</small>

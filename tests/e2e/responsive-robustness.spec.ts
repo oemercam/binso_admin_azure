@@ -143,38 +143,36 @@ test('V80 desktop public navigation and balanced hero remain visible at 1440x900
   await expectNoViewportOverflow(page, '1440px V80 landing')
 })
 
-test('V81.8 mobile public layout keeps calm mockup content order at 390x844', async ({ page }) => {
+test('V82.2 landing tells one clear product story on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/', { waitUntil: 'domcontentloaded' })
+
   await expect(page.locator('.v80-desktop-nav')).toBeHidden()
-  const trigger = page.locator('.v80-menu-trigger')
-  await expect(trigger).toBeVisible()
-  await trigger.click()
-  await expect(page.locator('.v80-mobile-menu-panel')).toBeVisible()
-  await expect(page.locator('.v80-mobile-primary a')).toHaveCount(4)
-  await trigger.click()
-  const visual = page.locator('.v816-laptop')
-  const box = await visual.boundingBox()
-  expect(box).not.toBeNull()
-  if (box) expect(box.height, 'hero visual must stay compact on mobile').toBeLessThan(360)
+  await expect(page.locator('.v80-menu-trigger')).toBeVisible()
+  await expect(page.locator('.v822-hero-copy h1')).toHaveText('Dein Unternehmen. Eine Plattform.')
 
-  const firstRowCopy = page.locator('.v816-feature').first().locator('.v816-feature-copy')
-  const firstRowVisual = page.locator('.v816-feature').first().locator('.v816-product-shot')
-  const copyBox = await firstRowCopy.boundingBox()
-  const rowVisualBox = await firstRowVisual.boundingBox()
-  expect(copyBox).not.toBeNull()
-  expect(rowVisualBox).not.toBeNull()
-  if (copyBox && rowVisualBox) expect(copyBox.y + copyBox.height, 'mobile mockup requires copy before the product image').toBeLessThan(rowVisualBox.y + 2)
+  const heroVisual = page.locator('.v822-hero-product')
+  await expect(heroVisual).toBeVisible()
+  const heroBox = await heroVisual.boundingBox()
+  expect(heroBox).not.toBeNull()
+  if (heroBox) {
+    expect(heroBox.x).toBeGreaterThanOrEqual(0)
+    expect(heroBox.x + heroBox.width).toBeLessThanOrEqual(391)
+  }
 
-  const screenshot = page.locator('.v816-feature').first().locator('.marketing-real-screenshot img')
-  await expect(screenshot).toHaveAttribute('src', /orders-desktop\.png$/)
+  await expect(page.locator('.v822-benefit-grid article')).toHaveCount(3)
+  await expect(page.locator('.v822-flow li')).toHaveCount(5)
+  await expect(page.locator('.v822-product-stage .marketing-real-screenshot')).toBeVisible()
+  await expect(page.locator('.v822-scene')).toHaveCount(3)
+  await expect(page.getByText('06:42 h')).toHaveCount(0)
+  await expect(page.getByText('82 %')).toHaveCount(0)
+  await expect(page.getByText('+6 % zum Vormonat')).toHaveCount(0)
 
-  const timeVisual = page.locator('.v817-time-visual')
-  await expect(timeVisual).toBeVisible()
-  await expect(page.locator('.v817-time-section .marketing-real-screenshot')).toHaveCount(0)
-  await expect(page.locator('.v817-time-grid .v817-time-card')).toHaveCount(4)
+  for (const label of ['Kunde', 'Angebot', 'Auftrag', 'Zeit', 'Rechnung']) {
+    await expect(page.locator('.v822-flow').getByText(label, { exact: true })).toBeVisible()
+  }
 
-  await expectNoViewportOverflow(page, '390px V81.8 landing')
+  await expectNoViewportOverflow(page, '390px V82.2 landing')
 })
 
 test('V81.10 public subpages use the same headline scale as the landing at 1440px', async ({ page }) => {
