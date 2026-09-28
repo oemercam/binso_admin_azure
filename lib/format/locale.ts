@@ -100,3 +100,20 @@ export function normalizeSearch(value: string) {
 export function formatHours(value: number) {
   return `${HOURS_FORMATTER.format(Number.isFinite(value) ? value : 0)} h`
 }
+
+export function formatNumberForLocale(
+  value: number,
+  locale: string,
+  options?: Intl.NumberFormatOptions,
+) {
+  return new Intl.NumberFormat(locale, options).format(value)
+}
+
+export function formatDateForLocale(
+  value: Date | string | number,
+  locale: string,
+  options?: Intl.DateTimeFormatOptions,
+) {
+  const date = value instanceof Date ? value : new Date(value)
+  return new Intl.DateTimeFormat(locale, options).format(date)
+}

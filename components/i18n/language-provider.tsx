@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_STORAGE_KEY, detectBrowserLocale, localeMeta, normalizeLocale, type Locale } from '@/lib/i18n/config'
 import { translateSourceText } from '@/lib/i18n/messages'
+import { formatDateForLocale, formatNumberForLocale } from '@/lib/format/locale'
 
 type LanguageContextValue = {
   locale: Locale
@@ -86,8 +87,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLocale,
     resetToBrowserLocale,
     t: (source) => translateSourceText(source, locale),
-    formatNumber: (number, options) => new Intl.NumberFormat(localeMeta[locale].intl, options).format(number),
-    formatDate: (input, options) => new Intl.DateTimeFormat(localeMeta[locale].intl, options).format(new Date(input)),
+    formatNumber: (number, options) => formatNumberForLocale(number, localeMeta[locale].intl, options),
+    formatDate: (input, options) => formatDateForLocale(input, localeMeta[locale].intl, options),
   }), [automatic, locale, resetToBrowserLocale, setLocale])
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
