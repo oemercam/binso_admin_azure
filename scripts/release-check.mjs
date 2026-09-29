@@ -13,7 +13,7 @@ const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.3.1")throw new Error(`Expected package version 1.3.1, got ${pkg.version}`);
+if(pkg.version!=="1.3.2")throw new Error(`Expected package version 1.3.2, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));
@@ -26,8 +26,8 @@ for(let i=0;i<migrations.length;i++){const expected=String(i+1).padStart(3,"0")+
 
 const i18n=fs.readFileSync("lib/i18n.ts","utf8");
 for(const locale of ['"de"','"en"','"fr"','"it"','"tr"'])if(!i18n.includes(locale))throw new Error(`Locale ${locale} missing`);
-const css=fs.readFileSync("styles/design-system.css","utf8")+"\n"+fs.readFileSync("styles/v1.3.1.css","utf8");
-for(const marker of ["Binso One v1.3.1","marketing-menu-button","ui-toggle-thumb","white-space:nowrap"]){if(!css.includes(marker))throw new Error(`UI baseline missing ${marker}`)}
+const css=fs.readFileSync("styles/design-system.css","utf8")+"\n"+fs.readFileSync("styles/v1.3.1.css","utf8")+"\n"+fs.readFileSync("styles/v1.3.2.css","utf8");
+for(const marker of ["Binso One v1.3.2","marketing-menu-button","ui-toggle-thumb","white-space:nowrap"]){if(!css.includes(marker))throw new Error(`UI baseline missing ${marker}`)}
 
 const noSecrets=["STRIPE_SECRET_KEY","STRIPE_WEBHOOK_SECRET","APP_ENCRYPTION_KEY","OPERATOR_BOOTSTRAP_PASSWORD"];
 const files=[];
