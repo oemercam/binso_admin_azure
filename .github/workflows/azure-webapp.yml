@@ -53,19 +53,18 @@ jobs:
 
           echo "=== Standalone server.js suchen ==="
 
-          SERVER_FILE="$(find .next/standalone -type f -name server.js -print -quit)"
+          SERVER_FILE=".next/standalone/server.js"
 
-          if [ -z "$SERVER_FILE" ]; then
-            echo "ERROR: Kein server.js unter .next/standalone gefunden."
+          if [ ! -f "$SERVER_FILE" ]; then
+            echo "ERROR: .next/standalone/server.js fehlt."
+            echo "Gefundene server.js Dateien:"
+            find .next/standalone -type f -name server.js | sort
             exit 1
           fi
 
-          SERVER_DIR="$(dirname "$SERVER_FILE")"
+          echo "Standalone Entry Point: $SERVER_FILE"
 
-          echo "server.js gefunden: $SERVER_FILE"
-          echo "Standalone Root: $SERVER_DIR"
-
-          cp -R "$SERVER_DIR"/. deploy/app/
+          cp -R .next/standalone/. deploy/app/
 
           mkdir -p deploy/app/.next
           cp -R .next/static deploy/app/.next/static
@@ -132,3 +131,4 @@ jobs:
         with:
           app-name: binso-admin-prod
           package: deploy/binso-one.zip
+
