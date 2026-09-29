@@ -110,7 +110,7 @@ export function parseMoney(value?: string | number) {
 export function money(value: number) { return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(value); }
 
 export type UserRole = "Inhaber" | "Admin" | "Finanzen" | "Personal" | "Projektleitung" | "Mitarbeiter" | "Lesen";
-export type AppUser = { id:string; name:string; email:string; role:UserRole; active:boolean; language?:"de"|"en"|"fr"|"it" };
+export type AppUser = { id:string; name:string; email:string; role:UserRole; active:boolean; language?:"de"|"en"|"fr"|"it"|"tr" };
 export type NumberSequences = { kunden:string; offerten:string; auftraege:string; rechnungen:string; projekte:string };
 export type DemoSettings = {
   companyName:string; uid:string; address:string; zipCity:string; email:string; phone:string; iban:string;
@@ -121,13 +121,13 @@ export type DemoSettings = {
 
 export const defaultSettings: DemoSettings = {
   companyName:"Binso GmbH", uid:"CHE-173.401.068 MWST", address:"Weissbadstrasse 8b", zipCity:"9050 Appenzell",
-  email:"oemer.cam@binso.ch", phone:"+41 58 510 88 58", iban:"CH93 0076 2011 6238 5295 7",
+  email:"kontakt@binso.ch", phone:"+41 58 510 88 58", iban:"CH93 0076 2011 6238 5295 7",
   defaultVat:"8.1", paymentDays:"30", currency:"CHF", language:"de-CH", vatMethod:"Effektive Abrechnung",
   invoiceIntro:"Besten Dank für Ihren Auftrag. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen.",
   quoteIntro:"Besten Dank für Ihre Anfrage. Gerne offerieren wir Ihnen folgende Leistungen.",
   reminderDays:"10", notificationsEmail:true, notificationsPush:true,
   users:[
-    {id:"u1",name:"Oemer Cam",email:"oemer.cam@binso.ch",role:"Inhaber",active:true,language:"de"},
+    {id:"u1",name:"Demo Inhaber",email:"demo@binso.local",role:"Inhaber",active:true,language:"de"},
     {id:"u2",name:"Anna Muster",email:"anna@binso.ch",role:"Finanzen",active:true,language:"de"},
     {id:"u3",name:"Luca Meier",email:"luca@binso.ch",role:"Mitarbeiter",active:true,language:"de"},
   ],

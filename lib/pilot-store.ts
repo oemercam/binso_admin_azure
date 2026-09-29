@@ -1,5 +1,6 @@
 import type {SupportDiagnostics} from "@/lib/support/diagnostics";
-export type SupportTicket={id:string;number:string;category:string;subject:string;description:string;priority:string;status:string;createdAt:string;updatedAt:string;diagnostics?:SupportDiagnostics; screenshot?:string;messages:{id:string;author:string;text:string;createdAt:string}[]};
+export type SupportAttachment={id:string;fileName:string;mimeType:string;sizeBytes:number;href?:string;dataUrl?:string};
+export type SupportTicket={id:string;number:string;category:string;subject:string;description:string;priority:string;status:string;createdAt:string;updatedAt:string;diagnostics?:SupportDiagnostics;screenshot?:string;attachments?:SupportAttachment[];messages:{id:string;author:string;text:string;createdAt:string}[]};
 export type FeedbackEntry={id:string;rating:number;category:string;text:string;contact:boolean;status:string;context:string;createdAt:string};
 export type Announcement={id:string;title:string;message:string;kind:"info"|"success"|"warning";active:boolean;createdAt:string};
 const ticketKey="binso-support-tickets";const feedbackKey="binso-pilot-feedback";
@@ -8,7 +9,7 @@ function read<T>(key:string,fallback:T):T{if(typeof window==="undefined")return 
 function write<T>(key:string,value:T){localStorage.setItem(key,JSON.stringify(value));window.dispatchEvent(new Event("binso-pilot-data"))}
 
 export function listSupportTickets(){return read<SupportTicket[]>(ticketKey,[])}
-export function createSupportTicket(input:{category:string;subject:string;description:string;priority:string;diagnostics?:SupportDiagnostics;screenshot?:string}){
+export function createSupportTicket(input:{category:string;subject:string;description:string;priority:string;diagnostics?:SupportDiagnostics;screenshot?:string;attachments?:SupportAttachment[]}){
  const items=listSupportTickets();const id=`sup-${Date.now()}`;const ticket:SupportTicket={id,number:`SUP-${new Date().getFullYear()}-${String(items.length+1).padStart(6,"0")}`,status:"Neu",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[],...input};write(ticketKey,[ticket,...items]);return ticket;
 }
 export function getSupportTicket(id:string){return listSupportTickets().find(x=>x.id===id)}

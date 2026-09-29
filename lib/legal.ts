@@ -1,13 +1,15 @@
+import {siteConfig} from "@/lib/site-config";
+
 export const legalConfig={
-  company:"Binso GmbH",
-  address:"Weissbadstrasse 8b",
-  zipCity:"9050 Appenzell",
-  country:"Schweiz",
-  uid:"CHE-173.401.068",
-  phone:"+41 58 510 88 58",
-  generalEmail:"info@binso.ch",
-  privacyEmail:"privacy@binso.ch",
-  supportEmail:"support@binso.ch",
+  company:siteConfig.company,
+  address:siteConfig.address.street,
+  zipCity:`${siteConfig.address.postalCode} ${siteConfig.address.city}`,
+  country:siteConfig.address.country,
+  uid:siteConfig.uid,
+  phone:siteConfig.phoneDisplay,
+  generalEmail:siteConfig.legalEmail,
+  privacyEmail:siteConfig.privacyEmail,
+  supportEmail:siteConfig.supportEmail,
   website:"www.binso.ch",
   legalVersion:"2026-09-29",
   termsVersion:"2026-09-29",
@@ -18,5 +20,5 @@ export const legalConfig={
 export const subprocessors=[
   {name:"Microsoft Azure",purpose:"Hosting, Datenbank, Speicher und technische Infrastruktur",region:"Schweiz/EU gemäss gewählter Azure-Region und Vertrag"},
   {name:"Stripe",purpose:"Zahlungsabwicklung und Abonnementverwaltung",region:"Internationale Verarbeitung gemäss Stripe-Vertrags- und Datenschutzunterlagen"},
-  {name:"Resend",purpose:"Transaktionaler E-Mail-Versand, sofern in der Produktionsumgebung aktiviert",region:"Verarbeitung gemäss Resend-Vertrags- und Datenschutzunterlagen"},
+  {name:"Resend",purpose:"Transaktionaler E-Mail-Versand, sofern produktiv aktiviert",region:"Verarbeitung gemäss den vertraglichen und datenschutzrechtlichen Einstellungen des Dienstes"},
 ] as const;

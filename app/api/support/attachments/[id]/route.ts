@@ -1,0 +1,10 @@
+import {NextRequest} from "next/server";
+import {requireSession} from "@/lib/server/session";
+import {authorize} from "@/lib/server/rbac";
+import {withTenant} from "@/lib/server/db";
+import {deleteBlobByUrl,getBlobByUrl} from "@/lib/server/storage";
+import {apiError,assertSameOrigin,json} from "@/lib/server/http";
+export const runtime="nodejs";
+export async function GET(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{const s=await requireSession();authorize(s,"support:read");const {id}=await params;const item=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select f.file_name as "fileName",f.mime_type as "mimeType",f.storage_path as "storagePath" from stored_files f join support_tickets t on t.id=f.support_ticket_id where f.id=$1 and f.organization_id=$2 and t.organization_id=$2`,[id,s.organizationId])).rows[0]);if(!item)return json({error:"Nicht gefunden."},404);const blob=await getBlobByUrl(item.storagePath);return new Response(blob.body,{headers:{"content-type":blob.contentType||item.mimeType||"application/octet-stream","content-disposition":`inline; filename*=UTF-8''${encodeURIComponent(item.fileName)}`,"cache-control":"private, no-store"}})}catch(e){return apiError(e,request)}}
+
+export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{assertSameOrigin(request);const session=await requireSession();authorize(session,"support:write");const {id}=await params;const item=await withTenant(session.organizationId,session.userId,async c=>(await c.query(`select id,storage_path as "storagePath" from stored_files where id=$1 and organization_id=$2 and uploaded_by=$3 and purpose='support' and support_ticket_id is null`,[id,session.organizationId,session.userId])).rows[0]);if(!item)return json({error:"Nicht gefunden oder bereits einem Ticket zugeordnet."},404);await deleteBlobByUrl(item.storagePath);await withTenant(session.organizationId,session.userId,async c=>c.query(`delete from stored_files where id=$1 and organization_id=$2 and support_ticket_id is null`,[id,session.organizationId]));return json({ok:true})}catch(e){return apiError(e,request)}}

@@ -10,3 +10,13 @@ node_modules
 coverage
 *.pem
 *.pfx
+
+tsconfig.tsbuildinfo
+# Local build and diagnostic artifacts
+azure-webapp-logs/
+.lint-current.txt
+.next/
+deploy/
+azure-webapp-logs-new/
+azure-webapp-logs*.zip
+azure-webapp-logs*/

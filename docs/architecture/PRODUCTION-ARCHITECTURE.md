@@ -1,52 +1,62 @@
-# Binso One v1.2.0 – Production Architecture
+# Binso One v1.3.0 – Production Architecture
 
-## Architektur
-- Next.js 16 / React 19
-- Node Runtime
-- PostgreSQL
-- Azure App Service
-- Azure Blob Storage
-- Stripe
-- serverseitige Authentifizierung und Sessions
+## Zielbild
+Binso One ist eine mandantenfähige B2B-SaaS-Plattform. Kundenmandanten und Binso-Plattformbetreiber sind technisch und berechtigungsseitig getrennt.
 
-## Multi-Tenant
-Tenant-sensitive Daten tragen `organization_id`. Zugriff erfolgt über explizite Tenant-Filter plus PostgreSQL RLS. `withTenant()` setzt `app.organization_id` und `app.user_id` transaktional. Kritische tenant-scoped Tabellen verwenden zusätzlich `FORCE ROW LEVEL SECURITY`.
+## Runtime
+- Next.js App Router auf Node.js Runtime
+- Azure App Service Linux / Standalone Output
+- PostgreSQL 16
+- Azure Blob Storage für Dateien
+- Application Insights / Log Analytics
+- Stripe für Billing
+- Resend für transaktionale E-Mails
 
-## Identitätsdomänen
-Kunden und Binso-Betreiber besitzen getrennte Tabellen, Cookies, Sessions und RBAC-Matrizen. Operatoren erhalten keine allgemeine API für fachliche Kundendaten.
+## Modi
+### Local
+UI-/Workflow-Demo mit lokalen Datensätzen. Keine echten Kundendaten.
 
-## Authentifizierung
-- Scrypt Passwort-Hashing
-- Hash-only Session Tokens
-- HttpOnly/Secure Cookies
-- E-Mail-Verifikation
-- Passwort-Reset
-- MFA/TOTP
-- Recovery Codes
-- Session-Verwaltung
+### Production
+Serverseitige Authentifizierung, PostgreSQL, Storage, Billing, E-Mail und APIs. `lib/client/data-service.ts` dient als Dual-Mode-Abstraktion für die Fachmodule.
 
-## Datenzugriff
-Bestehende Fachmodule verwenden eine mandantenfähige Records-API als Übergangsschicht. Finanz-/Lohn-/Buchhaltungsbereiche sollten bei zunehmender fachlicher Tiefe in normalisierte Domänentabellen migriert werden.
+## Tenant Isolation
+- `organization_id` auf tenantbezogenen Datensätzen
+- serverseitige Permission Checks
+- explizite Tenant-Filter in Repositories/APIs
+- `withTenant()` setzt DB-Kontext nur innerhalb einer Transaktion
+- PostgreSQL RLS
+- `FORCE ROW LEVEL SECURITY` auf kritischen tenantbezogenen Tabellen
+- Runtime soll mit einer dedizierten Rolle ohne `BYPASSRLS` laufen
 
-## Billing
-Stripe Checkout und Customer Portal werden serverseitig angesprochen. Kartendaten werden nicht in Binso One gespeichert. Webhooks werden signiert, dedupliziert und erst nach erfolgreicher Verarbeitung als verarbeitet markiert.
+## Identitäten
+### Kunden
+`users` + `sessions`, HttpOnly Session Cookie, RBAC, MFA/TOTP, Recovery Codes, E-Mail-Verifikation, Passwort-Reset, Sessionwiderruf.
 
-## Files
-Dokumente und Support-Screenshots verwenden Azure Blob Storage. Die App Service Managed Identity erhält Blob Data Contributor. Datenbanktabellen speichern Referenzen und Metadaten.
+### Betreiber
+`platform_users` + separate Operator Sessions/Cookies und eigene RBAC-Domäne. Supportrollen erhalten keinen generellen Business-Data-Endpunkt.
 
 ## Support
-Tickets, Nachrichten, Diagnose, Screenshot und temporärer Supportzugriff sind getrennt von normalen Businessdaten. Supportzugriff ist begründet, scope-begrenzt, zeitlich limitiert und widerrufbar.
+Supporttickets sind organisationsbezogen. Diagnose und Screenshots werden nur nach Benutzeraktion angehängt. Technische Ereignisse werden redigiert. Produktive Dateien liegen in Blob Storage. Temporärer Supportzugriff ist explizit, begründet, zeitlich limitiert und auditierbar.
 
-## Operations
-- Health Endpoint
-- Application Insights
-- Log Analytics
-- Operator Dashboard
-- Support Queue
-- Feedback
-- Feature Flags
-- Announcements
-- Audit
+## Billing
+Stripe Checkout/Portal/Webhooks. Webhook-Signaturen werden geprüft, Events dedupliziert und erst nach erfolgreicher Verarbeitung als verarbeitet markiert. Organisationen speichern Stripe Customer/Subscription Referenzen, nicht Kartendaten.
+
+## E-Mail
+Zentrale Provider-Schicht mit Templates für Verifikation, Passwort-Reset, Einladung und weitere transaktionale Nachrichten. Der Provider ist über Umgebungsvariablen konfiguriert.
+
+## Dateien
+Azure Blob Storage über Managed Identity oder SAS-Fallback. Uploads haben serverseitige Grössen-/MIME-Limits. Download erfolgt über autorisierte API-Endpunkte. Vor breitem produktivem Dateibetrieb sollte Malware Scanning aktiviert werden.
+
+## Observability
+- strukturierte, redigierte Serverlogs
+- `/api/health`
+- Application Insights / Log Analytics
+- Audit Logs
+- Betreiber-Metriken
+- Supportdiagnose
 
 ## Deployment
-GitHub Actions nutzt OIDC zu Azure. Build und Quality Gate laufen vor dem Deploy. Details stehen unter `docs/operations/AZURE-DEPLOYMENT.md`.
+GitHub Actions führt Release Check, Tests, Lint, Typecheck, Audit und Build aus. Anschliessend wird `.next/standalone` als Artifact per Azure OIDC nach App Service deployed und der Health Endpoint geprüft.
+
+## Fachmodul-Grenze
+Die generische `records`-API ist weiterhin ein Migrations-/Abstraktionslayer für mehrere Fachmodule. Finanz-, Lohn-, Steuer- und Bankfunktionen sollen vor einem regulierten oder buchhalterisch verbindlichen Vollbetrieb schrittweise in normalisierte Fachschemata und geprüfte Integrationen überführt werden.

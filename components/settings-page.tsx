@@ -52,7 +52,7 @@ export default function SettingsPage(){
     {activeUser&&<div className="form-grid">
       <label><span>Name</span><input value={activeUser.name} onChange={e=>updateUser(activeUser.id,{name:e.target.value})}/></label>
       <label><span>E-Mail</span><input type="email" value={activeUser.email} onChange={e=>updateUser(activeUser.id,{email:e.target.value})}/></label>
-      <label><span>Sprache</span><select value={activeUser.language||"de"} onChange={e=>updateUser(activeUser.id,{language:e.target.value as "de"|"en"|"fr"|"it"})}><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="it">Italiano</option></select><small className="field-help">Diese Sprache gilt nur für dein Benutzerprofil.</small></label>
+      <label><span>Sprache</span><select value={activeUser.language||"de"} onChange={e=>updateUser(activeUser.id,{language:e.target.value as "de"|"en"|"fr"|"it"|"tr"})}><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="it">Italiano</option><option value="tr">Türkçe</option></select><small className="field-help">Diese Sprache gilt nur für dein Benutzerprofil.</small></label>
     </div>}
     <button className="primary-button settings-save" onClick={saveProfile}><Check size={17}/>Profil speichern</button>
   </section>
