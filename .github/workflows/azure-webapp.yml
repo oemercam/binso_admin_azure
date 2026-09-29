@@ -20,24 +20,31 @@ env:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm audit --audit-level high
+
       - run: pnpm build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_APP_MODE: production
           NEXT_PUBLIC_SITE_URL: https://www.binso.ch
+
       - name: Prepare deploy artifact
+        shell: bash
         run: |
           set -euo pipefail
 
@@ -45,11 +52,12 @@ jobs:
           mkdir -p deploy/app
 
           echo "=== Standalone server.js suchen ==="
+
           SERVER_FILE="$(find .next/standalone -type f -name server.js -print -quit)"
 
           if [ -z "$SERVER_FILE" ]; then
             echo "ERROR: Kein server.js unter .next/standalone gefunden."
-            find .next/standalone -maxdepth 5 -type f | sort | head -200
+            find .next/standalone -maxdepth 6 -type f | sort | head -200
             exit 1
           fi
 
@@ -67,44 +75,17 @@ jobs:
             cp -R public deploy/app/public
           fi
 
-          test -f deploy/app/server.js || {
+          if [ ! -f deploy/app/server.js ]; then
             echo "ERROR: deploy/app/server.js fehlt."
-            find deploy/app -maxdepth 4 -type f | sort | head -200
+            find deploy/app -maxdepth 5 -type f | sort | head -200
             exit 1
-          }
+          fi
 
           cd deploy/app
           zip -qr ../binso-one.zip .
 
           echo "=== ZIP CHECK ==="
-          unzip -l ../binso-one.zip | grep -E '(^| )server\.js      - uses: actions/upload-artifact@v4
-        with:
-          name: binso-one-production
-          path: deploy/binso-one.zip
-          if-no-files-found: error
-          retention-days: 7
-
-  deploy:
-    needs: quality
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: binso-one-production
-          path: deploy
-      - uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - uses: azure/webapps-deploy@v3
-        with:
-          app-name: binso-admin-prod
-          package: deploy/binso-one.zip
-
-
+          unzip -l ../binso-one.zip | grep 'server.js'
 
       - uses: actions/upload-artifact@v4
         with:
@@ -118,21 +99,20 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
+
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: binso-one-production
           path: deploy
+
       - uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - uses: azure/webapps-deploy@v3
         with:
           app-name: binso-admin-prod
           package: deploy/binso-one.zip
-
-
-
-
