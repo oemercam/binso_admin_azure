@@ -39,8 +39,16 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://www.binso.ch
       - name: Prepare deploy artifact
         run: |
-          mkdir -p deploy
-          zip -qr deploy/binso-one.zip . -x '.git/*' 'node_modules/*' 'deploy/*'
+          rm -rf deploy
+          mkdir -p deploy/app
+
+          cp -R .next/standalone/. deploy/app/
+          mkdir -p deploy/app/.next
+          cp -R .next/static deploy/app/.next/static
+          cp -R public deploy/app/public
+
+          cd deploy/app
+          zip -qr ../binso-one.zip .
       - uses: actions/upload-artifact@v4
         with:
           name: binso-one-production
@@ -67,5 +75,6 @@ jobs:
         with:
           app-name: binso-admin-prod
           package: deploy/binso-one.zip
+
 
 
