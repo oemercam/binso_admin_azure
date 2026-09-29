@@ -57,7 +57,6 @@ jobs:
 
           if [ -z "$SERVER_FILE" ]; then
             echo "ERROR: Kein server.js unter .next/standalone gefunden."
-            find .next/standalone -maxdepth 6 -type f | sort | head -200
             exit 1
           fi
 
@@ -75,13 +74,30 @@ jobs:
             cp -R public deploy/app/public
           fi
 
-          if [ ! -f deploy/app/server.js ]; then
-            echo "ERROR: deploy/app/server.js fehlt."
-            find deploy/app -maxdepth 5 -type f | sort | head -200
-            exit 1
-          fi
+          cp package.json deploy/app/package.json
+          cp pnpm-lock.yaml deploy/app/pnpm-lock.yaml
+
+          echo "=== Production Dependencies installieren ==="
+
+          rm -rf deploy/app/node_modules
+
+          pnpm install \
+            --dir deploy/app \
+            --prod \
+            --frozen-lockfile \
+            --config.node-linker=hoisted
+
+          echo "=== Runtime Checks ==="
+
+          test -f deploy/app/server.js
 
           cd deploy/app
+
+          node -e "require.resolve('next')"
+          node -e "require.resolve('@swc/helpers/_/_interop_require_default')"
+
+          echo "Next.js und @swc/helpers vorhanden."
+
           zip -qr ../binso-one.zip .
 
           echo "=== ZIP CHECK ==="
