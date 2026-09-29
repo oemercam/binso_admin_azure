@@ -1,13 +1,1 @@
-import { BinsoLogo } from '@/components/ui/binso-logo'
-
-export default function Offline() {
-  return (
-    <main className="auth-page">
-      <div className="auth-card apple-auth-card">
-        <BinsoLogo />
-        <h1>Keine Verbindung</h1>
-        <p className="muted">Die App-Oberfläche ist verfügbar. Geschäftsdaten werden aus Sicherheitsgründen nicht offline zwischengespeichert.</p>
-      </div>
-    </main>
-  )
-}
+import Link from "next/link"; export default function Page(){return <main className="system-page"><div className="system-card"><div className="system-code">OFFLINE</div><h1>Offline</h1><p>Keine Internetverbindung.</p><Link href="/" className="primary-inline">Zur Startseite</Link></div></main>}

@@ -1,7 +1,0 @@
-/* Binso One application UI entry point.
-   Ordered modules preserve the established cascade while keeping ownership maintainable. */
-@import './styles/app-ui/01-foundation.css';
-@import './styles/app-ui/02-interactions.css';
-@import './styles/app-ui/03-application.css';
-@import './styles/app-ui/04-mobile-pwa.css';
-@import './styles/app-ui/05-public-auth.css';

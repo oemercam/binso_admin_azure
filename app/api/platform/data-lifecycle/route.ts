@@ -1,7 +1,0 @@
-import { PRODUCT_LIMITS } from '@/lib/config/product'
-import { getPlatformSession } from '@/lib/auth/server'
-import { listPlatformLifecycleRequests, updatePlatformLifecycleRequest } from '@/lib/db/repositories/data-lifecycle'
-import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import { PLATFORM_ROLE_GROUPS, canManagePlatform, hasPlatformRole } from '@/lib/auth/platform-permissions'
-export async function GET(){const s=await getPlatformSession();if(!s||!hasPlatformRole(s.user.platformRole, PLATFORM_ROLE_GROUPS.audit))return apiError(403,'forbidden','Keine Plattformberechtigung.');return apiJson({requests:await listPlatformLifecycleRequests()})}
-export async function PATCH(request:Request){try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}const s=await getPlatformSession();if(!s||!canManagePlatform(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');const b=await readJsonBody<{id?:string;status?:'approved'|'processing'|'completed'|'rejected'|'cancelled'}>(request,PRODUCT_LIMITS.apiBodySmallBytes).catch(()=>null);if(!b?.id||!b.status)return apiError(422,'validation','Anfrage ist ungültig.');try{return apiJson(await updatePlatformLifecycleRequest({id:b.id,status:b.status,actorUserId:s.user.id,actorEmail:s.user.email}))}catch{return apiError(404,'not_found','Anfrage nicht gefunden.')}}

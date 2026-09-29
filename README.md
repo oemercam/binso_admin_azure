@@ -1,155 +1,244 @@
-# Binso One V81.19
+# Binso One v1.2.0
 
-V81.19 vereinfacht die drei Self-Service-Abos Starter, Business und Professional, koppelt Navigation und Einstellungen konsequent an Entitlements und hält Enterprise ausserhalb des Self-Service.
+Binso One ist eine mandantenfähige Schweizer SaaS-Plattform für KMU. Die Anwendung deckt Verkauf, Projekte, Zeiterfassung, Spesen, Rechnungen, Zahlungen, Einkauf, Buchhaltung, MWST, Personal, Dokumente, Verträge, Support und Plattformbetrieb ab.
 
-# Binso One V81.19.1
+## Laufzeitmodi
 
-V81.16.2 keeps the canonical public responsive system and fixes React lint violations in the public mobile navigation.
+### Lokal
+`APP_MODE=local` / `NEXT_PUBLIC_APP_MODE=local`
 
-## V81.15
+- Browser-Demo ohne produktive Kundendaten
+- lokale Beispieldaten und lokale Workflows
+- geeignet für UI-/Prozessprüfung
 
-Mobile public navigation reliability fix.
+### Produktion
+`APP_MODE=production` / `NEXT_PUBLIC_APP_MODE=production`
 
-# Binso One
+- PostgreSQL auf Azure
+- serverseitige Sessions
+- Multi-Tenant-RBAC und RLS
+- Stripe-Abonnemente
+- E-Mail-/Einladungs-/Passwort-Reset-Workflows
+- MFA
+- Azure Blob Storage
+- Audit, Notifications, Support, Operatorbereich
 
-Binso One ist die von Binso GmbH entwickelte und betriebene SaaS-Plattform für Schweizer Dienstleistungsunternehmen.
+## Produktbereiche
 
-## Technischer Stand
+- Dashboard und globale Suche
+- Kunden
+- Offerten und Aufträge
+- Projekte
+- Zeiterfassung und Spesen
+- Rechnungen und Zahlungen
+- Lieferanten und Eingangsrechnungen
+- Buchhaltung, Bank und MWST
+- Berichte
+- Mitarbeitende, Abwesenheiten und Lohn
+- Produkte und Leistungen
+- Dokumente und Verträge
+- Aufgaben
+- Einstellungen und Benutzer/Rollen
+- Abo und Abrechnung
+- Benachrichtigungen
+- Support und Pilotfeedback
 
-- Next.js 16 / React 19 / Node.js 24
-- Azure App Service
-- PostgreSQL mit tenant-gebundener Persistenz und RLS
-- Azure App Service Authentication / Microsoft Entra ID bzw. External ID
-- Stripe Checkout, Billing Portal und Webhooks
-- Account, Organisationen, Rollen und Memberships
-- Drei klare Self-Service-Modelle (Starter, Business, Professional) mit modulbasierten Entitlements; Enterprise individuell
-- Binso-GmbH-Plattform-/Betreiberbereich
-- Desktop, Mobile und PWA
-- öffentliche Produktseite mit Preisen, FAQ, Support, Legal und responsivem Login
-- Microsoft-Graph-Mail für Organisationseinladungen optional integriert
-- automatischer Subscription-Lifecycle und Billing-Recovery für abgelaufene Trials
+## SaaS / Marketing
 
-## Qualitätsprüfung
+Öffentliche Bereiche:
+
+- `/`
+- `/features`
+- `/preise`
+- `/demo`
+- `/kontakt`
+- `/status`
+- `/impressum`
+- `/datenschutz`
+- `/agb`
+- `/cookies`
+- `/auftragsbearbeitung`
+- `/unterauftragsbearbeiter`
+- `/sicherheit`
+
+Enthalten sind zentrale Metadata, Open Graph, Twitter Cards, `robots.ts`, `sitemap.ts`, Organization-/LocalBusiness-/SoftwareApplication-JSON-LD, Favicon-/Apple-/PWA-Icons sowie eine installierbare PWA.
+
+## UX / Design
+
+- zentrales Design-System
+- Light / Dark / System
+- automatische passende Schwarz-/Weiss-Brand-Assets
+- App-Ladeanimation mit Binso Icon
+- Desktop, Laptop, Tablet, Mobile und PWA
+- Safe Areas und Touch-Optimierung
+- Mobile Bottom Navigation und Sheets
+- konsistente Toggles, Formulare, Tabellen, Karten und Aktionsbuttons
+- Desktop-Unterseiten ohne redundante Zurück-Navigation
+- reduzierte Animationen bei `prefers-reduced-motion`
+
+## Support
+
+Kundensupport beinhaltet:
+
+- Tickets mit Kategorie, Priorität und Status
+- Nachrichtenverlauf
+- technische Diagnose auf ausdrückliche Benutzeraktion
+- Screenshot-Aufnahme über Browserfreigabe
+- redigierte technische Ereignisse
+- temporären, zeitlich begrenzten Supportzugriff
+- Operator-Supportqueue
+
+Technische Diagnose sammelt keine Passwörter oder Cookies. E-Mail-/IBAN-/Secret-ähnliche Werte werden soweit möglich redigiert.
+
+## Sicherheit
+
+- getrennte Kunden- und Betreiberidentitäten
+- HttpOnly Sessions
+- Scrypt Passwort-Hashing
+- MFA/TOTP und Recovery Codes
+- rollenbasierte Berechtigungen
+- Tenant-Kontext in Transaktionen
+- PostgreSQL RLS + FORCE RLS für tenant-sensitive Tabellen
+- Same-Origin-Schutz für mutierende Browser-APIs
+- Body-Limits und Rate Limiting
+- CSP/HSTS/nosniff/Frame-Schutz/Permissions-Policy
+- PII-reduziertes Logging
+- Audit Logs
+- Stripe Webhook-Signatur, Deduplizierung und retry-fähige Verarbeitung
+- keine Speicherung von Kartendaten in Binso One
+
+## Betreiberbereich
+
+`/operator`
+
+- Plattformübersicht
+- Kunden-/Mandantenmetadaten
+- Betreiberbenutzer
+- Support
+- Feedback
+- Feature Flags
+- Ankündigungen
+- Plattform-Audit
+- Sicherheit/MFA
+
+Der Betreiberbereich bietet keinen allgemeinen Zugriff auf fachliche Kundendaten. Temporärer Supportzugriff ist separat, begründet, zeitlich limitiert und auditierbar.
+
+## Produktions-APIs
+
+Unter anderem:
+
+- Auth / MFA / Passwort-Reset / E-Mail-Verifikation
+- Organisation / Benutzer / Einladungen / Sessions
+- Kunden und generische Records
+- Suche
+- Notifications und Audit
+- Files
+- Support / Feedback / Feature Flags / Announcements
+- Billing / Stripe
+- Operator APIs
+- Health
+
+## Datenbank
+
+Migrationen liegen unter `database/migrations/`.
+
+Aktuell:
+
+1. Basisschema
+2. Berechtigungen / Operator
+3. Pilot / Support / Rechtliches
+4. Support-Diagnose
+5. Production Readiness
+6. Organisationseinstellungen
+
+`pnpm db:migrate` führt Migrationen aus. Vor Produktion immer Backup/Restore-Prozess und Migrationen in Staging prüfen.
+
+## Azure
+
+`infra/main.bicep` stellt die Produktionsbasis bereit:
+
+- Linux App Service
+- VNet Integration
+- Azure Database for PostgreSQL Flexible Server mit privatem Netzwerk
+- Blob Storage ohne Public Access
+- Managed Identity
+- Storage Blob Data Contributor für die Web App Identity
+- Application Insights
+- Log Analytics
+- Health Check
+
+Zusätzliche Secrets wie Stripe, E-Mail und `APP_ENCRYPTION_KEY` werden nach Provisionierung als sichere Azure App Settings bzw. bevorzugt über Key Vault gesetzt.
+
+## CI/CD
+
+`.github/workflows/azure-webapp.yml`
+
+Pipeline:
+
+1. Install
+2. Tests / Release Check
+3. Lint
+4. Typecheck
+5. Security Audit
+6. Production Build
+7. Deploy-Artefakt
+8. OIDC Login zu Azure
+9. Deployment auf Azure Web App
+
+Zusätzlich:
+
+- CodeQL
+- Dependabot
+
+## Qualitätsprüfungen
 
 ```powershell
-pnpm install --frozen-lockfile
+pnpm install
+pnpm test
+pnpm release:check
 pnpm lint
 pnpm typecheck
-pnpm verify
-pnpm test:e2e
+pnpm build
 ```
 
-Für den produktiven Go-live zusätzlich:
+Mit produktiver Testdatenbank zusätzlich:
 
 ```powershell
-pnpm db:migrate
-pnpm production:preflight
+pnpm db:check
+pnpm tenant:test
 ```
 
-V70 Public Entry und Authentication: `docs/V70-PUBLIC-ENTRY-AUTH.md`.
+## Operator bootstrap
 
-V69-Bestandsaufnahme: `docs/V69-INVENTORY-AND-PLAN.md`. Aktueller Review, Implementierungsgrenzen und manuelle Go-live-Schritte: `docs/V69-REVIEW-AND-GO-LIVE.md` und `docs/DEPLOYMENT.md`. Historische Vxx-Dokumente beschreiben frühere Zwischenstände.
+Nach Migration und mit gesetzten Umgebungsvariablen:
 
+```powershell
+pnpm operator:bootstrap
+```
 
-V72 Produktvereinfachung und DevSecOps-Basis: `docs/V72-PRODUCT-SIMPLICITY-DEVSECOPS.md`, `docs/development.md`, `docs/testing.md`, `docs/deployment.md` und `docs/security.md`.
+Danach `/operator/login` verwenden und MFA für Betreiber aktivieren.
 
-## V75 Complete Production Foundation
+## Relevante Dokumentation
 
-V75 bündelt Operator-Portal, DB-Rollentrennung, Staging-Härtung, Support/Feedback, Pilot, Leads, Help Center, Analytics, Billing-Reconciliation, Daten-Lifecycle, Incidents und Release-Historie in einem Stand. Details und die verbleibenden externen Azure/Entra/DB-Schritte stehen in `docs/V75-COMPLETE-PRODUCTION-FOUNDATION.md`.
+- `docs/architecture/PRODUCTION-ARCHITECTURE.md`
+- `docs/architecture/SECURITY.md`
+- `docs/architecture/PERMISSION-CONCEPT.md`
+- `docs/architecture/PERMISSION-MATRIX.md`
+- `docs/operations/PRODUCTION-CHECKLIST.md`
+- `docs/operations/AZURE-DEPLOYMENT.md`
+- `docs/operations/SUPPORT-RUNBOOK.md`
 
+## Vor Go-Live
 
-## V76 – Public Entry UX
+Die Anwendung ist technisch für Staging/Produktionsintegration vorbereitet. Vor realen Kundendaten müssen insbesondere durchgeführt werden:
 
-V76 überarbeitet Landingpage, Login, Registrierung und Onboarding, ohne die Darstellung der authentifizierten Binso-One-Kundenanwendung zu verändern. Die Einrichtung ist auf drei kurze Schritte reduziert. Marketing-Screenshots können mit `pnpm marketing:screenshots` direkt aus der echten Anwendung erzeugt werden. Details: `docs/V76-PUBLIC-ENTRY-UX.md`.
-
-## V77 – CI/CD Performance
-
-V77 parallelisiert Quality, Build, PostgreSQL und Critical E2E, ergänzt Next.js- und Playwright-Caches und schreibt Build-, Artefakt- und Azure-Deploy-Zeiten direkt in die GitHub Step Summary. Produktionskontrollen, Staging-Slot, Healthchecks und Rollback bleiben erhalten. Details: `docs/V77-CICD-PERFORMANCE.md`.
-
-## V78 – Public Site, echte Produktansichten und getrennte Zugänge
-
-V78 ersetzt illustrierte Demo-Ansichten im öffentlichen Auftritt durch echte Screenshots der Binso-One-Anwendung, modernisiert Landingpage, Funktionen und Ablauf und bereinigt Navigation und Footer. `/sign-in` ist der Kunden-Login; der interne Microsoft-Zugang für Binso befindet sich getrennt unter `/admin-access`. Die Provider sind über `AUTH_PROVIDER_NAME` und `AUTH_ADMIN_PROVIDER_NAME` unabhängig konfigurierbar. Details: `docs/V78-PUBLIC-SITE-REDESIGN.md`.
-
-## V81.2 – Complete Public Mockup System
-
-V81.2 vereinheitlicht die gesamte öffentliche Binso-One-Website und die Pre-App-Zugänge nach dem freigegebenen Mockup-System. Landingpage, Funktionen, Preise, FAQ, Kontakt, Ablauf, Sicherheit, Status, Hilfe, Registrierung, Kunden-Login, Admin-Zugang und Legal-Seiten verwenden denselben kompakten Header, dieselben Proportionen, Typografie, Abstände, Mobile-Navigation und Footer. Die authentifizierte Kunden-App unter `app/(app)` bleibt optisch unverändert. Details: `docs/V81.2-COMPLETE-PUBLIC-MOCKUP.md`.
-
-
-## V81.8
-Public/pre-app responsive standardisation across web, mobile and PWA.
-
-
-## V81.13
-Public-route visual QA now uses the canonical local preview mode for sign-in and admin-access so the complete PublicShell is tested instead of intentional authenticated redirects.
-
-
-## V81.14
-Public desktop footer spacing and alignment refined; mobile/PWA behaviour unchanged.
-
-
-## V81.16.4
-Responsive regression fixes for canonical H1 scaling, mobile/tablet menu closed state and exhaustive viewport-matrix timeout.
-
-## V81.17 Mobile/PWA UX
-
-Mobile/PWA now has one canonical safe-area, sticky-header, white-system-surface and motion layer (`app/styles/mobile-pwa-system.css`). The old header hide-on-scroll mechanism and unused global scroll subscriber were removed; route motion is short and reduced-motion aware, while installed-PWA cold start stays white and non-blocking.
-
-- V81.17.1: Sticky public/app headers no longer inherit overflow/transform containment; broad responsive E2E timing hardened.
-
-
-### V81.17.2
-Public sticky-header E2E assertions now follow the actual layout boundary: marketing pages do not wait for the authenticated `.route-stage`; that transform assertion runs after entering `/dashboard`.
-
-## V81.18 – Product Simplicity
-
-Die Kundenanwendung hat nur noch fünf primäre Arbeitsbereiche: Übersicht, Kunden, Arbeit, Zeit und Rechnungen. Angebote, Aufträge und Verträge werden unter Arbeit gebündelt; Finanzen, Mitarbeitende und Einstellungen liegen unter Mehr. Organisation, Konto und Daten bleiben vollständig verfügbar, sind aber bewusst aus der globalen Hauptnavigation entfernt und werden über Einstellungen erreicht. Die globale Neu-erstellen-Aktion ist auf fünf Kernaktionen reduziert.
-
-
-## V81.19.1
-Desktop navigation `<details>` TypeScript compatibility fix; subscription simplicity from V81.19 remains unchanged.
-
-
-## V81.19.2
-Root document scrolling is canonical for sticky headers, and E2E coverage follows the simplified mobile primary navigation introduced in V81.18.
-
-
-## V81.19.3
-CI compatibility fix: architecture scans now tolerate optional source-root directories that are absent after a Git checkout.
-
-
-## V81.19.4
-Legacy V79 responsive regression validation now recognises the canonical `.mobile-primary-nav` introduced by the simplified product navigation. Runtime behaviour is unchanged.
-
-## V82.0 production architecture
-
-V82.0 adds the controlled normalized PostgreSQL strangler for core business records, tenant-scoped external IDs/RLS, server-side pagination, atomic document counters, idempotency primitives, deterministic minor-unit money helpers and the new Binso typography system (Josefin Sans for brand headings, Inter for product UI). See `docs/V82.0-PRODUCTION-ARCHITECTURE-AND-TYPOGRAPHY.md` before running the optional production backfill.
-
-
-## V82.0.1
-
-Maintenance correction for zero-warning lint compliance after the V82.0 architecture rollout. See `docs/V82.0.1-LINT-CORRECTIONS.md`.
-
-## Self-Service Registrierung
-
-Der öffentliche Kunden-Onboarding-Flow unterstützt drei getrennte Modi: Produktdemo (`mode=demo`), 30-Tage-Test (`mode=trial`) und direktes kostenpflichtiges Abo (`mode=subscription`). Kundenidentitäten werden produktiv über Microsoft Entra External ID (`AUTH_PROVIDER_NAME=external_id`) mit E-Mail-Verifikation verwaltet; Binso One speichert keine Kundenpasswörter. Der interne Binso-Admin-Zugang bleibt separat über `AUTH_ADMIN_PROVIDER_NAME=aad`. Details und Go-Live-Abnahmetests: `docs/SELF-SERVICE-REGISTRATION.md`.
-
-## V82.0.7 – Production Hardening
-
-V82.0.7 härtet Self-Service und Billing für den Real-Customer-Betrieb: kontrollierte DB-Unavailable-Antworten im E2E-/Fehlerfall, Correlation IDs, Billing-Rate-Limits, redigierte Provider-Fehler, Stripe-Webhook-Härtung, konsistente 30-Tage-Trial-Logik und zusätzliche Self-Service-Acceptance-E2E. Details: `docs/V82.0.7-PRODUCTION-HARDENING.md`.
-
-
-## V82.0.8 – Typography und Mobile Navigation
-
-V82.0.8 vereinheitlicht die öffentliche und interne Typografie auf Inter, reduziert die Dominanz grosser Marketing-Überschriften und entfernt Plus Jakarta Sans aus der Runtime. Die mobile öffentliche Navigation sperrt beim Öffnen den Seitenscroll vollständig; Header, Logo und Schliesskontrolle bleiben fix sichtbar, während ausschliesslich das Navigationspanel scrollt.
-
-
-
-## V82.1.1 – Mehrsprachigkeit
-
-Binso One unterstützt Deutsch, Französisch, Italienisch, Englisch und Türkisch. Beim ersten Besuch wird die Browsersprache automatisch erkannt; eine manuelle Auswahl bleibt gespeichert. Über **Automatisch** kann jederzeit wieder auf die aktuelle Browsersprache zurückgeschaltet werden. Die Sprachlogik gilt für öffentliche Seiten, Authentifizierung, App, Mobile/PWA und gemeinsame UI-Komponenten. Langform-Rechtstexte behalten Deutsch als massgebende Referenzfassung und werden nicht als rechtlich gleichwertige Übersetzung ausgegeben. Details: `docs/INTERNATIONALIZATION.md`.
-
-Binso One unterstützt Deutsch, Französisch, Italienisch, Englisch und Türkisch. Beim ersten Besuch wird die Browser-Sprache erkannt; eine manuelle Auswahl über den Sprachschalter hat Vorrang und wird lokal sowie als SameSite-Cookie gespeichert. Die Sprachwahl gilt für Public-Seiten, Registrierung, Login und die angemeldete Anwendung. `html[lang]` wird passend auf `de-CH`, `fr-CH`, `it-CH`, `en-CH` oder `tr-CH` gesetzt. Die Übersetzungslogik ist zentral unter `lib/i18n/` abgelegt und wird durch `pnpm run i18n:check` sowie Playwright-E2E-Tests abgesichert.
-
-## V82.0.9 – Ruhiger Public-Auftritt
-
-V82.0.9 reduziert den öffentlichen Auftritt auf echte Produktinhalte und verifizierbare Aussagen. Platzhalter-Referenzen und nicht freigegebene Testimonials wurden entfernt, die Integrationsdarstellung durch einen sachlichen Datenfluss ersetzt, Header und Footer vereinfacht und der Kunden-Login als kompakte moderne Zugangsfläche neu gestaltet. Öffentliche Überschriften bleiben Inter SemiBold, sind aber nochmals ruhiger skaliert.
+- vollständiger lokaler `pnpm check`
+- produktiver Tenant-Isolationstest gegen PostgreSQL
+- Azure Staging Deployment
+- reale Browser-/Gerätetests
+- Restore-Test
+- Stripe Testmode E2E
+- E-Mail-Zustellungstest
+- Security Review
+- finale juristische Prüfung der Vertrags-/Datenschutzdokumente
+- Einrichtung der öffentlichen Mailadressen `info@binso.ch`, `privacy@binso.ch`, `legal@binso.ch`, `support@binso.ch`

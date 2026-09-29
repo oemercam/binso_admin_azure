@@ -1,0 +1,1 @@
+import Shell from "@/components/shell"; import EntityForm from "@/components/entity-form"; export default function Page(){return <Shell><EntityForm title="Buchung erfassen" backHref="/buchhaltung" type="Buchung"/></Shell>}

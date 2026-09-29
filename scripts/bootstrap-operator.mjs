@@ -1,0 +1,10 @@
+import pg from "pg";
+import { randomUUID, randomBytes, scrypt as scryptCb } from "node:crypto";
+import { promisify } from "node:util";
+const scrypt=promisify(scryptCb);
+const url=process.env.DATABASE_URL;const email=process.env.OPERATOR_BOOTSTRAP_EMAIL;const password=process.env.OPERATOR_BOOTSTRAP_PASSWORD;
+if(!url||!email||!password)throw new Error("DATABASE_URL, OPERATOR_BOOTSTRAP_EMAIL and OPERATOR_BOOTSTRAP_PASSWORD are required");
+if(password.length<12)throw new Error("OPERATOR_BOOTSTRAP_PASSWORD must be at least 12 characters");
+const salt=randomBytes(16).toString("hex");const derived=await scrypt(password,salt,64);const hash=`scrypt$${salt}$${Buffer.from(derived).toString("hex")}`;
+const pool=new pg.Pool({connectionString:url,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:false}});
+try{const exists=await pool.query("select 1 from platform_users where lower(email)=lower($1)",[email]);if(exists.rowCount){console.log("Operator already exists")}else{await pool.query("insert into platform_users (id,name,email,password_hash,role,active) values ($1,$2,$3,$4,\'platform_owner\',true)",[randomUUID(),"Binso Owner",email,hash]);console.log("Platform owner created")}}finally{await pool.end()}

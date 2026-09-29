@@ -1,0 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Check, Building2, Settings2, Users, X } from "lucide-react";
+import { getOrganization, getSession, updateOrganization } from "@/lib/saas-store";
+import { loadSettings, saveSettings } from "@/lib/local-store";
+import { confirmAction } from "@/lib/confirm";
+import { notify } from "@/lib/notify";
+import { useUnsavedChanges } from "@/lib/use-unsaved-changes";
+import { apiFetch, isProductionMode } from "@/lib/client/runtime";
+
+import { LanguageSwitcher } from "@/components/locale-provider";
+import BrandLogo from "@/components/ui/brand-logo";
+export default function OnboardingPage(){
+ const router=useRouter(); const [step,setStep]=useState(1); const [ready,setReady]=useState(false); const [dirty,setDirty]=useState(false); const [error,setError]=useState("");
+ useUnsavedChanges(dirty);
+ const [v,setV]=useState({company:"",uid:"",address:"",zipCity:"",phone:"",industry:"Dienstleistungen",employees:"1–5"});
+ useEffect(()=>{const t=window.setTimeout(async()=>{try{if(isProductionMode()){const data=await apiFetch<{organization:{name:string;uid?:string;address?:string;zipCity?:string;phone?:string;industry?:string;employees?:string}}>("/api/organization");const o=data.organization;setV(x=>({...x,company:o.name,uid:o.uid||"",address:o.address||"",zipCity:o.zipCity||"",phone:o.phone||"",industry:o.industry||"Dienstleistungen",employees:o.employees||"1–5"}));setReady(true);return}const session=getSession();if(!session){router.replace("/login");return}const o=getOrganization(session.orgId);if(!o)return;setV(x=>({...x,company:o.name,uid:o.uid||"",address:o.address||"",zipCity:o.zipCity||"",phone:o.phone||"",industry:o.industry||"Dienstleistungen",employees:o.employees||"1–5"}));setReady(true)}catch{router.replace("/login")}},0);return()=>window.clearTimeout(t)},[router]);
+ function next(){
+   setError("");
+   if(step===1&&!v.company.trim()){setError("Bitte prüfen Sie die markierten Pflichtfelder.");notify("Firmenname ist erforderlich.","danger");return}
+   setStep(s=>Math.min(3,s+1))
+ }
+ async function cancel(){
+   const ok=await confirmAction({title:"Onboarding wirklich abbrechen?",message:"Nicht gespeicherte Änderungen gehen verloren. Du kannst die Einrichtung später fortsetzen.",confirmLabel:"Onboarding abbrechen",cancelLabel:"Fortfahren",tone:"danger"});
+   if(ok){setDirty(false);router.push("/")}
+ }
+ async function finish(){setError("");if(!v.company.trim()){setError("Bitte prüfen Sie die markierten Pflichtfelder.");notify("Firmenname ist erforderlich.","danger");setStep(1);return}if(isProductionMode()){await apiFetch("/api/organization",{method:"PATCH",body:JSON.stringify({name:v.company,uid:v.uid,address:v.address,zipCity:v.zipCity,phone:v.phone,industry:v.industry,employees:v.employees})})}else{const session=getSession();if(!session)return;updateOrganization(session.orgId,{name:v.company,uid:v.uid,address:v.address,zipCity:v.zipCity,phone:v.phone,industry:v.industry,employees:v.employees,onboardingComplete:true})}const settings=loadSettings();saveSettings({...settings,companyName:v.company,uid:v.uid||settings.uid,address:v.address||settings.address,zipCity:v.zipCity||settings.zipCity,phone:v.phone||settings.phone});setDirty(false);notify("Einrichtung erfolgreich abgeschlossen.");router.push("/dashboard")}
+ if(!ready)return <div className="auth-shell"><div className="auth-card">Onboarding wird geladen …</div></div>;
+ return <div className="onboarding-shell"><div className="onboarding-top"><BrandLogo/><div className="onboarding-top-actions"><button className="onboarding-cancel" onClick={cancel}><X size={16}/> Einrichtung abbrechen</button><LanguageSwitcher compact/><span>Einrichtung {step}/3</span></div></div><div className="onboarding-card"><div className="onboarding-progress"><span className={step>=1?"active":""}/><span className={step>=2?"active":""}/><span className={step>=3?"active":""}/></div>{step===1&&<><div className="onboarding-icon"><Building2/></div><h1>Deine Firma</h1><p>Diese Angaben werden für Dokumente, Rechnungen und die Mandantendarstellung verwendet.</p><div className="form-grid"><label><span>Firmenname *</span><input required value={v.company} onChange={e=>{setDirty(true);setV(x=>({...x,company:e.target.value}))}}/></label><label><span>UID / MWST</span><input value={v.uid} onChange={e=>{setDirty(true);setV(x=>({...x,uid:e.target.value}))}}/></label><label><span>Adresse</span><input value={v.address} onChange={e=>{setDirty(true);setV(x=>({...x,address:e.target.value}))}}/></label><label><span>PLZ / Ort</span><input value={v.zipCity} onChange={e=>{setDirty(true);setV(x=>({...x,zipCity:e.target.value}))}}/></label></div>{error&&<div className="form-error-summary">{error}</div>}<button className="marketing-primary onboarding-next" onClick={next}>Weiter <ArrowRight size={16}/></button></>}{step===2&&<><div className="onboarding-icon"><Users/></div><h1>Unternehmen einordnen</h1><p>Damit können wir die Startansicht und Demo-Daten sinnvoll vorbereiten.</p><div className="form-grid"><label><span>Branche</span><select value={v.industry} onChange={e=>{setDirty(true);setV(x=>({...x,industry:e.target.value}))}}>{["Dienstleistungen","IT","Beratung","Handwerk","Agentur","Bau","Immobilien","Andere"].map(x=><option key={x}>{x}</option>)}</select></label><label><span>Mitarbeitende</span><select value={v.employees} onChange={e=>{setDirty(true);setV(x=>({...x,employees:e.target.value}))}}>{["1–5","6–15","16–50","51+"].map(x=><option key={x}>{x}</option>)}</select></label><label><span>Telefon</span><input value={v.phone} onChange={e=>{setDirty(true);setV(x=>({...x,phone:e.target.value}))}}/></label></div><button className="marketing-primary onboarding-next" onClick={next}>Weiter <ArrowRight size={16}/></button></>}{step===3&&<><div className="onboarding-icon"><Settings2/></div><h1>Bereit zum Start</h1><p>Die wichtigsten Module sind aktiviert. Weitere Benutzer, Nummernkreise und Integrationen kannst du danach in den Einstellungen konfigurieren.</p><div className="onboarding-checks">{["Kunden und Verkauf","Projekte, Zeit und Spesen","Finanzen und MWST","Personal und Organisation"].map(x=><span key={x}><Check size={17}/>{x}</span>)}</div><button className="marketing-primary onboarding-next" onClick={finish}>Zum Dashboard <ArrowRight size={16}/></button></>}</div></div>
+}

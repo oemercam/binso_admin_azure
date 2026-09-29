@@ -1,0 +1,9 @@
+"use client";
+import Link from "next/link";import {useEffect,useState} from "react";import {Headphones,Plus,Search} from "lucide-react";import {apiFetch,isProductionMode} from "@/lib/client/runtime";import {listSupportTickets,type SupportTicket} from "@/lib/pilot-store";
+export default function SupportList(){
+ const [items,setItems]=useState<SupportTicket[]>([]);const [q,setQ]=useState("");
+ useEffect(()=>{const load=async()=>{if(isProductionMode()){try{const r=await apiFetch<{items:SupportTicket[]}>("/api/support");setItems(r.items)}catch{setItems([])}}else setItems(listSupportTickets())};void load()},[]);
+ const shown=items.filter(x=>`${x.number} ${x.subject} ${x.category} ${x.status}`.toLowerCase().includes(q.toLowerCase()));
+ return <div className="page"><section className="module-heading"><div><div className="eyebrow">Hilfe</div><h1>Support</h1><p>Fragen, Fehler und Sicherheitsmeldungen direkt mit dem Binso Support klären.</p></div><Link className="primary-inline" href="/support/neu"><Plus size={17}/>Ticket erstellen</Link></section>
+ <section className="workspace-card"><div className="support-search"><Search size={17}/><input placeholder="Tickets suchen …" value={q} onChange={e=>setQ(e.target.value)}/></div>{shown.length?<div className="support-table"><div className="support-row head"><span>Ticket</span><span>Betreff</span><span>Kategorie</span><span>Priorität</span><span>Status</span></div>{shown.map(x=><Link className="support-row" href={`/support/${x.id}`} key={x.id}><strong>{x.number}</strong><span>{x.subject}</span><span>{x.category}</span><span>{x.priority}</span><em>{x.status}</em></Link>)}</div>:<div className="empty-state"><Headphones size={28}/><strong>Noch keine Supporttickets</strong><p>Erstelle ein Ticket, wenn du Hilfe benötigst oder etwas nicht wie erwartet funktioniert.</p><Link href="/support/neu">Erstes Ticket erstellen</Link></div>}</section></div>
+}

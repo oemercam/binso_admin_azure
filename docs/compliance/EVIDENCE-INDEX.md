@@ -1,2 +1,0 @@
-# Evidence Index
-Evidence must point to tests, CI jobs, configs, migrations or runbooks. Current examples: lint/typecheck in package scripts and Actions; tenant/database controls in migrations/DB CI; production deployment in main workflow; health endpoints; contact architecture in contact-config + master:check. External MFA, backup and restore remain unevidenced until actual admin evidence exists.

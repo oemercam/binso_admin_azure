@@ -1,0 +1,9 @@
+"use client";
+import {useEffect,useState} from "react";import {usePathname} from "next/navigation";import FeedbackForm from "@/components/feedback/feedback-form";import {useFeatureFlags} from "@/lib/client/use-feature-flags";
+const appPrefixes=["/dashboard","/kunden","/offerten","/auftraege","/projekte","/zeiterfassung","/spesen","/rechnungen","/zahlungen","/lieferanten","/eingangsrechnungen","/buchhaltung","/bank","/mwst","/berichte","/personal","/abwesenheiten","/lohn","/produkte","/dokumente","/vertraege","/aufgaben","/einstellungen","/support"];
+export default function PilotFeedbackHost(){
+ const pathname=usePathname();const [open,setOpen]=useState(false);const {ready,enabled}=useFeatureFlags();
+ useEffect(()=>{if(!ready||!enabled("pilot_feedback")||!appPrefixes.some(x=>pathname.startsWith(x)))return;const never=localStorage.getItem("binso-feedback-never")==="1";if(never)return;const last=Number(localStorage.getItem("binso-feedback-last")||0);if(last&&Date.now()-last<14*24*60*60*1000)return;const views=Number(localStorage.getItem("binso-feedback-views")||0)+1;localStorage.setItem("binso-feedback-views",String(views));if(views<4)return;const t=window.setTimeout(()=>setOpen(true),45000);return()=>window.clearTimeout(t)},[pathname,ready,enabled]);
+ if(!open)return null;
+ return <div className="pilot-feedback-panel"><button className="pilot-feedback-close" onClick={()=>setOpen(false)}>×</button><div className="eyebrow">Pilotphase</div><h2>Wie läuft Binso One für dich?</h2><p>Kurzes Feedback hilft uns, die nächsten Verbesserungen richtig zu priorisieren.</p><FeedbackForm compact onDone={()=>setOpen(false)}/><div className="pilot-feedback-secondary"><button onClick={()=>{localStorage.setItem("binso-feedback-last",Date.now().toString());setOpen(false)}}>Später</button><button onClick={()=>{localStorage.setItem("binso-feedback-never","1");setOpen(false)}}>Nicht mehr anzeigen</button></div></div>
+}

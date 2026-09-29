@@ -1,30 +1,10 @@
-import { apiJson } from '@/lib/http/server-api'
-import { isDatabaseConfigured, query } from '@/lib/db/client'
-import { publicEnv } from '@/lib/config/public-env'
-
-export const dynamic = 'force-dynamic'
-
-export async function GET() {
-  const production = publicEnv.isProduction
-  let dependencyHealthy = !production && !isDatabaseConfigured()
-
-  if (isDatabaseConfigured()) {
-    try {
-      await query('select 1 as ok')
-      const latest = await query<{ ok: number }>("select 1 as ok from schema_migrations where version = '0010_product_simplicity_devsecops.sql' limit 1")
-      dependencyHealthy = Boolean(latest.rowCount)
-    } catch {
-      dependencyHealthy = false
-    }
-  }
-
-  const status = dependencyHealthy ? 'ok' : 'degraded'
-  return apiJson(
-    {
-      status,
-      buildId: publicEnv.buildId || 'unknown',
-      timestamp: new Date().toISOString(),
-    },
-    { status: status === 'ok' ? 200 : 503, headers: { 'Cache-Control': 'no-store' } },
-  )
+import { query } from "@/lib/server/db";
+import { env } from "@/lib/server/env";
+export const runtime="nodejs";
+export async function GET(){
+ let database:"disabled"|"ok"|"error"="disabled";
+ if(env.databaseUrl){
+  try{await query("select 1");database="ok"}catch{database="error"}
+ }
+ return Response.json({status:database==="error"?"degraded":"ok",service:"binso-one",version:process.env.NEXT_PUBLIC_APP_VERSION||"1.2.0",mode:env.appMode,database,timestamp:new Date().toISOString()},{status:database==="error"?503:200,headers:{"cache-control":"no-store"}});
 }

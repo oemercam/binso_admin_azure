@@ -1,1 +1,0 @@
-import { PageHeader } from '@/components/ui/page-header'; import { PlatformOperations } from '@/components/settings/platform-operations'; export default function Page(){return <section className="page apple-page"><PageHeader title="Operations" description="Jobs, Mail, Fehler und betriebliche Plattformzustände."/><PlatformOperations canManage/></section>}

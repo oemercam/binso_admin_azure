@@ -1,2 +1,0 @@
-# External Setup Required
-Microsoft 365 role mailboxes/permissions; SPF/DKIM/DMARC; Azure alerts; Azure/PostgreSQL backup; real restore test; Azure access reviews; Entra MFA/Conditional Access; GitHub branch protection; Stripe production config/webhook verification; registrar MFA/auto-renew; privacy/security mailbox ownership; legal review; insurance review; ISO organizational controls. None are marked complete without evidence.

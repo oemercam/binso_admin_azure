@@ -1,0 +1,1 @@
+import Shell from "@/components/shell";import SupportDetail from "@/components/support/support-detail";export default async function Page({params}:{params:Promise<{id:string}>}){const {id}=await params;return <Shell><SupportDetail id={id}/></Shell>}

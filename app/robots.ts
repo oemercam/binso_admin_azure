@@ -1,18 +1,2 @@
-import type { MetadataRoute } from 'next'
-import { headers } from 'next/headers'
-import { appIdentity } from '@/lib/config/app-identity'
-import { serverEnv } from '@/lib/config/server-env'
-
-export const dynamic = 'force-dynamic'
-
-export default async function robots(): Promise<MetadataRoute.Robots> {
-  const requestHeaders = await headers()
-  const host = (requestHeaders.get('x-forwarded-host') || requestHeaders.get('host') || '').split(':')[0].toLowerCase()
-  const publicHost = serverEnv.publicHost || new URL(appIdentity.website).host.toLowerCase()
-  if (host && host !== publicHost) return { rules: { userAgent: '*', disallow: '/' } }
-  return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/platform/', '/post-login', '/onboarding', '/sign-in', '/register', '/subscription-required', '/support'] }],
-    sitemap: `${appIdentity.website}/sitemap.xml`,
-    host: appIdentity.website,
-  }
-}
+import type {MetadataRoute} from "next";
+export default function robots():MetadataRoute.Robots{const base=process.env.NEXT_PUBLIC_SITE_URL??"https://www.binso.ch";return {rules:[{userAgent:"*",allow:["/","/features","/preise","/demo","/impressum","/datenschutz","/agb","/cookies","/auftragsbearbeitung","/unterauftragsbearbeiter","/sicherheit","/status","/kontakt"],disallow:["/api/","/dashboard","/operator/","/checkout","/onboarding","/einstellungen","/feedback","/support/"]}],sitemap:`${base}/sitemap.xml`,host:base}}

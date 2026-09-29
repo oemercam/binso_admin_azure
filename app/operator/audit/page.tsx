@@ -1,0 +1,1 @@
+import OperatorShell from "@/components/operator/operator-shell";import OperatorAudit from "@/components/operator/operator-audit";export default function Page(){return <OperatorShell><OperatorAudit/></OperatorShell>}

@@ -1,8 +1,0 @@
-import { PRODUCT_LIMITS } from '@/lib/config/product'
-import { getPlatformSession } from '@/lib/auth/server'
-import { listPlatformPilotCustomers, updatePlatformPilotCustomer } from '@/lib/db/repositories/platform-pilot'
-import { apiError, apiJson, readJsonBody, requireSameOrigin } from '@/lib/http/server-api'
-import { canSupportPlatform } from '@/lib/auth/platform-permissions'
-const statuses=new Set(['active_pilot','pilot_review','pilot_completed','converted','not_converted','extended'])
-export async function GET(){const s=await getPlatformSession();if(!s||!canSupportPlatform(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');return apiJson({customers:await listPlatformPilotCustomers()})}
-export async function PATCH(request:Request){try{requireSameOrigin(request)}catch{return apiError(403,'invalid_origin','Ungültige Anfragequelle.')}const s=await getPlatformSession();if(!s||!canSupportPlatform(s.user.platformRole))return apiError(403,'forbidden','Keine Plattformberechtigung.');const b=await readJsonBody<{organizationId?:string;pilotStatus?:string;pilotGoal?:string;pilotOutcome?:string;pilotGroup?:string;endsAt?:string|null}>(request,PRODUCT_LIMITS.apiBodyContactBytes).catch(()=>null);if(!b?.organizationId||!b.pilotStatus||!statuses.has(b.pilotStatus)||((b.pilotGoal?.length??0)>3000)||((b.pilotOutcome?.length??0)>3000))return apiError(422,'validation','Pilotdaten sind ungültig.');await updatePlatformPilotCustomer({organizationId:b.organizationId,pilotStatus:b.pilotStatus,pilotGoal:b.pilotGoal?.trim(),pilotOutcome:b.pilotOutcome?.trim(),pilotGroup:b.pilotGroup?.trim(),endsAt:b.endsAt||undefined,actorUserId:s.user.id,actorEmail:s.user.email});return apiJson({ok:true})}

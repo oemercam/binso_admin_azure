@@ -1,32 +1,8 @@
-'use client'
-
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { ErrorState } from '@/components/ui/error-state'
-
-export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  const router = useRouter()
-
-  useEffect(() => {
-    void fetch('/api/monitoring/client-error', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ digest: error.digest, name: error.name, path: window.location.pathname }),
-      keepalive: true,
-    }).catch(() => undefined)
-  }, [error])
-
-  return (
-    <ErrorState
-      title="Seite konnte nicht geladen werden"
-      description="Die Ansicht konnte nicht vollständig geladen werden. Du kannst sie erneut öffnen."
-      referenceId={error.digest}
-      actions={(
-        <>
-          <button className="button primary" type="button" onClick={reset}>Erneut versuchen</button>
-          <button className="button secondary" type="button" onClick={() => router.push('/dashboard')}>Zum Dashboard</button>
-        </>
-      )}
-    />
-  )
+"use client";
+import { useEffect } from "react";
+import Link from "next/link";
+import { AlertTriangle, RotateCcw } from "lucide-react";
+export default function ErrorPage({error,reset}:{error:Error&{digest?:string};reset:()=>void}){
+ useEffect(()=>{console.error(error)},[error]);
+ return <main className="system-page"><div className="system-card"><div className="system-icon danger"><AlertTriangle/></div><div className="system-code">500</div><h1>Etwas ist schiefgelaufen</h1><p>Die Anwendung konnte diese Ansicht nicht laden. Bitte versuchen Sie es erneut.</p>{error.digest&&<small>Referenz: {error.digest}</small>}<div className="system-actions"><button className="primary-inline" onClick={reset}><RotateCcw size={16}/> Erneut versuchen</button><Link href="/dashboard" className="secondary-button">Zurück zum Dashboard</Link></div></div></main>
 }

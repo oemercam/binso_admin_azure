@@ -1,0 +1,1 @@
+import Link from "next/link"; export default function Page(){return <main className="system-page"><div className="system-card"><div className="system-code">403</div><h1>Zugriff verweigert</h1><p>Du hast keine Berechtigung für diese Seite.</p><Link href="/" className="primary-inline">Zur Startseite</Link></div></main>}

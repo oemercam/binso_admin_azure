@@ -36,9 +36,6 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    ".cache",
-    "deploy-root",
-    "qa"
+    "node_modules"
   ]
 }

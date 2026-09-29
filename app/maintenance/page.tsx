@@ -1,0 +1,1 @@
+import Link from "next/link"; export default function Page(){return <main className="system-page"><div className="system-card"><div className="system-code">503</div><h1>Wartung</h1><p>Binso One wird gerade gewartet.</p><Link href="/" className="primary-inline">Zur Startseite</Link></div></main>}
