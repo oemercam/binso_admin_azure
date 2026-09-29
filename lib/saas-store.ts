@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
-export type PlanId = "start" | "business" | "pro";
-export type BillingCycle = "monthly" | "yearly";
+import {plans,type BillingCycle,type PlanId} from "@/lib/plans";
+export {plans};
+export type {BillingCycle,PlanId};
 
 export type SaasUser = {
   id: string;
@@ -51,24 +52,6 @@ function write<T>(key:string, value:T){
   window.dispatchEvent(new CustomEvent("binso-saas-changed"));
 }
 
-export const plans = [
-  {
-    id:"start" as PlanId, name:"Start", monthly:29, yearly:290,
-    description:"Für Selbstständige und kleine Teams, die Verkauf und Administration zentralisieren möchten.",
-    features:["Kunden und Kontakte","Offerten und Rechnungen","Zeiterfassung und Spesen","Projekte","Basisberichte","1 Firma · bis 3 Benutzer"]
-  },
-  {
-    id:"business" as PlanId, name:"Business", monthly:69, yearly:690, popular:true,
-    description:"Für KMU mit Team, Personal, Einkauf und erweiterten Finanzprozessen.",
-    features:["Alles aus Start","Lieferanten und Eingangsrechnungen","Personal und Abwesenheiten","MWST und Buchhaltungsübersicht","Produkte und Leistungen","bis 15 Benutzer"]
-  },
-  {
-    id:"pro" as PlanId, name:"Pro", monthly:129, yearly:1290,
-    description:"Für wachsende Unternehmen mit mehreren Bereichen, Rollen und erweiterten Kontrollen.",
-    features:["Alles aus Business","Lohn-Demo und Freigaben","Verträge und Dokumente","Erweiterte Rollen und Audit","Priorisierter Support","unbegrenzte Benutzer"]
-  }
-];
-
 export function getOrganizations(){ return read<SaasOrg[]>(ORGS_KEY, []); }
 export function getUsers(){ return read<SaasUser[]>(USERS_KEY, []); }
 export function getSession(){ return read<SaasSession | null>(SESSION_KEY, null); }
@@ -83,7 +66,7 @@ export function createAccount(input:{
   billingCycle:BillingCycle; trial:boolean;
 }){
   const email=input.email.trim().toLowerCase();
-  if(getUsers().some(u=>u.email.toLowerCase()===email)) throw new Error("Für diese E-Mail besteht bereits ein lokales Testkonto.");
+  if(getUsers().some(u=>u.email.toLowerCase()===email)) throw new Error("FÃ¼r diese E-Mail besteht bereits ein lokales Testkonto.");
   const now=new Date();
   const org:SaasOrg={
     id:`org-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
@@ -138,3 +121,5 @@ export function updateOrganization(orgId:string, patch:Partial<SaasOrg>){
 }
 
 export function logout(){ setSession(null); }
+
+
