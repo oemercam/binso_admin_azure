@@ -13,7 +13,7 @@ export const siteConfig={
   description:"Binso One verbindet Verkauf, Projekte, Zeiterfassung, Rechnungen, Finanzen, Personal und Administration für Schweizer KMU in einer zentralen Plattform.",
   locale:"de_CH",
   language:"de-CH",
-  version:"1.5.2",
+  version:"1.5.3",
 } as const;
 
 export function absoluteUrl(path="/"){

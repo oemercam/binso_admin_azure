@@ -25,7 +25,7 @@ const cssLeftovers=obsoleteCss.filter(p=>fs.existsSync(p));
 if(cssLeftovers.length)throw new Error(`Obsolete CSS layers still present: ${cssLeftovers.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.5.2")throw new Error(`Expected package version 1.5.2, got ${pkg.version}`);
+if(pkg.version!=="1.5.3")throw new Error(`Expected package version 1.5.3, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));

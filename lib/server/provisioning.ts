@@ -137,8 +137,8 @@ export async function provisionOrganization(input:{
    );
    await client.query(
      `insert into audit_events(organization_id,actor_user_id,actor_name,action,entity_type,entity_id,detail)
-      values($1,$2,$3,$4,'organization',$1::text,$5)`,
-     [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId})]
+      values($1,$2,$3,$4,'organization',$6,$5)`,
+     [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId}),organizationId]
    );
    if(input.mode==="demo"){
      await seedDemo(client,organizationId,input.userId);

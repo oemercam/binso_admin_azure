@@ -24,4 +24,8 @@ const suspicious=[];
 function walk(dir){for(const name of fs.readdirSync(dir)){if(["node_modules",".next",".git"].includes(name))continue;const p=path.join(dir,name);const st=fs.statSync(p);if(st.isDirectory())walk(p);else if(/\.(ts|tsx|css|mjs|json)$/.test(name)){const text=fs.readFileSync(p,"utf8");if(/[ÃÂ]|â€“|â€™|â€œ|â€/.test(text))suspicious.push(p)}}}
 for(const root of ["app","components","lib","styles","config"]){if(fs.existsSync(root))walk(root)}
 if(suspicious.length)throw new Error(`Possible encoding corruption: ${[...new Set(suspicious)].join(", ")}`);
+
+const customerRepo=fs.readFileSync("lib/server/repositories/customers.ts","utf8");
+if(customerRepo.includes("$1::text,$3"))throw new Error("Customer creation must not reuse a UUID SQL parameter as text; use a dedicated external_id parameter.");
+
 console.log("Architecture self-check passed: CSS entrypoints, overlay system, PWA policy, mobile nav and encoding are centralized.");
