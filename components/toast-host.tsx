@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from "lucide-react";
+import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
+import {useLocale} from "@/components/locale-provider";
 type Toast={id:number;message:string;title?:string;tone:"success"|"info"|"danger"|"warning"};
 export default function ToastHost(){
+ const {t}=useLocale();
  const [toasts,setToasts]=useState<Toast[]>([]);
- useEffect(()=>{const handler=(e:Event)=>{const d=(e as CustomEvent).detail;const id=Date.now()+Math.random();setToasts(t=>[...t,{id,message:d.message,title:d.title,tone:d.tone||"success"}]);window.setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),4500)};window.addEventListener("binso-toast",handler);return()=>window.removeEventListener("binso-toast",handler)},[]);
- return <div className="toast-host" aria-live="polite">{toasts.map(t=>{const Icon=t.tone==="danger"?XCircle:t.tone==="warning"?AlertTriangle:t.tone==="info"?Info:CheckCircle2;return <div className={`toast ${t.tone}`} key={t.id}><Icon size={19}/><div className="toast-copy">{t.title&&<strong>{t.title}</strong>}<span>{t.message}</span></div><button onClick={()=>setToasts(x=>x.filter(y=>y.id!==t.id))} aria-label="Schliessen"><X size={15}/></button></div>})}</div>
+ useEffect(()=>{const handler=(e:Event)=>{const d=(e as CustomEvent).detail;const id=Date.now()+Math.random();setToasts(t=>[...t,{id,message:d.message,title:d.title,tone:d.tone||"success"}]);window.setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),4500)};const unsubscribe=subscribeAppEvent(appEvents.toast,handler);return unsubscribe},[]);
+ return <div className="toast-host" aria-live="polite">{toasts.map(toast=>{const Icon=toast.tone==="danger"?XCircle:toast.tone==="warning"?AlertTriangle:toast.tone==="info"?Info:CheckCircle2;return <div className={`toast ${toast.tone}`} key={toast.id}><Icon size={19}/><div className="toast-copy">{toast.title&&<strong>{toast.title}</strong>}<span>{toast.message}</span></div><button onClick={()=>setToasts(x=>x.filter(y=>y.id!==toast.id))} aria-label={t("Schliessen")}><X size={15}/></button></div>})}</div>
 }

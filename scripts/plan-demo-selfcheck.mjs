@@ -6,7 +6,7 @@ const mustContain=(file,needles)=>{
 };
 
 mustContain("app/api/auth/demo/route.ts",[
-  "'business'","'trial'","onboarding_complete","await createSession","expiresInHours:24"
+  "'business'","'trial'","onboarding_complete","await createSession","expiresInHours:domainConfig.demoSessionHours"
 ]);
 mustContain("components/auth-pages.tsx",[
   'apiFetch("/api/auth/demo"','/portal/registrieren?trial=1','plan,billingCycle:billing,trial'

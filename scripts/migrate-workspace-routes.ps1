@@ -48,7 +48,8 @@ foreach ($route in $workspaceRoutes) {
 $obsoleteFiles = @(
     "components\app-boot-loader.tsx",
     "components\marketing-features.tsx",
-    "components\marketing-pricing.tsx"
+    "components\marketing-pricing.tsx",
+    "lib\data.ts"
 )
 
 foreach ($relativePath in $obsoleteFiles) {

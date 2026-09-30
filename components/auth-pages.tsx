@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
+import {legalConfig} from "@/lib/legal";
 import {useRouter,useSearchParams} from "next/navigation";
 import Link from "next/link";
 import {ArrowRight,Check,Eye,EyeOff} from "lucide-react";
@@ -71,7 +72,7 @@ export function LoginPage(){
 export function RegisterPage(){
  const router=useRouter();
  const params=useSearchParams();
- const {t}=useLocale();
+ const {t,formatCurrency,locale}=useLocale();
  const trial=params.get("trial")==="1";
  const initial=trial?"business":((params.get("plan") as PlanId)||"business");
  const [plan,setPlan]=useState<PlanId>(["start","business","pro"].includes(initial)?initial:"business");
@@ -97,7 +98,7 @@ export function RegisterPage(){
   setBusy(true);
   try{
    if(isProductionMode()){
-    const result=await apiFetch<{requiresEmailVerification?:boolean;emailSent?:boolean}>("/api/auth/register",{method:"POST",body:JSON.stringify({...v,plan,billingCycle:billing,trial,acceptedTerms:true,termsVersion:"2026-09-29",privacyVersion:"2026-09-29"})});
+    const result=await apiFetch<{requiresEmailVerification?:boolean;emailSent?:boolean}>("/api/auth/register",{method:"POST",body:JSON.stringify({...v,plan,billingCycle:billing,trial,locale,acceptedTerms:true,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion})});
     if(result.requiresEmailVerification){notify(result.emailSent?t("Testorganisation erstellt. Bestätigungs-E-Mail wurde versendet."):t("Testorganisation erstellt. E-Mail-Bestätigung kann später nachgeholt werden."),"info")}
    }else createAccount({...v,plan,billingCycle:billing,trial});
    router.replace(trial?"/onboarding":`/checkout?plan=${plan}&billing=${billing}`);
@@ -112,9 +113,9 @@ export function RegisterPage(){
     {trial?
      <div className="trial-summary-card"><div><strong>{t("Business")}</strong><span>{t("Alle Business-Funktionen für deine eigene Firma")}</span></div><em>{t("14 Tage kostenlos")}</em><small>{t("Keine Kreditkarte nötig. Nach 14 Tagen entscheidest du, ob du weitermachen möchtest.")}</small></div>
      :<>
-      <div className="plan-picker">{plans.map(p=><button type="button" key={p.id} className={plan===p.id?"selected":""} onClick={()=>setPlan(p.id)} disabled={busy}><strong>{p.name}</strong><span>CHF {p.monthly}/Mt.</span></button>)}</div>
+      <div className="plan-picker">{plans.map(p=><button type="button" key={p.id} className={plan===p.id?"selected":""} onClick={()=>setPlan(p.id)} disabled={busy}><strong>{p.name}</strong><span>{formatCurrency(p.monthly)} / {t("Monat")}</span></button>)}</div>
       <div className="billing-toggle"><button type="button" className={billing==="monthly"?"active":""} onClick={()=>setBilling("monthly")} disabled={busy}>{t("Monatlich")}</button><button type="button" className={billing==="yearly"?"active":""} onClick={()=>setBilling("yearly")} disabled={busy}>{t("Jährlich · 2 Monate gratis")}</button></div>
-      <div className="selected-plan-summary"><div><strong>{selected.name}</strong><span>{billing==="monthly"?`CHF ${selected.monthly} / ${t("Monat")}`:`CHF ${selected.yearly} / ${t("Jahr")}`}</span></div></div>
+      <div className="selected-plan-summary"><div><strong>{selected.name}</strong><span>{billing==="monthly"?`${formatCurrency(selected.monthly)} / ${t("Monat")}`:`${formatCurrency(selected.yearly)} / ${t("Jahr")}`}</span></div></div>
      </>}
     <button type="button" className="marketing-primary auth-submit" onClick={()=>setRegisterStep(2)}>{t("Weiter")} <ArrowRight size={16}/></button>
    </>}

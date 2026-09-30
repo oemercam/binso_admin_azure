@@ -1,14 +1,17 @@
+import {siteConfig} from "@/lib/site-config";
+import {uiConfig} from "@/config/ui";
+
 export const appConfig = {
-  name: "Binso One",
-  company: "Binso GmbH",
+  name: siteConfig.name,
+  company: siteConfig.company,
   defaultLocale: "de" as const,
   locales: ["de", "fr", "it", "en", "tr"] as const,
-  appVersion: process.env.NEXT_PUBLIC_APP_VERSION || "1.3.1",
-  supportEmail: "support@binso.ch",
+  appVersion: process.env.NEXT_PUBLIC_APP_VERSION || siteConfig.version,
+  supportEmail: siteConfig.supportEmail,
   publicBasePath: "/",
   portalBasePath: "/portal",
   operatorBasePath: "/operator",
-  mobileBreakpoint: 760,
+  mobileBreakpoint: uiConfig.breakpoints.mobile,
   searchDebounceMs: 300,
   pagination: [25, 50, 100] as const,
   pwa: {

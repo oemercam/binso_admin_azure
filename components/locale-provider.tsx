@@ -1,113 +1,69 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
-import { getLocale, localeLabels, localeNames, setLocale, sourceText, translate, type Locale } from "@/lib/i18n";
+import {createContext,useContext,useEffect,useMemo,useSyncExternalStore} from "react";
+import {getLocale,localeLabels,localeNames,setLocale as persistLocale,translate,type Locale} from "@/lib/i18n";
+import {formatCurrency as formatCurrencyValue,formatDate as formatDateValue,formatDateTime as formatDateTimeValue,formatNumber as formatNumberValue,formatTime as formatTimeValue} from "@/lib/locale-format";
+import {appEvents,subscribeAppEvent} from "@/lib/client/app-events";
+import {storageKeys} from "@/config/storage-keys";
 
-type LocaleContextValue={locale:Locale;setLocale:(l:Locale)=>void;t:(value:string)=>string};
-const LocaleContext=createContext<LocaleContextValue>({locale:"de",setLocale:()=>{},t:(value)=>value});
+type LocaleContextValue={
+  locale:Locale;
+  setLocale:(locale:Locale)=>void;
+  t:(value:string)=>string;
+  formatDate:(value:Date|string|number,options?:Intl.DateTimeFormatOptions)=>string;
+  formatDateTime:(value:Date|string|number,options?:Intl.DateTimeFormatOptions)=>string;
+  formatTime:(value:Date|string|number,options?:Intl.DateTimeFormatOptions)=>string;
+  formatNumber:(value:number,options?:Intl.NumberFormatOptions)=>string;
+  formatCurrency:(value:number,currency?:string,options?:Intl.NumberFormatOptions)=>string;
+};
+
+const LocaleContext=createContext<LocaleContextValue>({
+  locale:"de",setLocale:()=>{},t:value=>value,
+  formatDate:value=>formatDateValue(value,"de"),
+  formatDateTime:value=>formatDateTimeValue(value,"de"),
+  formatTime:value=>formatTimeValue(value,"de"),
+  formatNumber:value=>formatNumberValue(value,"de"),
+  formatCurrency:(value,currency)=>formatCurrencyValue(value,"de",currency)
+});
+
 export function useLocale(){return useContext(LocaleContext)}
 
-const textOriginals=new WeakMap<Text,string>();
-const attributeOriginals=new WeakMap<Element,Map<string,string>>();
-
-function getOriginalAttribute(el:Element, attr:string){
-  let map=attributeOriginals.get(el);
-  if(!map){map=new Map();attributeOriginals.set(el,map)}
-  if(!map.has(attr)) map.set(attr,sourceText(el.getAttribute(attr)||""));
-  return map.get(attr)||"";
+function subscribeLocale(onStoreChange:()=>void){
+ const unsubscribeLocale=subscribeAppEvent(appEvents.localeChanged,()=>onStoreChange());
+ const onStorage=(event:StorageEvent)=>{if(event.key===storageKeys.locale)onStoreChange()};
+ window.addEventListener("storage",onStorage);
+ return()=>{unsubscribeLocale();window.removeEventListener("storage",onStorage)};
 }
-
-function translateNode(root:ParentNode, locale:Locale){
-  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-  const nodes:Text[]=[];
-  let node:Node|null;
-
-  while((node=walker.nextNode())) nodes.push(node as Text);
-
-  for(const textNode of nodes){
-    const parent=textNode.parentElement;
-    if(!parent||["SCRIPT","STYLE","CODE","PRE"].includes(parent.tagName)) continue;
-    if(!textOriginals.has(textNode)) textOriginals.set(textNode,sourceText(textNode.nodeValue||""));
-    const base=textOriginals.get(textNode)||"";
-    const translated=translate(base,locale);
-    if(textNode.nodeValue!==translated) textNode.nodeValue=translated;
-  }
-
-  root.querySelectorAll?.("input[placeholder],textarea[placeholder],[title],[aria-label]").forEach(el=>{
-    for(const attr of ["placeholder","title","aria-label"]){
-      if(!el.hasAttribute(attr)) continue;
-      const original=getOriginalAttribute(el,attr);
-      const translated=translate(original,locale);
-      if(el.getAttribute(attr)!==translated) el.setAttribute(attr,translated);
-    }
-  });
-}
+function getServerLocale():Locale{return "de"}
 
 export default function LocaleProvider({children}:{children:React.ReactNode}){
-  const pathname=usePathname();
-  const [locale,setCurrent]=useState<Locale>("de");
-  const hydrated=useRef(false);
-  const observerRef=useRef<MutationObserver|null>(null);
+  // useSyncExternalStore gives React a deterministic SSR snapshot and switches to
+  // the persisted/browser locale only after hydration, without DOM mutation or
+  // synchronous setState inside an effect.
+  const locale=useSyncExternalStore(subscribeLocale,getLocale,getServerLocale);
 
-  useEffect(()=>{
-    const initial=getLocale();
-    // Keep SSR/hydration deterministic (German) and apply the persisted/browser locale
-    // immediately after hydration without a synchronous state update inside the effect.
-    const stateTimer=window.setTimeout(()=>setCurrent(initial),0);
-    document.documentElement.lang=initial==="de"?"de-CH":initial;
-    hydrated.current=true;
-    window.requestAnimationFrame(()=>translateNode(document.body,initial));
+  useEffect(()=>{document.documentElement.lang=locale==="de"?"de-CH":locale},[locale]);
 
-    // Translate only newly mounted hard-coded legacy nodes. Component text should use t().
-    const observer=new MutationObserver(mutations=>{
-        if(!hydrated.current) return;
-        const active=getLocale();
-        for(const mutation of mutations){
-          mutation.addedNodes.forEach(added=>{
-            if(added.nodeType===Node.ELEMENT_NODE){
-              translateNode(added as Element,active);
-            }else if(added.nodeType===Node.TEXT_NODE && added.parentNode){
-              translateNode(added.parentNode,active);
-            }
-          });
-        }
-    });
-    observer.observe(document.body,{subtree:true,childList:true});
-    observerRef.current=observer;
+  const value=useMemo<LocaleContextValue>(()=>({
+    locale,
+    setLocale:(next)=>persistLocale(next),
+    t:(text)=>translate(text,locale),
+    formatDate:(input,options)=>formatDateValue(input,locale,options),
+    formatDateTime:(input,options)=>formatDateTimeValue(input,locale,options),
+    formatTime:(input,options)=>formatTimeValue(input,locale,options),
+    formatNumber:(input,options)=>formatNumberValue(input,locale,options),
+    formatCurrency:(input,currency="CHF",options)=>formatCurrencyValue(input,locale,currency,options)
+  }),[locale]);
 
-    const listener=(e:Event)=>{
-      const l=(e as CustomEvent).detail.locale as Locale;
-      setCurrent(l);
-      document.documentElement.lang=l==="de"?"de-CH":l;
-      window.requestAnimationFrame(()=>translateNode(document.body,l));
-    };
-
-    window.addEventListener("binso-locale-changed",listener);
-    return()=>{
-      window.clearTimeout(stateTimer);
-      observerRef.current?.disconnect();
-      observerRef.current=null;
-      window.removeEventListener("binso-locale-changed",listener);
-    };
-  },[]);
-
-  useEffect(()=>{
-    if(!hydrated.current) return;
-    const timer=window.setTimeout(()=>translateNode(document.body,getLocale()),50);
-    return()=>window.clearTimeout(timer);
-  },[pathname]);
-
-  const value=useMemo<LocaleContextValue>(()=>({locale,setLocale:(l)=>{setLocale(l);setCurrent(l)},t:(text)=>translate(text,locale)}),[locale]);
-  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
 export function LanguageSwitcher({compact=false}:{compact?:boolean}){
   const {locale,setLocale,t}=useLocale();
   return <label className={compact?"language-switcher compact":"language-switcher"} aria-label={t("Sprache")}>
     {!compact&&<span>{t("Sprache")}</span>}
-    <select aria-label={t("Sprache")} value={locale} onChange={e=>setLocale(e.target.value as Locale)}>
-      {(Object.keys(localeLabels) as Locale[]).map(l=><option value={l} key={l}>{compact?localeLabels[l]:localeNames[l]}</option>)}
+    <select aria-label={t("Sprache")} value={locale} onChange={event=>setLocale(event.target.value as Locale)}>
+      {(Object.keys(localeLabels) as Locale[]).map(item=><option value={item} key={item}>{compact?localeLabels[item]:localeNames[item]}</option>)}
     </select>
-  </label>
+  </label>;
 }

@@ -4,6 +4,7 @@ import {useEffect,useId,useRef} from "react";
 import {createPortal} from "react-dom";
 import {X} from "lucide-react";
 import {useOverlayLock} from "@/hooks/use-overlay-lock";
+import {useLocale} from "@/components/locale-provider";
 
 type OverlaySize="sm"|"md"|"lg"|"document";
 type OverlayRole="dialog"|"alertdialog";
@@ -31,6 +32,7 @@ export default function ResponsiveOverlay({
   open,title,onClose,children,actions,ariaDescription,size="md",role="dialog",
   closeOnBackdrop=true,showHandle=true,className=""
 }:Props){
+  const {t}=useLocale();
   const titleId=useId();
   const descId=useId();
   const panelRef=useRef<HTMLElement>(null);
@@ -78,7 +80,7 @@ export default function ResponsiveOverlay({
       {showHandle&&<div className="ui-overlay-handle" aria-hidden="true"/>}
       <header className="ui-overlay-header">
         <h2 id={titleId}>{title}</h2>
-        <button ref={closeRef} className="ui-overlay-close" type="button" aria-label="Schliessen" onClick={onClose}><X size={18}/></button>
+        <button ref={closeRef} className="ui-overlay-close" type="button" aria-label={t("Schliessen")} onClick={onClose}><X size={18}/></button>
       </header>
       {ariaDescription&&<p id={descId} className="sr-only">{ariaDescription}</p>}
       <div className="ui-overlay-body">{children}</div>

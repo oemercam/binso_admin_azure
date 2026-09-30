@@ -1,5 +1,5 @@
-﻿export type PlanId = "start" | "business" | "pro";
-export type BillingCycle = "monthly" | "yearly";
+import type {PlanId} from "@/config/domain";
+export type {BillingCycle,PlanId} from "@/config/domain";
 
 export type PricingPlan = {
   id: PlanId;

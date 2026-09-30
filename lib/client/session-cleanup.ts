@@ -1,8 +1,12 @@
 "use client";
-const userScopedPrefixes=["binso-one-saas-","binso-one-local-","binso-local-","binso-data-","binso-records-"];
+import {getBrowserStorage} from "@/lib/client/browser-storage";
+import {storagePrefixes} from "@/config/storage-keys";
+import {emitAppEvent,appEvents} from "@/lib/client/app-events";
+const userScopedPrefixes=storagePrefixes.userScoped;
 export async function clearUserRuntimeState(){
- for(let i=localStorage.length-1;i>=0;i--){const key=localStorage.key(i);if(key&&userScopedPrefixes.some(prefix=>key.startsWith(prefix)))localStorage.removeItem(key)}
- sessionStorage.clear();
+ const local=getBrowserStorage("local");const session=getBrowserStorage("session");
+ if(local)for(let i=local.length-1;i>=0;i--){const key=local.key(i);if(key&&userScopedPrefixes.some(prefix=>key.startsWith(prefix)))local.removeItem(key)}
+ session?.clear();
  if("caches" in window){const keys=await caches.keys();await Promise.all(keys.filter(key=>/user|tenant|api/i.test(key)).map(key=>caches.delete(key)))}
- window.dispatchEvent(new Event("binso-session-cleared"));
+ emitAppEvent(appEvents.sessionCleared);
 }

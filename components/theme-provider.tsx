@@ -1,16 +1,27 @@
 "use client";
 
 import {createContext,useContext,useEffect,useMemo,useState} from "react";
+import {appEvents,emitAppEvent} from "@/lib/client/app-events";
+import {readTextStorage,writeTextStorage} from "@/lib/client/browser-storage";
+import {storageKeys} from "@/config/storage-keys";
 
 export type ThemePreference="system"|"light"|"dark";
 type ThemeContextValue={theme:ThemePreference;resolved:"light"|"dark";setTheme:(theme:ThemePreference)=>void};
 const ThemeContext=createContext<ThemeContextValue|null>(null);
-const STORAGE_KEY="binso-theme";
+const STORAGE_KEY=storageKeys.theme;
+const themes:ThemePreference[]=["system","light","dark"];
 
 function resolveTheme(theme:ThemePreference):"light"|"dark"{
  if(theme!=="system")return theme;
  if(typeof window==="undefined")return "light";
  return window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+}
+
+function applyTheme(theme:ThemePreference){
+ const resolved=resolveTheme(theme);
+ document.documentElement.dataset.theme=resolved;
+ document.documentElement.style.colorScheme=resolved;
+ return resolved;
 }
 
 export default function ThemeProvider({children}:{children:React.ReactNode}){
@@ -19,22 +30,21 @@ export default function ThemeProvider({children}:{children:React.ReactNode}){
  useEffect(()=>{
   const media=window.matchMedia("(prefers-color-scheme: dark)");
   let current:ThemePreference="system";
-  const apply=()=>{const next=resolveTheme(current);setResolved(next);document.documentElement.dataset.theme=next;document.documentElement.style.colorScheme=next};
   const timer=window.setTimeout(()=>{
-   const stored=localStorage.getItem(STORAGE_KEY) as ThemePreference|null;
-   current=stored&&["system","light","dark"].includes(stored)?stored:"system";
+   const stored=readTextStorage(STORAGE_KEY,"system") as ThemePreference;
+   current=themes.includes(stored)?stored:"system";
    setThemeState(current);
-   apply();
+   setResolved(applyTheme(current));
   },0);
-  const listener=()=>{if(current==="system")apply()};
+  const listener=()=>{if(current==="system")setResolved(applyTheme(current))};
   media.addEventListener("change",listener);
   return()=>{window.clearTimeout(timer);media.removeEventListener("change",listener)};
  },[]);
  function setTheme(next:ThemePreference){
-  localStorage.setItem(STORAGE_KEY,next);
+  writeTextStorage(STORAGE_KEY,next);
   setThemeState(next);
-  const value=resolveTheme(next);setResolved(value);document.documentElement.dataset.theme=value;document.documentElement.style.colorScheme=value;
-  window.dispatchEvent(new CustomEvent("binso-theme-changed",{detail:{theme:next,resolved:value}}));
+  const value=applyTheme(next);setResolved(value);
+  emitAppEvent(appEvents.themeChanged,{theme:next,resolved:value});
  }
  const value=useMemo(()=>({theme,resolved,setTheme}),[theme,resolved]);
  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

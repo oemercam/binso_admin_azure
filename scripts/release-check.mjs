@@ -5,11 +5,22 @@ const required=[
   "app/layout.tsx","app/robots.ts","app/sitemap.ts","public/manifest.webmanifest","public/manifest-site.webmanifest","public/manifest-portal.webmanifest","public/manifest-operator.webmanifest","public/favicon.ico",
   "app/portal/page.tsx","app/portal/layout.tsx","app/operator/layout.tsx","app/api/auth/demo/route.ts",
   "components/theme-provider.tsx","components/support/support-new.tsx",
+  "lib/document-number.ts",
   "components/security/account-security.tsx","components/notifications/notification-center.tsx",
   "app/api/health/route.ts","app/api/search/route.ts","app/api/files/route.ts","app/api/webhooks/stripe/route.ts",
   "database/migrations/008_locale_turkish.sql","database/migrations/009_platform_foundation.sql",
-  "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","hooks/use-overlay-lock.ts",
-  "config/app.ts","components/ui/responsive-overlay.tsx","scripts/rendering-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
+  "lib/i18n-dynamic.ts","styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","styles/primitives.css","hooks/use-overlay-lock.ts",
+  "config/domain.ts",
+  "config/accounting.ts",
+  "config/storage-keys.ts",
+  "config/ui.ts",
+  "config/limits.ts",
+  "config/entity-forms.ts",
+  "lib/documents/calculations.ts",
+  "lib/documents/defaults.ts",
+  "scripts/architecture-hardcoding-selfcheck.mjs",
+  "lib/demo/pilot-fixtures.ts",
+  "config/app.ts","components/ui/responsive-overlay.tsx","components/workspace-runtime.tsx","lib/i18n-app.ts","scripts/rendering-selfcheck.mjs","scripts/ui-standards-selfcheck.mjs","scripts/runtime-boundary-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
@@ -34,12 +45,12 @@ const i18n=fs.readFileSync("lib/i18n.ts","utf8");
 for(const locale of ['"de"','"en"','"fr"','"it"','"tr"'])if(!i18n.includes(locale))throw new Error(`Locale ${locale} missing`);
 
 const tokens=fs.readFileSync("styles/tokens.css","utf8");
-const appCss=fs.readFileSync("styles/app.css","utf8");
 const responsive=fs.readFileSync("styles/responsive-central.css","utf8");
 const overlays=fs.readFileSync("styles/overlays.css","utf8");
 const shellCss=fs.readFileSync("styles/shell.css","utf8");
+const primitives=fs.readFileSync("styles/primitives.css","utf8");
 for(const marker of ["--safe-top","--surface-0","--z-overlay","--page-gutter-mobile"]){if(!tokens.includes(marker))throw new Error(`Token baseline missing ${marker}`)}
-for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!appCss.includes(marker))throw new Error(`Application CSS baseline missing ${marker}`)}
+for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!primitives.includes(marker))throw new Error(`Primitive CSS baseline missing ${marker}`)}
 for(const marker of ["pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
 for(const marker of ["marketing-menu-button","marketing-mobile-menu","marketing-footer",".topbar",".mobile-nav"]){if(!shellCss.includes(marker))throw new Error(`Shell baseline missing ${marker}`)}
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","@media print"]){if(!overlays.includes(marker))throw new Error(`Overlay baseline missing ${marker}`)}

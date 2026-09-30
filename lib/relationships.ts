@@ -4,6 +4,8 @@ import { getModule, type ModuleKey } from "@/lib/modules";
 import { listLocalRecords, parseMoney, type LocalRecord } from "@/lib/local-store";
 import { listAppRecords } from "@/lib/client/data-service";
 import { isProductionMode } from "@/lib/client/runtime";
+import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
+import {domainConfig} from "@/config/domain";
 
 export type EntityOption = {
   id: string;
@@ -17,7 +19,7 @@ export type EntityOption = {
 
 function seedOptions(module:ModuleKey):EntityOption[]{
   const config=getModule(module);
-  return (config.rows||[]).map((row,index)=>({
+  return getDemoModuleSeed(module).rows.map((row,index)=>({
     id:`seed:${module}:${index+1}`,
     module,
     label:row[0]||`${config.label} ${index+1}`,
@@ -79,7 +81,7 @@ export function customerDefaults(option?:EntityOption){
     address:f["Strasse und Nr."]||f["Adresse"]||"",
     zipCity:f["PLZ / Ort"]||"",
     uid:f["UID"]||"",
-    paymentDays:f["Zahlungsfrist"]||"30",
+    paymentDays:f["Zahlungsfrist"]||String(domainConfig.defaultPaymentDays),
     language:f["Sprache"]||"Deutsch",
     discount:f["Rabatt %"]||"0"
   };
@@ -95,7 +97,7 @@ export function supplierDefaults(option?:EntityOption){
     email:f["E-Mail"]||"",
     address:f["Adresse"]||"",
     iban:f["IBAN"]||"",
-    paymentDays:f["Zahlungsfrist"]||"30"
+    paymentDays:f["Zahlungsfrist"]||String(domainConfig.defaultPaymentDays)
   };
 }
 
@@ -107,7 +109,7 @@ export function productDefaults(option?:EntityOption){
     description:option.label,
     unit:f["Einheit"]||"Stunde",
     unitPrice:parseMoney(f["Preis CHF"]||f["Preis"]||option.record?.row[3]||"0"),
-    vatRate:Number(String(f["MWST %"]||"8.1").replace(",", "."))||8.1
+    vatRate:Number(String(f["MWST %"]||domainConfig.defaultVatRate).replace(",", "."))||domainConfig.defaultVatRate
   };
 }
 

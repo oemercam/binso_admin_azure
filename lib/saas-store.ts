@@ -1,7 +1,13 @@
 "use client";
+import {storageKeys} from "@/config/storage-keys";
 
-export type PlanId = "start" | "business" | "pro";
-export type BillingCycle = "monthly" | "yearly";
+import {addDays,addHours,domainConfig} from "@/config/domain";
+import {plans} from "@/lib/plans";
+import {appEvents,emitAppEvent} from "@/lib/client/app-events";
+import {readJsonStorage,removeStorage,writeJsonStorage} from "@/lib/client/browser-storage";
+export type {BillingCycle,PlanId} from "@/config/domain";
+import type {BillingCycle,PlanId} from "@/config/domain";
+export {plans};
 
 export type SaasUser = {
   id: string;
@@ -37,44 +43,19 @@ export type SaasSession = {
   role: SaasUser["role"];
 };
 
-const ORGS_KEY = "binso-one-saas-orgs-v1";
-const USERS_KEY = "binso-one-saas-users-v1";
-const SESSION_KEY = "binso-one-saas-session-v1";
+const ORGS_KEY = storageKeys.saasOrganizations;
+const USERS_KEY = storageKeys.saasUsers;
+const SESSION_KEY = storageKeys.saasSession;
 
-function read<T>(key:string, fallback:T):T {
-  if (typeof window === "undefined") return fallback;
-  try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) as T; }
-  catch { return fallback; }
-}
-function write<T>(key:string, value:T){
-  localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new CustomEvent("binso-saas-changed"));
-}
-
-export const plans = [
-  {
-    id:"start" as PlanId, name:"Start", monthly:29, yearly:290,
-    description:"Für Selbstständige und kleine Teams, die Verkauf und Administration zentralisieren möchten.",
-    features:["Kunden und Kontakte","Offerten und Rechnungen","Zeiterfassung und Spesen","Projekte","Basisberichte","1 Firma · bis 3 Benutzer"]
-  },
-  {
-    id:"business" as PlanId, name:"Business", monthly:69, yearly:690, popular:true,
-    description:"Für KMU mit Team, Personal, Einkauf und erweiterten Finanzprozessen.",
-    features:["Alles aus Start","Lieferanten und Eingangsrechnungen","Personal und Abwesenheiten","MWST und Buchhaltungsübersicht","Produkte und Leistungen","bis 15 Benutzer"]
-  },
-  {
-    id:"pro" as PlanId, name:"Pro", monthly:129, yearly:1290,
-    description:"Für wachsende Unternehmen mit mehreren Bereichen, Rollen und erweiterten Kontrollen.",
-    features:["Alles aus Business","Lohn-Demo und Freigaben","Verträge und Dokumente","Erweiterte Rollen und Audit","Priorisierter Support","unbegrenzte Benutzer"]
-  }
-];
+function read<T>(key:string,fallback:T):T{return readJsonStorage(key,fallback)}
+function write<T>(key:string,value:T){writeJsonStorage(key,value);emitAppEvent(appEvents.saasChanged)}
 
 export function getOrganizations(){ return read<SaasOrg[]>(ORGS_KEY, []); }
 export function getUsers(){ return read<SaasUser[]>(USERS_KEY, []); }
 export function getSession(){ return read<SaasSession | null>(SESSION_KEY, null); }
 export function setSession(v:SaasSession|null){
   if(v) write(SESSION_KEY,v);
-  else { localStorage.removeItem(SESSION_KEY); window.dispatchEvent(new CustomEvent("binso-saas-changed")); }
+  else { removeStorage(SESSION_KEY); emitAppEvent(appEvents.saasChanged); }
 }
 export function getOrganization(id:string){ return getOrganizations().find(o=>o.id===id); }
 
@@ -91,7 +72,7 @@ export function createAccount(input:{
     plan:input.plan,
     billingCycle:input.billingCycle,
     subscriptionStatus:input.trial?"trial":"active",
-    trialEndsAt:input.trial?new Date(now.getTime()+14*86400000).toISOString():undefined,
+    trialEndsAt:input.trial?addDays(now,domainConfig.trialDays).toISOString():undefined,
     onboardingComplete:false,
     createdAt:now.toISOString()
   };
@@ -111,7 +92,7 @@ export function createDemoAccount(){
   if(existing){
     const org=getOrganization(existing.orgId);
     if(org){
-      const updated=updateOrganization(org.id,{onboardingComplete:true,trialEndsAt:new Date(Date.now()+24*60*60*1000).toISOString()})||org;
+      const updated=updateOrganization(org.id,{onboardingComplete:true,trialEndsAt:addHours(new Date(),domainConfig.demoSessionHours).toISOString()})||org;
       const session:SaasSession={userId:existing.id,orgId:updated.id,email:existing.email,name:existing.name,role:existing.role};
       setSession(session); return {org:updated,user:existing,session};
     }
@@ -120,7 +101,7 @@ export function createDemoAccount(){
     name:"Demo Benutzer",email:"demo@binso.local",password:"demo1234",
     company:"Binso Demo AG",plan:"business",billingCycle:"monthly",trial:true
   });
-  const org=updateOrganization(created.org.id,{onboardingComplete:true,trialEndsAt:new Date(Date.now()+24*60*60*1000).toISOString()})||created.org;
+  const org=updateOrganization(created.org.id,{onboardingComplete:true,trialEndsAt:addHours(new Date(),domainConfig.demoSessionHours).toISOString()})||created.org;
   return {...created,org};
 }
 

@@ -1,4 +1,5 @@
 import {NextRequest} from "next/server";
+import {limitsConfig,megabytes} from "@/config/limits";
 import {randomUUID} from "node:crypto";
 import {requireSession} from "@/lib/server/session";
 import {authorize} from "@/lib/server/rbac";
@@ -15,7 +16,7 @@ export async function POST(request:NextRequest){
   const s=await requireSession();authorize(s,"support:write");
   const form=await request.formData();const file=form.get("file");
   if(!(file instanceof File))return json({error:"Datei fehlt."},400);
-  if(file.size>10*1024*1024)return json({error:"Datei ist grösser als 10 MB."},413);
+  if(file.size>limitsConfig.maxFileUploadBytes)return json({error:`Datei ist grösser als ${megabytes(limitsConfig.maxFileUploadBytes)} MB.`},413);
   if(!allowed.has(file.type))return json({error:"Dateityp ist nicht erlaubt."},400);
   const id=randomUUID();const ext=(file.name.split(".").pop()||"bin").replace(/[^a-zA-Z0-9]/g,"").slice(0,8);
   const storagePath=`support/${s.organizationId}/attachments/${id}.${ext}`;

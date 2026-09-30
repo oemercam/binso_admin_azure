@@ -1,3 +1,4 @@
+import {limitsConfig} from "@/config/limits";
 import "server-only";
 import {createHmac,timingSafeEqual} from "node:crypto";
 import {env} from "@/lib/server/env";
@@ -13,6 +14,6 @@ export async function updateSubscription(input:{subscriptionId:string;cancelAtPe
 export function verifyStripeSignature(payload:string,signatureHeader:string){
  if(!env.stripeWebhookSecret)throw new Error("Stripe webhook is not configured.");
  const fields=signatureHeader.split(",").map(x=>x.split("=",2) as [string,string]);const timestamp=fields.find(([k])=>k==="t")?.[1];const signatures=fields.filter(([k])=>k==="v1").map(([,v])=>v);if(!timestamp||!signatures.length)return false;
- if(Math.abs(Date.now()/1000-Number(timestamp))>300)return false;
+ if(Math.abs(Date.now()/1000-Number(timestamp))>limitsConfig.stripeWebhookToleranceSeconds)return false;
  const expected=createHmac("sha256",env.stripeWebhookSecret).update(`${timestamp}.${payload}`,"utf8").digest("hex");const a=Buffer.from(expected,"hex");return signatures.some(sig=>{try{const b=Buffer.from(sig,"hex");return a.length===b.length&&timingSafeEqual(a,b)}catch{return false}})
 }

@@ -3,6 +3,8 @@ import Link from "next/link";
 import BrandLogo from "@/components/ui/brand-logo";
 import {useLocale} from "@/components/locale-provider";
 
+const currentYear=new Date().getFullYear();
+
 export default function MarketingFooter(){
  const {t}=useLocale();
  return <footer className="marketing-footer">
@@ -22,7 +24,7 @@ export default function MarketingFooter(){
     </nav>
    </div>
    <div className="marketing-footer-bottom">
-    <small>© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
+    <small>© {currentYear} <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
    </div>
   </div>
 
@@ -36,7 +38,7 @@ export default function MarketingFooter(){
     <span aria-hidden="true">·</span>
     <Link href="/impressum">{t("Impressum")}</Link>
    </nav>
-   <small className="marketing-footer-mobile-copyright">© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
+   <small className="marketing-footer-mobile-copyright">© {currentYear} <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
   </div>
  </footer>;
 }

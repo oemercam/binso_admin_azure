@@ -1,3 +1,5 @@
 "use client";
 import {useEffect,useState} from "react";
-export default function PwaUpdateNotice(){const [ready,setReady]=useState(false);useEffect(()=>{const h=()=>setReady(true);window.addEventListener("binso-pwa-update",h);return()=>window.removeEventListener("binso-pwa-update",h)},[]);if(!ready)return null;return <div className="pwa-update-notice" role="status"><span>Neue Version verfügbar.</span><button type="button" onClick={()=>window.dispatchEvent(new Event("binso-pwa-apply-update"))}>Aktualisieren</button></div>}
+import {useLocale} from "@/components/locale-provider";
+import {appEvents,emitAppEvent,subscribeAppEvent} from "@/lib/client/app-events";
+export default function PwaUpdateNotice(){const {t}=useLocale();const [ready,setReady]=useState(false);useEffect(()=>subscribeAppEvent(appEvents.pwaUpdateAvailable,()=>setReady(true)),[]);if(!ready)return null;return <div className="pwa-update-notice" role="status"><span>{t("Neue Version verfügbar.")}</span><button type="button" onClick={()=>emitAppEvent(appEvents.pwaApplyUpdate)}>{t("Aktualisieren")}</button></div>}

@@ -1,12 +1,15 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import {useLocale} from "@/components/locale-provider";
 import {RefreshCw} from "lucide-react";
+import {apiPublicFetch} from "@/lib/client/runtime";
+import {Button} from "@/components/ui/button";
 type Health={status:"ok"|"degraded";service:string;mode:string;database:"disabled"|"ok"|"error";timestamp:string};
 type State={loading:boolean;health:Health|null;error:boolean};
-export default function StatusClient(){
+export default function StatusClient(){const {t,formatDateTime}=useLocale();
  const [state,setState]=useState<State>({loading:true,health:null,error:false});
- const load=useCallback(async()=>{setState(x=>({...x,loading:true}));try{const r=await fetch("/api/health",{cache:"no-store"});const data=await r.json() as Health;setState({loading:false,health:data,error:!r.ok})}catch{setState({loading:false,health:null,error:true})}},[]);
- useEffect(()=>{const t=window.setTimeout(()=>void load(),0);return()=>window.clearTimeout(t)},[load]);
+ const load=useCallback(async()=>{setState(x=>({...x,loading:true}));try{const {ok,body}=await apiPublicFetch<Health>("/api/health",{cache:"no-store"});setState({loading:false,health:body,error:!ok})}catch{setState({loading:false,health:null,error:true})}},[]);
+ useEffect(()=>{const timer=window.setTimeout(()=>void load(),0);return()=>window.clearTimeout(timer)},[load]);
  const appOk=!state.error&&Boolean(state.health);const db=state.health?.database;const overall=appOk&&db!=="error";
  const rows=[
   {label:"Web-Anwendung",value:appOk?"Betriebsbereit":"Nicht erreichbar",ok:appOk},
@@ -17,9 +20,9 @@ export default function StatusClient(){
   {label:"Support",value:"Über Anwendungsstatus überwacht",ok:appOk},
  ];
  return <>
-  <div className={overall?"status-ok":"status-ok degraded"}><i/>{state.loading?"Status wird geprüft …":overall?"Keine bekannte Kernstörung":"Beeinträchtigung erkannt"}</div>
-  <div className="status-page-title"><div><h1>Binso One Status</h1><p>Live-Prüfung der öffentlich messbaren Kernkomponenten. Nicht öffentlich geprüfte Dienste werden bewusst nicht als «betriebsbereit» behauptet.</p></div><button className="secondary-button" onClick={()=>void load()} disabled={state.loading}><RefreshCw size={15}/>{state.loading?"Prüft …":"Neu prüfen"}</button></div>
-  <section className="status-services">{rows.map(x=><div key={x.label}><span>{x.label}</span><strong className={x.neutral?"neutral":x.ok?"":"degraded"}><i/>{x.value}</strong></div>)}</section>
-  <section className="workspace-card"><h2>Geplante Wartungen</h2><p>Zurzeit sind keine öffentlichen Wartungsfenster angekündigt.</p>{state.health?.timestamp&&<small>Letzte technische Prüfung: {new Date(state.health.timestamp).toLocaleString("de-CH")}</small>}</section>
+  <div className={overall?"status-ok":"status-ok degraded"}><i/>{state.loading?t("Status wird geprüft …"):overall?t("Keine bekannte Kernstörung"):t("Beeinträchtigung erkannt")}</div>
+  <div className="status-page-title"><div><h1>{t("Binso One Status")}</h1><p>{t("Live-Prüfung der öffentlich messbaren Kernkomponenten. Nicht öffentlich geprüfte Dienste werden bewusst nicht als «betriebsbereit» behauptet.")}</p></div><Button variant="secondary" onClick={()=>void load()} disabled={state.loading} icon={<RefreshCw size={15}/>}>{state.loading?t("Prüft …"):t("Neu prüfen")}</Button></div>
+  <section className="status-services">{rows.map(x=><div key={x.label}><span>{t(x.label)}</span><strong className={x.neutral?"neutral":x.ok?"":"degraded"}><i/>{t(x.value)}</strong></div>)}</section>
+  <section className="workspace-card"><h2>{t("Geplante Wartungen")}</h2><p>{t("Zurzeit sind keine öffentlichen Wartungsfenster angekündigt.")}</p>{state.health?.timestamp&&<small>{t("Letzte technische Prüfung")}: {formatDateTime(state.health.timestamp)}</small>}</section>
  </>
 }

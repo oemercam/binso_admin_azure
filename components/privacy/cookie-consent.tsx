@@ -7,13 +7,14 @@ import ToggleSwitch from "@/components/ui/toggle-switch";
 import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import {Button} from "@/components/ui/button";
 import {useLocale} from "@/components/locale-provider";
+import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
 
 export default function CookieConsent(){
  const {t}=useLocale();
  const [open,setOpen]=useState(false);
  const [details,setDetails]=useState(false);
  const [analytics,setAnalytics]=useState(false);
- useEffect(()=>{const timer=window.setTimeout(()=>{const consent=loadConsent();if(!consent)setOpen(true);else setAnalytics(consent.analytics)},250);const handler=()=>{const consent=loadConsent();setAnalytics(Boolean(consent?.analytics));setOpen(true);setDetails(true)};window.addEventListener("binso-open-consent",handler);return()=>{window.clearTimeout(timer);window.removeEventListener("binso-open-consent",handler)}},[]);
+ useEffect(()=>{const timer=window.setTimeout(()=>{const consent=loadConsent();if(!consent)setOpen(true);else setAnalytics(consent.analytics)},250);const handler=()=>{const consent=loadConsent();setAnalytics(Boolean(consent?.analytics));setOpen(true);setDetails(true)};const unsubscribe=subscribeAppEvent(appEvents.openConsent,handler);return()=>{window.clearTimeout(timer);unsubscribe()}},[]);
  const commit=(value:boolean)=>{saveConsent({analytics:value});setOpen(false);setDetails(false)};
  return <ResponsiveOverlay
    open={open}

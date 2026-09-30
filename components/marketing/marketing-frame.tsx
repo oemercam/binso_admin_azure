@@ -8,6 +8,7 @@ import {LanguageSwitcher,useLocale} from "@/components/locale-provider";
 import MarketingMenuButton from "@/components/marketing/marketing-menu-button";
 import MarketingFooter from "@/components/marketing/marketing-footer";
 import {ArrowRight} from "lucide-react";
+import {useOverlayLock} from "@/hooks/use-overlay-lock";
 
 export default function MarketingFrame({children}:{children:React.ReactNode}){
  const pathname=usePathname();
@@ -15,18 +16,16 @@ export default function MarketingFrame({children}:{children:React.ReactNode}){
  const menuOpen=menuPath===pathname;
  const menuRef=useRef<HTMLElement|null>(null);
  const {t}=useLocale();
+ useOverlayLock(menuOpen);
 
  useEffect(()=>{
   document.body.classList.toggle("marketing-menu-open",menuOpen);
   if(!menuOpen)return()=>document.body.classList.remove("marketing-menu-open");
-  const previousOverflow=document.documentElement.style.overflow;
-  document.documentElement.style.overflow="hidden";
   const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape")setMenuPath(null)};
   window.addEventListener("keydown",onKey);
   window.requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLAnchorElement>("nav a")?.focus());
   return()=>{
    document.body.classList.remove("marketing-menu-open");
-   document.documentElement.style.overflow=previousOverflow;
    window.removeEventListener("keydown",onKey);
   };
  },[menuOpen]);

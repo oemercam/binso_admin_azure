@@ -1,4 +1,6 @@
 "use client";
+import {storageKeys} from "@/config/storage-keys";
+import {getBrowserStorage,readJsonStorage,writeJsonStorage} from "@/lib/client/browser-storage";
 
 export type SupportEvent={at:string;type:string;message:string;path?:string};
 export type SupportDiagnostics={
@@ -18,7 +20,7 @@ export type SupportDiagnostics={
   recentEvents:SupportEvent[];
 };
 
-const EVENT_KEY="binso-support-events";
+const EVENT_KEY=storageKeys.supportEvents;
 const MAX_EVENTS=50;
 
 function redact(input:string){
@@ -30,16 +32,15 @@ function redact(input:string){
 
 export function recordSupportEvent(type:string,message:string){
   if(typeof window==="undefined")return;
-  try{
-    const current=JSON.parse(sessionStorage.getItem(EVENT_KEY)||"[]") as SupportEvent[];
-    const next=[...current,{at:new Date().toISOString(),type,message:redact(String(message)).slice(0,500),path:window.location.pathname}].slice(-MAX_EVENTS);
-    sessionStorage.setItem(EVENT_KEY,JSON.stringify(next));
-  }catch{}
+  const storage=getBrowserStorage("session");
+  const current=readJsonStorage<SupportEvent[]>(EVENT_KEY,[],storage);
+  const next=[...current,{at:new Date().toISOString(),type,message:redact(String(message)).slice(0,500),path:window.location.pathname}].slice(-MAX_EVENTS);
+  writeJsonStorage(EVENT_KEY,next,storage);
 }
 
 export function recentSupportEvents(){
   if(typeof window==="undefined")return [] as SupportEvent[];
-  try{return (JSON.parse(sessionStorage.getItem(EVENT_KEY)||"[]") as SupportEvent[]).slice(-MAX_EVENTS)}catch{return []}
+  return readJsonStorage<SupportEvent[]>(EVENT_KEY,[],getBrowserStorage("session")).slice(-MAX_EVENTS)
 }
 
 export function collectSupportDiagnostics():SupportDiagnostics{

@@ -14,11 +14,12 @@
     "db:check": "node scripts/check-db.mjs",
     "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
     "permissions:test": "node scripts/permission-selfcheck.mjs",
-    "test": "node scripts/architecture-selfcheck.mjs && node scripts/ui-consistency-selfcheck.mjs && node scripts/rendering-selfcheck.mjs && node scripts/content-selfcheck.mjs && node scripts/i18n-mobile-selfcheck.mjs && node scripts/trial-demo-selfcheck.mjs && node scripts/overlay-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/production-selfcheck.mjs && node scripts/plan-demo-selfcheck.mjs",
+    "test": "node scripts/architecture-selfcheck.mjs && node scripts/ui-consistency-selfcheck.mjs && node scripts/rendering-selfcheck.mjs && node scripts/content-selfcheck.mjs && node scripts/i18n-mobile-selfcheck.mjs && node scripts/ui-standards-selfcheck.mjs && node scripts/architecture-hardcoding-selfcheck.mjs && node scripts/runtime-boundary-selfcheck.mjs && node scripts/trial-demo-selfcheck.mjs && node scripts/overlay-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/production-selfcheck.mjs && node scripts/plan-demo-selfcheck.mjs",
     "tenant:test": "node scripts/tenant-isolation-check.mjs",
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
-    "architecture:check": "node scripts/architecture-selfcheck.mjs"
+    "architecture:check": "node scripts/architecture-selfcheck.mjs",
+    "architecture:hardcoding": "node scripts/architecture-hardcoding-selfcheck.mjs"
   },
   "dependencies": {
     "next": "16.3.6",

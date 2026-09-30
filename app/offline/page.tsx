@@ -1,1 +1,2 @@
-import Link from "next/link"; export default function Page(){return <main className="system-page"><div className="system-card"><div className="system-code">OFFLINE</div><h1>Offline</h1><p>Keine Internetverbindung.</p><Link href="/" className="primary-inline">Zur Startseite</Link></div></main>}
+import SystemPage from "@/components/system-page";
+export default function Page(){return <SystemPage code="OFFLINE" title="Offline" text="Keine Internetverbindung."/>}

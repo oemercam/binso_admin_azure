@@ -1,9 +1,16 @@
 "use client";
 
+import {appEvents,emitAppEvent} from "@/lib/client/app-events";
+import {readTextStorage,writeTextStorage} from "@/lib/client/browser-storage";
+import {storageKeys} from "@/config/storage-keys";
+
+import {appTranslations,extraTranslations} from "@/lib/i18n-app";
+import {dynamicTranslations} from "@/lib/i18n-dynamic";
+
 export type Locale = "de" | "en" | "fr" | "it" | "tr";
 export const localeLabels:Record<Locale,string>={de:"DE",en:"EN",fr:"FR",it:"IT",tr:"TR"};
 export const localeNames:Record<Locale,string>={de:"Deutsch",en:"English",fr:"Français",it:"Italiano",tr:"Türkçe"};
-const KEY="binso-one-locale-v1";
+const KEY=storageKeys.locale;
 
 const en:Record<string,string>={
 "Übersicht":"Overview","Verkauf":"Sales","Projekte":"Projects","Einkauf":"Purchasing","Finanzen":"Finance","Personal":"HR","Stammdaten":"Master data","System":"System",
@@ -244,6 +251,19 @@ Object.assign(trDict,{
 "Klare Pläne pro Firma. Wähle den Funktionsumfang, den du heute brauchst, und wechsle später bei Bedarf.":"Şirket başına net planlar. Bugün gereken işlevleri seçin, ihtiyaç olduğunda daha sonra değiştirin."
 });
 
+Object.assign(en,appTranslations.en);
+Object.assign(en,extraTranslations.en);
+Object.assign(en,dynamicTranslations.en);
+Object.assign(fr,appTranslations.fr);
+Object.assign(fr,extraTranslations.fr);
+Object.assign(fr,dynamicTranslations.fr);
+Object.assign(it,appTranslations.it);
+Object.assign(it,extraTranslations.it);
+Object.assign(it,dynamicTranslations.it);
+Object.assign(trDict,appTranslations.tr);
+Object.assign(trDict,extraTranslations.tr);
+Object.assign(trDict,dynamicTranslations.tr);
+
 const dictionaries={en,fr,it,tr:trDict};
 
 const commonWords:Record<Exclude<Locale,"de">,Record<string,string>>={
@@ -266,40 +286,23 @@ export function getBrowserLocale():Locale{
 }
 export function getLocale():Locale{
  if(typeof window==="undefined") return "de";
- try{
-  const saved=localStorage.getItem(KEY) as Locale|null;
-  if(saved&&supportedLocales.includes(saved))return saved;
- }catch{}
+ const saved=readTextStorage(KEY,"") as Locale;
+ if(saved&&supportedLocales.includes(saved))return saved;
  return getBrowserLocale();
 }
 export function setLocale(locale:Locale){
- try{localStorage.setItem(KEY,locale)}catch{}
- window.dispatchEvent(new CustomEvent("binso-locale-changed",{detail:{locale}}));
+ writeTextStorage(KEY,locale);
+ emitAppEvent(appEvents.localeChanged,{locale});
 }
-export function sourceText(input:string):string{
- if(!input)return input;
+export function translate(input:string, locale:Locale):string{
+ if(!input||locale==="de")return input;
+ const dict=dictionaries[locale];
  const match=input.match(/^(\s*)([\s\S]*?)(\s*)$/);
  const leading=match?.[1]||"";
  const core=match?.[2]||input;
  const trailing=match?.[3]||"";
- for(const locale of ["en","fr","it","tr"] as const){
-  for(const [source,translated] of Object.entries(dictionaries[locale]))if(translated===core)return `${leading}${source}${trailing}`;
-  for(const [source,translated] of Object.entries(commonWords[locale]))if(translated===core)return `${leading}${source}${trailing}`;
- }
- return input;
-}
-export function translate(input:string, locale:Locale):string{
- if(!input)return input;
- const canonical=sourceText(input);
- if(locale==="de")return canonical;
- const dict=dictionaries[locale];
- const match=canonical.match(/^(\s*)([\s\S]*?)(\s*)$/);
- const leading=match?.[1]||"";
- const core=match?.[2]||canonical;
- const trailing=match?.[3]||"";
  const direct=dict[core]||commonWords[locale][core];
- if(direct) return `${leading}${direct}${trailing}`;
- return canonical;
+ return direct?`${leading}${direct}${trailing}`:input;
 }
 export function tr(key:string, locale:Locale=getLocale()){return translate(key,locale)}
 
@@ -342,3 +345,30 @@ Object.assign(fr,{"Binso One verbindet die wichtigsten administrativen Prozesse 
 Object.assign(it,{"Binso One verbindet die wichtigsten administrativen Prozesse eines Schweizer KMU. Informationen werden zwischen den Modulen weiterverwendet, statt mehrfach erfasst.":"Binso One collega i principali processi amministrativi di una PMI svizzera. Le informazioni vengono riutilizzate tra i moduli invece di essere inserite più volte.","Einrichtung abbrechen":"Annulla configurazione","Ja. Die Demo funktioniert ohne Registrierung und ohne Kreditkarte. Zusätzlich kannst du eine eigene Testorganisation starten.":"Sì. La demo funziona senza registrazione e senza carta di credito. Puoi anche avviare una tua organizzazione di prova.","Jede Organisation arbeitet in einem eigenen Mandanten. Rollen und Berechtigungen werden serverseitig geprüft, wichtige Aktionen nachvollziehbar protokolliert und Betreiberzugriffe von Kundenzugriffen getrennt.":"Ogni organizzazione lavora nel proprio tenant. Ruoli e autorizzazioni vengono verificati lato server, le azioni importanti vengono registrate in modo tracciabile e gli accessi operatore sono separati da quelli dei clienti.","Kunden, Dokumente und Leistungen bleiben miteinander verknüpft, damit der nächste Schritt auf vorhandenen Daten aufbaut.":"Clienti, documenti e prestazioni restano collegati affinché il passo successivo possa basarsi sui dati esistenti.","Onboarding abbrechen":"Annulla onboarding","Onboarding wirklich abbrechen?":"Vuoi davvero annullare l’onboarding?"});
 
 Object.assign(trDict,{"Binso One verbindet die wichtigsten administrativen Prozesse eines Schweizer KMU. Informationen werden zwischen den Modulen weiterverwendet, statt mehrfach erfasst.":"Binso One, İsviçre’deki bir KOBİ’nin temel idari süreçlerini birbirine bağlar. Bilgiler tekrar tekrar girilmek yerine modüller arasında yeniden kullanılır.","Einrichtung abbrechen":"Kurulumu iptal et","Ja. Die Demo funktioniert ohne Registrierung und ohne Kreditkarte. Zusätzlich kannst du eine eigene Testorganisation starten.":"Evet. Demo kayıt ve kredi kartı olmadan çalışır. Ayrıca kendi deneme organizasyonunuzu da başlatabilirsiniz.","Jede Organisation arbeitet in einem eigenen Mandanten. Rollen und Berechtigungen werden serverseitig geprüft, wichtige Aktionen nachvollziehbar protokolliert und Betreiberzugriffe von Kundenzugriffen getrennt.":"Her kuruluş kendi tenantında çalışır. Roller ve yetkiler sunucu tarafında kontrol edilir, önemli işlemler izlenebilir şekilde kaydedilir ve operatör erişimleri müşteri erişimlerinden ayrılır.","Kunden, Dokumente und Leistungen bleiben miteinander verknüpft, damit der nächste Schritt auf vorhandenen Daten aufbaut.":"Müşteriler, belgeler ve hizmetler birbirine bağlı kalır; böylece sonraki adım mevcut verilere dayanır.","Onboarding abbrechen":"Onboarding’i iptal et","Onboarding wirklich abbrechen?":"Onboarding gerçekten iptal edilsin mi?"});
+
+/* Core application UI translations — standardized React-driven surfaces. */
+Object.assign(en,{
+"Ablehnen":"Reject","Abschliessen":"Complete","Aktivität":"Activity","Aktueller Stand":"Current status","Alle":"All","Ansicht":"View","Ansicht wechseln":"Switch view","Archivieren":"Archive","Aufgabe oder Meilenstein …":"Task or milestone …","Aufgaben und Meilensteine":"Tasks and milestones","Auftrag starten":"Start order","Bankimport Demo":"Demo bank import","Bestätigung drucken":"Print confirmation","Budget":"Budget","Datensatz geöffnet und geprüft.":"Record opened and reviewed.","Dokument anhängen":"Attach document","Drucken":"Print","Erfassen":"Add","Erfasster Aufwand":"Recorded effort","Export":"Export","Ferien und Abwesenheiten":"Leave and absences","Filter":"Filter","Kontakte":"Contacts","Link kopieren":"Copy link","Live-Timer":"Live timer","Noch keine Aufgaben vorhanden.":"No tasks yet.","Noch keine Einträge. Nutzen Sie die Aktion oben, um den ersten Datensatz zu erfassen.":"No entries yet. Use the action above to create the first record.","Noch keine verknüpften Vorgänge.":"No linked records yet.","Notiz hinzufügen …":"Add note …","Notizen":"Notes","PDF-Beleg öffnen":"Open PDF receipt","Projekt abschliessen":"Complete project","Projekt starten":"Start project","Projekt: Intern · Leistung: Live-Timer":"Project: Internal · Service: Live timer","Rückzahlung erfassen":"Record refund","Stammdaten vorhanden.":"Master data available.","Stop & speichern":"Stop & save","Verknüpfte Vorgänge":"Linked records","Verlauf":"History","Vorgang bereit.":"Process ready.","Weiterverrechnen":"Bill onward","Workflow":"Workflow","Zurück zu":"Back to","Zurückweisen":"Reject","bearbeiten":"edit","durchsuchen …":"search …","lokal":"local","lokal bearbeitet":"edited locally","lokal gespeichert":"stored locally"
+});
+Object.assign(fr,{
+"Ablehnen":"Refuser","Abschliessen":"Terminer","Aktivität":"Activité","Aktueller Stand":"État actuel","Alle":"Tous","Ansicht":"Vue","Ansicht wechseln":"Changer de vue","Archivieren":"Archiver","Aufgabe oder Meilenstein …":"Tâche ou jalon …","Aufgaben und Meilensteine":"Tâches et jalons","Auftrag starten":"Démarrer la commande","Bankimport Demo":"Import bancaire démo","Bestätigung drucken":"Imprimer la confirmation","Budget":"Budget","Datensatz geöffnet und geprüft.":"Enregistrement ouvert et vérifié.","Dokument anhängen":"Joindre un document","Drucken":"Imprimer","Erfassen":"Saisir","Erfasster Aufwand":"Effort saisi","Export":"Exporter","Ferien und Abwesenheiten":"Vacances et absences","Filter":"Filtre","Kontakte":"Contacts","Link kopieren":"Copier le lien","Live-Timer":"Minuteur en direct","Noch keine Aufgaben vorhanden.":"Aucune tâche pour le moment.","Noch keine Einträge. Nutzen Sie die Aktion oben, um den ersten Datensatz zu erfassen.":"Aucune entrée. Utilisez l’action ci-dessus pour créer le premier enregistrement.","Noch keine verknüpften Vorgänge.":"Aucun enregistrement lié.","Notiz hinzufügen …":"Ajouter une note …","Notizen":"Notes","PDF-Beleg öffnen":"Ouvrir le justificatif PDF","Projekt abschliessen":"Terminer le projet","Projekt starten":"Démarrer le projet","Projekt: Intern · Leistung: Live-Timer":"Projet : Interne · Prestation : Minuteur","Rückzahlung erfassen":"Saisir un remboursement","Stammdaten vorhanden.":"Données de base disponibles.","Stop & speichern":"Arrêter et enregistrer","Verknüpfte Vorgänge":"Enregistrements liés","Verlauf":"Historique","Vorgang bereit.":"Processus prêt.","Weiterverrechnen":"Refacturer","Workflow":"Workflow","Zurück zu":"Retour à","Zurückweisen":"Rejeter","bearbeiten":"modifier","durchsuchen …":"rechercher …","lokal":"local","lokal bearbeitet":"modifié localement","lokal gespeichert":"enregistré localement"
+});
+Object.assign(it,{
+"Ablehnen":"Rifiuta","Abschliessen":"Completa","Aktivität":"Attività","Aktueller Stand":"Stato attuale","Alle":"Tutti","Ansicht":"Vista","Ansicht wechseln":"Cambia vista","Archivieren":"Archivia","Aufgabe oder Meilenstein …":"Attività o milestone …","Aufgaben und Meilensteine":"Attività e milestone","Auftrag starten":"Avvia ordine","Bankimport Demo":"Importazione bancaria demo","Bestätigung drucken":"Stampa conferma","Budget":"Budget","Datensatz geöffnet und geprüft.":"Record aperto e verificato.","Dokument anhängen":"Allega documento","Drucken":"Stampa","Erfassen":"Registra","Erfasster Aufwand":"Impegno registrato","Export":"Esporta","Ferien und Abwesenheiten":"Ferie e assenze","Filter":"Filtro","Kontakte":"Contatti","Link kopieren":"Copia link","Live-Timer":"Timer live","Noch keine Aufgaben vorhanden.":"Nessuna attività presente.","Noch keine Einträge. Nutzen Sie die Aktion oben, um den ersten Datensatz zu erfassen.":"Nessuna voce presente. Usa l’azione sopra per creare il primo record.","Noch keine verknüpften Vorgänge.":"Nessun record collegato.","Notiz hinzufügen …":"Aggiungi nota …","Notizen":"Note","PDF-Beleg öffnen":"Apri ricevuta PDF","Projekt abschliessen":"Completa progetto","Projekt starten":"Avvia progetto","Projekt: Intern · Leistung: Live-Timer":"Progetto: Interno · Prestazione: Timer live","Rückzahlung erfassen":"Registra rimborso","Stammdaten vorhanden.":"Dati di base disponibili.","Stop & speichern":"Ferma e salva","Verknüpfte Vorgänge":"Record collegati","Verlauf":"Cronologia","Vorgang bereit.":"Processo pronto.","Weiterverrechnen":"Riadddebita","Workflow":"Workflow","Zurück zu":"Torna a","Zurückweisen":"Rifiuta","bearbeiten":"modifica","durchsuchen …":"cerca …","lokal":"locale","lokal bearbeitet":"modificato localmente","lokal gespeichert":"salvato localmente"
+});
+Object.assign(trDict,{
+"Ablehnen":"Reddet","Abschliessen":"Tamamla","Aktivität":"Etkinlik","Aktueller Stand":"Mevcut durum","Alle":"Tümü","Ansicht":"Görünüm","Ansicht wechseln":"Görünümü değiştir","Archivieren":"Arşivle","Aufgabe oder Meilenstein …":"Görev veya kilometre taşı …","Aufgaben und Meilensteine":"Görevler ve kilometre taşları","Auftrag starten":"Siparişi başlat","Bankimport Demo":"Demo banka içe aktarımı","Bestätigung drucken":"Onayı yazdır","Budget":"Bütçe","Datensatz geöffnet und geprüft.":"Kayıt açıldı ve kontrol edildi.","Dokument anhängen":"Belge ekle","Drucken":"Yazdır","Erfassen":"Ekle","Erfasster Aufwand":"Kaydedilen efor","Export":"Dışa aktar","Ferien und Abwesenheiten":"İzinler ve devamsızlıklar","Filter":"Filtre","Kontakte":"Kişiler","Link kopieren":"Bağlantıyı kopyala","Live-Timer":"Canlı zamanlayıcı","Noch keine Aufgaben vorhanden.":"Henüz görev yok.","Noch keine Einträge. Nutzen Sie die Aktion oben, um den ersten Datensatz zu erfassen.":"Henüz kayıt yok. İlk kaydı oluşturmak için yukarıdaki işlemi kullanın.","Noch keine verknüpften Vorgänge.":"Henüz bağlantılı kayıt yok.","Notiz hinzufügen …":"Not ekle …","Notizen":"Notlar","PDF-Beleg öffnen":"PDF fişini aç","Projekt abschliessen":"Projeyi tamamla","Projekt starten":"Projeyi başlat","Projekt: Intern · Leistung: Live-Timer":"Proje: Dahili · Hizmet: Canlı zamanlayıcı","Rückzahlung erfassen":"İade kaydet","Stammdaten vorhanden.":"Ana veriler mevcut.","Stop & speichern":"Durdur ve kaydet","Verknüpfte Vorgänge":"Bağlantılı kayıtlar","Verlauf":"Geçmiş","Vorgang bereit.":"İşlem hazır.","Weiterverrechnen":"Yansıt","Workflow":"İş akışı","Zurück zu":"Geri dön","Zurückweisen":"Reddet","bearbeiten":"düzenle","durchsuchen …":"ara …","lokal":"yerel","lokal bearbeitet":"yerel olarak düzenlendi","lokal gespeichert":"yerel olarak kaydedildi"
+});
+
+Object.assign(en,{
+"Aktueller Status":"Current status","Als bezahlt markieren":"Mark as paid","Annehmen und Auftrag erstellen":"Accept and create order","Auswahl löschen":"Clear selection","Brutto Positionen":"Gross items","Demo-Versand":"Demo delivery","Details":"Details","Dokumentvorschau":"Document preview","Duplizieren":"Duplicate","Einleitung":"Introduction","Erstellen, prüfen, als PDF drucken und direkt versenden.":"Create, review, print as PDF and send directly.","Für diese Rolle sind keine Workflow-Aktionen freigegeben.":"No workflow actions are available for this role.","Gutschrift erstellen":"Create credit note","Hinweis schliessen":"Close notice","Kundensprache":"Customer language","Mahnung erstellen":"Create reminder","Nur Lesen":"Read only","PDF / Drucken":"PDF / Print","Position":"Item","Produkte und Leistungen suchen …":"Search products and services …","Projekt / Bezug":"Project / reference","Stornieren":"Cancel","Wird geladen …":"Loading …","Zeit und Spesen übernehmen":"Import time and expenses","auswählen":"select","suchen …":"search …"
+});
+Object.assign(fr,{
+"Aktueller Status":"Statut actuel","Als bezahlt markieren":"Marquer comme payé","Annehmen und Auftrag erstellen":"Accepter et créer la commande","Auswahl löschen":"Effacer la sélection","Brutto Positionen":"Positions brutes","Demo-Versand":"Envoi démo","Details":"Détails","Dokumentvorschau":"Aperçu du document","Duplizieren":"Dupliquer","Einleitung":"Introduction","Erstellen, prüfen, als PDF drucken und direkt versenden.":"Créer, vérifier, imprimer en PDF et envoyer directement.","Für diese Rolle sind keine Workflow-Aktionen freigegeben.":"Aucune action de workflow n’est disponible pour ce rôle.","Gutschrift erstellen":"Créer une note de crédit","Hinweis schliessen":"Fermer l’avis","Kundensprache":"Langue du client","Mahnung erstellen":"Créer un rappel","Nur Lesen":"Lecture seule","PDF / Drucken":"PDF / Imprimer","Position":"Position","Produkte und Leistungen suchen …":"Rechercher produits et prestations …","Projekt / Bezug":"Projet / référence","Stornieren":"Annuler","Wird geladen …":"Chargement …","Zeit und Spesen übernehmen":"Importer temps et frais","auswählen":"sélectionner","suchen …":"rechercher …"
+});
+Object.assign(it,{
+"Aktueller Status":"Stato attuale","Als bezahlt markieren":"Segna come pagato","Annehmen und Auftrag erstellen":"Accetta e crea ordine","Auswahl löschen":"Cancella selezione","Brutto Positionen":"Posizioni lorde","Demo-Versand":"Invio demo","Details":"Dettagli","Dokumentvorschau":"Anteprima documento","Duplizieren":"Duplica","Einleitung":"Introduzione","Erstellen, prüfen, als PDF drucken und direkt versenden.":"Crea, verifica, stampa in PDF e invia direttamente.","Für diese Rolle sind keine Workflow-Aktionen freigegeben.":"Nessuna azione di workflow è disponibile per questo ruolo.","Gutschrift erstellen":"Crea nota di credito","Hinweis schliessen":"Chiudi avviso","Kundensprache":"Lingua cliente","Mahnung erstellen":"Crea sollecito","Nur Lesen":"Sola lettura","PDF / Drucken":"PDF / Stampa","Position":"Posizione","Produkte und Leistungen suchen …":"Cerca prodotti e servizi …","Projekt / Bezug":"Progetto / riferimento","Stornieren":"Annulla","Wird geladen …":"Caricamento …","Zeit und Spesen übernehmen":"Importa ore e spese","auswählen":"seleziona","suchen …":"cerca …"
+});
+Object.assign(trDict,{
+"Aktueller Status":"Mevcut durum","Als bezahlt markieren":"Ödendi olarak işaretle","Annehmen und Auftrag erstellen":"Kabul et ve sipariş oluştur","Auswahl löschen":"Seçimi temizle","Brutto Positionen":"Brüt kalemler","Demo-Versand":"Demo gönderimi","Details":"Ayrıntılar","Dokumentvorschau":"Belge önizleme","Duplizieren":"Çoğalt","Einleitung":"Giriş","Erstellen, prüfen, als PDF drucken und direkt versenden.":"Oluşturun, kontrol edin, PDF olarak yazdırın ve doğrudan gönderin.","Für diese Rolle sind keine Workflow-Aktionen freigegeben.":"Bu rol için iş akışı işlemleri kullanılamaz.","Gutschrift erstellen":"Alacak dekontu oluştur","Hinweis schliessen":"Bildirimi kapat","Kundensprache":"Müşteri dili","Mahnung erstellen":"Hatırlatma oluştur","Nur Lesen":"Salt okunur","PDF / Drucken":"PDF / Yazdır","Position":"Kalem","Produkte und Leistungen suchen …":"Ürün ve hizmet ara …","Projekt / Bezug":"Proje / referans","Stornieren":"İptal et","Wird geladen …":"Yükleniyor …","Zeit und Spesen übernehmen":"Zaman ve masrafları aktar","auswählen":"seç","suchen …":"ara …"
+});

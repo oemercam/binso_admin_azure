@@ -1,20 +1,26 @@
 "use client";
 
+import {appConfig} from "@/config/app";
+import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { listLocalRecords, loadAppPreferences, loadSettings, type AppUser, type LocalRecord } from "@/lib/local-store";
 import { modules } from "@/lib/modules";
+import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import { getOrganization, getSession, logout } from "@/lib/saas-store";
 import { apiFetch, isProductionMode } from "@/lib/client/runtime";
 import { localRoleToTenant, routePermission, tenantCan } from "@/lib/permissions";
 import BrandLogo from "@/components/ui/brand-logo";
+import WorkspaceRuntime from "@/components/workspace-runtime";
 import {useLocale} from "@/components/locale-provider";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import {clearUserRuntimeState} from "@/lib/client/session-cleanup";
 import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
+import {uiConfig} from "@/config/ui";
 import {
   ChevronDown, Clock3, FolderKanban, LayoutDashboard, Menu, ReceiptText, Search,
   X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard, Bell, Headphones, Newspaper
@@ -27,17 +33,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false); const [moreOpen,setMoreOpen]=useState(false); const [mobileSearchOpen,setMobileSearchOpen]=useState(false); const [query,setQuery]=useState(''); const [companyOpen,setCompanyOpen]=useState(false); const [company,setCompany]=useState('Binso GmbH'); const [records,setRecords]=useState<LocalRecord[]>([]); const [users,setUsers]=useState<AppUser[]>([]); const [activeUserId,setActiveUserId]=useState('u1'); const [productionRole,setProductionRole]=useState<string>('reader'); const [permissionsReady,setPermissionsReady]=useState(false);
   const [productionPlan,setProductionPlan]=useState<PlanId>('business'); const [productionSearch,setProductionSearch]=useState<{query:string;items:SearchItem[]}>({query:"",items:[]}); const searchRef=useRef<HTMLInputElement>(null); const pathname = usePathname(); const router=useRouter(); const active = (href: string) => href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
   useEffect(()=>{const t=window.setTimeout(async()=>{if(isProductionMode()){try{const me=await apiFetch<{user:{role:string};plan:PlanId}>("/api/me");setProductionRole(me.user.role);setProductionPlan(me.plan);setPermissionsReady(true)}catch{router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`)}return}const session=getSession();if(!session){router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`);return}const org=getOrganization(session.orgId);if(org&&!org.onboardingComplete){router.replace("/onboarding")}},0);return()=>window.clearTimeout(t)},[router,pathname]);
-  useEffect(()=>{const load=()=>{const pref=loadAppPreferences();const st=loadSettings();setCompany(pref.activeCompany||st.companyName);setActiveUserId(pref.activeUserId);setUsers(st.users);setRecords(listLocalRecords());if(!isProductionMode())setPermissionsReady(true)};const t=window.setTimeout(load,0);window.addEventListener('binso-data-changed',load);window.addEventListener('binso-settings-changed',load);return()=>{window.clearTimeout(t);window.removeEventListener('binso-data-changed',load);window.removeEventListener('binso-settings-changed',load)}},[]);
+  useEffect(()=>{const load=()=>{const pref=loadAppPreferences();const st=loadSettings();setCompany(pref.activeCompany||st.companyName);setActiveUserId(pref.activeUserId);setUsers(st.users);setRecords(listLocalRecords());if(!isProductionMode())setPermissionsReady(true)};const t=window.setTimeout(load,0);const unsubData=subscribeAppEvent(appEvents.dataChanged,load);const unsubSettings=subscribeAppEvent(appEvents.settingsChanged,load);return()=>{window.clearTimeout(t);unsubData();unsubSettings()}},[]);
   const searchItems=useMemo<SearchItem[]>(()=>{
     const items:SearchItem[]=[];
-    modules.filter(m=>!['einstellungen','berichte','lohn','mwst'].includes(m.key)).forEach(m=>m.rows?.forEach((r,i)=>items.push({label:r[0],sub:m.label,href:`${m.href}/${i+1}`})));
+    if(!isProductionMode())modules.filter(m=>!['einstellungen','berichte','lohn','mwst'].includes(m.key)).forEach(m=>getDemoModuleSeed(m.key).rows.forEach((r:string[],i:number)=>items.push({label:r[0],sub:m.label,href:`${m.href}/${i+1}`})));
     records.forEach(r=>items.push({label:r.row[0]||r.module,sub:r.module,href:`/${r.module}/${r.id}`}));
     return items;
   },[records]);
-  useEffect(()=>{const normalized=query.trim();if(!isProductionMode()||normalized.length<2)return;const controller=new AbortController();const t=window.setTimeout(()=>{void apiFetch<{items:SearchItem[]}>(`/api/search?q=${encodeURIComponent(normalized)}`,{signal:controller.signal}).then(r=>setProductionSearch({query:normalized,items:r.items})).catch(()=>{})},300);return()=>{window.clearTimeout(t);controller.abort()}},[query]);
+  useEffect(()=>{const normalized=query.trim();if(!isProductionMode()||normalized.length<2)return;const controller=new AbortController();const t=window.setTimeout(()=>{void apiFetch<{items:SearchItem[]}>(`/api/search?q=${encodeURIComponent(normalized)}`,{signal:controller.signal}).then(r=>setProductionSearch({query:normalized,items:r.items})).catch(()=>{})},appConfig.searchDebounceMs);return()=>{window.clearTimeout(t);controller.abort()}},[query]);
   const results=useMemo(()=>{const normalized=query.trim();if(isProductionMode())return normalized.length>=2&&productionSearch.query===normalized?productionSearch.items.slice(0,8):[];const q=normalized.toLowerCase();if(!q)return[];return searchItems.filter(i=>`${i.label} ${i.sub}`.toLowerCase().includes(q)).slice(0,8)},[query,searchItems,productionSearch]);
   function submitSearch(e:React.FormEvent){e.preventDefault();if(results[0]){router.push(results[0].href);setQuery('')}}
-  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(window.innerWidth<=760)setMobileSearchOpen(true);else searchRef.current?.focus()}};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[]);
+  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(window.innerWidth<=uiConfig.breakpoints.mobile)setMobileSearchOpen(true);else searchRef.current?.focus()}};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[]);
   const activeUser=users.find(u=>u.id===activeUserId)||users[0];
   const initials=(activeUser?.name||'Binso').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
   const effectiveRole=isProductionMode()?productionRole:localRoleToTenant(activeUser?.role||'Lesen');
@@ -122,5 +128,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </ResponsiveOverlay>
       </div>
+      {permissionsReady&&<WorkspaceRuntime/>}
     </div>
 }
