@@ -108,6 +108,8 @@ export async function provisionOrganization(input:{
      [companyName,slug,input.mode==="subscription"?"active":"trial",input.mode==="demo"]
    );
    const organizationId=org.rows[0].id;
+   await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
+   await client.query("select set_config('app.user_id',$1,true)",[input.userId]);
    await client.query(
      `insert into organization_memberships(organization_id,user_id,email,role,role_id,status)
       values($1,$2,$3,'owner',(select id from organization_roles where organization_id=$1 and code='owner' limit 1),'active')`,
@@ -135,12 +137,10 @@ export async function provisionOrganization(input:{
    );
    await client.query(
      `insert into audit_events(organization_id,actor_user_id,actor_name,action,entity_type,entity_id,detail)
-      values($1,$2,$3,$4,'organization',$1,$5)`,
+      values($1,$2,$3,$4,'organization',$1::text,$5)`,
      [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId})]
    );
    if(input.mode==="demo"){
-     await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
-     await client.query("select set_config('app.user_id',$1,true)",[input.userId]);
      await seedDemo(client,organizationId,input.userId);
      await client.query(`insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','demo') on conflict do nothing`,[organizationId]);
    }

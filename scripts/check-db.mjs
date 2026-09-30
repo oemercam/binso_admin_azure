@@ -4,6 +4,7 @@ const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.en
 
 const required={
  organizations:["id","name","slug","status","currency","locale","is_demo"],
+ company_profile:["organization_id","name","address","zip","city","country","email","phone","uid","iban","industry","employee_range","settings"],
  app_users:["id","email","display_name","status","password_hash","language","email_verified_at","mfa_enabled"],
  organization_memberships:["organization_id","user_id","email","role","status"],
  organization_subscriptions:["organization_id","plan","status","trial_until"],
@@ -51,6 +52,7 @@ try{
  const versions=migrations.rows.map(r=>r.version);
  if(!versions.includes("0016_self_service_signup.sql"))throw new Error("Canonical database lineage incomplete: 0016_self_service_signup.sql is not applied.");
  if(!versions.includes("0017_v150_code_schema_alignment.sql"))throw new Error("Database migration 0017_v150_code_schema_alignment.sql is not applied.");
+ if(!versions.includes("0018_v151_organization_profile_alignment.sql"))throw new Error("Database migration 0018_v151_organization_profile_alignment.sql is not applied.");
  const cols=await pool.query(`select table_name,column_name from information_schema.columns where table_schema='public' and table_name=any($1::text[])`,[Object.keys(required)]);
  const found=new Map();for(const row of cols.rows){if(!found.has(row.table_name))found.set(row.table_name,new Set());found.get(row.table_name).add(row.column_name)}
  const missing=[];for(const [table,names] of Object.entries(required))for(const name of names)if(!found.get(table)?.has(name))missing.push(`${table}.${name}`);
@@ -65,5 +67,5 @@ try{
  const policyMap=new Map(policies.rows.map(r=>[r.tablename,Number(r.count)]));
  const policyMissing=tenantTables.filter(t=>(policyMap.get(t)||0)<1);
  if(policyMissing.length)throw new Error(`Tenant RLS policy missing on: ${policyMissing.join(", ")}`);
- console.log({...meta.rows[0],lineage:"canonical-0001..0017",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
+ console.log({...meta.rows[0],lineage:"canonical-0001..0018",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
 }finally{await pool.end()}

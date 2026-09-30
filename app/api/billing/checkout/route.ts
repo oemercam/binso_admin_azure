@@ -17,7 +17,7 @@ export async function POST(request:NextRequest){
   const plan=enumField(body,"plan",plans);const billing=enumField(body,"billing",cycles);
   const priceId=env.stripePrices[plan][billing];
   if(!priceId)throw new Error("Stripe-Preis ist nicht konfiguriert.");
-  const org=await query<{subscription_status:string}>("select subscription_status from organizations where id=$1",[s.organizationId]);
+  const org=await query<{subscription_status:string}>("select status as subscription_status from organization_subscriptions where organization_id=$1",[s.organizationId]);
   if(!org.rows[0])return json({error:"Organisation nicht gefunden."},404);
   const checkout=await createCheckoutSession({
     priceId,customerEmail:s.email,organizationId:s.organizationId,
