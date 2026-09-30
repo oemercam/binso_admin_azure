@@ -6,15 +6,17 @@ import {LanguageSwitcher,useLocale} from "@/components/locale-provider";
 export default function MarketingFooter(){
  const {t}=useLocale();
  return <footer className="marketing-footer">
-  <div className="marketing-footer-brand">
-   <BrandLogo/>
-   <span>{t("KMU-Plattform für die Schweiz")}</span>
+  <div className="marketing-footer-main">
+   <div className="marketing-footer-brand">
+    <BrandLogo/>
+    <p>{t("KMU-Plattform für die Schweiz")}</p>
+   </div>
+   <nav className="marketing-footer-links" aria-label={t("Footer Navigation")}>
+    <div className="marketing-footer-group"><strong>{t("Produkt")}</strong><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/demo">{t("Demo")}</Link><Link href="/sicherheit">{t("Sicherheit")}</Link><Link href="/status">{t("Status")}</Link></div>
+    <div className="marketing-footer-group"><strong>{t("Hilfe")}</strong><Link href="/kontakt">{t("Kontakt")}</Link><Link href="/support">{t("Support")}</Link></div>
+    <div className="marketing-footer-group"><strong>{t("Rechtliches")}</strong><Link href="/impressum">{t("Impressum")}</Link><Link href="/agb">{t("AGB")}</Link><Link href="/datenschutz">{t("Datenschutz")}</Link><Link href="/cookies">{t("Cookies")}</Link></div>
+   </nav>
   </div>
-  <nav className="marketing-footer-links" aria-label={t("Produkt und Unternehmen")}>
-   <div><strong>{t("Produkt")}</strong><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/status">{t("Status")}</Link></div>
-   <div><strong>{t("Unternehmen")}</strong><Link href="/kontakt">{t("Kontakt")}</Link><Link href="/support">{t("Support")}</Link><Link href="/impressum">{t("Impressum")}</Link></div>
-   <div><strong>{t("Rechtliches")}</strong><Link href="/agb">{t("AGB")}</Link><Link href="/datenschutz">{t("Datenschutz")}</Link><Link href="/cookies">{t("Cookies")}</Link></div>
-  </nav>
-  <div className="marketing-footer-bottom"><LanguageSwitcher compact/><small>© 2026 Binso GmbH</small></div>
+  <div className="marketing-footer-bottom"><small>© 2026 Binso GmbH</small><LanguageSwitcher compact/></div>
  </footer>;
 }

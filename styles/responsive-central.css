@@ -846,3 +846,42 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
  .app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}
  .marketing-menu-glyph>span,.marketing-mobile-menu{transition:none!important}
 }
+
+
+/* v1.4.x navigation hierarchy and public footer */
+.account-menu-section{display:grid;gap:4px;padding-top:6px}
+.account-menu-section+.account-menu-section{margin-top:2px}
+.account-menu-section-label{padding:0 9px;font-size:9px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.account-menu-section .account-menu-links{border-top:0}
+.account-menu-section:last-of-type .account-menu-links{border-bottom:1px solid var(--line)}
+
+.marketing-footer{display:block!important;max-width:1180px!important;margin:0 auto!important;padding:0 28px calc(34px + var(--safe-bottom))!important;border-top:1px solid var(--surface-border)!important}
+.marketing-footer-main{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.6fr);gap:72px;padding:34px 0 30px}
+.marketing-footer-brand{display:grid;align-content:start;justify-items:start;gap:10px}
+.marketing-footer-brand .binso-brand-image{height:32px!important;max-width:108px!important}
+.marketing-footer-brand p{max-width:230px;margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.marketing-footer-links{display:grid!important;grid-template-columns:minmax(120px,1fr) minmax(110px,.8fr) minmax(130px,1fr)!important;gap:42px!important}
+.marketing-footer-group{display:grid;align-content:start;justify-items:start;gap:9px}
+.marketing-footer-group strong{margin-bottom:2px;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.marketing-footer-group a{font-size:13px!important;line-height:1.35;color:var(--text)!important;transition:opacity var(--motion-fast) ease}
+.marketing-footer-group a:hover{opacity:.58}
+.marketing-footer-bottom{display:flex!important;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--surface-border);padding-top:16px!important}
+.marketing-footer-bottom small{font-size:10px;color:var(--muted)}
+
+@media(max-width:760px){
+ .account-menu-section-label{font-size:9px}
+ .marketing-footer{padding:0 max(var(--app-gutter-mobile),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--app-gutter-mobile),var(--safe-left))!important}
+ .marketing-footer-main{grid-template-columns:1fr;gap:24px;padding:26px 0 22px}
+ .marketing-footer-brand{display:flex!important;align-items:center;justify-content:space-between;gap:16px}
+ .marketing-footer-brand p{max-width:180px;text-align:right;font-size:10px;line-height:1.4}
+ .marketing-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;border:0!important;padding:0!important}
+ .marketing-footer-group{display:grid!important;align-content:start!important;gap:8px!important;min-height:0!important;overflow:visible!important}
+ .marketing-footer-group strong{min-width:0!important;font-size:9px!important}
+ .marketing-footer-group a{font-size:11px!important;white-space:normal!important}
+ .marketing-footer-bottom{border-top:1px solid var(--surface-border)!important;padding-top:14px!important}
+}
+@media(max-width:430px){
+ .marketing-footer-links{grid-template-columns:1fr 1fr!important;row-gap:22px!important}
+ .marketing-footer-group:last-child{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
+ .marketing-footer-group:last-child strong{grid-column:1/-1}
+}

@@ -17,7 +17,7 @@ import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {
   ChevronDown, Clock3, FolderKanban, LayoutDashboard, Menu, ReceiptText, Search,
-  X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard
+  X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard, Bell, Headphones, Newspaper
 } from "lucide-react";
 
 type SearchItem={label:string;sub:string;href:string};
@@ -75,11 +75,23 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <div><small>{t("Aktuelle Firma")}</small><strong>{company}</strong></div>
                 <Check size={16}/>
               </div>
-              <div className="account-theme-row"><span>{t("Darstellung")}</span><ThemeToggle compact/></div><div className="account-menu-links">
-                <Link href="/einstellungen?tab=profil" onClick={()=>setCompanyOpen(false)}><UserRound size={17}/><span><strong>{t("Mein Profil")}</strong><small>{t("Sprache und persönliche Einstellungen")}</small></span></Link>
-                <Link href="/feedback" onClick={()=>setCompanyOpen(false)}><MessageSquareText size={17}/><span><strong>{t("Feedback geben")}</strong><small>{t("Idee, Fehler oder Verbesserung melden")}</small></span></Link>
-                {tenantCan(effectiveRole,"organization:write")&&<Link href="/einstellungen?tab=firma" onClick={()=>setCompanyOpen(false)}><SlidersHorizontal size={17}/><span><strong>{t("Unternehmenseinstellungen")}</strong><small>{t("Firma, Benutzer und System")}</small></span></Link>}
-                {tenantCan(effectiveRole,"billing:read")&&<Link href="/abo" onClick={()=>setCompanyOpen(false)}><CreditCard size={17}/><span><strong>{t("Plan und Abrechnung")}</strong><small>{t("Abonnement und Zahlungsdaten")}</small></span></Link>}
+              <div className="account-theme-row"><span>{t("Darstellung")}</span><ThemeToggle compact/></div>
+              <div className="account-menu-section">
+                <span className="account-menu-section-label">{t("Konto")}</span>
+                <div className="account-menu-links">
+                  <Link href="/einstellungen?tab=profil" onClick={()=>setCompanyOpen(false)}><UserRound size={17}/><span><strong>{t("Mein Profil")}</strong><small>{t("Sprache und persönliche Einstellungen")}</small></span></Link>
+                  {tenantCan(effectiveRole,"organization:write")&&<Link href="/einstellungen?tab=firma" onClick={()=>setCompanyOpen(false)}><SlidersHorizontal size={17}/><span><strong>{t("Unternehmenseinstellungen")}</strong><small>{t("Firma, Benutzer und System")}</small></span></Link>}
+                  {tenantCan(effectiveRole,"billing:read")&&<Link href="/abo" onClick={()=>setCompanyOpen(false)}><CreditCard size={17}/><span><strong>{t("Plan und Abrechnung")}</strong><small>{t("Abonnement und Zahlungsdaten")}</small></span></Link>}
+                </div>
+              </div>
+              <div className="account-menu-section">
+                <span className="account-menu-section-label">{t("Service")}</span>
+                <div className="account-menu-links">
+                  <Link href="/benachrichtigungen" onClick={()=>setCompanyOpen(false)}><Bell size={17}/><span><strong>{t("Benachrichtigungen")}</strong><small>{t("Hinweise und Aktivitäten")}</small></span></Link>
+                  <Link href="/neuigkeiten" onClick={()=>setCompanyOpen(false)}><Newspaper size={17}/><span><strong>{t("Neuigkeiten")}</strong><small>{t("Änderungen und neue Funktionen")}</small></span></Link>
+                  <Link href="/support" onClick={()=>setCompanyOpen(false)}><Headphones size={17}/><span><strong>{t("Support")}</strong><small>{t("Hilfe und Supportanfragen")}</small></span></Link>
+                  <Link href="/feedback" onClick={()=>setCompanyOpen(false)}><MessageSquareText size={17}/><span><strong>{t("Feedback geben")}</strong><small>{t("Idee, Fehler oder Verbesserung melden")}</small></span></Link>
+                </div>
               </div>
               <button className="account-logout" onClick={async()=>{if(isProductionMode()){try{await apiFetch("/api/auth/logout",{method:"POST",body:"{}"})}catch{}}else logout();await clearUserRuntimeState();setCompanyOpen(false);router.push("/portal/login")}}><LogOut size={17}/><span>{t("Abmelden")}</span></button>
             </div>}
