@@ -35,7 +35,9 @@ if(!marketingFrame.includes('className="marketing-mobile-language"'))throw new E
 if(!shellCss.includes('.marketing-header-language{display:none}'))throw new Error("Mobile/PWA marketing header must hide the language switcher.");
 if(marketingFooter.includes("Appenzell, Schweiz"))throw new Error("Compact public footer must not render the location text.");
 if(!marketingFooter.includes('href="https://binso.ch"'))throw new Error("Public footer copyright must link to binso.ch.");
-if(!marketingFooter.includes("footer-heart"))throw new Error("Public footer must include the subtle Swiss-made heart mark.");
+if(marketingFooter.includes("footer-heart")||marketingFooter.includes("Mit Liebe in der Schweiz entwickelt"))throw new Error("Compact mobile/PWA footer must not render the previous heart tagline.");
+if(!marketingFooter.includes('className="marketing-footer-mobile"'))throw new Error("Public footer must provide a dedicated compact mobile/PWA layout.");
+for(const href of ["/agb","/datenschutz","/impressum"]){if(!marketingFooter.includes(`href="${href}"`))throw new Error(`Compact mobile/PWA footer is missing ${href}.`)}
 const appPublicCss=fs.readFileSync("styles/app.css","utf8");
 const securityRule=appPublicCss.match(/\.security-card\{[^}]*\}/s)?.[0]||"";
 if(/#[0-9a-f]{3,8}/i.test(securityRule))throw new Error("Security/CTA card must use theme tokens instead of hard-coded colours.");

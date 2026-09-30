@@ -60,6 +60,7 @@
 .marketing-mobile-language{display:none}
 
 .marketing-footer{max-width:1200px;margin:0 auto;padding:0 32px calc(34px + var(--safe-bottom));border-top:1px solid var(--surface-border)}
+.marketing-footer-mobile{display:none}
 .marketing-footer-main{display:grid;grid-template-columns:minmax(260px,.95fr) minmax(0,1.45fr);gap:88px;padding:42px 0 34px}
 .marketing-footer-brand{display:grid;align-content:start;justify-items:start;gap:16px}.marketing-footer-brand .binso-brand-image{height:32px;max-width:108px}.marketing-footer-brand-copy{display:grid;gap:6px;max-width:300px}.marketing-footer-brand-copy strong{font-size:13px;font-weight:650;line-height:1.35}.marketing-footer-brand-copy p{margin:0;color:var(--foreground-muted);font-size:12px;line-height:1.55}
 .marketing-footer-links{display:grid;grid-template-columns:minmax(130px,1fr) minmax(110px,.8fr) minmax(140px,1fr);gap:44px}
@@ -67,8 +68,6 @@
 .marketing-footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;border-top:1px solid var(--surface-border)}
 .marketing-footer-bottom small,.marketing-footer-bottom span{font-size:10px;color:var(--foreground-muted)}
 .marketing-footer-bottom a{color:inherit;text-decoration:none;font-weight:700;transition:color var(--motion-fast) ease}.marketing-footer-bottom a:hover{color:var(--foreground)}
-.marketing-footer-made{display:inline-flex;align-items:center;gap:5px}.footer-heart{fill:currentColor;transform-origin:center;animation:footer-heartbeat 1.8s ease-in-out infinite}
-@keyframes footer-heartbeat{0%,55%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}34%{transform:scale(1.1)}44%{transform:scale(1)}}
 
 @media(min-width:761px) and (max-width:900px){:root{--sidebar:210px}.sidebar-brand-row{padding-inline:14px}.nav-item{padding-inline:8px}.topbar{padding-inline:18px}.account-trigger-copy{display:none}}
 
@@ -99,19 +98,25 @@
  .account-menu{position:fixed;z-index:var(--z-dropdown);left:max(10px,var(--safe-left));right:max(10px,var(--safe-right));top:auto;bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 20px);width:auto;max-height:min(70dvh,620px);overflow:auto;border-radius:18px}
  .mobile-nav{display:grid;position:fixed;z-index:var(--z-mobile-nav);left:max(10px,var(--safe-left));right:max(10px,var(--safe-right));bottom:max(10px,var(--safe-bottom));height:var(--app-bottom-nav-row);grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;padding:5px 6px;border:1px solid var(--surface-border);border-radius:18px;background:var(--surface-1);box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateZ(0);backface-visibility:hidden}
  .mobile-nav-item{min-width:0;min-height:52px;display:grid;place-content:center;justify-items:center;gap:2px;border:0;border-radius:13px;background:transparent;color:var(--foreground-muted);font-size:9px;font-weight:600}.mobile-nav-item.active{background:var(--surface-2);color:var(--foreground)}.mobile-nav-item span{font-size:9px;line-height:1.05;white-space:nowrap}
- .marketing-footer{padding-left:max(var(--app-gutter-mobile),var(--safe-left));padding-right:max(var(--app-gutter-mobile),var(--safe-right));padding-bottom:calc(20px + var(--safe-bottom))}
- .marketing-footer-main{grid-template-columns:1fr;gap:18px;padding:24px 0 18px}
- .marketing-footer-brand{display:flex;align-items:center;justify-content:space-between;gap:14px}.marketing-footer-brand .binso-brand-image{height:26px;max-width:92px}.marketing-footer-brand-copy{max-width:230px;text-align:right}.marketing-footer-brand-copy strong{font-size:11px}.marketing-footer-brand-copy p{display:none}
- .marketing-footer-links{display:flex;flex-wrap:wrap;gap:8px 14px}
- .marketing-footer-group{display:contents}.marketing-footer-group strong{display:none}.marketing-footer-group a{font-size:11px;line-height:1.2;color:var(--foreground-muted)}.marketing-footer-group a:hover{transform:none;color:var(--foreground);opacity:1}
- .marketing-footer-bottom{align-items:center;flex-wrap:wrap;gap:8px 14px;padding-top:12px}.marketing-footer-bottom small,.marketing-footer-bottom span{font-size:9px}
+ .marketing-footer{padding-left:max(var(--app-gutter-mobile),var(--safe-left));padding-right:max(var(--app-gutter-mobile),var(--safe-right));padding-bottom:calc(18px + var(--safe-bottom));border-top:1px solid var(--surface-border)}
+ .marketing-footer-desktop{display:none}
+ .marketing-footer-mobile{display:grid;justify-items:center;text-align:center;gap:10px;padding:22px 0 4px}
+ .marketing-footer-mobile-brand{display:flex;align-items:center;justify-content:center;min-height:28px}
+ .marketing-footer-mobile-brand .binso-brand-image{height:28px;max-width:96px}
+ .marketing-footer-mobile-slogan{margin:0;max-width:280px;color:var(--foreground-muted);font-size:11px;line-height:1.45}
+ .marketing-footer-mobile-legal{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;color:var(--foreground-muted);font-size:10px;line-height:1.2}
+ .marketing-footer-mobile-legal a{transition:color var(--motion-fast) ease}
+ .marketing-footer-mobile-legal a:hover{color:var(--foreground)}
+ .marketing-footer-mobile-legal span{opacity:.55}
+ .marketing-footer-mobile-copyright{display:block;margin-top:2px;color:var(--foreground-muted);font-size:9px;line-height:1.3}
+ .marketing-footer-mobile-copyright a{color:inherit;font-weight:700;text-decoration:none}
 }
 
-@media(max-width:430px){:root{--app-gutter-mobile:14px}.marketing-footer-brand{align-items:flex-start}.marketing-footer-brand-copy{max-width:190px}.marketing-footer-links{gap:7px 12px}.marketing-footer-bottom{align-items:flex-start;flex-direction:column;gap:6px}}
+@media(max-width:430px){:root{--app-gutter-mobile:14px}.marketing-footer-mobile{gap:9px;padding-top:20px}.marketing-footer-mobile-legal{gap:5px;font-size:9px}}
 
 
 @media(hover:none) and (pointer:coarse){
- .nav-item,.mobile-nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-primary,.marketing-secondary{transition:none}
+ .nav-item,.mobile-nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-footer-mobile-legal a,.marketing-primary,.marketing-secondary{transition:none}
  .mobile-top-action:hover,.account-trigger:hover,.account-menu-links a:hover{background:transparent}
 }
 
@@ -119,4 +124,4 @@
  .topbar,.mobile-nav{contain:layout paint style}
 }
 
-@media(prefers-reduced-motion:reduce){.nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-menu-glyph>span,.marketing-mobile-menu,.footer-heart{transition:none!important;animation:none!important;transform:none!important}}
+@media(prefers-reduced-motion:reduce){.nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-footer-mobile-legal a,.marketing-menu-glyph>span,.marketing-mobile-menu{transition:none!important;animation:none!important;transform:none!important}}
