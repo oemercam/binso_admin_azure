@@ -1,0 +1,16 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8");
+const auth=read("components/auth-pages.tsx");
+const demo=read("app/api/auth/demo/route.ts");
+const register=read("app/api/auth/register/route.ts");
+const me=read("app/api/me/route.ts");
+const http=read("lib/server/http.ts");
+const local=read("lib/saas-store.ts");
+if(!demo.includes("expiresInHours:24")||!demo.includes("onboarding_complete) values")||!demo.includes("true)"))throw new Error("Demo flow must create an onboarded 24h demo tenant.");
+if(!register.includes('trial?"trial":"pending"')||!register.includes("14*86400000"))throw new Error("Trial registration must persist 14-day trial state.");
+if(!me.includes("onboardingComplete")||!me.includes("subscriptionStatus")||!me.includes("trialEndsAt"))throw new Error("/api/me must expose onboarding and trial state.");
+if(!http.includes("x-forwarded-host")||!http.includes("request.nextUrl.origin"))throw new Error("Same-origin validation must support proxied/custom-domain requests.");
+if(!auth.includes('params.get("start")==="1"')||!auth.includes('router.replace("/dashboard")'))throw new Error("Demo page must support one-click demo entry.");
+if(!auth.includes("Keine Kreditkarte nötig")||!auth.includes("14-Tage-Test starten"))throw new Error("Trial UX must clearly distinguish the 14-day test from demo access.");
+if(!local.includes("onboardingComplete:true")||!local.includes("24*60*60*1000"))throw new Error("Local demo must mirror the production demo contract.");
+console.log("Trial/demo self-check passed: demo, 14-day trial, proxy origin and onboarding contracts are aligned.");

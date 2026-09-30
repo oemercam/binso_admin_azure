@@ -9,7 +9,7 @@ export default function PortalEntry(){
  const router=useRouter();
  useEffect(()=>{let active=true;void (async()=>{
   if(isProductionMode()){
-   try{const me=await apiFetch<{organization?:{onboardingComplete?:boolean};onboardingComplete?:boolean}>("/api/me");if(!active)return;const complete=me.onboardingComplete??me.organization?.onboardingComplete??true;router.replace(complete?"/dashboard":"/onboarding")}catch{if(active)router.replace("/portal/login")}
+   try{const me=await apiFetch<{onboardingComplete:boolean}>("/api/me");if(!active)return;router.replace(me.onboardingComplete?"/dashboard":"/onboarding")}catch{if(active)router.replace("/portal/login")}
   }else{
    const session=getSession();if(!session){router.replace("/portal/login");return}const org=getOrganization(session.orgId);router.replace(org?.onboardingComplete?"/dashboard":"/onboarding")
   }

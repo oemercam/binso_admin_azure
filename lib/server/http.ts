@@ -16,8 +16,13 @@ export function apiError(error:unknown,request?:NextRequest){
 export function assertSameOrigin(request:NextRequest){
   const origin=request.headers.get("origin");
   if(!origin)return;
-  const allowed=new URL(env.appUrl).origin;
-  if(origin!==allowed)throw new Response("Forbidden",{status:403});
+  const configured=new URL(env.appUrl).origin;
+  const requestOrigin=request.nextUrl.origin;
+  const forwardedProto=request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost=request.headers.get("x-forwarded-host")?.split(",")[0]?.trim()||request.headers.get("host")?.trim();
+  const forwardedOrigin=forwardedHost?`${forwardedProto||"https"}://${forwardedHost}`:null;
+  const allowed=new Set([configured,requestOrigin,forwardedOrigin].filter(Boolean));
+  if(!allowed.has(origin))throw new Response("Forbidden",{status:403});
 }
 export async function readJson(request:NextRequest,maxBytes=64_000){
   const length=Number(request.headers.get("content-length")||0);

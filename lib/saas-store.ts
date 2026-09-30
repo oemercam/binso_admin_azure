@@ -109,14 +109,19 @@ export function createAccount(input:{
 export function createDemoAccount(){
   const existing=getUsers().find(u=>u.email==="demo@binso.local");
   if(existing){
-    const org=getOrganization(existing.orgId)!;
-    const session:SaasSession={userId:existing.id,orgId:org.id,email:existing.email,name:existing.name,role:existing.role};
-    setSession(session); return {org,user:existing,session};
+    const org=getOrganization(existing.orgId);
+    if(org){
+      const updated=updateOrganization(org.id,{onboardingComplete:true,trialEndsAt:new Date(Date.now()+24*60*60*1000).toISOString()})||org;
+      const session:SaasSession={userId:existing.id,orgId:updated.id,email:existing.email,name:existing.name,role:existing.role};
+      setSession(session); return {org:updated,user:existing,session};
+    }
   }
-  return createAccount({
+  const created=createAccount({
     name:"Demo Benutzer",email:"demo@binso.local",password:"demo1234",
-    company:"Demo Unternehmen AG",plan:"business",billingCycle:"monthly",trial:true
+    company:"Binso Demo AG",plan:"business",billingCycle:"monthly",trial:true
   });
+  const org=updateOrganization(created.org.id,{onboardingComplete:true,trialEndsAt:new Date(Date.now()+24*60*60*1000).toISOString()})||created.org;
+  return {...created,org};
 }
 
 export function login(email:string,password:string){

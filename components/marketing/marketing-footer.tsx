@@ -16,7 +16,7 @@ export default function MarketingFooter(){
      </div>
     </div>
     <nav className="marketing-footer-links" aria-label={t("Footer Navigation")}>
-     <div className="marketing-footer-group"><strong>{t("Produkt")}</strong><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/demo">{t("Demo")}</Link><Link href="/sicherheit">{t("Sicherheit")}</Link><Link href="/status">{t("Status")}</Link></div>
+     <div className="marketing-footer-group"><strong>{t("Produkt")}</strong><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/demo?start=1">{t("Demo")}</Link><Link href="/sicherheit">{t("Sicherheit")}</Link><Link href="/status">{t("Status")}</Link></div>
      <div className="marketing-footer-group"><strong>{t("Hilfe")}</strong><Link href="/kontakt">{t("Kontakt")}</Link><Link href="/support">{t("Support")}</Link></div>
      <div className="marketing-footer-group"><strong>{t("Rechtliches")}</strong><Link href="/impressum">{t("Impressum")}</Link><Link href="/agb">{t("AGB")}</Link><Link href="/datenschutz">{t("Datenschutz")}</Link><Link href="/cookies">{t("Cookies")}</Link></div>
     </nav>

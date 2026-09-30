@@ -1,4 +1,18 @@
 import pg from "pg";
 if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");
-const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:false}});
-try{const r=await pool.query("select current_database() db, now() now");console.log(r.rows[0])}finally{await pool.end()}
+const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"}});
+const required={
+ organizations:["id","plan","billing_cycle","subscription_status","trial_ends_at","onboarding_complete","terms_version","terms_accepted_at","privacy_version"],
+ users:["id","organization_id","email","password_hash","email_verified_at","active"],
+ sessions:["id","user_id","organization_id","token_hash","expires_at","user_agent","ip_hash","last_seen_at"],
+ records:["id","organization_id","module","status","row_data","fields","metadata"],
+ auth_tokens:["id","user_id","organization_id","email","token_hash","token_type","expires_at"]
+};
+try{
+ const meta=await pool.query("select current_database() db, now() now");
+ const cols=await pool.query(`select table_name,column_name from information_schema.columns where table_schema='public' and table_name = any($1::text[])`,[Object.keys(required)]);
+ const found=new Map();for(const row of cols.rows){if(!found.has(row.table_name))found.set(row.table_name,new Set());found.get(row.table_name).add(row.column_name)}
+ const missing=[];for(const [table,names] of Object.entries(required)){for(const name of names){if(!found.get(table)?.has(name))missing.push(`${table}.${name}`)}}
+ if(missing.length)throw new Error(`Database schema incomplete. Missing: ${missing.join(", ")}`);
+ console.log({...meta.rows[0],schema:"ok",checkedTables:Object.keys(required).length});
+}finally{await pool.end()}

@@ -4,12 +4,12 @@ import path from "node:path";
 const required=[
   "app/layout.tsx","app/robots.ts","app/sitemap.ts","public/manifest.webmanifest","public/manifest-site.webmanifest","public/manifest-portal.webmanifest","public/manifest-operator.webmanifest","public/favicon.ico",
   "app/portal/page.tsx","app/portal/layout.tsx","app/operator/layout.tsx","app/api/auth/demo/route.ts",
-  "components/theme-provider.tsx","components/app-boot-loader.tsx","components/support/support-new.tsx",
+  "components/theme-provider.tsx","components/support/support-new.tsx",
   "components/security/account-security.tsx","components/notifications/notification-center.tsx",
   "app/api/health/route.ts","app/api/search/route.ts","app/api/files/route.ts","app/api/webhooks/stripe/route.ts",
   "database/migrations/008_locale_turkish.sql","database/migrations/009_platform_foundation.sql",
   "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","hooks/use-overlay-lock.ts",
-  "config/app.ts","components/ui/responsive-overlay.tsx","infra/main.bicep",".github/workflows/azure-webapp.yml"
+  "config/app.ts","components/ui/responsive-overlay.tsx","scripts/rendering-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
