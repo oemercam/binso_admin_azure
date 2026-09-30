@@ -44,4 +44,19 @@ foreach ($route in $workspaceRoutes) {
     }
 }
 
-Write-Host "Workspace route migration cleanup complete."
+
+$obsoleteFiles = @(
+    "components\app-boot-loader.tsx",
+    "components\marketing-features.tsx",
+    "components\marketing-pricing.tsx"
+)
+
+foreach ($relativePath in $obsoleteFiles) {
+    $obsoletePath = Join-Path $projectRoot $relativePath
+    if (Test-Path $obsoletePath) {
+        Write-Host "Removing obsolete file: $relativePath"
+        Remove-Item $obsoletePath -Force
+    }
+}
+
+Write-Host "Workspace route and obsolete-file cleanup complete."

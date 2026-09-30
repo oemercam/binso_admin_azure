@@ -310,13 +310,6 @@
    ========================================================== */
 :is(h1,h2,h3,.hero-copy h1,.marketing-section h2,.auth-intro h1,.page h1,.module-heading h1,.detail-heading h1){font-family:var(--font-sans);font-weight:600!important;letter-spacing:-.025em!important}
 
-/* Icon-only loader: no frame, spinner, label or page movement. */
-.app-boot-loader{background:var(--surface-0)!important;gap:0!important}
-.app-boot-icon-reveal,.route-loading-mark{width:58px!important;height:58px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;display:grid;place-items:center;overflow:hidden;clip-path:inset(100% 0 0 0);animation:binso-icon-build .82s cubic-bezier(.22,1,.36,1) forwards!important}
-.app-boot-icon-reveal:after,.route-loading-mark:after{display:none!important;content:none!important}
-.app-boot-icon-reveal .binso-brand-image.compact,.route-loading-mark .binso-brand-image.compact{width:52px!important;height:52px!important}
-.route-loading-page{min-height:100dvh;background:var(--surface-0)!important;display:grid;place-items:center}.route-loading-label{display:none!important}
-@keyframes binso-icon-build{0%{clip-path:inset(100% 0 0 0);opacity:.75}100%{clip-path:inset(0 0 0 0);opacity:1}}
 
 /* Public hamburger: invisible touch target, visible glyph only. */
 
@@ -341,7 +334,6 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
  
  
  
- .page{box-sizing:border-box;padding-top:20px!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;padding-bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 30px)!important}
  
  
  .onboarding-shell{padding-top:calc(var(--app-header-row) + var(--safe-top))!important;padding-bottom:calc(78px + var(--safe-bottom))!important}
@@ -354,28 +346,28 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
  .register-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important}.register-actions .marketing-secondary,.register-actions .marketing-primary{width:100%!important;min-width:0!important;min-height:44px!important;justify-content:center!important}
 }
 
-/* Auth safe-area and contrast. */
-@media(max-width:760px){
- .auth-shell{min-height:100dvh!important;padding-top:calc(70px + var(--safe-top))!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;padding-bottom:calc(20px + var(--safe-bottom))!important;background:var(--surface-0)!important}
- .auth-logo{top:calc(12px + var(--safe-top))!important;left:max(var(--app-gutter-mobile),var(--safe-left))!important}.auth-language{top:calc(12px + var(--safe-top))!important;right:max(var(--app-gutter-mobile),var(--safe-right))!important}
- .auth-shell-login,.auth-shell-demo{padding-left:0!important;padding-right:0!important;padding-bottom:0!important;align-items:end!important}
- .auth-shell-login .auth-card,.auth-shell-demo .auth-card{background:var(--surface-1)!important;padding-left:max(20px,var(--safe-left))!important;padding-right:max(20px,var(--safe-right))!important;padding-bottom:calc(20px + var(--safe-bottom))!important;border-color:var(--surface-border)!important}
- .auth-shell-register .auth-card{background:transparent!important}.auth-intro h1{font-size:25px!important}.auth-intro p{font-size:13px!important}
-}
-
 /* Public header and footer safe areas. */
-@media(max-width:900px){
- 
- 
-}
 
-@media(max-width:600px){
- 
-}
 
 /* Softer public type scale. */
 .hero-copy h1{font-size:clamp(42px,5vw,62px)!important;line-height:1.02!important}.marketing-section>h2,.workflow-band h2,.security-copy h2,.marketing-subhero h1{font-weight:600!important}
 @media(max-width:600px){.hero-copy h1{font-size:34px!important;line-height:1.06!important}.marketing-section>h2,.workflow-band h2,.security-copy h2,.marketing-subhero h1{font-size:27px!important;line-height:1.1!important}.marketing-section,.marketing-subhero{padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important}}
+
+/* Canonical mobile/PWA vertical rhythm. Keep spacing ownership here only. */
+@media(max-width:760px){
+ .page{box-sizing:border-box;width:100%;max-width:100%;padding-top:var(--mobile-content-top)!important;padding-left:max(var(--page-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--page-gutter-mobile),var(--safe-right))!important;padding-bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + var(--mobile-content-bottom))!important}
+ .page-header,.module-heading,.detail-heading,.ui-page-header{margin-bottom:var(--mobile-block-space)!important}
+ .metric-grid,.module-stats,.dashboard-grid{gap:var(--mobile-card-gap)!important}
+ .marketing-hero{padding:28px max(var(--page-gutter-mobile),var(--safe-left)) var(--mobile-section-space)!important;gap:var(--mobile-block-space)!important}
+ .marketing-section{padding-top:var(--mobile-section-space)!important;padding-bottom:var(--mobile-section-space)!important}
+ .marketing-feature-grid,.pricing-grid,.marketing-faq-grid{margin-top:var(--mobile-block-space)!important;gap:var(--mobile-card-gap)!important}
+ .workflow-band{padding-top:var(--mobile-section-space)!important;padding-bottom:var(--mobile-section-space)!important;gap:var(--mobile-block-space)!important}
+ .security-section{gap:var(--mobile-block-space)!important}
+}
+
+@media(display-mode:standalone) and (max-width:760px){
+ html,body{overscroll-behavior-y:none}
+}
 
 /* Mobile pricing: native snap carousel, Business centered initially with side cards visible. */
 .pricing-carousel-shell{min-width:0}.pricing-swipe-hint{display:none}
@@ -385,69 +377,12 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
  .pricing-carousel::-webkit-scrollbar{display:none}.pricing-carousel .pricing-card{flex:0 0 84vw!important;max-width:360px!important;scroll-snap-align:center!important;scroll-snap-stop:always!important;padding:20px!important;border-radius:16px!important}.pricing-carousel .pricing-card.popular{transform:none!important;border-width:1.5px!important}.pricing-carousel .pricing-card>p{min-height:0!important}.pricing-swipe-hint{display:flex!important;justify-content:center;gap:5px;padding:4px 0 0}.pricing-swipe-hint span{width:5px;height:5px;border-radius:50%;background:var(--border-strong)}.pricing-swipe-hint span.active{width:16px;border-radius:999px;background:var(--text)}
 }
 
-@media(prefers-reduced-motion:reduce){.app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}}
-/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
-/* ==========================================================
-   Binso One v1.3.3 — full-height mobile/PWA marketing navigation
-   ========================================================== */
 
-@media(max-width:900px){
-  /* Header stays fixed and unchanged while the menu opens. */
-  
-  
-  
-  
-
-  /* Fixed header needs an explicit content offset so every page starts below it. */
-  .marketing-shell>main{
-    padding-top:calc(56px + var(--safe-top))!important;
-  }
-
-  /* No separate side-drawer/backdrop: the navigation fills the complete area below the header. */
-  
-  
-  
-  
-  
-  
-  
-  .marketing-mobile-language{
-    margin-top:4px!important;
-    padding-top:0!important;
-  }
-  
-  
-
-  body.marketing-menu-open{
-    overflow:hidden!important;
-    overscroll-behavior:none!important;
-  }
-}
-
-@media(max-width:600px){
-  
-  
-}
-
-@media(prefers-reduced-motion:reduce){
-  
-}
-
-@media(max-width:900px){#marketing-mobile-navigation{isolation:isolate}}
 
 /* ---- canonical mobile/PWA layout overrides ---- */
 @media(max-width:760px){
   html,body{min-height:100%;overflow-x:clip}
   body{background:var(--surface-0)}
-  
-  
-  .page{
-    box-sizing:border-box;width:100%;max-width:100%;
-    padding-top:20px!important;
-    padding-left:max(var(--page-gutter-mobile),var(--safe-left))!important;
-    padding-right:max(var(--page-gutter-mobile),var(--safe-right))!important;
-    padding-bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 30px)!important;
-  }
   
   
   .auth-shell{
@@ -474,16 +409,7 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 
 @media(max-width:430px){:root{--page-gutter-mobile:14px}}
 
-/* v1.4.1 navigation, route position and boot-motion corrections. */
-.app-boot-icon-reveal,.route-loading-mark{
- width:82px!important;
- height:82px!important;
- animation:binso-icon-build 1.15s cubic-bezier(.22,1,.36,1) forwards!important;
-}
-.app-boot-icon-reveal .binso-brand-image.compact,.route-loading-mark .binso-brand-image.compact{
- width:74px!important;
- height:74px!important;
-}
+/* v1.4.1 navigation and route-position corrections. */
 
 
 
@@ -494,18 +420,7 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 
 
 
-@media(max-width:900px){
- 
- .marketing-shell>main{padding-top:calc(64px + var(--safe-top))!important}
- 
- 
- 
-}
 
-@media(prefers-reduced-motion:reduce){
- .app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}
- 
-}
 
 
 /* v1.4.x navigation hierarchy and public footer */
@@ -528,18 +443,6 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 
 
 
-@media(max-width:760px){
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-}
 @media(max-width:430px){
  
  
@@ -605,32 +508,16 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
  
 }
 
-@media(prefers-reduced-motion:reduce){
- 
-}
 
 /* v1.4.x PWA/mobile app-header paint and stacking correction.
    Keep the app chrome fully opaque and stable while route content changes below it. */
-@media(max-width:760px){
-  
-  
-  
-  
-  
-  
-  
-}
 
-@media(display-mode:standalone) and (max-width:760px){
-  
-  
-  .page{
-    padding-top:20px!important;
-  }
-}
 
 /* Public/mobile header follows the same opaque PWA chrome rule. */
-@media(max-width:900px){
-  
-  
+
+/* Touch rendering: avoid hover/compositor work while scrolling. */
+@media(hover:none) and (pointer:coarse){
+ .marketing-shell [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+ .hero-product,.pricing-card,.marketing-feature-grid article,.marketing-faq-grid article{box-shadow:none!important;transform:none!important;transition:none!important}
+ .primary-button,.secondary-button,.primary-link,.marketing-primary,.marketing-secondary,.ui-button{transform:none!important;transition:background-color var(--motion-fast),border-color var(--motion-fast),color var(--motion-fast),opacity var(--motion-fast)!important}
 }

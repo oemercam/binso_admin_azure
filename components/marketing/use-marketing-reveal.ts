@@ -8,8 +8,16 @@ export function useMarketingReveal(){
   if(!root)return;
   const items=Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
   if(!items.length)return;
+
   const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(reduce){items.forEach(item=>item.classList.add("is-visible"));return}
+  const compact=window.matchMedia("(max-width: 900px)").matches;
+  const standalone=window.matchMedia("(display-mode: standalone)").matches;
+
+  if(reduce||compact||standalone){
+   items.forEach(item=>item.classList.add("is-visible"));
+   return;
+  }
+
   const observer=new IntersectionObserver(entries=>{
    for(const entry of entries){
     if(!entry.isIntersecting)continue;
@@ -18,6 +26,7 @@ export function useMarketingReveal(){
     observer.unobserve(el);
    }
   },{rootMargin:"0px 0px -8% 0px",threshold:.12});
+
   items.forEach(item=>observer.observe(item));
   return()=>observer.disconnect();
  },[]);

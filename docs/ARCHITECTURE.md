@@ -17,3 +17,10 @@ UI chrome ownership is intentionally separated:
 - `styles/tokens.css`: design tokens and compatibility aliases.
 
 `scripts/ui-consistency-selfcheck.mjs` enforces these ownership boundaries during `pnpm test` so duplicate shell implementations cannot silently return.
+
+## Mobile/PWA rendering standard
+- Native PWA splash is the only application boot screen; no global React boot overlay.
+- Mobile spacing is tokenized in `styles/tokens.css`.
+- Shell/fixed chrome remains in `styles/shell.css`; viewport adaptations remain in `styles/responsive-central.css`.
+- Mobile marketing content does not use scroll-triggered reveal animations.
+- Route changes perform one scheduled scroll reset only.
