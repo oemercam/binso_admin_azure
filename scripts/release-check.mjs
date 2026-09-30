@@ -8,7 +8,7 @@ const required=[
   "components/security/account-security.tsx","components/notifications/notification-center.tsx",
   "app/api/health/route.ts","app/api/search/route.ts","app/api/files/route.ts","app/api/webhooks/stripe/route.ts",
   "database/migrations/008_locale_turkish.sql","database/migrations/009_platform_foundation.sql",
-  "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","hooks/use-overlay-lock.ts",
+  "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","hooks/use-overlay-lock.ts",
   "config/app.ts","components/ui/responsive-overlay.tsx","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
@@ -37,9 +37,11 @@ const tokens=fs.readFileSync("styles/tokens.css","utf8");
 const appCss=fs.readFileSync("styles/app.css","utf8");
 const responsive=fs.readFileSync("styles/responsive-central.css","utf8");
 const overlays=fs.readFileSync("styles/overlays.css","utf8");
+const shellCss=fs.readFileSync("styles/shell.css","utf8");
 for(const marker of ["--safe-top","--surface-0","--z-overlay","--page-gutter-mobile"]){if(!tokens.includes(marker))throw new Error(`Token baseline missing ${marker}`)}
 for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!appCss.includes(marker))throw new Error(`Application CSS baseline missing ${marker}`)}
-for(const marker of ["marketing-menu-button","marketing-mobile-navigation","pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
+for(const marker of ["pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
+for(const marker of ["marketing-menu-button","marketing-mobile-menu","marketing-footer",".topbar",".mobile-nav"]){if(!shellCss.includes(marker))throw new Error(`Shell baseline missing ${marker}`)}
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","@media print"]){if(!overlays.includes(marker))throw new Error(`Overlay baseline missing ${marker}`)}
 
 const noSecrets=["STRIPE_SECRET_KEY","STRIPE_WEBHOOK_SECRET","APP_ENCRYPTION_KEY","OPERATOR_BOOTSTRAP_PASSWORD"];

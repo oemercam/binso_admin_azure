@@ -1,1 +1,0 @@
-import Shell from "@/components/shell";import SupportNew from "@/components/support/support-new";export default function Page(){return <Shell><SupportNew/></Shell>}

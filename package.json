@@ -14,7 +14,7 @@
     "db:check": "node scripts/check-db.mjs",
     "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
     "permissions:test": "node scripts/permission-selfcheck.mjs",
-    "test": "node scripts/architecture-selfcheck.mjs && node scripts/overlay-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/production-selfcheck.mjs && node scripts/plan-demo-selfcheck.mjs",
+    "test": "node scripts/architecture-selfcheck.mjs && node scripts/ui-consistency-selfcheck.mjs && node scripts/overlay-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/production-selfcheck.mjs && node scripts/plan-demo-selfcheck.mjs",
     "tenant:test": "node scripts/tenant-isolation-check.mjs",
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",

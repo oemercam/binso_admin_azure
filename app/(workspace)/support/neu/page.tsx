@@ -1,0 +1,1 @@
+import SupportNew from "@/components/support/support-new";export default function Page(){return <SupportNew/>}

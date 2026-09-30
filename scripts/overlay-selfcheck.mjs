@@ -6,7 +6,7 @@ const overlay=fs.readFileSync("components/ui/responsive-overlay.tsx","utf8");
 const hook=fs.readFileSync("hooks/use-overlay-lock.ts","utf8");
 
 const imports=[...globals.matchAll(/@import\s+["']([^"']+)["']/g)].map(m=>m[1]);
-if(imports.length!==4)throw new Error(`Expected four centralized CSS entrypoints, got ${imports.length}: ${imports.join(", ")}`);
+if(imports.length!==5)throw new Error(`Expected five centralized CSS entrypoints, got ${imports.length}: ${imports.join(", ")}`);
 if(imports.at(-1)!=="../styles/overlays.css")throw new Error("Overlay stylesheet must be imported last.");
 
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","100dvh","--safe-bottom","grid-auto-columns:minmax(0,1fr)","@media print"]){

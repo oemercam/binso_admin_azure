@@ -1,1 +1,0 @@
-import Shell from "@/components/shell";import SupportList from "@/components/support/support-list";export default function Page(){return <Shell><SupportList/></Shell>}

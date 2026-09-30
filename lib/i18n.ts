@@ -205,6 +205,11 @@ Object.assign(fr,{"Anfrage fehlgeschlagen.":"La demande a échoué.","Passwort k
 Object.assign(it,{"Anfrage fehlgeschlagen.":"La richiesta non è riuscita.","Passwort konnte nicht geändert werden.":"Non è stato possibile modificare la password."});
 Object.assign(trDict,{"Anfrage fehlgeschlagen.":"İstek başarısız oldu.","Passwort konnte nicht geändert werden.":"Şifre değiştirilemedi."});
 
+Object.assign(en,{"Business-Software für Schweizer KMU":"Business software for Swiss SMEs","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Sales, projects, time, finance and HR in one clear platform.","Appenzell, Schweiz":"Appenzell, Switzerland"});
+Object.assign(fr,{"Business-Software für Schweizer KMU":"Logiciel de gestion pour les PME suisses","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Ventes, projets, temps, finances et personnel dans une plateforme claire.","Appenzell, Schweiz":"Appenzell, Suisse"});
+Object.assign(it,{"Business-Software für Schweizer KMU":"Software gestionale per PMI svizzere","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Vendite, progetti, tempo, finanze e personale in un’unica piattaforma chiara.","Appenzell, Schweiz":"Appenzello, Svizzera"});
+Object.assign(trDict,{"Business-Software für Schweizer KMU":"İsviçre KOBİ’leri için iş yazılımı","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Satış, projeler, zaman, finans ve personel tek ve sade bir platformda.","Appenzell, Schweiz":"Appenzell, İsviçre"});
+
 const dictionaries={en,fr,it,tr:trDict};
 
 const commonWords:Record<Exclude<Locale,"de">,Record<string,string>>={

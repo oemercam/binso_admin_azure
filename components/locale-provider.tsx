@@ -106,8 +106,8 @@ export default function LocaleProvider({children}:{children:React.ReactNode}){
 export function LanguageSwitcher({compact=false}:{compact?:boolean}){
   const {locale,setLocale,t}=useLocale();
   return <label className={compact?"language-switcher compact":"language-switcher"} aria-label={t("Sprache")}>
-    <span>{compact?localeLabels[locale]:t("Sprache")}</span>
-    <select value={locale} onChange={e=>setLocale(e.target.value as Locale)}>
+    {!compact&&<span>{t("Sprache")}</span>}
+    <select aria-label={t("Sprache")} value={locale} onChange={e=>setLocale(e.target.value as Locale)}>
       {(Object.keys(localeLabels) as Locale[]).map(l=><option value={l} key={l}>{compact?localeLabels[l]:localeNames[l]}</option>)}
     </select>
   </label>

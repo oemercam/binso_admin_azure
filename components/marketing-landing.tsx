@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {usePathname} from "next/navigation";
-import {useEffect,useRef,useState} from "react";
 import {ArrowRight,Check,ChevronRight,Clock3,FileText,FolderKanban,ReceiptText,ShieldCheck,Sparkles,Users,WalletCards} from "lucide-react";
 import PricingCarousel from "@/components/marketing/pricing-carousel";
-import {LanguageSwitcher,useLocale} from "@/components/locale-provider";
-import BrandLogo from "@/components/ui/brand-logo";
-import MarketingMenuButton from "@/components/marketing/marketing-menu-button";
+import {useLocale} from "@/components/locale-provider";
+import MarketingFrame from "@/components/marketing/marketing-frame";
 import {useMarketingReveal} from "@/components/marketing/use-marketing-reveal";
-import MarketingFooter from "@/components/marketing/marketing-footer";
 
 const featureGroups=[
  {icon:ReceiptText,title:"Verkauf und Finanzen",text:"Kunden, Offerten, Aufträge, Rechnungen, Zahlungen, Lieferanten und Eingangsrechnungen in einem Ablauf."},
@@ -19,37 +15,9 @@ const featureGroups=[
 ];
 
 export default function MarketingLanding(){
- const pathname=usePathname();
- const [menuPath,setMenuPath]=useState<string|null>(null);
- const menuOpen=menuPath===pathname;
- const menuRef=useRef<HTMLElement|null>(null);
  const {t}=useLocale();
  useMarketingReveal();
- useEffect(()=>{
-  document.body.classList.toggle("marketing-menu-open",menuOpen);
-  if(!menuOpen)return()=>document.body.classList.remove("marketing-menu-open");
-  const previousOverflow=document.documentElement.style.overflow;
-  document.documentElement.style.overflow="hidden";
-  const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape")setMenuPath(null)};
-  window.addEventListener("keydown",onKey);
-  window.requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLAnchorElement>("nav a")?.focus());
-  return()=>{document.body.classList.remove("marketing-menu-open");document.documentElement.style.overflow=previousOverflow;window.removeEventListener("keydown",onKey)};
- },[menuOpen]);
- const close=()=>setMenuPath(null);
- return <div className="marketing-shell">
-  <header className="marketing-header">
-   <Link href="/" className="marketing-logo marketing-logo-image" aria-label="Binso One"><BrandLogo priority/></Link>
-   <nav className="marketing-nav"><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/sicherheit">{t("Sicherheit")}</Link><Link href="/kontakt">{t("Kontakt")}</Link></nav>
-   <div className="marketing-actions"><LanguageSwitcher compact/><Link href="/portal/login">{t("Anmelden")}</Link><Link className="marketing-primary" href="/portal/registrieren">{t("Kostenlos starten")} <ArrowRight size={16}/></Link></div>
-   <MarketingMenuButton open={menuOpen} onClick={()=>setMenuPath(current=>current===pathname?null:pathname)}/>
-  </header>
-  <aside id="marketing-mobile-navigation" ref={menuRef} className={`marketing-mobile-menu ${menuOpen?"open":""}`} aria-hidden={!menuOpen} aria-modal={menuOpen?true:undefined} role="dialog">
-   <div className="marketing-mobile-menu-head"><strong>{t("Navigation")}</strong></div>
-   <nav><Link href="/features" onClick={close}>{t("Funktionen")}</Link><Link href="/preise" onClick={close}>{t("Preise")}</Link><Link href="/sicherheit" onClick={close}>{t("Sicherheit")}</Link><Link href="/kontakt" onClick={close}>{t("Kontakt")}</Link></nav>
-   <div className="marketing-mobile-language"><LanguageSwitcher/></div>
-   <div className="marketing-mobile-actions"><Link href="/portal/login" className="marketing-secondary" onClick={close}>{t("Anmelden")}</Link><Link href="/portal/registrieren?trial=1" className="marketing-primary" onClick={close}>{t("14 Tage kostenlos testen")}</Link></div>
-  </aside>
-  <main>
+ return <MarketingFrame>
    <section className="marketing-hero" data-reveal>
     <div className="hero-copy">
       <div className="eyebrow-pill"><Sparkles size={15}/>{t("Schweizer KMU-Plattform")}</div>
@@ -69,7 +37,5 @@ export default function MarketingLanding(){
    <section id="preise" className="marketing-section pricing-section" data-reveal><div className="section-kicker">{t("Transparent und skalierbar")}</div><h2>{t("Drei Pläne. Jederzeit wechselbar.")}</h2><p className="section-lead">{t("Alle Preise pro Firma und Monat, exkl. MWST. Jährliche Zahlung entspricht zwei kostenlosen Monaten.")}</p><PricingCarousel/></section>
    <section className="marketing-section marketing-faq-section" data-reveal><div className="section-kicker">{t("Kurz beantwortet")}</div><h2>{t("Was Unternehmen vor dem Start wissen wollen.")}</h2><div className="marketing-faq-grid"><article><h3>{t("Für wen ist Binso One gedacht?")}</h3><p>{t("Für Schweizer KMU, die Verkauf, Projekte, Zeit, Rechnungen und Administration in einer zentralen Plattform führen möchten.")}</p></article><article><h3>{t("Kann ich zuerst testen?")}</h3><p>{t("Ja. Die Demo funktioniert ohne Kreditkarte. Für eine eigene Testorganisation ist ein Trial-Flow vorbereitet.")}</p></article><article><h3>{t("Unterstützt Binso One mehrere Benutzer?")}</h3><p>{t("Ja. Rollen, Einladungen und Berechtigungen werden pro Organisation verwaltet.")}</p></article><article><h3>{t("Wie ist der Support organisiert?")}</h3><p>{t("Kunden können Tickets direkt in Binso One erstellen und freiwillig Diagnose, Screenshot oder Anhänge mitsenden.")}</p></article></div></section>
    <section id="sicherheit" className="marketing-section security-section" data-reveal><div className="security-copy"><div className="section-kicker">{t("Für Unternehmen entwickelt")}</div><h2>{t("Klar getrennte Firmen, Rollen und Prozesse.")}</h2><p>{t("Jede registrierte Organisation erhält ihren eigenen Mandanten. Rollen, serverseitige Berechtigungen, Audit-Verlauf und Einstellungen werden pro Firma getrennt verwaltet. Betreiberzugriffe und Kundenzugriffe sind zusätzlich voneinander getrennt.")}</p><div className="security-points"><span><ShieldCheck size={18}/>{t("Rollen und Berechtigungen")}</span><span><FileText size={18}/>{t("Audit und Dokumente")}</span><span><Clock3 size={18}/>{t("nachvollziehbare Workflows")}</span></div></div><div className="security-card"><strong>{t("Bereit für deinen Prozess?")}</strong><p>{t("Starte eine kostenlose Testorganisation oder öffne die vorkonfigurierte Demo.")}</p><Link className="marketing-primary big" href="/portal/registrieren?trial=1">{t("Jetzt testen")} <ArrowRight size={17}/></Link><Link className="marketing-secondary big" href="/demo">{t("Demo ansehen")}</Link></div></section>
-  </main>
-  <MarketingFooter/>
- </div>;
+ </MarketingFrame>;
 }

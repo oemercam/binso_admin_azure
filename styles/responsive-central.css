@@ -22,54 +22,21 @@
   }
 
   /* Mobile/PWA uses bottom navigation + sheets, never the desktop side drawer. */
-  .sidebar,
-  .sidebar-backdrop,
-  .menu-button {
-    display: none !important;
-  }
+  
 
-  .content-shell {
-    margin-left: 0 !important;
-    min-height: 100dvh;
-  }
+  
 
-  .topbar {
-    height: 56px;
-    padding: 0 12px;
-    gap: 8px;
-    background: rgba(255,255,255,.94);
-  }
+  
 
-  .mobile-brand {
-    display: block !important;
-    font-size: 17px;
-    font-weight: 720;
-    letter-spacing: -.03em;
-  }
+  
 
-  .global-search,
-  .topbar > .language-switcher {
-    display: none !important;
-  }
+  
 
-  .mobile-top-action {
-    display: grid !important;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border: 0;
-    background: transparent;
-    border-radius: 50%;
-  }
+  
 
-  .company-switch {
-    margin-left: 0;
-  }
+  
 
-  .company-switch .avatar {
-    width: 34px;
-    height: 34px;
-  }
+  
 
   .page {
     width: 100%;
@@ -124,61 +91,17 @@
   }
 
   /* New bottom navigation */
-  .mobile-nav {
-    display: grid !important;
-    position: fixed;
-    z-index: 70;
-    left: 8px;
-    right: 8px;
-    bottom: max(8px, env(safe-area-inset-bottom));
-    height: 66px;
-    grid-template-columns: repeat(5,minmax(0,1fr)) !important;
-    background: rgba(255,255,255,.96);
-    border: 1px solid rgba(220,220,216,.95);
-    border-radius: 19px;
-    box-shadow: 0 12px 38px rgba(0,0,0,.14);
-    backdrop-filter: blur(18px);
-    padding: 5px;
-  }
+  
 
-  .mobile-nav-item {
-    border: 0;
-    background: transparent;
-    border-radius: 14px;
-    min-width: 0;
-    color: #777771;
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 2px;
-    font-size: 9.5px;
-    font-weight: 600;
-  }
+  
 
-  .mobile-nav-item.active {
-    color: #111;
-    background: #f2f2ef;
-  }
+  
 
-  .mobile-nav-item span {
-    font-size: 9.5px;
-  }
+  
 
-  .mobile-nav-create {
-    align-self: center;
-    justify-self: center;
-    width: 48px;
-    height: 48px;
-    margin-top: -18px;
-    border-radius: 50%;
-    background: #111 !important;
-    color: #fff !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,.22);
-  }
+  
 
-  .mobile-nav-create span {
-    display: none;
-  }
+  
 
   /* All mobile overlays use bottom sheets */
   
@@ -303,28 +226,15 @@
 @media (max-width: 370px) {
   
 
-  .mobile-nav {
-    left: 5px;
-    right: 5px;
-  }
+  
 
-  .mobile-nav-item span {
-    font-size: 9px;
-  }
+  
 }
 
 @media (display-mode: standalone) and (max-width: 760px) {
-  .topbar {
-    height: calc(56px + env(safe-area-inset-top));
-    padding-top: env(safe-area-inset-top);
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-  }
+  
 
-  .mobile-nav {
-    left: max(8px, env(safe-area-inset-left));
-    right: max(8px, env(safe-area-inset-right));
-  }
+  
 }
 
 @media print {
@@ -335,35 +245,13 @@
 
 
 @media (max-width: 760px) {
-  .account-trigger {
-    width: 38px;
-    height: 38px;
-    padding: 0;
-    gap: 0;
-    justify-content: center;
-  }
+  
 
-  .account-trigger-copy,
-  .account-trigger > svg {
-    display: none;
-  }
+  
 
-  .account-trigger .avatar {
-    width: 34px;
-    height: 34px;
-  }
+  
 
-  .account-menu {
-    position: fixed;
-    z-index: 96;
-    left: 8px;
-    right: 8px;
-    top: auto;
-    bottom: calc(82px + env(safe-area-inset-bottom));
-    width: auto;
-    border-radius: 18px;
-    padding: 10px;
-  }
+  
 
   .profile-settings-grid {
     grid-template-columns: minmax(0,1fr) !important;
@@ -377,118 +265,45 @@
 
 /* v0.8.2 mobile topbar polish */
 @media (max-width: 760px) {
-  .topbar {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) 38px 38px;
-    align-items: center;
-    gap: 6px;
-    padding-left: 12px;
-    padding-right: 10px;
-    border-bottom: 1px solid rgba(230,230,226,.92);
-  }
+  
 
-  .mobile-brand {
-    min-width: 0;
-    justify-self: start;
-    font-size: 17px;
-    font-weight: 720;
-    letter-spacing: -.035em;
-    color: #111;
-    text-decoration: none;
-  }
+  
 
-  .mobile-top-action {
-    width: 38px;
-    height: 38px;
-    border: 0 !important;
-    background: transparent !important;
-    color: #111;
-    border-radius: 50%;
-    padding: 0;
-    box-shadow: none !important;
-    display: grid !important;
-    place-items: center;
-  }
+  
 
-  .mobile-top-action:hover,
-  .mobile-top-action:active {
-    background: #f2f2ef !important;
-  }
+  
 
   .mobile-search-trigger {
     justify-self: end;
   }
 
-  .account-menu-wrap {
-    margin-left: 0;
-    justify-self: end;
-  }
+  
 
-  .account-trigger {
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
+  
 
-  .account-trigger:hover,
-  .account-trigger[aria-expanded="true"] {
-    background: #f2f2ef !important;
-  }
+  
 
-  .account-trigger .avatar {
-    background: #111;
-    color: #fff;
-    border: 0;
-    box-shadow: none;
-  }
+  
 
-  .mobile-nav {
-    grid-template-columns: 1fr 1fr 56px 1fr 1fr !important;
-    align-items: center;
-    padding: 6px 7px;
-  }
+  
 
-  .mobile-nav-create {
-    width: 50px;
-    height: 50px;
-    margin-top: -19px;
-    border: 4px solid #fff !important;
-    box-shadow: 0 9px 24px rgba(0,0,0,.20);
-  }
+  
 
-  .mobile-nav-item {
-    min-height: 52px;
-  }
+  
 
-  .mobile-nav-item svg {
-    width: 19px;
-    height: 19px;
-  }
+  
 
-  .mobile-nav-item span {
-    margin-top: 1px;
-  }
+  
 }
 
 @media (max-width: 370px) {
-  .topbar {
-    grid-template-columns: minmax(0,1fr) 36px 36px;
-    gap: 4px;
-    padding-inline: 9px 7px;
-  }
+  
 
-  .mobile-top-action,
-  .account-trigger {
-    width: 36px;
-    height: 36px;
-  }
+  
 
-  .account-trigger .avatar {
-    width: 32px;
-    height: 32px;
-  }
+  
 }
-n/* ---- consolidated v1.3.2 mobile/PWA rules ---- */
+/* ---- consolidated v1.3.2 mobile/PWA rules ---- */
 /* ==========================================================
    Binso One v1.3.2 — PWA safe areas, calmer type, contrast,
    icon-only loader, mobile pricing carousel and equal sheet actions
@@ -504,15 +319,15 @@ n/* ---- consolidated v1.3.2 mobile/PWA rules ---- */
 @keyframes binso-icon-build{0%{clip-path:inset(100% 0 0 0);opacity:.75}100%{clip-path:inset(0 0 0 0);opacity:1}}
 
 /* Public hamburger: invisible touch target, visible glyph only. */
-.marketing-menu-button{border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;animation:none!important;width:44px!important;height:44px!important;color:var(--text);touch-action:manipulation}
-.marketing-menu-button:hover,.marketing-menu-button:active{background:transparent!important}
-.marketing-menu-glyph{width:22px;height:18px}.marketing-menu-glyph>span{left:1px;width:20px;height:1.7px;transition:transform .22s cubic-bezier(.22,1,.36,1),top .22s cubic-bezier(.22,1,.36,1),opacity .13s ease}
-.marketing-menu-glyph>span:nth-child(1){top:2px}.marketing-menu-glyph>span:nth-child(2){top:8px}.marketing-menu-glyph>span:nth-child(3){top:14px}.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(1){top:8px;transform:rotate(45deg)}.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(2){opacity:0;transform:scaleX(0)}.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(3){top:8px;transform:rotate(-45deg)}
-html[data-theme="dark"] .marketing-menu-button{background:transparent!important;border:0!important;color:#f5f5f3!important}
+
+
+
+
+
 
 /* Better neutral surface hierarchy in dark mode. */
-html[data-theme="dark"] body,html[data-theme="dark"] .app-shell,html[data-theme="dark"] .content-shell{background:var(--surface-0)!important}
-html[data-theme="dark"] .topbar{background:color-mix(in srgb,var(--surface-1) 94%,transparent)!important;border-color:var(--surface-border)!important}
+
+
 
 html[data-theme="dark"] :is(.auth-form input,.auth-form select,.auth-form textarea,.ui-input,.ui-select,.ui-textarea,.password-input,.mobile-search-field){background:var(--surface-2)!important;border-color:var(--surface-border-strong)!important;color:#f5f5f3!important}
 html[data-theme="dark"] :is(.auth-form input,.auth-form select,.auth-form textarea,.ui-input,.ui-select,.ui-textarea):focus{background:var(--surface-3)!important;border-color:rgba(255,255,255,.32)!important;box-shadow:0 0 0 3px rgba(255,255,255,.08)!important}
@@ -523,12 +338,12 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 /* Safe-area app shell. */
 @media(max-width:760px){
  body{background:var(--surface-0)!important;overflow-x:clip}
- .content-shell{min-height:100dvh;padding-top:calc(var(--app-header-row) + var(--safe-top))}
- .topbar{position:fixed!important;z-index:80!important;top:0!important;left:0!important;right:0!important;height:calc(var(--app-header-row) + var(--safe-top))!important;min-height:0!important;padding-top:var(--safe-top)!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;grid-template-columns:minmax(0,1fr) 44px 44px!important;gap:4px!important}
- .mobile-brand-image,.mobile-top-action,.account-trigger{align-self:center}
+ 
+ 
+ 
  .page{box-sizing:border-box;padding-top:20px!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;padding-bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 30px)!important}
- .mobile-nav{left:max(10px,var(--safe-left))!important;right:max(10px,var(--safe-right))!important;bottom:max(10px,var(--safe-bottom))!important;height:var(--app-bottom-nav-row)!important;min-height:var(--app-bottom-nav-row)!important;border-radius:18px!important;background:color-mix(in srgb,var(--surface-1) 96%,transparent)!important;border-color:var(--surface-border)!important;padding:5px 6px!important}
- .mobile-nav-item{min-height:52px!important}.mobile-nav-item.active{background:var(--surface-2)!important}.mobile-nav-create{border-color:var(--surface-1)!important}
+ 
+ 
  .onboarding-shell{padding-top:calc(var(--app-header-row) + var(--safe-top))!important;padding-bottom:calc(78px + var(--safe-bottom))!important}
  .onboarding-top{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:20!important;height:calc(var(--app-header-row) + var(--safe-top))!important;padding-top:var(--safe-top)!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;background:var(--surface-0)!important}
  .onboarding-card{padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;margin-top:0!important}
@@ -550,12 +365,12 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 
 /* Public header and footer safe areas. */
 @media(max-width:900px){
- .marketing-header{min-height:calc(56px + var(--safe-top))!important;height:auto!important;padding-top:var(--safe-top)!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;background:color-mix(in srgb,var(--surface-1) 94%,transparent)!important;border-color:var(--surface-border)!important}
- .marketing-mobile-menu{padding-top:calc(16px + var(--safe-top))!important;padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;padding-bottom:calc(18px + var(--safe-bottom))!important;padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;background:var(--surface-1)!important;border-color:var(--surface-border)!important}
+ 
+ 
 }
-.marketing-footer{grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr)!important;align-items:start!important;padding-bottom:calc(34px + var(--safe-bottom))!important}.marketing-footer-links{display:grid!important;grid-template-columns:repeat(3,minmax(110px,1fr))!important;gap:24px!important}.marketing-footer-links>div{display:grid;align-content:start;gap:8px}.marketing-footer-links strong{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.marketing-footer-bottom{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--surface-border);padding-top:16px}.marketing-footer-brand .binso-brand-image{height:34px!important;max-width:110px!important}.marketing-footer-brand span{margin-top:6px}
+
 @media(max-width:600px){
- .marketing-footer{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;padding:24px max(var(--app-gutter-mobile),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--app-gutter-mobile),var(--safe-left))!important}.marketing-footer-brand{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}.marketing-footer-brand span{margin:0!important;font-size:10px!important;text-align:right!important;max-width:170px}.marketing-footer-links{grid-template-columns:1fr!important;gap:0!important;border-top:1px solid var(--surface-border);border-bottom:1px solid var(--surface-border);padding:8px 0!important}.marketing-footer-links>div{display:flex!important;align-items:center!important;gap:12px!important;min-height:34px!important;overflow-x:auto;scrollbar-width:none}.marketing-footer-links>div::-webkit-scrollbar{display:none}.marketing-footer-links strong{min-width:72px!important;flex:0 0 auto!important}.marketing-footer-links a{white-space:nowrap!important;font-size:11px!important}.marketing-footer-bottom{border:0!important;padding:0!important}.marketing-footer-bottom small{font-size:10px!important}.marketing-footer-bottom .language-switcher{min-width:0}
+ 
 }
 
 /* Softer public type scale. */
@@ -570,44 +385,18 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
  .pricing-carousel::-webkit-scrollbar{display:none}.pricing-carousel .pricing-card{flex:0 0 84vw!important;max-width:360px!important;scroll-snap-align:center!important;scroll-snap-stop:always!important;padding:20px!important;border-radius:16px!important}.pricing-carousel .pricing-card.popular{transform:none!important;border-width:1.5px!important}.pricing-carousel .pricing-card>p{min-height:0!important}.pricing-swipe-hint{display:flex!important;justify-content:center;gap:5px;padding:4px 0 0}.pricing-swipe-hint span{width:5px;height:5px;border-radius:50%;background:var(--border-strong)}.pricing-swipe-hint span.active{width:16px;border-radius:999px;background:var(--text)}
 }
 
-@media(prefers-reduced-motion:reduce){.app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}.marketing-menu-glyph>span{transition:none!important}}
-n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
+@media(prefers-reduced-motion:reduce){.app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}}
+/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
 /* ==========================================================
    Binso One v1.3.3 — full-height mobile/PWA marketing navigation
    ========================================================== */
 
 @media(max-width:900px){
   /* Header stays fixed and unchanged while the menu opens. */
-  .marketing-header{
-    position:fixed!important;
-    top:0!important;
-    left:0!important;
-    right:0!important;
-    z-index:120!important;
-    width:100%!important;
-    max-width:none!important;
-    margin:0!important;
-    min-height:calc(56px + var(--safe-top))!important;
-    height:calc(56px + var(--safe-top))!important;
-    padding-top:var(--safe-top)!important;
-    padding-bottom:0!important;
-    box-sizing:border-box!important;
-  }
-  .marketing-header .marketing-logo{
-    flex:0 0 auto!important;
-    min-width:0!important;
-  }
-  .marketing-header .marketing-menu-button{
-    margin-left:auto!important;
-    flex:0 0 44px!important;
-    width:44px!important;
-    min-width:44px!important;
-    height:44px!important;
-    padding:0!important;
-  }
-  .marketing-header .binso-brand-image{
-    display:block!important;
-  }
+  
+  
+  
+  
 
   /* Fixed header needs an explicit content offset so every page starts below it. */
   .marketing-shell>main{
@@ -615,86 +404,19 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
   }
 
   /* No separate side-drawer/backdrop: the navigation fills the complete area below the header. */
-  .marketing-mobile-backdrop{display:none!important}
-  .marketing-mobile-menu{
-    display:flex!important;
-    position:fixed!important;
-    z-index:110!important;
-    top:calc(56px + var(--safe-top))!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    width:100%!important;
-    max-width:none!important;
-    height:auto!important;
-    margin:0!important;
-    box-sizing:border-box!important;
-    padding-top:20px!important;
-    padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;
-    padding-bottom:calc(20px + var(--safe-bottom))!important;
-    padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;
-    border:0!important;
-    border-top:1px solid var(--surface-border)!important;
-    box-shadow:none!important;
-    background:var(--surface-0)!important;
-    color:var(--text)!important;
-    overflow-y:auto!important;
-    overscroll-behavior:contain!important;
-    -webkit-overflow-scrolling:touch;
-    transform:none!important;
-    transform-origin:top center!important;
-    clip-path:inset(0 0 100% 0)!important;
-    opacity:0!important;
-    visibility:hidden!important;
-    pointer-events:none!important;
-    transition:clip-path .28s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s linear .28s!important;
-    gap:18px!important;
-  }
-  .marketing-mobile-menu.open{
-    clip-path:inset(0 0 0 0)!important;
-    opacity:1!important;
-    visibility:visible!important;
-    pointer-events:auto!important;
-    transition:clip-path .28s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s!important;
-  }
-  .marketing-mobile-menu-head{
-    min-height:24px!important;
-    padding:0!important;
-  }
-  .marketing-mobile-menu-head strong{
-    font-size:11px!important;
-    font-weight:600!important;
-    letter-spacing:.06em!important;
-    text-transform:uppercase!important;
-    color:var(--muted)!important;
-  }
-  .marketing-mobile-menu nav{
-    display:grid!important;
-    align-content:start!important;
-    gap:0!important;
-  }
-  .marketing-mobile-menu nav a{
-    min-height:54px!important;
-    padding:0!important;
-    border-bottom:1px solid var(--surface-border)!important;
-    font-size:18px!important;
-    font-weight:500!important;
-    letter-spacing:-.015em!important;
-  }
+  
+  
+  
+  
+  
+  
+  
   .marketing-mobile-language{
     margin-top:4px!important;
     padding-top:0!important;
   }
-  .marketing-mobile-actions{
-    margin-top:auto!important;
-    padding-top:14px!important;
-    gap:10px!important;
-  }
-  .marketing-mobile-actions a{
-    min-height:46px!important;
-    width:100%!important;
-    justify-content:center!important;
-  }
+  
+  
 
   body.marketing-menu-open{
     overflow:hidden!important;
@@ -703,14 +425,12 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
 }
 
 @media(max-width:600px){
-  .marketing-mobile-menu{padding-top:18px!important}
-  .marketing-mobile-menu nav a{min-height:52px!important;font-size:17px!important}
+  
+  
 }
 
 @media(prefers-reduced-motion:reduce){
-  .marketing-mobile-menu,.marketing-mobile-menu.open{
-    transition:none!important;
-  }
+  
 }
 
 @media(max-width:900px){#marketing-mobile-navigation{isolation:isolate}}
@@ -719,14 +439,8 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
 @media(max-width:760px){
   html,body{min-height:100%;overflow-x:clip}
   body{background:var(--surface-0)}
-  .content-shell{min-height:100dvh;padding-top:calc(var(--app-header-row) + var(--safe-top))}
-  .topbar{
-    position:fixed!important;z-index:var(--z-header)!important;top:0!important;left:0!important;right:0!important;
-    height:calc(var(--app-header-row) + var(--safe-top))!important;min-height:0!important;
-    padding-top:var(--safe-top)!important;padding-left:max(var(--page-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--page-gutter-mobile),var(--safe-right))!important;
-    grid-template-columns:minmax(0,1fr) 44px 44px!important;gap:4px!important;
-    background:color-mix(in srgb,var(--surface-1) 96%,transparent)!important;border-color:var(--surface-border)!important;
-  }
+  
+  
   .page{
     box-sizing:border-box;width:100%;max-width:100%;
     padding-top:20px!important;
@@ -734,14 +448,8 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
     padding-right:max(var(--page-gutter-mobile),var(--safe-right))!important;
     padding-bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 30px)!important;
   }
-  .mobile-nav{
-    z-index:var(--z-mobile-nav)!important;
-    left:max(10px,var(--safe-left))!important;right:max(10px,var(--safe-right))!important;bottom:max(10px,var(--safe-bottom))!important;
-    height:var(--app-bottom-nav-row)!important;min-height:var(--app-bottom-nav-row)!important;
-    padding:5px 6px!important;border-radius:18px!important;
-    background:color-mix(in srgb,var(--surface-1) 96%,transparent)!important;border-color:var(--surface-border)!important;
-  }
-  .mobile-nav-item{min-height:52px!important}.mobile-nav-item.active{background:var(--surface-2)!important}
+  
+  
   .auth-shell{
     min-height:100dvh!important;padding-top:calc(70px + var(--safe-top))!important;
     padding-left:max(var(--page-gutter-mobile),var(--safe-left))!important;padding-right:max(var(--page-gutter-mobile),var(--safe-right))!important;
@@ -777,111 +485,152 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
  height:74px!important;
 }
 
-.marketing-menu-glyph{width:24px!important;height:20px!important}
-.marketing-menu-glyph>span{
- left:1px!important;
- width:22px!important;
- height:1.8px!important;
- transition:top .32s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1),opacity .18s ease!important;
-}
-.marketing-menu-glyph>span:nth-child(1){top:2px!important}
-.marketing-menu-glyph>span:nth-child(2){top:9px!important}
-.marketing-menu-glyph>span:nth-child(3){top:16px!important}
-.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(1){top:9px!important;transform:rotate(45deg)!important}
-.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(2){opacity:0!important;transform:scaleX(0)!important}
-.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(3){top:9px!important;transform:rotate(-45deg)!important}
+
+
+
+
+
+
+
+
 
 @media(max-width:900px){
- .marketing-header{
-  position:fixed!important;
-  top:0!important;
-  left:0!important;
-  right:0!important;
-  z-index:120!important;
-  height:calc(64px + var(--safe-top))!important;
-  padding-top:var(--safe-top)!important;
- }
+ 
  .marketing-shell>main{padding-top:calc(64px + var(--safe-top))!important}
- .marketing-mobile-menu{
-  display:flex!important;
-  position:fixed!important;
-  z-index:110!important;
-  inset:0!important;
-  width:100vw!important;
-  max-width:none!important;
-  height:100dvh!important;
-  min-height:100dvh!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-  padding-top:calc(84px + var(--safe-top))!important;
-  padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;
-  padding-bottom:calc(20px + var(--safe-bottom))!important;
-  padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;
-  border:0!important;
-  box-shadow:none!important;
-  background:var(--surface-0)!important;
-  color:var(--text)!important;
-  overflow-y:auto!important;
-  overscroll-behavior:contain!important;
-  -webkit-overflow-scrolling:touch;
-  transform:translateY(-100%)!important;
-  clip-path:none!important;
-  opacity:1!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-  transition:transform .38s cubic-bezier(.22,1,.36,1),visibility 0s linear .38s!important;
-  gap:18px!important;
- }
- .marketing-mobile-menu.open{
-  transform:translateY(0)!important;
-  opacity:1!important;
-  visibility:visible!important;
-  pointer-events:auto!important;
-  transition:transform .38s cubic-bezier(.22,1,.36,1),visibility 0s!important;
- }
- .marketing-mobile-backdrop{display:none!important}
+ 
+ 
+ 
 }
 
 @media(prefers-reduced-motion:reduce){
  .app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}
- .marketing-menu-glyph>span,.marketing-mobile-menu{transition:none!important}
+ 
 }
 
 
 /* v1.4.x navigation hierarchy and public footer */
-.account-menu-section{display:grid;gap:4px;padding-top:6px}
-.account-menu-section+.account-menu-section{margin-top:2px}
-.account-menu-section-label{padding:0 9px;font-size:9px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.account-menu-section .account-menu-links{border-top:0}
-.account-menu-section:last-of-type .account-menu-links{border-bottom:1px solid var(--line)}
 
-.marketing-footer{display:block!important;max-width:1180px!important;margin:0 auto!important;padding:0 28px calc(34px + var(--safe-bottom))!important;border-top:1px solid var(--surface-border)!important}
-.marketing-footer-main{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.6fr);gap:72px;padding:34px 0 30px}
-.marketing-footer-brand{display:grid;align-content:start;justify-items:start;gap:10px}
-.marketing-footer-brand .binso-brand-image{height:32px!important;max-width:108px!important}
-.marketing-footer-brand p{max-width:230px;margin:0;color:var(--muted);font-size:12px;line-height:1.5}
-.marketing-footer-links{display:grid!important;grid-template-columns:minmax(120px,1fr) minmax(110px,.8fr) minmax(130px,1fr)!important;gap:42px!important}
-.marketing-footer-group{display:grid;align-content:start;justify-items:start;gap:9px}
-.marketing-footer-group strong{margin-bottom:2px;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.marketing-footer-group a{font-size:13px!important;line-height:1.35;color:var(--text)!important;transition:opacity var(--motion-fast) ease}
-.marketing-footer-group a:hover{opacity:.58}
-.marketing-footer-bottom{display:flex!important;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--surface-border);padding-top:16px!important}
-.marketing-footer-bottom small{font-size:10px;color:var(--muted)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media(max-width:760px){
- .account-menu-section-label{font-size:9px}
- .marketing-footer{padding:0 max(var(--app-gutter-mobile),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--app-gutter-mobile),var(--safe-left))!important}
- .marketing-footer-main{grid-template-columns:1fr;gap:24px;padding:26px 0 22px}
- .marketing-footer-brand{display:flex!important;align-items:center;justify-content:space-between;gap:16px}
- .marketing-footer-brand p{max-width:180px;text-align:right;font-size:10px;line-height:1.4}
- .marketing-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;border:0!important;padding:0!important}
- .marketing-footer-group{display:grid!important;align-content:start!important;gap:8px!important;min-height:0!important;overflow:visible!important}
- .marketing-footer-group strong{min-width:0!important;font-size:9px!important}
- .marketing-footer-group a{font-size:11px!important;white-space:normal!important}
- .marketing-footer-bottom{border-top:1px solid var(--surface-border)!important;padding-top:14px!important}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 }
 @media(max-width:430px){
- .marketing-footer-links{grid-template-columns:1fr 1fr!important;row-gap:22px!important}
- .marketing-footer-group:last-child{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
- .marketing-footer-group:last-child strong{grid-column:1/-1}
+ 
+ 
+ 
+}
+
+
+/* v1.4.x public footer, single language location and interaction motion */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media(hover:hover) and (pointer:fine){
+ .marketing-primary,.marketing-secondary,.primary-button,.secondary-button,.ui-button-primary,.ui-button-secondary,.auth-submit,.plan-button{transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease!important}
+ .marketing-primary:hover,.marketing-secondary:hover,.primary-button:hover,.secondary-button:hover,.ui-button-primary:hover,.ui-button-secondary:hover,.auth-submit:hover,.plan-button:hover{transform:translateY(-2px)}
+ .marketing-primary:hover,.primary-button:hover,.ui-button-primary:hover,.auth-submit:hover{box-shadow:0 10px 24px rgba(0,0,0,.12)}
+ .marketing-secondary:hover,.secondary-button:hover,.ui-button-secondary:hover{box-shadow:0 8px 20px rgba(0,0,0,.07);border-color:var(--border-strong)}
+ .pricing-card{transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s ease,border-color .22s ease!important}
+ .pricing-card:hover{transform:translateY(-6px)!important;box-shadow:0 18px 42px rgba(0,0,0,.09);border-color:var(--border-strong)}
+ .pricing-card.popular:hover{transform:translateY(-7px)!important;box-shadow:0 20px 46px rgba(0,0,0,.12)}
+ 
+ 
+ 
+}
+
+@media(max-width:760px){
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ .pricing-carousel .pricing-card:hover,.pricing-carousel .pricing-card.popular:hover{transform:none!important;box-shadow:none}
+}
+
+@media(max-width:430px){
+ 
+ 
+}
+
+@media(prefers-reduced-motion:reduce){
+ 
+}
+
+/* v1.4.x PWA/mobile app-header paint and stacking correction.
+   Keep the app chrome fully opaque and stable while route content changes below it. */
+@media(max-width:760px){
+  
+  
+  
+  
+  
+  
+  
+}
+
+@media(display-mode:standalone) and (max-width:760px){
+  
+  
+  .page{
+    padding-top:20px!important;
+  }
+}
+
+/* Public/mobile header follows the same opaque PWA chrome rule. */
+@media(max-width:900px){
+  
+  
 }

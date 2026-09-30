@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const required=[
- "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","hooks/use-overlay-lock.ts","config/app.ts",
+ "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","hooks/use-overlay-lock.ts","config/app.ts",
  "components/ui/button.tsx","components/ui/form-controls.tsx","components/ui/responsive-overlay.tsx",
  "hooks/use-connectivity.ts","hooks/use-standalone.ts","components/connectivity-banner.tsx","components/pwa-update-notice.tsx",
  "database/migrations/009_platform_foundation.sql","app/api/notification-preferences/route.ts","lib/server/idempotency.ts"
@@ -13,7 +13,7 @@ const tokens=fs.readFileSync("styles/tokens.css","utf8");
 for(const token of ["--background","--surface","--foreground","--border","--space-1","--radius-sm","--text-base","--safe-top","--z-overlay","--motion-base"]){if(!tokens.includes(token))throw new Error(`Design token missing: ${token}`)}
 const globals=fs.readFileSync("app/globals.css","utf8");
 const imports=[...globals.matchAll(/@import\s+["']([^"']+)["']/g)].map(m=>m[1]);
-if(imports.join("|")!==["../styles/tokens.css","../styles/app.css","../styles/responsive-central.css","../styles/overlays.css"].join("|"))throw new Error(`CSS entrypoints not centralized: ${imports.join(", ")}`);
+if(imports.join("|")!==["../styles/tokens.css","../styles/app.css","../styles/responsive-central.css","../styles/shell.css","../styles/overlays.css"].join("|"))throw new Error(`CSS entrypoints not centralized: ${imports.join(", ")}`);
 const manifests=["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"].map(x=>JSON.parse(fs.readFileSync(path.join("public",x),"utf8")));
 for(const manifest of manifests){for(const key of ["name","short_name","start_url","scope","display","theme_color","background_color","icons"]){if(manifest[key]==null)throw new Error(`PWA manifest ${manifest.name} missing ${key}`)}}
 const sw=fs.readFileSync("public/sw.js","utf8");if(!sw.includes("isSensitive")||!sw.includes("SKIP_WAITING"))throw new Error("Service worker cache/update policy incomplete");

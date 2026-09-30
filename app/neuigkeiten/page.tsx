@@ -1,1 +1,0 @@
-import Shell from "@/components/shell";import ChangelogPage from "@/components/announcements/changelog-page";export default function Page(){return <Shell><ChangelogPage/></Shell>}

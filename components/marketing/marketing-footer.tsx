@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import BrandLogo from "@/components/ui/brand-logo";
-import {LanguageSwitcher,useLocale} from "@/components/locale-provider";
+import {useLocale} from "@/components/locale-provider";
 
 export default function MarketingFooter(){
  const {t}=useLocale();
@@ -9,7 +9,10 @@ export default function MarketingFooter(){
   <div className="marketing-footer-main">
    <div className="marketing-footer-brand">
     <BrandLogo/>
-    <p>{t("KMU-Plattform für die Schweiz")}</p>
+    <div className="marketing-footer-brand-copy">
+     <strong>{t("Business-Software für Schweizer KMU")}</strong>
+     <p>{t("Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.")}</p>
+    </div>
    </div>
    <nav className="marketing-footer-links" aria-label={t("Footer Navigation")}>
     <div className="marketing-footer-group"><strong>{t("Produkt")}</strong><Link href="/features">{t("Funktionen")}</Link><Link href="/preise">{t("Preise")}</Link><Link href="/demo">{t("Demo")}</Link><Link href="/sicherheit">{t("Sicherheit")}</Link><Link href="/status">{t("Status")}</Link></div>
@@ -17,6 +20,9 @@ export default function MarketingFooter(){
     <div className="marketing-footer-group"><strong>{t("Rechtliches")}</strong><Link href="/impressum">{t("Impressum")}</Link><Link href="/agb">{t("AGB")}</Link><Link href="/datenschutz">{t("Datenschutz")}</Link><Link href="/cookies">{t("Cookies")}</Link></div>
    </nav>
   </div>
-  <div className="marketing-footer-bottom"><small>© 2026 Binso GmbH</small><LanguageSwitcher compact/></div>
+  <div className="marketing-footer-bottom">
+   <small>© 2026 Binso GmbH</small>
+   <span>{t("Appenzell, Schweiz")}</span>
+  </div>
  </footer>;
 }
