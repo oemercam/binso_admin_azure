@@ -8,6 +8,7 @@ export default function MarketingMenuButton({open,onClick}:Props){
   className={`marketing-menu-button${open?" is-open":""}`}
   aria-label={open?"Navigation schliessen":"Navigation öffnen"}
   aria-expanded={open}
+  aria-controls="marketing-mobile-navigation"
   onClick={onClick}
  >
   <span className="marketing-menu-glyph" aria-hidden="true">

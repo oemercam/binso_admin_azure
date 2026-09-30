@@ -9,8 +9,10 @@ import { getOrganization, getSession, logout } from "@/lib/saas-store";
 import { apiFetch, isProductionMode } from "@/lib/client/runtime";
 import { localRoleToTenant, routePermission, tenantCan } from "@/lib/permissions";
 import BrandLogo from "@/components/ui/brand-logo";
+import {useLocale} from "@/components/locale-provider";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import {clearUserRuntimeState} from "@/lib/client/session-cleanup";
+import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {
@@ -21,6 +23,7 @@ import {
 type SearchItem={label:string;sub:string;href:string};
 
 export default function Shell({ children }: { children: React.ReactNode }) {
+  const {t}=useLocale();
   const [open, setOpen] = useState(false); const [moreOpen,setMoreOpen]=useState(false); const [mobileSearchOpen,setMobileSearchOpen]=useState(false); const [query,setQuery]=useState(''); const [companyOpen,setCompanyOpen]=useState(false); const [company,setCompany]=useState('Binso GmbH'); const [records,setRecords]=useState<LocalRecord[]>([]); const [users,setUsers]=useState<AppUser[]>([]); const [activeUserId,setActiveUserId]=useState('u1'); const [productionRole,setProductionRole]=useState<string>('reader'); const [permissionsReady,setPermissionsReady]=useState(false);
   const [productionPlan,setProductionPlan]=useState<PlanId>('business'); const [productionSearch,setProductionSearch]=useState<{query:string;items:SearchItem[]}>({query:"",items:[]}); const searchRef=useRef<HTMLInputElement>(null); const pathname = usePathname(); const router=useRouter(); const active = (href: string) => href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
   useEffect(()=>{const t=window.setTimeout(async()=>{if(isProductionMode()){try{const me=await apiFetch<{user:{role:string};plan:PlanId}>("/api/me");setProductionRole(me.user.role);setProductionPlan(me.plan);setPermissionsReady(true)}catch{router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`)}return}const session=getSession();if(!session){router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`);return}const org=getOrganization(session.orgId);if(org&&!org.onboardingComplete){router.replace("/onboarding")}},0);return()=>window.clearTimeout(t)},[router,pathname]);
@@ -44,18 +47,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(()=>{if(!permissionsReady)return;if(!planAllowsPath(effectivePlan,pathname)){router.replace(`/upgrade?next=${encodeURIComponent(pathname)}`);return}const permission=routePermission(pathname);if(permission&&!tenantCan(effectiveRole,permission))router.replace('/forbidden')},[pathname,effectiveRole,effectivePlan,permissionsReady,router]);
 
   return <div className="app-shell">
-      {open && <button className="sidebar-backdrop" aria-label="Navigation schliessen" onClick={() => setOpen(false)} />}
+      {open && <button className="sidebar-backdrop" aria-label={t("Navigation schliessen")} onClick={() => setOpen(false)} />}
       <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
-        <div className="sidebar-brand-row"><Link className="brand brand-image-link" href="/dashboard" aria-label="Binso One Dashboard"><BrandLogo/></Link><button className="sidebar-close" onClick={() => setOpen(false)}><X size={20}/></button></div>
-        <nav className="sidebar-nav">{groups.map(group => <div className="nav-group" key={group.label}><div className="nav-group-label">{group.label}</div>{group.items.filter(item=>canSee(item.href)).map(item => {const Icon = item.icon;return <Link onClick={() => setOpen(false)} key={item.href} href={item.href} className={active(item.href) ? "nav-item active" : "nav-item"}><Icon size={18} strokeWidth={1.8}/><span>{item.label}</span></Link>})}</div>)}</nav>
-        <div className="sidebar-footer"><BrandLogo/><small>Lokale Entwicklungsumgebung</small></div>
+        <div className="sidebar-brand-row"><Link className="brand brand-image-link" href="/dashboard" aria-label={t("Binso One Dashboard")}><BrandLogo/></Link><button className="sidebar-close" onClick={() => setOpen(false)}><X size={20}/></button></div>
+        <nav className="sidebar-nav">{groups.map(group => <div className="nav-group" key={group.label}><div className="nav-group-label">{t(group.label)}</div>{group.items.filter(item=>canSee(item.href)).map(item => {const Icon = item.icon;return <Link onClick={() => setOpen(false)} key={item.href} href={item.href} className={active(item.href) ? "nav-item active" : "nav-item"}><Icon size={18} strokeWidth={1.8}/><span>{t(item.label)}</span></Link>})}</div>)}</nav>
+        <div className="sidebar-footer"><BrandLogo/><small>{t("Lokale Entwicklungsumgebung")}</small></div>
       </aside>
 
       <div className="content-shell">
         <header className="topbar">
-          <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label="Binso One Dashboard"><BrandLogo compact/></Link>
-          <button className="mobile-top-action mobile-search-trigger" onClick={()=>setMobileSearchOpen(true)} aria-label="Suche öffnen"><Search size={18}/></button>
-          <form className="search global-search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden, Rechnungen, Projekte suchen …" aria-label="Globale Suche"/><kbd>Ctrl K</kbd>{query&&<div className="search-results">{results.length?results.map(r=><Link key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery('')}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>Keine Treffer</p>}</div>}</form>
+          <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label={t("Binso One Dashboard")}><BrandLogo compact/></Link>
+          <button className="mobile-top-action mobile-search-trigger" onClick={()=>setMobileSearchOpen(true)} aria-label={t("Suche öffnen")}><Search size={18}/></button>
+          <form className="search global-search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte suchen …")} aria-label={t("Globale Suche")}/><kbd>Ctrl K</kbd>{query&&<div className="search-results">{results.length?results.map(r=><Link key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery('')}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>}</form>
           <div className="account-menu-wrap">
             <button className="account-trigger" onClick={()=>setCompanyOpen(v=>!v)} aria-expanded={companyOpen} aria-haspopup="menu">
               <div className="account-trigger-copy"><strong>{activeUser?.name||"Benutzer"}</strong><span>{company}</span></div>
@@ -69,49 +72,43 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               </div>
               <div className="account-workspace">
                 <span className="account-workspace-icon"><Building2 size={16}/></span>
-                <div><small>Aktuelle Firma</small><strong>{company}</strong></div>
+                <div><small>{t("Aktuelle Firma")}</small><strong>{company}</strong></div>
                 <Check size={16}/>
               </div>
-              <div className="account-theme-row"><span>Darstellung</span><ThemeToggle compact/></div><div className="account-menu-links">
-                <Link href="/einstellungen?tab=profil" onClick={()=>setCompanyOpen(false)}><UserRound size={17}/><span><strong>Mein Profil</strong><small>Sprache und persönliche Einstellungen</small></span></Link>
-                <Link href="/feedback" onClick={()=>setCompanyOpen(false)}><MessageSquareText size={17}/><span><strong>Feedback geben</strong><small>Idee, Fehler oder Verbesserung melden</small></span></Link>
-                {tenantCan(effectiveRole,"organization:write")&&<Link href="/einstellungen?tab=firma" onClick={()=>setCompanyOpen(false)}><SlidersHorizontal size={17}/><span><strong>Unternehmenseinstellungen</strong><small>Firma, Benutzer und System</small></span></Link>}
-                {tenantCan(effectiveRole,"billing:read")&&<Link href="/abo" onClick={()=>setCompanyOpen(false)}><CreditCard size={17}/><span><strong>Plan und Abrechnung</strong><small>Abonnement und Zahlungsdaten</small></span></Link>}
+              <div className="account-theme-row"><span>{t("Darstellung")}</span><ThemeToggle compact/></div><div className="account-menu-links">
+                <Link href="/einstellungen?tab=profil" onClick={()=>setCompanyOpen(false)}><UserRound size={17}/><span><strong>{t("Mein Profil")}</strong><small>{t("Sprache und persönliche Einstellungen")}</small></span></Link>
+                <Link href="/feedback" onClick={()=>setCompanyOpen(false)}><MessageSquareText size={17}/><span><strong>{t("Feedback geben")}</strong><small>{t("Idee, Fehler oder Verbesserung melden")}</small></span></Link>
+                {tenantCan(effectiveRole,"organization:write")&&<Link href="/einstellungen?tab=firma" onClick={()=>setCompanyOpen(false)}><SlidersHorizontal size={17}/><span><strong>{t("Unternehmenseinstellungen")}</strong><small>{t("Firma, Benutzer und System")}</small></span></Link>}
+                {tenantCan(effectiveRole,"billing:read")&&<Link href="/abo" onClick={()=>setCompanyOpen(false)}><CreditCard size={17}/><span><strong>{t("Plan und Abrechnung")}</strong><small>{t("Abonnement und Zahlungsdaten")}</small></span></Link>}
               </div>
-              <button className="account-logout" onClick={async()=>{if(isProductionMode()){try{await apiFetch("/api/auth/logout",{method:"POST",body:"{}"})}catch{}}else logout();await clearUserRuntimeState();setCompanyOpen(false);router.push("/portal/login")}}><LogOut size={17}/><span>Abmelden</span></button>
+              <button className="account-logout" onClick={async()=>{if(isProductionMode()){try{await apiFetch("/api/auth/logout",{method:"POST",body:"{}"})}catch{}}else logout();await clearUserRuntimeState();setCompanyOpen(false);router.push("/portal/login")}}><LogOut size={17}/><span>{t("Abmelden")}</span></button>
             </div>}
           </div>
         </header>
         <main>{children}</main>
-        <nav className="mobile-nav" aria-label="Mobile Navigation">
-          <Link href="/dashboard" className={active("/dashboard")?"mobile-nav-item active":"mobile-nav-item"}><LayoutDashboard size={20}/><span>Start</span></Link>
-          <Link href="/projekte" className={active("/projekte")?"mobile-nav-item active":"mobile-nav-item"}><FolderKanban size={20}/><span>Projekte</span></Link>
-          <Link href="/zeiterfassung" className={active("/zeiterfassung")?"mobile-nav-item active":"mobile-nav-item"}><Clock3 size={20}/><span>Zeit</span></Link>
-          <Link href="/rechnungen" className={active("/rechnungen")?"mobile-nav-item active":"mobile-nav-item"}><ReceiptText size={20}/><span>Rechnungen</span></Link>
-          <button className={moreOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setMoreOpen(true)}><Menu size={20}/><span>Mehr</span></button>
+        <nav className="mobile-nav" aria-label={t("Mobile Navigation")}>
+          <Link href="/dashboard" className={active("/dashboard")?"mobile-nav-item active":"mobile-nav-item"}><LayoutDashboard size={20}/><span>{t("Start")}</span></Link>
+          <Link href="/projekte" className={active("/projekte")?"mobile-nav-item active":"mobile-nav-item"}><FolderKanban size={20}/><span>{t("Projekte")}</span></Link>
+          <Link href="/zeiterfassung" className={active("/zeiterfassung")?"mobile-nav-item active":"mobile-nav-item"}><Clock3 size={20}/><span>{t("Zeit")}</span></Link>
+          <Link href="/rechnungen" className={active("/rechnungen")?"mobile-nav-item active":"mobile-nav-item"}><ReceiptText size={20}/><span>{t("Rechnungen")}</span></Link>
+          <button className={moreOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setMoreOpen(true)}><Menu size={20}/><span>{t("Mehr")}</span></button>
         </nav>
 
-        {mobileSearchOpen&&<div className="mobile-sheet-backdrop" onClick={()=>setMobileSearchOpen(false)}>
-          <div className="mobile-search-sheet mobile-sheet" onClick={e=>e.stopPropagation()}>
-            <div className="sheet-handle"/>
-            <div className="sheet-title-row"><h2>Suchen</h2><button className="sheet-close" onClick={()=>setMobileSearchOpen(false)} aria-label="Schliessen"><X size={18}/></button></div>
-            <div className="mobile-search-panel">
-              <form className="mobile-search-field" onSubmit={e=>{submitSearch(e);setMobileSearchOpen(false)}}><Search size={17}/><input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden, Rechnungen, Projekte …"/></form>
-              <div className="mobile-search-results">{query?(results.length?results.map(r=><Link key={`m-${r.href}-${r.label}`} href={r.href} onClick={()=>{setQuery("");setMobileSearchOpen(false)}}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>Keine Treffer</p>):<p>Suche nach Kunden, Rechnungen, Projekten und weiteren Einträgen.</p>}</div>
-            </div>
+        <ResponsiveOverlay open={mobileSearchOpen} title={t("Suchen")} onClose={()=>setMobileSearchOpen(false)} size="md">
+          <div className="mobile-search-panel">
+            <form className="mobile-search-field" onSubmit={e=>{submitSearch(e);setMobileSearchOpen(false)}}><Search size={17}/><input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte …")}/></form>
+            <div className="mobile-search-results">{query?(results.length?results.map(r=><Link key={`m-${r.href}-${r.label}`} href={r.href} onClick={()=>{setQuery("");setMobileSearchOpen(false)}}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>{t("Keine Treffer")}</p>):<p>{t("Suche nach Kunden, Rechnungen, Projekten und weiteren Einträgen.")}</p>}</div>
           </div>
-        </div>}
+        </ResponsiveOverlay>
 
-        {moreOpen&&<div className="mobile-sheet-backdrop" onClick={()=>setMoreOpen(false)}>
-          <div className="mobile-more-sheet mobile-sheet" onClick={e=>e.stopPropagation()}>
-            <div className="sheet-handle"/>
-            <div className="sheet-title-row"><h2>Navigation</h2><button className="sheet-close" onClick={()=>setMoreOpen(false)} aria-label="Schliessen"><X size={18}/></button></div>
+        <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={()=>setMoreOpen(false)} size="md">
+          <div className="mobile-more-content">
             {groups.slice(1).map(group=><div className="sheet-group" key={group.label}>
-              <span className="sheet-group-label">{group.label}</span>
-              <div className="sheet-group-links">{group.items.filter(item=>canSee(item.href)).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={active(item.href)?"active":""}><Icon size={18}/><span>{item.label}</span></Link>})}</div>
+              <span className="sheet-group-label">{t(group.label)}</span>
+              <div className="sheet-group-links">{group.items.filter(item=>canSee(item.href)).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={active(item.href)?"active":""}><Icon size={18}/><span>{t(item.label)}</span></Link>})}</div>
             </div>)}
           </div>
-        </div>}
+        </ResponsiveOverlay>
       </div>
     </div>
 }

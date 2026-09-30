@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarDays, CheckCircle2, FilePlus2, FileText, MoreHorizontal, Pencil, Plus, ReceiptText, Save, Send, Trash2, X } from "lucide-react";
+import { ArrowLeft, CalendarDays, CheckCircle2, FilePlus2, FileText, MoreHorizontal, Pencil, Plus, ReceiptText, Save, Send, Trash2 } from "lucide-react";
 import type { ModuleConfig } from "@/lib/modules";
 import { ensureSeedOverride, findSeedOverride, getLocalRecord, listLocalRecords, money, parseMoney, type LocalRecord } from "@/lib/local-store";
 import { createAppRecord, deleteAppRecord, getAppRecord, listAppRecords, updateAppRecord } from "@/lib/client/data-service";
@@ -12,6 +12,8 @@ import { confirmAction } from "@/lib/confirm";
 import { useRouter } from "next/navigation";
 import { relationId } from "@/lib/relationships";
 import { usePermissions } from "@/lib/client/use-permissions";
+import ResponsiveOverlay from "@/components/ui/responsive-overlay";
+import {Button} from "@/components/ui/button";
 
 type Task={id:string;text:string;done:boolean};
 
@@ -116,6 +118,6 @@ export default function DetailPage({config,id}:{config:ModuleConfig;id:string}){
   </article>
   <article className="workspace-card timeline-card">{canWrite&&<><div className="section-title"><h2>Aktionen</h2><span>Workflow</span></div><button className="detail-workflow-button" onClick={workflow}>{['zeiterfassung','spesen','zahlungen'].includes(config.key)?<CheckCircle2 size={17}/>:config.key==='projekte'?<Send size={17}/>:<FilePlus2 size={17}/>} {actionLabel}</button>{config.key==='auftraege'&&<div className="secondary-workflow-actions"><button onClick={()=>setStatus('In Arbeit')}>Auftrag starten</button><button onClick={()=>setStatus('Abgeschlossen')}>Abschliessen</button><button onClick={()=>window.print()}>Bestätigung drucken</button></div>}{config.key==='projekte'&&<div className="secondary-workflow-actions"><button onClick={()=>setStatus('In Arbeit')}>Projekt starten</button><button onClick={()=>setStatus('Abgeschlossen')}>Projekt abschliessen</button></div>}{config.key==='spesen'&&<div className="secondary-workflow-actions"><button onClick={()=>setStatus('Abgelehnt')}>Ablehnen</button><button onClick={billExpense}>Weiterverrechnen</button></div>}{config.key==='zeiterfassung'&&<div className="secondary-workflow-actions"><button onClick={()=>setStatus('Entwurf')}>Zurückweisen</button></div>}{config.key==='zahlungen'&&<div className="secondary-workflow-actions"><button onClick={refundPayment}>Rückzahlung erfassen</button></div>}</>}<div className="section-title sub-section"><h2>Aktivität</h2><span>Verlauf</span></div>{activities.length?activities.slice(0,8).map((a,i)=><div className="timeline-item" key={`${a.at}-${i}`}><CalendarDays size={18}/><div><strong>{new Date(a.at).toLocaleString('de-CH')}</strong><span>{a.text}</span></div></div>):<><div className="timeline-item"><CalendarDays size={18}/><div><strong>Heute</strong><span>Datensatz geöffnet und geprüft.</span></div></div><div className="timeline-item"><FileText size={18}/><div><strong>Demo</strong><span>Stammdaten vorhanden.</span></div></div><div className="timeline-item"><ReceiptText size={18}/><div><strong>System</strong><span>Vorgang bereit.</span></div></div></>}</article></section>
 
-  {canWrite&&editing&&<div className="modal-backdrop"><div className="edit-modal"><div className="section-title"><h2>{config.label} bearbeiten</h2><button className="text-icon-button" onClick={()=>setEditing(false)}><X size={18}/></button></div><div className="form-grid">{Object.keys(draft).map(k=><label key={k}><span>{k}</span><input value={draft[k]??''} onChange={e=>setDraft(v=>({...v,[k]:e.target.value}))}/></label>)}</div><div className="send-actions"><button onClick={()=>setEditing(false)}>Abbrechen</button><button className="primary-inline" onClick={saveEdit}><Save size={17}/>Speichern</button></div></div></div>}
+  <ResponsiveOverlay open={canWrite&&editing} title={`${config.label} bearbeiten`} onClose={()=>setEditing(false)} size="md" actions={<><Button variant="secondary" onClick={()=>setEditing(false)}>Abbrechen</Button><Button icon={<Save size={17}/>} onClick={saveEdit}>Speichern</Button></>}><div className="form-grid">{Object.keys(draft).map(k=><label key={k}><span>{k}</span><input value={draft[k]??''} onChange={e=>setDraft(v=>({...v,[k]:e.target.value}))}/></label>)}</div></ResponsiveOverlay>
  </div>
 }

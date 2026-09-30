@@ -1,4 +1,4 @@
-const VERSION="v7";
+const VERSION="v8";
 const STATIC_CACHE=`binso-static-${VERSION}`;
 const PUBLIC_CACHE=`binso-public-${VERSION}`;
 const APP_SHELL=["/offline","/icons/icon-192.png","/icons/icon-512.png","/brand/binso-icon-black.svg","/brand/binso-icon-white.svg"];

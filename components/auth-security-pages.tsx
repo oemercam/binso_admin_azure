@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BrandLogo from "@/components/ui/brand-logo";
 import { apiFetch } from "@/lib/client/runtime";
+import {useLocale} from "@/components/locale-provider";
 
 function Frame({
   title,
@@ -13,6 +14,7 @@ function Frame({
   title: string;
   children: React.ReactNode;
 }) {
+  const {t}=useLocale();
   return (
     <div className="auth-shell">
       <Link href="/" className="auth-logo auth-logo-image">
@@ -21,7 +23,7 @@ function Frame({
 
       <div className="auth-card">
         <div className="auth-intro">
-          <h1>{title}</h1>
+          <h1>{t(title)}</h1>
         </div>
 
         {children}
@@ -31,6 +33,7 @@ function Frame({
 }
 
 export function ForgotPasswordPage() {
+  const {t}=useLocale();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -50,7 +53,7 @@ export function ForgotPasswordPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Anfrage fehlgeschlagen."
+          : t("Anfrage fehlgeschlagen.")
       );
     }
   }
@@ -59,15 +62,13 @@ export function ForgotPasswordPage() {
     <Frame title="Passwort zurücksetzen">
       {sent ? (
         <div className="auth-success">
-          <p>
-            Wenn ein Konto zu dieser E-Mail besteht, wurde ein Link versendet.
-          </p>
-          <Link href="/login">Zur Anmeldung</Link>
+          <p>{t("Wenn ein Konto zu dieser E-Mail besteht, wurde ein Link versendet.")}</p>
+          <Link href="/login">{t("Zur Anmeldung")}</Link>
         </div>
       ) : (
         <form className="auth-form" onSubmit={submit}>
           <label>
-            <span>E-Mail</span>
+            <span>{t("E-Mail")}</span>
             <input
               type="email"
               value={email}
@@ -79,10 +80,10 @@ export function ForgotPasswordPage() {
           {error && <div className="auth-error">{error}</div>}
 
           <button className="marketing-primary auth-submit">
-            Link senden
+            {t("Link senden")}
           </button>
 
-          <Link href="/login">Zurück zur Anmeldung</Link>
+          <Link href="/login">{t("Zurück zur Anmeldung")}</Link>
         </form>
       )}
     </Frame>
@@ -90,6 +91,7 @@ export function ForgotPasswordPage() {
 }
 
 export function ResetPasswordPage() {
+  const {t}=useLocale();
   const params = useSearchParams();
   const token = params.get("token") || "";
 
@@ -112,7 +114,7 @@ export function ResetPasswordPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Passwort konnte nicht geändert werden."
+          : t("Passwort konnte nicht geändert werden.")
       );
     }
   }
@@ -121,15 +123,13 @@ export function ResetPasswordPage() {
     <Frame title="Neues Passwort">
       {done ? (
         <div className="auth-success">
-          <p>
-            Das Passwort wurde geändert. Alle bisherigen Sitzungen wurden beendet.
-          </p>
-          <Link href="/login">Jetzt anmelden</Link>
+          <p>{t("Das Passwort wurde geändert. Alle bisherigen Sitzungen wurden beendet.")}</p>
+          <Link href="/login">{t("Jetzt anmelden")}</Link>
         </div>
       ) : (
         <form className="auth-form" onSubmit={submit}>
           <label>
-            <span>Neues Passwort</span>
+            <span>{t("Neues Passwort")}</span>
             <input
               type="password"
               minLength={12}
@@ -139,7 +139,7 @@ export function ResetPasswordPage() {
             />
           </label>
 
-          <small>Mindestens 12 Zeichen.</small>
+          <small>{t("Mindestens 12 Zeichen.")}</small>
 
           {error && <div className="auth-error">{error}</div>}
 
@@ -147,7 +147,7 @@ export function ResetPasswordPage() {
             className="marketing-primary auth-submit"
             disabled={!token}
           >
-            Passwort speichern
+            {t("Passwort speichern")}
           </button>
         </form>
       )}
@@ -156,6 +156,7 @@ export function ResetPasswordPage() {
 }
 
 export function VerifyEmailPage() {
+  const {t}=useLocale();
   const params = useSearchParams();
   const token = params.get("token") || "";
 
@@ -188,15 +189,15 @@ export function VerifyEmailPage() {
   return (
     <Frame title="E-Mail bestätigen">
       {state === "loading" ? (
-        <p>Bestätigung wird geprüft …</p>
+        <p>{t("Bestätigung wird geprüft …")}</p>
       ) : state === "ok" ? (
         <div className="auth-success">
-          <p>Deine E-Mail-Adresse wurde bestätigt.</p>
-          <Link href="/dashboard">Weiter zu Binso One</Link>
+          <p>{t("Deine E-Mail-Adresse wurde bestätigt.")}</p>
+          <Link href="/dashboard">{t("Weiter zu Binso One")}</Link>
         </div>
       ) : (
         <div className="auth-error">
-          Der Link ist ungültig oder abgelaufen.
+          {t("Der Link ist ungültig oder abgelaufen.")}
         </div>
       )}
     </Frame>

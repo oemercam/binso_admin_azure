@@ -1,3 +1,12 @@
 # Design System
 
-`styles/foundation.css` ist die zentrale Basis für semantische Farben, Typografie, Spacing, Radien, Controls, Icons, Motion, Z-Index, Light/Dark Mode und responsive Overlays. Neue Oberflächen sollen keine zufälligen Pixelwerte oder seitenspezifische Button-/Input-Komponenten einführen. Buttons bleiben einzeilig; Mobile-Interaktionen verwenden mindestens ca. 44 px Touch-Fläche. `ResponsiveOverlay` rendert denselben Inhalt am Desktop als Dialog und mobil als Bottom Sheet.
+Die UI-Basis ist seit v1.4.0 zentralisiert:
+
+- `styles/tokens.css`: semantische Tokens für Farben, Typografie, Spacing, Safe Areas, Controls, Motion und Z-Index.
+- `styles/app.css`: gemeinsame UI- und Produktkomponenten.
+- `styles/responsive-central.css`: alle Mobile/PWA- und responsive Regeln.
+- `styles/overlays.css`: Dialog-/Bottom-Sheet-System.
+
+`ResponsiveOverlay` ist der einzige Standard für Dialoge und Bottom Sheets. Es rendert per Portal auf `document.body`, sperrt den Hintergrund, behandelt ESC und Fokus und stellt Action-Bereiche auf Mobile/PWA safe-area-konform dar.
+
+Versionierte CSS-Patchdateien sind nicht mehr Teil der aktiven Architektur.

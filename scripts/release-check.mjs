@@ -7,13 +7,19 @@ const required=[
   "components/theme-provider.tsx","components/app-boot-loader.tsx","components/support/support-new.tsx",
   "components/security/account-security.tsx","components/notifications/notification-center.tsx",
   "app/api/health/route.ts","app/api/search/route.ts","app/api/files/route.ts","app/api/webhooks/stripe/route.ts",
-  "database/migrations/008_locale_turkish.sql","database/migrations/009_platform_foundation.sql","styles/foundation.css","config/app.ts","components/ui/responsive-overlay.tsx","infra/main.bicep",".github/workflows/azure-webapp.yml"
+  "database/migrations/008_locale_turkish.sql","database/migrations/009_platform_foundation.sql",
+  "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","hooks/use-overlay-lock.ts",
+  "config/app.ts","components/ui/responsive-overlay.tsx","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
 
+const obsolete=["styles/foundation.css","styles/legacy.css","styles/design-system.css","styles/responsive.css","styles/v1.3.1.css","styles/v1.3.2.css","styles/v1.3.3.css"];
+const leftovers=obsolete.filter(p=>fs.existsSync(p));
+if(leftovers.length)throw new Error(`Obsolete CSS layers still present: ${leftovers.join(", ")}`);
+
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.3.2")throw new Error(`Expected package version 1.3.2, got ${pkg.version}`);
+if(pkg.version!=="1.4.0")throw new Error(`Expected package version 1.4.0, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));
@@ -26,8 +32,15 @@ for(let i=0;i<migrations.length;i++){const expected=String(i+1).padStart(3,"0")+
 
 const i18n=fs.readFileSync("lib/i18n.ts","utf8");
 for(const locale of ['"de"','"en"','"fr"','"it"','"tr"'])if(!i18n.includes(locale))throw new Error(`Locale ${locale} missing`);
-const css=fs.readFileSync("styles/design-system.css","utf8")+"\n"+fs.readFileSync("styles/v1.3.1.css","utf8")+"\n"+fs.readFileSync("styles/v1.3.2.css","utf8");
-for(const marker of ["Binso One v1.3.2","marketing-menu-button","ui-toggle-thumb","white-space:nowrap"]){if(!css.includes(marker))throw new Error(`UI baseline missing ${marker}`)}
+
+const tokens=fs.readFileSync("styles/tokens.css","utf8");
+const appCss=fs.readFileSync("styles/app.css","utf8");
+const responsive=fs.readFileSync("styles/responsive-central.css","utf8");
+const overlays=fs.readFileSync("styles/overlays.css","utf8");
+for(const marker of ["--safe-top","--surface-0","--z-overlay","--page-gutter-mobile"]){if(!tokens.includes(marker))throw new Error(`Token baseline missing ${marker}`)}
+for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!appCss.includes(marker))throw new Error(`Application CSS baseline missing ${marker}`)}
+for(const marker of ["marketing-menu-button","marketing-mobile-navigation","pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
+for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","@media print"]){if(!overlays.includes(marker))throw new Error(`Overlay baseline missing ${marker}`)}
 
 const noSecrets=["STRIPE_SECRET_KEY","STRIPE_WEBHOOK_SECRET","APP_ENCRYPTION_KEY","OPERATOR_BOOTSTRAP_PASSWORD"];
 const files=[];

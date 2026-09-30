@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Eye, Mail, Plus, Printer, Save, Send, Trash2, X, Search, Clock3, ReceiptText } from "lucide-react";
+import { ArrowLeft, Check, Eye, Mail, Plus, Printer, Save, Send, Trash2, Search, Clock3, ReceiptText } from "lucide-react";
 import { defaultSettings, nextNumber } from "@/lib/local-store";
 import { createAppRecord, listAppRecords, updateAppRecord } from "@/lib/client/data-service";
 import { apiFetch, isProductionMode } from "@/lib/client/runtime";
@@ -13,6 +13,8 @@ import { useUnsavedChanges } from "@/lib/use-unsaved-changes";
 import { billableProjectEntries, customerDefaults, loadEntity, loadEntityOptions, productDefaults, type EntityOption } from "@/lib/relationships";
 import RelationshipPicker from "@/components/relationship-picker";
 import { usePermissions } from "@/lib/client/use-permissions";
+import ResponsiveOverlay from "@/components/ui/responsive-overlay";
+import {Button} from "@/components/ui/button";
 
 type Kind="rechnung"|"offerte";
 type Position={description:string;quantity:number;unitPrice:number;vatRate:number};
@@ -98,12 +100,12 @@ const [customer,setCustomer]=useState(''); const [email,setEmail]=useState(''); 
    </section>
    <aside className="editor-side document-side"><div className="workspace-card side-card live-preview-card"><div className="section-title"><h3>Live-Vorschau</h3><button className="text-icon-button" onClick={()=>setPreview(true)}><Eye size={16}/></button></div><div className="mini-document">{renderDocument()}</div></div><div className="workspace-card side-card"><h3>Aktionen</h3><button className="primary-button" onClick={()=>setSendOpen(true)}><Mail size={17}/> Versenden</button><button className="secondary-button" onClick={printDoc}><Printer size={17}/> Drucken / PDF</button><button className="secondary-button" onClick={()=>save()}><Check size={17}/> Entwurf speichern</button></div></aside>
   </div>
-  {preview&&<div className="modal-backdrop" onMouseDown={e=>{if(e.currentTarget===e.target)setPreview(false)}}><div className="document-modal" role="dialog" aria-modal="true" aria-labelledby="document-preview-title"><div className="modal-toolbar"><div className="modal-toolbar-title"><strong id="document-preview-title">Dokumentvorschau</strong><small>A4 · Druckansicht</small></div><div className="modal-toolbar-actions"><button onClick={printDoc}><Printer size={17}/><span className="preview-print-label">Drucken / PDF</span></button><button className="icon-only" onClick={()=>setPreview(false)} aria-label="Schliessen"><X size={18}/></button></div></div><div className="modal-document-scroll">{renderDocument()}</div></div></div>}
-  {sendOpen&&<div className="modal-backdrop"><div className="send-modal"><div className="section-title"><h2>Versand</h2><button className="text-icon-button" onClick={()=>setSendOpen(false)}><X size={18}/></button></div><p>{isProductionMode()?"Das Dokument wird gespeichert und über den konfigurierten E-Mail-Dienst versendet.":"Der Versand wird lokal simuliert. Es wird keine echte E-Mail versendet."}</p><label><span>Empfänger</span><input value={email} onChange={e=>{setDirty(true);setEmail(e.target.value)}} type="email"/></label><label><span>Betreff</span><input defaultValue={`${isInvoice?'Rechnung':'Offerte'} ${number} – ${settings.companyName}`}/></label><label><span>Nachricht</span><textarea rows={5} defaultValue={`Guten Tag
+  <ResponsiveOverlay open={preview} title="Dokumentvorschau" onClose={()=>setPreview(false)} size="document" actions={<Button variant="secondary" icon={<Printer size={17}/>} onClick={printDoc}>Drucken / PDF</Button>}><div className="modal-document-scroll">{renderDocument()}</div></ResponsiveOverlay>
+  <ResponsiveOverlay open={sendOpen} title="Versand" onClose={()=>setSendOpen(false)} size="md" actions={<><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button icon={<Send size={17}/>} onClick={send}>{isProductionMode()?"Versenden":"Demo-Versand ausführen"}</Button></>}><div className="overlay-form"><p>{isProductionMode()?"Das Dokument wird gespeichert und über den konfigurierten E-Mail-Dienst versendet.":"Der Versand wird lokal simuliert. Es wird keine echte E-Mail versendet."}</p><label><span>Empfänger</span><input value={email} onChange={e=>{setDirty(true);setEmail(e.target.value)}} type="email"/></label><label><span>Betreff</span><input defaultValue={`${isInvoice?'Rechnung':'Offerte'} ${number} – ${settings.companyName}`}/></label><label><span>Nachricht</span><textarea rows={5} defaultValue={`Guten Tag
 
 Im Anhang erhalten Sie unsere ${isInvoice?'Rechnung':'Offerte'} ${number}.
 
 Freundliche Grüsse
-${settings.companyName}`}/></label><div className="send-actions"><button onClick={()=>setSendOpen(false)}>Abbrechen</button><button className="primary-inline" onClick={send}><Send size={17}/> {isProductionMode()?"Versenden":"Demo-Versand ausführen"}</button></div></div></div>}
+${settings.companyName}`}/></label></div></ResponsiveOverlay>
  </div>
 }

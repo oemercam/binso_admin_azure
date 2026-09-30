@@ -1,6 +1,4 @@
-@import "../styles/legacy.css";
-@import "../styles/design-system.css";
-@import "../styles/responsive.css";
-@import "../styles/v1.3.1.css";
-@import "../styles/foundation.css";
-@import "../styles/v1.3.2.css";
+@import "../styles/tokens.css";
+@import "../styles/app.css";
+@import "../styles/responsive-central.css";
+@import "../styles/overlays.css";

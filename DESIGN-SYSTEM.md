@@ -1,44 +1,22 @@
-# Binso One v0.8.0 – Design System
+# Binso One Design System
 
-## Zentralisierung
-`app/globals.css` enthält nur noch Imports:
-- `styles/legacy.css`
-- `styles/design-system.css`
-- `styles/responsive.css`
+Der aktive CSS-Stack ist zentralisiert und besteht nur aus vier Einstiegspunkten:
 
-Neue und übergreifende Styles gehören nicht mehr direkt in einzelne Komponenten oder an das Ende von `globals.css`.
+- `styles/tokens.css` — semantische Farben, Typografie, Spacing, Safe Areas, Motion und Z-Index.
+- `styles/app.css` — zentrale Komponenten- und Anwendungsstile.
+- `styles/responsive-central.css` — Mobile/PWA-, Tablet- und responsive Layoutregeln.
+- `styles/overlays.css` — einzige Quelle für Dialoge, Bottom Sheets und Overlay-Geometrie.
 
-## Typografie
-Primär:
-- Segoe UI Variable Text / Display
-- Fallback: Segoe UI, System UI, Apple System Font, Arial
-
-Zentrale Schriftgrössen:
-- XS 11 px
-- SM 12 px
-- MD 14 px
-- LG 16 px
-- XL 20 px
-- 2XL 28 px
-- 3XL 34 px
-
-## Spacing
-4 / 8 / 12 / 16 / 20 / 24 / 32 px über CSS-Variablen.
+Neue versionsspezifische CSS-Dateien wie `v1.x.x.css` sind nicht zulässig. Neue Komponenten verwenden die zentralen Tokens und UI-Primitives unter `components/ui`.
 
 ## Mobile/PWA
-- keine seitliche Navigation
-- kompakter Header
-- schwebende Bottom-Navigation
-- zentrale `+`-Aktion
-- Aktionen als Bottom Sheet
-- Navigation „Mehr“ als gruppiertes Bottom Sheet
-- Suche als Bottom Sheet
-- Filter/Relationen als mobile Sheet-Popover
-- Safe-Area berücksichtigt
 
-## Dokumentvorschau
-- Desktop: zentriertes Modal mit 24 px Rand
-- Mobile/PWA: nahezu vollhohes Bottom Sheet
-- A4-Vorschau wird je Viewport skaliert
-- Toolbar hat konsistente Höhe, Abstände und Icon-Buttons
-- Druck bleibt A4 ohne Mobile-Skalierung
+- Seitenränder und Safe Areas werden über `--safe-*` und `--page-gutter-mobile` gesteuert.
+- Der App-Header und die Bottom-Navigation verwenden dieselben zentralen Höhen- und Z-Index-Tokens.
+- Dialoge und Bottom Sheets verwenden ausschliesslich `ResponsiveOverlay`.
+- Zwei gleichwertige Aktionen wie Zurück/Weiter oder Abbrechen/Speichern werden gleich breit dargestellt.
+- Inhalte dürfen nicht mit `100vw` in gepaddeten Content-Containern arbeiten.
+
+## Themes
+
+Light und Dark verwenden dieselben semantischen Tokens. Kontrast entsteht über Surface-Ebenen, Borders und Typografie, nicht über willkürliche lokale Schwarz-/Weisswerte.
