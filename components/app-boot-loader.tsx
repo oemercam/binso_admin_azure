@@ -2,14 +2,27 @@
 import {useEffect,useState} from "react";
 import BrandLogo from "@/components/ui/brand-logo";
 
+const MIN_VISIBLE_MS=1400;
+const MAX_VISIBLE_MS=2600;
+
 export default function AppBootLoader(){
  const [visible,setVisible]=useState(true);
  useEffect(()=>{
-  const min=window.setTimeout(()=>setVisible(false),900);
-  const onLoad=()=>window.setTimeout(()=>setVisible(false),120);
-  if(document.readyState==="complete")onLoad();
-  else window.addEventListener("load",onLoad,{once:true});
-  return()=>{window.clearTimeout(min);window.removeEventListener("load",onLoad)};
+  const started=performance.now();
+  let hideTimer:number|undefined;
+  const hide=()=>{
+   const remaining=Math.max(0,MIN_VISIBLE_MS-(performance.now()-started));
+   window.clearTimeout(hideTimer);
+   hideTimer=window.setTimeout(()=>setVisible(false),remaining);
+  };
+  const fallback=window.setTimeout(()=>setVisible(false),MAX_VISIBLE_MS);
+  if(document.readyState==="complete")hide();
+  else window.addEventListener("load",hide,{once:true});
+  return()=>{
+   window.clearTimeout(hideTimer);
+   window.clearTimeout(fallback);
+   window.removeEventListener("load",hide);
+  };
  },[]);
  if(!visible)return null;
  return <div className="app-boot-loader" role="status" aria-label="Binso One wird geladen">

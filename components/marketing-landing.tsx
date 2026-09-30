@@ -35,7 +35,6 @@ export default function MarketingLanding(){
   window.requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLAnchorElement>("nav a")?.focus());
   return()=>{document.body.classList.remove("marketing-menu-open");document.documentElement.style.overflow=previousOverflow;window.removeEventListener("keydown",onKey)};
  },[menuOpen]);
- useEffect(()=>{window.scrollTo({top:0,left:0,behavior:"auto"})},[pathname]);
  const close=()=>setMenuPath(null);
  return <div className="marketing-shell">
   <header className="marketing-header">

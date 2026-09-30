@@ -765,3 +765,84 @@ n/* ---- consolidated v1.3.3 marketing/navigation rules ---- */
 }
 
 @media(max-width:430px){:root{--page-gutter-mobile:14px}}
+
+/* v1.4.1 navigation, route position and boot-motion corrections. */
+.app-boot-icon-reveal,.route-loading-mark{
+ width:82px!important;
+ height:82px!important;
+ animation:binso-icon-build 1.15s cubic-bezier(.22,1,.36,1) forwards!important;
+}
+.app-boot-icon-reveal .binso-brand-image.compact,.route-loading-mark .binso-brand-image.compact{
+ width:74px!important;
+ height:74px!important;
+}
+
+.marketing-menu-glyph{width:24px!important;height:20px!important}
+.marketing-menu-glyph>span{
+ left:1px!important;
+ width:22px!important;
+ height:1.8px!important;
+ transition:top .32s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1),opacity .18s ease!important;
+}
+.marketing-menu-glyph>span:nth-child(1){top:2px!important}
+.marketing-menu-glyph>span:nth-child(2){top:9px!important}
+.marketing-menu-glyph>span:nth-child(3){top:16px!important}
+.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(1){top:9px!important;transform:rotate(45deg)!important}
+.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(2){opacity:0!important;transform:scaleX(0)!important}
+.marketing-menu-button.is-open .marketing-menu-glyph>span:nth-child(3){top:9px!important;transform:rotate(-45deg)!important}
+
+@media(max-width:900px){
+ .marketing-header{
+  position:fixed!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  z-index:120!important;
+  height:calc(64px + var(--safe-top))!important;
+  padding-top:var(--safe-top)!important;
+ }
+ .marketing-shell>main{padding-top:calc(64px + var(--safe-top))!important}
+ .marketing-mobile-menu{
+  display:flex!important;
+  position:fixed!important;
+  z-index:110!important;
+  inset:0!important;
+  width:100vw!important;
+  max-width:none!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  padding-top:calc(84px + var(--safe-top))!important;
+  padding-right:max(var(--app-gutter-mobile),var(--safe-right))!important;
+  padding-bottom:calc(20px + var(--safe-bottom))!important;
+  padding-left:max(var(--app-gutter-mobile),var(--safe-left))!important;
+  border:0!important;
+  box-shadow:none!important;
+  background:var(--surface-0)!important;
+  color:var(--text)!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch;
+  transform:translateY(-100%)!important;
+  clip-path:none!important;
+  opacity:1!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:transform .38s cubic-bezier(.22,1,.36,1),visibility 0s linear .38s!important;
+  gap:18px!important;
+ }
+ .marketing-mobile-menu.open{
+  transform:translateY(0)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  transition:transform .38s cubic-bezier(.22,1,.36,1),visibility 0s!important;
+ }
+ .marketing-mobile-backdrop{display:none!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .app-boot-icon-reveal,.route-loading-mark{animation:none!important;clip-path:none!important}
+ .marketing-menu-glyph>span,.marketing-mobile-menu{transition:none!important}
+}
