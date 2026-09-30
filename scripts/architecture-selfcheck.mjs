@@ -5,7 +5,7 @@ const required=[
  "styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","styles/primitives.css","hooks/use-overlay-lock.ts","config/app.ts",
  "components/ui/button.tsx","components/ui/form-controls.tsx","components/ui/responsive-overlay.tsx",
  "hooks/use-connectivity.ts","hooks/use-standalone.ts","components/connectivity-banner.tsx","components/pwa-update-notice.tsx",
- "database/migrations/009_platform_foundation.sql","app/api/notification-preferences/route.ts","lib/server/idempotency.ts"
+ "database/migrations/0017_v150_code_schema_alignment.sql","app/api/notification-preferences/route.ts","lib/server/idempotency.ts"
 ];
 const missing=required.filter(x=>!fs.existsSync(x));if(missing.length)throw new Error(`Foundation files missing: ${missing.join(", ")}`);
 for(const obsolete of ["styles/foundation.css","styles/legacy.css","styles/design-system.css","styles/responsive.css","styles/v1.3.1.css","styles/v1.3.2.css","styles/v1.3.3.css"]){if(fs.existsSync(obsolete))throw new Error(`Obsolete CSS layer still exists: ${obsolete}`)}

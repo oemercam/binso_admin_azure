@@ -23,11 +23,11 @@ try{
  assert.equal(permissionForModule("rechnungen","write"),"invoices:write");
  assert.equal(ownRecordOnly("member","zeiterfassung"),true);
  assert.equal(ownRecordOnly("member","projekte"),false);
- assert.equal(operatorCan("support","organizations:read"),true);
- assert.equal(operatorCan("support","operators:manage"),false);
- assert.equal(operatorCan("billing","subscriptions:read"),true);
- assert.equal(operatorCan("billing","platform_audit:read"),false);
- assert.equal(operatorCan("security_auditor","platform_audit:read"),true);
- assert.equal(operatorCan("security_auditor","operators:manage"),false);
+ assert.equal(operatorCan("platform_support","organizations:read"),true);
+ assert.equal(operatorCan("platform_support","operators:manage"),false);
+ assert.equal(operatorCan("platform_billing","subscriptions:read"),true);
+ assert.equal(operatorCan("platform_billing","platform_audit:read"),false);
+ assert.equal(operatorCan("platform_auditor","platform_audit:read"),true);
+ assert.equal(operatorCan("platform_auditor","operators:manage"),false);
  console.log("Permission self-check passed.");
 }finally{await fs.unlink(temp).catch(()=>{})}

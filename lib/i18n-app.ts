@@ -1,5 +1,6 @@
 export const appTranslations={
   en: {
+  "Datei ist noch nicht verfügbar.": "File is not available yet.",
   "Die Anwendung konnte diese Ansicht nicht laden. Bitte versuchen Sie es erneut.": "The application could not load this view. Please try again.",
   "Ansicht wird geladen": "Loading view",
   "Binso One wird geöffnet …": "Opening Binso One …",
@@ -445,6 +446,7 @@ export const appTranslations={
   "Konto-Löschung beantragen": "Request account deletion"
 },
   fr: {
+  "Datei ist noch nicht verfügbar.": "Le fichier n’est pas encore disponible.",
   "Die Anwendung konnte diese Ansicht nicht laden. Bitte versuchen Sie es erneut.": "L’application n’a pas pu charger cette vue. Veuillez réessayer.",
   "Ansicht wird geladen": "Chargement de la vue",
   "Binso One wird geöffnet …": "Ouverture de Binso One …",
@@ -890,6 +892,7 @@ export const appTranslations={
   "Konto-Löschung beantragen": "Demander la suppression du compte"
 },
   it: {
+  "Datei ist noch nicht verfügbar.": "Il file non è ancora disponibile.",
   "Die Anwendung konnte diese Ansicht nicht laden. Bitte versuchen Sie es erneut.": "L’applicazione non ha potuto caricare questa vista. Riprova.",
   "Ansicht wird geladen": "Caricamento vista",
   "Binso One wird geöffnet …": "Apertura di Binso One …",
@@ -1335,6 +1338,7 @@ export const appTranslations={
   "Konto-Löschung beantragen": "Richiedi eliminazione account"
 },
   tr: {
+  "Datei ist noch nicht verfügbar.": "Dosya henüz kullanılamıyor.",
   "Die Anwendung konnte diese Ansicht nicht laden. Bitte versuchen Sie es erneut.": "Uygulama bu görünümü yükleyemedi. Lütfen tekrar deneyin.",
   "Ansicht wird geladen": "Görünüm yükleniyor",
   "Binso One wird geöffnet …": "Binso One açılıyor …",

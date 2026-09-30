@@ -6,13 +6,16 @@ const mustContain=(file,needles)=>{
 };
 
 mustContain("app/api/auth/demo/route.ts",[
-  "'business'","'trial'","onboarding_complete","await createSession","expiresInHours:domainConfig.demoSessionHours"
+  'plan:"business"','mode:"demo"','await createSession','expiresInHours:domainConfig.demoSessionHours'
+]);
+mustContain("lib/server/provisioning.ts",[
+  'organization_subscriptions','organization_entitlements','platform_tenants','organization_milestones','onboarding_completed','domainConfig.trialDays'
 ]);
 mustContain("components/auth-pages.tsx",[
   'apiFetch("/api/auth/demo"','/portal/registrieren?trial=1','plan,billingCycle:billing,trial'
 ]);
 mustContain("app/api/auth/register/route.ts",[
-  "const plan=enumField","const trial=body.trial===true","trial?\"trial\":\"pending\""
+  "const plan=enumField","const trial=body.trial===true","mode:trial?\"trial\":\"subscription\""
 ]);
 mustContain("config/plan-access.ts",[
   'start:{users:3,projects:100}','business:{users:15,projects:1000}',

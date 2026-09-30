@@ -72,14 +72,14 @@ export function ownRecordOnly(role:string,moduleKey:string){
  return normalizeTenantRole(role)==="member"&&["zeiterfassung","spesen","aufgaben"].includes(moduleKey);
 }
 
-export type OperatorRole="platform_owner"|"platform_admin"|"support"|"billing"|"security_auditor";
+export type OperatorRole="platform_owner"|"platform_admin"|"platform_support"|"platform_billing"|"platform_auditor";
 export type OperatorPermission="platform:read"|"organizations:read"|"organizations:manage"|"subscriptions:read"|"subscriptions:manage"|"operators:read"|"operators:manage"|"platform_audit:read"|"support:manage"|"feedback:manage"|"feature_flags:manage"|"announcements:manage";
 export const operatorGrants:Record<OperatorRole,ReadonlySet<OperatorPermission>>={
  platform_owner:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","operators:manage","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage"]),
  platform_admin:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","operators:manage","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage"]),
- support:new Set(["platform:read","organizations:read","support:manage","feedback:manage"]),
- billing:new Set(["platform:read","organizations:read","subscriptions:read","subscriptions:manage"]),
- security_auditor:new Set(["platform:read","organizations:read","operators:read","platform_audit:read"])
+ platform_support:new Set(["platform:read","organizations:read","support:manage","feedback:manage"]),
+ platform_billing:new Set(["platform:read","organizations:read","subscriptions:read","subscriptions:manage"]),
+ platform_auditor:new Set(["platform:read","organizations:read","operators:read","platform_audit:read"])
 };
-export function operatorCan(role:OperatorRole|string,permission:OperatorPermission){return operatorGrants[(role in operatorGrants?role:"support") as OperatorRole].has(permission)}
-export function operatorPermissions(role:OperatorRole|string){return Array.from(operatorGrants[(role in operatorGrants?role:"support") as OperatorRole])}
+export function operatorCan(role:OperatorRole|string,permission:OperatorPermission){return operatorGrants[(role in operatorGrants?role:"platform_support") as OperatorRole].has(permission)}
+export function operatorPermissions(role:OperatorRole|string){return Array.from(operatorGrants[(role in operatorGrants?role:"platform_support") as OperatorRole])}
