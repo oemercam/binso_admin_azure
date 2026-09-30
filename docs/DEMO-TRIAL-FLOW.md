@@ -19,3 +19,7 @@
 - Demo und Trial verwenden serverseitige Sessions in Production.
 - Same-Origin-Schutz akzeptiert die konfigurierte Produktionsdomain sowie die tatsächlich weitergeleitete Host-Domain.
 - `/api/me` ist die kanonische Quelle für Onboarding-, Plan- und Trial-Status.
+
+## Datenbank und RLS
+
+Die Demo wird mit derselben Row-Level-Security wie normale Mandanten ausgeführt. Nach dem Anlegen von Demo-Organisation und Demo-Benutzer setzt der Server innerhalb derselben Transaktion `app.organization_id` und `app.user_id`, bevor Beispieldaten in `records` geschrieben werden. Die Demo umgeht RLS ausdrücklich nicht.

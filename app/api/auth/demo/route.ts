@@ -29,6 +29,13 @@ export async function POST(request:NextRequest){
    await client.query(`delete from organizations where uid='DEMO' and trial_ends_at<now()`);
    await client.query(`insert into organizations(id,name,uid,plan,billing_cycle,subscription_status,trial_ends_at,onboarding_complete) values($1,'Binso Demo AG','DEMO','business','monthly','trial',now()+interval '24 hours',true)`,[organizationId]);
    await client.query(`insert into users(id,organization_id,name,email,password_hash,role,active,email_verified_at) values($1,$2,$3,$4,$5,'owner',true,now())`,[userId,organizationId,name,email,passwordHash]);
+
+   // records is protected by FORCE ROW LEVEL SECURITY. Establish the same
+   // tenant/user context used by normal authenticated record operations before
+   // seeding demo data. Do not bypass RLS for demo creation.
+   await client.query(`select set_config('app.organization_id',$1,true)`,[organizationId]);
+   await client.query(`select set_config('app.user_id',$1,true)`,[userId]);
+
    for(const item of demoRows){
     await client.query(`insert into records(organization_id,module,status,row_data,fields,metadata,created_by,updated_by) values($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$7)`,[organizationId,item.module,item.status,JSON.stringify(item.row),JSON.stringify(item.fields),JSON.stringify({demo:true}),userId]);
    }

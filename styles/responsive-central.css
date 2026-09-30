@@ -541,3 +541,14 @@ html[data-theme="dark"] .auth-shell{background:var(--surface-0)!important}.auth-
 
 .hero-choice-note{margin:-8px 0 18px!important;font-size:12px!important;color:var(--foreground-muted)!important;line-height:1.45!important}
 @media(max-width:760px){.hero-choice-note{margin:-4px 0 14px!important;text-align:left;font-size:11px!important}}
+
+/* iOS/mobile form stability: Safari zooms focused controls below 16px. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media(max-width:760px){
+ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea{
+   font-size:16px!important;
+ }
+ .auth-form input,.auth-form select,.auth-form textarea,.mobile-search-field input{
+   font-size:16px!important;
+ }
+}

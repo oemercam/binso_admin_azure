@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { getLocale, localeLabels, localeNames, setLocale, translate, type Locale } from "@/lib/i18n";
+import { getLocale, localeLabels, localeNames, setLocale, sourceText, translate, type Locale } from "@/lib/i18n";
 
 type LocaleContextValue={locale:Locale;setLocale:(l:Locale)=>void;t:(value:string)=>string};
 const LocaleContext=createContext<LocaleContextValue>({locale:"de",setLocale:()=>{},t:(value)=>value});
@@ -14,7 +14,7 @@ const attributeOriginals=new WeakMap<Element,Map<string,string>>();
 function getOriginalAttribute(el:Element, attr:string){
   let map=attributeOriginals.get(el);
   if(!map){map=new Map();attributeOriginals.set(el,map)}
-  if(!map.has(attr)) map.set(attr,el.getAttribute(attr)||"");
+  if(!map.has(attr)) map.set(attr,sourceText(el.getAttribute(attr)||""));
   return map.get(attr)||"";
 }
 
@@ -28,7 +28,7 @@ function translateNode(root:ParentNode, locale:Locale){
   for(const textNode of nodes){
     const parent=textNode.parentElement;
     if(!parent||["SCRIPT","STYLE","CODE","PRE"].includes(parent.tagName)) continue;
-    if(!textOriginals.has(textNode)) textOriginals.set(textNode,textNode.nodeValue||"");
+    if(!textOriginals.has(textNode)) textOriginals.set(textNode,sourceText(textNode.nodeValue||""));
     const base=textOriginals.get(textNode)||"";
     const translated=translate(base,locale);
     if(textNode.nodeValue!==translated) textNode.nodeValue=translated;
@@ -52,15 +52,15 @@ export default function LocaleProvider({children}:{children:React.ReactNode}){
 
   useEffect(()=>{
     const initial=getLocale();
+    // Keep SSR/hydration deterministic (German) and apply the persisted/browser locale
+    // immediately after hydration without a synchronous state update inside the effect.
+    const stateTimer=window.setTimeout(()=>setCurrent(initial),0);
     document.documentElement.lang=initial==="de"?"de-CH":initial;
+    hydrated.current=true;
+    window.requestAnimationFrame(()=>translateNode(document.body,initial));
 
-    const stateTimer=window.setTimeout(()=>{
-      setCurrent(initial);
-      hydrated.current=true;
-      translateNode(document.body,initial);
-
-      // Start observing only after the initial hydration has settled.
-      const observer=new MutationObserver(mutations=>{
+    // Translate only newly mounted hard-coded legacy nodes. Component text should use t().
+    const observer=new MutationObserver(mutations=>{
         if(!hydrated.current) return;
         const active=getLocale();
         for(const mutation of mutations){
@@ -72,10 +72,9 @@ export default function LocaleProvider({children}:{children:React.ReactNode}){
             }
           });
         }
-      });
-      observer.observe(document.body,{subtree:true,childList:true});
-      observerRef.current=observer;
-    },150);
+    });
+    observer.observe(document.body,{subtree:true,childList:true});
+    observerRef.current=observer;
 
     const listener=(e:Event)=>{
       const l=(e as CustomEvent).detail.locale as Locale;

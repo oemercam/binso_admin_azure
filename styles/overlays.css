@@ -109,3 +109,29 @@ html.binso-overlay-open,body.binso-overlay-open{overflow:hidden;overscroll-behav
   .ui-overlay-header,.ui-overlay-actions,.ui-overlay-handle{display:none!important}
   .ui-overlay-body{overflow:visible!important;padding:0!important}
 }
+
+/* Compact privacy consent surface. It is intentionally smaller than normal task sheets. */
+.consent-overlay{width:min(calc(100vw - 32px),520px);max-height:min(78svh,560px)}
+.consent-overlay .ui-overlay-header{min-height:52px;padding-block:10px}
+.consent-overlay .ui-overlay-header h2{font-size:16px}
+.consent-overlay .ui-overlay-body{padding:14px 16px}
+.consent-overlay .ui-overlay-actions{padding:10px 16px 14px}
+.consent-content{gap:10px}
+.consent-content>p{font-size:12px;line-height:1.5}
+.consent-settings-toggle{width:max-content;max-width:100%;padding:0;border:0;background:transparent;color:var(--foreground);font-size:12px;font-weight:650;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.consent-links{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:2px}
+.consent-links a{font-size:11px;color:var(--foreground-muted);text-decoration:underline;text-underline-offset:3px}
+.consent-actions-central{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:760px){
+ .ui-overlay-backdrop:has(.consent-overlay){align-items:end;padding:0 0 calc(10px + var(--safe-bottom));background:rgba(0,0,0,.28)}
+ .consent-overlay{width:calc(100% - 24px);max-height:min(72svh,520px);margin:0 12px;border:1px solid var(--border);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18)}
+ .consent-overlay .ui-overlay-header{min-height:48px;padding:8px 14px;border-radius:16px 16px 0 0}
+ .consent-overlay .ui-overlay-header h2{font-size:15px}
+ .consent-overlay .ui-overlay-close{width:38px;height:38px;flex-basis:38px}
+ .consent-overlay .ui-overlay-body{padding:12px 14px}
+ .consent-overlay .ui-overlay-actions{padding:10px 14px 12px;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+ .consent-overlay .consent-actions-central{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .consent-overlay .ui-button{min-height:40px!important;font-size:12px!important;padding-inline:8px!important}
+ .consent-options{margin:4px 0!important;gap:6px!important}
+ .consent-options .consent-option-row{padding:10px!important;border-radius:10px!important}
+}

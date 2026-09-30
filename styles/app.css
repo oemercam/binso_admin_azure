@@ -1609,7 +1609,7 @@ html[data-theme="dark"] input::placeholder,html[data-theme="dark"] textarea::pla
  .auth-intro h1{font-size:27px;line-height:1.08;margin-bottom:7px}
  .auth-intro p{font-size:13px;line-height:1.45;margin-bottom:20px}
  .auth-form{gap:12px}
- .auth-form input,.auth-form select{height:42px;font-size:13px}
+ .auth-form input,.auth-form select{height:44px}
  .auth-form label>span{font-size:11px}
  .auth-logo{position:absolute;top:18px;left:16px}
  .auth-language{position:absolute;top:18px;right:16px}

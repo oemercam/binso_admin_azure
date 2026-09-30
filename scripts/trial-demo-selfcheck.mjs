@@ -7,6 +7,7 @@ const me=read("app/api/me/route.ts");
 const http=read("lib/server/http.ts");
 const local=read("lib/saas-store.ts");
 if(!demo.includes("expiresInHours:24")||!demo.includes("onboarding_complete) values")||!demo.includes("true)"))throw new Error("Demo flow must create an onboarded 24h demo tenant.");
+if(!demo.includes("set_config('app.organization_id'")||!demo.includes("set_config('app.user_id'"))throw new Error("Demo seeding must establish tenant/user RLS context before writing records.");
 if(!register.includes('trial?"trial":"pending"')||!register.includes("14*86400000"))throw new Error("Trial registration must persist 14-day trial state.");
 if(!me.includes("onboardingComplete")||!me.includes("subscriptionStatus")||!me.includes("trialEndsAt"))throw new Error("/api/me must expose onboarding and trial state.");
 if(!http.includes("x-forwarded-host")||!http.includes("request.nextUrl.origin"))throw new Error("Same-origin validation must support proxied/custom-domain requests.");
