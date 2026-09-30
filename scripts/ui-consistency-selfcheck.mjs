@@ -29,4 +29,15 @@ if(directShellOwners.join("|")!=="app/(workspace)/layout.tsx")throw new Error(`A
 if(/backdrop-filter\s*:/i.test(shellCss.match(/\.topbar\{[^}]*\}/s)?.[0]||""))throw new Error("Topbar must not use backdrop-filter; PWA chrome must be opaque.");
 if(!shellCss.includes("background:var(--surface-1)"))throw new Error("Shell surfaces must use centralized opaque surface token.");
 
+const marketingFrame=fs.readFileSync("components/marketing/marketing-frame.tsx","utf8");
+const marketingFooter=fs.readFileSync("components/marketing/marketing-footer.tsx","utf8");
+if(!marketingFrame.includes('className="marketing-mobile-language"'))throw new Error("Mobile marketing navigation must own the compact language switcher.");
+if(!shellCss.includes('.marketing-header-language{display:none}'))throw new Error("Mobile/PWA marketing header must hide the language switcher.");
+if(marketingFooter.includes("Appenzell, Schweiz"))throw new Error("Compact public footer must not render the location text.");
+if(!marketingFooter.includes('href="https://binso.ch"'))throw new Error("Public footer copyright must link to binso.ch.");
+if(!marketingFooter.includes("footer-heart"))throw new Error("Public footer must include the subtle Swiss-made heart mark.");
+const appPublicCss=fs.readFileSync("styles/app.css","utf8");
+const securityRule=appPublicCss.match(/\.security-card\{[^}]*\}/s)?.[0]||"";
+if(/#[0-9a-f]{3,8}/i.test(securityRule))throw new Error("Security/CTA card must use theme tokens instead of hard-coded colours.");
+
 console.log("UI consistency self-check passed: shell ownership, persistent workspace layout and public header are centralized.");

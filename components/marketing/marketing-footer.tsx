@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import BrandLogo from "@/components/ui/brand-logo";
+import {Heart} from "lucide-react";
 import {useLocale} from "@/components/locale-provider";
 
 export default function MarketingFooter(){
@@ -21,8 +22,8 @@ export default function MarketingFooter(){
    </nav>
   </div>
   <div className="marketing-footer-bottom">
-   <small>© 2026 Binso GmbH</small>
-   <span>{t("Appenzell, Schweiz")}</span>
+   <small>© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
+   <span className="marketing-footer-made">{t("Mit Liebe in der Schweiz entwickelt")} <Heart className="footer-heart" size={12} aria-hidden="true"/></span>
   </div>
  </footer>;
 }

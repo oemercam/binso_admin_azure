@@ -210,6 +210,40 @@ Object.assign(fr,{"Business-Software für Schweizer KMU":"Logiciel de gestion po
 Object.assign(it,{"Business-Software für Schweizer KMU":"Software gestionale per PMI svizzere","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Vendite, progetti, tempo, finanze e personale in un’unica piattaforma chiara.","Appenzell, Schweiz":"Appenzello, Svizzera"});
 Object.assign(trDict,{"Business-Software für Schweizer KMU":"İsviçre KOBİ’leri için iş yazılımı","Verkauf, Projekte, Zeit, Finanzen und Personal in einer klaren Plattform.":"Satış, projeler, zaman, finans ve personel tek ve sade bir platformda.","Appenzell, Schweiz":"Appenzell, İsviçre"});
 
+
+Object.assign(en,{
+"Zusammenhängende Abläufe":"Connected workflows","Die wichtigsten Abläufe an einem Ort.":"Your key workflows in one place.","Klare Pläne":"Clear plans","Wichtige Fragen vor dem Start.":"Important questions before you start.",
+"Ja. Die Demo funktioniert ohne Registrierung und ohne Kreditkarte. Zusätzlich kannst du eine eigene Testorganisation starten.":"Yes. The demo works without registration or a credit card. You can also start your own trial organisation.",
+"Sicherheit und Kontrolle":"Security and control","Zugriffe, Rollen und Firmendaten sauber getrennt.":"Access, roles and company data clearly separated.",
+"Jede Organisation arbeitet in einem eigenen Mandanten. Rollen und Berechtigungen werden serverseitig geprüft, wichtige Aktionen nachvollziehbar protokolliert und Betreiberzugriffe von Kundenzugriffen getrennt.":"Each organisation works in its own tenant. Roles and permissions are checked server-side, important actions are auditable, and operator access is separated from customer access.",
+"Binso One selbst prüfen":"Try Binso One yourself","Öffne die Demo oder starte eine eigene Testorganisation.":"Open the demo or start your own trial organisation.",
+"Ein Ablauf statt vieler Einzellösungen.":"One workflow instead of many separate tools.","Binso One verbindet die wichtigsten administrativen Prozesse eines Schweizer KMU. Informationen werden zwischen den Modulen weiterverwendet, statt mehrfach erfasst.":"Binso One connects the key administrative workflows of a Swiss SME. Information is reused across modules instead of being entered repeatedly.",
+"Kunden, Dokumente und Leistungen bleiben miteinander verknüpft, damit der nächste Schritt auf vorhandenen Daten aufbaut.":"Customers, documents and services stay connected so the next step builds on existing data.",
+"Sicherheit und Betrieb":"Security and operations","Rollen und Zugriffe klar steuern.":"Manage roles and access clearly.","Rollen und serverseitige Berechtigungen":"Roles and server-side permissions","Nachvollziehbare Aktionen":"Auditable actions","Getrennte Firmenmandanten":"Separate company tenants",
+"Klare Pläne pro Firma. Wähle den Funktionsumfang, den du heute brauchst, und wechsle später bei Bedarf.":"Clear plans per company. Choose the features you need today and switch later when needed.",
+"Ja. Du kannst deinen Plan später in der Abonnementverwaltung wechseln oder kündigen.":"Yes. You can later change or cancel your plan in subscription management.",
+"Nein. Die Demo kann ohne Registrierung und ohne Zahlungsdaten geöffnet werden.":"No. The demo can be opened without registration or payment details.",
+"Binso One wird produktiv in Microsoft Azure betrieben. Zugriffe, Datenbank und technische Dienste sind voneinander getrennt abgesichert.":"Binso One runs in production on Microsoft Azure. Access, database and technical services are protected separately."
+});
+Object.assign(fr,{
+"Zusammenhängende Abläufe":"Processus connectés","Die wichtigsten Abläufe an einem Ort.":"Les principaux processus au même endroit.","Klare Pläne":"Offres claires","Wichtige Fragen vor dem Start.":"Questions importantes avant de commencer.",
+"Sicherheit und Kontrolle":"Sécurité et contrôle","Zugriffe, Rollen und Firmendaten sauber getrennt.":"Accès, rôles et données d’entreprise clairement séparés.","Binso One selbst prüfen":"Tester Binso One","Öffne die Demo oder starte eine eigene Testorganisation.":"Ouvrez la démo ou démarrez votre propre organisation d’essai.",
+"Ein Ablauf statt vieler Einzellösungen.":"Un processus au lieu de nombreux outils séparés.","Sicherheit und Betrieb":"Sécurité et exploitation","Rollen und Zugriffe klar steuern.":"Gérer clairement les rôles et les accès.","Rollen und serverseitige Berechtigungen":"Rôles et autorisations côté serveur","Nachvollziehbare Aktionen":"Actions traçables","Getrennte Firmenmandanten":"Environnements d’entreprise séparés",
+"Klare Pläne pro Firma. Wähle den Funktionsumfang, den du heute brauchst, und wechsle später bei Bedarf.":"Des offres claires par entreprise. Choisissez les fonctions nécessaires aujourd’hui et changez plus tard si besoin."
+});
+Object.assign(it,{
+"Zusammenhängende Abläufe":"Processi collegati","Die wichtigsten Abläufe an einem Ort.":"I processi principali in un unico posto.","Klare Pläne":"Piani chiari","Wichtige Fragen vor dem Start.":"Domande importanti prima di iniziare.",
+"Sicherheit und Kontrolle":"Sicurezza e controllo","Zugriffe, Rollen und Firmendaten sauber getrennt.":"Accessi, ruoli e dati aziendali chiaramente separati.","Binso One selbst prüfen":"Prova Binso One","Öffne die Demo oder starte eine eigene Testorganisation.":"Apri la demo o avvia una tua organizzazione di prova.",
+"Ein Ablauf statt vieler Einzellösungen.":"Un flusso invece di molti strumenti separati.","Sicherheit und Betrieb":"Sicurezza e gestione","Rollen und Zugriffe klar steuern.":"Gestisci chiaramente ruoli e accessi.","Rollen und serverseitige Berechtigungen":"Ruoli e autorizzazioni lato server","Nachvollziehbare Aktionen":"Azioni tracciabili","Getrennte Firmenmandanten":"Tenant aziendali separati",
+"Klare Pläne pro Firma. Wähle den Funktionsumfang, den du heute brauchst, und wechsle später bei Bedarf.":"Piani chiari per azienda. Scegli oggi le funzioni necessarie e cambia piano in seguito se serve."
+});
+Object.assign(trDict,{
+"Zusammenhängende Abläufe":"Birbirine bağlı süreçler","Die wichtigsten Abläufe an einem Ort.":"Temel iş süreçleri tek yerde.","Klare Pläne":"Net planlar","Wichtige Fragen vor dem Start.":"Başlamadan önce önemli sorular.",
+"Sicherheit und Kontrolle":"Güvenlik ve kontrol","Zugriffe, Rollen und Firmendaten sauber getrennt.":"Erişimler, roller ve şirket verileri açık şekilde ayrılır.","Binso One selbst prüfen":"Binso One'ı deneyin","Öffne die Demo oder starte eine eigene Testorganisation.":"Demoyu açın veya kendi deneme organizasyonunuzu başlatın.",
+"Ein Ablauf statt vieler Einzellösungen.":"Birçok ayrı araç yerine tek bir süreç.","Sicherheit und Betrieb":"Güvenlik ve işletim","Rollen und Zugriffe klar steuern.":"Rolleri ve erişimleri açık şekilde yönetin.","Rollen und serverseitige Berechtigungen":"Roller ve sunucu tarafı yetkileri","Nachvollziehbare Aktionen":"İzlenebilir işlemler","Getrennte Firmenmandanten":"Ayrı şirket tenantları",
+"Klare Pläne pro Firma. Wähle den Funktionsumfang, den du heute brauchst, und wechsle später bei Bedarf.":"Şirket başına net planlar. Bugün gereken işlevleri seçin, ihtiyaç olduğunda daha sonra değiştirin."
+});
+
 const dictionaries={en,fr,it,tr:trDict};
 
 const commonWords:Record<Exclude<Locale,"de">,Record<string,string>>={
@@ -240,3 +274,8 @@ export function translate(input:string, locale:Locale):string{
  return input;
 }
 export function tr(key:string, locale:Locale=getLocale()){return translate(key,locale)}
+
+Object.assign(en,{"Mit Liebe in der Schweiz entwickelt":"Made with love in Switzerland"});
+Object.assign(fr,{"Mit Liebe in der Schweiz entwickelt":"Développé avec amour en Suisse"});
+Object.assign(it,{"Mit Liebe in der Schweiz entwickelt":"Sviluppato con amore in Svizzera"});
+Object.assign(trDict,{"Mit Liebe in der Schweiz entwickelt":"İsviçre’de sevgiyle geliştirildi"});

@@ -49,7 +49,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "auftraege", label: "Aufträge", href: "/auftraege",
-    description: "Angenommene Leistungen, Budgets und Lieferstatus steuern.", primaryAction: "Auftrag erfassen",
+    description: "Aufträge, Leistungen, Budgets und Fortschritt steuern.", primaryAction: "Auftrag erfassen",
     stats: [
       { label: "Aktiv", value: "14", meta: "6 mit Projekt" },
       { label: "Auftragsvolumen", value: "CHF 214’900", meta: "laufend" },
@@ -80,7 +80,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "zeiterfassung", label: "Zeiterfassung", href: "/zeiterfassung",
-    description: "Arbeitszeiten, Projektzeiten und interne Zeiten einfach erfassen.", primaryAction: "Zeit erfassen",
+    description: "Arbeitszeiten, Projektzeiten und interne Zeiten erfassen und zuordnen.", primaryAction: "Zeit erfassen",
     stats: [
       { label: "Diese Woche", value: "28 h", meta: "von 40 h" },
       { label: "Verrechenbar", value: "22 h", meta: "79 %" },
@@ -140,7 +140,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "mwst", label: "MWST", href: "/mwst",
-    description: "MWST-Perioden vorbereiten, plausibilisieren und für die Einreichung abschliessen.", primaryAction: "Abrechnung vorbereiten",
+    description: "MWST-Perioden vorbereiten, prüfen und abschliessen.", primaryAction: "Abrechnung vorbereiten",
     stats: [
       { label: "Aktuelle Periode", value: "Q3 2026", meta: "01.07.–30.09." },
       { label: "Zahllast", value: "CHF 7’820", meta: "vorläufig" },
@@ -155,7 +155,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "personal", label: "Personal", href: "/personal",
-    description: "Mitarbeitende, Beschäftigung, Ferien und Lohndaten verwalten.", primaryAction: "Mitarbeiter erfassen",
+    description: "Mitarbeitende, Beschäftigungsdaten, Abwesenheiten und Lohndaten verwalten.", primaryAction: "Mitarbeiter erfassen",
     stats: [
       { label: "Mitarbeitende", value: "8", meta: "7 aktiv" },
       { label: "Ferien offen", value: "84 Tage", meta: "gesamt" },

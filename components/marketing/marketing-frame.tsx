@@ -43,6 +43,7 @@ export default function MarketingFrame({children}:{children:React.ReactNode}){
   <aside id="marketing-mobile-navigation" ref={menuRef} className={`marketing-mobile-menu ${menuOpen?"open":""}`} aria-hidden={!menuOpen} aria-modal={menuOpen?true:undefined} role="dialog">
    <div className="marketing-mobile-menu-head"><strong>{t("Navigation")}</strong></div>
    <nav><Link href="/features" onClick={close}>{t("Funktionen")}</Link><Link href="/preise" onClick={close}>{t("Preise")}</Link><Link href="/sicherheit" onClick={close}>{t("Sicherheit")}</Link><Link href="/kontakt" onClick={close}>{t("Kontakt")}</Link></nav>
+   <div className="marketing-mobile-language"><span>{t("Sprache")}</span><LanguageSwitcher compact/></div>
    <div className="marketing-mobile-actions"><Link href="/portal/login" className="marketing-secondary" onClick={close}>{t("Anmelden")}</Link><Link href="/portal/registrieren?trial=1" className="marketing-primary" onClick={close}>{t("14 Tage kostenlos testen")}</Link></div>
   </aside>
   <main>{children}</main>
