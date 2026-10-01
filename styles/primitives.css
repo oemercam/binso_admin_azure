@@ -73,3 +73,61 @@ body{font-size:var(--text-base);line-height:1.45}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto;animation-duration:.01ms;animation-iteration-count:1;transition-duration:.01ms}
 }
+
+
+/* ==========================================================
+   Binso One v1.5.5 — responsive control hardening
+   Prevent clipped controls/text and viewport overflow across
+   Web, Tablet, Mobile and PWA.
+   ========================================================== */
+:where(.ui-input,.ui-select,.ui-textarea,input,select,textarea){
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+:where(.ui-button,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,
+       .secondary-button,.secondary-inline,.marketing-secondary,.auth-submit,.plan-button){
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+:where(.form-grid,.editor-layout,.detail-grid,.document-detail-grid,.workspace-toolbar,.ui-page-header,
+       .ui-overlay,.ui-overlay-body,.ui-overlay-actions,.overlay-form,.sheet-group-links,.mobile-action-grid)>*{
+  min-width:0;
+}
+:where(.ui-button-label,.ui-page-header-copy,.form-grid label,.overlay-form label){min-width:0}
+
+@media(max-width:760px){
+  :where(.ui-input,.ui-select,.ui-textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea){
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+  :where(input[type="date"],input[type="time"],input[type="datetime-local"],input[type="month"]){
+    display:block;
+    min-inline-size:0;
+    max-inline-size:100%;
+  }
+  :where(.ui-button,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,
+         .secondary-button,.secondary-inline,.marketing-secondary,.auth-submit,.plan-button,
+         .compact-action,.danger-button,.detail-workflow-button){
+    min-height:44px;
+    height:auto;
+    padding-block:10px;
+    white-space:normal;
+    line-height:1.2;
+    text-align:center;
+    overflow:visible;
+    text-overflow:clip;
+    overflow-wrap:anywhere;
+  }
+  .ui-button-label{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+  .ui-icon-button,:where(.icon-button,.text-icon-button,.operator-icon-button,.mobile-top-action,.ui-overlay-close){
+    width:44px;
+    min-width:44px;
+    max-width:44px;
+    height:44px;
+    padding:0;
+    white-space:nowrap;
+  }
+}

@@ -1737,3 +1737,286 @@ html[data-theme="dark"] .badge.open{background:#322416}
 }
 
 @media(max-width:900px),(prefers-reduced-motion:reduce){.marketing-shell [data-reveal]{opacity:1;transform:none;transition:none}}
+
+/* ==========================================================
+   Binso One v1.5.4 — customer portal mobile/PWA visual repair
+   Theme-safe controls, compact document detail and readable navigation.
+   ========================================================== */
+.sheet-group-links a,
+.mobile-action-grid a{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--line);
+}
+.sheet-group-links a.active{
+  background:var(--surface-2);
+  color:var(--text);
+  border-color:var(--line);
+}
+.sheet-group-links a svg,
+.mobile-action-grid a svg{color:currentColor;opacity:.88}
+
+html[data-theme="dark"] .document-actions-panel button,
+html[data-theme="dark"] .document-top-actions button,
+html[data-theme="dark"] .workflow-actions button,
+html[data-theme="dark"] .send-actions button,
+html[data-theme="dark"] .text-icon-button,
+html[data-theme="dark"] .inline-create button,
+html[data-theme="dark"] .section-title button{
+  background:var(--surface-2);
+  color:var(--text);
+  border-color:var(--line);
+}
+
+@media(max-width:760px){
+  .document-detail-page{overflow-x:hidden}
+  .document-detail-page .detail-heading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:start;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .document-detail-page .detail-heading>div:first-child{min-width:0}
+  .document-detail-page .detail-heading h1{
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:normal;
+  }
+  .document-detail-page .detail-actions{
+    display:grid;
+    grid-template-columns:44px minmax(0,1fr) minmax(0,1fr) 44px;
+    width:100%;
+    max-width:100%;
+    gap:6px;
+    overflow:visible;
+  }
+  .document-detail-page .detail-actions button{
+    width:100%;
+    min-width:0;
+    height:44px;
+    padding-inline:9px;
+    justify-content:center;
+    background:var(--surface);
+    color:var(--text);
+    border-color:var(--line);
+    overflow:hidden;
+  }
+  .document-detail-page .detail-actions .detail-action-icon{padding:0}
+  .document-detail-page .detail-actions .detail-action-icon span{display:none}
+  .document-detail-page .detail-actions .detail-action-label span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  html[data-theme="dark"] .document-detail-page .detail-actions button{
+    background:var(--surface-2);
+    color:var(--text);
+  }
+
+  .document-detail-page .document-detail-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:14px;
+    width:100%;
+    min-width:0;
+  }
+  .document-detail-page .document-detail-grid .document-paper{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    min-height:0;
+    margin:0;
+    padding:26px 18px 30px;
+    box-shadow:none;
+    overflow:hidden;
+  }
+  .document-detail-page .doc-brand{margin-bottom:32px}
+  .document-detail-page .doc-brand strong{font-size:22px}
+  .document-detail-page .doc-address{min-height:116px}
+  .document-detail-page .doc-title{display:grid;grid-template-columns:1fr;gap:14px}
+  .document-detail-page .doc-title h2{font-size:27px}
+  .document-detail-page .doc-title>div:last-child{
+    margin-top:0;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:5px 12px;
+    text-align:right;
+  }
+  .document-detail-page .doc-intro{font-size:12px;margin-bottom:20px}
+
+  .document-detail-page .doc-positions{overflow:visible}
+  .document-detail-page .doc-pos-head{display:none}
+  .document-detail-page .doc-pos{
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:6px 12px;
+    padding:12px 0;
+    border-bottom:1px solid #e8e8e5;
+  }
+  .document-detail-page .doc-pos span{
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(92px,.9fr) minmax(0,1fr);
+    gap:10px;
+    text-align:right;
+    overflow-wrap:anywhere;
+  }
+  .document-detail-page .doc-pos span::before{
+    content:attr(data-label);
+    color:#777;
+    font-size:10px;
+    font-weight:500;
+    text-align:left;
+  }
+  .document-detail-page .doc-pos span:first-child{
+    grid-column:1/-1;
+    grid-template-columns:1fr;
+    text-align:left;
+    font-weight:650;
+  }
+  .document-detail-page .doc-pos span:first-child::before{display:none}
+  .document-detail-page .doc-totals{
+    width:100%;
+    max-width:none;
+    margin:18px 0 26px;
+  }
+  .document-detail-page .qr-demo{
+    align-items:flex-start;
+    gap:12px;
+  }
+  .document-detail-page .qr-box{
+    width:72px;
+    height:72px;
+    flex:0 0 72px;
+  }
+  .document-detail-page .doc-footer{gap:5px}
+
+  .document-detail-page .document-actions-panel{
+    position:static;
+    width:100%;
+    max-width:100%;
+    padding:14px;
+    margin:0;
+    gap:8px;
+  }
+  .document-detail-page .document-actions-panel button{
+    width:100%;
+    min-width:0;
+    height:44px;
+    background:var(--surface);
+    color:var(--text);
+    border-color:var(--line);
+  }
+  html[data-theme="dark"] .document-detail-page .document-actions-panel button{
+    background:var(--surface-2);
+    color:var(--text);
+  }
+  .document-detail-page .document-actions-panel small{
+    overflow-wrap:anywhere;
+  }
+}
+
+@media(max-width:430px){
+  .sheet-group-links{grid-template-columns:1fr}
+  .document-detail-page .detail-actions{
+    grid-template-columns:42px minmax(0,1fr) minmax(0,1fr) 42px;
+  }
+  .document-detail-page .detail-actions button{font-size:11px;padding-inline:7px}
+}
+
+
+
+/* ==========================================================
+   Binso One v1.5.5 — document/mobile action fit corrections
+   ========================================================== */
+@media(max-width:760px){
+  /* Override legacy global nowrap/ellipsis rules for text actions. */
+  .primary-button,.secondary-button,.primary-link,.secondary-inline,.period-button,
+  .marketing-primary,.marketing-secondary,.plan-button,.auth-submit,.compact-action,.danger-button,
+  .detail-workflow-button,.secondary-workflow-actions button,.toolbar-actions button,.detail-actions button,
+  .document-top-actions button,.report-actions button,.workflow-actions button,.document-actions-panel button,
+  .send-actions button,.inline-create button,.section-title button{
+    white-space:normal;
+    height:auto;
+    min-height:44px;
+    line-height:1.2;
+    overflow:visible;
+    text-overflow:clip;
+  }
+
+  .document-detail-page .detail-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+    gap:8px;
+    overflow:visible;
+  }
+  .document-detail-page .detail-actions button,
+  .document-detail-page .detail-actions .detail-action-icon,
+  .document-detail-page .detail-actions .detail-action-label{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    min-height:46px;
+    height:auto;
+    padding:9px 10px;
+    justify-content:center;
+    white-space:normal;
+    line-height:1.15;
+  }
+  .document-detail-page .detail-actions .detail-action-icon span{display:inline}
+  .document-detail-page .detail-actions .detail-action-label span,
+  .document-detail-page .detail-actions .detail-action-icon span{
+    display:inline;
+    min-width:0;
+    overflow:visible;
+    text-overflow:clip;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .document-detail-page .document-actions-panel button{
+    justify-content:flex-start;
+    white-space:normal;
+    min-height:46px;
+    height:auto;
+    line-height:1.2;
+  }
+}
+
+/* ==========================================================
+   Binso One v1.5.6 — on-demand business document preview
+   ========================================================== */
+.document-detail-workspace{align-items:start}
+.document-summary-card{min-width:0;display:grid;gap:18px}
+.document-summary-card .section-title{margin-bottom:0;align-items:center}
+.document-summary-card .section-title>div{min-width:0}
+.document-summary-card .section-title .eyebrow{display:block;margin-bottom:4px}
+.document-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden}
+.document-summary-grid>div{min-width:0;background:var(--surface);padding:14px;display:grid;gap:5px}
+.document-summary-grid span{font-size:11px;color:var(--muted)}
+.document-summary-grid strong{min-width:0;font-size:14px;overflow-wrap:anywhere}
+.document-preview-gate{min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface-2)}
+.document-preview-gate>svg{color:var(--muted)}
+.document-preview-gate>div{min-width:0;display:grid;gap:3px}
+.document-preview-gate p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.document-preview-launcher{display:grid;gap:10px}
+.document-preview-launcher .section-title{margin-bottom:0}
+.document-preview-launcher p{margin:0}
+html[data-theme="dark"] .document-summary-grid>div{background:var(--surface)}
+
+@media(max-width:900px){
+  .document-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .document-summary-card{padding:14px;gap:14px}
+  .document-summary-card .section-title{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
+  .document-summary-card .section-title button{width:100%}
+  .document-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));border-radius:10px}
+  .document-summary-grid>div{padding:12px 10px}
+  .document-preview-gate{grid-template-columns:auto minmax(0,1fr);padding:12px}
+  .document-preview-gate>button{grid-column:1/-1;width:100%;min-width:0}
+}
+@media(max-width:430px){
+  .document-summary-grid{grid-template-columns:minmax(0,1fr)}
+}
