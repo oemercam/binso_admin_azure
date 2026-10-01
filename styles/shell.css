@@ -87,16 +87,6 @@
 }
 
 @media(max-width:760px){
- .sidebar,.sidebar-backdrop,.menu-button{display:none}
- .content-shell{margin-left:0;min-height:100vh;min-height:100svh;padding-top:calc(var(--app-header-row) + var(--safe-top))}
- .content-shell>main{position:relative;z-index:var(--z-content);isolation:isolate;min-width:0}
- .topbar{box-sizing:border-box;position:fixed;z-index:var(--z-header);top:0;left:0;right:0;height:calc(var(--app-header-row) + var(--safe-top));min-height:calc(var(--app-header-row) + var(--safe-top));display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:4px;padding:var(--safe-top) max(var(--app-gutter-mobile),var(--safe-right)) 0 max(var(--app-gutter-mobile),var(--safe-left));background:var(--background);border-bottom:1px solid var(--surface-border);box-shadow:none;isolation:isolate}
- .global-search{display:none}
- .mobile-brand{display:inline-flex;align-items:center;justify-self:start;min-width:0}.mobile-brand-image{width:auto;height:40px;max-width:76px}.mobile-brand-image .binso-brand-stack{display:inline-flex;align-items:center}.mobile-brand-image .binso-brand-image{width:auto;height:19px;max-width:70px;object-fit:contain}
- .mobile-top-action{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:10px;background:transparent;color:var(--foreground)}.mobile-top-action:hover,.mobile-top-action:active{background:var(--surface-2)}
- .account-menu-wrap{margin-left:0;justify-self:end}.account-trigger{width:40px;height:40px;min-height:40px;justify-content:center;padding:0;gap:0}.account-trigger-copy,.account-trigger>svg{display:none}.account-trigger .avatar{width:34px;height:34px}
- .mobile-nav{display:grid;position:fixed;z-index:var(--z-mobile-nav);grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;transform:translateZ(0);backface-visibility:hidden}
- .mobile-nav-item{min-width:0;min-height:52px;display:grid;place-content:center;justify-items:center;gap:2px;border:0;background:transparent;color:var(--foreground-muted);font-size:9px;font-weight:600}.mobile-nav-item span{font-size:9px;line-height:1.05;white-space:nowrap}
  .marketing-footer{padding-left:max(var(--app-gutter-mobile),var(--safe-left));padding-right:max(var(--app-gutter-mobile),var(--safe-right));padding-bottom:calc(18px + var(--safe-bottom));border-top:1px solid var(--surface-border)}
  .marketing-footer-desktop{display:none}
  .marketing-footer-mobile{display:grid;justify-items:center;text-align:center;gap:10px;padding:22px 0 4px}
@@ -119,10 +109,6 @@
  .mobile-top-action:hover,.account-trigger:hover,.account-menu-links a:hover{background:transparent}
 }
 
-@media(display-mode:standalone) and (max-width:760px){
- .mobile-nav{contain:layout paint style}
-}
-
 @media(prefers-reduced-motion:reduce){.nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-footer-mobile-legal a,.marketing-menu-glyph>span,.marketing-mobile-menu{transition:none;animation:none;transform:none}}
 
 /* v1.6.0 mobile marketing navigation keeps the brand/header visible above the menu. */
@@ -132,26 +118,5 @@
  body.marketing-menu-open .marketing-menu-button{position:relative}
  .marketing-mobile-menu{padding-top:calc(var(--app-header-row) + 22px + var(--safe-top))}
 }
-
-/* v1.6.2: the persistent mobile More control uses the same hamburger/X geometry. */
-@media(max-width:760px){
- .mobile-nav-item .workspace-menu-toggle-glyph{width:19px;height:19px}
- .mobile-nav-item .workspace-menu-toggle-glyph>span{left:2px;width:15px}
-}
-
-/* Central Quick Create trigger geometry; pill placement is owned by mobile-pwa.css. */
-@media(max-width:760px){
- .mobile-nav-create{position:relative;color:var(--foreground)}
- .mobile-nav-create-icon{width:38px;height:38px;margin-top:0;display:grid;place-items:center;border-radius:50%;background:var(--foreground);color:var(--background);box-shadow:none}
- .mobile-nav-create>span:last-child{margin-top:0}
- .mobile-create-sheet a{min-height:48px}
-}
-@media(display-mode:standalone) and (max-width:760px){.mobile-nav-create-icon{margin-top:0}}
-@media(max-width:760px){
- .account-menu-profile,.account-workspace{padding-inline:4px}.account-menu-links a{min-height:48px;padding:8px 4px;border-radius:8px}.account-menu-links strong{font-size:12px}.account-menu-links small{font-size:9px}
- .account-logout{min-height:46px;width:100%}
- .app-shell,.content-shell{max-width:100%;overflow-x:clip}
-}
-@media(display-mode:standalone) and (max-width:760px){.topbar{padding-top:var(--safe-top)}}
 
 @media(max-width:760px){.marketing-mobile-menu{max-height:calc(100dvh - var(--safe-top) - 64px);overflow:auto;overscroll-behavior:contain}}

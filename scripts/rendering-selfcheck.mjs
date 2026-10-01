@@ -5,6 +5,7 @@ const root=process.cwd();
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const providers=read("components/client-providers.tsx");
 const shell=read("styles/shell.css");
+const mobile=read("styles/mobile-pwa.css");
 const scroll=read("components/route-scroll-reset.tsx");
 const responsive=read("styles/responsive-central.css");
 const app=read("styles/app.css");
@@ -20,7 +21,7 @@ if(/\.page\{[^}]*padding-top:(?:17px|20px|22px)/.test(app))throw new Error("Lega
 if(/\.marketing-section\{padding:(?:58px|60px|72px)/.test(app))throw new Error("Legacy mobile marketing section spacing still exists in app.css.");
 const marketingMainOwners=["styles/shell.css","styles/responsive-central.css","styles/app.css"].filter(file=>read(file).includes(".marketing-shell>main"));
 if(marketingMainOwners.join("|")!=="styles/shell.css")throw new Error(`Marketing main header offset must be owned by shell.css only: ${marketingMainOwners.join(", ")}`);
-if(!shell.includes("contain:layout paint style"))throw new Error("Standalone fixed chrome paint containment is missing.");
+if(!mobile.includes("contain:layout paint style"))throw new Error("Standalone fixed chrome paint containment is missing from the canonical Mobile/PWA layer.");
 if(/backdrop-filter:blur\(16px\)/.test(app))throw new Error("Mobile sticky actions must not use expensive backdrop blur.");
 for(const token of ["--mobile-content-top","--mobile-section-space","--mobile-block-space","--mobile-card-gap","--mobile-content-bottom"]){
  if(!tokens.includes(token))throw new Error(`Missing centralized mobile layout token: ${token}`);

@@ -31,8 +31,12 @@
  .ui-button-primary,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,.auth-submit{background:var(--foreground);color:var(--background);border-color:var(--foreground);box-shadow:none}
  .ui-button-secondary,.secondary-button,.secondary-inline,.marketing-secondary{background:var(--background);color:var(--foreground);border-color:var(--border);box-shadow:none}
 
- /* App-first authenticated shell: no permanent mobile logo/avatar/header. */
- .topbar{display:none}
+ /* App-first authenticated shell: one canonical mobile owner, no permanent logo/avatar/header. */
+ .sidebar,.sidebar-backdrop,.menu-button{display:none}
+ .app-shell,.content-shell{max-width:100%;overflow-x:clip}
+ .content-shell{margin-left:0;min-height:100vh;min-height:100svh;padding-top:0}
+ .content-shell>main{position:relative;z-index:var(--z-content);isolation:isolate;min-width:0}
+ .topbar{display:none}.global-search{display:none}
  .mobile-app-spacer{display:none}
  main{min-width:0;padding-top:var(--safe-top)}.page{width:100%;max-width:100%;padding:14px max(var(--page-gutter-mobile),var(--safe-right)) calc(var(--app-bottom-nav-row) + 30px + var(--safe-bottom)) max(var(--page-gutter-mobile),var(--safe-left))}
  .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1{font-size:22px;line-height:1.12;letter-spacing:-.025em}
@@ -42,7 +46,8 @@
  /* Floating primary navigation. */
  .mobile-nav{left:max(12px,var(--safe-left));right:max(12px,var(--safe-right));bottom:max(10px,var(--safe-bottom));height:62px;padding:5px 7px;border:1px solid var(--border);border-radius:999px;background:var(--background);box-shadow:none}
  .mobile-nav-item{min-width:0;border-radius:999px;background:transparent;color:var(--foreground-muted)}.mobile-nav-item.active{background:transparent;color:var(--foreground);font-weight:750}
- .mobile-nav-item svg{width:var(--mobile-icon-nav);height:var(--mobile-icon-nav)}.mobile-nav-create-icon{background:var(--foreground);color:var(--background);box-shadow:none}
+ .mobile-nav-item svg{width:var(--mobile-icon-nav);height:var(--mobile-icon-nav)}.mobile-nav-create{position:relative;color:var(--foreground)}.mobile-nav-create-icon{background:var(--foreground);color:var(--background);box-shadow:none}.mobile-nav-create>span:last-child{margin-top:0}
+ .mobile-nav{contain:layout paint style;transform:translateZ(0);backface-visibility:hidden}
 
  /* Quick Create is a compact, content-driven task sheet. */
  .ui-overlay-backdrop:has(.mobile-quick-create-overlay){align-items:end;padding:0;background:var(--overlay)}
@@ -53,7 +58,7 @@
  .ui-overlay-backdrop:has(.mobile-account-overlay){align-items:end;padding:0;background:var(--overlay);backdrop-filter:none}
  .mobile-account-overlay{width:100%;height:auto;max-height:min(82dvh,720px);margin:0;border:1px solid var(--border);border-bottom:0;border-radius:var(--mobile-radius-sheet) var(--mobile-radius-sheet) 0 0;background:var(--background);box-shadow:none}
  .mobile-account-overlay .ui-overlay-header,.mobile-account-overlay .ui-overlay-body{background:var(--background)}
- .account-menu-profile,.account-workspace{padding-inline:2px}.account-menu-avatar,.account-workspace-icon{background:var(--foreground);color:var(--background)}.account-menu-links a{min-height:48px;padding:8px 2px;border-radius:0;border-bottom:1px solid var(--border)}.account-logout{width:100%;min-height:48px}
+ .account-menu-profile,.account-workspace{padding-inline:2px}.account-menu-avatar,.account-workspace-icon{background:var(--foreground);color:var(--background)}.account-menu-links a{min-height:48px;padding:8px 2px;border-radius:0;border-bottom:1px solid var(--border)}.account-menu-links strong{font-size:12px}.account-menu-links small{font-size:9px}.account-logout{width:100%;min-height:48px}
 
  /* Local list toolbar: one search surface, no layout shift. */
  .list-toolbar{width:100%;min-height:var(--touch-target);gap:5px;margin-bottom:8px}.list-search{flex:0 0 var(--touch-target);max-width:none}.list-search>.ui-icon-button{display:grid;width:var(--touch-target);height:var(--touch-target)}.list-search-field{display:none;width:100%;height:var(--touch-target);border-radius:var(--mobile-radius-control)}
@@ -164,7 +169,7 @@
 @media (min-width:761px){.mobile-module-overview{display:none}}
 
 /* ==========================================================
-   Binso One v1.7.2 — final mockup parity contract
+   Binso One v1.7.3 — canonical mockup parity contract
    Authenticated Mobile/PWA only. Desktop >= 761px is frozen.
    This block intentionally wins the cascade because mobile-pwa.css is the
    final global stylesheet. No screen-specific patch files are allowed.
