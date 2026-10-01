@@ -4,7 +4,6 @@ import path from "node:path";
 const root=process.cwd();
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const providers=read("components/client-providers.tsx");
-const shell=read("styles/shell.css");
 const mobile=read("styles/mobile-pwa.css");
 const scroll=read("components/route-scroll-reset.tsx");
 const responsive=read("styles/responsive-central.css");

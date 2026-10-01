@@ -169,7 +169,7 @@
 @media (min-width:761px){.mobile-module-overview{display:none}}
 
 /* ==========================================================
-   Binso One v1.7.3 — canonical mockup parity contract
+   Binso One v1.7.4 — canonical mockup parity contract
    Authenticated Mobile/PWA only. Desktop >= 761px is frozen.
    This block intentionally wins the cascade because mobile-pwa.css is the
    final global stylesheet. No screen-specific patch files are allowed.
