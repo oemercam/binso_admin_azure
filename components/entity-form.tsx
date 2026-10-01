@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Paperclip } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Paperclip } from "lucide-react";
 import { getModule } from "@/lib/modules";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import { ensureSeedOverride, listLocalRecords, money, parseMoney } from "@/lib/local-store";
@@ -21,6 +21,7 @@ import {accountingDefaults} from "@/config/accounting";
 import {domainConfig} from "@/config/domain";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {Input,Select,Textarea} from "@/components/ui/form-controls";
+import PageBackButton from "@/components/navigation/page-back-button";
 
 export default function EntityForm({ title, backHref, type }: { title: string; backHref: string; type: string }) {
  const router=useRouter();
@@ -71,7 +72,7 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
 
 
  const essentialFields:Record<string,Set<string>>={
-  Kunde:new Set(["firma","kontakt","email","telefon"]),Lieferant:new Set(["firma","kontakt","email","telefon"]),Projekt:new Set(["bezeichnung","kunde"]),Auftrag:new Set(["bezeichnung","kunde","projekt","volumen"]),Zeiteintrag:new Set(["datum","mitarbeiter","projekt","leistung","dauer"]),Spese:new Set(["datum","beschreibung","projekt","betrag"]),Zahlung:new Set(["datum","zahler","betrag","rechnung"]),Eingangsrechnung:new Set(["nummer","lieferant","datum","betrag"]),Leistung:new Set(["bezeichnung","typ","einheit","preis"]),Buchung:new Set(["datum","beleg","konto","betrag"]),Aufgabe:new Set(["aufgabe","projekt","faellig","verantwortlich"]),Abwesenheit:new Set(["mitarbeiter","art","von","bis"]),Dokument:new Set(["name","typ","beleg"]),Vertrag:new Set(["vertrag","kunde","lieferant","wert"]),Mitarbeiter:new Set(["name","funktion","email","pensum"])
+  Kunde:new Set(["firma","email"]),Lieferant:new Set(["firma","email"]),Projekt:new Set(["bezeichnung","kunde"]),Auftrag:new Set(["bezeichnung","kunde","projekt","volumen"]),Zeiteintrag:new Set(["datum","mitarbeiter","projekt","leistung","dauer"]),Spese:new Set(["datum","beschreibung","projekt","betrag"]),Zahlung:new Set(["datum","zahler","betrag","rechnung"]),Eingangsrechnung:new Set(["nummer","lieferant","datum","betrag"]),Leistung:new Set(["bezeichnung","typ","einheit","preis"]),Buchung:new Set(["datum","beleg","konto","betrag"]),Aufgabe:new Set(["aufgabe","projekt","faellig","verantwortlich"]),Abwesenheit:new Set(["mitarbeiter","art","von","bis"]),Dokument:new Set(["name","typ","beleg"]),Vertrag:new Set(["vertrag","kunde","lieferant","wert"]),Mitarbeiter:new Set(["name","funktion","email","pensum"])
  };
  const essentials=essentialFields[type]||new Set((cfg?.fields||[]).filter(f=>f.required).map(f=>f.name));
  const visibleFields=(cfg?.fields||[]).filter(f=>showAdvanced||essentials.has(f.name)||f.required);
@@ -165,7 +166,7 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
  }
 
  return <div className="page form-page">
-  <div className="form-title-row"><button type="button" className="back-link button-link" onClick={cancel}><ArrowLeft size={17}/> {t("Zurück")}</button><h1>{t(title)}</h1><p>{t("Erfasse zuerst nur das Nötigste. Weitere Angaben kannst du jederzeit ergänzen.")}</p></div>
+  <div className="form-title-row"><PageBackButton href={backHref} onBeforeNavigate={cancel}/><div className="form-title-copy"><h1>{t(title)}</h1><p>{t("Erfasse zuerst nur das Nötigste. Weitere Angaben kannst du jederzeit ergänzen.")}</p></div></div>
   <form className="editor-layout" onSubmit={save}>
    <section className="workspace-card editor-main">
     <div className="form-grid">{visibleFields.map(f=><div key={f.name} className={f.full?"full":""}>

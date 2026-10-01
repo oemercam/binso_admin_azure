@@ -16,6 +16,7 @@ export const storageKeys = {
   feedbackNever: "binso-feedback-never",
   feedbackLast: "binso-feedback-last",
   feedbackViews: "binso-feedback-views",
+  uiPrefix: "binso-one-ui",
 } as const;
 
 export const storagePrefixes = {

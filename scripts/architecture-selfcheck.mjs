@@ -17,7 +17,7 @@ if(imports.join("|")!==["../styles/tokens.css","../styles/app.css","../styles/re
 const manifests=["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"].map(x=>JSON.parse(fs.readFileSync(path.join("public",x),"utf8")));
 for(const manifest of manifests){for(const key of ["name","short_name","start_url","scope","display","theme_color","background_color","icons"]){if(manifest[key]==null)throw new Error(`PWA manifest ${manifest.name} missing ${key}`)}}
 const sw=fs.readFileSync("public/sw.js","utf8");if(!sw.includes("isSensitive")||!sw.includes("SKIP_WAITING"))throw new Error("Service worker cache/update policy incomplete");
-const shell=fs.readFileSync("components/shell.tsx","utf8");for(const label of ["t(\"Start\")","t(\"Projekte\")","t(\"Zeit\")","t(\"Rechnungen\")","t(\"Mehr\")"]){if(!shell.includes(label))throw new Error(`Mobile navigation item missing: ${label}`)}
+const shell=fs.readFileSync("components/shell.tsx","utf8");for(const label of ["t(\"Start\")","t(\"Kunden\")","t(\"Neu\")","t(\"Zeit\")","t(\"Mehr\")"]){if(!shell.includes(label))throw new Error(`Mobile navigation item missing: ${label}`)}
 const pricing=fs.readFileSync("components/marketing/pricing-carousel.tsx","utf8");if(pricing.includes("scrollIntoView"))throw new Error("Pricing carousel must not move the page vertically with scrollIntoView");
 const frame=fs.readFileSync("components/marketing/marketing-frame.tsx","utf8");if(frame.includes("<main data-reveal>"))throw new Error("Marketing frame must not animate the whole page container");
 const suspicious=[];

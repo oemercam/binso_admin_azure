@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 const required=[
-  "RELEASE-NOTES-v1.6.3.md",
+  "RELEASE-NOTES-v1.6.5.md",
+  "MOBILE-PWA-FULL-AUDIT-v1.6.5.md",
   "app/layout.tsx","app/robots.ts","app/sitemap.ts","public/manifest.webmanifest","public/manifest-site.webmanifest","public/manifest-portal.webmanifest","public/manifest-operator.webmanifest","public/favicon.ico",
   "app/portal/page.tsx","app/portal/layout.tsx","app/operator/layout.tsx","app/api/auth/demo/route.ts",
   "components/theme-provider.tsx","components/account-preference-sync.tsx","components/support/support-new.tsx",
@@ -12,11 +13,11 @@ const required=[
   "database/migrations/0017_v150_code_schema_alignment.sql","database/migrations/0018_v151_organization_profile_alignment.sql","database/migrations/0019_v163_productivity_ux.sql",
   "database/archive/simplified-v1.4/001_initial.sql","database/archive/simplified-v1.4/009_platform_foundation.sql",
   "lib/i18n-dynamic.ts","styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","styles/primitives.css","hooks/use-overlay-lock.ts",
-  "config/domain.ts","config/accounting.ts","config/storage-keys.ts","config/ui.ts","config/limits.ts","config/entity-forms.ts",
+  "config/domain.ts","config/accounting.ts","config/storage-keys.ts","config/ui.ts","config/limits.ts","config/entity-forms.ts","config/mobile-ux.ts","components/navigation/page-back-button.tsx",
   "lib/documents/calculations.ts","lib/documents/defaults.ts","scripts/architecture-hardcoding-selfcheck.mjs",
   "lib/demo/pilot-fixtures.ts","config/app.ts","components/ui/responsive-overlay.tsx","components/workspace-runtime.tsx","lib/i18n-app.ts",
   "scripts/rendering-selfcheck.mjs","scripts/ui-standards-selfcheck.mjs","scripts/runtime-boundary-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","scripts/mobile-portal-visual-selfcheck.mjs",
-  "scripts/productivity-ux-selfcheck.mjs","scripts/document-preview-selfcheck.mjs","scripts/customer-portal-header-activity-selfcheck.mjs","scripts/portal-ux-workflow-selfcheck.mjs","scripts/search-effect-selfcheck.mjs","scripts/mobile-theme-i18n-selfcheck.mjs","scripts/i18n-completeness-selfcheck.mjs","scripts/ui-interaction-contract-selfcheck.mjs","scripts/check-db.mjs","scripts/migrate.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
+  "scripts/productivity-ux-selfcheck.mjs","scripts/mobile-pwa-standard-selfcheck.mjs","scripts/mobile-pwa-full-audit-selfcheck.mjs","scripts/document-preview-selfcheck.mjs","scripts/customer-portal-header-activity-selfcheck.mjs","scripts/portal-ux-workflow-selfcheck.mjs","scripts/search-effect-selfcheck.mjs","scripts/mobile-theme-i18n-selfcheck.mjs","scripts/i18n-completeness-selfcheck.mjs","scripts/ui-interaction-contract-selfcheck.mjs","scripts/check-db.mjs","scripts/migrate.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
@@ -26,7 +27,7 @@ const cssLeftovers=obsoleteCss.filter(p=>fs.existsSync(p));
 if(cssLeftovers.length)throw new Error(`Obsolete CSS layers still present: ${cssLeftovers.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.6.3")throw new Error(`Expected package version 1.6.3, got ${pkg.version}`);
+if(pkg.version!=="1.6.5")throw new Error(`Expected package version 1.6.5, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));

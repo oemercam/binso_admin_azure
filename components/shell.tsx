@@ -22,7 +22,7 @@ import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {uiConfig} from "@/config/ui";
 import {
-  ChevronDown, ChevronRight, Clock3, FolderKanban, LayoutDashboard, ReceiptText, Search,
+  ChevronDown, ChevronRight, Clock3, FileText, FolderKanban, LayoutDashboard, Plus, ReceiptText, Search, Users,
   X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard, Bell, Headphones, Newspaper
 } from "lucide-react";
 
@@ -30,8 +30,8 @@ type SearchItem={label:string;sub:string;href:string};
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const {t}=useLocale();
-  const [open, setOpen] = useState(false); const [moreOpen,setMoreOpen]=useState(false); const [mobileSearchOpen,setMobileSearchOpen]=useState(false); const [query,setQuery]=useState(''); const [companyOpen,setCompanyOpen]=useState(false); const [company,setCompany]=useState('Binso GmbH'); const [records,setRecords]=useState<LocalRecord[]>([]); const [users,setUsers]=useState<AppUser[]>([]); const [activeUserId,setActiveUserId]=useState('u1'); const [productionRole,setProductionRole]=useState<string>('reader'); const [permissionsReady,setPermissionsReady]=useState(false);
-  const [productionPlan,setProductionPlan]=useState<PlanId>('business'); const [productionSearch,setProductionSearch]=useState<{query:string;items:SearchItem[]}>({query:"",items:[]}); const searchRef=useRef<HTMLInputElement>(null); const pathname = usePathname(); const router=useRouter(); const active = (href: string) => href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
+  const [open, setOpen] = useState(false); const [moreOpen,setMoreOpen]=useState(false); const [createOpen,setCreateOpen]=useState(false); const [mobileSearchOpen,setMobileSearchOpen]=useState(false); const [query,setQuery]=useState(''); const [companyOpen,setCompanyOpen]=useState(false); const [company,setCompany]=useState('Binso GmbH'); const [records,setRecords]=useState<LocalRecord[]>([]); const [users,setUsers]=useState<AppUser[]>([]); const [activeUserId,setActiveUserId]=useState('u1'); const [productionRole,setProductionRole]=useState<string>('reader'); const [permissionsReady,setPermissionsReady]=useState(false);
+  const [productionPlan,setProductionPlan]=useState<PlanId>('business'); const [productionSearch,setProductionSearch]=useState<{query:string;items:SearchItem[]}>({query:"",items:[]}); const searchRef=useRef<HTMLInputElement>(null); const accountRef=useRef<HTMLDivElement>(null); const pathname = usePathname(); const router=useRouter(); const active = (href: string) => href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
   useEffect(()=>{const t=window.setTimeout(async()=>{if(isProductionMode()){try{const me=await apiFetch<{user:{role:string};plan:PlanId}>("/api/me");setProductionRole(me.user.role);setProductionPlan(me.plan);setPermissionsReady(true)}catch{router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`)}return}const session=getSession();if(!session){router.replace(`/portal/login?next=${encodeURIComponent(pathname)}`);return}const org=getOrganization(session.orgId);if(org&&!org.onboardingComplete){router.replace("/onboarding")}},0);return()=>window.clearTimeout(t)},[router,pathname]);
   useEffect(()=>{const load=()=>{const pref=loadAppPreferences();const st=loadSettings();setCompany(pref.activeCompany||st.companyName);setActiveUserId(pref.activeUserId);setUsers(st.users);setRecords(listLocalRecords());if(!isProductionMode())setPermissionsReady(true)};const t=window.setTimeout(load,0);const unsubData=subscribeAppEvent(appEvents.dataChanged,load);const unsubSettings=subscribeAppEvent(appEvents.settingsChanged,load);return()=>{window.clearTimeout(t);unsubData();unsubSettings()}},[]);
   const searchItems=useMemo<SearchItem[]>(()=>{
@@ -46,6 +46,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const results=useMemo(()=>{const normalized=query.trim();if(isProductionMode())return normalized.length>=2&&productionSearch.query===normalized?productionSearch.items.slice(0,8):[];const q=normalized.toLowerCase();if(!q)return[];return searchItems.filter(i=>`${i.label} ${i.sub}`.toLowerCase().includes(q)).slice(0,8)},[query,searchItems,productionSearch]);
   function submitSearch(e:React.FormEvent){e.preventDefault();if(results[0]){router.push(results[0].href);setQuery('')}}
   useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(window.innerWidth<=uiConfig.breakpoints.mobile)setMobileSearchOpen(true);else searchRef.current?.focus()}};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[]);
+  useEffect(()=>{if(!companyOpen)return;const close=(event:PointerEvent)=>{if(accountRef.current&&!accountRef.current.contains(event.target as Node))setCompanyOpen(false)};const key=(event:KeyboardEvent)=>{if(event.key==="Escape")setCompanyOpen(false)};document.addEventListener("pointerdown",close);document.addEventListener("keydown",key);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",key)}},[companyOpen]);
   const activeUser=users.find(u=>u.id===activeUserId)||users[0];
   const initials=(activeUser?.name||'Binso').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
   const effectiveRole=isProductionMode()?productionRole:localRoleToTenant(activeUser?.role||'Lesen');
@@ -67,7 +68,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label={t("Binso One Dashboard")}><BrandLogo/></Link>
           <button className="mobile-top-action mobile-search-trigger" onClick={()=>setMobileSearchOpen(true)} aria-label={t("Suche öffnen")}><Search size={18}/></button>
           <form className="search global-search" role="search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} type="search" autoComplete="off" enterKeyHint="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte suchen …")} aria-label={t("Globale Suche")}/><kbd>Ctrl K</kbd>{query&&<div className="search-results" role="listbox" aria-label={t("Suchergebnisse")}>{query.trim().length<2?<p>{t("Mindestens 2 Zeichen eingeben")}</p>:searchLoading?<p>{t("Suche läuft …")}</p>:results.length?results.map(r=><Link role="option" aria-selected="false" key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery('')}><strong>{r.label}</strong><span>{t(r.sub)}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>}</form>
-          <div className="account-menu-wrap">
+          <div className="account-menu-wrap" ref={accountRef}>
             <button className="account-trigger" onClick={()=>setCompanyOpen(v=>!v)} aria-expanded={companyOpen} aria-haspopup="menu">
               <div className="account-trigger-copy"><strong>{activeUser?.name||"Benutzer"}</strong><span>{company}</span></div>
               <div className="avatar">{initials}</div>
@@ -108,11 +109,21 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
         <nav className="mobile-nav" aria-label={t("Mobile Navigation")}>
           <Link href="/dashboard" className={active("/dashboard")?"mobile-nav-item active":"mobile-nav-item"}><LayoutDashboard size={20}/><span>{t("Start")}</span></Link>
-          <Link href="/projekte" className={active("/projekte")?"mobile-nav-item active":"mobile-nav-item"}><FolderKanban size={20}/><span>{t("Projekte")}</span></Link>
+          <Link href="/kunden" className={active("/kunden")?"mobile-nav-item active":"mobile-nav-item"}><Users size={20}/><span>{t("Kunden")}</span></Link>
+          <button className="mobile-nav-item mobile-nav-create" onClick={()=>setCreateOpen(true)} aria-label={t("Neu erstellen")}><span className="mobile-nav-create-icon"><Plus size={22}/></span><span>{t("Neu")}</span></button>
           <Link href="/zeiterfassung" className={active("/zeiterfassung")?"mobile-nav-item active":"mobile-nav-item"}><Clock3 size={20}/><span>{t("Zeit")}</span></Link>
-          <Link href="/rechnungen" className={active("/rechnungen")?"mobile-nav-item active":"mobile-nav-item"}><ReceiptText size={20}/><span>{t("Rechnungen")}</span></Link>
           <button className={moreOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setMoreOpen(v=>!v)} aria-expanded={moreOpen} aria-label={t("Navigation")}><span className={`workspace-menu-toggle-glyph${moreOpen?" is-open":""}`} aria-hidden="true"><span/><span/><span/></span><span>{t("Mehr")}</span></button>
         </nav>
+
+        <ResponsiveOverlay open={createOpen} title={t("Neu erstellen")} onClose={()=>setCreateOpen(false)} size="sm">
+          <div className="mobile-create-sheet list-sheet-options">
+            {canSee("/kunden")&&<Link href="/kunden/neu" onClick={()=>setCreateOpen(false)}><Users size={18}/><span>{t("Kunde")}</span></Link>}
+            {canSee("/offerten")&&<Link href="/offerten/neu" onClick={()=>setCreateOpen(false)}><FileText size={18}/><span>{t("Offerte")}</span></Link>}
+            {canSee("/rechnungen")&&<Link href="/rechnungen/neu" onClick={()=>setCreateOpen(false)}><ReceiptText size={18}/><span>{t("Rechnung")}</span></Link>}
+            {canSee("/projekte")&&<Link href="/projekte/neu" onClick={()=>setCreateOpen(false)}><FolderKanban size={18}/><span>{t("Projekt")}</span></Link>}
+            {canSee("/zeiterfassung")&&<Link href="/zeiterfassung/neu" onClick={()=>setCreateOpen(false)}><Clock3 size={18}/><span>{t("Zeit")}</span></Link>}
+          </div>
+        </ResponsiveOverlay>
 
         <ResponsiveOverlay open={mobileSearchOpen} title={t("Suchen")} onClose={()=>setMobileSearchOpen(false)} size="md">
           <div className="mobile-search-panel">

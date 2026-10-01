@@ -1,22 +1,19 @@
-# Mobile / PWA QA – v0.4.1
+# Mobile / PWA QA – v1.6.5
 
-Geprüfte Zielbereiche:
-- 320 px
-- 360 px
-- 390 px
-- 430 px
-- 768 px
-- PWA standalone mit Safe-Area
+Geprüfte Zielbereiche: 320, 360, 390, 430 und 768 px sowie PWA standalone mit Safe Areas.
 
-Technische Absicherungen:
-- global kein horizontales Body-Overflow
-- alle Grid-Bereiche verwenden `minmax(0, 1fr)`
-- Tabellen scrollen lokal horizontal statt die Seite zu verbreitern
-- Aktionsleisten umbrechen auf kleinen Screens
-- Bottom-Navigation berücksichtigt iOS Safe-Area
-- Modals nutzen `100dvh` und Safe-Areas
-- Rechnungs-/Offertenvorschau bleibt A4-basiert und wird im Mini-Preview skaliert
-- grosse Dokumentvorschau scrollt innerhalb des Modals
-- Druckansicht erzwingt 210 mm A4-Breite ohne Mobile-Skalierung
-- lange Texte dürfen umbrechen
-- Formularelemente bleiben innerhalb der Viewport-Breite
+Zentrale Verträge:
+- Topbar: Marke · Suche · Benutzerprofil.
+- Bottom Navigation: Start · Kunden · + · Zeit · Mehr.
+- icon-only Back-Navigation auf Detail/Create/Dokument/Support.
+- Listen: maximal zwei Informationszeilen, keine horizontale Desktop-Tabelle.
+- Detail: arbeitsrelevante Daten zuerst, Stammdaten unter «Weitere Angaben».
+- Create/Edit: Pflichtfelder zuerst, optionale Felder progressiv.
+- Aktionen: eine klare Primäraktion; selten/destruktiv über Overflow/Sheet.
+- Formulare/Overlays: 44 px Touch, 16 px Inputs, Viewport- und Safe-Area-konform.
+- Back-Navigation stellt Scrollposition wieder her.
+- Kundenliste zeigt keine E-Mail als primäre Information.
+- Dokumentvorschau bleibt on-demand und innerhalb des Overlays viewport-sicher.
+- Operator, Public, Auth, Onboarding und Systemseiten dürfen die Viewport-Breite nicht überschreiten.
+
+Automatische Absicherung: `scripts/mobile-pwa-full-audit-selfcheck.mjs` inventarisiert alle Workspace-Seiten und prüft die zentralen Route-Familien und UI-Verträge.

@@ -706,3 +706,280 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  .search-results,.relationship-popover,.product-results{max-width:calc(100vw - 2 * var(--page-gutter-mobile));overflow-x:hidden}
  .filter-popover{max-width:calc(100vw - 16px);overflow-x:hidden}
 }
+
+
+/* ==========================================================
+   v1.6.4 canonical Mobile/PWA workspace composition
+   ========================================================== */
+/* Binso One v1.6.4 — canonical Mobile/PWA composition.
+   Desktop stays on the established layout; this layer only owns compact workspace composition. */
+.mobile-page-action,.mobile-record-primary,.mobile-record-secondary,.mobile-record-status,.record-card-mobile-summary{display:none}
+.list-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;min-width:0}
+.list-search{display:flex;align-items:center;gap:8px;flex:1;min-width:0;max-width:440px}.list-search>.ui-icon-button{display:none}.list-search-field{height:var(--control-height);display:flex;align-items:center;gap:7px;flex:1;min-width:0;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);padding:0 8px;color:var(--foreground-muted)}.list-search-field .ui-input{min-height:0;height:100%;padding:0;border:0;background:transparent;box-shadow:none}.list-search-close{width:32px;height:32px;display:grid;place-items:center;border:0;background:transparent;color:var(--foreground-muted);padding:0;border-radius:7px}.list-toolbar-actions{display:flex;align-items:center;gap:7px}.list-tool-button{position:relative;min-height:var(--control-height);display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--foreground);padding:0 11px;font-size:12px;cursor:pointer}.list-tool-button i{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--foreground)}
+.list-sheet-options{display:grid;gap:4px}.list-sheet-options :is(button,a){width:100%;min-height:44px;display:flex;align-items:center;gap:10px;padding:0 11px;border:0;border-radius:9px;background:transparent;color:var(--foreground);text-align:left;cursor:pointer}.list-sheet-options :is(button,a):hover,.list-sheet-options .selected{background:var(--secondary)}.list-sheet-options .selected{font-weight:700}.page-action-sheet svg{flex:0 0 auto}
+.expandable-search{display:flex;align-items:center;gap:8px;min-width:0}.expandable-search>.ui-icon-button{display:none}.expandable-search-field{display:flex;align-items:center;gap:7px;min-width:260px;height:var(--control-height);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);padding:0 8px;color:var(--foreground-muted)}.expandable-search-field .ui-input{height:100%;min-height:0;border:0;background:transparent;padding:0}.expandable-search-field>button{width:32px;height:32px;display:grid;place-items:center;border:0;background:transparent;color:var(--foreground-muted);padding:0}.support-list-toolbar{display:flex;justify-content:flex-start;margin-bottom:12px}
+
+@media(max-width:760px){
+ :root{--mobile-section-space:24px;--mobile-block-space:16px;--mobile-card-gap:8px;--mobile-content-top:10px}
+ body{background:var(--surface-0)}
+ .page{padding:var(--mobile-content-top) max(var(--page-gutter-mobile),var(--safe-right)) calc(var(--app-bottom-nav-row) + 22px + var(--safe-bottom)) max(var(--page-gutter-mobile),var(--safe-left));}
+ .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1{font-size:22px;line-height:1.12;letter-spacing:-.028em}
+ .eyebrow,.ui-eyebrow{margin-bottom:3px;font-size:9px}
+ .page h2,.card-header h2,.section-title h2{font-size:15px}
+ .page-header,.module-heading,.detail-heading{margin-bottom:12px;gap:8px}
+ .page-header p,.module-heading p,.detail-heading p,.form-title-row p{font-size:11px;line-height:1.4;margin-top:4px}
+ .section-title,.card-header{margin-bottom:9px;gap:8px}
+
+ /* Canonical page title: title and contextual + share one row. */
+ .mobile-standard-heading{display:grid;grid-template-columns:minmax(0,1fr) var(--touch-target);align-items:end;gap:8px}
+ .mobile-standard-heading>div:first-child{min-width:0;width:auto}
+ .mobile-standard-heading p{display:none}
+ .mobile-standard-heading .module-heading-actions{display:none}
+ .mobile-page-action{display:grid;width:var(--touch-target);height:var(--touch-target);align-self:end;border-color:transparent;background:transparent}
+ a.mobile-page-action{place-items:center}
+
+ /* List/workspace pages are no longer cards inside cards. */
+ .list-workspace-card{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+ .list-toolbar{width:100%;gap:6px;margin-bottom:8px;min-height:var(--touch-target)}
+ .list-search{flex:1;max-width:none}
+ .list-search>.ui-icon-button{display:grid;width:var(--touch-target);height:var(--touch-target)}
+ .list-search-field{display:none;height:var(--touch-target);border-radius:9px;padding-inline:9px}
+ .list-toolbar.is-searching .list-search{width:100%}
+ .list-toolbar.is-searching .list-search-field{display:flex}
+ .list-toolbar.is-searching .list-toolbar-actions{display:none}
+ .list-toolbar-actions{margin-left:auto;gap:4px}
+ .list-tool-button{width:var(--touch-target);height:var(--touch-target);min-height:var(--touch-target);padding:0;gap:0;background:var(--surface)}
+ .list-tool-button>span{display:none}
+ .list-tool-button i{right:6px;top:6px}
+
+ /* Mobile data rows: exactly two information lines plus inline status/chevron. */
+ .data-table-wrap{overflow:visible;margin:0;padding:0}
+ .data-table{min-width:0;width:100%}
+ .data-head{display:none}
+ .data-row:not(.data-head){min-width:0;min-height:54px;display:grid;grid-template-columns:minmax(0,1fr) auto 16px;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--border);background:transparent;font-size:12px}
+ .data-row:not(.data-head):hover{background:transparent}
+ .data-row .desktop-record-cell{display:none}
+ .data-row .mobile-record-primary{display:block;grid-column:1;grid-row:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:var(--foreground)}
+ .data-row .mobile-record-secondary{display:block;grid-column:1;grid-row:2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--foreground-muted)}
+ .data-row .mobile-record-status{display:block;grid-column:2;grid-row:1/3;align-self:center;max-width:112px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;padding:3px 6px}
+ .data-row .record-chevron{grid-column:3;grid-row:1/3;align-self:center;color:var(--foreground-muted)}
+ .module-kunden .mobile-record-secondary{max-width:100%}
+
+ /* Card view remains available, but behaves like a compact record rather than a dashboard tile. */
+ .record-card-grid{grid-template-columns:1fr;gap:0}
+ .record-card{position:relative;min-height:58px;padding:8px 72px 8px 2px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;gap:2px}
+ .record-card>div{display:block;min-width:0}.record-card>div>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+ .record-card .record-card-detail{display:none}.record-card .record-card-mobile-summary{display:block;margin:0;color:var(--foreground-muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .record-card>em{position:absolute;right:2px;top:50%;transform:translateY(-50%);max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;padding:3px 6px}
+
+ /* Empty states consume one compact row, not a large blank card. */
+ .empty-state,.ui-state{min-height:0;padding:12px 2px;border:0;border-top:1px solid var(--border);border-radius:0;background:transparent;text-align:left;display:block;color:var(--foreground-muted);font-size:11px}
+ .compact-list-empty{min-height:42px;display:flex;align-items:center}
+ .empty-state :is(svg,strong,p,a),.ui-state :is(.ui-state-icon,p){margin-block:0}
+
+ /* KPI/stat surfaces: 2x2 density, equal heights, no oversized values. */
+ .metric-grid,.module-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:10px}
+ .module-stats>:last-child:nth-child(odd){grid-column:1/-1}
+ .metric-card,.stat-card{min-height:88px;padding:10px;border-radius:10px;align-content:start}
+ .metric-card span,.stat-card span{font-size:10px;color:var(--foreground-muted)}
+ .metric-card strong,.stat-card strong{font-size:18px;line-height:1.08;margin:7px 0 4px;overflow-wrap:anywhere}
+ .metric-card small,.stat-card small{font-size:9px;line-height:1.25;color:var(--foreground-muted)}
+
+ /* Dashboard: first viewport prioritises KPIs, attention and four frequent actions. */
+ .dashboard-heading p{display:none}
+ .dashboard-kpi-grid{margin-bottom:12px}
+ .dashboard-attention{margin:2px 0 14px}
+ .dashboard-attention .section-title{margin-bottom:3px}.dashboard-attention .section-title a{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--foreground-muted)}
+ .attention-list{display:grid}.attention-list a{min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--border);font-size:11px}.attention-list a:first-child{border-top:0}.attention-list svg{color:var(--foreground-muted);flex:0 0 auto}
+ .dashboard-grid{display:grid;grid-template-columns:1fr;gap:12px}
+ .dashboard-quick-card,.dashboard-tasks-card{padding:0;border:0;background:transparent;border-radius:0}
+ .dashboard-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0}
+ .dashboard-quick-actions a{min-height:42px;display:flex;align-items:center;justify-content:flex-start;gap:7px;padding:0 9px;border:1px solid var(--border);border-radius:9px;background:var(--surface);font-size:11px}
+ .dashboard-quick-actions a>svg:first-child{width:16px}.dashboard-quick-actions a>svg:last-child{margin-left:auto;width:14px;color:var(--foreground-muted)}
+ .dashboard-quick-actions a:nth-child(n+5){display:none}
+ .dashboard-task-list a{min-height:48px;padding:7px 0}.dashboard-task-list strong{font-size:11px}.dashboard-task-list span,.dashboard-task-list em{font-size:9px}
+
+ /* Forms: one column, optional details progressive, actions stay reachable. */
+ .form-title-row{margin-bottom:12px}.form-title-row p{margin-top:4px}
+ .editor-layout{display:block}.editor-main{padding:0;border:0;background:transparent;border-radius:0}.form-grid{grid-template-columns:1fr;gap:11px}.form-grid .full{grid-column:auto}
+ .editor-side{position:sticky;z-index:var(--z-sticky);bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom));display:block;margin:12px calc(-1 * max(var(--page-gutter-mobile),var(--safe-right))) 0}
+ .editor-side .side-card{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:8px max(var(--page-gutter-mobile),var(--safe-right));border-width:1px 0 0;border-radius:0;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(12px)}
+ .editor-side .side-card :is(h3,p){display:none}.editor-side .side-card .ui-button{width:100%;min-height:44px;margin:0}
+ .progressive-fields-toggle{width:100%;min-height:42px;justify-content:center;margin-top:6px}
+
+ /* Detail pages: flatten non-semantic card nesting and keep actions compact. */
+ .detail-grid,.document-detail-grid,.support-detail-grid,.settings-grid,.vat-layout{grid-template-columns:1fr;gap:10px}
+ .detail-heading{align-items:flex-start}.detail-actions{width:100%;gap:5px;overflow-x:auto}.detail-actions>*{flex:0 0 auto}
+ .detail-grid>.workspace-card,.support-detail-grid>.workspace-card{padding:12px;border-radius:10px}
+ .detail-fields{grid-template-columns:1fr;border-radius:9px}.detail-fields div{padding:10px 11px}.detail-fields span{font-size:9px}.detail-fields strong{font-size:12px}
+ .timeline-item{padding:9px 0}.sub-section{margin-top:16px}
+
+ /* Settings: tabs are a compact horizontal app control; content does not nest oversized cards. */
+ .settings-tabs{width:100%;margin-bottom:10px;padding:3px;gap:2px;border-radius:9px;scrollbar-width:none}.settings-tabs::-webkit-scrollbar{display:none}.settings-tabs button{min-height:36px;padding:0 9px;font-size:10px}
+ .settings-grid{display:grid}.settings-grid>.workspace-card{padding:12px;border-radius:10px}.profile-settings-grid{grid-template-columns:1fr}.settings-profile-head{grid-template-columns:44px 1fr;gap:10px;margin-bottom:14px;padding-bottom:12px}.settings-profile-avatar{width:44px;height:44px;font-size:14px}.role-info{grid-template-columns:1fr;gap:5px}.role-info p{padding:8px;font-size:10px}
+ .integration-list>div{padding:10px 0}.integration-list button{min-height:38px}
+
+ /* Support list follows the same two-line mobile record contract. */
+ .support-list-toolbar{margin-bottom:7px}.expandable-search{width:100%}.expandable-search>.ui-icon-button{display:grid;width:var(--touch-target);height:var(--touch-target)}.expandable-search-field{display:none;min-width:0;width:100%;height:var(--touch-target)}.expandable-search.is-open>.ui-icon-button{display:none}.expandable-search.is-open .expandable-search-field{display:flex}
+ .support-row.head{display:none}.support-table{overflow:visible}.support-row{min-height:56px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:2px 8px;padding:8px 2px;border-top:1px solid var(--border);color:var(--foreground)}.support-row strong{grid-column:1;grid-row:1;font-size:11px}.support-row>span:nth-child(2){grid-column:1;grid-row:2;display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--foreground-muted)}.support-row-category,.support-row-priority{display:none}.support-row em{grid-column:2;grid-row:1/3;align-self:center;font-size:9px}
+
+ /* Payroll and specialist tables become compact records instead of 700px desktop rows. */
+ .payroll-table{overflow:visible}.payroll-row.head{display:none}.payroll-row{min-width:0;min-height:58px;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:2px 8px;padding:8px 0;border-bottom:1px solid var(--border)}.payroll-row>strong:first-child{grid-column:1;grid-row:1}.payroll-row>span:nth-child(2){grid-column:1;grid-row:2;font-size:10px;color:var(--foreground-muted)}.payroll-row>span:nth-child(3){display:none}.payroll-row>strong:nth-child(4){grid-column:2;grid-row:1}.payroll-row>button{grid-column:2;grid-row:2;width:auto;min-height:28px;height:28px;font-size:9px;padding:0 7px}
+ .vat-method-row{grid-template-columns:1fr;gap:6px}.vat-method-row label{padding:9px}.vat-checks>div{padding-block:8px}
+
+ /* Generic workspace cards are tighter, but only inside the authenticated mobile workspace. */
+ .workspace-card,.card{padding:12px;border-radius:10px}.workspace-card+.workspace-card{margin-top:8px}
+ .notification-list article{padding:10px 0;gap:9px}.notification-icon{width:30px;height:30px;border-radius:8px}.notification-list article p{font-size:10px}.notification-list article small{font-size:9px}
+ .changelog-list{gap:8px}.changelog-list>.workspace-card{padding:12px}
+
+ /* Bottom nav/safe-area contract. */
+ .page>*:last-child{margin-bottom:0}
+}
+
+@media(max-width:430px){
+ :root{--page-gutter-mobile:12px}
+ .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1{font-size:21px}
+ .metric-card strong,.stat-card strong{font-size:17px}
+ .data-row .mobile-record-status{max-width:86px}
+}
+
+@media(display-mode:standalone) and (max-width:760px){
+ .page{padding-top:8px;padding-bottom:calc(var(--app-bottom-nav-row) + 18px + var(--safe-bottom))}
+}
+
+@media(max-width:760px){
+ /* Specialist pages use the same compact header/action geometry without changing desktop. */
+ .module-heading>.ui-button{width:var(--touch-target);height:var(--touch-target);min-height:var(--touch-target);padding:0;flex:0 0 var(--touch-target)}
+ .module-heading>.ui-button .ui-button-label{display:none}
+ .report-actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr) var(--touch-target) var(--touch-target);gap:5px}
+ .report-actions .ui-select{height:var(--touch-target);min-height:var(--touch-target)}
+ .report-actions .ui-button{width:var(--touch-target);height:var(--touch-target);min-height:var(--touch-target);padding:0}
+ .report-actions .ui-button-label{display:none}
+ .reports-grid{grid-template-columns:1fr;gap:10px}.reports-grid>.workspace-card{padding:12px}.report-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.report-kpis>div{padding:9px}.report-kpis strong{font-size:16px}
+ .workflow-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.workflow-actions>*{width:100%;min-width:0;min-height:42px;margin:0;overflow:hidden;text-overflow:ellipsis}
+ .support-form{max-width:none;padding:0;border:0;background:transparent}.support-form .form-grid{gap:11px}
+ .support-detail-grid{display:grid}.support-detail-side{gap:8px}.support-thread{margin:14px 0;gap:7px}.support-thread>div{padding:9px}.support-reply .ui-button{width:100%}
+ .current-release-card{padding:11px}.current-release-card strong{font-size:14px}.changelog-list article h2{font-size:14px;margin:4px 0}.changelog-list article p{font-size:11px;line-height:1.45}
+ .subscription-card .ui-button,.settings-grid>aside>.ui-button{width:100%}
+}
+@media(max-width:760px){
+ .settings-user-table{overflow:visible}.settings-user-row.head{display:none}.settings-user-row{min-width:0;grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:10px 0}.settings-user-row>input,.settings-user-row>select{grid-column:1/-1}.settings-user-row>.ui-toggle{grid-column:1}.settings-user-actions{grid-column:2;justify-content:flex-end}
+ .time-tracker-card,.time-tracker-card.is-active{padding:11px;margin-bottom:8px;gap:10px}.time-tracker-clock{font-size:24px}.time-tracker-kicker{font-size:9px}.time-tracker-main small{font-size:10px}.time-tracker-setup{gap:7px}.time-tracker-actions{gap:6px}.time-scope-switch{margin-block:6px 10px}
+ .active-time-tracker{bottom:calc(var(--app-bottom-nav-row) + 10px + var(--safe-bottom));padding:7px 8px;gap:7px}.active-time-tracker-copy strong{font-size:11px}.active-time-tracker-copy small{font-size:9px}
+}
+
+/* ==========================================================
+   v1.6.5 — full Mobile/PWA app UX consolidation
+   One hierarchy for every route family; no page-specific mobile patches.
+   ========================================================== */
+.detail-fields-mobile,.detail-actions-mobile{display:none}
+.page-back-button{display:none}
+.document-advanced-fields{display:contents}
+.document-advanced-fields>summary{display:none}
+.document-advanced-fields:not([open])>:not(summary){display:grid}
+
+@media(max-width:760px){
+ /* Navigation semantics: back is always icon-only; page copy starts directly below it. */
+ .page-back-button{display:grid;width:var(--touch-target);height:var(--touch-target);margin:0 0 6px -6px;border-color:transparent;background:transparent}
+ .back-link{display:none}
+ .form-title-row{display:grid;grid-template-columns:var(--touch-target) minmax(0,1fr);align-items:start;gap:6px 8px;margin-bottom:12px}
+ .form-title-row>.page-back-button{grid-column:1;grid-row:1;margin:0 0 0 -6px}
+ .form-title-row>.form-title-copy,.form-title-row>.document-editor-heading{grid-column:1/-1;grid-row:2;min-width:0}
+ .form-title-copy p,.document-editor-heading p{display:none}
+
+ /* Detail first viewport: identity + working information only. Master data is progressive. */
+ .detail-fields-desktop{display:none}
+ .detail-fields-mobile{display:grid}
+ .mobile-detail-more{margin-top:8px;border-top:1px solid var(--border)}
+ .mobile-detail-more>summary{min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;font-size:11px;font-weight:700;color:var(--foreground)}
+ .mobile-detail-more>summary::-webkit-details-marker{display:none}
+ .mobile-detail-more>summary small{margin-left:auto;color:var(--foreground-muted);font-size:9px;font-weight:600}
+ .mobile-detail-more>summary svg{transition:transform var(--motion-fast)}
+ .mobile-detail-more[open]>summary svg{transform:rotate(180deg)}
+ .mobile-detail-more>.detail-fields{margin-top:4px}
+ .detail-main-card>.section-title:first-child span{display:none}
+ .detail-heading>div:first-child{min-width:0}.detail-heading h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .detail-heading p{display:none}
+ .detail-actions-desktop{display:none}
+ .detail-actions-mobile{display:flex;align-items:center;gap:4px;margin-left:auto}
+ .detail-actions-mobile .ui-icon-button{width:var(--touch-target);height:var(--touch-target);border-color:transparent;background:transparent}
+ .list-sheet-options .danger-action{color:var(--danger)}
+
+ /* Detail workflows are actions, not another dashboard. Keep one clear primary action. */
+ .timeline-card>.section-title:first-child{margin-bottom:6px}
+ .detail-workflow-button{width:100%;min-height:44px}
+ .secondary-workflow-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px}
+ .secondary-workflow-actions>*{width:100%;min-width:0;min-height:40px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .related-list a,.recent-local-list a{min-height:48px;grid-template-columns:78px minmax(0,1fr) auto;gap:7px}
+ .related-list a small,.recent-local-list a small{display:block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+ /* Create/edit: essential fields first. Optional business data stays collapsed on mobile. */
+ .document-advanced-fields{display:block;margin-top:10px;border-top:1px solid var(--border)}
+ .document-advanced-fields>summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;cursor:pointer;font-size:11px;font-weight:700}
+ .document-advanced-fields>summary::-webkit-details-marker{display:none}
+ .document-advanced-fields>summary svg{transition:transform var(--motion-fast)}
+ .document-advanced-fields[open]>summary svg{transform:rotate(180deg)}
+ .document-advanced-fields:not([open])>:not(summary){display:none}
+ .document-advanced-fields>.form-grid{padding-top:8px}
+ .document-top-actions{display:none}
+ .document-preview-launcher{display:none}
+ .document-side{position:sticky;bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom));z-index:var(--z-sticky);margin-inline:calc(-1 * max(var(--page-gutter-mobile),var(--safe-right)))}
+ .document-side .document-mobile-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;padding:8px max(var(--page-gutter-mobile),var(--safe-right));border-width:1px 0 0;border-radius:0;background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(12px)}
+ .document-mobile-actions>h3{display:none}.document-mobile-actions>.ui-button{width:100%;min-width:0;margin:0}
+ .document-mobile-actions>.ui-button:nth-of-type(n+3){display:none}
+ .positions-title{position:static}.document-relation-tools{display:grid;grid-template-columns:1fr;gap:7px}.document-relation-tools>.ui-button{width:100%}
+ .editor-totals{margin-top:10px}.editor-totals>div{min-height:32px}
+
+ /* Support create/detail: the task comes first; diagnostics are secondary. */
+ .support-form{display:grid;gap:12px}.support-capture-card{padding:10px;border-radius:9px}.support-capture-card>div:first-child span{font-size:10px;line-height:1.4}
+ .support-capture-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.support-capture-actions .ui-button{width:100%;min-width:0;padding-inline:8px}.support-capture-actions .ui-button-label{overflow:hidden;text-overflow:ellipsis}
+ .support-form>button[type="submit"]{width:100%;min-height:44px}
+ .support-detail-side{order:2}.support-detail-grid>article{order:1}.support-meta>div{min-height:36px}
+ .support-ticket-screenshot img{width:100%;height:auto}
+
+ /* Account menu is an app sheet on phones; desktop menu logic/actions stay identical. */
+
+ /* Settings, billing, notifications and changelog share the same compact app hierarchy. */
+ .ui-page-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin-bottom:12px}.ui-page-header-copy p{display:none}.ui-page-header-actions{min-width:0}.ui-page-header-actions .ui-button{min-height:var(--touch-target)}
+ .notification-layout{display:grid;grid-template-columns:1fr;gap:10px}.notification-preferences{order:2}.notification-list{order:1;padding:0;border:0;background:transparent}.notification-actions{gap:4px}.notification-actions :is(a,button){min-height:36px}
+ .notification-pref-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.notification-pref-row>label{grid-column:1/-1;min-height:38px;display:flex;align-items:center;justify-content:space-between}
+ .settings-grid{grid-template-columns:1fr}.subscription-card,.settings-grid>aside{padding:12px}.subscription-card .ui-button,.settings-grid>aside .ui-button{width:100%;min-height:44px}
+ .changelog-list>.workspace-card{border-width:0 0 1px;border-radius:0;padding:12px 0}.current-release-card{border-radius:9px}
+
+ /* Specialist finance/report/payroll pages: no desktop-width surface may widen the phone. */
+ .reports-grid,.vat-layout,.payroll-layout{grid-template-columns:1fr;gap:10px}
+ .bar-chart{min-width:0;overflow:hidden}.bar-chart>div{min-width:0}
+ .report-kpis,.vat-summary,.payroll-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .payroll-table,.operator-table,.settings-user-table{max-width:100%;overflow:visible}
+
+ /* Public/auth/onboarding/PWA system pages use the same touch and width contract. */
+ .auth-card,.onboarding-card,.system-card,.legal-page,.marketing-section{max-width:100%}
+ .auth-form,.onboarding-form{min-width:0}.auth-form .marketing-primary,.auth-form .marketing-secondary{min-height:44px}
+ .register-actions,.onboarding-actions:has(.onboarding-back){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .register-actions>*,.onboarding-actions>*{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+ /* Operator is also usable on a phone: compact navigation and records, never a 700px table. */
+ .operator-shell{grid-template-columns:1fr;overflow-x:hidden}
+ .operator-sidebar{position:static;height:auto;padding:10px max(10px,var(--safe-right));gap:8px}.operator-sidebar-brand{padding:5px 4px 8px}.operator-sidebar nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;overflow:visible}.operator-sidebar nav a{min-width:0;min-height:42px;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.operator-sidebar-foot{display:none}
+ .operator-content>header{height:54px;padding:0 max(12px,var(--safe-right))}.operator-content>main{padding:12px max(10px,var(--safe-right)) calc(20px + var(--safe-bottom))}
+ .operator-page-head{display:grid;gap:8px;margin-bottom:14px}.operator-page-head h1{font-size:22px}.operator-page-head p{display:none}.operator-page-head>input{width:100%;height:44px;font-size:16px}
+ .operator-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.operator-metrics article{padding:10px}.operator-metrics strong{font-size:18px}.operator-metrics article:last-child:nth-child(odd){grid-column:1/-1}
+ .operator-table-row,.operator-users-row{min-width:0;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:3px 8px;min-height:56px;padding:8px 0}.operator-table-row.head{display:none}.operator-table-row>span:nth-child(n+3){display:none}.operator-table-row>span:first-child{grid-column:1;grid-row:1/3}.operator-table-row>span:nth-child(2){grid-column:2;grid-row:1/3;align-self:center;text-align:right}.operator-users-row select{grid-column:2;grid-row:1/3;max-width:132px}
+
+ /* Prevent accidental horizontal page scrolling in every app family. */
+ .page,.operator-shell,.operator-content,.auth-shell,.marketing-shell{max-width:100%;overflow-x:clip}
+ :is(.page,.operator-page,.auth-card,.ui-overlay-body) :is(input,select,textarea,button,a){max-width:100%}
+}
+
+@media(max-width:430px){
+ .support-capture-actions{grid-template-columns:1fr}
+ .secondary-workflow-actions{grid-template-columns:1fr}
+ .document-side .document-mobile-actions{grid-template-columns:1fr 1fr}
+ .operator-sidebar nav{grid-template-columns:1fr 1fr}
+}
+
+@media(display-mode:standalone) and (max-width:760px){
+ body{overscroll-behavior-y:none}
+ .page-back-button{touch-action:manipulation}
+ .document-side{bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom))}
+}

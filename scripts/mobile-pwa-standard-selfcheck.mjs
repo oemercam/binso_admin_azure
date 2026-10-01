@@ -1,0 +1,15 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8");
+const required=["components/ui/list-toolbar.tsx","components/ui/expandable-search.tsx","components/module-page.tsx","components/dashboard.tsx","components/support/support-list.tsx"];
+for(const file of required)if(!fs.existsSync(file))throw new Error(`Mobile/PWA standard file missing: ${file}`);
+const css=read("styles/responsive-central.css");
+for(const marker of [".mobile-standard-heading",".list-toolbar",".mobile-record-primary",".compact-list-empty",".dashboard-kpi-grid",".dashboard-attention",".dashboard-quick-actions",".editor-side",".settings-tabs",".support-row","@media(display-mode:standalone)"])if(!css.includes(marker))throw new Error(`Mobile/PWA CSS contract missing: ${marker}`);
+if(css.includes("!important"))throw new Error("Mobile/PWA standard must not use !important.");
+const modulePage=read("components/module-page.tsx");
+for(const marker of ["mobileSecondaryValues","mobile-page-action","ListToolbar","Keine Einträge entsprechen den gewählten Filtern.","mobile-record-status"])if(!modulePage.includes(marker))throw new Error(`Module mobile composition missing: ${marker}`);
+const toolbar=read("components/ui/list-toolbar.tsx");
+for(const marker of ["Suche öffnen","Filter","Sortierung","Ansicht wechseln","ResponsiveOverlay","aria-label"])if(!toolbar.includes(marker))throw new Error(`List toolbar accessibility/overlay marker missing: ${marker}`);
+const dashboard=read("components/dashboard.tsx");
+for(const marker of ["Offene Rechnungen","dashboard-attention","dashboard-quick-actions","überfällige Rechnungen"])if(!dashboard.includes(marker))throw new Error(`Dashboard mobile information architecture missing: ${marker}`);
+const globals=read("app/globals.css");if(!globals.includes('responsive-central.css'))throw new Error("Canonical responsive stylesheet is not loaded.");
+console.log("Mobile/PWA standard self-check passed: compact headers, icon-first toolbars, two-line records, KPI grid, progressive forms, settings, support and safe-area composition are centralized.");

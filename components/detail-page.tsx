@@ -6,7 +6,7 @@ import {limitsConfig,megabytes} from "@/config/limits";
 import {demoAnalyticsFixture} from "@/lib/demo/fixtures";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarDays, CheckCircle2, FilePlus2, FileText, MoreHorizontal, Pencil, Plus, Save, Send, Trash2 } from "lucide-react";
+import { CalendarDays, CheckCircle2, ChevronDown, FilePlus2, FileText, MoreHorizontal, Pencil, Plus, Save, Send, Trash2 } from "lucide-react";
 import {modules,type ModuleConfig} from "@/lib/modules";
 import { ensureSeedOverride, findSeedOverride, getLocalRecord, listLocalRecords, money, parseMoney, type LocalRecord } from "@/lib/local-store";
 import { createAppRecord, deleteAppRecord, getAppRecord, listAppRecords, updateAppRecord } from "@/lib/client/data-service";
@@ -22,6 +22,8 @@ import {useLocale} from "@/components/locale-provider";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import {Input} from "@/components/ui/form-controls";
 import {IconButton} from "@/components/ui/icon-button";
+import PageBackButton from "@/components/navigation/page-back-button";
+import {mobileDetailEntries} from "@/config/mobile-ux";
 
 type Task={id:string;text:string;done:boolean};
 
@@ -44,6 +46,7 @@ export default function DetailPage({config,id}:{config:ModuleConfig;id:string}){
  const [editing,setEditing]=useState(false);
  const [draft,setDraft]=useState<Record<string,string>>(seedFields);
  const [menu,setMenu]=useState(false);
+ const [mobileMenu,setMobileMenu]=useState(false);
  const [note,setNote]=useState('');
  const [taskText,setTaskText]=useState('');
  const [allRecords,setAllRecords]=useState<LocalRecord[]>([]);
@@ -112,12 +115,16 @@ export default function DetailPage({config,id}:{config:ModuleConfig;id:string}){
  async function refundPayment(){if(!canWrite)return;const amount=-Math.abs(parseMoney(row[3]));const refund=await createAppRecord({module:'zahlungen',status:'Zugeordnet',row:[new Date().toISOString().slice(0,10),row[1]||'Zahler',`REFUND-${row[2]||Date.now()}`,money(amount),'Zugeordnet'],fields:{Datum:new Date().toISOString().slice(0,10),Zahler:row[1]||'',Referenz:`REFUND-${row[2]||''}`,Betrag:money(amount),Zuordnung:'Zugeordnet'},meta:{refundOf:row[2]||row[0]}});notify(t('Rückzahlung als negativer Zahlungsvorgang erstellt.'));router.push(`/zahlungen/${refund.id}`)}
 
  const translateSeedValue=(value:string)=>!isProductionMode()&&(!local||Boolean(local.meta?.sourceSeed))?t(value):value;
+ const detailEntries=Object.entries(local?.fields||seedFields).map(([key,value])=>[key,String(value)] as [string,string]);
+ const mobileDetails=mobileDetailEntries(config.key,detailEntries);
+ const renderField=([key,value]:[string,string])=><div key={key}><span>{t(key)}</span><strong>{translateSeedValue(value)||"–"}</strong></div>;
 
  return <div className="page detail-page">
-  <Link className="back-link" href={config.href}><ArrowLeft size={17}/>{t("Zurück zu")} {t(config.label)}</Link>
-  <section className="detail-heading"><div><div className="eyebrow">{t(config.label)}{local&&!isProductionMode()?` · ${t("lokal bearbeitet")}`:""}</div><h1>{translateSeedValue(row[0])}</h1><p>{t(config.description)}</p></div><div className="detail-actions">{canWrite&&<button onClick={()=>{setDraft(local?.fields||seedFields);setEditing(true)}}><Pencil size={17}/>{t("Bearbeiten")}</button>}{canWrite&&local&&<IconButton onClick={remove} aria-label={t("Löschen")}><Trash2 size={17}/></IconButton>}<div className="more-wrap"><IconButton onClick={()=>setMenu(v=>!v)} aria-label={t("Weitere Aktionen")}><MoreHorizontal size={18}/></IconButton>{menu&&<div className="more-menu"><button onClick={()=>{navigator.clipboard?.writeText(window.location.href);notify(t('Link kopiert.'));setMenu(false)}}>{t("Link kopieren")}</button><button onClick={()=>{window.print();setMenu(false)}}>{t("Drucken")}</button>{canWrite&&<button onClick={()=>{setStatus('Archiviert');setMenu(false)}}>{t("Archivieren")}</button>}</div>}</div></div></section>
+  <PageBackButton href={config.href}/>
+  <section className="detail-heading"><div><div className="eyebrow">{t(config.label)}{local&&!isProductionMode()?` · ${t("lokal bearbeitet")}`:""}</div><h1>{translateSeedValue(row[0])}</h1><p>{t(config.description)}</p></div><div className="detail-actions detail-actions-desktop">{canWrite&&<button onClick={()=>{setDraft(local?.fields||seedFields);setEditing(true)}}><Pencil size={17}/>{t("Bearbeiten")}</button>}{canWrite&&local&&<IconButton onClick={remove} aria-label={t("Löschen")}><Trash2 size={17}/></IconButton>}<div className="more-wrap"><IconButton onClick={()=>setMenu(v=>!v)} aria-label={t("Weitere Aktionen")}><MoreHorizontal size={18}/></IconButton>{menu&&<div className="more-menu"><button onClick={()=>{navigator.clipboard?.writeText(window.location.href);notify(t('Link kopiert.'));setMenu(false)}}>{t("Link kopieren")}</button><button onClick={()=>{window.print();setMenu(false)}}>{t("Drucken")}</button>{canWrite&&<button onClick={()=>{setStatus('Archiviert');setMenu(false)}}>{t("Archivieren")}</button>}</div>}</div></div><div className="detail-actions-mobile">{canWrite&&<IconButton aria-label={t("Bearbeiten")} onClick={()=>{setDraft(local?.fields||seedFields);setEditing(true)}}><Pencil size={18}/></IconButton>}<IconButton aria-label={t("Weitere Aktionen")} onClick={()=>setMobileMenu(true)}><MoreHorizontal size={19}/></IconButton></div></section>
+  <ResponsiveOverlay open={mobileMenu} title={t("Aktionen")} onClose={()=>setMobileMenu(false)} size="sm"><div className="list-sheet-options"><button type="button" onClick={()=>{navigator.clipboard?.writeText(window.location.href);notify(t("Link kopiert."));setMobileMenu(false)}}>{t("Link kopieren")}</button><button type="button" onClick={()=>{window.print();setMobileMenu(false)}}>{t("Drucken")}</button>{canWrite&&<button type="button" onClick={()=>{void setStatus("Archiviert");setMobileMenu(false)}}>{t("Archivieren")}</button>}{canWrite&&local&&<button type="button" className="danger-action" onClick={()=>{setMobileMenu(false);void remove()}}>{t("Löschen")}</button>}</div></ResponsiveOverlay>
 
-  <section className="detail-grid"><article className="workspace-card detail-main-card"><div className="section-title"><h2>{t("Übersicht")}</h2><span>{t("Aktueller Stand")}</span></div><div className="detail-fields">{Object.entries(local?.fields||seedFields).map(([k,v])=><div key={k}><span>{t(k)}</span><strong>{translateSeedValue(v)||'–'}</strong></div>)}</div>
+  <section className="detail-grid"><article className="workspace-card detail-main-card"><div className="section-title"><h2>{t("Übersicht")}</h2><span>{t("Aktueller Stand")}</span></div><div className="detail-fields detail-fields-desktop">{detailEntries.map(renderField)}</div><div className="detail-fields detail-fields-mobile">{mobileDetails.primary.map(renderField)}</div>{mobileDetails.additional.length>0&&<details className="mobile-detail-more"><summary><span>{t("Weitere Angaben")}</span><small>{mobileDetails.additional.length}</small><ChevronDown size={16}/></summary><div className="detail-fields">{mobileDetails.additional.map(renderField)}</div></details>}
    <div className="section-title sub-section"><h2>{t("Notizen")}</h2><span>{notes.length}</span></div>{canWrite&&<div className="inline-create"><Input value={note} onChange={e=>setNote(e.target.value)} placeholder={t("Notiz hinzufügen …")}/><button onClick={addNote}><Plus size={16}/>{t("Hinzufügen")}</button></div>}{notes.length>0&&<div className="note-list">{notes.map((n,i)=><p key={`${n}-${i}`}>{n}</p>)}</div>}
    {config.key==='projekte'&&<><div className="section-title sub-section"><h2>{t("Aufgaben und Meilensteine")}</h2><span>{tasks.filter(t=>t.done).length}/{tasks.length}</span></div>{canWrite&&<div className="inline-create"><Input value={taskText} onChange={e=>setTaskText(e.target.value)} placeholder={t("Aufgabe oder Meilenstein …")}/><button onClick={addTask}><Plus size={16}/>{t("Hinzufügen")}</button></div>}<div className="task-check-list">{tasks.map(t=><button key={t.id} onClick={()=>canWrite&&toggleTask(t.id)} className={t.done?'done':''}><CheckCircle2 size={17}/><span>{t.text}</span></button>)}{tasks.length===0&&<small>{t("Noch keine Aufgaben vorhanden.")}</small>}</div></>}
    {config.key==='kunden'&&<><div className="section-title sub-section"><h2>{t("Kontakte")}</h2><span>{contacts.length}</span></div>{canWrite&&<div className="inline-create"><Input value={contactText} onChange={e=>setContactText(e.target.value)} placeholder={t("Name · E-Mail · Telefon")}/><button onClick={addContact}><Plus size={16}/>{t("Kontakt")}</button></div>}<div className="note-list">{contacts.map((a,i)=><p key={`${a}-${i}`}>{a}</p>)}</div></>}
