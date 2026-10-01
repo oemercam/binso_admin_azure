@@ -1,6 +1,5 @@
 import fs from "node:fs";
 const read=p=>fs.readFileSync(p,"utf8");
-const translationSource=[read("lib/i18n.ts"),read("lib/i18n-app.ts"),read("lib/i18n-dynamic.ts")].join("\n");
 const locales=["en","fr","it","tr"];
 const localeVars={en:"en",fr:"fr",it:"it",tr:"trDict"};
 function objectBlock(source,start){let depth=0,quote="",escaped=false;for(let i=start;i<source.length;i++){const c=source[i];if(quote){if(escaped)escaped=false;else if(c==="\\")escaped=true;else if(c===quote)quote="";continue}if(c==='"'||c==="'"){quote=c;continue}if(c==="{")depth++;else if(c==="}"&&--depth===0)return source.slice(start,i+1)}throw new Error("Unbalanced translation object")}

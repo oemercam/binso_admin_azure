@@ -12,7 +12,7 @@ export function getEntityFormDefinitions():Record<string,FormDef>{
  const defaultVat=String(domainConfig.defaultVatRate);
  return {
  Kunde:{module:"kunden",fields:[
-  {name:"firma",label:"Firmenname",required:true},{name:"kontakt",label:"Kontaktperson",required:true},{name:"email",label:"E-Mail",type:"email",required:true},{name:"telefon",label:"Telefon"},
+  {name:"firma",label:"Firmenname",required:true},{name:"kontakt",label:"Kontaktperson"},{name:"email",label:"E-Mail",type:"email"},{name:"telefon",label:"Telefon"},
   {name:"adresse",label:"Strasse und Nr."},{name:"ort",label:"PLZ / Ort"},{name:"uid",label:"UID"},{name:"sprache",label:"Sprache",options:["Deutsch","Français","Italiano","English"],defaultValue:"Deutsch"},
   {name:"zahlungsfrist",label:"Zahlungsfrist",type:"number",defaultValue:defaultPaymentDays},{name:"rabatt",label:"Rabatt %",type:"number",defaultValue:"0"},{name:"notiz",label:"Notiz",full:true},{name:"status",label:"Status",options:["Aktiv","Interessent","Inaktiv"],defaultValue:"Aktiv"}
  ],row:v=>[v.firma,v.kontakt,v.email,money(0),v.status]},

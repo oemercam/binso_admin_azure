@@ -6,6 +6,7 @@ export type SupportEvent={at:string;type:string;message:string;path?:string};
 export type SupportDiagnostics={
   collectedAt:string;
   appVersion:string;
+  buildCommit:string;
   route:string;
   userAgent:string;
   platform:string;
@@ -43,11 +44,12 @@ export function recentSupportEvents(){
   return readJsonStorage<SupportEvent[]>(EVENT_KEY,[],getBrowserStorage("session")).slice(-MAX_EVENTS)
 }
 
-export function collectSupportDiagnostics():SupportDiagnostics{
+export function collectSupportDiagnostics(includeEvents=true):SupportDiagnostics{
   const standalone=window.matchMedia?.("(display-mode: standalone)")?.matches||Boolean((navigator as Navigator & {standalone?:boolean}).standalone);
   return {
     collectedAt:new Date().toISOString(),
-    appVersion:document.documentElement.getAttribute("data-app-version")||"1.1.x-pilot",
+    appVersion:document.documentElement.getAttribute("data-app-version")||"unknown",
+    buildCommit:process.env.NEXT_PUBLIC_BUILD_COMMIT?.slice(0,12)||"unknown",
     route:window.location.pathname,
     userAgent:redact(navigator.userAgent),
     platform:(navigator as Navigator & {userAgentData?:{platform?:string}}).userAgentData?.platform||navigator.platform||"unknown",
@@ -59,7 +61,7 @@ export function collectSupportDiagnostics():SupportDiagnostics{
     pwa:standalone,
     theme:document.documentElement.dataset.theme||"system",
     timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"unknown",
-    recentEvents:recentSupportEvents(),
+    recentEvents:includeEvents?recentSupportEvents():[],
   };
 }
 

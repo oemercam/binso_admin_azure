@@ -3,6 +3,8 @@
 import AnnouncementHost from "@/components/announcements/announcement-host";
 import PilotFeedbackHost from "@/components/feedback/pilot-feedback-host";
 import SupportTelemetryHost from "@/components/support/support-telemetry-host";
+import ActiveTimeTrackerHost from "@/components/time-tracking/active-time-tracker-host";
+import AccountPreferenceSync from "@/components/account-preference-sync";
 
 /**
  * Authenticated workspace-only client services.
@@ -13,6 +15,8 @@ export default function WorkspaceRuntime(){
   return <>
     <AnnouncementHost/>
     <SupportTelemetryHost/>
+    <ActiveTimeTrackerHost/>
+    <AccountPreferenceSync/>
     <PilotFeedbackHost/>
   </>;
 }

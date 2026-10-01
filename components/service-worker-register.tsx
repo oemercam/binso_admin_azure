@@ -12,6 +12,8 @@ export default function ServiceWorkerRegister(){
   navigator.serviceWorker.addEventListener("controllerchange",onControllerChange);
   const applyUpdate=()=>registration?.waiting?.postMessage({type:"SKIP_WAITING"});
   const unsubscribeApply=subscribeAppEvent(appEvents.pwaApplyUpdate,applyUpdate);
+  const checkUpdate=()=>void registration?.update();
+  const unsubscribeCheck=subscribeAppEvent(appEvents.pwaCheckUpdate,checkUpdate);
   void navigator.serviceWorker.register("/sw.js").then(reg=>{
    registration=reg;
    const notify=()=>emitAppEvent(appEvents.pwaUpdateAvailable);
@@ -21,7 +23,7 @@ export default function ServiceWorkerRegister(){
     worker.addEventListener("statechange",()=>{if(worker.state==="installed"&&navigator.serviceWorker.controller)notify()});
    });
   }).catch(()=>undefined);
-  return()=>{navigator.serviceWorker.removeEventListener("controllerchange",onControllerChange);unsubscribeApply()};
+  return()=>{navigator.serviceWorker.removeEventListener("controllerchange",onControllerChange);unsubscribeApply();unsubscribeCheck()};
  },[]);
  return null;
 }

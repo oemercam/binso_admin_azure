@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Check, Paperclip } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp, Paperclip } from "lucide-react";
 import { getModule } from "@/lib/modules";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import { ensureSeedOverride, listLocalRecords, money, parseMoney } from "@/lib/local-store";
@@ -34,6 +34,7 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
  const [fileData,setFileData]=useState("");
  const [dirty,setDirty]=useState(false);
  const [errors,setErrors]=useState<Record<string,string>>({});
+ const [showAdvanced,setShowAdvanced]=useState(false);
  useUnsavedChanges(dirty);
  useEffect(()=>{if(permissionsReady&&cfg&&!canModule(cfg.module,"write"))router.replace("/forbidden")},[permissionsReady,canModule,cfg,router]);
 
@@ -68,7 +69,15 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
    return()=>window.clearTimeout(timer);
  },[cfg,initial,type]);
 
- if(!cfg) return <div className="page"><h1>{t(title)}</h1><p>{t("Für diesen Datentyp ist kein lokales Formular konfiguriert.")}</p></div>;
+
+ const essentialFields:Record<string,Set<string>>={
+  Kunde:new Set(["firma","kontakt","email","telefon"]),Lieferant:new Set(["firma","kontakt","email","telefon"]),Projekt:new Set(["bezeichnung","kunde"]),Auftrag:new Set(["bezeichnung","kunde","projekt","volumen"]),Zeiteintrag:new Set(["datum","mitarbeiter","projekt","leistung","dauer"]),Spese:new Set(["datum","beschreibung","projekt","betrag"]),Zahlung:new Set(["datum","zahler","betrag","rechnung"]),Eingangsrechnung:new Set(["nummer","lieferant","datum","betrag"]),Leistung:new Set(["bezeichnung","typ","einheit","preis"]),Buchung:new Set(["datum","beleg","konto","betrag"]),Aufgabe:new Set(["aufgabe","projekt","faellig","verantwortlich"]),Abwesenheit:new Set(["mitarbeiter","art","von","bis"]),Dokument:new Set(["name","typ","beleg"]),Vertrag:new Set(["vertrag","kunde","lieferant","wert"]),Mitarbeiter:new Set(["name","funktion","email","pensum"])
+ };
+ const essentials=essentialFields[type]||new Set((cfg?.fields||[]).filter(f=>f.required).map(f=>f.name));
+ const visibleFields=(cfg?.fields||[]).filter(f=>showAdvanced||essentials.has(f.name)||f.required);
+ const advancedCount=Math.max(0,(cfg?.fields||[]).length-(cfg?.fields||[]).filter(f=>essentials.has(f.name)||f.required).length);
+
+  if(!cfg) return <div className="page"><h1>{t(title)}</h1><p>{t("Für diesen Datentyp ist kein lokales Formular konfiguriert.")}</p></div>;
 
  function onFile(file?:File){
    if(!file)return;
@@ -156,17 +165,17 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
  }
 
  return <div className="page form-page">
-  <div className="form-title-row"><button type="button" className="back-link button-link" onClick={cancel}><ArrowLeft size={17}/> {t("Zurück")}</button><h1>{t(title)}</h1><p>{t("Gespeicherte Stammdaten werden verknüpft und in Folgeprozessen wiederverwendet.")}</p></div>
+  <div className="form-title-row"><button type="button" className="back-link button-link" onClick={cancel}><ArrowLeft size={17}/> {t("Zurück")}</button><h1>{t(title)}</h1><p>{t("Erfasse zuerst nur das Nötigste. Weitere Angaben kannst du jederzeit ergänzen.")}</p></div>
   <form className="editor-layout" onSubmit={save}>
    <section className="workspace-card editor-main">
-    <div className="form-grid">{cfg.fields.map(f=><div key={f.name} className={f.full?"full":""}>
+    <div className="form-grid">{visibleFields.map(f=><div key={f.name} className={f.full?"full":""}>
      {f.relation?<RelationshipPicker module={f.relation.module} label={t(f.label)} value={relations[f.relation.relationKey]||""} onChange={o=>setRelation(f,o)} required={f.required} createHref={f.relation.createHref}/>:
       <label><span>{t(f.label)}{f.currency?` (${domainConfig.currency})`:""}{f.required?" *":""}</span>{f.options?<Select required={f.required} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}>{f.options.map(o=><option key={o} value={o}>{t(o)}</option>)}</Select>:
       f.type==="file"?<div className="file-input"><Paperclip size={18}/><input type="file" accept="image/*,.pdf" onChange={e=>onFile(e.target.files?.[0])}/>{values.beleg&&<small>{values.beleg}</small>}</div>:
       f.full?<Textarea rows={4} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>:
       <Input required={f.required} type={f.type||"text"} placeholder={f.placeholder?t(f.placeholder):undefined} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>}</label>}
      {errors[f.name]&&<small className="field-error">{errors[f.name]}</small>}
-    </div>)}</div>
+    </div>)}</div>{advancedCount>0&&<button type="button" className="progressive-fields-toggle" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?<ChevronUp size={16}/>:<ChevronDown size={16}/>}<span>{showAdvanced?t("Weniger Angaben anzeigen"):t("Weitere Angaben ({count})").replace("{count}",String(advancedCount))}</span></button>}
    </section>
    <aside className="editor-side"><div className="workspace-card side-card"><h3>{t("Speichern")}</h3><p>{t("Relationen werden als IDs gespeichert. Namen dienen nur der Anzeige.")}</p><Button type="submit" icon={<Check size={17}/>}>{t("Speichern")}</Button><Button type="button" variant="secondary" onClick={cancel}>{t("Abbrechen")}</Button></div></aside>
   </form>

@@ -1,35 +1,34 @@
 "use client";
-import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
+import {subscribeAppEvent,appEvents,emitAppEvent} from "@/lib/client/app-events";
 import {useEffect,useId,useMemo,useRef,useState} from "react";
 import Link from "next/link";
 import {ChevronDown,Plus,Search,X} from "lucide-react";
 import type {ModuleKey} from "@/lib/modules";
 import {loadEntityOptions,type EntityOption} from "@/lib/relationships";
+import {createAppRecord} from "@/lib/client/data-service";
 import {useLocale} from "@/components/locale-provider";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/form-controls";
+import {notify} from "@/lib/notify";
+import {domainConfig,isoDate} from "@/config/domain";
 
+const quickModules=new Set<ModuleKey>(["kunden","lieferanten","projekte","produkte"]);
 export default function RelationshipPicker({module,label,value,onChange,required=false,createHref,placeholder}:{module:ModuleKey;label:string;value:string;onChange:(option:EntityOption|undefined)=>void;required?:boolean;createHref?:string;placeholder?:string}){
- const {t}=useLocale();
- const fieldId=useId(),listId=useId();
- const rootRef=useRef<HTMLDivElement>(null);
- const [open,setOpen]=useState(false),[query,setQuery]=useState(""),[options,setOptions]=useState<EntityOption[]>([]),[loading,setLoading]=useState(true);
- useEffect(()=>{let active=true;const load=()=>void loadEntityOptions(module).then(items=>{if(active){setOptions(items);setLoading(false)}}).catch(()=>{if(active){setOptions([]);setLoading(false)}});load();const unsubscribe=subscribeAppEvent(appEvents.dataChanged,load);return()=>{active=false;unsubscribe()}},[module]);
- useEffect(()=>{if(!open)return;const close=(event:PointerEvent)=>{if(rootRef.current&&!rootRef.current.contains(event.target as Node)){setOpen(false);setQuery("")}};const key=(event:KeyboardEvent)=>{if(event.key==="Escape"){setOpen(false);setQuery("")}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",key);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",key)}},[open]);
- const selected=options.find(o=>o.id===value);
- const filtered=useMemo(()=>options.filter(o=>`${o.label} ${o.sub||""} ${Object.values(o.fields).join(" ")}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).slice(0,20),[options,query]);
- const choose=(option:EntityOption|undefined)=>{onChange(option);setOpen(false);setQuery("")};
- return <div className="relationship-field" ref={rootRef}>
-  <span id={fieldId} className="relationship-label">{t(label)}{required?" *":""}</span>
-  <div className="relationship-picker">
-   <button type="button" className="relationship-trigger" onClick={()=>setOpen(v=>!v)} aria-labelledby={fieldId} aria-haspopup="listbox" aria-controls={listId} aria-expanded={open}>
-    <span>{selected?.label||(loading?t("Wird geladen …"):placeholder||`${t(label)} ${t("auswählen")}`)}</span>
-    <span className="relationship-trigger-actions" aria-hidden="true">{selected?<X size={15}/>:open?<ChevronDown size={16}/>:<Search size={15}/>}</span>
-   </button>
-   {selected&&<button type="button" className="relationship-clear-button" aria-label={t("Auswahl löschen")} onClick={()=>choose(undefined)}><X size={14}/></button>}
-   {open&&<div className="relationship-popover">
-    <div className="relationship-search"><Search size={16}/><input autoFocus type="search" autoComplete="off" value={query} onChange={e=>setQuery(e.target.value)} placeholder={`${t(label)} ${t("suchen …")}`} aria-label={`${t(label)} ${t("suchen …")}`}/></div>
-    <div className="relationship-results" id={listId} role="listbox" aria-labelledby={fieldId}>{loading?<p>{t("Wird geladen …")}</p>:filtered.length?filtered.map(option=><button type="button" role="option" aria-selected={option.id===value} key={option.id} className={option.id===value?"selected":""} onClick={()=>choose(option)}><strong>{option.label}</strong>{option.sub&&<small>{option.sub}</small>}</button>):<p>{t("Keine Treffer")}</p>}</div>
-    {createHref&&<Link className="relationship-create" href={createHref} onClick={()=>setOpen(false)}><Plus size={15}/>{t("Neu erstellen")}</Link>}
-   </div>}
-  </div>
- </div>;
+ const {t}=useLocale();const fieldId=useId(),listId=useId();const rootRef=useRef<HTMLDivElement>(null);
+ const [open,setOpen]=useState(false),[query,setQuery]=useState(""),[options,setOptions]=useState<EntityOption[]>([]),[loading,setLoading]=useState(true),[quick,setQuick]=useState(false),[quickName,setQuickName]=useState(""),[quickExtra,setQuickExtra]=useState(""),[saving,setSaving]=useState(false);
+ useEffect(()=>{let active=true;const refresh=()=>void loadEntityOptions(module).then(items=>{if(active){setOptions(items);setLoading(false)}}).catch(()=>{if(active){setOptions([]);setLoading(false)}});refresh();const unsubscribe=subscribeAppEvent(appEvents.dataChanged,refresh);return()=>{active=false;unsubscribe()}},[module]);
+ useEffect(()=>{if(!open)return;const close=(event:PointerEvent)=>{if(rootRef.current&&!rootRef.current.contains(event.target as Node)){setOpen(false);setQuery("");setQuick(false)}};const key=(event:KeyboardEvent)=>{if(event.key==="Escape"){setOpen(false);setQuery("");setQuick(false)}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",key);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",key)}},[open]);
+ const selected=options.find(o=>o.id===value);const normalizedQuery=query.trim().toLocaleLowerCase();
+ const filtered=useMemo(()=>options.filter(o=>`${o.label} ${o.sub||""} ${Object.values(o.fields).join(" ")}`.toLocaleLowerCase().includes(normalizedQuery)).slice(0,20),[options,normalizedQuery]);
+ const duplicates=useMemo(()=>{const n=quickName.trim().toLocaleLowerCase();return n.length<2?[]:options.filter(o=>o.label.toLocaleLowerCase().includes(n)||n.includes(o.label.toLocaleLowerCase())).slice(0,3)},[options,quickName]);
+ const choose=(option:EntityOption|undefined)=>{onChange(option);setOpen(false);setQuery("");setQuick(false)};
+ async function createQuick(){const name=quickName.trim();if(!name)return;setSaving(true);try{let input;
+  if(module==="kunden")input={module,status:"Aktiv",row:[name,"",quickExtra,"CHF 0.00","Aktiv"],fields:{Firmenname:name,Kontaktperson:"","E-Mail":quickExtra,Telefon:"","Strasse und Nr.":"","PLZ / Ort":"",UID:"",Sprache:"Deutsch",Zahlungsfrist:String(domainConfig.defaultPaymentDays),"Rabatt %":"0",Notiz:"",Status:"Aktiv"}};
+  else if(module==="lieferanten")input={module,status:"Aktiv",row:[name,"",quickExtra,"CHF 0.00","Aktiv"],fields:{Firmenname:name,Kontaktperson:"","E-Mail":quickExtra,Telefon:"",Adresse:"",IBAN:"",Zahlungsfrist:String(domainConfig.defaultPaymentDays),Status:"Aktiv"}};
+  else if(module==="projekte")input={module,status:"Geplant",row:[name,"","0 %","CHF 0.00","Geplant"],fields:{Projektname:name,Kunde:"",Projektleitung:"","Team / Ressourcen":"",Budget:"0",Stundenbudget:"0","Fortschritt %":"0",Start:isoDate(),Ende:"",Status:"Geplant",Projektbeschreibung:""}};
+  else input={module:"produkte" as const,status:"Aktiv",row:[name,"Leistung","Stunde","CHF 0.00","Aktiv"],fields:{Bezeichnung:name,Typ:"Leistung",Einheit:"Stunde","Preis CHF":quickExtra||"0","MWST %":String(domainConfig.defaultVatRate),Status:"Aktiv"}};
+  const rec=await createAppRecord(input);const option:EntityOption={id:rec.id,module,label:rec.row[0]||name,sub:[rec.row[1],rec.row[2]].filter(Boolean).join(" · "),record:rec,fields:rec.fields};setOptions(xs=>[option,...xs]);emitAppEvent(appEvents.dataChanged);choose(option);notify(t("Schnell erstellt und ausgewählt."));
+ }catch(e){notify(e instanceof Error?e.message:t("Eintrag konnte nicht erstellt werden."),"danger")}finally{setSaving(false)}}
+ const quickSupported=quickModules.has(module);
+ return <div className="relationship-field" ref={rootRef}><span id={fieldId} className="relationship-label">{t(label)}{required?" *":""}</span><div className="relationship-picker"><button type="button" className="relationship-trigger" onClick={()=>setOpen(v=>!v)} aria-labelledby={fieldId} aria-haspopup="listbox" aria-controls={listId} aria-expanded={open}><span>{selected?.label||(loading?t("Wird geladen …"):placeholder||`${t(label)} ${t("auswählen")}`)}</span><span className="relationship-trigger-actions" aria-hidden="true">{selected?<X size={15}/>:open?<ChevronDown size={16}/>:<Search size={15}/>}</span></button>{selected&&<button type="button" className="relationship-clear-button" aria-label={t("Auswahl löschen")} onClick={()=>choose(undefined)}><X size={14}/></button>}{open&&<div className="relationship-popover">{!quick?<><div className="relationship-search"><Search size={16}/><input autoFocus type="search" autoComplete="off" value={query} onChange={e=>setQuery(e.target.value)} placeholder={`${t(label)} ${t("suchen …")}`} aria-label={`${t(label)} ${t("suchen …")}`}/></div><div className="relationship-results" id={listId} role="listbox" aria-labelledby={fieldId}>{loading?<p>{t("Wird geladen …")}</p>:filtered.length?filtered.map(option=><button type="button" role="option" aria-selected={option.id===value} key={option.id} className={option.id===value?"selected":""} onClick={()=>choose(option)}><strong>{option.label}</strong>{option.sub&&<small>{option.sub}</small>}</button>):<p>{t("Keine Treffer")}</p>}</div>{quickSupported?<button type="button" className="relationship-create" onClick={()=>{setQuick(true);setQuickName(query)}}><Plus size={15}/>{t("Schnell erstellen")}</button>:createHref&&<Link className="relationship-create" href={createHref} onClick={()=>setOpen(false)}><Plus size={15}/>{t("Neu erstellen")}</Link>}</>:<div className="relationship-quick-create"><div><strong>{t("Schnell erstellen")}</strong><small>{t("Nur die wichtigsten Angaben. Details kannst du später ergänzen.")}</small></div><label><span>{t(module==="projekte"?"Projektname":module==="produkte"?"Bezeichnung":"Firmenname")}</span><Input autoFocus value={quickName} onChange={e=>setQuickName(e.target.value)} /></label>{(module==="kunden"||module==="lieferanten")&&<label><span>{t("E-Mail")} <small>{t("optional")}</small></span><Input type="email" value={quickExtra} onChange={e=>setQuickExtra(e.target.value)}/></label>}{module==="produkte"&&<label><span>{t("Preis")} <small>{t("optional")}</small></span><Input type="number" value={quickExtra} onChange={e=>setQuickExtra(e.target.value)}/></label>}{duplicates.length>0&&<div className="relationship-duplicates"><small>{t("Möglicherweise bereits vorhanden")}</small>{duplicates.map(x=><button type="button" key={x.id} onClick={()=>choose(x)}>{x.label}</button>)}</div>}<div className="relationship-quick-actions"><Button type="button" variant="secondary" onClick={()=>setQuick(false)}>{t("Zurück")}</Button><Button type="button" loading={saving} disabled={!quickName.trim()} onClick={()=>void createQuick()}>{t("Erstellen und auswählen")}</Button></div>{createHref&&<Link className="relationship-full-create" href={createHref}>{t("Alle Angaben erfassen")}</Link>}</div>}</div>}</div></div>;
 }

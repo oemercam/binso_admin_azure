@@ -30,7 +30,7 @@ export default function ThemeProvider({children}:{children:React.ReactNode}){
  useEffect(()=>{
   const media=window.matchMedia("(prefers-color-scheme: dark)");
   let current:ThemePreference="system";
-  const timer=window.setTimeout(()=>{
+  const timer=window.setTimeout(async()=>{
    const stored=readTextStorage(STORAGE_KEY,"system") as ThemePreference;
    current=themes.includes(stored)?stored:"system";
    setThemeState(current);

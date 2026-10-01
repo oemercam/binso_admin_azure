@@ -11,6 +11,7 @@ export const storageKeys = {
   supportTickets: "binso-support-tickets",
   pilotFeedback: "binso-pilot-feedback",
   supportEvents: "binso-support-events",
+  timeTracker: "binso-time-tracker-v1",
   onboardingHidden: "binso-onboarding-hidden",
   feedbackNever: "binso-feedback-never",
   feedbackLast: "binso-feedback-last",

@@ -5,13 +5,14 @@ const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.en
 const required={
  organizations:["id","name","slug","status","currency","locale","is_demo"],
  company_profile:["organization_id","name","address","zip","city","country","email","phone","uid","iban","industry","employee_range","settings"],
- app_users:["id","email","display_name","status","password_hash","language","email_verified_at","mfa_enabled"],
+ app_users:["id","email","display_name","status","password_hash","language","theme","email_verified_at","mfa_enabled"],
  organization_memberships:["organization_id","user_id","email","role","status"],
  organization_subscriptions:["organization_id","plan","status","trial_until"],
  organization_entitlements:["organization_id","features","max_users","max_storage_mb"],
  platform_tenants:["organization_id","platform_status","owner_email"],
  auth_sessions:["id","user_id","organization_id","token_hash","expires_at","last_seen_at"],
  auth_tokens:["id","user_id","organization_id","email","token_hash","token_type","expires_at"],
+ active_time_trackers:["organization_id","user_id","state","started_at","active_since","accumulated_seconds","project_external_id","activity_label","billable"],
  customers:["id","organization_id","external_id","customer_no","name","status"],
  projects:["id","organization_id","external_id","customer_id","name","status"],
  quotes:["id","organization_id","external_id","quote_no","customer_id","status"],
@@ -44,8 +45,8 @@ const required={
  rate_limit_buckets:["bucket_key","count","reset_at","updated_at"],
  schema_migrations:["version","checksum","applied_at"]
 };
-const tenantTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","support_cases","in_app_notifications","file_objects"];
-const forceTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents"];
+const tenantTables=["active_time_trackers","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","support_cases","in_app_notifications","file_objects"];
+const forceTables=["active_time_trackers","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
  const migrations=await pool.query("select version from schema_migrations order by version");
@@ -53,6 +54,7 @@ try{
  if(!versions.includes("0016_self_service_signup.sql"))throw new Error("Canonical database lineage incomplete: 0016_self_service_signup.sql is not applied.");
  if(!versions.includes("0017_v150_code_schema_alignment.sql"))throw new Error("Database migration 0017_v150_code_schema_alignment.sql is not applied.");
  if(!versions.includes("0018_v151_organization_profile_alignment.sql"))throw new Error("Database migration 0018_v151_organization_profile_alignment.sql is not applied.");
+ if(!versions.includes("0019_v163_productivity_ux.sql"))throw new Error("Database migration 0019_v163_productivity_ux.sql is not applied.");
  const cols=await pool.query(`select table_name,column_name from information_schema.columns where table_schema='public' and table_name=any($1::text[])`,[Object.keys(required)]);
  const found=new Map();for(const row of cols.rows){if(!found.has(row.table_name))found.set(row.table_name,new Set());found.get(row.table_name).add(row.column_name)}
  const missing=[];for(const [table,names] of Object.entries(required))for(const name of names)if(!found.get(table)?.has(name))missing.push(`${table}.${name}`);
@@ -67,5 +69,5 @@ try{
  const policyMap=new Map(policies.rows.map(r=>[r.tablename,Number(r.count)]));
  const policyMissing=tenantTables.filter(t=>(policyMap.get(t)||0)<1);
  if(policyMissing.length)throw new Error(`Tenant RLS policy missing on: ${policyMissing.join(", ")}`);
- console.log({...meta.rows[0],lineage:"canonical-0001..0018",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
+ console.log({...meta.rows[0],lineage:"canonical-0001..0019",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
 }finally{await pool.end()}
