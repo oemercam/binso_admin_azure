@@ -16,7 +16,7 @@ const addMatches=(source,pattern)=>{for(const m of source.matchAll(pattern))add(
 const addQuotedList=(source,pattern)=>{for(const m of source.matchAll(pattern))for(const x of m[1].matchAll(/"([^"\n]+)"/g))add(x[1])};
 // Literal t() and LocalizedText across all visible React surfaces.
 const files=[];const walk=dir=>{for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(["node_modules",".next"].includes(e.name))continue;const p=`${dir}/${e.name}`;if(e.isDirectory())walk(p);else if(e.name.endsWith(".tsx"))files.push(p)}};walk("app");walk("components");
-for(const file of files){const source=read(file);addMatches(source,/\bt\(\s*"((?:\\.|[^"\\])*)"\s*\)/g);for(const m of source.matchAll(/<LocalizedText>([^<>{}]+)<\/LocalizedText>/g))add(m[1]);}
+for(const file of files){const source=read(file);addMatches(source,/\bt\(\s*"((?:\\.|[^"\\])*)"\s*\)/g);for(const m of source.matchAll(/\bt\(\s*[^()?\n]+\?\s*"([^"\n]+)"\s*:\s*"([^"\n]+)"\s*\)/g)){add(m[1]);add(m[2])}for(const m of source.matchAll(/<LocalizedText>([^<>{}]+)<\/LocalizedText>/g))add(m[1]);}
 // Module config: flexible whitespace is mandatory; earlier checks missed formatted entries.
 const modules=read("lib/modules.ts");for(const p of [/\blabel\s*:\s*"([^"]+)"/g,/\bdescription\s*:\s*"([^"]+)"/g,/\bprimaryAction\s*:\s*"([^"]+)"/g])addMatches(modules,p);addQuotedList(modules,/\bcolumns\s*:\s*\[([^\]]*)\]/g);
 // Entity select labels/options and pricing plans.

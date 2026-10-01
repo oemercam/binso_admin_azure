@@ -6,8 +6,8 @@ const overlay=fs.readFileSync("components/ui/responsive-overlay.tsx","utf8");
 const hook=fs.readFileSync("hooks/use-overlay-lock.ts","utf8");
 
 const imports=[...globals.matchAll(/@import\s+["']([^"']+)["']/g)].map(m=>m[1]);
-if(imports.length!==6)throw new Error(`Expected six centralized CSS entrypoints, got ${imports.length}: ${imports.join(", ")}`);
-if(imports.at(-2)!=="../styles/overlays.css"||imports.at(-1)!=="../styles/primitives.css")throw new Error("Overlay stylesheet must be followed only by the canonical primitives compatibility layer.");
+if(imports.length!==7)throw new Error(`Expected seven centralized CSS entrypoints, got ${imports.length}: ${imports.join(", ")}`);
+if(imports.at(-3)!=="../styles/overlays.css"||imports.at(-2)!=="../styles/primitives.css"||imports.at(-1)!=="../styles/mobile-pwa.css")throw new Error("Overlay, primitives and canonical Mobile/PWA layers are not ordered correctly.");
 
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","100dvh","--safe-bottom","grid-auto-columns:minmax(0,1fr)","@media print"]){
  if(!overlayCss.includes(marker))throw new Error(`Canonical overlay rule missing: ${marker}`);
@@ -23,7 +23,7 @@ const consumers=[
 ];
 for(const file of consumers){
  const text=fs.readFileSync(file,"utf8");
- if(!text.includes("ResponsiveOverlay"))throw new Error(`ResponsiveOverlay not used in ${file}`);
+ if(file==="components/shell.tsx"?!text.includes("MobileNavigationPanel"):!text.includes("ResponsiveOverlay"))throw new Error(`Central overlay infrastructure not used in ${file}`);
  if(/modal-backdrop|mobile-sheet-backdrop|send-modal|edit-modal|payslip-modal|consent-backdrop/.test(text))throw new Error(`Legacy overlay markup remains in ${file}`);
 }
 

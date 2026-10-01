@@ -95,8 +95,8 @@
  .mobile-brand{display:inline-flex;align-items:center;justify-self:start;min-width:0}.mobile-brand-image{width:auto;height:40px;max-width:76px}.mobile-brand-image .binso-brand-stack{display:inline-flex;align-items:center}.mobile-brand-image .binso-brand-image{width:auto;height:19px;max-width:70px;object-fit:contain}
  .mobile-top-action{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:10px;background:transparent;color:var(--foreground)}.mobile-top-action:hover,.mobile-top-action:active{background:var(--surface-2)}
  .account-menu-wrap{margin-left:0;justify-self:end}.account-trigger{width:40px;height:40px;min-height:40px;justify-content:center;padding:0;gap:0}.account-trigger-copy,.account-trigger>svg{display:none}.account-trigger .avatar{width:34px;height:34px}
- .mobile-nav{display:grid;position:fixed;z-index:var(--z-mobile-nav);left:max(10px,var(--safe-left));right:max(10px,var(--safe-right));bottom:max(10px,var(--safe-bottom));height:var(--app-bottom-nav-row);grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;padding:5px 6px;border:1px solid var(--surface-border);border-radius:18px;background:var(--surface-1);box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateZ(0);backface-visibility:hidden}
- .mobile-nav-item{min-width:0;min-height:52px;display:grid;place-content:center;justify-items:center;gap:2px;border:0;border-radius:13px;background:transparent;color:var(--foreground-muted);font-size:9px;font-weight:600}.mobile-nav-item.active{background:var(--surface-2);color:var(--foreground)}.mobile-nav-item span{font-size:9px;line-height:1.05;white-space:nowrap}
+ .mobile-nav{display:grid;position:fixed;z-index:var(--z-mobile-nav);grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;transform:translateZ(0);backface-visibility:hidden}
+ .mobile-nav-item{min-width:0;min-height:52px;display:grid;place-content:center;justify-items:center;gap:2px;border:0;background:transparent;color:var(--foreground-muted);font-size:9px;font-weight:600}.mobile-nav-item span{font-size:9px;line-height:1.05;white-space:nowrap}
  .marketing-footer{padding-left:max(var(--app-gutter-mobile),var(--safe-left));padding-right:max(var(--app-gutter-mobile),var(--safe-right));padding-bottom:calc(18px + var(--safe-bottom));border-top:1px solid var(--surface-border)}
  .marketing-footer-desktop{display:none}
  .marketing-footer-mobile{display:grid;justify-items:center;text-align:center;gap:10px;padding:22px 0 4px}
@@ -125,17 +125,6 @@
 
 @media(prefers-reduced-motion:reduce){.nav-item,.marketing-nav a,.marketing-footer-group a,.marketing-footer-mobile-legal a,.marketing-menu-glyph>span,.marketing-mobile-menu{transition:none;animation:none;transform:none}}
 
-/* v1.5.8 canonical mobile app navigation */
-@media(max-width:760px){
- .mobile-nav{left:0;right:0;bottom:0;height:calc(var(--app-bottom-nav-row) + var(--safe-bottom));padding:5px max(8px,var(--safe-right)) var(--safe-bottom) max(8px,var(--safe-left));border:0;border-top:1px solid var(--surface-border);border-radius:0;background:var(--surface-1);box-shadow:none}
- .mobile-nav-item{min-height:54px;border-radius:10px;font-size:10px}
- .mobile-nav-item svg{width:19px;height:19px}
- .mobile-nav-item span{font-size:10px;line-height:1.15}
- .mobile-nav-item.active{background:transparent;color:var(--foreground);font-weight:750}
- .mobile-nav-item.active svg{stroke-width:2.3}
-}
-
-
 /* v1.6.0 mobile marketing navigation keeps the brand/header visible above the menu. */
 @media(max-width:900px){
  body.marketing-menu-open .marketing-header{z-index:calc(var(--z-menu) + 1);background:var(--surface-0)}
@@ -150,14 +139,14 @@
  .mobile-nav-item .workspace-menu-toggle-glyph>span{left:2px;width:15px}
 }
 
-/* v1.6.5 canonical mobile/PWA bottom navigation: Start · Kunden · + · Zeit · Mehr */
+/* Central Quick Create trigger geometry; pill placement is owned by mobile-pwa.css. */
 @media(max-width:760px){
  .mobile-nav-create{position:relative;color:var(--foreground)}
- .mobile-nav-create-icon{width:38px;height:38px;margin-top:-14px;display:grid;place-items:center;border-radius:50%;background:var(--foreground);color:var(--background);box-shadow:0 5px 16px rgba(0,0,0,.16)}
- .mobile-nav-create>span:last-child{margin-top:-1px}
+ .mobile-nav-create-icon{width:38px;height:38px;margin-top:0;display:grid;place-items:center;border-radius:50%;background:var(--foreground);color:var(--background);box-shadow:none}
+ .mobile-nav-create>span:last-child{margin-top:0}
  .mobile-create-sheet a{min-height:48px}
 }
-@media(display-mode:standalone) and (max-width:760px){.mobile-nav-create-icon{margin-top:-12px}}
+@media(display-mode:standalone) and (max-width:760px){.mobile-nav-create-icon{margin-top:0}}
 @media(max-width:760px){
  .account-menu-profile,.account-workspace{padding-inline:4px}.account-menu-links a{min-height:48px;padding:8px 4px;border-radius:8px}.account-menu-links strong{font-size:12px}.account-menu-links small{font-size:9px}
  .account-logout{min-height:46px;width:100%}
@@ -166,20 +155,3 @@
 @media(display-mode:standalone) and (max-width:760px){.topbar{padding-top:var(--safe-top)}}
 
 @media(max-width:760px){.marketing-mobile-menu{max-height:calc(100dvh - var(--safe-top) - 64px);overflow:auto;overscroll-behavior:contain}}
-
-/* v1.6.7 Mobile/PWA shell: flat global header, stable safe area and account bottom sheet. */
-@media(max-width:760px){
- .topbar{grid-template-columns:minmax(0,1fr) 44px;background:var(--surface-1);border-bottom:1px solid var(--surface-border);box-shadow:none;filter:none;opacity:1}
- .topbar::before,.topbar::after{content:none}
- .mobile-brand{grid-column:1}.account-menu-wrap{grid-column:2}
- .mobile-search-trigger{display:none}
- .mobile-account-overlay .ui-overlay-body{padding-top:4px}
- .mobile-account-overlay .account-menu-content{display:grid;gap:4px}
- .mobile-account-overlay .account-menu-profile,.mobile-account-overlay .account-workspace{padding-inline:0}
- .mobile-account-overlay .account-menu-links a{min-height:48px;padding:8px 2px;border-radius:8px}
- .mobile-account-overlay .account-logout{width:100%;min-height:48px}
- .mobile-nav{background:var(--surface-1);box-shadow:none}
-}
-@media(display-mode:standalone) and (max-width:760px){
- .topbar{background:var(--surface-1);box-shadow:none;filter:none}
-}

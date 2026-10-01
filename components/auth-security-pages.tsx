@@ -83,7 +83,7 @@ export function ForgotPasswordPage() {
             {t("Link senden")}
           </button>
 
-          <Link href="/login">{t("Zurück zur Anmeldung")}</Link>
+          <Link href="/login">{t("Anmelden")}</Link>
         </form>
       )}
     </Frame>

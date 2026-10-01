@@ -137,7 +137,7 @@ export default function OnboardingPage(){
      <label><span>{t("Mitarbeitende")}</span><select value={v.employees} onChange={e=>{setDirty(true);setV(x=>({...x,employees:e.target.value}))}}>{["1–5","6–15","16–50","51+"].map(x=><option key={x}>{x}</option>)}</select></label>
      <label><span>{t("Telefon")}</span><input value={v.phone} onChange={e=>{setDirty(true);setV(x=>({...x,phone:e.target.value}))}}/></label>
     </div>
-    <div className="onboarding-actions"><button className="marketing-secondary onboarding-back" onClick={back}><ArrowLeft size={16}/>{t("Zurück")}</button><button className="marketing-primary onboarding-next" onClick={next}>{t("Weiter")} <ArrowRight size={16}/></button></div>
+    <div className="onboarding-actions"><button className="marketing-secondary onboarding-back" onClick={back}><ArrowLeft size={18}/><span className="sr-only">{t("Vorheriger Schritt")}</span></button><button className="marketing-primary onboarding-next" onClick={next}>{t("Weiter")} <ArrowRight size={16}/></button></div>
    </>}
 
    {step===3&&<>
@@ -146,7 +146,7 @@ export default function OnboardingPage(){
     <p>{t("Die Grundeinrichtung ist abgeschlossen. Weitere Einstellungen kannst du später anpassen.")}</p>
     <div className="onboarding-checks">{["Kunden und Verkauf","Projekte, Zeit und Spesen","Finanzen und MWST","Personal und Organisation"].map(x=><span key={x}><Check size={17}/>{t(x)}</span>)}</div>
     {error&&<div className="form-error-summary" role="alert">{error}</div>}
-    <div className="onboarding-actions"><button className="marketing-secondary onboarding-back" onClick={back} disabled={busy}><ArrowLeft size={16}/>{t("Zurück")}</button><button className="marketing-primary onboarding-next" onClick={finish} disabled={busy}>{busy?t("Bitte warten …"):t("Zum Dashboard")} <ArrowRight size={16}/></button></div>
+    <div className="onboarding-actions"><button className="marketing-secondary onboarding-back" onClick={back} disabled={busy}><ArrowLeft size={18}/><span className="sr-only">{t("Vorheriger Schritt")}</span></button><button className="marketing-primary onboarding-next" onClick={finish} disabled={busy}>{busy?t("Bitte warten …"):t("Zum Dashboard")} <ArrowRight size={16}/></button></div>
    </>}
   </main>
  </div>;

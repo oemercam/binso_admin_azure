@@ -453,3 +453,9 @@ Object.assign(en,{"Arbeit":"Work","Benutzermenü":"User menu"});
 Object.assign(fr,{"Arbeit":"Travail","Benutzermenü":"Menu utilisateur"});
 Object.assign(it,{"Arbeit":"Lavoro","Benutzermenü":"Menu utente"});
 Object.assign(trDict,{"Arbeit":"Çalışma","Benutzermenü":"Kullanıcı menüsü"});
+
+// v1.6.9 final Mobile/PWA master audit copy
+Object.assign(en,{"Geschäftsdaten":"Business data","Fortschritt":"Progress","Vorheriger Schritt":"Previous step","Prüfen":"Review"});
+Object.assign(fr,{"Geschäftsdaten":"Données métier","Fortschritt":"Progression","Vorheriger Schritt":"Étape précédente","Prüfen":"Vérifier"});
+Object.assign(it,{"Geschäftsdaten":"Dati aziendali","Fortschritt":"Avanzamento","Vorheriger Schritt":"Passaggio precedente","Prüfen":"Verifica"});
+Object.assign(trDict,{"Geschäftsdaten":"İş verileri","Fortschritt":"İlerleme","Vorheriger Schritt":"Önceki adım","Prüfen":"Kontrol"});

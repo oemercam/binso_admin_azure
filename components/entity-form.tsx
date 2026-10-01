@@ -20,7 +20,7 @@ import {getEntityFormDefinitions,type Def} from "@/config/entity-forms";
 import {accountingDefaults} from "@/config/accounting";
 import {domainConfig} from "@/config/domain";
 import {limitsConfig,megabytes} from "@/config/limits";
-import {Input,Select,Textarea} from "@/components/ui/form-controls";
+import {DateInput,Input,NumberInput,Select,Textarea,TimeInput} from "@/components/ui/form-controls";
 
 export default function EntityForm({ title, backHref, type }: { title: string; backHref: string; type: string }) {
  const router=useRouter();
@@ -173,6 +173,9 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
       <label><span>{t(f.label)}{f.currency?` (${domainConfig.currency})`:""}{f.required?" *":""}</span>{f.options?<Select required={f.required} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}>{f.options.map(o=><option key={o} value={o}>{t(o)}</option>)}</Select>:
       f.type==="file"?<div className="file-input"><Paperclip size={18}/><input type="file" accept="image/*,.pdf" onChange={e=>onFile(e.target.files?.[0])}/>{values.beleg&&<small>{values.beleg}</small>}</div>:
       f.full?<Textarea rows={4} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>:
+      f.type==="date"?<DateInput required={f.required} placeholder={f.placeholder?t(f.placeholder):undefined} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>:
+      f.type==="time"?<TimeInput required={f.required} placeholder={f.placeholder?t(f.placeholder):undefined} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>:
+      f.type==="number"?<NumberInput required={f.required} placeholder={f.placeholder?t(f.placeholder):undefined} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>:
       <Input required={f.required} type={f.type||"text"} placeholder={f.placeholder?t(f.placeholder):undefined} value={values[f.name]||""} onChange={e=>{setDirty(true);setErrors(x=>({...x,[f.name]:""}));setValues(v=>({...v,[f.name]:e.target.value}))}}/>}</label>}
      {errors[f.name]&&<small className="field-error">{errors[f.name]}</small>}
     </div>)}</div>{advancedCount>0&&<button type="button" className="progressive-fields-toggle" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?<ChevronUp size={16}/>:<ChevronDown size={16}/>}<span>{showAdvanced?t("Weniger Angaben anzeigen"):t("Weitere Angaben ({count})").replace("{count}",String(advancedCount))}</span></button>}

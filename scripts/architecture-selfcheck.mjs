@@ -13,7 +13,7 @@ const tokens=fs.readFileSync("styles/tokens.css","utf8");
 for(const token of ["--background","--surface","--foreground","--border","--space-1","--radius-sm","--text-base","--safe-top","--z-overlay","--motion-base","--touch-target","--control-height"]){if(!tokens.includes(token))throw new Error(`Design token missing: ${token}`)}
 const globals=fs.readFileSync("app/globals.css","utf8");
 const imports=[...globals.matchAll(/@import\s+["']([^"']+)["']/g)].map(m=>m[1]);
-if(imports.join("|")!==["../styles/tokens.css","../styles/app.css","../styles/responsive-central.css","../styles/shell.css","../styles/overlays.css","../styles/primitives.css"].join("|"))throw new Error(`CSS entrypoints not centralized: ${imports.join(", ")}`);
+if(imports.join("|")!==["../styles/tokens.css","../styles/app.css","../styles/responsive-central.css","../styles/shell.css","../styles/overlays.css","../styles/primitives.css","../styles/mobile-pwa.css"].join("|"))throw new Error(`CSS entrypoints not centralized: ${imports.join(", ")}`);
 const manifests=["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"].map(x=>JSON.parse(fs.readFileSync(path.join("public",x),"utf8")));
 for(const manifest of manifests){for(const key of ["name","short_name","start_url","scope","display","theme_color","background_color","icons"]){if(manifest[key]==null)throw new Error(`PWA manifest ${manifest.name} missing ${key}`)}}
 const sw=fs.readFileSync("public/sw.js","utf8");if(!sw.includes("isSensitive")||!sw.includes("SKIP_WAITING"))throw new Error("Service worker cache/update policy incomplete");

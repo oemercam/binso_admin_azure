@@ -2,7 +2,7 @@
 
 import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
-import {ChevronRight,Download,MoreHorizontal,Plus} from "lucide-react";
+import {Download,MoreHorizontal,Plus} from "lucide-react";
 import type {ModuleConfig,ModuleKey} from "@/lib/modules";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
@@ -23,6 +23,19 @@ import {IconButton} from "@/components/ui/icon-button";
 import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import ListToolbar from "@/components/ui/list-toolbar";
 import {mobileListSecondaryIndexes} from "@/config/mobile-ux";
+import {useSessionJsonState} from "@/lib/client/use-session-json-state";
+import {MobileRecordSecondary,MobileRecordSummary,mobileRecordSubtitle} from "@/components/mobile/mobile-list-record";
+
+
+type ModuleListState={
+ query:string;
+ statusFilter:string;
+ sort:"asc"|"desc";
+ view:"table"|"cards";
+ timeScope:"Woche"|"Monat";
+};
+
+const defaultModuleListState:ModuleListState={query:"",statusFilter:"Alle",sort:"asc",view:"table",timeScope:"Woche"};
 
 function badgeClass(value:string){
  const v=value.toLowerCase();
@@ -33,7 +46,7 @@ function badgeClass(value:string){
 
 function mobileSecondaryValues(key:ModuleKey,row:string[]){
  const indexes=mobileListSecondaryIndexes[key]||[1];
- return indexes.map(index=>row[index]).filter(value=>value&&value!=="–");
+ return indexes.map(index=>row[index]).filter((value):value is string=>Boolean(value&&value!=="–"));
 }
 
 
@@ -41,13 +54,15 @@ function mobileSecondaryValues(key:ModuleKey,row:string[]){
 export default function ModulePage({config}:{config:ModuleConfig}){
  const permissions=usePermissions();
  const {t,locale}=useLocale();
- const [query,setQuery]=useState("");
  const [local,setLocal]=useState<LocalRecord[]>([]);
- const [statusFilter,setStatusFilter]=useState("Alle");
- const [sort,setSort]=useState<"asc"|"desc">("asc");
- const [view,setView]=useState<"table"|"cards">("table");
- const [timeScope,setTimeScope]=useState<"Woche"|"Monat">("Woche");
  const [actionsOpen,setActionsOpen]=useState(false);
+ const [listState,setListState]=useSessionJsonState<ModuleListState>(`binso:list:${config.key}`,defaultModuleListState);
+ const {query,statusFilter,sort,view,timeScope}=listState;
+ const setQuery=(value:string)=>setListState(current=>({...current,query:value}));
+ const setStatusFilter=(value:string)=>setListState(current=>({...current,statusFilter:value}));
+ const setSort=(value:"asc"|"desc")=>setListState(current=>({...current,sort:value}));
+ const setView=(value:"table"|"cards")=>setListState(current=>({...current,view:value}));
+ const setTimeScope=(value:"Woche"|"Monat")=>setListState(current=>({...current,timeScope:value}));
 
  useEffect(()=>{
   let active=true;
@@ -107,15 +122,12 @@ export default function ModulePage({config}:{config:ModuleConfig}){
 
    {view==="table"?<div className="data-table-wrap"><div className="data-table" style={{"--columns":config.columns?.length??5} as React.CSSProperties}><div className="data-row data-head">{config.columns?.map(c=><span key={c}>{t(c)}</span>)}<span/></div>{rows.map(({row,id,local})=>{
     const primary=local?row[0]:t(row[0]);
-    const secondary=mobileSecondaryValues(config.key,row).map(value=>local?value:t(value)).join(" · ");
+    const secondary=mobileRecordSubtitle(local?row[0]:t(row[0]),mobileSecondaryValues(config.key,row).map(value=>local?value:t(value)));
     const status=row[row.length-1];
     return <Link className="data-row" href={`${config.href}/${id}`} key={`${id}-${row[0]}`}>
-     <span className="mobile-record-primary">{primary}{local&&<small className="local-tag"> {t("lokal")}</small>}</span>
-     <span className="mobile-record-secondary">{secondary}</span>
-     <span className={`mobile-record-status ${badgeClass(status)}`}>{t(status)}</span>
-     {row.map((cell,ci)=><span className={`desktop-record-cell ${ci===row.length-1?badgeClass(cell):""}`} key={`${cell}-${ci}`}>{local?(ci===row.length-1?t(cell):cell):t(cell)}{local&&ci===0&&<small className="local-tag"> {t("lokal")}</small>}</span>)}
-     <ChevronRight className="record-chevron" size={16}/>
-    </Link>})}</div></div>:<div className="record-card-grid">{rows.map(({row,id,local})=><Link href={`${config.href}/${id}`} className="record-card" key={`${id}-${row[0]}`}><div><strong>{local?row[0]:t(row[0])}</strong>{local&&<small className="local-tag">{t("lokal")}</small>}</div><p className="record-card-mobile-summary"><span>{mobileSecondaryValues(config.key,row).map(value=>local?value:t(value)).join(" · ")}</span></p>{row.slice(1,-1).map((cell,i)=><p className="record-card-detail" key={`${cell}-${i}`}><span>{t(config.columns?.[i+1]||"")}</span><strong>{local?cell:t(cell)}</strong></p>)}<em className={badgeClass(row[row.length-1])}>{t(row[row.length-1])}</em></Link>)}</div>}
+     <MobileRecordSummary title={primary} subtitle={secondary} status={t(status)} statusClass={badgeClass(status)}/>
+     {row.map((cell,ci)=><span className={`desktop-record-cell ${ci===row.length-1?badgeClass(cell):""}`} key={`${cell}-${ci}`}>{local?(ci===row.length-1?t(cell):cell):t(cell)}</span>)}
+    </Link>})}</div></div>:<div className="record-card-grid">{rows.map(({row,id,local})=><Link href={`${config.href}/${id}`} className="record-card" key={`${id}-${row[0]}`}><div><strong>{local?row[0]:t(row[0])}</strong></div><MobileRecordSecondary title={local?row[0]:t(row[0])} values={mobileSecondaryValues(config.key,row).map(value=>local?value:t(value))}/>{row.slice(1,-1).map((cell,i)=><p className="record-card-detail" key={`${cell}-${i}`}><span>{t(config.columns?.[i+1]||"")}</span><strong>{local?cell:t(cell)}</strong></p>)}<em className={badgeClass(row[row.length-1])}>{t(row[row.length-1])}</em></Link>)}</div>}
    {rows.length===0&&<div className="empty-state compact-list-empty">{emptyText}</div>}
   </section>
  </div>;

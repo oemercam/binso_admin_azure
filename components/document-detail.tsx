@@ -4,7 +4,6 @@ import {useEffect,useMemo,useState} from "react";
 import {useRouter} from "next/navigation";
 import {relationId} from "@/lib/relationships";
 import {CheckCircle2,Copy,Eye,FilePlus2,Mail,MoreHorizontal,Pencil,Plus,Printer,Save,Send,Trash2} from "lucide-react";
-import {getModule} from "@/lib/modules";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import {defaultSettings,ensureSeedOverride,findSeedOverride,getLocalRecord,money,type LocalRecord} from "@/lib/local-store";
 import {createAppRecord,getAppRecord,updateAppRecord} from "@/lib/client/data-service";
@@ -23,7 +22,7 @@ import {calculateDocumentTotals,type DocumentPosition} from "@/lib/documents/cal
 import {createBlankDocumentPosition,initialDocumentPositions} from "@/lib/documents/defaults";
 
 export default function DocumentDetail({kind,id}:{kind:"rechnung"|"offerte";id:string}){
- const router=useRouter();const permissions=usePermissions();const {t}=useLocale();const isInvoice=kind==="rechnung";const moduleKey=isInvoice?"rechnungen":"offerten";const canWrite=permissions.canModule(moduleKey,"write");const config=getModule(moduleKey);
+ const router=useRouter();const permissions=usePermissions();const {t}=useLocale();const isInvoice=kind==="rechnung";const moduleKey=isInvoice?"rechnungen":"offerten";const canWrite=permissions.canModule(moduleKey,"write");
  const seedIndex=Math.max(0,Number(id)-1);const demoRows=isProductionMode()?[]:getDemoModuleSeed(moduleKey).rows;const seed=demoRows[seedIndex]||demoRows[0]||[];
  const [rec,setRec]=useState<LocalRecord>();const [settings,setSettings]=useState(defaultSettings);const [editing,setEditing]=useState(false);const [previewOpen,setPreviewOpen]=useState(false);
  const [loading,setLoading]=useState(true);const [partialOpen,setPartialOpen]=useState(false);const [mobileActionsOpen,setMobileActionsOpen]=useState(false);const [partialAmount,setPartialAmount]=useState("");const [partialError,setPartialError]=useState("");

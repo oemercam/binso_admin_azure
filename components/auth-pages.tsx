@@ -4,7 +4,7 @@ import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {legalConfig} from "@/lib/legal";
 import {useRouter,useSearchParams} from "next/navigation";
 import Link from "next/link";
-import {ArrowRight,Check,Eye,EyeOff} from "lucide-react";
+import {ArrowLeft,ArrowRight,Check,Eye,EyeOff} from "lucide-react";
 import {createAccount,createDemoAccount,login,plans,type BillingCycle,type PlanId} from "@/lib/saas-store";
 import {notify} from "@/lib/notify";
 import {apiFetch,isProductionMode} from "@/lib/client/runtime";
@@ -127,7 +127,7 @@ export function RegisterPage(){
     <small className="field-help">{t(isProductionMode()?"Mindestens 12 Zeichen.":"Mindestens 8 Zeichen.")}</small>
     <label className="auth-legal-consent"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} required/><span>{t("Ich akzeptiere die")} <Link href="/agb" target="_blank">{t("AGB")}</Link> {t("und habe die")} <Link href="/datenschutz" target="_blank">{t("Datenschutzerklärung")}</Link> {t("gelesen.")}</span></label>
     {error&&<div className="auth-error" role="alert">{error}</div>}
-    <div className="register-actions"><button type="button" className="marketing-secondary" onClick={()=>setRegisterStep(1)} disabled={busy}>{t("Zurück")}</button><button className="marketing-primary" disabled={busy}>{busy?t("Bitte warten …"):trial?t("14-Tage-Test starten"):t("Weiter zur Zahlung")} <ArrowRight size={16}/></button></div>
+    <div className="register-actions"><button type="button" className="marketing-secondary auth-step-back" aria-label={t("Vorheriger Schritt")} onClick={()=>setRegisterStep(1)} disabled={busy}><ArrowLeft size={18}/><span className="sr-only">{t("Vorheriger Schritt")}</span></button><button className="marketing-primary" disabled={busy}>{busy?t("Bitte warten …"):trial?t("14-Tage-Test starten"):t("Weiter zur Zahlung")} <ArrowRight size={16}/></button></div>
     <small className="auth-terms">{t("Die Zustimmung wird im Produktivbetrieb mit der jeweiligen Dokumentversion protokolliert.")}</small>
    </>}
   </form>

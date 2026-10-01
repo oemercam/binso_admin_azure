@@ -12,7 +12,8 @@ const ownedSelectors=[
 for(const selector of ownedSelectors){
  if(!shellCss.includes(selector))throw new Error(`Canonical shell selector missing: ${selector}`);
  for(const [file,text] of [["styles/app.css",appCss],["styles/responsive-central.css",responsiveCss]]){
-  if(text.includes(selector))throw new Error(`Shell selector ${selector} must only live in styles/shell.css; found in ${file}`);
+  const escaped=selector.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  if(new RegExp(`${escaped}(?![\\w-])`).test(text))throw new Error(`Shell selector ${selector} must only live in styles/shell.css; found in ${file}`);
  }
 }
 

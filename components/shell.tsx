@@ -16,7 +16,7 @@ import WorkspaceRuntime from "@/components/workspace-runtime";
 import {useLocale} from "@/components/locale-provider";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import {clearUserRuntimeState} from "@/lib/client/session-cleanup";
-import ResponsiveOverlay from "@/components/ui/responsive-overlay";
+import {MobileAccountPanel,MobileNavigationPanel,MobileQuickCreate} from "@/components/mobile/mobile-overlays";
 import MobileNavigationRow from "@/components/navigation/mobile-navigation-row";
 import {mobileMoreNavigation,mobileQuickCreate,portalNavigation as groups} from "@/config/navigation";
 import {getWorkspaceRouteMetadata} from "@/config/route-metadata";
@@ -145,11 +145,11 @@ export default function Shell({children}:{children:React.ReactNode}){
     <button className={moreOpen||routeMeta?.mobileBottomNav==="more"?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>moreOpen?closeMoreNavigation():openMoreNavigation()} aria-expanded={moreOpen} aria-haspopup="dialog" aria-label={t("Navigation")}><span className="workspace-menu-toggle-glyph" aria-hidden="true"><span/><span/><span/></span><span>{t("Mehr")}</span></button>
    </nav>
 
-   <ResponsiveOverlay open={createOpen} title={t("Neu erstellen")} onClose={()=>setCreateOpen(false)} size="sm"><div className="mobile-create-sheet list-sheet-options">{mobileQuickCreate.filter(item=>canSee(item.href.replace(/\/neu$/,""))).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setCreateOpen(false)}><Icon size={18}/><span>{t(item.label)}</span></Link>})}</div></ResponsiveOverlay>
+   <MobileQuickCreate open={createOpen} title={t("Neu erstellen")} onClose={()=>setCreateOpen(false)}><div className="mobile-create-sheet list-sheet-options">{mobileQuickCreate.filter(item=>canSee(item.href.replace(/\/neu$/,""))).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setCreateOpen(false)}><Icon size={18}/><span>{t(item.label)}</span></Link>})}</div></MobileQuickCreate>
 
-   {compactViewport&&<ResponsiveOverlay open={companyOpen} title={t("Konto")} onClose={()=>setCompanyOpen(false)} size="sm" className="mobile-account-overlay">{accountContent}</ResponsiveOverlay>}
+   {compactViewport&&<MobileAccountPanel open={companyOpen} title={t("Konto")} onClose={()=>setCompanyOpen(false)}>{accountContent}</MobileAccountPanel>}
 
-   <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={closeMoreNavigation} size="md" showHandle={false} className="workspace-navigation-overlay"><div className="mobile-more-content">
+   <MobileNavigationPanel open={moreOpen} title={t("Navigation")} onClose={closeMoreNavigation}><div className="mobile-more-content">
     <div className="mobile-navigation-groups">{mobileMoreNavigation.map(group=>{const visible=group.items.filter(item=>canSee(item.href));if(!visible.length)return null;return <section className="mobile-navigation-group" key={group.label}><h3>{t(group.label)}</h3><div className="mobile-navigation-links">{visible.map(item=><MobileNavigationRow key={item.href} href={item.href} label={t(item.label)} icon={item.icon} active={active(item.href)} onNavigate={()=>navigateFromMore(item.href)}/>)}</div></section>})}</div>
     <footer className="mobile-navigation-footer">
      <div className="mobile-navigation-user"><div className="mobile-navigation-user-avatar" aria-hidden="true">{initials}</div><div><strong>{activeUser?.name||t("Benutzer")}</strong>{activeUser?.email&&<span>{activeUser.email}</span>}</div></div>
@@ -157,7 +157,7 @@ export default function Shell({children}:{children:React.ReactNode}){
      <button className="mobile-navigation-logout" type="button" onClick={()=>void signOut()}><LogOut size={18}/><span>{t("Abmelden")}</span></button>
      <small className="mobile-navigation-version">{t("Version")} {appConfig.appVersion}</small>
     </footer>
-   </div></ResponsiveOverlay>
+   </div></MobileNavigationPanel>
   </div>
   {permissionsReady&&<WorkspaceRuntime/>}
  </div>;
