@@ -85,7 +85,7 @@ export default function ModulePage({config}:{config:ModuleConfig}){
 
  return <div className={`page module-page module-${config.key}`}>
   <section className="module-heading mobile-standard-heading">
-   <div><div className="eyebrow">Binso One</div><h1>{t(config.label)}</h1><p>{t(config.description)}</p></div>
+   <div><h1>{t(config.label)}</h1><p>{t(config.description)}</p></div>
    <div className="module-heading-actions">{config.key==="zahlungen"&&!isProductionMode()&&permissions.canModule("zahlungen","write")&&<Button variant="secondary" onClick={demoBankImport} icon={<Download size={17}/>}>{t("Bankimport Demo")}</Button>}<Button className="module-export-action" variant="secondary" onClick={download} icon={<Download size={17}/>}>{t("Export")}</Button>{config.primaryAction&&canCreate&&<ButtonLink href={createHref} icon={<Plus size={18}/>}>{t(config.primaryAction)}</ButtonLink>}</div>
    <IconButton type="button" className="mobile-page-action" aria-label={t(canCreate&&config.primaryAction?config.primaryAction:"Aktionen")} onClick={()=>setActionsOpen(true)}>{canCreate&&config.primaryAction?<Plus size={20}/>:<MoreHorizontal size={20}/>}</IconButton>
   </section>

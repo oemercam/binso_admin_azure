@@ -15,7 +15,7 @@
   --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:40px;--space-9:48px;--space-10:64px;--space-11:80px;--space-12:96px;
   --radius-sm:8px;--radius-md:10px;--radius-lg:12px;--radius-xl:16px;--radius-sheet:22px;
   --text-xs:11px;--text-sm:12px;--text-base:14px;--text-lg:16px;--text-xl:20px;--text-2xl:24px;--text-3xl:30px;--text-hero:56px;
-  --z-content:0;--z-local-sticky:1;--z-sticky:40;--z-sidebar:60;--z-header:100;--z-menu:120;--z-announcement:160;--z-dropdown:200;--z-mobile-nav:300;--z-overlay:500;--z-toast:600;--z-loader:1000;
+  --z-content:0;--z-local-sticky:1;--z-sticky:40;--z-sidebar:60;--z-header:100;--z-menu:120;--z-announcement:160;--z-dropdown:200;--z-bottom-navigation:300;--z-backdrop:500;--z-sheet:510;--z-dialog:520;--z-toast:600;--z-loader:1000;--z-mobile-nav:var(--z-bottom-navigation);--z-overlay:var(--z-backdrop);
   --control-height-sm:36px;--control-height:42px;--control-height-lg:46px;--touch-target:44px;
   --motion-fast:140ms;--motion-base:200ms;--motion-slow:280ms;--ease-standard:cubic-bezier(.22,1,.36,1);
   --text:var(--foreground);--muted:var(--foreground-muted);--line:var(--border);--bg:var(--background);--soft:var(--secondary);--good:var(--success);--bad:var(--danger);--warn:var(--warning);

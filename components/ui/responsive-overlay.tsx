@@ -21,8 +21,6 @@ type Props={
   closeOnBackdrop?:boolean;
   showHandle?:boolean;
   className?:string;
-  headerLeading?:React.ReactNode;
-  animatedClose?:boolean;
 };
 
 const focusableSelector=[
@@ -32,7 +30,7 @@ const focusableSelector=[
 
 export default function ResponsiveOverlay({
   open,title,onClose,children,actions,ariaDescription,size="md",role="dialog",
-  closeOnBackdrop=true,showHandle=true,className="",headerLeading,animatedClose=false
+  closeOnBackdrop=true,showHandle=true,className=""
 }:Props){
   const {t}=useLocale();
   const titleId=useId();
@@ -81,10 +79,9 @@ export default function ResponsiveOverlay({
       aria-describedby={ariaDescription?descId:undefined}
     >
       {showHandle&&<div className="ui-overlay-handle" aria-hidden="true"/>}
-      <header className={`ui-overlay-header${headerLeading?" has-leading":""}`}>
-        {headerLeading?<div className="ui-overlay-header-leading" aria-hidden="true">{headerLeading}</div>:<h2 id={titleId}>{title}</h2>}
-        {headerLeading&&<h2 id={titleId} className="sr-only">{title}</h2>}
-        <button ref={closeRef} className={`ui-overlay-close${animatedClose?" ui-overlay-menu-toggle is-open":""}`} type="button" aria-label={t("Schliessen")} onClick={onClose}>{animatedClose?<span className="ui-overlay-menu-glyph" aria-hidden="true"><span/><span/><span/></span>:<X size={18}/>}</button>
+      <header className="ui-overlay-header">
+        <h2 id={titleId}>{title}</h2>
+        <button ref={closeRef} className="ui-overlay-close" type="button" aria-label={t("Schliessen")} onClick={onClose}><X size={18}/></button>
       </header>
       {ariaDescription&&<p id={descId} className="sr-only">{ariaDescription}</p>}
       <div className="ui-overlay-body">{children}</div>

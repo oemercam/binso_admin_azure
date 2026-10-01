@@ -8,7 +8,6 @@ import { createAppRecord, listAppRecords, updateAppRecord } from "@/lib/client/d
 import { apiFetch, isProductionMode } from "@/lib/client/runtime";
 import {loadOrganizationSettings} from "@/lib/client/organization-settings";
 import { notify } from "@/lib/notify";
-import { confirmAction } from "@/lib/confirm";
 import { useUnsavedChanges } from "@/lib/use-unsaved-changes";
 import { billableProjectEntries, customerDefaults, loadEntity, loadEntityOptions, productDefaults, type EntityOption } from "@/lib/relationships";
 import RelationshipPicker from "@/components/relationship-picker";
@@ -17,7 +16,6 @@ import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import {Button} from "@/components/ui/button";
 import {IconButton} from "@/components/ui/icon-button";
 import {Input,Select,Textarea} from "@/components/ui/form-controls";
-import PageBackButton from "@/components/navigation/page-back-button";
 import {domainConfig,dueDateFrom,isoDate} from "@/config/domain";
 import {demoAnalyticsFixture} from "@/lib/demo/fixtures";
 import {calculateDocumentTotals,type DocumentPosition} from "@/lib/documents/calculations";
@@ -78,7 +76,6 @@ const [customer,setCustomer]=useState(''); const [email,setEmail]=useState(''); 
    if(!positions.length||positions.some(p=>!p.description.trim()||p.quantity<=0||p.unitPrice<0)){setFormError(t("Bitte Positionen vollständig ausfüllen."));notify(t("Bitte Positionen vollständig ausfüllen."),"danger");return false}
    setFormError("");return true;
  }
- async function cancelEditor(){if(!dirty){router.back();return}const ok=await confirmAction({title:t("Möchten Sie wirklich abbrechen?"),message:t("Nicht gespeicherte Änderungen gehen verloren."),confirmLabel:t("Abbrechen"),cancelLabel:t("Fortfahren"),tone:"danger"});if(ok){setDirty(false);router.back()}}
  async function save(status='Entwurf',navigateAfter=false){
    if(saving||!validate()) return;
    setSaving(true);
@@ -110,7 +107,7 @@ const [customer,setCustomer]=useState(''); const [email,setEmail]=useState(''); 
    <div className="doc-footer"><span>{settings.companyName}</span><span>{settings.uid}</span><span>{settings.email} · {settings.phone}</span></div>
  </div>;
  return <div className="page document-editor-page">
-  <div className="form-title-row"><PageBackButton href={isInvoice?"/rechnungen":"/offerten"} onBeforeNavigate={cancelEditor}/><div className="document-editor-heading"><div><div className="eyebrow">{t(isInvoice?'Verkauf / Rechnung':'Verkauf / Offerte')}</div><h1>{t(isInvoice?'Rechnung erstellen':'Offerte erstellen')}</h1><p>{t("Erstellen, prüfen, als PDF drucken und direkt versenden.")}</p></div><div className="document-top-actions"><Button variant="secondary" icon={<Save size={17}/>} loading={saving} onClick={()=>save()}>{t("Entwurf speichern")}</Button><Button variant="secondary" icon={<Eye size={17}/>} onClick={()=>setPreview(true)}>{t("Vorschau anzeigen")}</Button><Button loading={saving} icon={<Check size={17}/>} onClick={()=>save('Entwurf',true)}>{t(isInvoice?'Rechnung erstellen':'Offerte erstellen')}</Button></div></div></div>
+  <div className="form-title-row"><div className="document-editor-heading"><div><div className="eyebrow">{t(isInvoice?'Verkauf / Rechnung':'Verkauf / Offerte')}</div><h1>{t(isInvoice?'Rechnung erstellen':'Offerte erstellen')}</h1><p>{t("Erstellen, prüfen, als PDF drucken und direkt versenden.")}</p></div><div className="document-top-actions"><Button variant="secondary" icon={<Save size={17}/>} loading={saving} onClick={()=>save()}>{t("Entwurf speichern")}</Button><Button variant="secondary" icon={<Eye size={17}/>} onClick={()=>setPreview(true)}>{t("Vorschau anzeigen")}</Button><Button loading={saving} icon={<Check size={17}/>} onClick={()=>save('Entwurf',true)}>{t(isInvoice?'Rechnung erstellen':'Offerte erstellen')}</Button></div></div></div>
   {formError&&<div className="form-error-summary">{formError}</div>}<div className="document-editor-grid">
    <section className="workspace-card editor-main">
     <div className="section-title"><h2>{t("Empfänger und Angaben")}</h2><span>{t(isProductionMode()?"Geschäftsdaten":"Demo-Daten")}</span></div>

@@ -447,3 +447,9 @@ Object.assign(en,{"Weitere Angaben":"More details"});
 Object.assign(fr,{"Weitere Angaben":"Informations supplémentaires"});
 Object.assign(it,{"Weitere Angaben":"Altri dettagli"});
 Object.assign(trDict,{"Weitere Angaben":"Diğer bilgiler"});
+
+// v1.6.7 navigation architecture
+Object.assign(en,{"Arbeit":"Work","Benutzermenü":"User menu"});
+Object.assign(fr,{"Arbeit":"Travail","Benutzermenü":"Menu utilisateur"});
+Object.assign(it,{"Arbeit":"Lavoro","Benutzermenü":"Menu utente"});
+Object.assign(trDict,{"Arbeit":"Çalışma","Benutzermenü":"Kullanıcı menüsü"});

@@ -13,7 +13,7 @@ const checks=[
  [picker.includes('role="listbox"'),"relationship picker must expose listbox semantics"],
  [shell.includes("searchLoading"),"global search must expose loading state"],
  [shell.includes('type="search"'),"search fields must use search semantics"],
- [shell.includes("workspace-menu-chevron"),"mobile navigation must use canonical row navigation"],
+ [shell.includes("MobileNavigationRow"),"mobile navigation must use canonical row navigation"],
  [css.includes("Document preview is a responsive reading view on phones"),"mobile document preview must be responsive"],
  [css.includes("width:100%;min-width:0;max-width:100%"),"mobile preview must not keep a fixed A4 width"]
 ];

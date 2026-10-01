@@ -39,7 +39,7 @@ export default function Dashboard(){
  ].filter(Boolean) as {href:string;label:string}[];
  const actions=[["/kunden/neu","Kunde",Users],["/offerten/neu","Offerte",FileText],["/rechnungen/neu","Rechnung",ReceiptText],["/zeiterfassung/neu","Zeit",Clock3],["/projekte/neu","Projekt",FolderKanban],["/spesen/neu","Spese",WalletCards]] as const;
  return <div className="page dashboard-page">
-  <section className="page-header dashboard-heading"><div><div className="eyebrow">Binso One</div><h1>{t("Unternehmensübersicht")}</h1><p>{t("Die wichtigsten Geschäftsdaten, Kennzahlen und offenen Arbeiten auf einen Blick.")}</p></div></section>
+  <section className="page-header dashboard-heading"><div><h1>{t("Unternehmensübersicht")}</h1><p>{t("Die wichtigsten Geschäftsdaten, Kennzahlen und offenen Arbeiten auf einen Blick.")}</p></div></section>
   <OnboardingChecklist/>
   <section className="metric-grid dashboard-kpi-grid">{summary.metrics.map(m=><article className="metric-card" key={m.label}><span>{t(m.label)}</span><strong>{m.value}</strong><small>{m.meta}</small></article>)}</section>
   {attention.length>0&&<section className="dashboard-attention"><div className="section-title"><h2>{t("Zu erledigen")}</h2><Link href="/aufgaben">{t("Alle")} <ArrowRight size={15}/></Link></div><div className="attention-list">{attention.map(item=><Link href={item.href} key={item.href}><span>{item.label}</span><ArrowRight size={15}/></Link>)}</div></section>}

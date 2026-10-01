@@ -22,7 +22,6 @@ import {useLocale} from "@/components/locale-provider";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import {Input} from "@/components/ui/form-controls";
 import {IconButton} from "@/components/ui/icon-button";
-import PageBackButton from "@/components/navigation/page-back-button";
 import {mobileDetailEntries} from "@/config/mobile-ux";
 
 type Task={id:string;text:string;done:boolean};
@@ -120,7 +119,6 @@ export default function DetailPage({config,id}:{config:ModuleConfig;id:string}){
  const renderField=([key,value]:[string,string])=><div key={key}><span>{t(key)}</span><strong>{translateSeedValue(value)||"–"}</strong></div>;
 
  return <div className="page detail-page">
-  <PageBackButton href={config.href}/>
   <section className="detail-heading"><div><div className="eyebrow">{t(config.label)}{local&&!isProductionMode()?` · ${t("lokal bearbeitet")}`:""}</div><h1>{translateSeedValue(row[0])}</h1><p>{t(config.description)}</p></div><div className="detail-actions detail-actions-desktop">{canWrite&&<button onClick={()=>{setDraft(local?.fields||seedFields);setEditing(true)}}><Pencil size={17}/>{t("Bearbeiten")}</button>}{canWrite&&local&&<IconButton onClick={remove} aria-label={t("Löschen")}><Trash2 size={17}/></IconButton>}<div className="more-wrap"><IconButton onClick={()=>setMenu(v=>!v)} aria-label={t("Weitere Aktionen")}><MoreHorizontal size={18}/></IconButton>{menu&&<div className="more-menu"><button onClick={()=>{navigator.clipboard?.writeText(window.location.href);notify(t('Link kopiert.'));setMenu(false)}}>{t("Link kopieren")}</button><button onClick={()=>{window.print();setMenu(false)}}>{t("Drucken")}</button>{canWrite&&<button onClick={()=>{setStatus('Archiviert');setMenu(false)}}>{t("Archivieren")}</button>}</div>}</div></div><div className="detail-actions-mobile">{canWrite&&<IconButton aria-label={t("Bearbeiten")} onClick={()=>{setDraft(local?.fields||seedFields);setEditing(true)}}><Pencil size={18}/></IconButton>}<IconButton aria-label={t("Weitere Aktionen")} onClick={()=>setMobileMenu(true)}><MoreHorizontal size={19}/></IconButton></div></section>
   <ResponsiveOverlay open={mobileMenu} title={t("Aktionen")} onClose={()=>setMobileMenu(false)} size="sm"><div className="list-sheet-options"><button type="button" onClick={()=>{navigator.clipboard?.writeText(window.location.href);notify(t("Link kopiert."));setMobileMenu(false)}}>{t("Link kopieren")}</button><button type="button" onClick={()=>{window.print();setMobileMenu(false)}}>{t("Drucken")}</button>{canWrite&&<button type="button" onClick={()=>{void setStatus("Archiviert");setMobileMenu(false)}}>{t("Archivieren")}</button>}{canWrite&&local&&<button type="button" className="danger-action" onClick={()=>{setMobileMenu(false);void remove()}}>{t("Löschen")}</button>}</div></ResponsiveOverlay>
 
