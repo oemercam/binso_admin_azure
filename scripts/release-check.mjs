@@ -15,7 +15,7 @@ const required=[
   "lib/documents/calculations.ts","lib/documents/defaults.ts","scripts/architecture-hardcoding-selfcheck.mjs",
   "lib/demo/pilot-fixtures.ts","config/app.ts","components/ui/responsive-overlay.tsx","components/workspace-runtime.tsx","lib/i18n-app.ts",
   "scripts/rendering-selfcheck.mjs","scripts/ui-standards-selfcheck.mjs","scripts/runtime-boundary-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","scripts/mobile-portal-visual-selfcheck.mjs",
-  "scripts/document-preview-selfcheck.mjs","scripts/check-db.mjs","scripts/migrate.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
+  "scripts/document-preview-selfcheck.mjs","scripts/customer-portal-header-activity-selfcheck.mjs","scripts/portal-ux-workflow-selfcheck.mjs","scripts/search-effect-selfcheck.mjs","scripts/check-db.mjs","scripts/migrate.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
 const missing=required.filter(p=>!fs.existsSync(p));
 if(missing.length)throw new Error(`Release files missing: ${missing.join(", ")}`);
@@ -25,7 +25,7 @@ const cssLeftovers=obsoleteCss.filter(p=>fs.existsSync(p));
 if(cssLeftovers.length)throw new Error(`Obsolete CSS layers still present: ${cssLeftovers.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.5.6")throw new Error(`Expected package version 1.5.6, got ${pkg.version}`);
+if(pkg.version!=="1.5.9")throw new Error(`Expected package version 1.5.9, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));

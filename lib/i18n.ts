@@ -385,3 +385,14 @@ Object.assign(trDict,{
 "Wiederkehrend":"Yinelenen","Wiederholung aus":"Yinelemeyi kapat","Workflow-Aktionen werden serverseitig gespeichert.":"İş akışı işlemleri sunucuda kaydedilir."
 });
 
+
+Object.assign(en,{"Keine Aktivität vorhanden":"No activity yet","Neue Aktivitäten erscheinen hier automatisch.":"New activity will appear here automatically."});
+Object.assign(fr,{"Keine Aktivität vorhanden":"Aucune activité","Neue Aktivitäten erscheinen hier automatisch.":"Les nouvelles activités apparaîtront ici automatiquement."});
+Object.assign(it,{"Keine Aktivität vorhanden":"Nessuna attività","Neue Aktivitäten erscheinen hier automatisch.":"Le nuove attività appariranno qui automaticamente."});
+Object.assign(trDict,{"Keine Aktivität vorhanden":"Henüz etkinlik yok","Neue Aktivitäten erscheinen hier automatisch.":"Yeni etkinlikler burada otomatik olarak görünür."});
+
+// v1.5.8 search and document workflow copy
+Object.assign(en,{"Suchergebnisse":"Search results","Mindestens 2 Zeichen eingeben":"Enter at least 2 characters","Suche läuft …":"Searching …","Suche löschen":"Clear search","Dokument konnte nicht gespeichert werden.":"The document could not be saved.","gespeichert.":"saved."});
+Object.assign(fr,{"Suchergebnisse":"Résultats de recherche","Mindestens 2 Zeichen eingeben":"Saisissez au moins 2 caractères","Suche läuft …":"Recherche en cours …","Suche löschen":"Effacer la recherche","Dokument konnte nicht gespeichert werden.":"Le document n’a pas pu être enregistré.","gespeichert.":"enregistrée."});
+Object.assign(it,{"Suchergebnisse":"Risultati della ricerca","Mindestens 2 Zeichen eingeben":"Inserisci almeno 2 caratteri","Suche läuft …":"Ricerca in corso …","Suche löschen":"Cancella ricerca","Dokument konnte nicht gespeichert werden.":"Impossibile salvare il documento.","gespeichert.":"salvato."});
+Object.assign(trDict,{"Suchergebnisse":"Arama sonuçları","Mindestens 2 Zeichen eingeben":"En az 2 karakter girin","Suche läuft …":"Aranıyor …","Suche löschen":"Aramayı temizle","Dokument konnte nicht gespeichert werden.":"Belge kaydedilemedi.","gespeichert.":"kaydedildi."});

@@ -22,7 +22,7 @@ import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {uiConfig} from "@/config/ui";
 import {
-  ChevronDown, Clock3, FolderKanban, LayoutDashboard, Menu, ReceiptText, Search,
+  ChevronDown, ChevronRight, Clock3, FolderKanban, LayoutDashboard, Menu, ReceiptText, Search,
   X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard, Bell, Headphones, Newspaper
 } from "lucide-react";
 
@@ -40,7 +40,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     records.forEach(r=>items.push({label:r.row[0]||r.module,sub:r.module,href:`/${r.module}/${r.id}`}));
     return items;
   },[records]);
-  useEffect(()=>{const normalized=query.trim();if(!isProductionMode()||normalized.length<2)return;const controller=new AbortController();const t=window.setTimeout(()=>{void apiFetch<{items:SearchItem[]}>(`/api/search?q=${encodeURIComponent(normalized)}`,{signal:controller.signal}).then(r=>setProductionSearch({query:normalized,items:r.items})).catch(()=>{})},appConfig.searchDebounceMs);return()=>{window.clearTimeout(t);controller.abort()}},[query]);
+  useEffect(()=>{const normalized=query.trim();if(!isProductionMode()||normalized.length<2)return;const controller=new AbortController();const timer=window.setTimeout(()=>{void apiFetch<{items:SearchItem[]}>(`/api/search?q=${encodeURIComponent(normalized)}`,{signal:controller.signal}).then(r=>{if(!controller.signal.aborted)setProductionSearch({query:normalized,items:r.items})}).catch(()=>{if(!controller.signal.aborted)setProductionSearch({query:normalized,items:[]})})},appConfig.searchDebounceMs);return()=>{window.clearTimeout(timer);controller.abort()}},[query]);
+  const normalizedSearchQuery=query.trim();
+  const searchLoading=isProductionMode()&&normalizedSearchQuery.length>=2&&productionSearch.query!==normalizedSearchQuery;
   const results=useMemo(()=>{const normalized=query.trim();if(isProductionMode())return normalized.length>=2&&productionSearch.query===normalized?productionSearch.items.slice(0,8):[];const q=normalized.toLowerCase();if(!q)return[];return searchItems.filter(i=>`${i.label} ${i.sub}`.toLowerCase().includes(q)).slice(0,8)},[query,searchItems,productionSearch]);
   function submitSearch(e:React.FormEvent){e.preventDefault();if(results[0]){router.push(results[0].href);setQuery('')}}
   useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(window.innerWidth<=uiConfig.breakpoints.mobile)setMobileSearchOpen(true);else searchRef.current?.focus()}};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[]);
@@ -62,9 +64,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
       <div className="content-shell">
         <header className="topbar">
-          <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label={t("Binso One Dashboard")}><BrandLogo compact/></Link>
+          <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label={t("Binso One Dashboard")}><BrandLogo/></Link>
           <button className="mobile-top-action mobile-search-trigger" onClick={()=>setMobileSearchOpen(true)} aria-label={t("Suche öffnen")}><Search size={18}/></button>
-          <form className="search global-search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte suchen …")} aria-label={t("Globale Suche")}/><kbd>Ctrl K</kbd>{query&&<div className="search-results">{results.length?results.map(r=><Link key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery('')}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>}</form>
+          <form className="search global-search" role="search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} type="search" autoComplete="off" enterKeyHint="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte suchen …")} aria-label={t("Globale Suche")}/><kbd>Ctrl K</kbd>{query&&<div className="search-results" role="listbox" aria-label={t("Suchergebnisse")}>{query.trim().length<2?<p>{t("Mindestens 2 Zeichen eingeben")}</p>:searchLoading?<p>{t("Suche läuft …")}</p>:results.length?results.map(r=><Link role="option" aria-selected="false" key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery('')}><strong>{r.label}</strong><span>{t(r.sub)}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>}</form>
           <div className="account-menu-wrap">
             <button className="account-trigger" onClick={()=>setCompanyOpen(v=>!v)} aria-expanded={companyOpen} aria-haspopup="menu">
               <div className="account-trigger-copy"><strong>{activeUser?.name||"Benutzer"}</strong><span>{company}</span></div>
@@ -114,16 +116,16 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
         <ResponsiveOverlay open={mobileSearchOpen} title={t("Suchen")} onClose={()=>setMobileSearchOpen(false)} size="md">
           <div className="mobile-search-panel">
-            <form className="mobile-search-field" onSubmit={e=>{submitSearch(e);setMobileSearchOpen(false)}}><Search size={17}/><input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte …")}/></form>
-            <div className="mobile-search-results">{query?(results.length?results.map(r=><Link key={`m-${r.href}-${r.label}`} href={r.href} onClick={()=>{setQuery("");setMobileSearchOpen(false)}}><strong>{r.label}</strong><span>{r.sub}</span></Link>):<p>{t("Keine Treffer")}</p>):<p>{t("Suche nach Kunden, Rechnungen, Projekten und weiteren Einträgen.")}</p>}</div>
+            <form className="mobile-search-field" role="search" onSubmit={e=>{submitSearch(e);if(results[0])setMobileSearchOpen(false)}}><Search size={17}/><input autoFocus type="search" autoComplete="off" enterKeyHint="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte …")} aria-label={t("Globale Suche")}/>{query&&<button type="button" className="mobile-search-clear" aria-label={t("Suche löschen")} onClick={()=>setQuery("")}><X size={16}/></button>}</form>
+            <div className="mobile-search-results" role="listbox" aria-label={t("Suchergebnisse")}>{!query?<p>{t("Suche nach Kunden, Rechnungen, Projekten und weiteren Einträgen.")}</p>:query.trim().length<2?<p>{t("Mindestens 2 Zeichen eingeben")}</p>:searchLoading?<p>{t("Suche läuft …")}</p>:results.length?results.map(r=><Link role="option" aria-selected="false" key={`m-${r.href}-${r.label}`} href={r.href} onClick={()=>{setQuery("");setMobileSearchOpen(false)}}><strong>{r.label}</strong><span>{t(r.sub)}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>
           </div>
         </ResponsiveOverlay>
 
-        <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={()=>setMoreOpen(false)} size="md">
+        <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={()=>setMoreOpen(false)} size="md" showHandle={false} className="workspace-navigation-overlay">
           <div className="mobile-more-content">
             {groups.slice(1).map(group=><div className="sheet-group" key={group.label}>
               <span className="sheet-group-label">{t(group.label)}</span>
-              <div className="sheet-group-links">{group.items.filter(item=>canSee(item.href)).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={active(item.href)?"active":""}><Icon size={18}/><span>{t(item.label)}</span></Link>})}</div>
+              <div className="sheet-group-links">{group.items.filter(item=>canSee(item.href)).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={active(item.href)?"active":""}><span className="workspace-menu-icon"><Icon size={18}/></span><span>{t(item.label)}</span><ChevronRight className="workspace-menu-chevron" size={16}/></Link>})}</div>
             </div>)}
           </div>
         </ResponsiveOverlay>

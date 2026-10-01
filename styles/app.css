@@ -2020,3 +2020,17 @@ html[data-theme="dark"] .document-summary-grid>div{background:var(--surface)}
 @media(max-width:430px){
   .document-summary-grid{grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* v1.5.7 customer portal header and compact activity empty state */
+.activity-empty-state{min-height:0;display:flex;align-items:flex-start;gap:9px;padding:11px 0 2px;color:var(--muted);border-top:1px solid var(--line)}
+.activity-empty-state>svg{flex:0 0 auto;margin-top:1px}
+.activity-empty-state>div{min-width:0;display:grid;gap:2px}
+.activity-empty-state strong{font-size:12px;line-height:1.3;color:var(--text)}
+.activity-empty-state span{font-size:11px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:760px){.activity-empty-state{padding:10px 0 0}.activity-empty-state strong{font-size:12px}.activity-empty-state span{font-size:10px}}
+
+/* v1.5.8 theme-safe relationship dropdown base */
+.relationship-popover,.relationship-results,.relationship-results>button,.relationship-create{color:var(--text)}
+html[data-theme="dark"] .relationship-popover,html[data-theme="dark"] .relationship-results,html[data-theme="dark"] .relationship-results>button,html[data-theme="dark"] .relationship-create{background:var(--surface);color:var(--text);border-color:var(--line)}
+html[data-theme="dark"] .relationship-results>button:hover,html[data-theme="dark"] .relationship-results>button.selected{background:var(--surface-2)}
