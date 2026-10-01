@@ -1,7 +1,7 @@
 "use client";
 
 import {useRef,useState} from "react";
-import {Filter,Grid2X2,List,Search,SlidersHorizontal,X} from "lucide-react";
+import {CheckSquare,Filter,Grid2X2,List,Search,SlidersHorizontal,X} from "lucide-react";
 import ResponsiveOverlay from "@/components/ui/responsive-overlay";
 import {IconButton} from "@/components/ui/icon-button";
 import {Input} from "@/components/ui/form-controls";
@@ -18,9 +18,11 @@ type Props={
  onSort:(value:"asc"|"desc")=>void;
  view:"table"|"cards";
  onView:(value:"table"|"cards")=>void;
+ selectionMode?:boolean;
+ onSelectionMode?:()=>void;
 };
 
-export default function ListToolbar({query,onQueryChange,searchPlaceholder,statuses,statusFilter,onStatusFilter,sort,onSort,view,onView}:Props){
+export default function ListToolbar({query,onQueryChange,searchPlaceholder,statuses,statusFilter,onStatusFilter,sort,onSort,view,onView,selectionMode=false,onSelectionMode}:Props){
  const {t}=useLocale();
  const [searchOpen,setSearchOpen]=useState(false);
  const [filterOpen,setFilterOpen]=useState(false);
@@ -42,6 +44,7 @@ export default function ListToolbar({query,onQueryChange,searchPlaceholder,statu
     <button type="button" className={`list-tool-button${statusFilter!=="Alle"?" is-active":""}`} aria-label={t("Filter")} onClick={()=>setFilterOpen(true)}><Filter size={18}/><span>{t("Filter")}</span>{statusFilter!=="Alle"&&<i aria-hidden="true"/>}</button>
     <button type="button" className="list-tool-button" aria-label={t("Sortierung")} onClick={()=>setSortOpen(true)}><SlidersHorizontal size={18}/><span>{sort==="asc"?"A–Z":"Z–A"}</span></button>
     <button type="button" className="list-tool-button" aria-label={t("Ansicht wechseln")} onClick={()=>onView(view==="table"?"cards":"table")}>{view==="table"?<Grid2X2 size={18}/>:<List size={18}/>}<span>{t("Ansicht")}</span></button>
+    {onSelectionMode&&<button type="button" className={`list-tool-button mobile-selection-tool${selectionMode?" is-active":""}`} aria-label={t("Auswahlmodus")} onClick={onSelectionMode}><CheckSquare size={18}/><span>{t("Auswahl")}</span></button>}
    </div>
   </div>
   <ResponsiveOverlay open={filterOpen} title={t("Filter")} onClose={()=>setFilterOpen(false)} size="sm">

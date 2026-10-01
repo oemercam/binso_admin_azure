@@ -55,7 +55,7 @@ for(const file of files){
  if(allowedDomainFiles.has(file)||file.startsWith("lib/i18n"))continue;
  const text=read(file);
  if(/(?:6500 Büroaufwand|2000 Kreditoren|1020 Bank)/.test(text))fail(`accounting default hardcoded in ${file}`);
- if(/\b(?:8\.1|2\.6|3\.8)\b/.test(text))fail(`Swiss VAT rate hardcoded outside domain config/demo in ${file}`);
+ if(/(?<![\d.])(?:8\.1|2\.6|3\.8)(?![\d.])/.test(text))fail(`Swiss VAT rate hardcoded outside domain config/demo in ${file}`);
 }
 
 

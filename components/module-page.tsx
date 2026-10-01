@@ -2,7 +2,7 @@
 
 import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
-import {Download,MoreHorizontal,Plus} from "lucide-react";
+import {Check,Download,MoreHorizontal,Plus,X} from "lucide-react";
 import type {ModuleConfig,ModuleKey} from "@/lib/modules";
 import {getDemoModuleSeed} from "@/lib/demo/module-seeds";
 import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
@@ -26,6 +26,7 @@ import {mobileListSecondaryIndexes} from "@/config/mobile-ux";
 import {useSessionJsonState} from "@/lib/client/use-session-json-state";
 import {MobileRecordSecondary,MobileRecordSummary,mobileRecordSubtitle} from "@/components/mobile/mobile-list-record";
 import MobileModuleLauncher from "@/components/mobile/mobile-module-launcher";
+import {MobileEmptyState,MobileErrorState,MobileSkeleton} from "@/components/mobile/mobile-app-state";
 
 
 type ModuleListState={
@@ -56,7 +57,11 @@ export default function ModulePage({config}:{config:ModuleConfig}){
  const permissions=usePermissions();
  const {t,locale}=useLocale();
  const [local,setLocal]=useState<LocalRecord[]>([]);
+ const [loading,setLoading]=useState(true);
+ const [loadError,setLoadError]=useState("");
  const [actionsOpen,setActionsOpen]=useState(false);
+ const [selectionMode,setSelectionMode]=useState(false);
+ const [selectedIds,setSelectedIds]=useState<string[]>([]);
  const [listState,setListState]=useSessionJsonState<ModuleListState>(`binso:list:${config.key}`,defaultModuleListState);
  const {query,statusFilter,sort,view,timeScope}=listState;
  const setQuery=(value:string)=>setListState(current=>({...current,query:value}));
@@ -67,11 +72,11 @@ export default function ModulePage({config}:{config:ModuleConfig}){
 
  useEffect(()=>{
   let active=true;
-  const load=()=>void listAppRecords(config.key).then(items=>{if(active)setLocal(items)});
+  const load=()=>{setLoadError("");void listAppRecords(config.key).then(items=>{if(active){setLocal(items);setLoading(false)}}).catch(error=>{if(active){setLoadError(error instanceof Error?error.message:t("Daten konnten nicht geladen werden."));setLoading(false)}})};
   const timer=window.setTimeout(load,0);
   const unsubscribe=subscribeAppEvent(appEvents.dataChanged,load);
   return()=>{active=false;window.clearTimeout(timer);unsubscribe()};
- },[config.key]);
+ },[config.key,t]);
 
  const demoSeed=useMemo(()=>isProductionMode()?undefined:getDemoModuleSeed(config.key),[config.key]);
  const seedRows=useMemo(()=>demoSeed?.rows??[],[demoSeed]);
@@ -119,17 +124,19 @@ export default function ModulePage({config}:{config:ModuleConfig}){
   {demoSeed?.stats?.length?<section className="module-stats">{demoSeed.stats.map(s=><article className="stat-card" key={s.label}><span>{t(s.label)}</span><strong>{t(s.value)}</strong>{s.meta&&<small>{t(s.meta)}</small>}</article>)}</section>:null}
 
   <section className="workspace-card list-workspace-card">
-   <ListToolbar query={query} onQueryChange={setQuery} searchPlaceholder={`${t(config.label)} ${t("durchsuchen …")}`} statuses={statuses} statusFilter={statusFilter} onStatusFilter={setStatusFilter} sort={sort} onSort={setSort} view={view} onView={setView}/>
+   <ListToolbar query={query} onQueryChange={setQuery} searchPlaceholder={`${t(config.label)} ${t("durchsuchen …")}`} statuses={statuses} statusFilter={statusFilter} onStatusFilter={setStatusFilter} sort={sort} onSort={setSort} view={view} onView={setView} selectionMode={selectionMode} onSelectionMode={()=>{setSelectionMode(v=>!v);setSelectedIds([])}}/>
+   {selectionMode&&<div className="mobile-selection-bar"><span>{selectedIds.length} {t("ausgewählt")}</span><button type="button" onClick={()=>setSelectedIds(selectedIds.length===rows.length?[]:rows.map(item=>item.id))}>{selectedIds.length===rows.length?t("Auswahl aufheben"):t("Alle auswählen")}</button><button type="button" aria-label={t("Auswahlmodus beenden")} onClick={()=>{setSelectionMode(false);setSelectedIds([])}}><X size={16}/></button></div>}
 
-   {view==="table"?<div className="data-table-wrap"><div className="data-table" style={{"--columns":config.columns?.length??5} as React.CSSProperties}><div className="data-row data-head">{config.columns?.map(c=><span key={c}>{t(c)}</span>)}<span/></div>{rows.map(({row,id,local})=>{
+   {loading?<MobileSkeleton rows={6}/>:loadError?<MobileErrorState title={t("Inhalte konnten nicht geladen werden")} text={loadError} onRetry={()=>{setLoading(true);setLoadError("");void listAppRecords(config.key).then(items=>{setLocal(items);setLoading(false)}).catch(error=>{setLoadError(error instanceof Error?error.message:t("Daten konnten nicht geladen werden."));setLoading(false)})}}/>:rows.length===0?<MobileEmptyState title={query.trim()?t("Keine Ergebnisse gefunden."):t("Noch keine Einträge")} text={emptyText} actionLabel={canCreate&&config.primaryAction?t(config.primaryAction):undefined} href={canCreate?createHref:undefined}/>:view==="table"?<div className="data-table-wrap"><div className="data-table" style={{"--columns":config.columns?.length??5} as React.CSSProperties}><div className="data-row data-head">{config.columns?.map(c=><span key={c}>{t(c)}</span>)}<span/></div>{rows.map(({row,id,local})=>{
     const primary=local?row[0]:t(row[0]);
     const secondary=mobileRecordSubtitle(local?row[0]:t(row[0]),mobileSecondaryValues(config.key,row).map(value=>local?value:t(value)));
     const status=row[row.length-1];
+    const selected=selectedIds.includes(id);
+    if(selectionMode)return <button type="button" className={`data-row mobile-select-row${selected?" selected":""}`} onClick={()=>setSelectedIds(current=>current.includes(id)?current.filter(x=>x!==id):[...current,id])} key={`${id}-${row[0]}`}><span className="mobile-selection-check">{selected&&<Check size={14}/>}</span><MobileRecordSummary title={primary} subtitle={secondary} status={t(status)} statusClass={badgeClass(status)}/></button>;
     return <Link className="data-row" href={`${config.href}/${id}`} key={`${id}-${row[0]}`}>
      <MobileRecordSummary title={primary} subtitle={secondary} status={t(status)} statusClass={badgeClass(status)}/>
      {row.map((cell,ci)=><span className={`desktop-record-cell ${ci===row.length-1?badgeClass(cell):""}`} key={`${cell}-${ci}`}>{local?(ci===row.length-1?t(cell):cell):t(cell)}</span>)}
     </Link>})}</div></div>:<div className="record-card-grid">{rows.map(({row,id,local})=><Link href={`${config.href}/${id}`} className="record-card" key={`${id}-${row[0]}`}><div><strong>{local?row[0]:t(row[0])}</strong></div><MobileRecordSecondary title={local?row[0]:t(row[0])} values={mobileSecondaryValues(config.key,row).map(value=>local?value:t(value))}/>{row.slice(1,-1).map((cell,i)=><p className="record-card-detail" key={`${cell}-${i}`}><span>{t(config.columns?.[i+1]||"")}</span><strong>{local?cell:t(cell)}</strong></p>)}<em className={badgeClass(row[row.length-1])}>{t(row[row.length-1])}</em></Link>)}</div>}
-   {rows.length===0&&<div className="empty-state compact-list-empty">{emptyText}</div>}
   </section>
  </div>;
 }

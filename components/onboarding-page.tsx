@@ -15,12 +15,16 @@ import BrandLogo from "@/components/ui/brand-logo";
 export default function OnboardingPage(){
  const router=useRouter();
  const {t}=useLocale();
+ const [compact,setCompact]=useState(false);
+ const [introStep,setIntroStep]=useState(1);
+ const [introDone,setIntroDone]=useState(false);
  const [step,setStep]=useState(1);
  const [ready,setReady]=useState(false);
  const [dirty,setDirty]=useState(false);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  useUnsavedChanges(dirty);
+ useEffect(()=>{const media=window.matchMedia("(max-width: 760px)");const sync=()=>setCompact(media.matches);sync();media.addEventListener?.("change",sync);return()=>media.removeEventListener?.("change",sync)},[]);
  const [v,setV]=useState({company:"",uid:"",address:"",zipCity:"",phone:"",industry:"Dienstleistungen",employees:"1–5"});
 
  useEffect(()=>{
@@ -100,6 +104,27 @@ export default function OnboardingPage(){
  }
 
  if(!ready)return <div className="auth-shell"><div className="auth-card">{t("Einrichtung wird geladen …")}</div></div>;
+
+ if(!introDone&&compact){
+  const intro=[
+   {title:t("Einfach. Übersichtlich. Effizient."),text:t("Alle deine Kunden, Projekte und Finanzen an einem Ort."),icon:<Building2/>},
+   {title:t("Arbeiten ohne Umwege"),text:t("Erfasse Zeit, erstelle Dokumente und erledige Aufgaben direkt im passenden Kontext."),icon:<Users/>},
+   {title:t("Bereit für deinen Alltag"),text:t("Binso One passt sich deinem Unternehmen an. Die wichtigsten Einstellungen richten wir jetzt gemeinsam ein."),icon:<Settings2/>}
+  ];
+  const item=intro[introStep-1];
+  return <div className="mobile-intro-shell">
+   <div className="mobile-intro-brand"><BrandLogo/></div>
+   <main className="mobile-intro-card">
+    <div className="mobile-intro-visual" aria-hidden="true">{item.icon}</div>
+    <h1>{item.title}</h1><p>{item.text}</p>
+    <div className="mobile-intro-dots" aria-label={`${t("Schritt")} ${introStep} ${t("von")} 3`}>{[1,2,3].map(i=><span className={i===introStep?"active":""} key={i}/>)}</div>
+    <div className="mobile-intro-actions">
+     {introStep>1?<button type="button" className="marketing-secondary" onClick={()=>setIntroStep(v=>Math.max(1,v-1))}><ArrowLeft size={17}/><span className="sr-only">{t("Vorheriger Schritt")}</span></button>:<button type="button" className="mobile-intro-skip" onClick={()=>setIntroDone(true)}>{t("Überspringen")}</button>}
+     <button type="button" className="marketing-primary" onClick={()=>introStep<3?setIntroStep(v=>v+1):setIntroDone(true)}>{introStep<3?t("Weiter"):t("Los geht's")} <ArrowRight size={16}/></button>
+    </div>
+   </main>
+  </div>;
+ }
 
  return <div className="onboarding-shell">
   <div className="onboarding-top">

@@ -3,8 +3,8 @@ const read=p=>fs.readFileSync(p,"utf8");
 const css=read("styles/mobile-pwa.css"), shell=read("components/shell.tsx"), modulePage=read("components/module-page.tsx"), sessionState=read("lib/client/use-session-json-state.ts"), overlays=read("components/mobile/mobile-overlays.tsx"), records=read("components/mobile/mobile-list-record.tsx"), forms=read("components/ui/form-controls.tsx"), doc=read("components/business-document-editor.tsx"), detail=read("components/detail-page.tsx"), toast=read("components/toast-host.tsx"), timer=read("components/time-tracking/active-time-tracker-host.tsx"), globals=read("app/globals.css");
 const checks=[
  [globals.trim().endsWith('@import "../styles/mobile-pwa.css";'),"canonical Mobile/PWA stylesheet loaded last"],
- [css.includes('--background:#fff')&&css.includes('--background:#000'),"exact white/black mobile surfaces"],
- [css.includes('.mobile-nav{left:max(12px')&&css.includes('border-radius:999px'),"floating pill navigation"],
+ [css.includes('--mockup-bg:#fff')&&css.includes('--mockup-bg:#090a0c'),"approved light/dark mobile canvases"],
+ [css.includes('width:min(calc(100vw - 22px),414px)')&&css.includes('border-radius:17px')&&css.includes('color:var(--mockup-blue)'),"approved floating bottom navigation"],
  [shell.includes('<span>{t("Profil")}</span>')&&!shell.includes('<span>{t("Mehr")}</span>'),"profile replaces More in primary pill"],
  [overlays.includes('MobileQuickCreate')&&overlays.includes('MobileAccountPanel'),"semantic task/profile overlay primitives"],
  [css.includes(':has(.mobile-account-overlay){align-items:end'),"profile bottom sheet"],
@@ -20,7 +20,7 @@ const checks=[
  [toast.includes('tone==="danger"?8000'),"tone-aware toast lifetime"],
  [timer.includes('if(!tracker)return null'),"timer only exists when active"],
  [css.includes('env(safe-area-inset')||read('styles/tokens.css').includes('env(safe-area-inset'),"safe-area tokens"],
- [!css.match(/#[12][0-9a-f]{5}/i),"no decorative dark-grey hex surfaces in canonical mobile layer"],
+ [css.includes('--mockup-blue:#0057ff')&&css.includes('--mockup-navy:#07194d')&&css.includes('--mockup-line:#e9edf2'),"approved mockup palette tokens"],
  [!css.includes('calc(-1')&&!css.match(/margin(?:-[a-z]+)?:\s*-\d/),"no negative-margin repair in canonical mobile layer"]
 ];
 const failed=checks.filter(([ok])=>!ok).map(([,name])=>name);if(failed.length)throw new Error(`Final Mobile/PWA contract failed: ${failed.join(", ")}`);

@@ -459,3 +459,64 @@ Object.assign(en,{"Geschäftsdaten":"Business data","Fortschritt":"Progress","Vo
 Object.assign(fr,{"Geschäftsdaten":"Données métier","Fortschritt":"Progression","Vorheriger Schritt":"Étape précédente","Prüfen":"Vérifier"});
 Object.assign(it,{"Geschäftsdaten":"Dati aziendali","Fortschritt":"Avanzamento","Vorheriger Schritt":"Passaggio precedente","Prüfen":"Verifica"});
 Object.assign(trDict,{"Geschäftsdaten":"İş verileri","Fortschritt":"İlerleme","Vorheriger Schritt":"Önceki adım","Prüfen":"Kontrol"});
+
+Object.assign(en,{
+ "Arbeiten ohne Umwege":"Work without detours",
+ "Erfasse Zeit, erstelle Dokumente und erledige Aufgaben direkt im passenden Kontext.":"Track time, create documents and complete tasks directly in the right context.",
+ "Bereit für deinen Alltag":"Ready for your day-to-day work",
+ "Binso One passt sich deinem Unternehmen an. Die wichtigsten Einstellungen richten wir jetzt gemeinsam ein.":"Binso One adapts to your company. We will now set up the most important settings together.",
+ "Überspringen":"Skip",
+ "Los geht's":"Let's go",
+ "Noch keine Einträge":"No entries yet",
+ "Inhalte konnten nicht geladen werden":"Content could not be loaded",
+ "Daten konnten nicht geladen werden.":"Data could not be loaded.",
+ "Datensatz konnte nicht geladen werden":"Record could not be loaded",
+ "Keine Verbindung. Bereits geladene Inhalte bleiben verfügbar.":"No connection. Already loaded content remains available."
+});
+Object.assign(fr,{
+ "Arbeiten ohne Umwege":"Travailler sans détours",
+ "Erfasse Zeit, erstelle Dokumente und erledige Aufgaben direkt im passenden Kontext.":"Saisissez le temps, créez des documents et effectuez les tâches directement dans le bon contexte.",
+ "Bereit für deinen Alltag":"Prêt pour votre quotidien",
+ "Binso One passt sich deinem Unternehmen an. Die wichtigsten Einstellungen richten wir jetzt gemeinsam ein.":"Binso One s’adapte à votre entreprise. Nous configurons maintenant ensemble les réglages les plus importants.",
+ "Überspringen":"Ignorer",
+ "Los geht's":"C’est parti",
+ "Noch keine Einträge":"Aucune entrée pour le moment",
+ "Inhalte konnten nicht geladen werden":"Le contenu n’a pas pu être chargé",
+ "Daten konnten nicht geladen werden.":"Les données n’ont pas pu être chargées.",
+ "Datensatz konnte nicht geladen werden":"L’enregistrement n’a pas pu être chargé",
+ "Keine Verbindung. Bereits geladene Inhalte bleiben verfügbar.":"Aucune connexion. Les contenus déjà chargés restent disponibles."
+});
+Object.assign(it,{
+ "Arbeiten ohne Umwege":"Lavora senza deviazioni",
+ "Erfasse Zeit, erstelle Dokumente und erledige Aufgaben direkt im passenden Kontext.":"Registra il tempo, crea documenti e completa le attività direttamente nel contesto corretto.",
+ "Bereit für deinen Alltag":"Pronto per il lavoro quotidiano",
+ "Binso One passt sich deinem Unternehmen an. Die wichtigsten Einstellungen richten wir jetzt gemeinsam ein.":"Binso One si adatta alla tua azienda. Ora configuriamo insieme le impostazioni più importanti.",
+ "Überspringen":"Salta",
+ "Los geht's":"Iniziamo",
+ "Noch keine Einträge":"Nessuna voce per ora",
+ "Inhalte konnten nicht geladen werden":"Impossibile caricare i contenuti",
+ "Daten konnten nicht geladen werden.":"Impossibile caricare i dati.",
+ "Datensatz konnte nicht geladen werden":"Impossibile caricare il record",
+ "Keine Verbindung. Bereits geladene Inhalte bleiben verfügbar.":"Nessuna connessione. I contenuti già caricati restano disponibili."
+});
+Object.assign(trDict,{
+ "Arbeiten ohne Umwege":"Dolambaçsız çalışın",
+ "Erfasse Zeit, erstelle Dokumente und erledige Aufgaben direkt im passenden Kontext.":"Süreyi kaydedin, belgeler oluşturun ve görevleri doğrudan doğru bağlamda tamamlayın.",
+ "Bereit für deinen Alltag":"Günlük işlerinize hazır",
+ "Binso One passt sich deinem Unternehmen an. Die wichtigsten Einstellungen richten wir jetzt gemeinsam ein.":"Binso One şirketinize uyum sağlar. Şimdi en önemli ayarları birlikte yapılandıralım.",
+ "Überspringen":"Atla",
+ "Los geht's":"Başlayalım",
+ "Noch keine Einträge":"Henüz kayıt yok",
+ "Inhalte konnten nicht geladen werden":"İçerik yüklenemedi",
+ "Daten konnten nicht geladen werden.":"Veriler yüklenemedi.",
+ "Datensatz konnte nicht geladen werden":"Kayıt yüklenemedi",
+ "Keine Verbindung. Bereits geladene Inhalte bleiben verfügbar.":"Bağlantı yok. Daha önce yüklenen içerikler kullanılabilir kalır."
+});
+Object.assign(en,{"Einfach. Übersichtlich. Effizient.":"Simple. Clear. Efficient.","Alle deine Kunden, Projekte und Finanzen an einem Ort.":"All your customers, projects and finances in one place."});
+Object.assign(fr,{"Einfach. Übersichtlich. Effizient.":"Simple. Clair. Efficace.","Alle deine Kunden, Projekte und Finanzen an einem Ort.":"Tous vos clients, projets et finances au même endroit."});
+Object.assign(it,{"Einfach. Übersichtlich. Effizient.":"Semplice. Chiaro. Efficiente.","Alle deine Kunden, Projekte und Finanzen an einem Ort.":"Tutti i clienti, i progetti e le finanze in un unico posto."});
+Object.assign(trDict,{"Einfach. Übersichtlich. Effizient.":"Basit. Anlaşılır. Verimli.","Alle deine Kunden, Projekte und Finanzen an einem Ort.":"Tüm müşterileriniz, projeleriniz ve finanslarınız tek yerde."});
+Object.assign(en,{"Auswahlmodus":"Selection mode","Auswahl":"Select","ausgewählt":"selected","Alle auswählen":"Select all","Auswahl aufheben":"Clear selection","Auswahlmodus beenden":"Exit selection mode"});
+Object.assign(fr,{"Auswahlmodus":"Mode de sélection","Auswahl":"Sélectionner","ausgewählt":"sélectionné(s)","Alle auswählen":"Tout sélectionner","Auswahl aufheben":"Effacer la sélection","Auswahlmodus beenden":"Quitter le mode de sélection"});
+Object.assign(it,{"Auswahlmodus":"Modalità selezione","Auswahl":"Seleziona","ausgewählt":"selezionati","Alle auswählen":"Seleziona tutto","Auswahl aufheben":"Deseleziona tutto","Auswahlmodus beenden":"Esci dalla modalità selezione"});
+Object.assign(trDict,{"Auswahlmodus":"Seçim modu","Auswahl":"Seç","ausgewählt":"seçildi","Alle auswählen":"Tümünü seç","Auswahl aufheben":"Seçimi temizle","Auswahlmodus beenden":"Seçim modundan çık"});

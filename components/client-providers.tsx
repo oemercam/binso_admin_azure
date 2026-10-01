@@ -7,6 +7,7 @@ import ThemeProvider from "@/components/theme-provider";
 import ConnectivityBanner from "@/components/connectivity-banner";
 import PwaUpdateNotice from "@/components/pwa-update-notice";
 import RouteScrollReset from "@/components/route-scroll-reset";
+import MobileSplashGate from "@/components/mobile/mobile-splash-gate";
 export default function ClientProviders({children}:{children:React.ReactNode}){
- return <ThemeProvider><LocaleProvider><RouteScrollReset/><ConnectivityBanner/>{children}<PwaUpdateNotice/><CookieConsent/><ToastHost/><ConfirmHost/></LocaleProvider></ThemeProvider>
+ return <ThemeProvider><LocaleProvider><MobileSplashGate/><RouteScrollReset/><ConnectivityBanner/>{children}<PwaUpdateNotice/><CookieConsent/><ToastHost/><ConfirmHost/></LocaleProvider></ThemeProvider>
 }
