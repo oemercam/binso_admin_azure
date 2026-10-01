@@ -16,9 +16,8 @@ import WorkspaceRuntime from "@/components/workspace-runtime";
 import {useLocale} from "@/components/locale-provider";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import {clearUserRuntimeState} from "@/lib/client/session-cleanup";
-import {MobileAccountPanel,MobileNavigationPanel,MobileQuickCreate} from "@/components/mobile/mobile-overlays";
-import MobileNavigationRow from "@/components/navigation/mobile-navigation-row";
-import {mobileMoreNavigation,mobileQuickCreate,portalNavigation as groups} from "@/config/navigation";
+import {MobileAccountPanel,MobileQuickCreate} from "@/components/mobile/mobile-overlays";
+import {mobileQuickCreate,portalNavigation as groups} from "@/config/navigation";
 import {getWorkspaceRouteMetadata} from "@/config/route-metadata";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {uiConfig} from "@/config/ui";
@@ -33,7 +32,6 @@ type ShellUser={id:string;name:string;email:string;role:string};
 export default function Shell({children}:{children:React.ReactNode}){
  const {t}=useLocale();
  const [open,setOpen]=useState(false);
- const [moreOpen,setMoreOpen]=useState(false);
  const [createOpen,setCreateOpen]=useState(false);
  const [query,setQuery]=useState("");
  const [companyOpen,setCompanyOpen]=useState(false);
@@ -49,7 +47,6 @@ export default function Shell({children}:{children:React.ReactNode}){
  const [compactViewport,setCompactViewport]=useState(false);
  const searchRef=useRef<HTMLInputElement>(null);
  const accountRef=useRef<HTMLDivElement>(null);
- const moreHistoryRef=useRef<{active:boolean;baseState:unknown}>({active:false,baseState:null});
  const pathname=usePathname();
  const router=useRouter();
  const routeMeta=getWorkspaceRouteMetadata(pathname);
@@ -76,28 +73,7 @@ export default function Shell({children}:{children:React.ReactNode}){
  const canSee=(href:string)=>{const permission=routePermission(href);return planAllowsPath(effectivePlan,href)&&(!permission||tenantCan(effectiveRole,permission))};
  useEffect(()=>{if(!permissionsReady)return;if(!planAllowsPath(effectivePlan,pathname)){router.replace(`/upgrade?next=${encodeURIComponent(pathname)}`);return}const permission=routePermission(pathname);if(permission&&!tenantCan(effectiveRole,permission))router.replace("/forbidden")},[pathname,effectiveRole,effectivePlan,permissionsReady,router]);
 
- function openMoreNavigation(){
-  if(moreOpen)return;
-  const baseState=window.history.state;
-  const nextState=baseState&&typeof baseState==="object"?{...baseState,__binsoOverlay:"navigation"}:{__binsoOverlay:"navigation"};
-  moreHistoryRef.current={active:true,baseState};
-  window.history.pushState(nextState,"",window.location.href);
-  setMoreOpen(true);
- }
- function closeMoreNavigation(){
-  if(moreHistoryRef.current.active&&window.history.state?.__binsoOverlay==="navigation"){window.history.back();return}
-  moreHistoryRef.current={active:false,baseState:null};
-  setMoreOpen(false);
- }
- function navigateFromMore(href:string){
-  if(moreHistoryRef.current.active&&window.history.state?.__binsoOverlay==="navigation"){window.history.replaceState(moreHistoryRef.current.baseState,"",window.location.href)}
-  moreHistoryRef.current={active:false,baseState:null};
-  setMoreOpen(false);
-  router.push(href);
- }
- useEffect(()=>{const onPopState=()=>{if(moreHistoryRef.current.active){moreHistoryRef.current={active:false,baseState:null};setMoreOpen(false)}};window.addEventListener("popstate",onPopState);return()=>window.removeEventListener("popstate",onPopState)},[]);
-
- async function signOut(){if(moreHistoryRef.current.active&&window.history.state?.__binsoOverlay==="navigation")window.history.replaceState(moreHistoryRef.current.baseState,"",window.location.href);moreHistoryRef.current={active:false,baseState:null};setMoreOpen(false);if(isProductionMode()){try{await apiFetch("/api/auth/logout",{method:"POST",body:"{}"})}catch{}}else logout();await clearUserRuntimeState();setCompanyOpen(false);router.push("/portal/login")}
+ async function signOut(){if(isProductionMode()){try{await apiFetch("/api/auth/logout",{method:"POST",body:"{}"})}catch{}}else logout();await clearUserRuntimeState();setCompanyOpen(false);router.push("/portal/login")}
 
  const accountContent=<div className="account-menu-content">
   <div className="account-menu-profile"><div className="account-menu-avatar">{initials}</div><div><strong>{activeUser?.name||t("Benutzer")}</strong><span>{activeUser?.email||""}</span><small>{activeUser?.role||t("Benutzer")}</small></div></div>
@@ -127,7 +103,7 @@ export default function Shell({children}:{children:React.ReactNode}){
 
   <div className="content-shell">
    <header className="topbar">
-    <Link href="/dashboard" className="mobile-brand mobile-brand-image" aria-label={t("Binso One Dashboard")}><BrandLogo/></Link>
+    <span className="mobile-app-spacer" aria-hidden="true"/>
     {!compactViewport&&<form className="search global-search" role="search" onSubmit={submitSearch}><Search size={18}/><input ref={searchRef} type="search" autoComplete="off" enterKeyHint="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Kunden, Rechnungen, Projekte suchen …")} aria-label={t("Globale Suche")}/><kbd>Ctrl K</kbd>{query&&<div className="search-results" role="listbox" aria-label={t("Suchergebnisse")}>{query.trim().length<2?<p>{t("Mindestens 2 Zeichen eingeben")}</p>:searchLoading?<p>{t("Suche läuft …")}</p>:results.length?results.map(r=><Link role="option" aria-selected="false" key={`${r.href}-${r.label}`} href={r.href} onClick={()=>setQuery("")}><strong>{r.label}</strong><span>{t(r.sub)}</span></Link>):<p>{t("Keine Treffer")}</p>}</div>}</form>}
     <div className="account-menu-wrap" ref={accountRef}>
      <button className="account-trigger" onClick={()=>setCompanyOpen(v=>!v)} aria-expanded={companyOpen} aria-haspopup="menu" aria-label={t("Benutzermenü")}><div className="account-trigger-copy"><strong>{activeUser?.name||t("Benutzer")}</strong><span>{company}</span></div><div className="avatar">{initials}</div><ChevronDown size={14}/></button>
@@ -142,22 +118,13 @@ export default function Shell({children}:{children:React.ReactNode}){
     <Link href="/kunden" className={routeMeta?.mobileBottomNav==="kunden"?"mobile-nav-item active":"mobile-nav-item"}><Users size={20}/><span>{t("Kunden")}</span></Link>
     <button className="mobile-nav-item mobile-nav-create" onClick={()=>setCreateOpen(true)} aria-label={t("Neu erstellen")}><span className="mobile-nav-create-icon"><Plus size={22}/></span><span>{t("Neu")}</span></button>
     <Link href="/zeiterfassung" className={routeMeta?.mobileBottomNav==="zeiterfassung"?"mobile-nav-item active":"mobile-nav-item"}><Clock3 size={20}/><span>{t("Zeit")}</span></Link>
-    <button className={moreOpen||routeMeta?.mobileBottomNav==="more"?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>moreOpen?closeMoreNavigation():openMoreNavigation()} aria-expanded={moreOpen} aria-haspopup="dialog" aria-label={t("Navigation")}><span className="workspace-menu-toggle-glyph" aria-hidden="true"><span/><span/><span/></span><span>{t("Mehr")}</span></button>
+    <button className={companyOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setCompanyOpen(v=>!v)} aria-expanded={companyOpen} aria-haspopup="dialog" aria-label={t("Profil")}><UserRound size={20}/><span>{t("Profil")}</span></button>
    </nav>
 
    <MobileQuickCreate open={createOpen} title={t("Neu erstellen")} onClose={()=>setCreateOpen(false)}><div className="mobile-create-sheet list-sheet-options">{mobileQuickCreate.filter(item=>canSee(item.href.replace(/\/neu$/,""))).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setCreateOpen(false)}><Icon size={18}/><span>{t(item.label)}</span></Link>})}</div></MobileQuickCreate>
 
-   {compactViewport&&<MobileAccountPanel open={companyOpen} title={t("Konto")} onClose={()=>setCompanyOpen(false)}>{accountContent}</MobileAccountPanel>}
+   {compactViewport&&<MobileAccountPanel open={companyOpen} title={t("Profil")} onClose={()=>setCompanyOpen(false)}>{accountContent}</MobileAccountPanel>}
 
-   <MobileNavigationPanel open={moreOpen} title={t("Navigation")} onClose={closeMoreNavigation}><div className="mobile-more-content">
-    <div className="mobile-navigation-groups">{mobileMoreNavigation.map(group=>{const visible=group.items.filter(item=>canSee(item.href));if(!visible.length)return null;return <section className="mobile-navigation-group" key={group.label}><h3>{t(group.label)}</h3><div className="mobile-navigation-links">{visible.map(item=><MobileNavigationRow key={item.href} href={item.href} label={t(item.label)} icon={item.icon} active={active(item.href)} onNavigate={()=>navigateFromMore(item.href)}/>)}</div></section>})}</div>
-    <footer className="mobile-navigation-footer">
-     <div className="mobile-navigation-user"><div className="mobile-navigation-user-avatar" aria-hidden="true">{initials}</div><div><strong>{activeUser?.name||t("Benutzer")}</strong>{activeUser?.email&&<span>{activeUser.email}</span>}</div></div>
-     <Link className="mobile-navigation-settings" href="/einstellungen" onClick={event=>{event.preventDefault();navigateFromMore("/einstellungen")}}><SlidersHorizontal size={18}/><span>{t("Einstellungen")}</span></Link>
-     <button className="mobile-navigation-logout" type="button" onClick={()=>void signOut()}><LogOut size={18}/><span>{t("Abmelden")}</span></button>
-     <small className="mobile-navigation-version">{t("Version")} {appConfig.appVersion}</small>
-    </footer>
-   </div></MobileNavigationPanel>
   </div>
   {permissionsReady&&<WorkspaceRuntime/>}
  </div>;

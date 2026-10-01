@@ -1,4 +1,5 @@
 "use client";
+import ToggleSwitch from "@/components/ui/toggle-switch";
 import {useCallback,useEffect,useMemo,useState} from "react";
 import {Pause,Play,Square} from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -22,7 +23,7 @@ export default function TimeTrackerPanel(){
  }
  return <section className={`time-tracker-card workspace-card${tracker?" is-active":""}`}>
   <div className="time-tracker-main"><div><span className="time-tracker-kicker">{t(tracker?.state==="paused"?"Zeiterfassung pausiert":"Live-Zeiterfassung")}</span><strong className="time-tracker-clock">{formatTrackerDuration(elapsed)}</strong><small>{tracker?(tracker.projectLabel||t("Intern"))+" · "+tracker.activity:t("Projekt und Tätigkeit wählen, dann Zeit starten.")}</small></div></div>
-  {!tracker?<div className="time-tracker-setup"><RelationshipPicker module="projekte" label={t("Projekt")} value={project?.id||""} onChange={o=>{setProject(o);setBillable(Boolean(o))}} createHref="/projekte/neu"/><label><span>{t("Tätigkeit")}</span><Input value={activity} onChange={e=>setActivity(e.target.value)} placeholder={t("z. B. Beratung")}/></label><label className="time-tracker-billable"><input type="checkbox" checked={billable} onChange={e=>setBillable(e.target.checked)}/><span>{t("Verrechenbar")}</span></label><Button loading={busy} icon={<Play size={17}/>} onClick={()=>void act("start")}>{t("Zeit starten")}</Button></div>:
+  {!tracker?<div className="time-tracker-setup"><RelationshipPicker module="projekte" label={t("Projekt")} value={project?.id||""} onChange={o=>{setProject(o);setBillable(Boolean(o))}} createHref="/projekte/neu"/><label><span>{t("Tätigkeit")}</span><Input value={activity} onChange={e=>setActivity(e.target.value)} placeholder={t("z. B. Beratung")}/></label><div className="time-tracker-billable toggle-setting-row"><span>{t("Verrechenbar")}</span><ToggleSwitch checked={billable} onChange={setBillable} label={t("Verrechenbar")}/></div><Button loading={busy} icon={<Play size={17}/>} onClick={()=>void act("start")}>{t("Zeit starten")}</Button></div>:
   <div className="time-tracker-actions">{tracker.state==="running"?<Button loading={busy} variant="secondary" icon={<Pause size={17}/>} onClick={()=>void act("pause")}>{t("Pause")}</Button>:<Button loading={busy} variant="secondary" icon={<Play size={17}/>} onClick={()=>void act("resume")}>{t("Fortsetzen")}</Button>}<Button loading={busy} icon={<Square size={16}/>} onClick={()=>void act("stop")}>{t("Beenden")}</Button></div>}
  </section>;
 }

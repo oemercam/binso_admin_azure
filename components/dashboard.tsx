@@ -3,6 +3,8 @@ import {subscribeAppEvent,appEvents} from "@/lib/client/app-events";
 import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
 import {ArrowRight,Clock3,FileText,FolderKanban,Plus,ReceiptText,Users,WalletCards} from "lucide-react";
+import {mobileMoreNavigation} from "@/config/navigation";
+import {usePermissions} from "@/lib/client/use-permissions";
 import {parseMoney,type LocalRecord} from "@/lib/local-store";
 import {listAppRecords} from "@/lib/client/data-service";
 import OnboardingChecklist from "@/components/onboarding-checklist";
@@ -10,6 +12,7 @@ import {useLocale} from "@/components/locale-provider";
 
 export default function Dashboard(){
  const {t,formatCurrency,formatNumber}=useLocale();
+ const permissions=usePermissions();
  const [records,setRecords]=useState<LocalRecord[]>([]);
  useEffect(()=>{let active=true;const load=()=>void listAppRecords().then(items=>{if(active)setRecords(items)});const timer=window.setTimeout(load,0);const unsubscribe=subscribeAppEvent(appEvents.dataChanged,load);return()=>{active=false;window.clearTimeout(timer);unsubscribe()}},[]);
  const summary=useMemo(()=>{
@@ -41,6 +44,7 @@ export default function Dashboard(){
  return <div className="page dashboard-page">
   <section className="page-header dashboard-heading"><div><h1>{t("Unternehmensübersicht")}</h1><p>{t("Die wichtigsten Geschäftsdaten, Kennzahlen und offenen Arbeiten auf einen Blick.")}</p></div></section>
   <OnboardingChecklist/>
+  <section className="mobile-module-overview" aria-label={t("Bereiche")}><div className="section-title"><h2>{t("Bereiche")}</h2></div><div className="mobile-module-groups">{mobileMoreNavigation.map(group=>{const items=group.items.filter(item=>permissions.canModule(item.href.slice(1),"read"));if(!items.length)return null;return <div className="mobile-module-group" key={group.label}><h3>{t(group.label)}</h3>{items.map(item=>{const Icon=item.icon;return <Link href={item.href} key={item.href}><Icon size={18}/><span>{t(item.label)}</span><ArrowRight size={15}/></Link>})}</div>})}</div></section>
   <section className="metric-grid dashboard-kpi-grid">{summary.metrics.map(m=><article className="metric-card" key={m.label}><span>{t(m.label)}</span><strong>{m.value}</strong><small>{m.meta}</small></article>)}</section>
   {attention.length>0&&<section className="dashboard-attention"><div className="section-title"><h2>{t("Zu erledigen")}</h2><Link href="/aufgaben">{t("Alle")} <ArrowRight size={15}/></Link></div><div className="attention-list">{attention.map(item=><Link href={item.href} key={item.href}><span>{item.label}</span><ArrowRight size={15}/></Link>)}</div></section>}
   <section className="dashboard-grid">

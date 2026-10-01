@@ -23,7 +23,7 @@ const consumers=[
 ];
 for(const file of consumers){
  const text=fs.readFileSync(file,"utf8");
- if(file==="components/shell.tsx"?!text.includes("MobileNavigationPanel"):!text.includes("ResponsiveOverlay"))throw new Error(`Central overlay infrastructure not used in ${file}`);
+ if(file==="components/shell.tsx"?!(text.includes("MobileQuickCreate")&&text.includes("MobileAccountPanel")):!text.includes("ResponsiveOverlay"))throw new Error(`Central overlay infrastructure not used in ${file}`);
  if(/modal-backdrop|mobile-sheet-backdrop|send-modal|edit-modal|payslip-modal|consent-backdrop/.test(text))throw new Error(`Legacy overlay markup remains in ${file}`);
 }
 

@@ -56,7 +56,6 @@ html.binso-overlay-open,body.binso-overlay-open{overflow:hidden;overscroll-behav
 .consent-content{display:grid;gap:16px}.consent-content>p{margin:0;color:var(--foreground-muted);line-height:1.55}
 .consent-actions-central{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
 .consent-actions-central>*{width:100%;min-width:0}
-.mobile-more-content{display:grid;gap:18px}
 
 /* document preview gets a dedicated scrolling canvas inside the canonical shell */
 .ui-overlay-document .ui-overlay-body{padding:0;background:var(--surface-subtle)}

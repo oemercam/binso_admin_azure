@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 const required=[
-  "RELEASE-NOTES-v1.6.9.md","MOBILE-PWA-MASTER-AUDIT-v1.6.9.md",
-  "NAVIGATION-INVENTORY-v1.6.9.md","MOBILE-PWA-VISUAL-QA-v1.6.9.md",
+  "RELEASE-NOTES-v1.7.1.md","MOBILE-PWA-MASTER-AUDIT-v1.7.1.md",
+  "NAVIGATION-INVENTORY-v1.7.1.md","MOBILE-PWA-VISUAL-QA-v1.7.1.md",
   "app/layout.tsx","app/robots.ts","app/sitemap.ts","public/manifest.webmanifest","public/manifest-site.webmanifest","public/manifest-portal.webmanifest","public/manifest-operator.webmanifest","public/favicon.ico",
   "app/portal/page.tsx","app/portal/layout.tsx","app/operator/layout.tsx","app/api/auth/demo/route.ts",
   "components/theme-provider.tsx","components/account-preference-sync.tsx","lib/client/use-session-json-state.ts","components/support/support-new.tsx","components/mobile/mobile-list-record.tsx","components/mobile/mobile-overlays.tsx",
@@ -15,7 +15,7 @@ const required=[
   "lib/i18n-dynamic.ts","styles/tokens.css","styles/app.css","styles/responsive-central.css","styles/overlays.css","styles/shell.css","styles/primitives.css","styles/mobile-pwa.css","hooks/use-overlay-lock.ts",
   "config/domain.ts","config/accounting.ts","config/storage-keys.ts","config/ui.ts","config/limits.ts","config/entity-forms.ts","config/mobile-ux.ts","config/navigation.ts","config/route-metadata.ts",
   "lib/documents/calculations.ts","lib/documents/defaults.ts","scripts/architecture-hardcoding-selfcheck.mjs",
-  "lib/demo/pilot-fixtures.ts","config/app.ts","components/ui/responsive-overlay.tsx","components/navigation/mobile-navigation-row.tsx","components/workspace-runtime.tsx","lib/i18n-app.ts",
+  "lib/demo/pilot-fixtures.ts","config/app.ts","components/ui/responsive-overlay.tsx","components/workspace-runtime.tsx","lib/i18n-app.ts",
   "scripts/rendering-selfcheck.mjs","scripts/ui-standards-selfcheck.mjs","scripts/runtime-boundary-selfcheck.mjs","scripts/trial-demo-selfcheck.mjs","scripts/mobile-portal-visual-selfcheck.mjs",
   "scripts/productivity-ux-selfcheck.mjs","scripts/mobile-pwa-standard-selfcheck.mjs","scripts/mobile-pwa-full-audit-selfcheck.mjs","scripts/navigation-architecture-selfcheck.mjs","scripts/mobile-navigation-sheet-selfcheck.mjs","scripts/mobile-pwa-master-audit-selfcheck.mjs","scripts/mobile-pwa-final-contract-selfcheck.mjs","scripts/mobile-pwa-route-matrix-selfcheck.mjs","scripts/mobile-pwa-i18n-hardcode-selfcheck.mjs","scripts/document-preview-selfcheck.mjs","scripts/customer-portal-header-activity-selfcheck.mjs","scripts/portal-ux-workflow-selfcheck.mjs","scripts/search-effect-selfcheck.mjs","scripts/mobile-theme-i18n-selfcheck.mjs","scripts/i18n-completeness-selfcheck.mjs","scripts/ui-interaction-contract-selfcheck.mjs","scripts/check-db.mjs","scripts/migrate.mjs","infra/main.bicep",".github/workflows/azure-webapp.yml"
 ];
@@ -27,7 +27,7 @@ const cssLeftovers=obsoleteCss.filter(p=>fs.existsSync(p));
 if(cssLeftovers.length)throw new Error(`Obsolete CSS layers still present: ${cssLeftovers.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.6.9")throw new Error(`Expected package version 1.6.9, got ${pkg.version}`);
+if(pkg.version!=="1.7.1")throw new Error(`Expected package version 1.7.1, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));
@@ -63,7 +63,7 @@ for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!p
 for(const marker of ["pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
 for(const marker of ["marketing-menu-button","marketing-mobile-menu","marketing-footer",".topbar",".mobile-nav"]){if(!shellCss.includes(marker))throw new Error(`Shell baseline missing ${marker}`)}
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","@media print"]){if(!overlays.includes(marker))throw new Error(`Overlay baseline missing ${marker}`)}
-for(const marker of ["--background:#fff","--background:#000",".mobile-nav{",".workspace-navigation-overlay{",".mobile-account-overlay{",".document-mobile-step"]){if(!mobileCss.includes(marker))throw new Error(`Mobile/PWA v1.6.9 baseline missing ${marker}`)}
+for(const marker of ["--background:#fff","--background:#000",".mobile-nav{",".mobile-account-overlay{",".document-mobile-step"]){if(!mobileCss.includes(marker))throw new Error(`Mobile/PWA v1.7.1 baseline missing ${marker}`)}
 
 // Runtime SQL must not regress to the retired parallel schema.
 const retiredRuntimeTables=["users","sessions","records","support_tickets","stored_files","feedback_entries","feature_flags","announcements","platform_users","platform_sessions","platform_audit_logs","audit_logs","webhook_events","idempotency_keys"];
