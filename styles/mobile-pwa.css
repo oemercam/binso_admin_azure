@@ -162,3 +162,159 @@
  .mobile-module-group a>svg:last-child{color:var(--foreground-muted)}
 }
 @media (min-width:761px){.mobile-module-overview{display:none}}
+
+/* ==========================================================
+   Binso One v1.7.2 — final mockup parity contract
+   Authenticated Mobile/PWA only. Desktop >= 761px is frozen.
+   This block intentionally wins the cascade because mobile-pwa.css is the
+   final global stylesheet. No screen-specific patch files are allowed.
+   ========================================================== */
+.mobile-heading-label{display:none}
+@media (max-width:760px){
+ /* Base canvas: flat, quiet and native-app-like. */
+ html,body{min-height:100%;background:var(--background);color:var(--foreground)}
+ body{font-size:13px;line-height:1.4}
+ .desktop-heading-label{display:none}.mobile-heading-label{display:inline}
+ .page{padding-top:10px}
+ .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1,.page-header h1{margin:0;font-size:22px;line-height:1.08;letter-spacing:-.035em;font-weight:760}
+ .page h2,.section-title h2,.card-header h2{font-size:14px;line-height:1.2;letter-spacing:-.01em}
+ .module-heading p,.detail-heading p,.page-header p,.form-title-row p{margin:4px 0 0;max-width:42rem;font-size:11px;line-height:1.42;color:var(--foreground-muted)}
+ .module-heading,.detail-heading,.page-header,.form-title-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px;padding:0 0 12px;margin:0 0 8px;border-bottom:1px solid var(--border)}
+ .module-heading>div:first-child,.detail-heading>div:first-child,.page-header>div:first-child,.form-title-copy{min-width:0}
+ .module-heading-actions,.detail-actions{display:none}
+ .mobile-page-action,.detail-actions-mobile{display:flex}
+ .mobile-page-action{align-self:start}
+
+ /* Absolutely no card landscape on authenticated work surfaces. */
+ :is(.page,.workspace-card,.card,.ui-card,.metric-card,.stat-card,.editor-main,.editor-side,.side-card,.detail-main-card,.timeline-card,.dashboard-quick-card,.dashboard-tasks-card,.settings-grid>.workspace-card,.support-detail-main,.support-detail-side){background:transparent;box-shadow:none}
+ :is(.workspace-card,.card,.ui-card,.editor-main,.editor-side,.side-card,.detail-main-card,.timeline-card,.dashboard-quick-card,.dashboard-tasks-card,.settings-grid>.workspace-card){border:0;border-radius:0;padding:0}
+ .workspace-card+.workspace-card{margin-top:0}
+
+ /* Floating navigation exactly as the mockup: one compact pill, five destinations. */
+ .mobile-nav{left:50%;right:auto;bottom:max(10px,var(--safe-bottom));transform:translateX(-50%);width:min(calc(100vw - 24px),430px);height:62px;padding:5px 7px;gap:0;border:1px solid var(--border);border-radius:999px;background:var(--background);box-shadow:0 8px 28px rgba(0,0,0,.08)}
+ html[data-theme="dark"] .mobile-nav{box-shadow:0 8px 28px rgba(255,255,255,.035)}
+ .mobile-nav-item{height:50px;min-height:50px;padding:0 3px;color:var(--foreground-muted);background:transparent;border:0}
+ .mobile-nav-item.active{color:var(--foreground);background:transparent;font-weight:750}
+ .mobile-nav-item>span:last-child{font-size:9px;line-height:1;white-space:nowrap}
+ .mobile-nav-create-icon{width:38px;height:38px;border-radius:50%;background:var(--foreground);color:var(--background)}
+
+ /* Lists: dense two-line rows, dividers, no outer card. */
+ .list-workspace-card{margin:0;padding:0;border:0;border-radius:0}
+ .list-toolbar{padding:0 0 8px;margin:0;border-bottom:1px solid var(--border)}
+ .data-table-wrap,.data-table{border:0;border-radius:0;background:transparent}
+ .data-row:not(.data-head){position:relative;min-height:58px;padding:9px 2px;gap:2px 8px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;box-shadow:none}
+ .data-row:not(.data-head):active{opacity:.62}
+ .mobile-record-summary{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:8px;align-items:center}
+ .mobile-record-summary strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;line-height:1.25;font-weight:700}
+ .mobile-record-summary small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;line-height:1.25;color:var(--foreground-muted)}
+ .mobile-record-summary .status-good,.mobile-record-summary .status-bad,.mobile-record-summary .status-neutral{grid-column:2;grid-row:1/3;align-self:center;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px}
+ .record-card-grid{display:grid;grid-template-columns:1fr;gap:0}
+ .record-card{padding:10px 2px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;box-shadow:none}
+ .compact-list-empty,.empty-state{padding:32px 8px;border:0;border-radius:0;background:transparent;text-align:center}
+
+ /* Toolbars are icon-first; controls never open a second launcher. */
+ .list-tool-button,.ui-icon-button,.mobile-page-action{width:44px;height:44px;min-width:44px;border:1px solid var(--border);border-radius:10px;background:var(--background);color:var(--foreground);box-shadow:none}
+ .list-toolbar-actions{gap:5px}
+ .list-sheet-options{display:grid;gap:0}
+ .list-sheet-options :is(button,a){min-height:50px;display:flex;align-items:center;gap:10px;padding:0 2px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;color:var(--foreground);text-align:left;text-decoration:none}
+
+ /* Details: flat information hierarchy with one next action. */
+ .detail-grid,.detail-layout,.document-detail-grid{display:grid;grid-template-columns:1fr;gap:0}
+ .detail-main-card{padding:0}
+ .detail-fields-mobile{display:grid;grid-template-columns:1fr;gap:0}
+ .detail-fields-mobile>div,.mobile-detail-more .detail-fields>div{display:grid;grid-template-columns:minmax(110px,.75fr) minmax(0,1.25fr);align-items:start;gap:12px;min-height:44px;padding:10px 0;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+ .detail-fields-mobile dt,.mobile-detail-more dt{font-size:10px;color:var(--foreground-muted)}
+ .detail-fields-mobile dd,.mobile-detail-more dd{margin:0;text-align:right;overflow-wrap:anywhere;font-size:12px;font-weight:650}
+ .mobile-detail-more{border-bottom:1px solid var(--border)}
+ .mobile-detail-more summary{min-height:46px;display:flex;align-items:center;gap:8px;list-style:none;color:var(--foreground)}
+ .mobile-detail-more summary small{margin-left:auto;color:var(--foreground-muted)}
+ .section-title{min-height:42px;margin:16px 0 0;padding:8px 0;border-bottom:1px solid var(--border)}
+ .section-title.sub-section{margin-top:18px}
+ .note-list p,.attachment-list a,.related-list a,.simple-position-list>div,.timeline-item,.task-check-list button{margin:0;padding:10px 0;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;box-shadow:none}
+ .timeline-card{margin-top:18px;padding-top:0;border-top:1px solid var(--border)}
+ .detail-workflow-button{width:100%;min-height:46px;margin:10px 0;background:var(--foreground);color:var(--background);border-color:var(--foreground)}
+ .secondary-workflow-actions{display:grid;grid-template-columns:1fr;gap:0}
+ .secondary-workflow-actions button{min-height:46px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent;color:var(--foreground);text-align:left}
+
+ /* Create/edit: one-column progressive forms, sticky primary completion. */
+ .editor-layout,.form-grid,.settings-grid,.support-detail-grid{display:grid;grid-template-columns:1fr;gap:0}
+ .form-grid>*,.record-edit-fields>*{min-width:0;margin:0;padding:0 0 12px}
+ .form-grid label>span,.ui-field-label{display:block;margin-bottom:5px;font-size:10px;font-weight:650;color:var(--foreground-muted)}
+ :is(input,textarea,select,.ui-input,.ui-select,.ui-textarea,.password-input){width:100%;min-width:0;min-height:44px;border:1px solid var(--border);border-radius:9px;background:var(--background);color:var(--foreground);box-shadow:none}
+ textarea,.ui-textarea{min-height:92px;padding-block:10px;resize:vertical}
+ .editor-side{position:static;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+ .editor-side .side-card h3,.editor-side .side-card p{display:none}
+ .editor-side .side-card{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+ .editor-side .side-card .ui-button{width:100%;min-width:0}
+ .progressive-fields-toggle{margin-top:2px;padding:0;min-height:46px;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent;color:var(--foreground)}
+ .record-edit-overlay{height:auto;max-height:min(92dvh,820px);margin-top:auto;border:1px solid var(--border);border-bottom:0;border-radius:18px 18px 0 0}
+ .ui-overlay-backdrop:has(.record-edit-overlay){align-items:end}
+ .record-edit-overlay .ui-overlay-header{padding-top:10px}
+ .record-edit-overlay .ui-overlay-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-bottom:calc(12px + var(--safe-bottom))}
+
+ /* Sheets: all short mobile choices are content-driven bottom sheets. */
+ .ui-overlay-backdrop{align-items:end;padding:0;background:rgba(0,0,0,.32);backdrop-filter:none}
+ .ui-overlay{width:100%;height:auto;max-height:min(82dvh,720px);margin:0;border:1px solid var(--border);border-bottom:0;border-radius:18px 18px 0 0;background:var(--background);box-shadow:none}
+ .ui-overlay-header{min-height:52px;padding:10px max(14px,var(--safe-right)) 8px max(14px,var(--safe-left));border-bottom:1px solid var(--border)}
+ .ui-overlay-body{padding:12px max(14px,var(--safe-right)) calc(14px + var(--safe-bottom)) max(14px,var(--safe-left));overflow:auto}
+ .ui-overlay-actions{padding:10px max(14px,var(--safe-right)) calc(10px + var(--safe-bottom)) max(14px,var(--safe-left));border-top:1px solid var(--border)}
+ .workspace-navigation-overlay{height:min(82dvh,720px);max-height:min(82dvh,720px);border-radius:18px 18px 0 0}
+
+ /* Dashboard: tasks and business areas, not decorative cards. */
+ .dashboard-heading p{display:none}
+ .dashboard-page .onboarding-checklist{margin-bottom:14px}
+ .mobile-module-overview{margin:0 0 18px}
+ .mobile-module-groups{gap:14px}
+ .mobile-module-group h3{padding:8px 0 5px;font-size:9px}
+ .mobile-module-group a{min-height:48px;padding:0 2px}
+ .metric-grid,.module-stats{margin:0 0 18px;border-block:1px solid var(--border)}
+ .metric-card,.stat-card{min-height:76px;padding:10px 8px;border-radius:0;background:transparent}
+ .metric-card strong,.stat-card strong{margin:5px 0 1px;font-size:18px;line-height:1.1}
+ .metric-card span,.stat-card span,.metric-card small,.stat-card small{font-size:9px}
+ .dashboard-grid{gap:18px}
+ .dashboard-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--border)}
+ .dashboard-quick-actions a{min-height:48px;padding:0 8px;border:0;border-right:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+ .dashboard-task-list{display:grid;gap:0}.dashboard-task-list a{min-height:52px;padding:9px 2px;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+ .attention-list a{min-height:48px;padding:0 2px;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+
+ /* Settings/profile/support: same hierarchy as every other screen. */
+ .settings-tabs{display:flex;gap:4px;overflow-x:auto;width:100%;padding:3px;border:1px solid var(--border);border-radius:10px;background:var(--background)}
+ .settings-tabs :is(button,a){flex:0 0 auto;min-height:38px;border-radius:7px;white-space:nowrap}
+ .toggle-setting-row{padding:4px 0}
+ .support-search{height:44px;margin:0 0 8px;border-color:var(--border);border-radius:9px;background:transparent}
+ .support-row{min-height:56px;padding:9px 2px;border-top:0;border-bottom:1px solid var(--border);background:transparent}
+ .support-thread>div{padding:10px 0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+
+ /* Documents and time tracking. */
+ .document-editor-grid{display:block}
+ .document-position-row{padding:12px 0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+ .document-mobile-flow-actions{background:var(--background);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border)}
+ .time-scope-switch{display:grid;grid-template-columns:1fr 1fr;padding:3px;border:1px solid var(--border);border-radius:10px;background:var(--background)}
+ .time-scope-switch button{min-height:38px;border:0;border-radius:7px;background:transparent;color:var(--foreground)}
+ .time-scope-switch button.active{background:var(--foreground);color:var(--background)}
+ .time-tracker-card,.time-tracker-card.is-active{margin-bottom:12px}
+
+ /* Feedback/state surfaces. */
+ .toast-host{pointer-events:none}.toast{pointer-events:auto}
+ .activity-empty-state{padding:18px 0;border:0;background:transparent}
+ .field-error{display:block;margin-top:4px;font-size:10px}
+ .pwa-update-notice,.connectivity-banner{left:max(12px,var(--safe-left));right:max(12px,var(--safe-right));width:auto;border-radius:10px}
+
+ /* Strict theme contract: greys are text/borders only, never large surfaces. */
+ :is(.page,.workspace-card,.card,.ui-card,.record-card,.data-row,.dashboard-quick-actions a,.dashboard-task-list a,.attention-list a,.support-thread>div,.note-list p,.related-list a,.attachment-list a){background:transparent}
+ html[data-theme="dark"] :is(.page,.workspace-card,.card,.ui-card,.record-card,.data-row,.dashboard-quick-actions a,.dashboard-task-list a,.attention-list a,.support-thread>div){background:transparent;color:#fff}
+
+ /* Safe areas + keyboard/short viewport. */
+ @supports (height:100dvh){.page{min-height:calc(100dvh - var(--app-bottom-nav-row))}}
+}
+
+@media (max-width:430px){
+ .page{padding-left:max(14px,var(--safe-left));padding-right:max(14px,var(--safe-right))}
+ .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1,.page-header h1{font-size:21px}
+ .mobile-nav{width:calc(100vw - 20px)}
+}
+
+@media (max-width:760px) and (max-height:620px){
+ .mobile-nav{height:58px}.mobile-nav-item{height:46px;min-height:46px}.mobile-nav-create-icon{width:35px;height:35px}
+ .ui-overlay{max-height:88dvh}
+}

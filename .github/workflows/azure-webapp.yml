@@ -134,22 +134,33 @@ jobs:
           app-name: binso-admin-prod
           package: deploy/binso-one.zip
 
-      - name: Verify production health
+      - name: Verify production release identity
         shell: bash
+        env:
+          EXPECTED_BUILD: ${{ github.sha }}
         run: |
           set -euo pipefail
           URL="https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/api/health"
-          echo "Waiting for $URL"
+          EXPECTED_VERSION=$(unzip -p deploy/binso-one.zip package.json | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>process.stdout.write(JSON.parse(s).version))')
+          EXPECTED_BUILD="${EXPECTED_BUILD:0:12}"
+          echo "Waiting for release v${EXPECTED_VERSION} / ${EXPECTED_BUILD}"
           for attempt in $(seq 1 30); do
-            code=$(curl -sS -o /tmp/binso-health.json -w "%{http_code}" --max-time 20 "$URL" || true)
+            code=$(curl -sS -H 'Cache-Control: no-cache, no-store' -H 'Pragma: no-cache' -o /tmp/binso-health.json -w "%{http_code}" --max-time 20 "${URL}?attempt=${attempt}&sha=${EXPECTED_BUILD}" || true)
             if [ "$code" = "200" ]; then
-              echo "Production health check passed."
-              cat /tmp/binso-health.json
-              exit 0
+              ACTUAL_STATUS=$(node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync("/tmp/binso-health.json","utf8"));process.stdout.write(String(j.status||""))')
+              ACTUAL_VERSION=$(node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync("/tmp/binso-health.json","utf8"));process.stdout.write(String(j.version||""))')
+              ACTUAL_BUILD=$(node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync("/tmp/binso-health.json","utf8"));process.stdout.write(String(j.build||""))')
+              if [ "$ACTUAL_STATUS" = "ok" ] && [ "$ACTUAL_VERSION" = "$EXPECTED_VERSION" ] && [ "$ACTUAL_BUILD" = "$EXPECTED_BUILD" ]; then
+                echo "Production release identity verified."
+                cat /tmp/binso-health.json
+                exit 0
+              fi
+              echo "Attempt $attempt/30: HTTP 200 but release identity is ${ACTUAL_STATUS} / ${ACTUAL_VERSION} / ${ACTUAL_BUILD}; waiting for ${EXPECTED_VERSION} / ${EXPECTED_BUILD}."
+            else
+              echo "Attempt $attempt/30 returned HTTP $code."
             fi
-            echo "Attempt $attempt/30 returned HTTP $code; retrying in 10s..."
             sleep 10
           done
-          echo "Production health check failed."
+          echo "Production release identity verification failed."
           cat /tmp/binso-health.json 2>/dev/null || true
           exit 1

@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 const required=[
-  "RELEASE-NOTES-v1.7.1.md","MOBILE-PWA-MASTER-AUDIT-v1.7.1.md",
-  "NAVIGATION-INVENTORY-v1.7.1.md","MOBILE-PWA-VISUAL-QA-v1.7.1.md",
+  "RELEASE-NOTES-v1.7.2.md","MOBILE-PWA-MASTER-AUDIT-v1.7.2.md",
+  "NAVIGATION-INVENTORY-v1.7.2.md","MOBILE-PWA-VISUAL-QA-v1.7.2.md",
   "app/layout.tsx","app/robots.ts","app/sitemap.ts","public/manifest.webmanifest","public/manifest-site.webmanifest","public/manifest-portal.webmanifest","public/manifest-operator.webmanifest","public/favicon.ico",
   "app/portal/page.tsx","app/portal/layout.tsx","app/operator/layout.tsx","app/api/auth/demo/route.ts",
   "components/theme-provider.tsx","components/account-preference-sync.tsx","lib/client/use-session-json-state.ts","components/support/support-new.tsx","components/mobile/mobile-list-record.tsx","components/mobile/mobile-overlays.tsx",
@@ -27,7 +27,7 @@ const cssLeftovers=obsoleteCss.filter(p=>fs.existsSync(p));
 if(cssLeftovers.length)throw new Error(`Obsolete CSS layers still present: ${cssLeftovers.join(", ")}`);
 
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
-if(pkg.version!=="1.7.1")throw new Error(`Expected package version 1.7.1, got ${pkg.version}`);
+if(pkg.version!=="1.7.2")throw new Error(`Expected package version 1.7.2, got ${pkg.version}`);
 
 for(const name of ["manifest-site.webmanifest","manifest-portal.webmanifest","manifest-operator.webmanifest"]){
  const manifest=JSON.parse(fs.readFileSync(path.join("public",name),"utf8"));
@@ -52,6 +52,12 @@ for(const marker of ["0016_self_service_signup.sql","0017_v150_code_schema_align
 const i18n=fs.readFileSync("lib/i18n.ts","utf8");
 for(const locale of ['"de"','"en"','"fr"','"it"','"tr"'])if(!i18n.includes(locale))throw new Error(`Locale ${locale} missing`);
 
+
+const globals=fs.readFileSync("app/globals.css","utf8");
+const importLines=globals.split(/\r?\n/).filter(Boolean);
+if(importLines.some(line=>!line.startsWith("@import ")))throw new Error("app/globals.css must contain imports only so the canonical Mobile/PWA layer remains last");
+if(!importLines.at(-1)?.includes("mobile-pwa.css"))throw new Error("mobile-pwa.css must be the final global CSS layer");
+
 const tokens=fs.readFileSync("styles/tokens.css","utf8");
 const responsive=fs.readFileSync("styles/responsive-central.css","utf8");
 const overlays=fs.readFileSync("styles/overlays.css","utf8");
@@ -63,7 +69,7 @@ for(const marker of [".ui-button",".ui-page-header",".pwa-update-notice"]){if(!p
 for(const marker of ["pricing-carousel","onboarding-actions"]){if(!responsive.includes(marker))throw new Error(`Responsive baseline missing ${marker}`)}
 for(const marker of ["marketing-menu-button","marketing-mobile-menu","marketing-footer",".topbar",".mobile-nav"]){if(!shellCss.includes(marker))throw new Error(`Shell baseline missing ${marker}`)}
 for(const marker of [".ui-overlay-backdrop",".ui-overlay-body",".ui-overlay-actions","@media print"]){if(!overlays.includes(marker))throw new Error(`Overlay baseline missing ${marker}`)}
-for(const marker of ["--background:#fff","--background:#000",".mobile-nav{",".mobile-account-overlay{",".document-mobile-step"]){if(!mobileCss.includes(marker))throw new Error(`Mobile/PWA v1.7.1 baseline missing ${marker}`)}
+for(const marker of ["--background:#fff","--background:#000",".mobile-nav{",".mobile-account-overlay{",".document-mobile-step","final mockup parity contract",".mobile-record-summary",".detail-fields-mobile",".dashboard-quick-actions"]){if(!mobileCss.includes(marker))throw new Error(`Mobile/PWA v1.7.2 baseline missing ${marker}`)}
 
 // Runtime SQL must not regress to the retired parallel schema.
 const retiredRuntimeTables=["users","sessions","records","support_tickets","stored_files","feedback_entries","feature_flags","announcements","platform_users","platform_sessions","platform_audit_logs","audit_logs","webhook_events","idempotency_keys"];

@@ -42,7 +42,7 @@ export default function Dashboard(){
  ].filter(Boolean) as {href:string;label:string}[];
  const actions=[["/kunden/neu","Kunde",Users],["/offerten/neu","Offerte",FileText],["/rechnungen/neu","Rechnung",ReceiptText],["/zeiterfassung/neu","Zeit",Clock3],["/projekte/neu","Projekt",FolderKanban],["/spesen/neu","Spese",WalletCards]] as const;
  return <div className="page dashboard-page">
-  <section className="page-header dashboard-heading"><div><h1>{t("Unternehmensübersicht")}</h1><p>{t("Die wichtigsten Geschäftsdaten, Kennzahlen und offenen Arbeiten auf einen Blick.")}</p></div></section>
+  <section className="page-header dashboard-heading"><div><h1><span className="desktop-heading-label">{t("Unternehmensübersicht")}</span><span className="mobile-heading-label">{t("Start")}</span></h1><p>{t("Die wichtigsten Geschäftsdaten, Kennzahlen und offenen Arbeiten auf einen Blick.")}</p></div></section>
   <OnboardingChecklist/>
   <section className="mobile-module-overview" aria-label={t("Bereiche")}><div className="section-title"><h2>{t("Bereiche")}</h2></div><div className="mobile-module-groups">{mobileMoreNavigation.map(group=>{const items=group.items.filter(item=>permissions.canModule(item.href.slice(1),"read"));if(!items.length)return null;return <div className="mobile-module-group" key={group.label}><h3>{t(group.label)}</h3>{items.map(item=>{const Icon=item.icon;return <Link href={item.href} key={item.href}><Icon size={18}/><span>{t(item.label)}</span><ArrowRight size={15}/></Link>})}</div>})}</div></section>
   <section className="metric-grid dashboard-kpi-grid">{summary.metrics.map(m=><article className="metric-card" key={m.label}><span>{t(m.label)}</span><strong>{m.value}</strong><small>{m.meta}</small></article>)}</section>
