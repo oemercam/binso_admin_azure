@@ -157,6 +157,7 @@ export function DemoPage(){
   const timer=window.setTimeout(()=>{void open()},0);
   return()=>window.clearTimeout(timer);
  },[autoStart,open]);
+ if(loading)return <div className="demo-loading-screen" role="status" aria-live="polite"><div className="demo-loading-content"><BrandLogo priority/><span className="demo-loading-spinner" aria-hidden="true"/><strong>{t("Demo wird geladen …")}</strong><p>{t("Die vorbereitete Demo wird geöffnet.")}</p></div></div>;
  return <AuthFrame variant="demo" title="Binso One Demo" text="Öffne eine vorbereitete Testfirma mit Beispieldaten. Keine Registrierung und keine Kreditkarte.">
   <div className="demo-benefits">{["Direkter Zugang ohne Konto","Vorkonfigurierte Beispieldaten","Keine echte Zahlung oder E-Mail","Demo-Sitzung läuft nach 24 Stunden ab"].map(x=><span key={x}><Check size={16}/>{t(x)}</span>)}</div>
   {error&&<div className="auth-error" role="alert">{error}</div>}

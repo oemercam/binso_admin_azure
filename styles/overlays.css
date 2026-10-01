@@ -166,3 +166,28 @@ html.binso-overlay-open,body.binso-overlay-open{overflow:hidden;overscroll-behav
 @media(max-width:430px){
   .ui-overlay-actions,.ui-action-row,.consent-actions-central{grid-template-columns:minmax(0,1fr)}
 }
+
+/* v1.6.2 workspace navigation header: brand remains visible and the menu glyph
+   morphs from hamburger to close without replacing the touch target. */
+.ui-overlay-header.has-leading{min-height:var(--app-header-row)}
+.ui-overlay-header-leading{display:flex;align-items:center;min-width:0}
+.ui-overlay-header-leading .binso-brand-stack{display:inline-flex;align-items:center}
+.ui-overlay-header-leading .binso-brand-image{display:block;width:auto;height:19px;max-width:72px;object-fit:contain}
+.ui-overlay-menu-glyph,.workspace-menu-toggle-glyph{position:relative;display:block;width:20px;height:18px;flex:0 0 20px}
+.ui-overlay-menu-glyph>span,.workspace-menu-toggle-glyph>span{position:absolute;left:1px;width:18px;height:1.7px;border-radius:999px;background:currentColor;transform-origin:center;transition:top .2s var(--ease-standard),transform .2s var(--ease-standard),opacity .14s ease}
+.ui-overlay-menu-glyph>span:nth-child(1),.workspace-menu-toggle-glyph>span:nth-child(1){top:2px}
+.ui-overlay-menu-glyph>span:nth-child(2),.workspace-menu-toggle-glyph>span:nth-child(2){top:8px}
+.ui-overlay-menu-glyph>span:nth-child(3),.workspace-menu-toggle-glyph>span:nth-child(3){top:14px}
+.ui-overlay-menu-toggle.is-open .ui-overlay-menu-glyph>span:nth-child(1),.workspace-menu-toggle-glyph.is-open>span:nth-child(1){top:8px;transform:rotate(45deg)}
+.ui-overlay-menu-toggle.is-open .ui-overlay-menu-glyph>span:nth-child(2),.workspace-menu-toggle-glyph.is-open>span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ui-overlay-menu-toggle.is-open .ui-overlay-menu-glyph>span:nth-child(3),.workspace-menu-toggle-glyph.is-open>span:nth-child(3){top:8px;transform:rotate(-45deg)}
+.ui-overlay-menu-toggle.is-open .ui-overlay-menu-glyph{animation:binso-menu-to-close .2s var(--ease-standard)}
+@keyframes binso-menu-to-close{from{transform:scale(.92);opacity:.72}to{transform:scale(1);opacity:1}}
+
+@media(max-width:760px){
+ .ui-overlay-backdrop:has(.workspace-navigation-overlay){padding:0;background:var(--surface-0)}
+ .workspace-navigation-overlay{width:100%;height:100dvh;max-height:100dvh;margin:0;border:0;border-radius:0;box-shadow:none;background:var(--surface-0)}
+ .workspace-navigation-overlay .ui-overlay-header{min-height:calc(var(--app-header-row) + var(--safe-top));padding:var(--safe-top) max(var(--app-gutter-mobile),var(--safe-right)) 0 max(var(--app-gutter-mobile),var(--safe-left));background:var(--surface-0);border-bottom:1px solid var(--surface-border)}
+ .workspace-navigation-overlay .ui-overlay-close{width:40px;min-width:40px;height:40px;flex-basis:40px}
+ .workspace-navigation-overlay .ui-overlay-body{padding:8px max(var(--app-gutter-mobile),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--app-gutter-mobile),var(--safe-left));background:var(--surface-0)}
+}

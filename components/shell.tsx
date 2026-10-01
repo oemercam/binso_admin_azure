@@ -22,7 +22,7 @@ import {portalNavigation as groups} from "@/config/navigation";
 import {planAllowsPath,type PlanId} from "@/config/plan-access";
 import {uiConfig} from "@/config/ui";
 import {
-  ChevronDown, ChevronRight, Clock3, FolderKanban, LayoutDashboard, Menu, ReceiptText, Search,
+  ChevronDown, ChevronRight, Clock3, FolderKanban, LayoutDashboard, ReceiptText, Search,
   X, Building2, LogOut, UserRound, SlidersHorizontal, Check, MessageSquareText, CreditCard, Bell, Headphones, Newspaper
 } from "lucide-react";
 
@@ -36,10 +36,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(()=>{const load=()=>{const pref=loadAppPreferences();const st=loadSettings();setCompany(pref.activeCompany||st.companyName);setActiveUserId(pref.activeUserId);setUsers(st.users);setRecords(listLocalRecords());if(!isProductionMode())setPermissionsReady(true)};const t=window.setTimeout(load,0);const unsubData=subscribeAppEvent(appEvents.dataChanged,load);const unsubSettings=subscribeAppEvent(appEvents.settingsChanged,load);return()=>{window.clearTimeout(t);unsubData();unsubSettings()}},[]);
   const searchItems=useMemo<SearchItem[]>(()=>{
     const items:SearchItem[]=[];
-    if(!isProductionMode())modules.filter(m=>!['einstellungen','berichte','lohn','mwst'].includes(m.key)).forEach(m=>getDemoModuleSeed(m.key).rows.forEach((r:string[],i:number)=>items.push({label:r[0],sub:m.label,href:`${m.href}/${i+1}`})));
+    if(!isProductionMode())modules.filter(m=>!['einstellungen','berichte','lohn','mwst'].includes(m.key)).forEach(m=>getDemoModuleSeed(m.key).rows.forEach((r:string[],i:number)=>items.push({label:t(r[0]),sub:t(m.label),href:`${m.href}/${i+1}`})));
     records.forEach(r=>items.push({label:r.row[0]||r.module,sub:r.module,href:`/${r.module}/${r.id}`}));
     return items;
-  },[records]);
+  },[records,t]);
   useEffect(()=>{const normalized=query.trim();if(!isProductionMode()||normalized.length<2)return;const controller=new AbortController();const timer=window.setTimeout(()=>{void apiFetch<{items:SearchItem[]}>(`/api/search?q=${encodeURIComponent(normalized)}`,{signal:controller.signal}).then(r=>{if(!controller.signal.aborted)setProductionSearch({query:normalized,items:r.items})}).catch(()=>{if(!controller.signal.aborted)setProductionSearch({query:normalized,items:[]})})},appConfig.searchDebounceMs);return()=>{window.clearTimeout(timer);controller.abort()}},[query]);
   const normalizedSearchQuery=query.trim();
   const searchLoading=isProductionMode()&&normalizedSearchQuery.length>=2&&productionSearch.query!==normalizedSearchQuery;
@@ -111,7 +111,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/projekte" className={active("/projekte")?"mobile-nav-item active":"mobile-nav-item"}><FolderKanban size={20}/><span>{t("Projekte")}</span></Link>
           <Link href="/zeiterfassung" className={active("/zeiterfassung")?"mobile-nav-item active":"mobile-nav-item"}><Clock3 size={20}/><span>{t("Zeit")}</span></Link>
           <Link href="/rechnungen" className={active("/rechnungen")?"mobile-nav-item active":"mobile-nav-item"}><ReceiptText size={20}/><span>{t("Rechnungen")}</span></Link>
-          <button className={moreOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setMoreOpen(true)}><Menu size={20}/><span>{t("Mehr")}</span></button>
+          <button className={moreOpen?"mobile-nav-item active":"mobile-nav-item"} onClick={()=>setMoreOpen(v=>!v)} aria-expanded={moreOpen} aria-label={t("Navigation")}><span className={`workspace-menu-toggle-glyph${moreOpen?" is-open":""}`} aria-hidden="true"><span/><span/><span/></span><span>{t("Mehr")}</span></button>
         </nav>
 
         <ResponsiveOverlay open={mobileSearchOpen} title={t("Suchen")} onClose={()=>setMobileSearchOpen(false)} size="md">
@@ -121,7 +121,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </ResponsiveOverlay>
 
-        <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={()=>setMoreOpen(false)} size="md" showHandle={false} className="workspace-navigation-overlay">
+        <ResponsiveOverlay open={moreOpen} title={t("Navigation")} onClose={()=>setMoreOpen(false)} size="md" showHandle={false} className="workspace-navigation-overlay" headerLeading={<BrandLogo/>} animatedClose>
           <div className="mobile-more-content">
             {groups.slice(1).map(group=><div className="sheet-group" key={group.label}>
               <span className="sheet-group-label">{t(group.label)}</span>

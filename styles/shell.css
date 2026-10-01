@@ -136,3 +136,18 @@
  .mobile-nav-item.active svg{stroke-width:2.3}
  .account-menu{bottom:calc(var(--app-bottom-nav-row) + var(--safe-bottom) + 8px)}
 }
+
+
+/* v1.6.0 mobile marketing navigation keeps the brand/header visible above the menu. */
+@media(max-width:900px){
+ body.marketing-menu-open .marketing-header{z-index:calc(var(--z-menu) + 1);background:var(--surface-0)}
+ body.marketing-menu-open .marketing-logo{position:relative}
+ body.marketing-menu-open .marketing-menu-button{position:relative}
+ .marketing-mobile-menu{padding-top:calc(var(--app-header-row) + 22px + var(--safe-top))}
+}
+
+/* v1.6.2: the persistent mobile More control uses the same hamburger/X geometry. */
+@media(max-width:760px){
+ .mobile-nav-item .workspace-menu-toggle-glyph{width:19px;height:19px}
+ .mobile-nav-item .workspace-menu-toggle-glyph>span{left:2px;width:15px}
+}

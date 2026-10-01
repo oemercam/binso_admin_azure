@@ -131,3 +131,130 @@ body{font-size:var(--text-base);line-height:1.45}
     white-space:nowrap;
   }
 }
+
+
+/* v1.6.0 interactive surface contract: all legacy controls inherit the same theme-safe tokens. */
+:where(
+ .toolbar-actions button,.detail-actions button,.positions-title button,.document-top-actions button,
+ .report-actions button,.workflow-actions button,.document-actions-panel button,.timer-strip button,
+ .inline-create button,.section-title button,.task-check-list button,.integration-list button,
+ .secondary-workflow-actions button,.confirm-actions>button,.text-button,.relationship-trigger,
+ .relationship-results>button,.sheet-group-links a,.mobile-action-grid a
+){border-color:var(--border);background:var(--surface);color:var(--foreground)}
+:where(.relationship-popover,.product-results,.filter-popover,.search-results,.account-menu){background:var(--surface);color:var(--foreground);border-color:var(--border)}
+:where(.relationship-results>button:hover,.relationship-results>button.selected,.product-results button:hover){background:var(--secondary);color:var(--secondary-foreground)}
+:where(.product-lookup){background:var(--surface);color:var(--foreground);border-color:var(--border)}
+:where(.form-grid input,.form-grid select,.form-grid textarea,.position-row input,.document-position-row select,
+ .auth-form input,.auth-form select,.checkout-form input,.tenant-user-create input,.tenant-user-create select,
+ .operator-create input,.operator-create select,.operator-users-row select,.table-search input,.filter-popover input,
+ .filter-popover select,.search input,.mobile-search-field input){min-width:0;max-width:100%;background:var(--surface);color:var(--foreground);border-color:var(--border)}
+:where(.workspace-toolbar,.toolbar-actions,.detail-actions,.document-top-actions,.document-relation-tools,.form-grid,
+ .position-row,.table-search,.filter-popover,.relationship-picker,.product-lookup,.search,.mobile-search-field)>*{min-width:0;max-width:100%}
+:where(button,a,input,select,textarea){-webkit-tap-highlight-color:transparent}
+html[data-theme="dark"] :where(button,input,select,textarea){color-scheme:dark}
+
+/* ==========================================================
+   Binso One v1.6.2 — final interactive-control contract
+   One-line actions, equal control heights, theme-safe surfaces
+   and viewport-safe dropdown/search/filter geometry.
+   ========================================================== */
+:where(
+ .ui-button,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,
+ .secondary-button,.secondary-inline,.marketing-secondary,.auth-submit,.plan-button,.compact-action,
+ .danger-button,.detail-workflow-button,.toolbar-actions button,.detail-actions button,
+ .document-top-actions button,.report-actions button,.workflow-actions button,
+ .document-actions-panel button,.send-actions button,.secondary-workflow-actions button,
+ .section-title button,.positions-title button,.inline-create button,.text-button
+){
+ box-sizing:border-box;
+ min-width:0;
+ height:var(--control-height);
+ min-height:var(--control-height);
+ max-height:var(--control-height);
+ padding-block:0;
+ white-space:nowrap;
+ line-height:1;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ align-items:center;
+ justify-content:center;
+}
+:where(
+ .ui-button,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,
+ .secondary-button,.secondary-inline,.marketing-secondary,.auth-submit,.plan-button,.compact-action,
+ .danger-button,.detail-workflow-button,.toolbar-actions button,.detail-actions button,
+ .document-top-actions button,.report-actions button,.workflow-actions button,
+ .document-actions-panel button,.send-actions button,.secondary-workflow-actions button,
+ .section-title button,.positions-title button,.inline-create button,.text-button
+)>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+:where(.ui-input,.ui-select,.form-grid input,.form-grid select,.auth-form input,.auth-form select,
+ .checkout-form input,.tenant-user-create input,.tenant-user-create select,.operator-create input,
+ .operator-create select,.operator-users-row select,.table-search,.mobile-search-field,.relationship-trigger){
+ box-sizing:border-box;min-width:0;max-width:100%;height:var(--control-height);min-height:var(--control-height)
+}
+:where(select,.ui-select){text-overflow:ellipsis;white-space:nowrap;padding-right:34px}
+
+/* Legacy controls may still be declared with white backgrounds in older layers;
+   the canonical layer owns their runtime theme. */
+:where(
+ .toolbar-actions button,.detail-actions button,.positions-title button,.document-top-actions button,
+ .report-actions button,.workflow-actions button,.document-actions-panel button,.send-actions button,
+ .secondary-workflow-actions button,.section-title button,.inline-create button,.text-button,
+ .relationship-trigger,.relationship-results>button,.product-results button,.filter-popover button,
+ .operator-users-row select,.operator-create input,.operator-create select,.tenant-user-create input,
+ .tenant-user-create select,.status-services>div
+){background:var(--surface);color:var(--foreground);border-color:var(--border)}
+
+:where(.search,.table-search,.mobile-search-field,.product-lookup,.relationship-trigger,
+ .relationship-popover,.product-results,.filter-popover,.search-results){
+ box-sizing:border-box;min-width:0;max-width:100%;background:var(--surface);color:var(--foreground);border-color:var(--border)
+}
+:where(.search input,.table-search input,.mobile-search-field input,.product-lookup input,
+ .relationship-search input,.filter-popover input,.filter-popover select){min-width:0;max-width:100%;color:var(--foreground);background:transparent}
+
+@media(max-width:760px){
+ :where(
+  .ui-button,.primary-button,.primary-inline,.primary-link,.marketing-primary,.operator-primary,
+  .secondary-button,.secondary-inline,.marketing-secondary,.auth-submit,.plan-button,.compact-action,
+  .danger-button,.detail-workflow-button,.toolbar-actions button,.detail-actions button,
+  .document-top-actions button,.report-actions button,.workflow-actions button,
+  .document-actions-panel button,.send-actions button,.secondary-workflow-actions button,
+  .section-title button,.positions-title button,.inline-create button,.text-button
+ ){
+  height:44px;min-height:44px;max-height:44px;padding-block:0;white-space:nowrap;
+  line-height:1;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal
+ }
+ :where(.ui-button-label){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+ :where(.ui-input,.ui-select,.form-grid input,.form-grid select,.auth-form input,.auth-form select,
+  .checkout-form input,.tenant-user-create input,.tenant-user-create select,.operator-create input,
+  .operator-create select,.operator-users-row select,.table-search,.mobile-search-field,.relationship-trigger){
+  height:44px;min-height:44px;max-height:44px
+ }
+ .toolbar-actions,.detail-actions,.document-top-actions,.workflow-actions,.send-actions,.secondary-workflow-actions{
+  align-items:stretch
+ }
+ .toolbar-actions>* ,.detail-actions>* ,.document-top-actions>* ,.workflow-actions>* ,.send-actions>* ,.secondary-workflow-actions>*{
+  min-height:44px;max-height:44px
+ }
+ .filter-popover,.relationship-popover,.product-results,.search-results{
+  box-sizing:border-box;max-width:calc(100vw - 16px);overflow-x:hidden
+ }
+ .relationship-popover,.filter-popover{left:8px;right:8px;width:auto}
+ .relationship-results>button{min-height:44px;height:auto;max-height:none;white-space:normal;overflow:visible;text-overflow:clip}
+ .sheet-group-links a{min-height:48px}
+ .sheet-group-links a span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* Remaining legacy interactive islands are normalized here because primitives.css
+   is intentionally the final CSS layer. */
+:where(.timer-strip button,.time-scope-switch button,.plan-picker button,.billing-toggle button,
+ .confirm-actions>button,.language-switcher select,.vat-method-row input,.operator-login-card input,
+ .operator-page-head>input,.settings-user-row input,.settings-user-row select){
+ border-color:var(--border);background:var(--surface);color:var(--foreground)
+}
+:where(.time-scope-switch,.billing-toggle){background:var(--secondary)}
+:where(.time-scope-switch button.active,.billing-toggle button.active,.plan-picker button.selected){background:var(--surface-raised);color:var(--foreground);border-color:var(--border-strong)}
+:where(.auth-shell,.operator-login-shell,.operator-shell){background:var(--background);color:var(--foreground)}
+:where(.auth-card,.operator-login-card,.operator-content>header,.operator-metrics article,.operator-card){background:var(--surface);color:var(--foreground);border-color:var(--border)}
+:where(.danger-zone button){background:var(--surface);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 34%,var(--border))}
