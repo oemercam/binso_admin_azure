@@ -15,6 +15,7 @@ export type RouteMetadata={
  * the More navigation so the avatar remains their primary entry point.
  */
 export const workspaceRouteMetadata:RouteMetadata[]=[
+ {prefix:"/module",parentArea:"module",titleKey:"Alle Module",navigationGroup:"Übersicht",mobileBottomNav:null,requiresAuth:true},
  {prefix:"/dashboard",parentArea:"dashboard",titleKey:"Dashboard",navigationGroup:"Übersicht",mobileBottomNav:"dashboard",requiresAuth:true},
  {prefix:"/kunden",parentArea:"kunden",titleKey:"Kunden",navigationGroup:"Verkauf",mobileBottomNav:"kunden",requiresAuth:true,quickCreateContext:"kunde"},
  {prefix:"/zeiterfassung",parentArea:"zeiterfassung",titleKey:"Zeiterfassung",navigationGroup:"Arbeit",mobileBottomNav:"zeiterfassung",requiresAuth:true,quickCreateContext:"zeit"},

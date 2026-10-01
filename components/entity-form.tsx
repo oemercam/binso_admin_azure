@@ -21,6 +21,7 @@ import {accountingDefaults} from "@/config/accounting";
 import {domainConfig} from "@/config/domain";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {DateInput,Input,NumberInput,Select,Textarea,TimeInput} from "@/components/ui/form-controls";
+import MobileBackButton from "@/components/mobile/mobile-back-button";
 
 export default function EntityForm({ title, backHref, type }: { title: string; backHref: string; type: string }) {
  const router=useRouter();
@@ -165,7 +166,8 @@ export default function EntityForm({ title, backHref, type }: { title: string; b
  }
 
  return <div className="page form-page">
-  <div className="form-title-row"><div className="form-title-copy"><h1>{t(title)}</h1><p>{t("Erfasse zuerst nur das Nötigste. Weitere Angaben kannst du jederzeit ergänzen.")}</p></div></div>
+  <div className="mobile-form-topbar"><MobileBackButton fallback={backHref}/><span>{t(title)}</span><span aria-hidden="true"/></div>
+  <div className="form-title-row"><div className="form-title-copy"><h1>{t(title)}</h1><p>{t("Erfasse zuerst nur das Nötigste. Weitere Angaben kannst du jederzeit ergänzen.")}</p><div className="mobile-form-progress" aria-hidden="true"><span className="active">1</span><i/><span>2</span><i/><span>3</span></div></div></div>
   <form className="editor-layout" onSubmit={save}>
    <section className="workspace-card editor-main">
     <div className="form-grid">{visibleFields.map(f=><div key={f.name} className={f.full?"full":""}>

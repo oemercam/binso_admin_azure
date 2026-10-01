@@ -25,7 +25,6 @@ export default function ListToolbar({query,onQueryChange,searchPlaceholder,statu
  const [searchOpen,setSearchOpen]=useState(false);
  const [filterOpen,setFilterOpen]=useState(false);
  const [sortOpen,setSortOpen]=useState(false);
- const [viewOpen,setViewOpen]=useState(false);
  const inputRef=useRef<HTMLInputElement>(null);
  function openSearch(){setSearchOpen(true);window.setTimeout(()=>inputRef.current?.focus(),0)}
  function closeSearch(){onQueryChange("");setSearchOpen(false)}
@@ -42,7 +41,7 @@ export default function ListToolbar({query,onQueryChange,searchPlaceholder,statu
    <div className="list-toolbar-actions">
     <button type="button" className={`list-tool-button${statusFilter!=="Alle"?" is-active":""}`} aria-label={t("Filter")} onClick={()=>setFilterOpen(true)}><Filter size={18}/><span>{t("Filter")}</span>{statusFilter!=="Alle"&&<i aria-hidden="true"/>}</button>
     <button type="button" className="list-tool-button" aria-label={t("Sortierung")} onClick={()=>setSortOpen(true)}><SlidersHorizontal size={18}/><span>{sort==="asc"?"A–Z":"Z–A"}</span></button>
-    <button type="button" className="list-tool-button" aria-label={t("Ansicht wechseln")} onClick={()=>setViewOpen(true)}>{view==="table"?<Grid2X2 size={18}/>:<List size={18}/>}<span>{t("Ansicht")}</span></button>
+    <button type="button" className="list-tool-button" aria-label={t("Ansicht wechseln")} onClick={()=>onView(view==="table"?"cards":"table")}>{view==="table"?<Grid2X2 size={18}/>:<List size={18}/>}<span>{t("Ansicht")}</span></button>
    </div>
   </div>
   <ResponsiveOverlay open={filterOpen} title={t("Filter")} onClose={()=>setFilterOpen(false)} size="sm">
@@ -50,9 +49,6 @@ export default function ListToolbar({query,onQueryChange,searchPlaceholder,statu
   </ResponsiveOverlay>
   <ResponsiveOverlay open={sortOpen} title={t("Sortierung")} onClose={()=>setSortOpen(false)} size="sm">
    <div className="list-sheet-options"><button className={sort==="asc"?"selected":""} onClick={()=>{onSort("asc");setSortOpen(false)}}>A–Z</button><button className={sort==="desc"?"selected":""} onClick={()=>{onSort("desc");setSortOpen(false)}}>Z–A</button></div>
-  </ResponsiveOverlay>
-  <ResponsiveOverlay open={viewOpen} title={t("Ansicht")} onClose={()=>setViewOpen(false)} size="sm">
-   <div className="list-sheet-options"><button className={view==="table"?"selected":""} onClick={()=>{onView("table");setViewOpen(false)}}><List size={17}/>{t("Liste")}</button><button className={view==="cards"?"selected":""} onClick={()=>{onView("cards");setViewOpen(false)}}><Grid2X2 size={17}/>{t("Karten")}</button></div>
   </ResponsiveOverlay>
  </>;
 }
