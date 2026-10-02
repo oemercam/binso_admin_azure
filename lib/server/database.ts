@@ -65,6 +65,12 @@ export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){
 }
 
 
+export async function userRpc<T>(fn:string,args:Record<string,unknown>={}){
+  const {token}=await currentTenant();
+  return requestDb<T>("rpc/"+fn,"POST",token,args);
+}
+
+
 export async function currentCompany(){
   const {token,tenantId}=await currentTenant();
   const rows=await requestDb<Array<Record<string,unknown>>>(
