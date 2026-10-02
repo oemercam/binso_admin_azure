@@ -161,3 +161,12 @@ button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell b
  .public-mobile-menu nav{display:grid}
  .public-mobile-menu nav:after{content:"Sicherheit   Kontakt   Datenschutz   Impressum   AGB";white-space:pre-wrap;font-size:9px;line-height:2;color:#666;border-top:1px solid var(--line);padding-top:12px;margin-top:5px}
 }
+
+/* Approved state details */
+.choice-list .flag{font-style:normal;font-size:17px;width:26px;background:transparent}.selected-check{color:var(--blue);font-size:15px}
+.team-list .avatar.blue,.team-list .avatar.owner{background:#eaf2ff;color:#1768e5}.team-list .avatar.orange{background:#fff0dc;color:#c66b00}.team-list strong{display:flex;align-items:center;gap:4px}.owner-crown{color:#e7aa19;fill:#f4c34d}.team-list em.online{color:var(--green)}.team-list em.online:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:1px}
+@media(max-width:760px){
+ .timer>div{display:grid;grid-template-columns:1fr auto}.timer>div span{grid-column:1}.timer>div strong{grid-column:1}.timer>div p{grid-column:1;margin-top:5px}
+ .pwa>svg{width:45px;height:45px;stroke-width:1.35}.pwa ol li{min-height:53px}
+ .toggle-list .switch{transform:scale(.88);transform-origin:right center}
+}
