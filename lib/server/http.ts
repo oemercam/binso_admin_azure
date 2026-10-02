@@ -5,8 +5,8 @@ export const jsonHeaders = {
   "X-Content-Type-Options":"nosniff",
 };
 
-export function json(data:unknown,status=200){
-  return NextResponse.json(data,{status,headers:jsonHeaders});
+export function json(data:unknown,status=200,headers?:HeadersInit){
+  return NextResponse.json(data,{status,headers:{...jsonHeaders,...(headers??{})}});
 }
 
 export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>{
@@ -27,13 +27,13 @@ export function assertSameOrigin(request:NextRequest){
 }
 
 export class ApiError extends Error {
-  constructor(public status:number,public code:string,message:string){
+  constructor(public status:number,public code:string,message:string,public headers?:HeadersInit){
     super(message);
   }
 }
 
 export function apiError(error:unknown){
-  if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status);
+  if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   console.error("Unhandled API error",error instanceof Error ? error.message : "unknown");
   return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden."},500);
 }
