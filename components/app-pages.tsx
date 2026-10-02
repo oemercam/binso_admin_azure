@@ -83,6 +83,55 @@ function ListToolbar({ placeholder, chips = ["Alle","Aktiv","Inaktiv"] }: { plac
   </>;
 }
 
+function RecordsView({
+  items,
+  placeholder,
+  chips = ["Alle","Aktiv","Inaktiv"],
+  children,
+}: {
+  items: string[][];
+  placeholder: string;
+  chips?: string[];
+  children: (item: string[]) => React.ReactNode;
+}) {
+  const [query,setQuery]=useState("");
+  const [activeChip,setActiveChip]=useState(chips[0] ?? "Alle");
+  const [filtersOpen,setFiltersOpen]=useState(false);
+  const [period,setPeriod]=useState("Alle");
+  const [owner,setOwner]=useState("Alle");
+
+  const normalizedChip=(value:string)=>value.toLowerCase().replace(/e?n$/, "");
+  const visible=items.filter(item=>{
+    const matchesQuery=!query.trim() || item.join(" ").toLowerCase().includes(query.trim().toLowerCase());
+    const state=item.at(-1) ?? "";
+    const type=item[1] ?? "";
+    const chip=activeChip;
+    const matchesChip=chip==="Alle" || state===chip || normalizedChip(type).startsWith(normalizedChip(chip)) || normalizedChip(chip).startsWith(normalizedChip(type));
+    return matchesQuery && matchesChip;
+  });
+
+  return <>
+    <div className="toolbar">
+      <label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
+      <div className="chips">{chips.map((x)=><button type="button" onClick={() => setActiveChip(x)} className={x===activeChip?"active":""} key={x}>{x}</button>)}</div>
+      <button className="filter-button" type="button" onClick={() => setFiltersOpen(true)}><Icon name="filter" size={17}/><span>Filter</span></button>
+    </div>
+
+    {visible.length ? <div className="records">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div> :
+      <EmptyState icon="search" title="Keine Treffer" text="Passe Suche oder Filter an, um Einträge zu finden."/>}
+
+    {filtersOpen && <div className="sheet-layer filter-layer" onMouseDown={(e)=>{if(e.target===e.currentTarget)setFiltersOpen(false)}}>
+      <section className="bottom-sheet filter-sheet" role="dialog" aria-modal="true" aria-label="Filter">
+        <div className="sheet-handle"/>
+        <header className="sheet-header"><div><h2>Filter</h2><p>Ansicht eingrenzen, ohne die Seite zu verlassen.</p></div><button className="icon-button" type="button" onClick={()=>setFiltersOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header>
+        <div className="filter-section"><b>Zeitraum</b><div className="segmented">{["Alle","30 Tage","90 Tage","Dieses Jahr"].map(x=><button type="button" className={period===x?"active":""} onClick={()=>setPeriod(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-section"><b>Zuständigkeit</b><div className="segmented">{["Alle","Ich","Team"].map(x=><button type="button" className={owner===x?"active":""} onClick={()=>setOwner(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-sheet-actions"><button type="button" className="button button-secondary" onClick={()=>{setPeriod("Alle");setOwner("Alle");setActiveChip(chips[0] ?? "Alle");setQuery("")}}>Zurücksetzen</button><button type="button" className="button button-primary" onClick={()=>setFiltersOpen(false)}>Anwenden</button></div>
+      </section>
+    </div>}
+  </>;
+}
+
 function RecordRow({ href, icon, title, meta, value, status }: { href?: string; icon?: string; title: string; meta: string; value?: string; status?: string }) {
   const body = <>
     {icon ? <span className="activity-icon"><Icon name={icon}/></span> : <span className="record-avatar">{title[0]}</span>}
@@ -149,8 +198,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <ListToolbar placeholder="Kunden suchen..."/>
-        <div className="records">{customers.map(([name,sector,city,status])=><RecordRow href="/kunden/acme" key={name} title={name} meta={`${sector} · ${city}`} status={status}/>)}</div>
+        <RecordsView items={customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
@@ -197,8 +245,7 @@ export function CustomerForm() {
 
 export function OffersPage() {
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
-    <ListToolbar placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}/>
-    <div className="records">{offers.map(([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} key={nr} icon="file" title={nr} meta={name} value={amount} status={status}/>)}</div>
+    <RecordsView items={offers} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -215,8 +262,7 @@ export function InvoicesPage() {
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
-        <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
-        <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+        <RecordsView items={invoices} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail invoice-tablet-preview">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
@@ -336,8 +382,7 @@ export function PaymentDetail() {
 
 export function ProductsPage() {
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus">Neues Produkt</Button>}>
-    <ListToolbar placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}/>
-    <div className="records">{products.map(([name,type,price,status])=><RecordRow href="/produkte/beratung" key={name} icon="box" title={name} meta={type} value={price} status={status}/>)}</div>
+    <RecordsView items={products} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -360,8 +405,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
 
 export function EmployeesPage() {
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus">Mitarbeiter</Button>}>
-    <ListToolbar placeholder="Mitarbeiter suchen..."/>
-    <div className="records">{employees.map(([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" key={name} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>)}</div>
+    <RecordsView items={employees} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -386,8 +430,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
 
 export function ExpensesPage() {
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus">Spese erfassen</Button>}>
-    <ListToolbar placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}/>
-    <div className="records">{expenses.map(([title,person,amount,status])=><RecordRow href="/spesen/1" key={title} icon="card" title={title} meta={person} value={amount} status={status}/>)}</div>
+    <RecordsView items={expenses} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
