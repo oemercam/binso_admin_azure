@@ -279,9 +279,10 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
   </AppShell>;
 }
 
-function DocumentEditor({ type, draft, onChange }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void }) {
+function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory }) {
   const totals=useDocumentTotals(draft);
-  const customer=customerData[draft.customer] ?? customerData["Acme AG"];
+  const names=Object.keys(directory);
+  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
     onChange({...draft,positions:draft.positions.map(item=>item.id===id?{...item,...patch}:item)});
@@ -297,13 +298,17 @@ function DocumentEditor({ type, draft, onChange }: { type:DocumentKind; draft:Do
     onChange({...draft,positions:draft.positions.filter(item=>item.id!==id)});
   };
 
+  if(useProductionBackend()&&names.length===0){
+    return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu">Kunde erfassen</Button>}/></section></div>;
+  }
+
   return <div className="invoice-workspace">
     <section className="invoice-form">
       <div className="form-section">
         <h2>Kunde</h2>
         <Field label="Kunde">
           <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value})}>
-            {Object.keys(customerData).map(name=><option key={name}>{name}</option>)}
+            {names.map(name=><option key={name}>{name}</option>)}
           </select>
         </Field>
         <div className="document-customer-hint"><b>{draft.customer}</b><span>{customer.sector} · {customer.city}</span></div>
@@ -338,7 +343,7 @@ function DocumentEditor({ type, draft, onChange }: { type:DocumentKind; draft:Do
       </div>
       <div className="form-section optional-row"><Field label="Notiz"><textarea value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optionaler Text für den Kunden"/></Field></div>
     </section>
-    <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft}/> : <OfferPreview draft={draft}/>}</aside>
+    <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft} directory={directory}/> : <OfferPreview draft={draft} directory={directory}/>}</aside>
   </div>;
 }
 
@@ -349,9 +354,9 @@ function DocumentModal({ title, onClose, children }: { title:string; onClose:()=
   </div>;
 }
 
-export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-019") }: { draft?:DocumentDraft }) {
+export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-019"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
   const totals=useDocumentTotals(draft);
-  const customer=customerData[draft.customer] ?? customerData["Acme AG"];
+  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
 
   return <div className="paper invoice-paper">
@@ -370,9 +375,9 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   </div>;
 }
 
-export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012") }: { draft?:DocumentDraft }) {
+export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
   const totals=useDocumentTotals(draft);
-  const customer=customerData[draft.customer] ?? customerData["Acme AG"];
+  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
 
   return <div className="paper">
     <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>ANGEBOT</span></div>
