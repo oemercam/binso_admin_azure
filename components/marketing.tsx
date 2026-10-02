@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button, Icon, IconButton, Logo } from "./ui";
+import { Button, Icon, Logo } from "./ui";
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
