@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
+import { apiGet, clearDemoClientSession, useProductionBackend } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -47,6 +48,7 @@ export function AppShell({
   const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
   const [timerNow, setTimerNow] = useState(0);
+  const [accountInitials,setAccountInitials]=useState("TM");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -68,6 +70,19 @@ export function AppShell({
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
+
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{authenticated:boolean;user?:{email?:string}}>("/api/auth/session")
+      .then(session=>{
+        const email=session.user?.email??"";
+        const local=email.split("@")[0]??"";
+        const parts=local.split(/[._-]+/).filter(Boolean);
+        const initials=(parts.length>1?(parts[0][0]+parts[1][0]):local.slice(0,2)).toUpperCase();
+        if(initials) queueMicrotask(()=>setAccountInitials(initials));
+      })
+      .catch(()=>undefined);
+  },[]);
 
   useEffect(() => {
     document.body.style.overflow = sheet ? "hidden" : "";
@@ -116,6 +131,12 @@ export function AppShell({
     window.localStorage.removeItem("binso.timer.startedAt");
   }
 
+  async function logout(){
+    clearDemoClientSession();
+    try{ await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}}); }
+    finally{ window.location.assign("/login"); }
+  }
+
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <div className="app-root">
@@ -143,7 +164,7 @@ export function AppShell({
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <IconButton label="Benachrichtigungen" icon="bell" onClick={() => setSheet("notifications")}/>
-          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">TM</Link>
+          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">{accountInitials}</Link>
         </div>
       </header>
 
@@ -201,7 +222,7 @@ export function AppShell({
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <Link href="/login"><Icon name="logout"/><span>Abmelden</span></Link>
+              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button>
             </div>
           </>}
 
