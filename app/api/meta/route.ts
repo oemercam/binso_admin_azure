@@ -1,0 +1,1 @@
+import {apiOk} from "@/lib/security";import {supportedLocales} from "@/lib/locales";import {currencies} from "@/lib/currency";import {swissVatRates} from "@/lib/vat";import {plans,roles,statuses} from "@/lib/product";export function GET(){return apiOk({supportedLocales,currencies,swissVatRates,plans,roles,statuses})}
