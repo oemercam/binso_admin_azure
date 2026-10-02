@@ -48,6 +48,8 @@ export async function POST(request:NextRequest){
   let cleanup:{bucket:string;path:string;token:string}|null=null;
   try{
     assertSameOrigin(request);
+    const length=Number(request.headers.get("content-length")??"0");
+    if(length&&length>11*1024*1024) return json({error:"request_too_large",message:"Upload ist zu gross."},413);
     const tenant=await currentTenant();
     const form=await request.formData();
     const file=form.get("file");
