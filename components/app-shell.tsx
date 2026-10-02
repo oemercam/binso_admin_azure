@@ -169,7 +169,7 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <div className="app-root">
+  return <div className={`app-root app-section-${active}`}>
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
@@ -198,7 +198,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="page-container">
+      <main className="page-container" data-section={active}>
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
           <div>
             {backHref && <Link className="desktop-back" href={backHref}><Icon name="back" size={16}/>{backLabel}</Link>}

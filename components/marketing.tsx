@@ -8,6 +8,10 @@ export function MarketingHeader() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    document.documentElement.removeAttribute("data-theme");
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
