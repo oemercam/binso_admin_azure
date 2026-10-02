@@ -550,20 +550,27 @@ export function SubscriptionSettingsPage() {
 
 export function NotificationSettingsPage() {
   const rows = [
-    ["Rechnungen","Zahlungen, Überfälligkeit und Mahnungen",true,true],
-    ["Angebote","Angenommen, abgelehnt oder abgelaufen",true,true],
-    ["Support","Neue Antworten und Statusänderungen",true,true],
-    ["Zeiterfassung","Erinnerungen und laufende Timer",false,true],
-    ["Produktupdates","Neue Funktionen und wichtige Hinweise",true,false],
+    ["Rechnungen","Zahlungen, Überfälligkeit und Mahnungen"],
+    ["Angebote","Angenommen, abgelehnt oder abgelaufen"],
+    ["Support","Neue Antworten und Statusänderungen"],
+    ["Zeiterfassung","Erinnerungen und laufende Timer"],
+    ["Produktupdates","Neue Funktionen und wichtige Hinweise"],
   ] as const;
+  const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
+    Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
+  });
+  const toggle = (title:string, channel:"email"|"push") => setPrefs(current=>({...current,[title]:{...current[title],[channel]:!current[title][channel]}}));
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text,email,push])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={email} label={`E-Mail ${title}`}/><Toggle checked={push} label={`Push ${title}`}/></div>)}</section>
+    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
   </AppShell>;
 }
 
 export function LanguageSettingsPage() {
+  const [language,setLanguage] = useState("de");
+  const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="choice-list">{[["Deutsch (Schweiz)","de","Aktiv"],["Français","fr",""],["Italiano","it",""],["English","en",""],["Türkçe","tr",""]].map(([label,code,status])=><button className={status?"selected":""} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{status || "Auswählen"}</small></div>{status?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>setLanguage(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
   </AppShell>;
 }
 
@@ -576,8 +583,19 @@ export function SecuritySettingsPage() {
 }
 
 export function AppearanceSettingsPage() {
+  const [theme,setTheme] = useState<"light"|"dark"|"system">("light");
+  const choose=(next:"light"|"dark"|"system")=>{
+    setTheme(next);
+    const resolved=next==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):next;
+    document.documentElement.dataset.theme=resolved;
+    window.localStorage.setItem("binso.theme",resolved);
+  };
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="appearance-grid"><button className="appearance-card selected"><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button><button className="appearance-card"><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button><button className="appearance-card"><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button></div>
+    <div className="appearance-grid">
+      <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
+      <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>
+      <button className={`appearance-card ${theme==="system"?"selected":""}`} onClick={()=>choose("system")}><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button>
+    </div>
   </AppShell>;
 }
 
