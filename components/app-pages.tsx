@@ -789,6 +789,26 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
 
+  const uploadSupportFile=async(file:File|undefined)=>{
+    if(!file)return;
+    if(!isProductionBackendEnabled()){
+      setToast("Datei im Demo-Modus nicht dauerhaft gespeichert.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      const form=new FormData();
+      form.append("file",file);
+      form.append("purpose","support_attachment");
+      form.append("entityId",ticketId);
+      await apiUpload("/api/files",form);
+      setToast("Datei angehängt.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Datei konnte nicht angehängt werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages")
@@ -826,7 +846,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
       </>}
       {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
-      <div className="thread-composer"><button type="button" aria-label="Datei anhängen" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
+      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div>
     {toast&&<Toast title={toast} tone="danger"/>}
   </AppShell>;
