@@ -13,7 +13,7 @@ export async function POST(request:NextRequest){
     const body=await readJson<LoginBody>(request,8192);
     const email=cleanText(body.email,320).toLowerCase();
     const password=typeof body.password==="string"?body.password:"";
-    await enforcePublicRateLimit(request,"auth.login",email,{windowSeconds:900,ipLimit:30,identityLimit:10});
+    await enforcePublicRateLimit(request,"auth.login",email);
     if(!validEmail(email)||password.length<8) return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist nicht korrekt."},400);
     const session=await passwordLogin(email,password);
     const response=json({ok:true,user:{id:session.user.id,email:session.user.email}});
