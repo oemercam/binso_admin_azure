@@ -83,6 +83,14 @@ export async function getAccessToken(){
   return store.get(accessCookie)?.value ?? null;
 }
 
+export async function requireUserNoRefresh(){
+  const store=await cookies();
+  const token=store.get(accessCookie)?.value;
+  if(!token) throw new ApiError(401,"unauthorized","Nicht angemeldet.");
+  const user=await fetchUser(token);
+  return {user,token};
+}
+
 export async function requireUser(){
   const store=await cookies();
   const token=store.get(accessCookie)?.value;
