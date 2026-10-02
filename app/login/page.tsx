@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button, Logo } from "@/components/ui";
+import { clearDemoClientSession } from "@/lib/client/backend";
 
 export default function Login() {
   const router=useRouter();
@@ -25,6 +26,7 @@ export default function Login() {
       });
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
+      clearDemoClientSession();
       const next=search.get("next");
       router.push(next&&next.startsWith("/")?next:"/dashboard");
       router.refresh();
