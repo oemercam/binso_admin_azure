@@ -286,7 +286,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
       <h3>{String(tenant?.name??"Kunde")}</h3><p>{String(tenant?.uid??"")} {tenant?.city?"· "+String(tenant.city):""}</p>
-      {tenant?.id&&<Link href={"/operator/kunden/"+String(tenant.id)}>Kundendetails öffnen →</Link>}
+      {Boolean(tenant?.id)&&<Link href={"/operator/kunden/"+String(tenant?.id)}>Kundendetails öffnen →</Link>}
       <div className="context-block"><small>Support-Zugriff</small><b>{supportAccess?"Aktiv · 30 Minuten":"Nicht aktiv"}</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary" onClick={()=>{setSupportAccess(!supportAccess);setToast(supportAccess?"Support-Zugriff beendet.":"Support-Zugriff vorbereitet. Technische Impersonation ist noch nicht aktiviert.");window.setTimeout(()=>setToast(null),2200)}}>{supportAccess?"Zugriff beenden":"Zugriff starten"}</Button></div>
     </aside>
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
