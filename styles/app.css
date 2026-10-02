@@ -170,3 +170,18 @@ button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell b
  .pwa>svg{width:45px;height:45px;stroke-width:1.35}.pwa ol li{min-height:53px}
  .toggle-list .switch{transform:scale(.88);transform-origin:right center}
 }
+
+/* Consistent mockup-derived detail and creation pages */
+@media(max-width:760px){
+ .content>.segments:first-child{margin-top:2px}
+ .detail .badge{margin-bottom:10px}
+ .detail dl{border-top:1px solid var(--line)}
+ .detail dl>div{display:grid;grid-template-columns:minmax(92px,35%) 1fr;align-items:start}
+ .detail dt{font-size:10px;color:var(--muted)}.detail dd{font-size:11px;text-align:right}
+ .form{padding-top:2px}.form textarea{min-height:84px;padding:9px 10px}.form select{height:40px;padding:0 10px}
+ .form>.primary{width:100%;margin-top:15px}
+ .content>.primary,.content>.secondary{width:100%;margin-top:9px}
+ .identity{min-height:94px;justify-content:center}.identity>strong{font-size:12px}
+ .badge,.status-inline{border-radius:999px;font-size:9px;padding:3px 7px}
+ .doclist>a>div:last-child{text-align:right;align-items:flex-end}
+}
