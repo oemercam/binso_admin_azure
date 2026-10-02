@@ -465,15 +465,56 @@ export function TimePage() {
   const [running,setRunning]=useState(true);
   const [seconds,setSeconds]=useState(8067);
   const [manualOpen,setManualOpen]=useState(false);
+  const [manualDate,setManualDate]=useState("2026-10-02");
+  const [manualDuration,setManualDuration]=useState("01:00");
+  const [manualCustomer,setManualCustomer]=useState("Acme AG");
+  const [manualProject,setManualProject]=useState("Website Redesign");
+  const [manualDescription,setManualDescription]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
+
+  const stop=async()=>{
+    setRunning(false);
+    try{
+      if(useProductionBackend()){
+        const ended=new Date();
+        const started=new Date(ended.getTime()-seconds*1000);
+        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
+      }
+      setToast("Zeiteintrag gespeichert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  const saveManual=async()=>{
+    const [hours,minutes]=manualDuration.split(":").map(Number);
+    const durationMinutes=(Number.isFinite(hours)?hours:0)*60+(Number.isFinite(minutes)?minutes:0);
+    if(durationMinutes<=0){
+      setToast("Bitte eine gültige Dauer erfassen.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      if(useProductionBackend()) await apiPost("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+      setManualOpen(false);
+      setToast("Zeiteintrag gespeichert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs"><button className="active">Timer</button><button>Einträge</button></div>
         <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
         <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Heute, 09:27</span></div></div>
-        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>setRunning(false)}>Stoppen</Button></div>
+        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
       </section>
       <section className="surface">
         <SectionTitle title="Heute" action={<strong>4:28 h</strong>}/>
@@ -481,7 +522,8 @@ export function TimePage() {
         <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
       </section>
     </div>
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field><Field label="Dauer"><input type="time" defaultValue="01:00"/></Field><Field label="Kunde"><select><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>setManualOpen(false)}>Speichern</Button></div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field><Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")?"danger":"success"}/>}
   </AppShell>;
 }
 
