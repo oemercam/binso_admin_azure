@@ -135,29 +135,52 @@ function operatorSubtitle(key: string, detail: string) {
 }
 
 function OperatorDashboard() {
-  return <>
+  const production=useBackendMode();
+  const [data,setData]=useState<{
+    stats?:Record<string,unknown>;
+    tickets?:OperatorTicket[];
+    incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>;
+  }>({});
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+  },[production]);
+
+  if(!production) return <>
     <div className="metrics-grid">
       <Metric label="Aktive Kunden" value="2’841" hint="+12%" icon="users"/>
       <Metric label="Offene Tickets" value="12" hint="4 in Bearbeitung" icon="support"/>
       <Metric label="Monatlicher Umsatz" value="CHF 49’820" hint="+8%" icon="chart"/>
       <Metric label="Systemstatus" value="Operational" hint="Alle Systeme verfügbar" icon="lock"/>
     </div>
+    <div className="operator-grid"><section className="surface"><SectionTitle title="Support" action={<Link className="text-action" href="/operator/tickets">Alle Tickets</Link>}/><div className="compact-list">{tickets.map(([nr,subject,customer,status])=><div key={nr}><b>{nr} · {subject}</b><span>{customer}</span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></div>)}</div></section><section className="surface"><SectionTitle title="Monitoring" action={<Link className="text-action" href="/operator/monitoring">Details</Link>}/><div className="service-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><span><i/>{s}</span><strong>{i<3?"Operational":"Nicht verbunden"}</strong></div>)}</div></section></div>
+  </>;
 
+  const stats=data.stats??{};
+  const recent=data.tickets??[];
+  const incidents=data.incidents??[];
+  return <>
+    <div className="metrics-grid">
+      <Metric label="Aktive Kunden" value={String(stats.tenants_active??0)} hint={String(stats.tenants_total??0)+" insgesamt"} icon="users"/>
+      <Metric label="Offene Tickets" value={String(stats.tickets_open??0)} hint={String(stats.tickets_in_progress??0)+" in Bearbeitung"} icon="support"/>
+      <Metric label="Rechnungsvolumen 30 Tage" value={"CHF "+Number(stats.documents_30d_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Kundenrechnungen" icon="chart"/>
+      <Metric label="Einschränkungen" value={String(stats.restrictions_active??0)} hint="Aktive Kontoeinschränkungen" icon="lock"/>
+    </div>
     <div className="operator-grid">
       <section className="surface">
         <SectionTitle title="Support" action={<Link className="text-action" href="/operator/tickets">Alle Tickets</Link>}/>
-        <div className="compact-list">{tickets.map(([nr,subject,customer,status])=><div key={nr}><b>{nr} · {subject}</b><span>{customer}</span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></div>)}</div>
+        {recent.length?<div className="compact-list">{recent.map(ticket=><Link href={"/operator/tickets/"+ticket.id} key={ticket.id}><b>{ticket.subject}</b><span>{ticket.tenant?.name??"Kunde"}</span><Status tone={ticket.status==="open"?"warning":"info"}>{operatorStatus(ticket.status)}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine offenen Tickets" text="Aktuell liegen keine Support-Anfragen vor."/>}
       </section>
       <section className="surface">
-        <SectionTitle title="Monitoring" action={<Link className="text-action" href="/operator/monitoring">Details</Link>}/>
-        <div className="service-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><span><i/>{s}</span><strong>{i===4?"99.98%":"99.99%"}</strong></div>)}</div>
+        <SectionTitle title="Systemereignisse" action={<Link className="text-action" href="/operator/monitoring">Monitoring</Link>}/>
+        {incidents.length?<div className="incident-history">{incidents.map(incident=><div className="incident-row" key={incident.id}><span className={"incident-dot "+(incident.status==="resolved"?"resolved":"maintenance")}/><div><b>{incident.title}</b><small>{incident.service+" · "+new Date(incident.started_at).toLocaleString("de-CH")}</small></div><Status tone={incident.status==="resolved"?"success":"warning"}>{operatorStatus(incident.status)}</Status></div>)}</div>:<div className="notice"><Status tone="success">Operational</Status><b>Keine erfassten Störungen</b><span>Für Web App, API und Datenbank sind keine aktiven Vorfälle hinterlegt.</span></div>}
       </section>
     </div>
-
     <div className="operator-grid thirds">
-      <section className="surface"><SectionTitle title="Zahlungen"/><div className="mini-stat"><span>Erfolgreich</span><strong>184</strong></div><div className="mini-stat"><span>Fehlgeschlagen</span><strong>2</strong></div><div className="mini-stat"><span>Umsatz</span><strong>CHF 49’820</strong></div></section>
-      <section className="surface"><SectionTitle title="Sperrungen"/><div className="notice"><Status tone="warning">1 aktiv</Status><b>Meier Handel AG</b><span>Zahlungsausstand seit 14 Tagen</span><Link className="text-action" href="/operator/sperrungen">Details öffnen</Link></div></section>
-      <section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Kunde aktualisiert · Acme AG</span><span><b>09:18</b> Sperrung erstellt · Meier Handel AG</span><span><b>Gestern</b> Zahlung manuell erfasst</span></div></section>
+      <section className="surface"><SectionTitle title="Abonnemente"/><div className="mini-stat"><span>Aktiv</span><strong>{String(stats.subscriptions_active??0)}</strong></div><div className="mini-stat"><span>Überfällig</span><strong>{String(stats.subscriptions_past_due??0)}</strong></div></section>
+      <section className="surface"><SectionTitle title="Kontostatus"/><div className="mini-stat"><span>Eingeschränkt / gesperrt</span><strong>{String(stats.tenants_restricted??0)}</strong></div><Link className="text-action" href="/operator/sperrungen">Einschränkungen verwalten</Link></section>
+      <section className="surface"><SectionTitle title="Kundenzahlungen"/><div className="mini-stat"><span>30 Tage</span><strong>{"CHF "+Number(stats.payments_30d_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div><span>Nur erfasste Kundenrechnungs-Zahlungen, kein SaaS-Billing.</span></section>
     </div>
   </>;
 }
