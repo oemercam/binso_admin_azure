@@ -1,0 +1,1 @@
+import {AppShell} from "@/components/app-shell";const l=["Deutsch","Français","Italiano","English","Türkçe"];export default function Sprache(){return <AppShell title="Sprache"><div className="choice-list">{l.map((x,i)=><button key={x}><span>{x}</span>{i===0&&<b>✓</b>}</button>)}</div></AppShell>}

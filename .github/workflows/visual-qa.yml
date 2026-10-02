@@ -1,0 +1,29 @@
+name: Binso One Visual QA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.0.0
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:visual
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: binso-one-visual-qa
+          path: test-results
+          retention-days: 14
