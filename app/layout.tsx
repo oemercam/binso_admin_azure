@@ -3,6 +3,7 @@ import "./globals.css";
 import "./completion.css";
 import "./completion-v04.css";
 import "./completion-v06.css";
+import "./mockup-v10.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { siteConfig } from "@/lib/config";
 
