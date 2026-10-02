@@ -42,9 +42,16 @@ export function AppShell({
 }) {
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
-  const [timerRunning, setTimerRunning] = useState(() => typeof window === "undefined" ? true : window.localStorage.getItem("binso.timer.running") !== "false");
-  const [dark, setDark] = useState(() => typeof window === "undefined" ? false : window.localStorage.getItem("binso.theme") === "dark");
+  const [timerRunning, setTimerRunning] = useState(true);
+  const [dark, setDark] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(8067);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setTimerRunning(window.localStorage.getItem("binso.timer.running") !== "false");
+      setDark(window.localStorage.getItem("binso.theme") === "dark");
+    });
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
