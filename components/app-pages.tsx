@@ -87,10 +87,11 @@ export function WelcomePage() {
 }
 
 export function CustomersPage() {
+  const customerRows=useDemoRows("customers",customers);
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <RecordsView items={customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
+        <RecordsView items={customerRows} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
