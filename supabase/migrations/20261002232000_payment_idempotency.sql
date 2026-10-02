@@ -1,4 +1,5 @@
 -- Idempotent financial write protection for payment creation.
+-- Reusing a key with different payment data is rejected rather than silently returning the wrong result.
 
 alter table public.payments
   add column if not exists idempotency_key text;
@@ -23,6 +24,9 @@ set search_path=public
 as $$
 declare
   payment public.payments;
+  normalized_method text;
+  normalized_note text;
+  normalized_date date;
 begin
   if not public.tenant_can_write(p_tenant_id) then raise exception 'tenant write denied'; end if;
   if p_amount is null or p_amount<=0 then raise exception 'invalid amount'; end if;
@@ -30,14 +34,33 @@ begin
     raise exception 'invalid idempotency key';
   end if;
 
+  normalized_method:=coalesce(nullif(trim(p_method),''),'bank');
+  normalized_note:=nullif(trim(coalesce(p_note,'')),'');
+  normalized_date:=coalesce(p_paid_on,current_date);
+
+  select * into payment
+  from public.payments
+  where tenant_id=p_tenant_id and idempotency_key=trim(p_idempotency_key)
+  limit 1;
+
+  if payment.id is not null then
+    if payment.invoice_id is distinct from p_invoice_id
+       or payment.customer_id is distinct from p_customer_id
+       or payment.paid_on is distinct from normalized_date
+       or payment.amount is distinct from p_amount
+       or payment.method is distinct from normalized_method
+       or payment.note is distinct from normalized_note then
+      raise exception 'idempotency key reused with different payload';
+    end if;
+    return payment;
+  end if;
+
   insert into public.payments(
     tenant_id,invoice_id,customer_id,paid_on,amount,method,note,status,idempotency_key
   ) values(
-    p_tenant_id,p_invoice_id,p_customer_id,coalesce(p_paid_on,current_date),p_amount,
-    coalesce(nullif(trim(p_method),''),'bank'),nullif(trim(coalesce(p_note,'')),''),'booked',trim(p_idempotency_key)
+    p_tenant_id,p_invoice_id,p_customer_id,normalized_date,p_amount,
+    normalized_method,normalized_note,'booked',trim(p_idempotency_key)
   )
-  on conflict(tenant_id,idempotency_key)
-  do update set idempotency_key=excluded.idempotency_key
   returning * into payment;
 
   return payment;
