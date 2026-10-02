@@ -454,23 +454,113 @@ export function SupportChat() {
 }
 
 export function SettingsPage() {
+  const rows = [
+    ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
+    ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
+    ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
+    ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
+    ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
+    ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
+    ["/einstellungen/darstellung","moon","Darstellung","Hell oder Dunkel"],
+    ["/support","support","Hilfe und Support","Tickets und Kontakt"],
+  ];
   return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">
     <div className="settings-list">
-      {[
-        ["user","Persönliche Daten","Name, E-Mail und Sprache"],
-        ["users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
-        ["card","Abonnement","Business · CHF 49 / Monat"],
-        ["bell","Benachrichtigungen","E-Mail und Push"],
-        ["settings","Sprache","Deutsch (Schweiz) · Französisch · Italienisch · Englisch · Türkisch"],
-        ["lock","Sicherheit","Passwort, Sitzungen und Geräte"],
-        ["settings","Darstellung","Hell oder Dunkel"],
-        ["support","Hilfe und Support","Tickets und Kontakt"],
-      ].map(([icon,title,text])=><Link href="#" key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
+      {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
     </div>
     <section className="subscription-panel">
       <div><small>Aktueller Plan</small><h2>Business</h2><p>CHF 49 / Monat · nächste Rechnung am 01.11.2026</p></div>
-      <Button variant="secondary">Plan verwalten</Button>
+      <Button href="/einstellungen/abonnement" variant="secondary">Plan verwalten</Button>
     </section>
+  </AppShell>;
+}
+
+export function AccountSettingsPage() {
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+    <div className="settings-detail-grid">
+      <section className="surface settings-profile">
+        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary">Bild ändern</Button>
+      </section>
+      <section className="settings-form">
+        <div className="form-grid two">
+          <Field label="Vorname"><input defaultValue="Thomas"/></Field>
+          <Field label="Nachname"><input defaultValue="Müller"/></Field>
+          <Field label="E-Mail"><input type="email" defaultValue="thomas@musterwerk.ch"/></Field>
+          <Field label="Telefon"><input type="tel" defaultValue="+41 79 123 45 67"/></Field>
+          <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
+          <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
+        </div>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function CompanySettingsPage() {
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+    <div className="settings-detail-grid">
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary">Logo ändern</Button></section>
+      <section className="settings-form">
+        <div className="form-grid two">
+          <Field label="Firmenname"><input defaultValue="Musterwerk AG"/></Field>
+          <Field label="UID"><input defaultValue="CHE-123.456.789"/></Field>
+          <Field label="Strasse"><input defaultValue="Bahnhofstrasse 12"/></Field>
+          <Field label="PLZ / Ort"><input defaultValue="3000 Bern"/></Field>
+          <Field label="E-Mail"><input type="email" defaultValue="info@musterwerk.ch"/></Field>
+          <Field label="Telefon"><input type="tel" defaultValue="+41 31 123 45 67"/></Field>
+          <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
+        </div>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function SubscriptionSettingsPage() {
+  return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="plan-hero">
+      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>Business</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div>
+      <div className="plan-price"><strong>CHF 49</strong><span>/ Monat</span></div>
+      <Button>Plan ändern</Button>
+    </section>
+    <div className="subscription-detail-grid">
+      <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section>
+      <section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary">Ändern</Button></div></section>
+    </div>
+    <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.08.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
+    <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger">Kündigung starten</Button></div>
+  </AppShell>;
+}
+
+export function NotificationSettingsPage() {
+  const rows = [
+    ["Rechnungen","Zahlungen, Überfälligkeit und Mahnungen",true,true],
+    ["Angebote","Angenommen, abgelehnt oder abgelaufen",true,true],
+    ["Support","Neue Antworten und Statusänderungen",true,true],
+    ["Zeiterfassung","Erinnerungen und laufende Timer",false,true],
+    ["Produktupdates","Neue Funktionen und wichtige Hinweise",true,false],
+  ] as const;
+  return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text,email,push])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={email} label={`E-Mail ${title}`}/><Toggle checked={push} label={`Push ${title}`}/></div>)}</section>
+  </AppShell>;
+}
+
+export function LanguageSettingsPage() {
+  return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="choice-list">{[["Deutsch (Schweiz)","de","Aktiv"],["Français","fr",""],["Italiano","it",""],["English","en",""],["Türkçe","tr",""]].map(([label,code,status])=><button className={status?"selected":""} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{status || "Auswählen"}</small></div>{status?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+  </AppShell>;
+}
+
+export function SecuritySettingsPage() {
+  return <AppShell title="Sicherheit" subtitle="Passwort, Sitzungen und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="surface security-card"><SectionTitle title="Passwort"/><p>Zuletzt geändert vor 63 Tagen.</p><Button variant="secondary">Passwort ändern</Button></section>
+    <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>Zusätzlicher Schutz für dein Konto.</p></div><Status tone="warning">Nicht aktiv</Status><Button>Aktivieren</Button></div></section>
+    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Biel/Bienne · Dieses Gerät · jetzt aktiv</small></div><Status tone="success">Aktiv</Status></div><div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Bern · vor 2 Stunden</small></div><button className="text-action">Abmelden</button></div></div></section>
+  </AppShell>;
+}
+
+export function AppearanceSettingsPage() {
+  return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="appearance-grid"><button className="appearance-card selected"><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button><button className="appearance-card"><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button><button className="appearance-card"><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button></div>
   </AppShell>;
 }
 
