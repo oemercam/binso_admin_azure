@@ -9,6 +9,7 @@ import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
+import { useDemoTimer } from "@/hooks/use-demo-timer";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 function useDemoRows(collection:DemoCollection, defaults:string[][]) {
@@ -356,18 +357,21 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
 }
 
 export function TimePage() {
-  const [running,setRunning]=useState(true);
-  const [seconds,setSeconds]=useState(8067);
+  const timer=useDemoTimer();
   const [manualOpen,setManualOpen]=useState(false);
-  useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
-  const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
+  const [manualToast,setManualToast]=useState(false);
+
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs"><button className="active">Timer</button><button>Einträge</button></div>
         <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
-        <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Heute, 09:27</span></div></div>
-        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>setRunning(false)}>Stoppen</Button></div>
+        <div className={`timer-ring ${timer.running?"is-running":"is-paused"}`}><div><small>{timer.running?"Läuft":"Pausiert"}</small><strong>{timer.formatted}</strong><span>Website Redesign</span></div></div>
+        <div className="timer-actions">
+          <Button onClick={timer.running?timer.pause:timer.resume} icon={timer.running?"pause":"clock"}>{timer.running?"Pause":"Fortsetzen"}</Button>
+          <Button variant="secondary" icon="stop" onClick={timer.stop}>Stoppen</Button>
+          {!timer.running&&timer.seconds>0&&<Button variant="ghost" icon="clock" onClick={timer.restart}>Neu starten</Button>}
+        </div>
       </section>
       <section className="surface">
         <SectionTitle title="Heute" action={<strong>4:28 h</strong>}/>
@@ -375,7 +379,8 @@ export function TimePage() {
         <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
       </section>
     </div>
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field><Field label="Dauer"><input type="time" defaultValue="01:00"/></Field><Field label="Kunde"><select><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>setManualOpen(false)}>Speichern</Button></div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field><Field label="Dauer"><input type="time" defaultValue="01:00"/></Field><Field label="Kunde"><select><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>{setManualOpen(false);setManualToast(true);window.setTimeout(()=>setManualToast(false),2200)}}>Speichern</Button></div></section></div>}
+    {manualToast&&<Toast title="Zeiteintrag gespeichert."/>}
   </AppShell>;
 }
 
