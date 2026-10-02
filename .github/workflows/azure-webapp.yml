@@ -79,23 +79,25 @@ jobs:
         if: always()
         shell: bash
         run: |
+          set +e
           echo "=== App Service config ==="
           az webapp config show --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --query "{linuxFxVersion:linuxFxVersion,appCommandLine:appCommandLine,alwaysOn:alwaysOn}" -o json
           echo "=== App settings ==="
           az webapp config appsettings list --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --query "[?name=='WEBSITE_RUN_FROM_PACKAGE' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='PORT' || name=='WEBSITES_PORT']" -o table
-          echo "=== Recent application logs ==="
-          az webapp log config --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --application-logging filesystem --level information --web-server-logging filesystem || true
           echo "=== Azure log download ==="
-          az webapp log download --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --log-file /tmp/logs.zip || true
-          if [ -f /tmp/logs.zip ]; then unzip -oq /tmp/logs.zip -d /tmp/azurelogs; find /tmp/azurelogs -type f -maxdepth 5 -print; grep -R -i -E "error|exception|failed|server.js|node|container" /tmp/azurelogs | tail -n 300 || true; fi
-          echo "=== Kudu log files ==="
-          TOKEN=$(az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv)
-          az rest --method post --url "https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$AZURE_WEBAPP_RG/providers/Microsoft.Web/sites/binso-admin-prod/config/publishingcredentials/list?api-version=2024-04-01" --headers "Authorization=Bearer $TOKEN" > /tmp/pub.json
-          KUDU_USER=$(jq -r .publishingUserName /tmp/pub.json)
-          KUDU_PASS=$(jq -r .publishingPassword /tmp/pub.json)
-          curl -fsS -u "$KUDU_USER:$KUDU_PASS" "https://binso-admin-prod-asctesfvhnd5b6ay.scm.switzerlandnorth-01.azurewebsites.net/api/vfs/LogFiles/" || true
-          echo "=== Docker startup log ==="
-          curl -fsS -u "$KUDU_USER:$KUDU_PASS" "https://binso-admin-prod-asctesfvhnd5b6ay.scm.switzerlandnorth-01.azurewebsites.net/api/vfs/LogFiles/default_docker.log" || true
+          rm -f /tmp/logs.zip
+          if az webapp log download --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --log-file /tmp/logs.zip; then
+            if unzip -tq /tmp/logs.zip >/dev/null 2>&1; then
+              rm -rf /tmp/azurelogs
+              mkdir -p /tmp/azurelogs
+              unzip -oq /tmp/logs.zip -d /tmp/azurelogs
+              grep -R -i -E "error|exception|failed|server.js|node|container" /tmp/azurelogs | tail -n 300 || true
+            else
+              echo "Azure returned an invalid/incomplete log archive; continuing."
+            fi
+          else
+            echo "Azure log download failed; continuing with production verification."
+          fi
       - name: Verify deployed application
         shell: bash
         run: |
