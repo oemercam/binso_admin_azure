@@ -1,0 +1,1 @@
+export async function retry<T>(work:()=>Promise<T>,attempts=3){let last:unknown;for(let i=0;i<attempts;i++){try{return await work()}catch(e){last=e}}throw last}
