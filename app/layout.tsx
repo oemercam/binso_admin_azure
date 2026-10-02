@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./completion.css";
 import "./completion-v04.css";
+import "./completion-v06.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { siteConfig } from "@/lib/config";
 
