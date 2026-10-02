@@ -214,33 +214,82 @@ function TicketsView() {
   </section>;
 }
 
-function TicketDetail() {
+function TicketDetail({ticketId}:{ticketId:string}) {
+  const production=useBackendMode();
   const [reply,setReply]=useState("");
+  const [internal,setInternal]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [supportAccess,setSupportAccess]=useState(false);
-  const send=()=>{if(!reply.trim())return;setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);};
+  const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
+  const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>("/api/operator/tickets/"+encodeURIComponent(ticketId))
+      .then(payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);}))
+      .catch(()=>undefined);
+  },[production,ticketId]);
+
+  const update=async(field:"status"|"priority",value:string)=>{
+    if(!production) return;
+    try{
+      const payload=await apiPatch<{item:Record<string,unknown>}>("/api/operator/tickets/"+encodeURIComponent(ticketId),{[field]:value});
+      setTicket(payload.item);
+      setToast("Ticket aktualisiert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Ticket konnte nicht aktualisiert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2200);
+  };
+
+  const send=async()=>{
+    const value=reply.trim();
+    if(!value)return;
+    if(!production){setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);return;}
+    try{
+      const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value,internal});
+      setMessages(current=>[...current,payload.item]);
+      setReply("");
+      setToast(internal?"Interne Notiz gespeichert.":"Antwort gesendet.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Nachricht konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2200);
+  };
+
+  if(!production) return <div className="operator-ticket-layout">
+    <section className="surface operator-thread">
+      <div className="ticket-meta-bar"><label>Status<select defaultValue="progress"><option value="open">Offen</option><option value="progress">In Bearbeitung</option><option value="waiting">Wartet auf Kunde</option><option value="solved">Gelöst</option></select></label><label>Priorität<select defaultValue="high"><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></select></label></div>
+      <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
+      <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
+      <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><Button onClick={()=>void send()}>Senden</Button></div></div>
+    </section>
+    <aside className="surface customer-context"><SectionTitle title="Kunde"/><h3>Acme AG</h3><p>Demo-Kontext</p></aside>{toast&&<Toast title={toast}/>}
+  </div>;
+
+  if(!ticket) return <section className="surface"><EmptyState icon="support" title="Ticket wird geladen" text="Die Ticketdaten werden abgerufen."/></section>;
+
+  const tenant=ticket.tenant as Record<string,unknown>|undefined;
+  const status=String(ticket.status??"open");
+  const priority=String(ticket.priority??"normal");
+
   return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
       <div className="ticket-meta-bar">
-        <label>Status<select defaultValue="progress"><option value="open">Offen</option><option value="progress">In Bearbeitung</option><option value="waiting">Wartet auf Kunde</option><option value="solved">Gelöst</option></select></label>
-        <label>Priorität<select defaultValue="high"><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></select></label>
-        <label>Zugewiesen<select defaultValue="mb"><option value="mb">Maria Bianchi</option><option value="ls">Luca Schneider</option></select></label>
+        <label>Status<select value={status} onChange={e=>void update("status",e.target.value)}><option value="open">Offen</option><option value="in_progress">In Bearbeitung</option><option value="waiting_customer">Wartet auf Kunde</option><option value="resolved">Gelöst</option><option value="closed">Geschlossen</option></select></label>
+        <label>Priorität<select value={priority} onChange={e=>void update("priority",e.target.value)}><option value="low">Niedrig</option><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></select></label>
       </div>
-      <div className="tabs"><button className="active">Konversation</button><button>Interne Notizen</button><button>Aktivitäten</button></div>
-      <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
-      <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
-      <div className="internal-note"><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>Nur für Operator sichtbar. Kundendaten und Abklärungen hier dokumentieren.</span></div><button className="text-action" onClick={()=>{setToast("Interne Notiz kann jetzt erfasst werden.");window.setTimeout(()=>setToast(null),2200)}}>Notiz hinzufügen</button></div>
-      <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><Button onClick={send}>Senden</Button></div></div>
+      <div className="tabs"><button className={!internal?"active":""} onClick={()=>setInternal(false)}>Konversation</button><button className={internal?"active":""} onClick={()=>setInternal(true)}>Interne Notiz</button></div>
+      {messages.filter(message=>internal?message.internal===true:message.internal!==true).map(message=><article className={"operator-message "+(message.author_type==="customer"?"customer":"support")} key={String(message.id)}><header><b>{message.author_type==="customer"?"Kunde":"Binso Operator"}</b><small>{new Date(String(message.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</small></header><p>{String(message.body??"")}</p>{message.internal===true&&<Status tone="neutral">Intern</Status>}</article>)}
+      <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder={internal?"Interne Notiz schreiben...":"Antwort an Kunden schreiben..."}/><div><Button onClick={()=>void send()}>{internal?"Notiz speichern":"Senden"}</Button></div></div>
     </section>
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
-      <h3>Acme AG</h3><p>K-1001 · CHE-123.456.789</p>
-      <Link href="/operator/kunden/acme">Kundendetails öffnen →</Link>
-      <div className="context-block"><small>Abonnement</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div>
-      <div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b></div>
-      <div className="context-block"><small>Support-Zugriff</small><b>{supportAccess?"Aktiv · 30 Minuten":"Nicht aktiv"}</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary" onClick={()=>{setSupportAccess(!supportAccess);setToast(supportAccess?"Support-Zugriff beendet.":"Support-Zugriff für 30 Minuten gestartet.");window.setTimeout(()=>setToast(null),2200)}}>{supportAccess?"Zugriff beenden":"Zugriff starten"}</Button></div>
+      <h3>{String(tenant?.name??"Kunde")}</h3><p>{String(tenant?.uid??"")} {tenant?.city?"· "+String(tenant.city):""}</p>
+      {tenant?.id&&<Link href={"/operator/kunden/"+String(tenant.id)}>Kundendetails öffnen →</Link>}
+      <div className="context-block"><small>Support-Zugriff</small><b>{supportAccess?"Aktiv · 30 Minuten":"Nicht aktiv"}</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary" onClick={()=>{setSupportAccess(!supportAccess);setToast(supportAccess?"Support-Zugriff beendet.":"Support-Zugriff vorbereitet. Technische Impersonation ist noch nicht aktiviert.");window.setTimeout(()=>setToast(null),2200)}}>{supportAccess?"Zugriff beenden":"Zugriff starten"}</Button></div>
     </aside>
-    {toast&&<Toast title={toast}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </div>;
 }
 
