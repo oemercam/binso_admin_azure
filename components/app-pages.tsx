@@ -11,11 +11,16 @@ import { useDemoData } from "./demo-data-provider";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 export function DashboardPage() {
+  const { data }=useDemoData();
+  const openInvoices=data.invoices.filter(row=>["Offen","Überfällig"].includes(row.at(-1)??"")).length;
+  const activeCustomers=data.customers.filter(row=>row.at(-1)==="Aktiv").length;
+  const latestInvoices=data.invoices.slice(0,3);
+
   return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="metrics-grid">
       <Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/>
-      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
-      <Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/>
+      <Metric label="Offene Rechnungen" value={String(openInvoices)} hint="inkl. überfällige Rechnungen" icon="receipt"/>
+      <Metric label="Aktive Kunden" value={String(activeCustomers)} hint={`${data.customers.length} Kunden total`} icon="users"/>
       <Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/>
     </div>
 
@@ -25,14 +30,9 @@ export function DashboardPage() {
         <div className="big-chart">{[42,54,47,68,61,76,70,84,72,90,86,96].map((h,i)=><div key={i}><i style={{height:`${h}%`}}/><span>{["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"][i]}</span></div>)}</div>
       </section>
       <section className="surface">
-        <SectionTitle title="Letzte Aktivitäten" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
+        <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
         <div className="activity-list">
-          {[
-            ["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt"],
-            ["Neuer Kunde","Berger Bau AG","users"],
-            ["Angebot angenommen","Müller GmbH · CHF 3’200.00","file"],
-            ["Zeit erfasst","Website Redesign · 4:30 h","clock"],
-          ].map(([a,b,c])=><div key={a}><span className="activity-icon"><Icon name={c}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></div>)}
+          {latestInvoices.map(([number,customer,date,amount,status])=><Link href={`/rechnungen/${number}`} key={number}><span className="activity-icon"><Icon name="receipt"/></span><div><b>{number} · {customer}</b><small>{date} · {amount} · {status}</small></div><Icon name="arrow" size={16}/></Link>)}
         </div>
       </section>
     </div>
@@ -585,36 +585,30 @@ export function AppearanceSettingsPage() {
 }
 
 export function DocumentsHubPage() {
+  const { data }=useDemoData();
+  const openOffers=data.offers.filter(row=>["Entwurf","Gesendet"].includes(row.at(-1)??""));
+  const openInvoices=data.invoices.filter(row=>["Offen","Überfällig"].includes(row.at(-1)??""));
+
   return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="metrics-grid three">
-      <Metric label="Offene Angebote" value="2" hint="CHF 10’464.32" icon="file"/>
-      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
-      <Metric label="Zahlungen im Monat" value="CHF 49’820" hint="184 Eingänge" icon="wallet"/>
+      <Metric label="Offene Angebote" value={String(openOffers.length)} hint={`${data.offers.length} Angebote total`} icon="file"/>
+      <Metric label="Offene Rechnungen" value={String(openInvoices.length)} hint={`${data.invoices.length} Rechnungen total`} icon="receipt"/>
+      <Metric label="Zahlungen" value={String(data.payments.length)} hint="erfasste Zahlungseingänge" icon="wallet"/>
     </div>
     <div className="documents-hub-grid">
       <section className="surface">
         <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/angebote/AN-2026-012"><b>AN-2026-012 · Acme AG</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link>
-          <Link href="/angebote/AN-2026-011"><b>AN-2026-011 · Müller GmbH</b><span>CHF 3’200.00</span><Status tone="neutral">Entwurf</Status></Link>
-        </div>
+        <div className="compact-list">{data.offers.slice(0,3).map(([number,customer,amount,status])=><Link href={`/angebote/${number}`} key={number}><b>{number} · {customer}</b><span>{amount}</span><Status tone={status==="Angenommen"?"success":status==="Abgelaufen"?"danger":status==="Gesendet"?"warning":"neutral"}>{status}</Status></Link>)}</div>
         <Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button>
       </section>
       <section className="surface">
         <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/rechnungen/RE-2026-019"><b>RE-2026-019 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link>
-          <Link href="/rechnungen/RE-2026-018"><b>RE-2026-018 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></Link>
-          <Link href="/rechnungen/RE-2026-017"><b>RE-2026-017 · Berger Bau AG</b><span>CHF 3’700.00</span><Status tone="danger">Überfällig</Status></Link>
-        </div>
+        <div className="compact-list">{data.invoices.slice(0,3).map(([number,customer,,amount,status])=><Link href={`/rechnungen/${number}`} key={number}><b>{number} · {customer}</b><span>{amount}</span><Status tone={status==="Bezahlt"?"success":status==="Überfällig"?"danger":"warning"}>{status}</Status></Link>)}</div>
         <Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button>
       </section>
       <section className="surface">
         <SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/zahlungen/1"><b>02.10.2026 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Verbucht</Status></Link>
-          <Link href="/zahlungen/2"><b>30.09.2026 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="success">Verbucht</Status></Link>
-        </div>
+        <div className="compact-list">{data.payments.slice(0,3).map(([id,date,customer,,amount,status])=><Link href={`/zahlungen/${id}`} key={id}><b>{date} · {customer}</b><span>{amount}</span><Status tone={status==="Verbucht"?"success":"warning"}>{status}</Status></Link>)}</div>
         <Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button>
       </section>
     </div>
