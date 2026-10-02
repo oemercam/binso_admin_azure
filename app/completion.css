@@ -1148,3 +1148,18 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
   .operator-mobile-nav a{min-height:38px;padding:0 11px;border:1px solid #ddd;border-radius:9px;display:flex;align-items:center;gap:6px;white-space:nowrap;background:#fff;font-size:10px}
   .operator-mobile-nav a.active{background:#111;color:#fff;border-color:#111}
 }
+
+
+.ticket-meta-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.ticket-meta-bar label{display:grid;gap:5px;color:var(--muted);font-size:9px;font-weight:700}
+.ticket-meta-bar select{height:38px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 9px;font-size:11px}
+.internal-note{margin-top:18px;border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:start;background:var(--soft)}
+.internal-note b,.internal-note span{display:block}
+.internal-note b{font-size:10px}
+.internal-note span{color:var(--muted);font-size:9px;margin-top:2px;line-height:1.4}
+.internal-note .text-action{align-self:center}
+@media(max-width:760px){
+ .ticket-meta-bar{grid-template-columns:1fr}
+ .internal-note{grid-template-columns:auto 1fr}
+ .internal-note .text-action{grid-column:1/-1;justify-self:start}
+}
