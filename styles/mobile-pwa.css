@@ -710,3 +710,168 @@
  .mobile-nav{height:52px}.mobile-nav-item{height:44px;min-height:44px}.mobile-nav-create-icon{width:32px;height:32px}
  .page{padding-bottom:calc(68px + var(--safe-bottom))}
 }
+
+
+/* ==========================================================
+   Binso One v1.8.4 - central UX refinement pass
+   ========================================================== */
+
+/* Binso One v1.8.4 — central UX refinement pass.
+   Loaded last. Mobile/PWA is deliberately monochrome and divider-led. */
+
+@media (max-width:760px){
+  :root{
+    --page-gutter-mobile:16px;
+    --mobile-content-top:12px;
+    --mobile-section-space:20px;
+    --mobile-block-space:14px;
+  }
+
+  html:not([data-theme="dark"]){
+    --background:#fff;--surface:#fff;--surface-subtle:#fff;--surface-raised:#fff;
+    --surface-0:#fff;--surface-1:#fff;--surface-2:#fff;--surface-3:#fff;
+    --foreground:#000;--foreground-muted:rgba(0,0,0,.58);
+    --border:rgba(0,0,0,.14);--border-strong:rgba(0,0,0,.26);
+  }
+  html[data-theme="dark"]{
+    --background:#000;--surface:#000;--surface-subtle:#000;--surface-raised:#000;
+    --surface-0:#000;--surface-1:#000;--surface-2:#000;--surface-3:#000;
+    --foreground:#fff;--foreground-muted:rgba(255,255,255,.62);
+    --border:rgba(255,255,255,.18);--border-strong:rgba(255,255,255,.30);
+  }
+
+  body,.app-shell,.content-shell,.page{background:var(--background);color:var(--foreground)}
+  .page{padding-top:12px}
+  .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1{
+    font-size:21px;line-height:1.15;letter-spacing:-.025em
+  }
+
+  /* No decorative outer cards on mobile. */
+  :is(.workspace-card,.card,.ui-card,.metric-card,.stat-card,.side-card){
+    box-shadow:none;
+  }
+  :is(.list-workspace-card,.detail-main-card,.timeline-card,.dashboard-quick-card,.dashboard-tasks-card){
+    border:0;border-radius:0;background:transparent;padding-left:0;padding-right:0;
+  }
+
+  /* Lists are compact rows with dividers, never nested cards. */
+  .list-workspace-card{margin:0}
+  .data-row:not(.data-head){
+    min-height:56px;padding:9px 0;border-bottom:1px solid var(--border);
+  }
+  .record-card{
+    min-height:56px;padding-top:9px;padding-bottom:9px;border-bottom:1px solid var(--border);
+  }
+  .mobile-record-primary,.record-card>div>strong{font-size:13px;font-weight:700}
+  .mobile-record-secondary,.record-card-mobile-summary{font-size:10px}
+  .mobile-record-status,.record-card>em{
+    background:transparent;color:var(--foreground);
+    border:1px solid var(--border);box-shadow:none;
+  }
+
+  /* Toolbar actions are direct compact controls. */
+  .list-toolbar{margin-bottom:6px}
+  .list-tool-button,.ui-icon-button{
+    background:transparent;border-color:var(--border);box-shadow:none;
+  }
+  .list-tool-button:active,.ui-icon-button:active{background:transparent}
+
+  /* Dashboard: no grey landscape and no oversized cards. */
+  .mobile-dashboard-content{display:grid;gap:20px}
+  .mobile-dashboard-today{margin:0}
+  .mobile-dashboard-kpis{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  }
+  .mobile-dashboard-kpi{
+    min-height:82px;padding:11px 10px;border:0;border-radius:0;background:transparent;
+    border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  }
+  .mobile-dashboard-kpi:nth-child(2n){border-right:0}
+  .mobile-dashboard-kpi:nth-last-child(-n+2){border-bottom:0}
+  .mobile-dashboard-kpi span{font-size:10px;color:var(--foreground-muted)}
+  .mobile-dashboard-kpi strong{font-size:20px;line-height:1.1;margin-top:6px}
+  .mobile-dashboard-kpi small{font-size:9px;color:var(--foreground-muted)}
+  .mobile-dashboard-section{margin:0}
+  .mobile-section-heading{margin-bottom:6px}
+  .mobile-activity-list{border-top:1px solid var(--border)}
+  .mobile-activity-list>a{
+    min-height:52px;padding:8px 0;border-bottom:1px solid var(--border);
+    border-radius:0;background:transparent;
+  }
+
+  /* Bottom navigation: stable floating app navigation. */
+  .mobile-nav{
+    left:max(12px,var(--safe-left));right:max(12px,var(--safe-right));
+    bottom:max(10px,var(--safe-bottom));height:62px;padding:5px 7px;
+    border:1px solid var(--border);border-radius:999px;background:var(--background);
+    box-shadow:none;
+  }
+  .mobile-nav-item{background:transparent;color:var(--foreground-muted)}
+  .mobile-nav-item.active{color:var(--foreground);font-weight:750}
+
+  /* Bottom sheets: full width, safe area, no clipping. */
+  .ui-overlay-backdrop:has(.mobile-quick-create-overlay),
+  .ui-overlay-backdrop:has(.mobile-account-overlay){
+    align-items:end;padding:0;background:var(--overlay);
+  }
+  .mobile-quick-create-overlay,.mobile-account-overlay{
+    width:100%;max-width:none;margin:0;border:1px solid var(--border);border-bottom:0;
+    border-radius:18px 18px 0 0;background:var(--background);box-shadow:none;
+  }
+  .mobile-quick-create-overlay .ui-overlay-body,
+  .mobile-account-overlay .ui-overlay-body{
+    padding-bottom:calc(14px + var(--safe-bottom));
+  }
+
+  /* Active timer and success/error notices remain visible at the top. */
+  .active-time-tracker{
+    position:fixed;top:calc(var(--safe-top) + 8px);left:50%;right:auto;bottom:auto;
+    transform:translateX(-50%);z-index:var(--z-toast);
+    max-width:calc(100vw - 150px);background:var(--background);
+    border:1px solid var(--border);box-shadow:none;
+  }
+  .toast-host{
+    position:fixed;top:calc(var(--safe-top) + 8px);right:max(12px,var(--safe-right));
+    bottom:auto;left:max(12px,var(--safe-left));z-index:var(--z-toast);max-width:none;
+  }
+  body:has(.active-time-tracker) .toast-host{top:calc(var(--safe-top) + 48px)}
+  .toast{
+    background:var(--background);color:var(--foreground);
+    border:1px solid var(--border);box-shadow:none;
+  }
+
+  /* Auth: logo must never collide with heading. */
+  .auth-shell{
+    display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;
+    min-height:100dvh;padding:calc(var(--safe-top) + 20px) 16px calc(var(--safe-bottom) + 24px);
+    background:var(--background);
+  }
+  .auth-logo{
+    position:static;display:inline-flex;align-self:flex-start;margin:0 0 34px;
+  }
+  .auth-language{
+    position:absolute;top:calc(var(--safe-top) + 14px);right:max(16px,var(--safe-right));
+  }
+  .auth-card{
+    width:100%;max-width:520px;margin:0 auto;padding:0;border:0;border-radius:0;
+    background:transparent;box-shadow:none;
+  }
+  .auth-intro h1{font-size:28px;line-height:1.08;margin-bottom:8px}
+  .auth-intro p{font-size:13px;line-height:1.5;margin-bottom:22px;color:var(--foreground-muted)}
+  .auth-foot{position:static;margin:28px auto 0;text-align:center;color:var(--foreground-muted)}
+  .auth-form input,.auth-form select,.password-input{background:var(--background);color:var(--foreground)}
+  .demo-login-note{border-color:var(--border)}
+
+  /* Settings and forms follow the same flat hierarchy. */
+  .settings-grid>.workspace-card,.ui-form-section{
+    border:0;border-radius:0;background:transparent;box-shadow:none;
+  }
+  .ui-form-section+.ui-form-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+}
+
+@media (max-width:430px){
+  :root{--page-gutter-mobile:14px}
+  .page h1,.module-heading h1,.detail-heading h1,.form-title-row h1{font-size:20px}
+}
+
