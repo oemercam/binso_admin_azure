@@ -184,15 +184,21 @@ export function CustomerForm() {
   const [city,setCity]=useState("");
   const [sector,setSector]=useState("Dienstleistung");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
-    setToast("Kunde gespeichert.");
-    window.setTimeout(()=>router.push("/kunden"),700);
+    try{
+      if(useProductionBackend()) await apiPost("/api/customers",{name:company.trim(),sector,email,phone,city});
+      else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
+      setToast("Kunde gespeichert.");
+      window.setTimeout(()=>router.push("/kunden"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
@@ -248,18 +254,26 @@ export function PaymentForm() {
   const [amount,setAmount]=useState("4346.40");
   const [method,setMethod]=useState("Banküberweisung");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     const value=Number(amount.replace(",","."));
     if(!Number.isFinite(value)||value<=0){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    const id=String(Date.now());
-    const swissDate=date.split("-").reverse().join(".");
-    appendDemoRow("payments",[id,swissDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
-    setToast("Zahlung gespeichert.");
-    window.setTimeout(()=>router.push("/zahlungen"),700);
+    try{
+      if(useProductionBackend()) await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""});
+      else{
+        const id=String(Date.now());
+        const displayDate=date.split("-").reverse().join(".");
+        appendDemoRow("payments",[id,displayDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
+      }
+      setToast("Zahlung gespeichert.");
+      window.setTimeout(()=>router.push("/zahlungen"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
@@ -296,11 +310,20 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
   const [type,setType]=useState("Dienstleistung");
   const [price,setPrice]=useState(existing?"120.00":"");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!name.trim()||!price.trim()){setToast("Name und Verkaufspreis sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("products",[name.trim(),type,`CHF ${Number(price.replace(",",".")).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
-    setToast("Produkt gespeichert.");
-    window.setTimeout(()=>router.push("/produkte"),700);
+    try{
+      const numericPrice=Number(price.replace(",","."));
+      if(!existing){
+        if(useProductionBackend()) await apiPost("/api/products",{name:name.trim(),kind:type==="Produkt"?"product":"service",unitPrice:numericPrice,vatRate:8.1,unit:type==="Produkt"?"piece":"hour"});
+        else appendDemoRow("products",[name.trim(),type,`CHF ${numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
+      }
+      setToast("Produkt gespeichert.");
+      window.setTimeout(()=>router.push("/produkte"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Produkt konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
@@ -334,11 +357,19 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
   const [load,setLoad]=useState(existing?"100":"100");
   const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
-    setToast("Mitarbeiter gespeichert.");
-    window.setTimeout(()=>router.push("/mitarbeiter"),700);
+    try{
+      if(!existing){
+        if(useProductionBackend()) await apiPost("/api/employees",{firstName:firstName.trim(),lastName:lastName.trim(),jobTitle:role.trim(),workloadPercent:Number(load),status:status==="Inaktiv"?"inactive":"active"});
+        else appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
+      }
+      setToast("Mitarbeiter gespeichert.");
+      window.setTimeout(()=>router.push("/mitarbeiter"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Mitarbeiter konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
     {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
@@ -373,12 +404,20 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
   const [amount,setAmount]=useState(existing?"280.00":"");
   const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     const value=Number(amount.replace(",","."));
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
-    setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
-    window.setTimeout(()=>router.push("/spesen"),700);
+    try{
+      if(!existing){
+        if(useProductionBackend()) await apiPost("/api/expenses",{employeeName:person,merchant:description.trim()||category,expenseDate:"2026-10-02",category,amount:value,currency:"CHF",vatRate:8.1,description,status:"submitted"});
+        else appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
+      }
+      setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
+      window.setTimeout(()=>router.push("/spesen"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
