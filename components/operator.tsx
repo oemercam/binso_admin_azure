@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
@@ -377,13 +377,13 @@ function SubscriptionsView() {
   const [selected,setSelected]=useState<Record<string,unknown>|null>(null);
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=()=>{
+  const load=useCallback(()=>{
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/accounts")
       .then(payload=>setItems(payload.items))
       .catch(()=>undefined);
-  };
-  useEffect(()=>{load();},[production]);
+  },[production]);
+  useEffect(()=>{load();},[load]);
 
   const updateSelected=async(patch:Record<string,unknown>)=>{
     if(!selected||!production)return;
@@ -430,12 +430,12 @@ function RestrictionsView() {
   const [confirm,setConfirm]=useState<"create"|string|null>(null);
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=()=>{
+  const load=useCallback(()=>{
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/restrictions").then(payload=>setItems(payload.items)).catch(()=>undefined);
-  };
+  },[production]);
 
-  useEffect(()=>{load();},[production]);
+  useEffect(()=>{load();},[load]);
   useEffect(()=>{if(production&&!tenantId&&customers[0]) queueMicrotask(()=>setTenantId(customers[0].id));},[production,tenantId,customers]);
 
   const createRestriction=async()=>{
@@ -528,14 +528,14 @@ function AnnouncementsView() {
   const [body,setBody]=useState("");
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=()=>{
+  const load=useCallback(()=>{
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/announcements")
       .then(payload=>setItems(payload.items))
       .catch(()=>undefined);
-  };
+  },[production]);
 
-  useEffect(()=>{load();},[production]);
+  useEffect(()=>{load();},[load]);
 
   const publish=async()=>{
     if(!title.trim()||!body.trim()){
