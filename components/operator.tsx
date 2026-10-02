@@ -386,13 +386,66 @@ function SubscriptionsView() {
 }
 
 function RestrictionsView() {
-  const [confirm,setConfirm]=useState<"create"|"remove"|null>(null);
+  const production=useBackendMode();
+  const {items:customers}=useOperatorCustomers();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  const [tenantId,setTenantId]=useState("");
+  const [reason,setReason]=useState("Zahlungsausstand");
+  const [scope,setScope]=useState("write");
+  const [endsAt,setEndsAt]=useState("");
+  const [note,setNote]=useState("");
+  const [confirm,setConfirm]=useState<"create"|string|null>(null);
+  const [toast,setToast]=useState<string|null>(null);
+
+  const load=()=>{
+    if(!production) return;
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/restrictions").then(payload=>setItems(payload.items)).catch(()=>undefined);
+  };
+
+  useEffect(()=>{load();},[production]);
+  useEffect(()=>{if(production&&!tenantId&&customers[0]) queueMicrotask(()=>setTenantId(customers[0].id));},[production,tenantId,customers]);
+
+  const createRestriction=async()=>{
+    if(!production){setConfirm(null);setToast("Einschränkung im Demo-Modus simuliert.");window.setTimeout(()=>setToast(null),2200);return;}
+    try{
+      await apiPost("/api/operator/restrictions",{tenantId,scope,reason,note:note.trim()||reason,endsAt:endsAt||null});
+      setConfirm(null);setNote("");setEndsAt("");
+      await load();
+      setToast("Einschränkung erstellt und im Audit protokolliert.");
+    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht erstellt werden.");}
+    window.setTimeout(()=>setToast(null),2600);
+  };
+
+  const removeRestriction=async(id:string)=>{
+    if(!production){setConfirm(null);return;}
+    try{
+      await apiPatch("/api/operator/restrictions/"+encodeURIComponent(id),{active:false});
+      setConfirm(null);await load();setToast("Einschränkung aufgehoben.");
+    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht aufgehoben werden.");}
+    window.setTimeout(()=>setToast(null),2600);
+  };
+
+  const active=production?items.filter(item=>item.active===true):[];
   return <>
     <div className="operator-grid">
-      <section className="surface restriction-form"><SectionTitle title="Sperrung erstellen"/><div className="form-grid two"><label>Kunde<select><option>Meier Handel AG</option></select></label><label>Grund<select><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option></select></label><label>Umfang<select><option>Gesamter Zugriff</option><option>Nur Schreibzugriff</option></select></label><label>Ablaufdatum<input type="date"/></label><label className="full">Interne Begründung<textarea defaultValue="Ausstehende Zahlung seit 14 Tagen. Mehrfache Mahnung ohne Reaktion."/></label></div><Button variant="danger" onClick={()=>setConfirm("create")}>Sperrung erstellen</Button></section>
-      <section className="surface"><SectionTitle title="Aktive Einschränkungen"/><div className="notice"><Status tone="warning">Eingeschränkt</Status><b>Meier Handel AG</b><span>Zahlungsausstand · seit 18.09.2026</span><Button variant="secondary" onClick={()=>setConfirm("remove")}>Aufheben</Button></div></section>
+      <section className="surface restriction-form">
+        <SectionTitle title="Einschränkung erstellen"/>
+        <div className="form-grid two">
+          <label>Kunde<select value={tenantId} onChange={e=>setTenantId(e.target.value)}>{production?customers.map(customer=><option value={customer.id} key={customer.id}>{customer.name}</option>):<option>Meier Handel AG</option>}</select></label>
+          <label>Grund<select value={reason} onChange={e=>setReason(e.target.value)}><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option><option>Manuelle Prüfung</option></select></label>
+          <label>Umfang<select value={scope} onChange={e=>setScope(e.target.value)}><option value="all">Gesamter Zugriff</option><option value="write">Nur Schreibzugriff</option></select></label>
+          <label>Ablaufdatum<input type="date" value={endsAt} onChange={e=>setEndsAt(e.target.value)}/></label>
+          <label className="full">Interne Begründung<textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Begründung für Audit und interne Nachvollziehbarkeit"/></label>
+        </div>
+        <Button variant="danger" onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung erstellen</Button>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Aktive Einschränkungen"/>
+        {production?(active.length?active.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <div className="notice" key={String(item.id)}><Status tone="warning">{item.scope==="all"?"Gesperrt":"Eingeschränkt"}</Status><b>{tenant?.name??"Kunde"}</b><span>{String(item.reason??"")} · seit {new Date(String(item.starts_at)).toLocaleDateString("de-CH")}</span><Button variant="secondary" onClick={()=>setConfirm(String(item.id))}>Aufheben</Button></div>}):<EmptyState icon="lock" title="Keine aktiven Einschränkungen" text="Alle Kundenkonten sind ohne Operator-Einschränkung."/>):<div className="notice"><Status tone="warning">Demo</Status><b>Meier Handel AG</b><span>Zahlungsausstand · Beispiel</span><Button variant="secondary" onClick={()=>setConfirm("demo")}>Aufheben</Button></div>}
+      </section>
     </div>
-    {confirm&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirm(null)}}><section className="operator-confirm" role="dialog" aria-modal="true"><span className="confirm-icon"><Icon name="lock"/></span><h2>{confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"}</h2><p>{confirm==="create"?"Der Kunde kann je nach Umfang nicht mehr auf Binso One zugreifen. Die Aktion wird mit Begründung im Audit protokolliert.":"Der normale Zugriff für Meier Handel AG wird wiederhergestellt. Auch diese Aktion wird protokolliert."}</p><div><Button variant="secondary" onClick={()=>setConfirm(null)}>Abbrechen</Button><Button variant={confirm==="create"?"danger":"primary"} onClick={()=>setConfirm(null)}>{confirm==="create"?"Einschränken":"Aufheben"}</Button></div></section></div>}
+    {confirm&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirm(null)}}><section className="operator-confirm" role="dialog" aria-modal="true"><span className="confirm-icon"><Icon name="lock"/></span><h2>{confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"}</h2><p>{confirm==="create"?"Der Zugriff wird gemäss Umfang eingeschränkt. Grund, Operator und Zeitpunkt werden im Audit protokolliert.":"Der normale Zugriff wird wiederhergestellt, sofern keine weitere aktive Einschränkung besteht."}</p><div><Button variant="secondary" onClick={()=>setConfirm(null)}>Abbrechen</Button><Button variant={confirm==="create"?"danger":"primary"} onClick={()=>confirm==="create"?void createRestriction():void removeRestriction(confirm)}>{confirm==="create"?"Einschränken":"Aufheben"}</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
