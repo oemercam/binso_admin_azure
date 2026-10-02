@@ -22,17 +22,12 @@ function formatMoney(value: number) {
   return value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-function nextDocumentNumber(prefix: "AN"|"RE") {
-  const stamp=String(Date.now()).slice(-6);
-  return `${prefix}-2026-${stamp}`;
-}
-
 export function OfferEditor({ existing = false }: { existing?: boolean }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
+  const { addRecord, data }=useDemoData();
   const [preview,setPreview]=useState(false);
   const [customer,setCustomer]=useState("Acme AG");
-  const [number]=useState(existing?"AN-2026-012":nextDocumentNumber("AN"));
+  const number=existing?"AN-2026-012":`AN-2026-${String(100+data.offers.length+1).padStart(3,"0")}`;
   const [positions,setPositions]=useState<Position[]>([
     { description:"Website Konzept", quantity:"24", price:"120.00" },
     { description:"Design & Umsetzung", quantity:"12", price:"95.00" },
@@ -56,11 +51,11 @@ export function OfferEditor({ existing = false }: { existing?: boolean }) {
 
 export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
+  const { addRecord, data }=useDemoData();
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [customer,setCustomer]=useState("Acme AG");
-  const [number]=useState(existing?"RE-2026-019":nextDocumentNumber("RE"));
+  const number=existing?"RE-2026-019":`RE-2026-${String(100+data.invoices.length+1).padStart(3,"0")}`;
   const [positions,setPositions]=useState<Position[]>([
     { description:"Website Konzept", quantity:"24", price:"120.00" },
     { description:"Design & Umsetzung", quantity:"12", price:"95.00" },
@@ -77,7 +72,8 @@ export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   };
 
   const duplicate=()=>{
-    addRecord("invoices",[nextDocumentNumber("RE"),customer,"02.10.2026",`CHF ${formatMoney(total)}`,"Offen"]);
+    const duplicateNumber=`RE-2026-${String(100+data.invoices.length+2).padStart(3,"0")}`;
+    addRecord("invoices",[duplicateNumber,customer,"02.10.2026",`CHF ${formatMoney(total)}`,"Offen"]);
     show("Rechnung wurde als neuer Entwurf dupliziert.");
   };
 
