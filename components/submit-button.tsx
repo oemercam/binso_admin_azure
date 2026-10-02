@@ -1,0 +1,1 @@
+"use client";import {useState} from "react";export function SubmitButton({children="Speichern"}:{children?:React.ReactNode}){const[done,setDone]=useState(false);return <button className="primary" type="button" onClick={()=>{setDone(true);setTimeout(()=>setDone(false),1800)}}>{done?"Gespeichert":children}</button>}
