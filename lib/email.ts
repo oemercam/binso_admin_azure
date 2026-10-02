@@ -1,0 +1,1 @@
+export type EmailMessage={to:string;subject:string;text:string;replyTo?:string};export function validateEmailMessage(m:EmailMessage){if(!m.to||!m.subject||!m.text)throw new Error("EMAIL_MESSAGE_INVALID");return m}
