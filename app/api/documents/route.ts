@@ -26,7 +26,7 @@ export async function POST(request:NextRequest){
     const number=cleanText(body.number,80);
     const issueDate=cleanText(body.issueDate,20);
     const rawItems=Array.isArray(body.items)?body.items as Line[]:[];
-    if(!kind||!customerName||!number||!issueDate||rawItems.length===0) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
+    if(!kind||!customerName||!issueDate||rawItems.length===0) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
 
     const customers=await tenantList<{id:string}>("customers","id","name=eq."+encodeURIComponent(customerName)+"&limit=1");
     const customer=customers[0];
@@ -41,7 +41,7 @@ export async function POST(request:NextRequest){
       return json({error:"invalid_line_items",message:"Mindestens eine Position ist ungültig."},400);
     }
 
-    const result=await tenantRpc("create_document_atomic",{
+    const result=await tenantRpc<Record<string,unknown>|Array<Record<string,unknown>>>("create_document_atomic",{
       p_customer_id:customer.id,
       p_kind:kind,
       p_number:number,
@@ -53,6 +53,8 @@ export async function POST(request:NextRequest){
       p_currency:cleanText(body.currency,3)||"CHF",
       p_items:items,
     });
-    return json({item:result},201);
+    const item=Array.isArray(result)?result[0]:result;
+    if(!item) return json({error:"document_create_failed",message:"Dokument konnte nicht erstellt werden."},500);
+    return json({item},201);
   }catch(error){return apiError(error);}
 }
