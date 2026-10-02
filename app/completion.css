@@ -1139,3 +1139,12 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
 @media(max-width:760px){
   .app-main:has(.global-timer) .thread-composer{bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 66px)}
 }
+
+
+.operator-mobile-nav{display:none}
+@media(max-width:760px){
+  .operator-mobile-nav{display:flex;gap:6px;overflow:auto;margin:0 -12px 16px;padding:0 12px 8px;border-bottom:1px solid #ddd;scrollbar-width:none}
+  .operator-mobile-nav::-webkit-scrollbar{display:none}
+  .operator-mobile-nav a{min-height:38px;padding:0 11px;border:1px solid #ddd;border-radius:9px;display:flex;align-items:center;gap:6px;white-space:nowrap;background:#fff;font-size:10px}
+  .operator-mobile-nav a.active{background:#111;color:#fff;border-color:#111}
+}
