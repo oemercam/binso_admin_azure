@@ -1,0 +1,1 @@
+import {newId} from "./ids";import {validateProject,type ProjectInput} from "./project-input";export function createProject(organisationId:string,input:ProjectInput,now=new Date()){const v=validateProject(input);return {id:newId(),organisationId,...v,status:"Entwurf" as const,createdAt:now.toISOString(),updatedAt:now.toISOString()}}
