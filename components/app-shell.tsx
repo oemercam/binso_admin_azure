@@ -44,11 +44,23 @@ export function AppShell({
   const [query, setQuery] = useState("");
   const [timerRunning, setTimerRunning] = useState(true);
   const [dark, setDark] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(8067);
+  const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
+  const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
+  const [timerNow, setTimerNow] = useState(0);
 
   useEffect(() => {
     queueMicrotask(() => {
-      setTimerRunning(window.localStorage.getItem("binso.timer.running") !== "false");
+      const running=window.localStorage.getItem("binso.timer.running") !== "false";
+      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "8067");
+      let startedAt=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
+      if(running && !startedAt){
+        startedAt=Date.now();
+        window.localStorage.setItem("binso.timer.startedAt",String(startedAt));
+      }
+      setTimerRunning(running);
+      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 8067);
+      setTimerStartedAt(running ? startedAt : null);
+      setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
     });
   }, []);
@@ -63,8 +75,20 @@ export function AppShell({
   }, [sheet]);
 
   useEffect(() => {
+    const onKeyDown=(event:KeyboardEvent)=>{
+      if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k"){
+        event.preventDefault();
+        setSheet("search");
+      }
+      if(event.key==="Escape") setSheet(null);
+    };
+    window.addEventListener("keydown",onKeyDown);
+    return()=>window.removeEventListener("keydown",onKeyDown);
+  }, []);
+
+  useEffect(() => {
     if (!timerRunning) return;
-    const id = window.setInterval(() => setTimerSeconds(value => value + 1), 1000);
+    const id = window.setInterval(() => setTimerNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [timerRunning]);
 
@@ -81,9 +105,15 @@ export function AppShell({
     window.localStorage.setItem("binso.theme", next ? "dark" : "light");
   }
 
+  const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
+
   function stopTimer() {
     setTimerRunning(false);
+    setTimerBaseSeconds(timerSeconds);
+    setTimerStartedAt(null);
     window.localStorage.setItem("binso.timer.running", "false");
+    window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
+    window.localStorage.removeItem("binso.timer.startedAt");
   }
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
@@ -155,6 +185,7 @@ export function AppShell({
           </header>
 
           {sheet === "docs" && <div className="sheet-menu">
+            <SheetLink href="/belege" icon="receipt" title="Belegübersicht" text="Angebote, Rechnungen und Zahlungen zusammen" onSelect={() => setSheet(null)}/>
             <SheetLink href="/angebote" icon="file" title="Angebote" text="Erstellen und nachverfolgen" onSelect={() => setSheet(null)}/>
             <SheetLink href="/rechnungen" icon="receipt" title="Rechnungen" text="Erstellen, senden und verwalten" onSelect={() => setSheet(null)}/>
             <SheetLink href="/zahlungen" icon="wallet" title="Zahlungen" text="Eingänge und offene Beträge" onSelect={() => setSheet(null)}/>
@@ -189,7 +220,8 @@ export function AppShell({
             <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
             <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
             <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
-            <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Benachrichtigungen verwalten <Icon name="arrow" size={15}/></Link>
+            <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}>Alle Benachrichtigungen <Icon name="arrow" size={15}/></Link>
+            <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Einstellungen <Icon name="arrow" size={15}/></Link>
           </div>}
         </section>
       </div>}

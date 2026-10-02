@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Button, Icon, Logo, Metric, SectionTitle, Status } from "./ui";
+import { Button, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 
 const operatorNav = [
   ["","Dashboard","home"],
@@ -115,6 +115,10 @@ function TicketsView() {
 }
 
 function TicketDetail() {
+  const [reply,setReply]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+  const [supportAccess,setSupportAccess]=useState(false);
+  const send=()=>{if(!reply.trim())return;setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);};
   return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
       <div className="ticket-meta-bar">
@@ -125,8 +129,8 @@ function TicketDetail() {
       <div className="tabs"><button className="active">Konversation</button><button>Interne Notizen</button><button>Aktivitäten</button></div>
       <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
       <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
-      <div className="internal-note"><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>Nur für Operator sichtbar. Kundendaten und Abklärungen hier dokumentieren.</span></div><button className="text-action">Notiz hinzufügen</button></div>
-      <div className="operator-reply"><textarea placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen"><Icon name="upload"/></button><Button>Senden</Button></div></div>
+      <div className="internal-note"><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>Nur für Operator sichtbar. Kundendaten und Abklärungen hier dokumentieren.</span></div><button className="text-action" onClick={()=>{setToast("Interne Notiz kann jetzt erfasst werden.");window.setTimeout(()=>setToast(null),2200)}}>Notiz hinzufügen</button></div>
+      <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><Button onClick={send}>Senden</Button></div></div>
     </section>
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
@@ -134,8 +138,9 @@ function TicketDetail() {
       <Link href="/operator/kunden/acme">Kundendetails öffnen →</Link>
       <div className="context-block"><small>Abonnement</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div>
       <div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b></div>
-      <div className="context-block"><small>Support-Zugriff</small><b>Nicht aktiv</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary">Zugriff starten</Button></div>
+      <div className="context-block"><small>Support-Zugriff</small><b>{supportAccess?"Aktiv · 30 Minuten":"Nicht aktiv"}</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary" onClick={()=>{setSupportAccess(!supportAccess);setToast(supportAccess?"Support-Zugriff beendet.":"Support-Zugriff für 30 Minuten gestartet.");window.setTimeout(()=>setToast(null),2200)}}>{supportAccess?"Zugriff beenden":"Zugriff starten"}</Button></div>
     </aside>
+    {toast&&<Toast title={toast}/>}
   </div>;
 }
 
@@ -147,18 +152,21 @@ function CustomersView() {
 }
 
 function OperatorCustomerDetail() {
+  const [toast,setToast]=useState<string|null>(null);
+  const notify=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
   return <>
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>K-1001 · CHE-123.456.789 · Zürich</p></div></div>
-      <div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary">Support-Zugriff</Button><Button variant="danger">Einschränken</Button></div>
+      <div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary" onClick={()=>notify("Zeitlich begrenzter Support-Zugriff vorbereitet.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
     </div>
     <div className="operator-customer-metrics"><Metric label="Plan" value="Business" hint="CHF 49 / Monat" icon="card"/><Metric label="Benutzer" value="8 / 10" hint="2 Plätze frei" icon="users"/><Metric label="Offene Tickets" value="1" hint="#8421" icon="support"/><Metric label="Zahlungsstatus" value="Bezahlt" hint="Nächste Abbuchung 01.11." icon="wallet"/></div>
     <div className="operator-customer-grid">
       <section className="surface"><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>Kontakt</dt><dd>Thomas Meier · thomas@acme.ch</dd></div><div><dt>Erstellt</dt><dd>14.02.2025</dd></div><div><dt>Letzte Anmeldung</dt><dd>Heute, 10:31</dd></div><div><dt>Mandant</dt><dd>tenant_acme_ch</dd></div></dl></section>
-      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div><div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b><span>Letzte Zahlung 01.10.2026</span></div><Button variant="secondary">Abonnement öffnen</Button></section>
-      <section className="surface"><SectionTitle title="Support"/><div className="compact-list"><div><b>#8421 · Rechnungsstellung unklar</b><span>Heute 10:42</span><Status tone="warning">Offen</Status></div><div><b>#8112 · Datenexport</b><span>18.08.2026</span><Status tone="success">Gelöst</Status></div></div></section>
+      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div><div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b><span>Letzte Zahlung 01.10.2026</span></div><Button href="/operator/abonnemente" variant="secondary">Abonnement öffnen</Button></section>
+      <section className="surface"><SectionTitle title="Support"/><div className="compact-list"><Link href="/operator/tickets/8421"><b>#8421 · Rechnungsstellung unklar</b><span>Heute 10:42</span><Status tone="warning">Offen</Status></Link><div><b>#8112 · Datenexport</b><span>18.08.2026</span><Status tone="success">Gelöst</Status></div></div></section>
       <section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Ticket #8421 erstellt</span><span><b>09:18</b> Benutzer angemeldet</span><span><b>01.10.</b> Zahlung CHF 49.00 verbucht</span><span><b>28.09.</b> Rechnungseinstellungen geändert</span></div></section>
     </div>
+    {toast&&<Toast title={toast}/>}
   </>;
 }
 
@@ -170,13 +178,17 @@ function PaymentsView() {
 }
 
 function SubscriptionsView() {
-  return <div className="operator-grid thirds">
-    {[
-      ["Start","1’128","CHF 19","21’432"],
-      ["Business","1’462","CHF 49","71’638"],
-      ["Pro","251","CHF 89","22’339"],
-    ].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary">Details</Button></section>)}
-  </div>;
+  const [selected,setSelected]=useState<string|null>(null);
+  return <>
+    <div className="operator-grid thirds">
+      {[
+        ["Start","1’128","CHF 19","21’432"],
+        ["Business","1’462","CHF 49","71’638"],
+        ["Pro","251","CHF 89","22’339"],
+      ].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary" onClick={()=>setSelected(plan)}>Details</Button></section>)}
+    </div>
+    {selected&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="operator-confirm subscription-detail-modal"><span className="confirm-icon"><Icon name="card"/></span><h2>{selected}</h2><p>Planübersicht mit aktiven Kunden, monatlichem Umsatz und hinterlegten Leistungsgrenzen.</p><dl><div><dt>Aktive Kunden</dt><dd>{selected==="Start"?"1’128":selected==="Business"?"1’462":"251"}</dd></div><div><dt>Monatlicher Preis</dt><dd>{selected==="Start"?"CHF 19":selected==="Business"?"CHF 49":"CHF 89"}</dd></div><div><dt>Status</dt><dd>Aktiv</dd></div></dl><div><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href="/operator/kunden">Kunden anzeigen</Button></div></section></div>}
+  </>;
 }
 
 function RestrictionsView() {
@@ -212,17 +224,24 @@ function MonitoringView() {
 }
 
 function AnnouncementsView() {
+  const [published,setPublished]=useState(false);
   return <div className="operator-grid">
-    <section className="surface"><SectionTitle title="Neue Ankündigung"/><div className="form-grid"><label className="full">Titel<input placeholder="Kurzer Titel"/></label><label className="full">Typ<select><option>Information</option><option>Wartung</option><option>Störung</option><option>Neue Funktion</option></select></label><label className="full">Zielgruppe<select><option>Alle Kunden</option><option>Business</option><option>Pro</option></select></label><label className="full">Nachricht<textarea placeholder="Nachricht..."/></label></div><Button>Veröffentlichen</Button></section>
-    <section className="surface"><SectionTitle title="Aktiv"/><div className="announcement-card"><Status tone="info">Information</Status><b>Neue Rechnungsansicht</b><p>Die neue mobile Rechnungsvorschau ist verfügbar.</p><small>Heute · alle Kunden</small></div></section>
+    <section className="surface"><SectionTitle title="Neue Ankündigung"/><div className="form-grid"><label className="full">Titel<input placeholder="Kurzer Titel"/></label><label className="full">Typ<select><option>Information</option><option>Wartung</option><option>Störung</option><option>Neue Funktion</option></select></label><label className="full">Zielgruppe<select><option>Alle Kunden</option><option>Business</option><option>Pro</option></select></label><label className="full">Nachricht<textarea placeholder="Nachricht..."/></label></div><Button onClick={()=>setPublished(true)}>Veröffentlichen</Button></section>
+    <section className="surface"><SectionTitle title="Aktiv"/><div className="announcement-card"><Status tone="info">Information</Status><b>Neue Rechnungsansicht</b><p>Die neue mobile Rechnungsvorschau ist verfügbar.</p><small>Heute · alle Kunden</small></div>{published&&<div className="announcement-card"><Status tone="success">Veröffentlicht</Status><b>Neue Ankündigung</b><p>Die Ankündigung wurde für alle Kunden veröffentlicht.</p><small>gerade eben</small></div>}</section>
   </div>;
 }
 
 function SecurityView() {
-  return <section className="surface">
-    <SectionTitle title="Interne Benutzer" action={<Button icon="plus">Benutzer</Button>}/>
-    <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Letzte Anmeldung</span></div>{[["Oemer Cam","Administrator","Aktiv","Heute 09:18"],["Maria Bianchi","Support","Aktiv","Heute 08:42"],["Luca Schneider","Support","Aktiv","Gestern"],["Anna Pross","Finanzen","Aktiv","Gestern"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
-  </section>;
+  const [inviteOpen,setInviteOpen]=useState(false);
+  const [toast,setToast]=useState<string|null>(null);
+  return <>
+    <section className="surface">
+      <SectionTitle title="Interne Benutzer" action={<Button icon="plus" onClick={()=>setInviteOpen(true)}>Benutzer</Button>}/>
+      <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Letzte Anmeldung</span></div>{[["Oemer Cam","Administrator","Aktiv","Heute 09:18"],["Maria Bianchi","Support","Aktiv","Heute 08:42"],["Luca Schneider","Support","Aktiv","Gestern"],["Anna Pross","Finanzen","Aktiv","Gestern"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
+    </section>
+    {inviteOpen&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setInviteOpen(false)}}><section className="operator-confirm operator-user-modal"><span className="confirm-icon"><Icon name="users"/></span><h2>Interner Benutzer</h2><p>Neue interne Benutzer erhalten nur die ausgewählte Rolle. Änderungen werden im Audit protokolliert.</p><label>Name<input placeholder="Vorname Nachname"/></label><label>E-Mail<input type="email" placeholder="name@binso.ch"/></label><label>Rolle<select><option>Support</option><option>Finanzen</option><option>Administrator</option></select></label><div><Button variant="secondary" onClick={()=>setInviteOpen(false)}>Abbrechen</Button><Button onClick={()=>{setInviteOpen(false);setToast("Einladung vorbereitet.");window.setTimeout(()=>setToast(null),2200)}}>Einladen</Button></div></section></div>}
+    {toast&&<Toast title={toast}/>}
+  </>;
 }
 
 function AuditView() {

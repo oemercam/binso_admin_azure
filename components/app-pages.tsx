@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toggle } from "./ui";
+import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 const customers = [
   ["Acme AG","Bauunternehmen","Zürich","Aktiv"],
@@ -51,6 +51,18 @@ const expenses = [
   ["Büromaterial","Nina Schmid","CHF 64.50","Entwurf"],
 ];
 
+const payments = [
+  ["1","02.10.2026","Acme AG","RE-2026-019 · Banküberweisung","CHF 4’346.40","Verbucht"],
+  ["2","30.09.2026","Müller GmbH","RE-2026-018 · Karte","CHF 1’200.00","Verbucht"],
+  ["3","28.09.2026","Schmid Consulting","RE-2026-015","CHF 1’745.00","Ausstehend"],
+];
+
+const supportTickets = [
+  ["5832","Frage zur Rechnung","vor 12 Minuten","Offen"],
+  ["5828","Zeiterfassung","vor 1 Stunde","In Bearbeitung"],
+  ["5814","Datenexport","vor 1 Tag","Gelöst"],
+];
+
 function tone(s: string): "success"|"danger"|"warning"|"neutral"|"info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(s)) return "success";
   if (["Überfällig","Abgelehnt","Abgelaufen"].includes(s)) return "danger";
@@ -78,6 +90,55 @@ function ListToolbar({ placeholder, chips = ["Alle","Aktiv","Inaktiv"] }: { plac
         <div className="filter-section"><b>Zeitraum</b><div className="segmented">{["Alle","30 Tage","90 Tage","Dieses Jahr"].map(x=><button type="button" className={period===x?"active":""} onClick={()=>setPeriod(x)} key={x}>{x}</button>)}</div></div>
         <div className="filter-section"><b>Zuständigkeit</b><div className="segmented">{["Alle","Ich","Team"].map(x=><button type="button" className={owner===x?"active":""} onClick={()=>setOwner(x)} key={x}>{x}</button>)}</div></div>
         <div className="filter-sheet-actions"><button type="button" className="button button-secondary" onClick={()=>{setPeriod("Alle");setOwner("Alle");setActiveChip(chips[0] ?? "Alle")}}>Zurücksetzen</button><button type="button" className="button button-primary" onClick={()=>setFiltersOpen(false)}>Anwenden</button></div>
+      </section>
+    </div>}
+  </>;
+}
+
+function RecordsView({
+  items,
+  placeholder,
+  chips = ["Alle","Aktiv","Inaktiv"],
+  children,
+}: {
+  items: string[][];
+  placeholder: string;
+  chips?: string[];
+  children: (item: string[]) => React.ReactNode;
+}) {
+  const [query,setQuery]=useState("");
+  const [activeChip,setActiveChip]=useState(chips[0] ?? "Alle");
+  const [filtersOpen,setFiltersOpen]=useState(false);
+  const [period,setPeriod]=useState("Alle");
+  const [owner,setOwner]=useState("Alle");
+
+  const normalizedChip=(value:string)=>value.toLowerCase().replace(/e?n$/, "");
+  const visible=items.filter(item=>{
+    const matchesQuery=!query.trim() || item.join(" ").toLowerCase().includes(query.trim().toLowerCase());
+    const state=item.at(-1) ?? "";
+    const type=item[1] ?? "";
+    const chip=activeChip;
+    const matchesChip=chip==="Alle" || state===chip || normalizedChip(type).startsWith(normalizedChip(chip)) || normalizedChip(chip).startsWith(normalizedChip(type));
+    return matchesQuery && matchesChip;
+  });
+
+  return <>
+    <div className="toolbar">
+      <label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
+      <div className="chips">{chips.map((x)=><button type="button" onClick={() => setActiveChip(x)} className={x===activeChip?"active":""} key={x}>{x}</button>)}</div>
+      <button className="filter-button" type="button" onClick={() => setFiltersOpen(true)}><Icon name="filter" size={17}/><span>Filter</span></button>
+    </div>
+
+    {visible.length ? <div className="records">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div> :
+      <EmptyState icon="search" title="Keine Treffer" text="Passe Suche oder Filter an, um Einträge zu finden."/>}
+
+    {filtersOpen && <div className="sheet-layer filter-layer" onMouseDown={(e)=>{if(e.target===e.currentTarget)setFiltersOpen(false)}}>
+      <section className="bottom-sheet filter-sheet" role="dialog" aria-modal="true" aria-label="Filter">
+        <div className="sheet-handle"/>
+        <header className="sheet-header"><div><h2>Filter</h2><p>Ansicht eingrenzen, ohne die Seite zu verlassen.</p></div><button className="icon-button" type="button" onClick={()=>setFiltersOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header>
+        <div className="filter-section"><b>Zeitraum</b><div className="segmented">{["Alle","30 Tage","90 Tage","Dieses Jahr"].map(x=><button type="button" className={period===x?"active":""} onClick={()=>setPeriod(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-section"><b>Zuständigkeit</b><div className="segmented">{["Alle","Ich","Team"].map(x=><button type="button" className={owner===x?"active":""} onClick={()=>setOwner(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-sheet-actions"><button type="button" className="button button-secondary" onClick={()=>{setPeriod("Alle");setOwner("Alle");setActiveChip(chips[0] ?? "Alle");setQuery("")}}>Zurücksetzen</button><button type="button" className="button button-primary" onClick={()=>setFiltersOpen(false)}>Anwenden</button></div>
       </section>
     </div>}
   </>;
@@ -149,8 +210,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <ListToolbar placeholder="Kunden suchen..."/>
-        <div className="records">{customers.map(([name,sector,city,status])=><RecordRow href="/kunden/acme" key={name} title={name} meta={`${sector} · ${city}`} status={status}/>)}</div>
+        <RecordsView items={customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
@@ -167,13 +227,26 @@ export function CustomersPage() {
 }
 
 export function CustomerDetail() {
+  const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
+  const [contactOpen,setContactOpen]=useState(false);
+  const [contactToast,setContactToast]=useState(false);
   return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
     <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
-    <div className="tabs"><button className="active">Übersicht</button><button>Kontakte</button><button>Belege</button><button>Aktivität</button></div>
-    <div className="detail-grid">
-      <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section>
-      <section className="surface"><SectionTitle title="Letzte Belege" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="compact-list"><div><b>RE-2026-019</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></div><div><b>AN-2026-012</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></div><div><b>RE-2026-015</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></div></div></section>
+    <div className="tabs">
+      <button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button>
+      <button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button>
+      <button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button>
+      <button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button>
     </div>
+    {tab==="overview"&&<div className="detail-grid">
+      <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section>
+      <section className="surface"><SectionTitle title="Letzte Belege" action={<button className="text-action" onClick={()=>setTab("docs")}>Alle anzeigen</button>}/><div className="compact-list"><div><b>RE-2026-019</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></div><div><b>AN-2026-012</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></div><div><b>RE-2026-015</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></div></div></section>
+    </div>}
+    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div><div><span className="record-avatar">SB</span><div><b>Sarah Baumann</b><small>Buchhaltung · finance@acme.ch · +41 44 123 45 68</small></div></div></div></section>}
+    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link><Link href="/angebote/AN-2026-012"><b>AN-2026-012</b><span>05.09.2026 · CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link><Link href="/rechnungen/RE-2026-015"><b>RE-2026-015</b><span>20.08.2026 · CHF 1’200.00</span><Status tone="warning">Offen</Status></Link></div></section>}
+    {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Rechnung bezahlt</b><small>RE-2026-019 · heute, 10:24</small></div></div><div><i/><div><b>Angebot gesendet</b><small>AN-2026-012 · 05.09.2026</small></div></div><div><i/><div><b>Kundendaten aktualisiert</b><small>Thomas Müller · 01.09.2026</small></div></div></div></section>}
+    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input/></Field><Field label="Nachname"><input/></Field><Field label="E-Mail"><input type="email"/></Field><Field label="Telefon"><input type="tel"/></Field><Field label="Funktion" className="full"><input placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>{setContactOpen(false);setContactToast(true);window.setTimeout(()=>setContactToast(false),2200)}}>Kontakt speichern</Button></div></section></div>}
+    {contactToast&&<Toast title="Kontakt gespeichert."/>}
   </AppShell>;
 }
 
@@ -197,8 +270,7 @@ export function CustomerForm() {
 
 export function OffersPage() {
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
-    <ListToolbar placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}/>
-    <div className="records">{offers.map(([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} key={nr} icon="file" title={nr} meta={name} value={amount} status={status}/>)}</div>
+    <RecordsView items={offers} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -215,8 +287,7 @@ export function InvoicesPage() {
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
-        <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
-        <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+        <RecordsView items={invoices} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail invoice-tablet-preview">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
@@ -229,11 +300,14 @@ export function InvoicesPage() {
 
 export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   const [preview, setPreview] = useState(false);
-  return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
-    {existing && <div className="document-actions"><Button variant="secondary" icon="mail">Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost">Duplizieren</Button></div>}
+  const [toast,setToast]=useState<string|null>(null);
+  const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+  return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
+    {existing && <div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Rechnung wurde zum Versand vorbereitet.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Rechnung wurde als neuer Entwurf dupliziert.")}>Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" number="RE-2026-019"/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
     {preview && <DocumentModal title="Rechnungsvorschau" onClose={() => setPreview(false)}><InvoicePreview/></DocumentModal>}
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
@@ -303,12 +377,7 @@ export function OfferPreview() {
 export function PaymentsPage() {
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus">Zahlung erfassen</Button>}>
     <div className="metrics-grid three"><Metric label="Eingegangen" value="CHF 49’820" hint="diesen Monat" icon="wallet"/><Metric label="Offen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Überfällig" value="CHF 3’700" hint="1 Rechnung" icon="clock"/></div>
-    <ListToolbar placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}/>
-    <div className="records">
-      <RecordRow href="/zahlungen/1" icon="wallet" title="02.10.2026 · Acme AG" meta="RE-2026-019 · Banküberweisung" value="CHF 4’346.40" status="Verbucht"/>
-      <RecordRow href="/zahlungen/2" icon="wallet" title="30.09.2026 · Müller GmbH" meta="RE-2026-018 · Karte" value="CHF 1’200.00" status="Verbucht"/>
-      <RecordRow icon="wallet" title="28.09.2026 · Schmid Consulting" meta="RE-2026-015" value="CHF 1’745.00" status="Ausstehend"/>
-    </div>
+    <RecordsView items={payments} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -336,8 +405,7 @@ export function PaymentDetail() {
 
 export function ProductsPage() {
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus">Neues Produkt</Button>}>
-    <ListToolbar placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}/>
-    <div className="records">{products.map(([name,type,price,status])=><RecordRow href="/produkte/beratung" key={name} icon="box" title={name} meta={type} value={price} status={status}/>)}</div>
+    <RecordsView items={products} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -360,8 +428,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
 
 export function EmployeesPage() {
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus">Mitarbeiter</Button>}>
-    <ListToolbar placeholder="Mitarbeiter suchen..."/>
-    <div className="records">{employees.map(([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" key={name} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>)}</div>
+    <RecordsView items={employees} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -386,8 +453,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
 
 export function ExpensesPage() {
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus">Spese erfassen</Button>}>
-    <ListToolbar placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}/>
-    <div className="records">{expenses.map(([title,person,amount,status])=><RecordRow href="/spesen/1" key={title} icon="card" title={title} meta={person} value={amount} status={status}/>)}</div>
+    <RecordsView items={expenses} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -439,11 +505,7 @@ export function SupportPage() {
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <div className="records">
-        <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
-        <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
-        <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
-      </div>
+      <RecordsView items={supportTickets} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
       <aside className="tablet-detail support-tablet-preview surface">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
         <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
@@ -509,10 +571,12 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+  const [toast,setToast]=useState<string|null>(null);
+  const save=(message="Persönliche Daten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary">Bild ändern</Button>
+        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary" onClick={()=>save("Profilbild-Auswahl geöffnet.")}>Bild ändern</Button>
       </section>
       <section className="settings-form">
         <div className="form-grid two">
@@ -523,16 +587,19 @@ export function AccountSettingsPage() {
           <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
           <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
       </section>
     </div>
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
 export function CompanySettingsPage() {
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+  const [toast,setToast]=useState<string|null>(null);
+  const save=(message="Firmendaten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary">Logo ändern</Button></section>
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>save("Logo-Auswahl geöffnet.")}>Logo ändern</Button></section>
       <section className="settings-form">
         <div className="form-grid two">
           <Field label="Firmenname"><input defaultValue="Musterwerk AG"/></Field>
@@ -544,25 +611,41 @@ export function CompanySettingsPage() {
           <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
           <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
       </section>
     </div>
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
 export function SubscriptionSettingsPage() {
+  const [dialog,setDialog]=useState<"plan"|"payment"|"cancel"|null>(null);
+  const [plan,setPlan]=useState("Business");
+  const [toast,setToast]=useState<string|null>(null);
+  const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89"};
+  const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
   return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
-      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>Business</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div>
-      <div className="plan-price"><strong>CHF 49</strong><span>/ Monat</span></div>
-      <Button>Plan ändern</Button>
+      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div>
+      <div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div>
+      <Button onClick={()=>setDialog("plan")}>Plan ändern</Button>
     </section>
     <div className="subscription-detail-grid">
       <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section>
-      <section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary">Ändern</Button></div></section>
+      <section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary" onClick={()=>setDialog("payment")}>Ändern</Button></div></section>
     </div>
     <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.08.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
-    <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger">Kündigung starten</Button></div>
+    <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger" onClick={()=>setDialog("cancel")}>Kündigung starten</Button></div>
+
+    {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true">
+      <div className="sheet-handle"/>
+      <header className="sheet-header"><div><h2>{dialog==="plan"?"Plan ändern":dialog==="payment"?"Zahlungsmittel ändern":"Abonnement kündigen"}</h2><p>{dialog==="cancel"?"Die Kündigung wird erst nach deiner Bestätigung vorgemerkt.":"Änderungen werden vor Abschluss nochmals bestätigt."}</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>
+      {dialog==="plan"&&<div className="plan-choice-list">{["Start","Business","Pro"].map(name=><button type="button" className={plan===name?"selected":""} onClick={()=>setPlan(name)} key={name}><div><b>{name}</b><small>CHF {prices[name]} / Monat</small></div>{plan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>}
+      {dialog==="payment"&&<div className="form-grid two"><Field label="Karteninhaber"><input defaultValue="Thomas Müller"/></Field><Field label="Kartennummer"><input inputMode="numeric" placeholder="•••• •••• •••• 4242"/></Field><Field label="Ablauf"><input placeholder="MM / JJ"/></Field><Field label="CVC"><input inputMode="numeric" placeholder="•••"/></Field></div>}
+      {dialog==="cancel"&&<div className="cancel-summary"><Icon name="lock"/><div><b>Zugriff bleibt bis 31.10.2026 aktiv</b><p>Danach wird das Abonnement beendet. Deine Daten werden nicht sofort gelöscht.</p></div></div>}
+      <div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button variant={dialog==="cancel"?"danger":"primary"} onClick={()=>confirm(dialog==="plan"?"Planänderung gespeichert.":dialog==="payment"?"Zahlungsmittel aktualisiert.":"Kündigung vorgemerkt.")}>{dialog==="cancel"?"Kündigung bestätigen":"Speichern"}</Button></div>
+    </section></div>}
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
@@ -593,10 +676,17 @@ export function LanguageSettingsPage() {
 }
 
 export function SecuritySettingsPage() {
+  const [dialog,setDialog]=useState<"password"|"2fa"|null>(null);
+  const [twoFactor,setTwoFactor]=useState(false);
+  const [sessionVisible,setSessionVisible]=useState(true);
+  const [toast,setToast]=useState<string|null>(null);
+  const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
   return <AppShell title="Sicherheit" subtitle="Passwort, Sitzungen und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="surface security-card"><SectionTitle title="Passwort"/><p>Zuletzt geändert vor 63 Tagen.</p><Button variant="secondary">Passwort ändern</Button></section>
-    <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>Zusätzlicher Schutz für dein Konto.</p></div><Status tone="warning">Nicht aktiv</Status><Button>Aktivieren</Button></div></section>
-    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Biel/Bienne · Dieses Gerät · jetzt aktiv</small></div><Status tone="success">Aktiv</Status></div><div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Bern · vor 2 Stunden</small></div><button className="text-action">Abmelden</button></div></div></section>
+    <section className="surface security-card"><SectionTitle title="Passwort"/><p>Zuletzt geändert vor 63 Tagen.</p><Button variant="secondary" onClick={()=>setDialog("password")}>Passwort ändern</Button></section>
+    <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>Zusätzlicher Schutz für dein Konto.</p></div><Status tone={twoFactor?"success":"warning"}>{twoFactor?"Aktiv":"Nicht aktiv"}</Status><Button onClick={()=>setDialog("2fa")}>{twoFactor?"Verwalten":"Aktivieren"}</Button></div></section>
+    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Biel/Bienne · Dieses Gerät · jetzt aktiv</small></div><Status tone="success">Aktiv</Status></div>{sessionVisible&&<div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Bern · vor 2 Stunden</small></div><button className="text-action" onClick={()=>{setSessionVisible(false);setToast("iPhone-Sitzung wurde abgemeldet.");window.setTimeout(()=>setToast(null),2200)}}>Abmelden</button></div>}</div></section>
+    {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet security-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{dialog==="password"?"Passwort ändern":"Zwei-Faktor-Authentifizierung"}</h2><p>{dialog==="password"?"Verwende ein einzigartiges, starkes Passwort.":"Zusätzlicher Schutz für dein Benutzerkonto."}</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>{dialog==="password"?<div className="form-grid"><Field label="Aktuelles Passwort"><input type="password"/></Field><Field label="Neues Passwort"><input type="password"/></Field><Field label="Neues Passwort bestätigen"><input type="password"/></Field></div>:<div className="two-factor-setup"><div className="two-factor-code">BINSO<br/>2FA</div><div><b>Authenticator-App verbinden</b><p>Scanne den Code mit deiner Authenticator-App und bestätige anschliessend einen sechsstelligen Code.</p><Field label="Bestätigungscode"><input inputMode="numeric" placeholder="000000"/></Field></div></div>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>{if(dialog==="2fa")setTwoFactor(true);confirm(dialog==="password"?"Passwort geändert.":"Zwei-Faktor-Authentifizierung aktiviert.")}}>Bestätigen</Button></div></section></div>}
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
@@ -617,6 +707,68 @@ export function AppearanceSettingsPage() {
   </AppShell>;
 }
 
+export function DocumentsHubPage() {
+  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+    <div className="metrics-grid three">
+      <Metric label="Offene Angebote" value="2" hint="CHF 10’464.32" icon="file"/>
+      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
+      <Metric label="Zahlungen im Monat" value="CHF 49’820" hint="184 Eingänge" icon="wallet"/>
+    </div>
+    <div className="documents-hub-grid">
+      <section className="surface">
+        <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/angebote/AN-2026-012"><b>AN-2026-012 · Acme AG</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link>
+          <Link href="/angebote/AN-2026-011"><b>AN-2026-011 · Müller GmbH</b><span>CHF 3’200.00</span><Status tone="neutral">Entwurf</Status></Link>
+        </div>
+        <Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/rechnungen/RE-2026-019"><b>RE-2026-019 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link>
+          <Link href="/rechnungen/RE-2026-018"><b>RE-2026-018 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></Link>
+          <Link href="/rechnungen/RE-2026-017"><b>RE-2026-017 · Berger Bau AG</b><span>CHF 3’700.00</span><Status tone="danger">Überfällig</Status></Link>
+        </div>
+        <Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/zahlungen/1"><b>02.10.2026 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Verbucht</Status></Link>
+          <Link href="/zahlungen/2"><b>30.09.2026 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="success">Verbucht</Status></Link>
+        </div>
+        <Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function NotificationsPage() {
+  const [read,setRead]=useState<string[]>(["invoice","offer"]);
+  const items=[
+    ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
+    ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
+    ["offer","file","Angebot angenommen","Acme AG · AN-2026-012","heute","/angebote/AN-2026-012"],
+    ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
+  ];
+  return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
+    <div className="notification-center">
+      <div className="notification-center-tabs"><button className="active">Alle</button><button>Ungelesen</button></div>
+      <div className="notification-center-list">{items.map(([id,icon,title,text,time,href])=>{
+        const isRead=read.includes(id);
+        return <Link href={href} className={isRead?"notification-center-row":"notification-center-row unread"} key={id} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}>
+          <span className="activity-icon"><Icon name={icon}/></span>
+          <div><b>{title}</b><p>{text}</p><small>{time}</small></div>
+          {!isRead&&<i className="unread-dot"/>}
+          <Icon name="arrow" size={16}/>
+        </Link>;
+      })}</div>
+      <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
+    </div>
+  </AppShell>;
+}
+
 export function SimpleModule({ kind }: { kind: "angebote"|"zahlungen"|"produkte"|"mitarbeiter"|"spesen"|"support"|"einstellungen" }) {
   if (kind === "angebote") return <OffersPage/>;
   if (kind === "zahlungen") return <PaymentsPage/>;
@@ -628,5 +780,5 @@ export function SimpleModule({ kind }: { kind: "angebote"|"zahlungen"|"produkte"
 }
 
 export function EmptyDemoPage() {
-  return <AppShell title="Noch keine Einträge" active="dashboard"><EmptyState icon="file" title="Noch nichts vorhanden" text="Erstelle deinen ersten Eintrag, um loszulegen." action={<Button icon="plus">Erstellen</Button>}/></AppShell>;
+  return <AppShell title="Noch keine Einträge" active="dashboard"><EmptyState icon="file" title="Noch nichts vorhanden" text="Erstelle deinen ersten Eintrag, um loszulegen." action={<Button href="/kunden/neu" icon="plus">Erstellen</Button>}/></AppShell>;
 }
