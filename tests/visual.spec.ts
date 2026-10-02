@@ -22,3 +22,6 @@ for (const route of routes) {
     });
   });
 }
+test("mobile More sheet state",async({page},testInfo)=>{await page.setViewportSize({width:390,height:844});await page.goto("/dashboard");await page.getByRole("button",{name:"Mehr"}).click();await expect(page.locator(".more-sheet")).toBeVisible();await page.screenshot({path:testInfo.outputPath("dashboard-more-sheet.png"),fullPage:true});});
+test("logout confirmation state",async({page},testInfo)=>{await page.setViewportSize({width:390,height:844});await page.goto("/einstellungen");await page.getByRole("button",{name:"Abmelden"}).click();await expect(page.getByRole("dialog")).toBeVisible();await page.screenshot({path:testInfo.outputPath("einstellungen-abmelden-dialog.png"),fullPage:true});});
+test("public mobile navigation state",async({page},testInfo)=>{await page.setViewportSize({width:390,height:844});await page.goto("/");await page.getByRole("button",{name:/menü/i}).click();await expect(page.locator(".public-mobile-menu")).toBeVisible();await page.screenshot({path:testInfo.outputPath("public-mobile-menu.png"),fullPage:true});});
