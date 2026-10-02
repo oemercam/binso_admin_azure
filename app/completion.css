@@ -1245,3 +1245,24 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
  .notification-center-row{grid-template-columns:auto 1fr auto}
  .notification-center-row>svg:last-child{display:none}
 }
+
+
+.subscription-sheet,.security-sheet{max-width:620px}
+.plan-choice-list{border-top:1px solid var(--line)}
+.plan-choice-list button{width:100%;min-height:62px;border:0;border-bottom:1px solid var(--line);background:transparent;color:inherit;display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left;padding:0 4px}
+.plan-choice-list b,.plan-choice-list small{display:block}
+.plan-choice-list b{font-size:13px}
+.plan-choice-list small{font-size:10px;color:var(--muted);margin-top:3px}
+.plan-choice-list button.selected{font-weight:700}
+.cancel-summary{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cancel-summary>svg{margin-top:2px}
+.cancel-summary b{font-size:12px}
+.cancel-summary p{margin:4px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.two-factor-setup{display:grid;grid-template-columns:128px 1fr;gap:18px;align-items:start;padding:10px 0}
+.two-factor-code{width:128px;height:128px;border:8px solid var(--ink);display:grid;place-items:center;text-align:center;font-size:16px;font-weight:900;letter-spacing:.08em;background:repeating-linear-gradient(45deg,var(--soft) 0 8px,var(--bg) 8px 16px)}
+.two-factor-setup b{font-size:13px}
+.two-factor-setup p{color:var(--muted);font-size:10px;line-height:1.5;margin:5px 0 14px}
+@media(max-width:760px){
+ .two-factor-setup{grid-template-columns:1fr}
+ .two-factor-code{margin:auto}
+}
