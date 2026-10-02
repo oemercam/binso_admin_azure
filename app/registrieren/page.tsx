@@ -10,7 +10,7 @@ export default function Registrieren() {
         <label>Name<input autoComplete="name" placeholder="Dein Name" /></label>
         <label>E-Mail<input type="email" autoComplete="email" placeholder="name@firma.ch" /></label>
         <label>Passwort<input type="password" autoComplete="new-password" placeholder="Passwort wählen" /></label>
-        <label className="check"><input type="checkbox" /> Ich akzeptiere die AGB und Datenschutzbestimmungen.</label>
+        <label className="check"><input type="checkbox" /> <span>Ich akzeptiere die <Link href="/agb">AGB</Link> und <Link href="/datenschutz">Datenschutzbestimmungen</Link>.</span></label>
         <Link className="auth-submit" href="/dashboard">Konto erstellen</Link>
         <footer>Bereits registriert?<br /><Link href="/login">Anmelden</Link></footer>
       </section>
