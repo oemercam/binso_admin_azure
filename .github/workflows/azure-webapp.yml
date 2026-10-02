@@ -61,6 +61,7 @@ jobs:
         with:
           app-name: binso-admin-prod
           package: binso-one.zip
+          startup-command: node server.js
       - name: Verify deployed application
         shell: bash
         run: |
