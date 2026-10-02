@@ -463,3 +463,37 @@ html[data-theme="dark"] .status-success,
 html[data-theme="dark"] .status-warning,
 html[data-theme="dark"] .status-danger,
 html[data-theme="dark"] .status-info{background:#000!important;color:#fff!important;border-color:#333!important}
+
+
+/* Auth, loading and system states use the same restrained mockup geometry. */
+.auth-page{background:#fff;padding:28px;align-items:center}
+.auth-card{width:min(100%,400px)}
+.auth-card>.logo{margin-bottom:52px}
+.auth-card h1{font-size:28px}
+.auth-card>p{font-size:13px;margin-bottom:25px}
+.auth-card form{gap:14px}
+.auth-card label{font-size:11px}
+.auth-card .button{min-height:44px;width:100%}
+.password-field{position:relative}
+.password-field input{width:100%;padding-right:82px}
+.password-field button{position:absolute;right:5px;top:5px;bottom:5px;border:0;background:transparent;font-size:10px;font-weight:700;padding:0 8px}
+.auth-error{border-left:2px solid #111;padding:8px 10px;margin:0!important;background:#fff!important;color:#111!important;font-size:11px;line-height:1.45}
+.demo-company{border-radius:9px;padding:15px}
+.demo-card>a:last-child{margin-top:18px;font-size:11px;color:var(--muted)}
+.error-state>.logo{margin-bottom:40px}
+.error-state .error-code{font-size:9px}
+.loading-shell{background:#fff;grid-template-columns:var(--sidebar) 1fr}
+.loading-sidebar{padding:20px 12px;border-color:var(--line)}
+.loading-main{padding:30px var(--page-x);max-width:var(--max)}
+.skeleton{background:linear-gradient(90deg,#f3f3f1 25%,#fafaf9 50%,#f3f3f1 75%);background-size:200% 100%;animation:skeletonShift 1.25s linear infinite;border-radius:7px}
+@keyframes skeletonShift{to{background-position:-200% 0}}
+html[data-theme="dark"] .skeleton{background:linear-gradient(90deg,#111 25%,#191919 50%,#111 75%);background-size:200% 100%}
+
+@media(max-width:760px){
+  .auth-page{padding:calc(20px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));align-items:start}
+  .auth-card{padding-top:24px}
+  .auth-card>.logo{margin-bottom:46px}
+  .auth-card h1{font-size:27px}
+  .auth-card>p{font-size:12px}
+  .loading-main{padding:24px 16px}
+}
