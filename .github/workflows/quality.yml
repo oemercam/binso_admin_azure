@@ -54,6 +54,9 @@ jobs:
           curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
           curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"configured":false'
           curl -fsS -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
