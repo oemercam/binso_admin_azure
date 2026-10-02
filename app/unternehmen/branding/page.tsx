@@ -1,0 +1,1 @@
+import {AppShell} from "@/components/app-shell";export default function Branding(){return <AppShell title="Logo & Branding" back="/unternehmen"><div className="upload-zone"><strong>Firmenlogo</strong><span>PNG, JPG oder SVG</span><button className="secondary">Datei auswählen</button></div></AppShell>}
