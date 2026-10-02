@@ -372,16 +372,49 @@ function PaymentsView() {
 }
 
 function SubscriptionsView() {
-  const [selected,setSelected]=useState<string|null>(null);
+  const production=useBackendMode();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  const [selected,setSelected]=useState<Record<string,unknown>|null>(null);
+  const [toast,setToast]=useState<string|null>(null);
+
+  const load=()=>{
+    if(!production) return;
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/accounts")
+      .then(payload=>setItems(payload.items))
+      .catch(()=>undefined);
+  };
+  useEffect(()=>{load();},[production]);
+
+  const updateSelected=async(patch:Record<string,unknown>)=>{
+    if(!selected||!production)return;
+    try{
+      const tenantId=String(selected.tenant_id);
+      const payload=await apiPatch<{item:Record<string,unknown>}>("/api/operator/accounts/"+encodeURIComponent(tenantId),patch);
+      setSelected(current=>current?{...current,...payload.item}:current);
+      await load();
+      setToast("Abonnementstatus aktualisiert.");
+    }catch(error){setToast(error instanceof Error?error.message:"Abonnement konnte nicht aktualisiert werden.");}
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  if(!production){
+    return <>
+      <div className="operator-grid thirds">{[["Start","1’128","CHF 19","21’432"],["Business","1’462","CHF 49","71’638"],["Pro","251","CHF 89","22’339"]].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary">Demo</Button></section>)}</div>
+    </>;
+  }
+
+  const grouped=["trial","start","business","pro"].map(plan=>({plan,items:items.filter(item=>item.plan===plan)}));
+  const price:Record<string,string>={trial:"CHF 0",start:"CHF 19",business:"CHF 49",pro:"CHF 89"};
+
   return <>
     <div className="operator-grid thirds">
-      {[
-        ["Start","1’128","CHF 19","21’432"],
-        ["Business","1’462","CHF 49","71’638"],
-        ["Pro","251","CHF 89","22’339"],
-      ].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary" onClick={()=>setSelected(plan)}>Details</Button></section>)}
+      {grouped.map(group=><section className="surface subscription-card" key={group.plan}><small>Plan</small><h2>{operatorPlan(group.plan)}</h2><strong>{group.items.length} Kunden</strong><p>{group.items.filter(item=>item.subscription_status==="active").length} aktiv</p><span>{price[group.plan]} / Monat</span><Button variant="secondary" onClick={()=>setSelected(group.items[0]??null)}>Kundenstatus</Button></section>)}
     </div>
-    {selected&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="operator-confirm subscription-detail-modal"><span className="confirm-icon"><Icon name="card"/></span><h2>{selected}</h2><p>Planübersicht mit aktiven Kunden, monatlichem Umsatz und hinterlegten Leistungsgrenzen.</p><dl><div><dt>Aktive Kunden</dt><dd>{selected==="Start"?"1’128":selected==="Business"?"1’462":"251"}</dd></div><div><dt>Monatlicher Preis</dt><dd>{selected==="Start"?"CHF 19":selected==="Business"?"CHF 49":"CHF 89"}</dd></div><div><dt>Status</dt><dd>Aktiv</dd></div></dl><div><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href="/operator/kunden">Kunden anzeigen</Button></div></section></div>}
+    <section className="surface operator-table-card">
+      <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></div>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <button type="button" className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b><small>{String(item.tenant_id).slice(0,8)}</small></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></button>})}</div>
+    </section>
+    {selected&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="operator-confirm subscription-detail-modal"><span className="confirm-icon"><Icon name="card"/></span><h2>{String((selected.tenant as {name?:string}|undefined)?.name??"Kunde")}</h2><p>Plan und interner Kontostatus. Externes Stripe-Billing ist noch nicht verbunden.</p><label>Plan<select value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial">Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></select></label><label>Abonnement<select value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></select></label><label>Benutzerlimit<input type="number" min="1" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></label><div><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected.tenant_id)}>Kunde öffnen</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
