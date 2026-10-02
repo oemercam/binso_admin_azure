@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { Button, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
+import { useEffect, useMemo, useState } from "react";
+import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
+import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
 const operatorNav = [
   ["","Dashboard","home"],
@@ -23,6 +24,63 @@ const tickets = [
   ["#8416","Zugangsproblem","Berger Bau AG","Offen"],
   ["#8415","Funktionserweiterung","Huber & Söhne","Wartet auf Kunde"],
 ];
+
+type OperatorTicket = {
+  id:string;
+  subject:string;
+  priority:string;
+  status:string;
+  updated_at:string;
+  tenant?:{name?:string}|null;
+};
+
+type OperatorTenant = {
+  id:string;
+  name:string;
+  uid?:string|null;
+  city?:string|null;
+  created_at:string;
+  account?:{plan?:string;subscription_status?:string;account_status?:string;user_limit?:number}|null;
+};
+
+function operatorStatus(value:string){
+  const map:Record<string,string>={
+    new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Wartet auf Kunde",
+    resolved:"Gelöst",closed:"Geschlossen",active:"Aktiv",past_due:"Überfällig",suspended:"Gesperrt",
+    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase"
+  };
+  return map[value]??value;
+}
+
+function operatorPlan(value:string|undefined){
+  const map:Record<string,string>={trial:"Testphase",start:"Start",business:"Business",pro:"Pro"};
+  return map[value??""]??"—";
+}
+
+function useOperatorTickets(){
+  const production=useBackendMode();
+  const [items,setItems]=useState<OperatorTicket[]>([]);
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:OperatorTicket[]}>("/api/operator/tickets")
+      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
+      .catch(()=>undefined);
+  },[production]);
+  return {production,items};
+}
+
+function useOperatorCustomers(){
+  const production=useBackendMode();
+  const [items,setItems]=useState<OperatorTenant[]>([]);
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:OperatorTenant[]}>("/api/operator/customers")
+      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
+      .catch(()=>undefined);
+  },[production]);
+  return {production,items};
+}
+
 
 export function OperatorPage({ section = "" }: { section?: string }) {
   const key = section.split("/")[0] || "";
