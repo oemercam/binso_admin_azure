@@ -533,20 +533,52 @@ export function SupportTicketForm() {
   </AppShell>;
 }
 
-export function SupportChat() {
+export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [draft,setDraft]=useState("");
   const [sent,setSent]=useState<string[]>([]);
-  const send=()=>{const value=draft.trim();if(!value)return;setSent(current=>[...current,value]);setDraft("");};
-  return <AppShell title="Ticket #5832" subtitle="Frage zur Rechnung" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
+  const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
+  const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages")
+      .then(payload=>queueMicrotask(()=>setRemote(payload.items)))
+      .catch(()=>undefined);
+  },[ticketId]);
+
+  const send=async()=>{
+    const value=draft.trim();
+    if(!value)return;
+    setDraft("");
+    if(useProductionBackend()){
+      try{
+        const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
+        setRemote(current=>[...current,payload.item]);
+      }catch(error){
+        setDraft(value);
+        setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
+        window.setTimeout(()=>setToast(null),2600);
+      }
+      return;
+    }
+    setSent(current=>[...current,value]);
+  };
+
+  const production=useProductionBackend();
+  return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
-      <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
-      <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
-      {sent.map((text,i)=><article className="message message-user" key={`${text}-${i}`}><div>{text}</div><small>jetzt</small></article>)}
-      <div className="thread-composer"><button type="button" aria-label="Datei anhängen"><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={send} aria-label="Senden"><Icon name="arrow"/></button></div>
+      {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
+        <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
+        <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
+        <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
+        <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
+        {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
+      </>}
+      {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
+      <div className="thread-composer"><button type="button" aria-label="Datei anhängen" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div>
+    {toast&&<Toast title={toast} tone="danger"/>}
   </AppShell>;
 }
 
