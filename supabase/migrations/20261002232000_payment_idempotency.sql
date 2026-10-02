@@ -1,5 +1,5 @@
 -- Idempotent financial write protection for payment creation.
--- Reusing a key with different payment data is rejected rather than silently returning the wrong result.
+-- Concurrent retries return the same payment. Reusing a key with different payment data is rejected.
 
 alter table public.payments
   add column if not exists idempotency_key text;
@@ -38,30 +38,32 @@ begin
   normalized_note:=nullif(trim(coalesce(p_note,'')),'');
   normalized_date:=coalesce(p_paid_on,current_date);
 
-  select * into payment
-  from public.payments
-  where tenant_id=p_tenant_id and idempotency_key=trim(p_idempotency_key)
-  limit 1;
-
-  if payment.id is not null then
-    if payment.invoice_id is distinct from p_invoice_id
-       or payment.customer_id is distinct from p_customer_id
-       or payment.paid_on is distinct from normalized_date
-       or payment.amount is distinct from p_amount
-       or payment.method is distinct from normalized_method
-       or payment.note is distinct from normalized_note then
-      raise exception 'idempotency key reused with different payload';
-    end if;
-    return payment;
-  end if;
-
   insert into public.payments(
     tenant_id,invoice_id,customer_id,paid_on,amount,method,note,status,idempotency_key
   ) values(
     p_tenant_id,p_invoice_id,p_customer_id,normalized_date,p_amount,
     normalized_method,normalized_note,'booked',trim(p_idempotency_key)
   )
+  on conflict(tenant_id,idempotency_key) do nothing
   returning * into payment;
+
+  if payment.id is not null then return payment; end if;
+
+  select * into payment
+  from public.payments
+  where tenant_id=p_tenant_id and idempotency_key=trim(p_idempotency_key)
+  limit 1;
+
+  if payment.id is null then raise exception 'idempotency conflict without existing payment'; end if;
+
+  if payment.invoice_id is distinct from p_invoice_id
+     or payment.customer_id is distinct from p_customer_id
+     or payment.paid_on is distinct from normalized_date
+     or payment.amount is distinct from p_amount
+     or payment.method is distinct from normalized_method
+     or payment.note is distinct from normalized_note then
+    raise exception 'idempotency key reused with different payload';
+  end if;
 
   return payment;
 end $$;
