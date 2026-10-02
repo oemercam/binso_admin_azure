@@ -604,14 +604,32 @@ function AnnouncementsView() {
 }
 
 function SecurityView() {
-  const [inviteOpen,setInviteOpen]=useState(false);
+  const production=useBackendMode();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/users")
+      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
+      .catch(()=>undefined);
+  },[production]);
+
+  if(!production) return <>
+    <section className="surface">
+      <SectionTitle title="Interne Benutzer"/>
+      <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Hinweis</span></div>{[["Oemer Cam","Administrator","Aktiv","Demo"],["Maria Bianchi","Support","Aktiv","Demo"],["Luca Schneider","Support","Aktiv","Demo"],["Anna Pross","Finanzen","Aktiv","Demo"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
+    </section>
+  </>;
+
+  const roleLabel:Record<string,string>={administrator:"Administrator",support:"Support",finance:"Finanzen",readonly:"Nur Lesen"};
   return <>
     <section className="surface">
-      <SectionTitle title="Interne Benutzer" action={<Button icon="plus" onClick={()=>setInviteOpen(true)}>Benutzer</Button>}/>
-      <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Letzte Anmeldung</span></div>{[["Oemer Cam","Administrator","Aktiv","Heute 09:18"],["Maria Bianchi","Support","Aktiv","Heute 08:42"],["Luca Schneider","Support","Aktiv","Gestern"],["Anna Pross","Finanzen","Aktiv","Gestern"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
+      <SectionTitle title="Operator-Zugriffe"/>
+      <p className="technical-hint">Es werden nur tatsächlich autorisierte Operator-Konten angezeigt. Namen und E-Mail-Adressen werden nicht aus dem Auth-System erfunden.</p>
+      {items.length?<div className="operator-table"><div className="operator-table-head security"><span>Benutzer-ID</span><span>Rolle</span><span>Status</span><span>Erstellt</span></div>{items.map(item=><div className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.user_id).slice(0,12)}…</b></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{new Date(String(item.created_at)).toLocaleDateString("de-CH")}</span></div>)}</div>:<EmptyState icon="lock" title="Keine Operator-Zugriffe" text="Es sind keine autorisierten internen Benutzer hinterlegt."/>}
     </section>
-    {inviteOpen&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setInviteOpen(false)}}><section className="operator-confirm operator-user-modal"><span className="confirm-icon"><Icon name="users"/></span><h2>Interner Benutzer</h2><p>Neue interne Benutzer erhalten nur die ausgewählte Rolle. Änderungen werden im Audit protokolliert.</p><label>Name<input placeholder="Vorname Nachname"/></label><label>E-Mail<input type="email" placeholder="name@binso.ch"/></label><label>Rolle<select><option>Support</option><option>Finanzen</option><option>Administrator</option></select></label><div><Button variant="secondary" onClick={()=>setInviteOpen(false)}>Abbrechen</Button><Button onClick={()=>{setInviteOpen(false);setToast("Einladung vorbereitet.");window.setTimeout(()=>setToast(null),2200)}}>Einladen</Button></div></section></div>}
+    <section className="surface security-card"><div className="security-row"><div><b>Operator-Benutzer hinzufügen</b><p>Neue Operator-Konten müssen bewusst über den sicheren Auth- und Berechtigungsprozess provisioniert werden.</p></div><Status tone="neutral">Manuell provisionieren</Status><Button variant="secondary" disabled>Einladen</Button></div></section>
     {toast&&<Toast title={toast}/>}
   </>;
 }
