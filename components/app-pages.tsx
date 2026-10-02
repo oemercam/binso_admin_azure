@@ -563,6 +563,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [vatRate,setVatRate]=useState("8.1");
   const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
   const [status,setStatus]=useState(existing?"Eingereicht":"Eingereicht");
+  const [receiptFile,setReceiptFile]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -590,13 +591,26 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
     try{
       const payload={employeeName:person,merchant:description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
+      let targetExpenseId=expenseId??"";
       if(production){
-        if(existing&&expenseId) await apiPatch("/api/expenses/"+encodeURIComponent(expenseId),payload);
-        else await apiPost("/api/expenses",payload);
+        if(existing&&expenseId){
+          const result=await apiPatch<{item:{id:string}}>("/api/expenses/"+encodeURIComponent(expenseId),payload);
+          targetExpenseId=result.item?.id??expenseId;
+        }else{
+          const result=await apiPost<{item:{id:string}}>("/api/expenses",payload);
+          targetExpenseId=result.item.id;
+        }
+        if(receiptFile&&targetExpenseId){
+          const form=new FormData();
+          form.append("file",receiptFile);
+          form.append("purpose","expense_receipt");
+          form.append("entityId",targetExpenseId);
+          await apiUpload("/api/files",form);
+        }
       }else if(!existing){
         appendDemoRow("expenses",[description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
-      setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
+      setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");
       window.setTimeout(()=>router.push("/spesen"),700);
     }catch(error){
       setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
@@ -606,7 +620,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
 
   return <AppShell title={existing ? description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
-      <button className="receipt-upload" type="button" onClick={()=>{setToast("Dateiupload wird mit Supabase Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
+      <label className="receipt-upload" htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{receiptFile?receiptFile.name:"Beleg hinzufügen"}</b><small>{receiptFile?"Wird beim Speichern hochgeladen":"Kamera oder Datei verwenden"}</small></label><input id="expense-receipt-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>setReceiptFile(e.target.files?.[0]??null)}/>
       <div className="form-page">
         <div className="form-grid two">
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
