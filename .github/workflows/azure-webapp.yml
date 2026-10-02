@@ -85,6 +85,9 @@ jobs:
           az webapp config appsettings list --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --query "[?name=='WEBSITE_RUN_FROM_PACKAGE' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='PORT' || name=='WEBSITES_PORT']" -o table
           echo "=== Recent application logs ==="
           az webapp log config --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --application-logging filesystem --level information --web-server-logging filesystem || true
+          echo "=== Azure log download ==="
+          az webapp log download --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --log-file /tmp/logs.zip || true
+          if [ -f /tmp/logs.zip ]; then unzip -oq /tmp/logs.zip -d /tmp/azurelogs; find /tmp/azurelogs -type f -maxdepth 5 -print; grep -R -i -E "error|exception|failed|server.js|node|container" /tmp/azurelogs | tail -n 300 || true; fi
           echo "=== Kudu log files ==="
           TOKEN=$(az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv)
           az rest --method post --url "https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$AZURE_WEBAPP_RG/providers/Microsoft.Web/sites/binso-admin-prod/config/publishingcredentials/list?api-version=2024-04-01" --headers "Authorization=Bearer $TOKEN" > /tmp/pub.json
