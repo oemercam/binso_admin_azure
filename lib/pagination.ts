@@ -1,0 +1,1 @@
+export function pageParams(url:string){const p=new URL(url).searchParams;const limit=Math.min(Math.max(Number(p.get("limit")||25),1),100);const cursor=p.get("cursor");return {limit,cursor}}
