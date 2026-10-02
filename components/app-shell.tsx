@@ -44,11 +44,23 @@ export function AppShell({
   const [query, setQuery] = useState("");
   const [timerRunning, setTimerRunning] = useState(true);
   const [dark, setDark] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(8067);
+  const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
+  const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
+  const [timerNow, setTimerNow] = useState(Date.now());
 
   useEffect(() => {
     queueMicrotask(() => {
-      setTimerRunning(window.localStorage.getItem("binso.timer.running") !== "false");
+      const running=window.localStorage.getItem("binso.timer.running") !== "false";
+      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "8067");
+      let startedAt=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
+      if(running && !startedAt){
+        startedAt=Date.now();
+        window.localStorage.setItem("binso.timer.startedAt",String(startedAt));
+      }
+      setTimerRunning(running);
+      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 8067);
+      setTimerStartedAt(running ? startedAt : null);
+      setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
     });
   }, []);
@@ -64,7 +76,7 @@ export function AppShell({
 
   useEffect(() => {
     if (!timerRunning) return;
-    const id = window.setInterval(() => setTimerSeconds(value => value + 1), 1000);
+    const id = window.setInterval(() => setTimerNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [timerRunning]);
 
@@ -81,9 +93,15 @@ export function AppShell({
     window.localStorage.setItem("binso.theme", next ? "dark" : "light");
   }
 
+  const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
+
   function stopTimer() {
     setTimerRunning(false);
+    setTimerBaseSeconds(timerSeconds);
+    setTimerStartedAt(null);
     window.localStorage.setItem("binso.timer.running", "false");
+    window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
+    window.localStorage.removeItem("binso.timer.startedAt");
   }
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
