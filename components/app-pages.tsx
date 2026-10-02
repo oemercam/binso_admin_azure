@@ -628,7 +628,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     setSent(current=>[...current,value]);
   };
 
-  const production=isProductionBackendEnabled();
+  const production=useBackendMode();
   return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
