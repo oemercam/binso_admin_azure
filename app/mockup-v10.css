@@ -449,3 +449,17 @@ html[data-theme="dark"] .record:hover{background:#000}
   .marketing-nav{padding-left:24px;padding-right:24px}
   .hero{padding-left:24px;padding-right:24px;gap:38px}
 }
+
+
+/* Black/white product language: status is communicated by text, weight and separators, not coloured surfaces. */
+.status,.status-neutral,.status-success,.status-warning,.status-danger,.status-info{
+  background:#fff;color:#111;border:1px solid #dcdcd9
+}
+.status-danger{font-weight:800}
+html[data-theme="dark"] .app-root .logo{filter:invert(1)}
+html[data-theme="dark"] .status,
+html[data-theme="dark"] .status-neutral,
+html[data-theme="dark"] .status-success,
+html[data-theme="dark"] .status-warning,
+html[data-theme="dark"] .status-danger,
+html[data-theme="dark"] .status-info{background:#000!important;color:#fff!important;border-color:#333!important}
