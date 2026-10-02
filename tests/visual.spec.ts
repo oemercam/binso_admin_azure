@@ -6,7 +6,7 @@ const routes = [
   "/angebote", "/angebote/neu", "/angebote/1", "/rechnungen", "/rechnungen/neu", "/rechnungen/1", "/dokumente", "/dokumente/neu", "/dokumente/1",
   "/berichte", "/berichte/umsatz", "/berichte/zeit", "/berichte/forderungen", "/unternehmen", "/unternehmen/firmendaten", "/unternehmen/branding", "/unternehmen/zahlungseinstellungen", "/unternehmen/rechnungsvorlagen", "/unternehmen/standardtexte", "/unternehmen/email-vorlagen", "/unternehmen/nummernkreise", "/unternehmen/steuersaetze", "/unternehmen/waehrungen", "/team", "/team/neu", "/team/1", "/zahlungen", "/mahnungen", "/support", "/support/neu", "/support/tickets", "/support/wissen", "/support/status", "/mehr", "/einstellungen",
   "/einstellungen/profil", "/einstellungen/sprache", "/einstellungen/darstellung", "/einstellungen/sicherheit", "/einstellungen/daten", "/einstellungen/ueber",
-  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/einstellungen/abonnement", "/einstellungen/berechtigungen", "/zahlungen", "/sprache", "/login", "/passwort-vergessen", "/registrieren", "/onboarding", "/rechtliches", "/impressum", "/datenschutz", "/agb",
+  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/einstellungen/abonnement", "/einstellungen/berechtigungen", "/sprache", "/login", "/passwort-vergessen", "/registrieren", "/onboarding", "/rechtliches", "/impressum", "/datenschutz", "/agb",
   "/offline", "/maintenance", "/control", "/control/firmen", "/control/abonnements", "/control/zahlungen", "/control/support", "/control/betrieb", "/control/sicherheit", "/control/kommunikation", "/control/konfiguration",
 ];
 
