@@ -1,0 +1,1 @@
+export type SqlParam=string|number|boolean|null|Date;export interface Database{query<T>(sql:string,params?:SqlParam[]):Promise<T[]>;transaction<T>(work:(db:Database)=>Promise<T>):Promise<T>}export function databaseConfigured(){return Boolean(process.env.DATABASE_URL)}export function requireDatabase(){if(!databaseConfigured())throw new Error("DATABASE_NOT_CONFIGURED")}
