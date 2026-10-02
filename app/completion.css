@@ -1191,3 +1191,30 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
   .mobile-document-bar .button{width:100%;min-height:48px}
   .app-main:has(.global-timer) .mobile-document-bar{bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 66px)}
 }
+
+
+/* Product completion: functional lists and detail views */
+.record-wrapper{display:contents}
+.customer-tab-panel{margin-top:16px;max-width:980px}
+.contact-list>div{min-height:66px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.contact-list>div:last-child{border-bottom:0}
+.contact-list b,.contact-list small{display:block}
+.contact-list b{font-size:12px}
+.contact-list small{margin-top:3px;color:var(--muted);font-size:10px}
+.timeline{display:grid;margin-top:8px}
+.timeline>div{display:grid;grid-template-columns:18px 1fr;gap:10px;min-height:62px;position:relative}
+.timeline>div:before{content:"";position:absolute;left:4px;top:16px;bottom:-6px;width:1px;background:var(--line)}
+.timeline>div:last-child:before{display:none}
+.timeline>div>i{width:9px;height:9px;border-radius:50%;background:var(--ink);margin-top:5px;z-index:1}
+.timeline b,.timeline small{display:block}
+.timeline b{font-size:11px}
+.timeline small{margin-top:3px;color:var(--muted);font-size:9px}
+.customer-tab-panel .compact-list a{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;min-height:54px;border-bottom:1px solid var(--line)}
+.customer-tab-panel .compact-list a:last-child{border-bottom:0}
+@media(max-width:760px){
+  .customer-tab-panel{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0;border-radius:0}
+  .contact-list>div{grid-template-columns:auto 1fr}
+  .contact-list .status{grid-column:2}
+  .customer-tab-panel .compact-list a{grid-template-columns:1fr auto}
+  .customer-tab-panel .compact-list a .status{grid-column:2}
+}
