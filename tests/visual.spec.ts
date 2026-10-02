@@ -15,6 +15,7 @@ for (const route of routes) {
     await page.goto(route);
     await expect(page.locator("body")).toBeVisible();
     await expect(page.locator("body")).not.toHaveCSS("overflow-x", "scroll");
+    expect(await page.locator('a[href="#"]').count()).toBe(0);
     await page.screenshot({
       path: testInfo.outputPath((route.replaceAll("/", "_").replace(/^_/, "") || "home") + ".png"),
       fullPage: true,
