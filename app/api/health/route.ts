@@ -1,1 +1,1 @@
-import {NextResponse} from "next/server";export const dynamic="force-dynamic";export function GET(){return NextResponse.json({status:"ok",service:"binso-one"},{headers:{"Cache-Control":"no-store"}})}
+import {apiOk} from "@/lib/security";import {runtimeCapabilities} from "@/lib/env";export const dynamic="force-dynamic";export function GET(){return apiOk({status:"ok",service:"binso-one",capabilities:runtimeCapabilities()})}
