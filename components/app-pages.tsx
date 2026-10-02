@@ -219,17 +219,39 @@ export function CustomerForm() {
   </AppShell>;
 }
 
+function useDocumentRows(kind:"offer"|"invoice",defaults:string[][]){
+  const [rows,setRows]=useState(defaults);
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
+      .then(payload=>{
+        const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
+        const mapped=payload.items.map(item=>{
+          const customer=item.customer?.name??"Kunde";
+          const status=statusMap[item.status]??item.status;
+          if(kind==="offer") return [item.number,customer,moneyChf(item.total),status];
+          return [item.number,customer,swissDate(item.issue_date),moneyChf(item.total),status];
+        });
+        queueMicrotask(()=>setRows(mapped));
+      })
+      .catch(()=>undefined);
+  },[kind,defaults]);
+  return rows;
+}
+
 export function OffersPage() {
+  const offerRows=useDocumentRows("offer",offers);
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
-    <RecordsView items={offers} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function InvoicesPage() {
+  const invoiceRows=useDocumentRows("invoice",invoices);
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
-        <RecordsView items={invoices} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
+        <RecordsView items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail invoice-tablet-preview">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
