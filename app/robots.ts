@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_MARKETING_URL ?? "https://www.binso.ch";
+import { siteConfig } from "@/lib/config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -30,6 +29,6 @@ export default function robots(): MetadataRoute.Robots {
         "/offline",
       ],
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: `${siteConfig.marketingUrl}/sitemap.xml`,
   };
 }
