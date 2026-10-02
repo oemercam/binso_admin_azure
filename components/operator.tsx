@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button, Icon, Logo, Metric, SectionTitle, Status } from "./ui";
 
 const operatorNav = [
