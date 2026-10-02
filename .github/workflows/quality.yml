@@ -25,3 +25,33 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
+      - name: Runtime smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/binso-next.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID 2>/dev/null || true' EXIT
+
+          READY=0
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            cat /tmp/binso-next.log
+            exit 1
+          fi
+
+          for route in / /produkt /preise /dashboard /kunden /angebote /rechnungen /belege /benachrichtigungen /zeit /support /einstellungen /operator; do
+            curl -fsS "http://127.0.0.1:3000$route" > /dev/null
+          done
+
+          curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
+          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
+          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
+          curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"

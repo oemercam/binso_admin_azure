@@ -1,13 +1,39 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
+import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
+
+function useDemoRows(collection:DemoCollection, defaults:string[][]) {
+  const [rows,setRows]=useState(defaults);
+
+  useEffect(()=>{
+    const sync=()=>{
+      const stored=readDemoRows(collection);
+      queueMicrotask(()=>setRows([...stored,...defaults]));
+    };
+    sync();
+    const listener=(event:Event)=>{
+      const detail=(event as CustomEvent<{collection?:string}>).detail;
+      if(!detail?.collection || detail.collection===collection) sync();
+    };
+    window.addEventListener("binso-demo-data",listener);
+    window.addEventListener("storage",sync);
+    return()=>{
+      window.removeEventListener("binso-demo-data",listener);
+      window.removeEventListener("storage",sync);
+    };
+  },[collection,defaults]);
+
+  return rows;
+}
 
 export function DashboardPage() {
   return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
@@ -61,10 +87,11 @@ export function WelcomePage() {
 }
 
 export function CustomersPage() {
+  const customerRows=useDemoRows("customers",customers);
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <RecordsView items={customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
+        <RecordsView items={customerRows} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
@@ -105,20 +132,39 @@ export function CustomerDetail() {
 }
 
 export function CustomerForm() {
-  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button href="/kunden/acme">Speichern</Button>}>
+  const router=useRouter();
+  const [company,setCompany]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
+  const [city,setCity]=useState("");
+  const [sector,setSector]=useState("Dienstleistung");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=()=>{
+    if(!company.trim() || !city.trim()){
+      setToast("Firmenname und Ort sind erforderlich.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
+    setToast("Kunde gespeichert.");
+    window.setTimeout(()=>router.push("/kunden"),700);
+  };
+  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <section className="form-section clean">
         <h2>Grundangaben</h2>
         <div className="form-grid two">
-          <Field label="Firmenname"><input autoFocus placeholder="Firma oder Name"/></Field>
-          <Field label="E-Mail"><input type="email" placeholder="name@firma.ch"/></Field>
-          <Field label="Telefon"><input type="tel" inputMode="tel" placeholder="+41 00 000 00 00"/></Field>
-          <Field label="Ort"><input placeholder="Zürich"/></Field>
+          <Field label="Firmenname"><input autoFocus value={company} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
+          <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
+          <Field label="Telefon"><input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
+          <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
+          <Field label="Branche"><select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></select></Field>
         </div>
       </section>
       <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><input placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><input inputMode="numeric" placeholder="8000"/></Field><Field label="UID"><input placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><input placeholder="Optional"/></Field></div></details>
-      <div className="mobile-sticky-save"><Button href="/kunden/acme">Kunde speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Kunde speichern</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={company.trim()&&city.trim()?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -144,24 +190,44 @@ export function InvoicesPage() {
 }
 
 export function PaymentsPage() {
+  const paymentRows=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus">Zahlung erfassen</Button>}>
     <div className="metrics-grid three"><Metric label="Eingegangen" value="CHF 49’820" hint="diesen Monat" icon="wallet"/><Metric label="Offen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Überfällig" value="CHF 3’700" hint="1 Rechnung" icon="clock"/></div>
-    <RecordsView items={payments} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function PaymentForm() {
-  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button href="/zahlungen">Zahlung speichern</Button>}>
+  const router=useRouter();
+  const [date,setDate]=useState("2026-10-02");
+  const [amount,setAmount]=useState("4346.40");
+  const [method,setMethod]=useState("Banküberweisung");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=()=>{
+    const value=Number(amount.replace(",","."));
+    if(!Number.isFinite(value)||value<=0){
+      setToast("Bitte einen gültigen Betrag erfassen.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    const id=String(Date.now());
+    const swissDate=date.split("-").reverse().join(".");
+    appendDemoRow("payments",[id,swissDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
+    setToast("Zahlung gespeichert.");
+    window.setTimeout(()=>router.push("/zahlungen"),700);
+  };
+  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
       <section className="payment-context"><span className="activity-icon"><Icon name="receipt"/></span><div><small>Rechnung</small><b>RE-2026-019 · Acme AG</b><span>Offener Betrag CHF 4’346.40</span></div></section>
       <div className="form-grid two">
-        <Field label="Zahlungsdatum"><input type="date" defaultValue="2026-10-02"/></Field>
-        <Field label="Betrag"><input inputMode="decimal" defaultValue="4346.40"/></Field>
-        <Field label="Zahlungsmethode"><select defaultValue="bank"><option value="bank">Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
+        <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
+        <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field>
+        <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
         <Field label="Notiz"><input placeholder="Optional"/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/zahlungen">Zahlung speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Zahlung speichern</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("gültigen")?"danger":"success"}/>}
   </AppShell>;
 }
 
@@ -173,76 +239,119 @@ export function PaymentDetail() {
 }
 
 export function ProductsPage() {
+  const productRows=useDemoRows("products",products);
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus">Neues Produkt</Button>}>
-    <RecordsView items={products} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
+    <RecordsView items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function ProductForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button href="/produkte">Speichern</Button>}>
+  const router=useRouter();
+  const [name,setName]=useState(existing?"Beratung":"");
+  const [type,setType]=useState("Dienstleistung");
+  const [price,setPrice]=useState(existing?"120.00":"");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=()=>{
+    if(!name.trim()||!price.trim()){setToast("Name und Verkaufspreis sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
+    if(!existing) appendDemoRow("products",[name.trim(),type,`CHF ${Number(price.replace(",",".")).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
+    setToast("Produkt gespeichert.");
+    window.setTimeout(()=>router.push("/produkte"),700);
+  };
+  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <div className="form-grid two">
-        <Field label="Name"><input defaultValue={existing ? "Beratung" : ""} placeholder="Name"/></Field>
-        <Field label="Typ"><select defaultValue="service"><option value="service">Dienstleistung</option><option value="product">Produkt</option></select></Field>
+        <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
+        <Field label="Typ"><select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></select></Field>
         <Field label="Artikelnummer"><input placeholder="Optional"/></Field>
         <Field label="Einheit"><select><option>Stunde</option><option>Stück</option><option>Pauschal</option></select></Field>
-        <Field label="Verkaufspreis"><input inputMode="decimal" defaultValue={existing ? "120.00" : ""} placeholder="0.00"/></Field>
+        <Field label="Verkaufspreis"><input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
         <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/produkte">Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")?"danger":"success"}/>}
   </AppShell>;
 }
 
 export function EmployeesPage() {
+  const employeeRows=useDemoRows("employees",employees);
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus">Mitarbeiter</Button>}>
-    <RecordsView items={employees} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
+    <RecordsView items={employeeRows} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function EmployeeForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button href="/mitarbeiter">Speichern</Button>}>
+  const router=useRouter();
+  const [firstName,setFirstName]=useState(existing?"Thomas":"");
+  const [lastName,setLastName]=useState(existing?"Müller":"");
+  const [role,setRole]=useState(existing?"Inhaber":"");
+  const [load,setLoad]=useState(existing?"100":"100");
+  const [status,setStatus]=useState("Aktiv");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=()=>{
+    if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
+    if(!existing) appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
+    setToast("Mitarbeiter gespeichert.");
+    window.setTimeout(()=>router.push("/mitarbeiter"),700);
+  };
+  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
     {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
     <div className="form-page">
       <div className="form-grid two">
-        <Field label="Vorname"><input defaultValue={existing ? "Thomas" : ""}/></Field>
-        <Field label="Nachname"><input defaultValue={existing ? "Müller" : ""}/></Field>
+        <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
+        <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
         <Field label="E-Mail"><input type="email" defaultValue={existing ? "thomas@firma.ch" : ""}/></Field>
         <Field label="Telefon"><input type="tel" inputMode="tel"/></Field>
-        <Field label="Funktion"><input defaultValue={existing ? "Inhaber" : ""}/></Field>
-        <Field label="Pensum"><input inputMode="numeric" defaultValue={existing ? "100" : ""} placeholder="%"/></Field>
+        <Field label="Funktion"><input value={role} onChange={e=>setRole(e.target.value)}/></Field>
+        <Field label="Pensum"><input inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
         <Field label="Eintritt"><input type="date" defaultValue={existing ? "2024-01-01" : ""}/></Field>
-        <Field label="Status"><select><option>Aktiv</option><option>Inaktiv</option></select></Field>
+        <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/mitarbeiter">Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")?"danger":"success"}/>}
   </AppShell>;
 }
 
 export function ExpensesPage() {
+  const expenseRows=useDemoRows("expenses",expenses);
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus">Spese erfassen</Button>}>
-    <RecordsView items={expenses} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function ExpenseForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button>}>
+  const router=useRouter();
+  const [person,setPerson]=useState("Thomas Müller");
+  const [category,setCategory]=useState(existing?"Reise":"Reise");
+  const [amount,setAmount]=useState(existing?"280.00":"");
+  const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=()=>{
+    const value=Number(amount.replace(",","."));
+    if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
+    if(!existing) appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
+    setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
+    window.setTimeout(()=>router.push("/spesen"),700);
+  };
+  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
-      <button className="receipt-upload" type="button"><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
+      <button className="receipt-upload" type="button" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
       <div className="form-page">
         <div className="form-grid two">
-          <Field label="Mitarbeiter"><select><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
+          <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
           <Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field>
-          <Field label="Kategorie"><select><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
-          <Field label="Betrag"><input inputMode="decimal" defaultValue={existing ? "280.00" : ""} placeholder="0.00"/></Field>
+          <Field label="Kategorie"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
+          <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
           <Field label="Währung"><select><option>CHF</option><option>EUR</option></select></Field>
           <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
-          <Field label="Beschreibung" className="full"><textarea defaultValue={existing ? "Übernachtung Kundentermin Zürich" : ""} placeholder="Kurze Beschreibung"/></Field>
+          <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("gültigen")?"danger":"success"}/>}
   </AppShell>;
 }
 
@@ -515,16 +624,19 @@ export function DocumentsHubPage() {
 
 export function NotificationsPage() {
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
+  const [view,setView]=useState<"all"|"unread">("all");
   const items=[
     ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
     ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
     ["offer","file","Angebot angenommen","Acme AG · AN-2026-012","heute","/angebote/AN-2026-012"],
     ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
   ];
+  const visible=view==="all"?items:items.filter(([id])=>!read.includes(id));
+  const unreadCount=items.length-read.length;
   return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
     <div className="notification-center">
-      <div className="notification-center-tabs"><button className="active">Alle</button><button>Ungelesen</button></div>
-      <div className="notification-center-list">{items.map(([id,icon,title,text,time,href])=>{
+      <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}>Alle</button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}>Ungelesen{unreadCount>0?` (${unreadCount})`:""}</button></div>
+      {visible.length?<div className="notification-center-list">{visible.map(([id,icon,title,text,time,href])=>{
         const isRead=read.includes(id);
         return <Link href={href} className={isRead?"notification-center-row":"notification-center-row unread"} key={id} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}>
           <span className="activity-icon"><Icon name={icon}/></span>
@@ -532,7 +644,7 @@ export function NotificationsPage() {
           {!isRead&&<i className="unread-dot"/>}
           <Icon name="arrow" size={16}/>
         </Link>;
-      })}</div>
+      })}</div>:<EmptyState icon="bell" title="Alles gelesen" text="Es gibt aktuell keine ungelesenen Benachrichtigungen."/>}
       <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
     </div>
   </AppShell>;

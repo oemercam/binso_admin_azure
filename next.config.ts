@@ -28,10 +28,13 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
   { key: "X-DNS-Prefetch-Control", value: "off" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
 ];
 
 const noStoreHeaders = [
   { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
 ];
 
 const sensitiveRoutes = [
@@ -53,6 +56,8 @@ const sensitiveRoutes = [
   "/registrieren/:path*",
   "/passwort-vergessen/:path*",
   "/willkommen/:path*",
+  "/demo/:path*",
+  "/api/:path*",
 ];
 
 const nextConfig: NextConfig = {
