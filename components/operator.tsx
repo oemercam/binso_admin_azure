@@ -511,12 +511,23 @@ function RestrictionsView() {
 
 function MonitoringView() {
   const production=useBackendMode();
-  const [data,setData]=useState<{services?:Array<{name:string;status:string}>;incidents?:Array<Record<string,unknown>>}>({});
+  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string}>;incidents?:Array<Record<string,unknown>>}>({});
+  const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
     if(!production) return;
     apiGet<typeof data>("/api/operator/monitoring").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
   },[production]);
+
+  const testEmail=async()=>{
+    try{
+      await apiPost("/api/operator/integrations/email-test",{});
+      setToast("Test-E-Mail wurde an dein Operator-Konto gesendet.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Test-E-Mail konnte nicht gesendet werden.");
+    }
+    window.setTimeout(()=>setToast(null),2600);
+  };
 
   if(!production) return <>
     <div className="operator-monitor-metrics"><Metric label="Verfügbarkeit" value="99.99%" hint="Demo" icon="chart"/><Metric label="API Antwortzeit" value="182 ms" hint="Demo" icon="clock"/><Metric label="Fehlerrate" value="0.08%" hint="Demo" icon="support"/><Metric label="Aktive Nutzer" value="1’284" hint="Demo" icon="users"/></div>
@@ -525,24 +536,28 @@ function MonitoringView() {
 
   const services=data.services??[];
   const incidents=data.incidents??[];
-  const connected=services.filter(service=>service.status==="operational").length;
-  const missing=services.filter(service=>service.status==="not_connected").length;
+  const operational=services.filter(service=>service.status==="operational").length;
+  const configured=services.filter(service=>service.status==="configured").length;
+  const missing=services.filter(service=>service.status==="not_connected"||service.status==="not_implemented").length;
+  const emailReady=services.some(service=>service.key==="email"&&service.status==="configured");
+  const label=(status:string)=>status==="operational"?"Operational":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht implementiert":"Nicht verbunden";
 
   return <>
     <div className="operator-monitor-metrics">
-      <Metric label="Core Services" value={String(connected)} hint="als operational hinterlegt" icon="chart"/>
-      <Metric label="Externe Integrationen" value={String(missing)} hint="noch nicht verbunden" icon="clock"/>
+      <Metric label="Operational" value={String(operational)} hint="laufende Kernservices" icon="chart"/>
+      <Metric label="Konfiguriert" value={String(configured)} hint="externe Integrationen bereit" icon="check"/>
+      <Metric label="Offen" value={String(missing)} hint="nicht verbunden / nicht implementiert" icon="clock"/>
       <Metric label="Aktive Ereignisse" value={String(incidents.filter(item=>String(item.status)!=="resolved").length)} hint="nicht gelöst" icon="support"/>
-      <Metric label="Telemetrie" value="App Health" hint="Azure Health Check aktiv" icon="users"/>
     </div>
     <div className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>Keine erfundenen SLA-Werte</small></div>
-      <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.status==="operational"?"Binso One":"Externe Integration"}</small></span></div><strong>{service.status==="operational"?"Operational":"Nicht verbunden"}</strong><div className="spark"/></div>)}</div>
+      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>Konfiguration statt erfundener SLA-Werte</small></div>
+      <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
     </div>
     <section className="surface incident-history">
       <SectionTitle title="Ereignisse"/>
       {incidents.length?incidents.map(item=><div className="incident-row" key={String(item.id)}><span className={"incident-dot "+(String(item.status)==="resolved"?"resolved":"maintenance")}/><div><b>{String(item.title??"Ereignis")}</b><small>{String(item.service??"")} · {new Date(String(item.started_at)).toLocaleString("de-CH")}</small></div><Status tone={String(item.status)==="resolved"?"success":"warning"}>{operatorStatus(String(item.status))}</Status></div>):<EmptyState icon="chart" title="Keine Ereignisse" text="Es sind keine Plattform-Ereignisse erfasst."/>}
     </section>
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
