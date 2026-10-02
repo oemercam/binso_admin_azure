@@ -15,7 +15,8 @@ export function proxy(request:NextRequest){
 
   const demo=request.cookies.get("binso_demo")?.value==="1";
   const access=request.cookies.get("binso_access_token")?.value;
-  if(demo||access) return NextResponse.next();
+  const refresh=request.cookies.get("binso_refresh_token")?.value;
+  if(demo||access||refresh) return NextResponse.next();
 
   const login=new URL("/login",request.url);
   login.searchParams.set("next",pathname);
