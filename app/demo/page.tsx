@@ -12,6 +12,7 @@ export default function Demo(){
   const start=async()=>{
     setLoading(true);setError("");
     try{
+      window.localStorage.setItem("binso.demo.session","1");
       const response=await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
       if(!response.ok) throw new Error("Demo konnte nicht gestartet werden.");
       router.push("/dashboard");
