@@ -1,14 +1,2 @@
-import Link from "next/link";
-
-export function PublicShell({children}:{children:React.ReactNode}) {
-  return <main className="public-shell">
-    <header className="public-header">
-      <Link className="public-brand" href="/">binso <span>One</span></Link>
-      <nav>
-        <Link href="/funktionen">Funktionen</Link><Link href="/so-funktioniert-es">So funktioniert es</Link>
-        <Link href="/preise">Preise</Link><Link href="/faq">FAQ</Link>
-      </nav>
-      <div className="public-actions"><Link href="/login">Anmelden</Link><Link className="black" href="/registrieren">30 Tage kostenlos testen</Link><button>DE⌄</button></div>
-    </header>{children}
-  </main>
-}
+"use client";import Link from "next/link";import {Menu,X} from "lucide-react";import {useState} from "react";
+export function PublicShell({children}:{children:React.ReactNode}){const[open,setOpen]=useState(false);return <main className="public-shell"><header className="public-header"><Link className="public-brand" href="/">binso <span>One</span></Link><nav><Link href="/funktionen">Funktionen</Link><Link href="/so-funktioniert-es">So funktioniert es</Link><Link href="/preise">Preise</Link><Link href="/faq">FAQ</Link></nav><div className="public-actions"><Link href="/login">Anmelden</Link><Link className="black" href="/registrieren">30 Tage kostenlos testen</Link><Link className="language-link" href="/sprache">DE⌄</Link></div><button className="public-menu-toggle" aria-label={open?"Navigation schliessen":"Navigation öffnen"} aria-expanded={open} onClick={()=>setOpen(!open)}>{open?<X size={21}/>:<Menu size={21}/>}</button></header>{open&&<div className="public-mobile-menu"><nav><Link onClick={()=>setOpen(false)} href="/funktionen">Funktionen</Link><Link onClick={()=>setOpen(false)} href="/so-funktioniert-es">So funktioniert es</Link><Link onClick={()=>setOpen(false)} href="/preise">Preise</Link><Link onClick={()=>setOpen(false)} href="/faq">FAQ</Link><Link onClick={()=>setOpen(false)} href="/sicherheit">Sicherheit</Link><Link onClick={()=>setOpen(false)} href="/kontakt">Kontakt</Link></nav><div><Link href="/login">Anmelden</Link><Link className="black" href="/registrieren">30 Tage kostenlos testen</Link><Link href="/sprache">Sprache · DE</Link></div></div>}{children}</main>}
