@@ -1,6 +1,188 @@
-import { Icon, Logo, Metric, SectionTitle, Status } from "./ui";
+"use client";
 
-export function OperatorPage(){
- const tickets=[["#8421","Rechnungsstellung unklar","Acme AG","Offen"],["#8419","Zahlung fehlgeschlagen","Müller GmbH","In Bearbeitung"],["#8416","Zugangsproblem","Berger Bau AG","Offen"],["#8415","Funktionserweiterung","Huber & Söhne","Wartet auf Kunde"]];
- return <div className="operator-root"><aside className="operator-sidebar"><Logo dark/><nav>{[["home","Dashboard"],["support","Tickets"],["users","Kunden"],["wallet","Zahlungen"],["card","Abonnemente"],["lock","Sperrungen"],["chart","Monitoring"],["bell","Ankündigungen"],["settings","Sicherheit"],["file","Audit"]].map(([i,l],idx)=><a className={idx===0?"active":""} href="#" key={l}><Icon name={i}/><span>{l}</span>{l==="Tickets"&&<em>12</em>}</a>)}</nav></aside><main className="operator-main"><header><div><h1>Operator Dashboard</h1><p>Betrieb und Kundenumgebung von Binso One.</p></div><div className="operator-user"><button><Icon name="search"/></button><button><Icon name="bell"/></button><span className="avatar">OC</span></div></header><div className="metrics-grid"><Metric label="Aktive Kunden" value="2’841" hint="+12%" icon="users"/><Metric label="Offene Tickets" value="12" hint="4 in Bearbeitung" icon="support"/><Metric label="Monatlicher Umsatz" value="CHF 49’820" hint="+8%" icon="chart"/><Metric label="Systemstatus" value="Operational" hint="Alle Systeme verfügbar" icon="lock"/></div><div className="operator-grid"><section className="surface"><SectionTitle title="Support" action={<button className="text-action">Alle Tickets</button>}/><div className="compact-list">{tickets.map(([nr,subject,customer,status])=><div key={nr}><b>{nr} · {subject}</b><span>{customer}</span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></div>)}</div></section><section className="surface"><SectionTitle title="Monitoring"/><div className="service-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><span><i/>{s}</span><strong>{i===4?"99.98%":"99.99%"}</strong></div>)}</div></section></div><div className="operator-grid thirds"><section className="surface"><SectionTitle title="Zahlungen"/><div className="mini-stat"><span>Erfolgreich</span><strong>184</strong></div><div className="mini-stat"><span>Fehlgeschlagen</span><strong>2</strong></div><div className="mini-stat"><span>Umsatz</span><strong>CHF 49’820</strong></div></section><section className="surface"><SectionTitle title="Sperrungen"/><div className="notice"><Status tone="warning">1 aktiv</Status><b>Meier Handel AG</b><span>Zahlungsausstand seit 14 Tagen</span><button className="text-action">Details öffnen</button></div></section><section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Kunde aktualisiert · Acme AG</span><span><b>09:18</b> Sperrung erstellt · Meier Handel AG</span><span><b>Gestern</b> Zahlung manuell erfasst</span></div></section></div></main></div>
+import Link from "next/link";
+import { useMemo } from "react";
+import { Button, Icon, Logo, Metric, SectionTitle, Status } from "./ui";
+
+const operatorNav = [
+  ["","Dashboard","home"],
+  ["tickets","Tickets","support"],
+  ["kunden","Kunden","users"],
+  ["zahlungen","Zahlungen","wallet"],
+  ["abonnemente","Abonnemente","card"],
+  ["sperrungen","Sperrungen","lock"],
+  ["monitoring","Monitoring","chart"],
+  ["ankuendigungen","Ankündigungen","bell"],
+  ["sicherheit","Sicherheit","settings"],
+  ["audit","Audit","file"],
+] as const;
+
+const tickets = [
+  ["#8421","Rechnungsstellung unklar","Acme AG","Offen"],
+  ["#8419","Zahlung fehlgeschlagen","Müller GmbH","In Bearbeitung"],
+  ["#8416","Zugangsproblem","Berger Bau AG","Offen"],
+  ["#8415","Funktionserweiterung","Huber & Söhne","Wartet auf Kunde"],
+];
+
+export function OperatorPage({ section = "" }: { section?: string }) {
+  const key = section.split("/")[0] || "";
+  const detail = section.split("/")[1] || "";
+  const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
+
+  return <div className="operator-root">
+    <aside className="operator-sidebar">
+      <Link href="/operator"><Logo dark/></Link>
+      <nav>{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span>{label==="Tickets"&&<em>12</em>}</Link>)}</nav>
+    </aside>
+
+    <main className="operator-main">
+      <header>
+        <div><h1>{detail ? `Ticket #${detail}` : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
+        <div className="operator-user"><button aria-label="Suche"><Icon name="search"/></button><button aria-label="Benachrichtigungen"><Icon name="bell"/></button><span className="avatar">OC</span></div>
+      </header>
+
+      {detail && key === "tickets" ? <TicketDetail/> :
+        key === "tickets" ? <TicketsView/> :
+        key === "kunden" ? <CustomersView/> :
+        key === "zahlungen" ? <PaymentsView/> :
+        key === "abonnemente" ? <SubscriptionsView/> :
+        key === "sperrungen" ? <RestrictionsView/> :
+        key === "monitoring" ? <MonitoringView/> :
+        key === "ankuendigungen" ? <AnnouncementsView/> :
+        key === "sicherheit" ? <SecurityView/> :
+        key === "audit" ? <AuditView/> :
+        <OperatorDashboard/>}
+    </main>
+  </div>;
+}
+
+function operatorSubtitle(key: string, detail: string) {
+  if (detail) return "Kundenanfrage prüfen und beantworten.";
+  return {
+    "": "Betrieb und Kundenumgebung von Binso One.",
+    tickets: "Kundenanfragen verwalten und beantworten.",
+    kunden: "Kundenkonten, Status und Supportkontext.",
+    zahlungen: "Zahlungen und fehlgeschlagene Transaktionen.",
+    abonnemente: "Pläne, Nutzung und Abrechnungsstatus.",
+    sperrungen: "Einschränkungen kontrolliert verwalten.",
+    monitoring: "Status der Plattform und abhängiger Services.",
+    ankuendigungen: "Hinweise für Kunden veröffentlichen.",
+    sicherheit: "Interne Benutzer, Rollen und Sicherheitsstatus.",
+    audit: "Kritische Operator-Aktionen nachvollziehen.",
+  }[key] ?? "Binso One Operator";
+}
+
+function OperatorDashboard() {
+  return <>
+    <div className="metrics-grid">
+      <Metric label="Aktive Kunden" value="2’841" hint="+12%" icon="users"/>
+      <Metric label="Offene Tickets" value="12" hint="4 in Bearbeitung" icon="support"/>
+      <Metric label="Monatlicher Umsatz" value="CHF 49’820" hint="+8%" icon="chart"/>
+      <Metric label="Systemstatus" value="Operational" hint="Alle Systeme verfügbar" icon="lock"/>
+    </div>
+
+    <div className="operator-grid">
+      <section className="surface">
+        <SectionTitle title="Support" action={<Link className="text-action" href="/operator/tickets">Alle Tickets</Link>}/>
+        <div className="compact-list">{tickets.map(([nr,subject,customer,status])=><div key={nr}><b>{nr} · {subject}</b><span>{customer}</span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></div>)}</div>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Monitoring" action={<Link className="text-action" href="/operator/monitoring">Details</Link>}/>
+        <div className="service-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><span><i/>{s}</span><strong>{i===4?"99.98%":"99.99%"}</strong></div>)}</div>
+      </section>
+    </div>
+
+    <div className="operator-grid thirds">
+      <section className="surface"><SectionTitle title="Zahlungen"/><div className="mini-stat"><span>Erfolgreich</span><strong>184</strong></div><div className="mini-stat"><span>Fehlgeschlagen</span><strong>2</strong></div><div className="mini-stat"><span>Umsatz</span><strong>CHF 49’820</strong></div></section>
+      <section className="surface"><SectionTitle title="Sperrungen"/><div className="notice"><Status tone="warning">1 aktiv</Status><b>Meier Handel AG</b><span>Zahlungsausstand seit 14 Tagen</span><Link className="text-action" href="/operator/sperrungen">Details öffnen</Link></div></section>
+      <section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Kunde aktualisiert · Acme AG</span><span><b>09:18</b> Sperrung erstellt · Meier Handel AG</span><span><b>Gestern</b> Zahlung manuell erfasst</span></div></section>
+    </div>
+  </>;
+}
+
+function TicketsView() {
+  return <section className="surface operator-table-card">
+    <div className="operator-toolbar"><div className="chips"><button className="active">Alle 124</button><button>Offen 12</button><button>In Bearbeitung 8</button><button>Wartet auf Kunde 6</button><button>Gelöst 98</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Tickets suchen..."/></label></div>
+    <div className="operator-table">
+      <div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>
+      {tickets.concat([["#8413","Frage zu Abonnement","Schmid Consulting","In Bearbeitung"],["#8410","Datenexport fehlerhaft","Meier Handel AG","Offen"]]).map(([nr,subject,customer,status],i)=><Link href={`/operator/tickets/${nr.replace("#","")}`} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>vor {12+i*18} Min.</span></Link>)}
+    </div>
+  </section>;
+}
+
+function TicketDetail() {
+  return <div className="operator-ticket-layout">
+    <section className="surface operator-thread">
+      <div className="tabs"><button className="active">Konversation</button><button>Interne Notizen</button><button>Aktivitäten</button></div>
+      <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
+      <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
+      <div className="operator-reply"><textarea placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen"><Icon name="upload"/></button><Button>Senden</Button></div></div>
+    </section>
+    <aside className="surface customer-context">
+      <SectionTitle title="Kunde"/>
+      <h3>Acme AG</h3><p>K-1001 · CHE-123.456.789</p>
+      <Link href="/operator/kunden">Kundendetails öffnen →</Link>
+      <div className="context-block"><small>Abonnement</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div>
+      <div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b></div>
+    </aside>
+  </div>;
+}
+
+function CustomersView() {
+  return <section className="surface">
+    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input placeholder="Kunden suchen..."/></label><div className="chips"><button className="active">Alle</button><button>Aktiv</button><button>Eingeschränkt</button><button>Gesperrt</button></div></div>
+    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status])=><div className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>heute</span></div>)}</div>
+  </section>;
+}
+
+function PaymentsView() {
+  return <>
+    <div className="metrics-grid three"><Metric label="Umsatz total" value="CHF 49’820" hint="+8%" icon="chart"/><Metric label="Erfolgreiche Zahlungen" value="184" hint="98.9%" icon="wallet"/><Metric label="Fehlgeschlagen" value="2" hint="1.1%" icon="clock"/></div>
+    <section className="surface operator-table-card"><div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></div>{[["02.10.2026","Acme AG","CHF 1’240.00","Erfolgreich","Visa •••• 4242"],["02.10.2026","Müller GmbH","CHF 49.00","Erfolgreich","Mastercard •••• 7319"],["01.10.2026","Schmid Consulting","CHF 89.00","Fehlgeschlagen","Visa •••• 4002"]].map(r=><div className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Erfolgreich"?"success":"danger"}>{x}</Status>:x}</span>)}</div>)}</div></section>
+  </>;
+}
+
+function SubscriptionsView() {
+  return <div className="operator-grid thirds">
+    {[
+      ["Start","1’128","CHF 19","21’432"],
+      ["Business","1’462","CHF 49","71’638"],
+      ["Pro","251","CHF 89","22’339"],
+    ].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary">Details</Button></section>)}
+  </div>;
+}
+
+function RestrictionsView() {
+  return <div className="operator-grid">
+    <section className="surface restriction-form"><SectionTitle title="Sperrung erstellen"/><div className="form-grid two"><label>Kunde<select><option>Meier Handel AG</option></select></label><label>Grund<select><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option></select></label><label>Umfang<select><option>Gesamter Zugriff</option><option>Nur Schreibzugriff</option></select></label><label>Ablaufdatum<input type="date"/></label><label className="full">Interne Begründung<textarea defaultValue="Ausstehende Zahlung seit 14 Tagen. Mehrfache Mahnung ohne Reaktion."/></label></div><Button variant="danger">Sperrung erstellen</Button></section>
+    <section className="surface"><SectionTitle title="Aktive Einschränkungen"/><div className="notice"><Status tone="warning">Eingeschränkt</Status><b>Meier Handel AG</b><span>Zahlungsausstand · seit 18.09.2026</span><Button variant="secondary">Aufheben</Button></div></section>
+  </div>;
+}
+
+function MonitoringView() {
+  return <div className="monitoring-panel">
+    <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Alle Systeme verfügbar</b></div><small>Aktualisiert vor 1 Minute</small></div>
+    <div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i===4?"Stripe":"Binso One"}</small></span></div><strong>{i===4?"99.98%":"99.99%"}</strong><div className="spark">{[30,42,36,58,52,70,66,80].map((h,n)=><i key={n} style={{height:h/2}}/>)}</div></div>)}</div>
+  </div>;
+}
+
+function AnnouncementsView() {
+  return <div className="operator-grid">
+    <section className="surface"><SectionTitle title="Neue Ankündigung"/><div className="form-grid"><label className="full">Titel<input placeholder="Kurzer Titel"/></label><label className="full">Typ<select><option>Information</option><option>Wartung</option><option>Störung</option><option>Neue Funktion</option></select></label><label className="full">Zielgruppe<select><option>Alle Kunden</option><option>Business</option><option>Pro</option></select></label><label className="full">Nachricht<textarea placeholder="Nachricht..."/></label></div><Button>Veröffentlichen</Button></section>
+    <section className="surface"><SectionTitle title="Aktiv"/><div className="announcement-card"><Status tone="info">Information</Status><b>Neue Rechnungsansicht</b><p>Die neue mobile Rechnungsvorschau ist verfügbar.</p><small>Heute · alle Kunden</small></div></section>
+  </div>;
+}
+
+function SecurityView() {
+  return <section className="surface">
+    <SectionTitle title="Interne Benutzer" action={<Button icon="plus">Benutzer</Button>}/>
+    <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Letzte Anmeldung</span></div>{[["Oemer Cam","Administrator","Aktiv","Heute 09:18"],["Maria Bianchi","Support","Aktiv","Heute 08:42"],["Luca Schneider","Support","Aktiv","Gestern"],["Anna Pross","Finanzen","Aktiv","Gestern"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
+  </section>;
+}
+
+function AuditView() {
+  return <section className="surface">
+    <div className="operator-toolbar"><div className="chips"><button className="active">Letzte 7 Tage</button><button>Alle Kategorien</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Audit durchsuchen..."/></label></div>
+    <div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></div>{[["10:42","ocam","Kunde aktualisiert","Acme AG (K-1001)"],["09:18","lschneider","Sperrung erstellt","Meier Handel AG"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"],["Gestern","apross","Zahlung manuell erfasst","CHF 299.00"],["28.09.","system","Login erfolgreich","lschneider · Zürich"]].map(r=><div className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</div>)}</div>
+  </section>;
 }
