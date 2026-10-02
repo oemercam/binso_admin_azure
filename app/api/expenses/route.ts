@@ -5,7 +5,7 @@ import { tenantInsert, tenantList } from "@/lib/server/database";
 type ExpenseBody={employeeId?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
 
 export async function GET(){
-  try{return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at","order=expense_date.desc")});}
+  try{return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)","order=expense_date.desc")});}
   catch(error){return apiError(error);}
 }
 
