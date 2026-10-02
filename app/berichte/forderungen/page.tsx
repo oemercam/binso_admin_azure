@@ -1,0 +1,1 @@
+import {AppShell} from "@/components/app-shell";export default function Page(){return <AppShell title="Offene Forderungen" back="/berichte"><div className="metrics"><article><span>Offen</span><strong>CHF 8 450</strong><small>4 Rechnungen</small></article><article><span>Überfällig</span><strong>CHF 3 400</strong><small>2 Rechnungen</small></article></div></AppShell>}

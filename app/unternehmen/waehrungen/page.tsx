@@ -1,0 +1,1 @@
+import {AppShell} from "@/components/app-shell";export default function Page(){return <AppShell title="Währungen" back="/unternehmen"><div className="choice-list"><button><span><i>CHF</i>Schweizer Franken</span><b>✓</b></button><button><span><i>EUR</i>Euro</span></button></div></AppShell>}

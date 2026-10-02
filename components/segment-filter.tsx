@@ -1,0 +1,1 @@
+"use client";import {useState} from "react";export function SegmentFilter({items}:{items:string[]}){const[active,setActive]=useState(items[0]);return <div className="segments">{items.map(x=><button className={active===x?"active":""} onClick={()=>setActive(x)} key={x}>{x}</button>)}</div>}

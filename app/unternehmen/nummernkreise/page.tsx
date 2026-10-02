@@ -1,0 +1,1 @@
+import {AppShell} from "@/components/app-shell";import {SaveButton} from "@/components/save-button";export default function Page(){return <AppShell title="Nummernkreise" back="/unternehmen"><form className="form"><label>Rechnungen<input defaultValue="RE-2026-0001"/></label><label>Angebote<input defaultValue="AN-2026-0001"/></label><SaveButton/></form></AppShell>}
