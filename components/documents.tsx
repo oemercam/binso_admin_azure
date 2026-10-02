@@ -22,12 +22,20 @@ function formatMoney(value: number) {
   return value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
+function nextNumber(rows: string[][], prefix: "AN"|"RE") {
+  const sequence=rows.reduce((max,row)=>{
+    const match=(row[0]??"").match(new RegExp("^"+prefix+"-\\d{4}-(\\d+)$"));
+    return match ? Math.max(max,Number(match[1])) : max;
+  },0)+1;
+  return `${prefix}-2026-${String(sequence).padStart(3,"0")}`;
+}
+
 export function OfferEditor({ existing = false }: { existing?: boolean }) {
   const router=useRouter();
   const { addRecord, data }=useDemoData();
   const [preview,setPreview]=useState(false);
   const [customer,setCustomer]=useState("Acme AG");
-  const number=existing?"AN-2026-012":`AN-2026-${String(100+data.offers.length+1).padStart(3,"0")}`;
+  const number=existing?"AN-2026-012":nextNumber(data.offers,"AN");
   const [positions,setPositions]=useState<Position[]>([
     { description:"Website Konzept", quantity:"24", price:"120.00" },
     { description:"Design & Umsetzung", quantity:"12", price:"95.00" },
@@ -55,7 +63,7 @@ export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [customer,setCustomer]=useState("Acme AG");
-  const number=existing?"RE-2026-019":`RE-2026-${String(100+data.invoices.length+1).padStart(3,"0")}`;
+  const number=existing?"RE-2026-019":nextNumber(data.invoices,"RE");
   const [positions,setPositions]=useState<Position[]>([
     { description:"Website Konzept", quantity:"24", price:"120.00" },
     { description:"Design & Umsetzung", quantity:"12", price:"95.00" },
@@ -72,7 +80,7 @@ export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   };
 
   const duplicate=()=>{
-    const duplicateNumber=`RE-2026-${String(100+data.invoices.length+2).padStart(3,"0")}`;
+    const duplicateNumber=nextNumber(data.invoices,"RE");
     addRecord("invoices",[duplicateNumber,customer,"02.10.2026",`CHF ${formatMoney(total)}`,"Offen"]);
     show("Rechnung wurde als neuer Entwurf dupliziert.");
   };
