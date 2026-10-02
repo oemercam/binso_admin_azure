@@ -3,6 +3,7 @@ import "./globals.css";
 import "./completion.css";
 import "./completion-v04.css";
 import { PwaRegister } from "@/components/pwa-register";
+import { DemoDataProvider } from "@/components/demo-data-provider";
 import { siteConfig } from "@/lib/config";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
@@ -60,7 +61,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de-CH" suppressHydrationWarning>
       <body>
-        {children}
+        <DemoDataProvider>{children}</DemoDataProvider>
         <PwaRegister />
       </body>
     </html>
