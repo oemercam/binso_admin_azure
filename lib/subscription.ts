@@ -1,0 +1,1 @@
+import type {Subscription} from "./billing";export function trialDaysRemaining(s:Subscription,now=new Date()){if(!s.trialEndsAt)return null;return Math.max(0,Math.ceil((new Date(s.trialEndsAt).getTime()-now.getTime())/86400000))}export function subscriptionNeedsAttention(s:Subscription){return s.status==="Past Due"||s.status==="Grace Period"||s.status==="Suspended"}
