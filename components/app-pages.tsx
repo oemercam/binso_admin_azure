@@ -902,6 +902,25 @@ export function CompanySettingsPage() {
   const [paymentTerms,setPaymentTerms]=useState("30");
   const [toast,setToast]=useState<string|null>(null);
 
+  const uploadLogo=async(file:File|undefined)=>{
+    if(!file) return;
+    if(!isProductionBackendEnabled()){
+      setToast("Logo-Upload ist im Demo-Modus nicht dauerhaft.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      const form=new FormData();
+      form.append("file",file);
+      form.append("purpose","company_logo");
+      await apiUpload("/api/files",form);
+      setToast("Firmenlogo gespeichert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Firmenlogo konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2600);
+  };
+
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
     apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
@@ -932,7 +951,7 @@ export function CompanySettingsPage() {
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>{name}</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>void save("Logo wird mit Storage angebunden.")}>Logo ändern</Button></section>
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>{name}</b><small>Logo für Angebote und Rechnungen</small></div><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e=>void uploadLogo(e.target.files?.[0])}/></section>
       <section className="settings-form">
         <div className="form-grid two">
           <Field label="Firmenname"><input value={name} onChange={e=>setName(e.target.value)}/></Field>
