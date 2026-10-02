@@ -245,9 +245,24 @@ function TicketDetail() {
 }
 
 function CustomersView() {
-  return <section className="surface">
+  const {production,items}=useOperatorCustomers();
+  const [query,setQuery]=useState("");
+  const [filter,setFilter]=useState("all");
+
+  if(!production) return <section className="surface">
     <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input placeholder="Kunden suchen..."/></label><div className="chips"><button className="active">Alle</button><button>Aktiv</button><button>Eingeschränkt</button><button>Gesperrt</button></div></div>
-    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>heute</span></Link>)}</div>
+    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+  </section>;
+
+  const visible=items.filter(item=>{
+    const accountStatus=item.account?.account_status??"active";
+    return (!query.trim()||(item.name+" "+(item.uid??"")+" "+(item.city??"")).toLowerCase().includes(query.trim().toLowerCase()))&&(filter==="all"||accountStatus===filter);
+  });
+  const price:Record<string,string>={start:"CHF 19",business:"CHF 49",pro:"CHF 89",trial:"CHF 0"};
+
+  return <section className="surface">
+    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden suchen..."/></label><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="active"?"active":""} onClick={()=>setFilter("active")}>Aktiv</button><button className={filter==="restricted"?"active":""} onClick={()=>setFilter("restricted")}>Eingeschränkt</button><button className={filter==="suspended"?"active":""} onClick={()=>setFilter("suspended")}>Gesperrt</button></div></div>
+    {visible.length?<div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Erstellt</span></div>{visible.map(item=>{const status=item.account?.account_status??"active";const plan=item.account?.plan??"trial";return <Link href={"/operator/kunden/"+item.id} className="operator-table-row customer" key={item.id}><span><b>{item.name}</b><small>{item.uid??item.city??"—"}</small></span><span>{operatorPlan(plan)}</span><span>{price[plan]??"—"}</span><span><Status tone={status==="active"?"success":"warning"}>{operatorStatus(status)}</Status></span><span>{new Date(item.created_at).toLocaleDateString("de-CH")}</span></Link>})}</div>:<EmptyState icon="users" title="Keine Kunden" text="Für die aktuelle Auswahl wurden keine Kunden gefunden."/>}
   </section>;
 }
 
