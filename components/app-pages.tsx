@@ -672,6 +672,68 @@ export function AppearanceSettingsPage() {
   </AppShell>;
 }
 
+export function DocumentsHubPage() {
+  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+    <div className="metrics-grid three">
+      <Metric label="Offene Angebote" value="2" hint="CHF 10’464.32" icon="file"/>
+      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
+      <Metric label="Zahlungen im Monat" value="CHF 49’820" hint="184 Eingänge" icon="wallet"/>
+    </div>
+    <div className="documents-hub-grid">
+      <section className="surface">
+        <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/angebote/AN-2026-012"><b>AN-2026-012 · Acme AG</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link>
+          <Link href="/angebote/AN-2026-011"><b>AN-2026-011 · Müller GmbH</b><span>CHF 3’200.00</span><Status tone="neutral">Entwurf</Status></Link>
+        </div>
+        <Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/rechnungen/RE-2026-019"><b>RE-2026-019 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link>
+          <Link href="/rechnungen/RE-2026-018"><b>RE-2026-018 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></Link>
+          <Link href="/rechnungen/RE-2026-017"><b>RE-2026-017 · Berger Bau AG</b><span>CHF 3’700.00</span><Status tone="danger">Überfällig</Status></Link>
+        </div>
+        <Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button>
+      </section>
+      <section className="surface">
+        <SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
+        <div className="compact-list">
+          <Link href="/zahlungen/1"><b>02.10.2026 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Verbucht</Status></Link>
+          <Link href="/zahlungen/2"><b>30.09.2026 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="success">Verbucht</Status></Link>
+        </div>
+        <Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function NotificationsPage() {
+  const [read,setRead]=useState<string[]>(["invoice","offer"]);
+  const items=[
+    ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
+    ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
+    ["offer","file","Angebot angenommen","Acme AG · AN-2026-012","heute","/angebote/AN-2026-012"],
+    ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
+  ];
+  return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
+    <div className="notification-center">
+      <div className="notification-center-tabs"><button className="active">Alle</button><button>Ungelesen</button></div>
+      <div className="notification-center-list">{items.map(([id,icon,title,text,time,href])=>{
+        const isRead=read.includes(id);
+        return <Link href={href} className={isRead?"notification-center-row":"notification-center-row unread"} key={id} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}>
+          <span className="activity-icon"><Icon name={icon}/></span>
+          <div><b>{title}</b><p>{text}</p><small>{time}</small></div>
+          {!isRead&&<i className="unread-dot"/>}
+          <Icon name="arrow" size={16}/>
+        </Link>;
+      })}</div>
+      <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
+    </div>
+  </AppShell>;
+}
+
 export function SimpleModule({ kind }: { kind: "angebote"|"zahlungen"|"produkte"|"mitarbeiter"|"spesen"|"support"|"einstellungen" }) {
   if (kind === "angebote") return <OffersPage/>;
   if (kind === "zahlungen") return <PaymentsPage/>;
