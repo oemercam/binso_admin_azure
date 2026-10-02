@@ -452,20 +452,45 @@ export function EmployeesPage() {
   </AppShell>;
 }
 
-export function EmployeeForm({ existing = false }: { existing?: boolean }) {
+export function EmployeeForm({ existing = false, employeeId }: { existing?: boolean; employeeId?: string }) {
   const router=useRouter();
+  const production=useBackendMode();
   const [firstName,setFirstName]=useState(existing?"Thomas":"");
   const [lastName,setLastName]=useState(existing?"Müller":"");
+  const [email,setEmail]=useState(existing?"thomas@firma.ch":"");
+  const [phone,setPhone]=useState("");
   const [role,setRole]=useState(existing?"Inhaber":"");
   const [load,setLoad]=useState(existing?"100":"100");
+  const [entryDate,setEntryDate]=useState(existing?"2024-01-01":"");
   const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!production||!existing||!employeeId) return;
+    apiGet<{item:Record<string,unknown>}>("/api/employees/"+encodeURIComponent(employeeId)).then(payload=>{
+      const item=payload.item;
+      queueMicrotask(()=>{
+        setFirstName(String(item.first_name??""));
+        setLastName(String(item.last_name??""));
+        setEmail(String(item.email??""));
+        setPhone(String(item.phone??""));
+        setRole(String(item.job_title??""));
+        setLoad(String(item.workload_percent??"100"));
+        setEntryDate(String(item.entry_date??""));
+        setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
+      });
+    }).catch(()=>undefined);
+  },[production,existing,employeeId]);
+
   const save=async()=>{
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
-      if(!existing){
-        if(isProductionBackendEnabled()) await apiPost("/api/employees",{firstName:firstName.trim(),lastName:lastName.trim(),jobTitle:role.trim(),workloadPercent:Number(load),status:status==="Inaktiv"?"inactive":"active"});
-        else appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
+      const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,status:status==="Inaktiv"?"inactive":"active"};
+      if(production){
+        if(existing&&employeeId) await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
+        else await apiPost("/api/employees",payload);
+      }else if(!existing){
+        appendDemoRow("employees",[firstName.trim()+" "+lastName.trim(),role.trim(),load+"%",status]);
       }
       setToast("Mitarbeiter gespeichert.");
       window.setTimeout(()=>router.push("/mitarbeiter"),700);
@@ -474,22 +499,24 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
+
+  const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
     <div className="form-page">
       <div className="form-grid two">
         <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
-        <Field label="E-Mail"><input type="email" defaultValue={existing ? "thomas@firma.ch" : ""}/></Field>
-        <Field label="Telefon"><input type="tel" inputMode="tel"/></Field>
+        <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
+        <Field label="Telefon"><input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         <Field label="Funktion"><input value={role} onChange={e=>setRole(e.target.value)}/></Field>
         <Field label="Pensum"><input inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
-        <Field label="Eintritt"><input type="date" defaultValue={existing ? "2024-01-01" : ""}/></Field>
+        <Field label="Eintritt"><input type="date" value={entryDate} onChange={e=>setEntryDate(e.target.value)}/></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
-      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
