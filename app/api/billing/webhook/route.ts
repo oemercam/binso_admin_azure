@@ -18,6 +18,17 @@ function unixToIso(value:unknown){
   return Number.isFinite(seconds)&&seconds>0?new Date(seconds*1000).toISOString():null;
 }
 
+
+function invoiceSubscriptionRef(object:Record<string,unknown>){
+  const direct=stringValue(object.subscription);
+  if(direct) return direct;
+  const parent=object.parent;
+  if(!parent||typeof parent!=="object") return "";
+  const subscriptionDetails=(parent as Record<string,unknown>).subscription_details;
+  if(!subscriptionDetails||typeof subscriptionDetails!=="object") return "";
+  return stringValue((subscriptionDetails as Record<string,unknown>).subscription);
+}
+
 export async function POST(request:NextRequest){
   try{
     const length=Number(request.headers.get("content-length")??"0");
@@ -49,11 +60,13 @@ export async function POST(request:NextRequest){
       plan=metadataValue(object,"plan")||plan;
     }else if(event.type==="invoice.payment_failed"){
       customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=stringValue(object.subscription)||subscriptionRef;
+      subscriptionRef=invoiceSubscriptionRef(object)||subscriptionRef;
+      if(!subscriptionRef) return json({received:true,ignored:true});
       subscriptionStatus="past_due";
     }else if(event.type==="invoice.paid"){
       customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=stringValue(object.subscription)||subscriptionRef;
+      subscriptionRef=invoiceSubscriptionRef(object)||subscriptionRef;
+      if(!subscriptionRef) return json({received:true,ignored:true});
       subscriptionStatus="active";
     }else{
       return json({received:true,ignored:true});
