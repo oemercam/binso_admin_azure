@@ -740,6 +740,7 @@ export function SupportTicketForm() {
   const [subject,setSubject]=useState("");
   const [category,setCategory]=useState("Allgemeine Frage");
   const [message,setMessage]=useState("");
+  const [attachment,setAttachment]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
   const save=async()=>{
     if(!subject.trim()||!message.trim()){
@@ -750,6 +751,13 @@ export function SupportTicketForm() {
     try{
       if(isProductionBackendEnabled()){
         const payload=await apiPost<{item:{id:string}}>("/api/support/tickets",{subject,category,priority:"normal",message});
+        if(attachment){
+          const form=new FormData();
+          form.append("file",attachment);
+          form.append("purpose","support_attachment");
+          form.append("entityId",payload.item.id);
+          await apiUpload("/api/files",form);
+        }
         router.push("/support/"+payload.item.id);
       }else{
         setToast("Ticket erstellt.");
@@ -767,7 +775,7 @@ export function SupportTicketForm() {
         <Field label="Kategorie" className="full"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
         <Field label="Nachricht" className="full"><textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
-      <button className="attachment-button" type="button" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
+      <label className="attachment-button" htmlFor="support-file-upload"><Icon name="upload"/><span>{attachment?attachment.name:"Screenshot oder Datei hinzufügen"}</span></label><input id="support-file-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>setAttachment(e.target.files?.[0]??null)}/>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
       <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
     </div>
