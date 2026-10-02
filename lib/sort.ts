@@ -1,0 +1,1 @@
+export function sortByUpdated<T extends {updatedAt:string}>(items:T[]){return [...items].sort((a,b)=>Date.parse(b.updatedAt)-Date.parse(a.updatedAt))}
