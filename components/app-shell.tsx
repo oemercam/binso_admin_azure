@@ -44,6 +44,7 @@ export function AppShell({
   const [query, setQuery] = useState("");
   const [timerRunning, setTimerRunning] = useState(() => typeof window === "undefined" ? true : window.localStorage.getItem("binso.timer.running") !== "false");
   const [dark, setDark] = useState(() => typeof window === "undefined" ? false : window.localStorage.getItem("binso.theme") === "dark");
+  const [timerSeconds, setTimerSeconds] = useState(8067);
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
@@ -53,6 +54,12 @@ export function AppShell({
     document.body.style.overflow = sheet ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [sheet]);
+
+  useEffect(() => {
+    if (!timerRunning) return;
+    const id = window.setInterval(() => setTimerSeconds(value => value + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [timerRunning]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return searchItems;
@@ -71,6 +78,8 @@ export function AppShell({
     setTimerRunning(false);
     window.localStorage.setItem("binso.timer.running", "false");
   }
+
+  const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <div className="app-root">
     <aside className="app-sidebar">
@@ -115,7 +124,7 @@ export function AppShell({
 
       {timerRunning && <div className="global-timer" role="status">
         <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
-        <b>02:14:27</b>
+        <b>{formattedTimer}</b>
         <button type="button" onClick={stopTimer} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
