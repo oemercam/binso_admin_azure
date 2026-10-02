@@ -497,3 +497,16 @@ html[data-theme="dark"] .skeleton{background:linear-gradient(90deg,#111 25%,#191
   .auth-card>p{font-size:12px}
   .loading-main{padding:24px 16px}
 }
+
+
+html[data-theme="dark"] .auth-page{
+  --bg:#fff;--ink:#111;--muted:#6c6c6c;--line:#e9e9e7;--soft:#f6f6f4;
+  background:#fff!important;color:#111!important;color-scheme:light
+}
+html[data-theme="dark"] .auth-page .logo{filter:none}
+html[data-theme="dark"] .auth-page input,
+html[data-theme="dark"] .auth-page select,
+html[data-theme="dark"] .auth-page textarea,
+html[data-theme="dark"] .auth-page .button-secondary{
+  background:#fff!important;color:#111!important;border-color:#dcdcd9!important
+}
