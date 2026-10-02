@@ -9,7 +9,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     const {id}=await params;
     const tickets=await operatorList<Record<string,unknown>>(
       "support_tickets",
-      "id,tenant_id,created_by,subject,category,priority,status,created_at,updated_at,tenant:tenants(id,name,uid,city,email,phone),account:tenants(tenant_accounts(plan,subscription_status,account_status))",
+      "id,tenant_id,created_by,subject,category,priority,status,created_at,updated_at,tenant:tenants(id,name,uid,city,email,phone)",
       "id=eq."+encodeURIComponent(id)+"&limit=1"
     );
     if(!tickets[0]) return json({error:"not_found",message:"Ticket wurde nicht gefunden."},404);
