@@ -138,3 +138,11 @@ button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell b
  .auth{max-width:980px;padding:26px 32px}.auth-brand{text-align:left;margin:0 0 42px}.auth section{max-width:440px}
  .control{grid-template-columns:220px 1fr}.control>aside{padding:24px 16px}.control>aside a{height:40px}.control>section>header{height:62px;padding:0 26px}.control-content{padding:24px 26px}
 }
+
+/* Exact component corrections from approved app board */
+.system-choice{width:100%;min-height:58px;margin-top:10px;border:1px solid var(--line);border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;text-align:left}.system-choice>span{display:flex;align-items:center;gap:10px}.system-choice strong,.system-choice small{display:block}.system-choice strong{font-size:11px}.system-choice small{font-size:9px;color:var(--muted);margin-top:2px}.system-choice>i{width:15px;height:15px;border:1px solid #bbb;border-radius:50%}.system-choice.selected>i{border:4px solid var(--blue)}
+@media(max-width:760px){
+ .theme-grid{grid-template-columns:1fr 1fr!important}.theme-grid button{min-height:126px}.theme{height:82px}
+ .form input,.form select,.form textarea{font-size:12px}
+ .form input{padding:8px 10px}
+}
