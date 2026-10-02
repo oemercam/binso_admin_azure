@@ -16,7 +16,7 @@ for (const route of routes) {
     await expect(page.locator("body")).toBeVisible();
     await expect(page.locator("body")).not.toHaveCSS("overflow-x", "scroll");
     await page.screenshot({
-      path: testInfo.outputPath(route.replaceAll("/", "_").replace(/^_/, "") || "home" + ".png"),
+      path: testInfo.outputPath((route.replaceAll("/", "_").replace(/^_/, "") || "home") + ".png"),
       fullPage: true,
     });
   });
