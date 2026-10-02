@@ -438,6 +438,7 @@ export function SettingsPage() {
         ["users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
         ["card","Abonnement","Business · CHF 49 / Monat"],
         ["bell","Benachrichtigungen","E-Mail und Push"],
+        ["settings","Sprache","Deutsch (Schweiz) · Französisch · Italienisch · Englisch · Türkisch"],
         ["lock","Sicherheit","Passwort, Sitzungen und Geräte"],
         ["settings","Darstellung","Hell oder Dunkel"],
         ["support","Hilfe und Support","Tickets und Kontakt"],
