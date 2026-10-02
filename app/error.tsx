@@ -1,0 +1,1 @@
+"use client";export default function ErrorPage({reset}:{reset:()=>void}){return <main className="state"><div className="state-brand">binso <span>One</span></div><h1>Etwas ist schiefgelaufen</h1><p>Die Seite konnte nicht geladen werden.</p><button onClick={reset}>Erneut versuchen</button></main>}
