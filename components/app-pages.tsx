@@ -1,13 +1,39 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
+import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
+
+function useDemoRows(collection:DemoCollection, defaults:string[][]) {
+  const [rows,setRows]=useState(defaults);
+
+  useEffect(()=>{
+    const sync=()=>{
+      const stored=readDemoRows(collection);
+      queueMicrotask(()=>setRows([...stored,...defaults]));
+    };
+    sync();
+    const listener=(event:Event)=>{
+      const detail=(event as CustomEvent<{collection?:string}>).detail;
+      if(!detail?.collection || detail.collection===collection) sync();
+    };
+    window.addEventListener("binso-demo-data",listener);
+    window.addEventListener("storage",sync);
+    return()=>{
+      window.removeEventListener("binso-demo-data",listener);
+      window.removeEventListener("storage",sync);
+    };
+  },[collection,defaults]);
+
+  return rows;
+}
 
 export function DashboardPage() {
   return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
