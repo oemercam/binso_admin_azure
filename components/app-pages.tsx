@@ -217,10 +217,13 @@ export function PaymentForm() {
   </AppShell>;
 }
 
-export function PaymentDetail() {
-  return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
-    <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section>
+export function PaymentDetail({ id = "1" }: { id?: string }) {
+  const { data }=useDemoData();
+  const payment=data.payments.find(row=>row[0]===id) ?? data.payments[0] ?? ["1","–","Kunde","Rechnung","CHF 0.00","Ausstehend"];
+  const [,date,customer,meta,amount,status]=payment;
+  return <AppShell title="Zahlung" subtitle={`${meta} · ${customer}`} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
+    <div className="success-panel"><span><Icon name={status==="Verbucht"?"check":"clock"} size={28}/></span><h2>{amount}</h2><p>{status==="Verbucht"?"Zahlung erfolgreich verbucht":"Zahlung ist noch ausstehend"}</p><Status tone={status==="Verbucht"?"success":"warning"}>{status}</Status></div>
+    <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{date}</dd></div><div><dt>Referenz</dt><dd>{meta}</dd></div><div><dt>Kunde</dt><dd>{customer}</dd></div><div><dt>Status</dt><dd>{status}</dd></div></dl></section>
   </AppShell>;
 }
 
@@ -445,18 +448,20 @@ export function SupportTicketForm() {
   </AppShell>;
 }
 
-export function SupportChat() {
+export function SupportChat({ id = "5832" }: { id?: string }) {
+  const { data }=useDemoData();
+  const ticket=data.supportTickets.find(row=>row[0]===id) ?? data.supportTickets[0] ?? [id,"Support-Anfrage","gerade eben","Offen"];
+  const [,subject,,status]=ticket;
   const [draft,setDraft]=useState("");
   const [sent,setSent]=useState<string[]>([]);
   const send=()=>{const value=draft.trim();if(!value)return;setSent(current=>[...current,value]);setDraft("");};
-  return <AppShell title="Ticket #5832" subtitle="Frage zur Rechnung" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
+
+  return <AppShell title={`Ticket #${id}`} subtitle={subject} active="support" backHref="/support" backLabel="Support" actions={<Status tone={status==="Gelöst"?"success":status==="In Bearbeitung"?"info":"warning"}>{status}</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
-      <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
-      <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
-      {sent.map((text,i)=><article className="message message-user" key={`${text}-${i}`}><div>{text}</div><small>jetzt</small></article>)}
+      <article className="message message-user"><div>{id==="5832"?"Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?":`Anfrage: ${subject}`}</div><small>10:24</small></article>
+      <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Vielen Dank für deine Anfrage. Wir prüfen das gerne für dich.</div><small>10:37</small></article>
+      {sent.map((text,index)=><article className="message message-user" key={text+index}><div>{text}</div><small>jetzt</small></article>)}
       <div className="thread-composer"><button type="button" aria-label="Datei anhängen"><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={send} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div>
   </AppShell>;
