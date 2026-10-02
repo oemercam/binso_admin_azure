@@ -61,8 +61,8 @@ Then open http://localhost:3000.
 - `/einstellungen`
 - `/operator`
 
-The current UI release intentionally uses demo data, but the prototype now includes functional search and status filtering, persistent timer state, customer detail tabs, document hub, notification center, account/security/subscription interaction flows and operator action feedback.
+The current UI release intentionally uses demo data, but the prototype now includes functional search and direct sorting, local demo persistence for core create flows, customer detail tabs, document hub, notification center, account/security/subscription interaction flows, operator action feedback, and a live document editor whose totals and previews update from the entered positions.
 
 Backend authentication, database persistence, billing provider integration, email delivery and real Swiss QR generation remain separate production integrations and are not represented as completed until connected to real services.
 
-Security-sensitive routes are configured with private no-store caching already. The current authentication screens are still prototype UI and do not claim to enforce access control until a real identity backend is connected.
+Security-sensitive routes are configured with private no-store caching and explicit noindex headers. CI now performs lint, typecheck, production build, runtime route smoke tests, security-header checks and the `/api/health` application health check. The Azure workflow verifies `/api/health` after deployment. The current authentication screens are still prototype UI and do not claim to enforce access control until a real identity backend is connected.
