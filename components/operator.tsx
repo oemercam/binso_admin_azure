@@ -365,9 +365,36 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
 }
 
 function PaymentsView() {
+  const production=useBackendMode();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/payments")
+      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
+      .catch(()=>undefined);
+  },[production]);
+
+  if(!production) return <>
+    <div className="metrics-grid three"><Metric label="Kundenzahlungen" value="CHF 49’820" hint="Demo" icon="chart"/><Metric label="Verbucht" value="184" hint="Demo" icon="wallet"/><Metric label="Storniert / offen" value="2" hint="Demo" icon="clock"/></div>
+    <section className="surface operator-table-card"><div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></div>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><div className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</div>)}</div></section>
+  </>;
+
+  const booked=items.filter(item=>item.status==="booked");
+  const total=booked.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const pending=items.filter(item=>item.status==="pending").length;
+  const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
-    <div className="metrics-grid three"><Metric label="Umsatz total" value="CHF 49’820" hint="+8%" icon="chart"/><Metric label="Erfolgreiche Zahlungen" value="184" hint="98.9%" icon="wallet"/><Metric label="Fehlgeschlagen" value="2" hint="1.1%" icon="clock"/></div>
-    <section className="surface operator-table-card"><div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></div>{[["02.10.2026","Acme AG","CHF 1’240.00","Erfolgreich","Visa •••• 4242"],["02.10.2026","Müller GmbH","CHF 49.00","Erfolgreich","Mastercard •••• 7319"],["01.10.2026","Schmid Consulting","CHF 89.00","Fehlgeschlagen","Visa •••• 4002"]].map(r=><div className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Erfolgreich"?"success":"danger"}>{x}</Status>:x}</span>)}</div>)}</div></section>
+    <div className="metrics-grid three">
+      <Metric label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="chart"/>
+      <Metric label="Verbucht" value={String(booked.length)} hint="In dieser Liste" icon="wallet"/>
+      <Metric label="Ausstehend / storniert" value={String(pending+reversed)} hint={String(pending)+" ausstehend · "+String(reversed)+" storniert"} icon="clock"/>
+    </div>
+    <section className="surface operator-table-card">
+      <SectionTitle title="Kundenzahlungen"/>
+      <p className="technical-hint">Diese Liste zeigt Zahlungen zu Kundenrechnungen. SaaS-Abonnementzahlungen über Stripe sind noch nicht angebunden.</p>
+      {items.length?<div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></div>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <div className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{"CHF "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></div>})}</div>:<EmptyState icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
+    </section>
   </>;
 }
 
