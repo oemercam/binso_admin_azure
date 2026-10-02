@@ -8,6 +8,7 @@ import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { useDemoData } from "./demo-data-provider";
+import { slugify } from "@/lib/ids";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 export function DashboardPage() {
@@ -66,7 +67,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <RecordsView items={data.customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
+        <RecordsView items={data.customers} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href={`/kunden/${slugify(name)}`} title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
@@ -82,12 +83,16 @@ export function CustomersPage() {
   </AppShell>;
 }
 
-export function CustomerDetail() {
+export function CustomerDetail({ id = "acme-ag" }: { id?: string }) {
+  const { data }=useDemoData();
+  const customer=data.customers.find(row=>slugify(row[0]??"")===id) ?? data.customers[0] ?? ["Kunde","Unternehmen","–","Aktiv"];
+  const [name,sector,city,status]=customer;
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
   const [contactOpen,setContactOpen]=useState(false);
   const [contactToast,setContactToast]=useState(false);
-  return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
-    <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
+
+  return <AppShell title={name} subtitle={`${sector} · ${city}`} active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href={`/kunden/${id}/bearbeiten`} variant="secondary" icon="edit">Bearbeiten</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
+    <div className="entity-hero"><span className="record-avatar large">{name[0]??"K"}</span><div><h2>{name}</h2><p>{sector} · {city}</p></div><Status tone={status==="Aktiv"?"success":"neutral"}>{status}</Status></div>
     <div className="tabs">
       <button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button>
       <button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button>
@@ -95,46 +100,59 @@ export function CustomerDetail() {
       <button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button>
     </div>
     {tab==="overview"&&<div className="detail-grid">
-      <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section>
+      <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>Branche</dt><dd>{sector}</dd></div><div><dt>Ort</dt><dd>{city}</dd></div><div><dt>Status</dt><dd>{status}</dd></div></dl></section>
       <section className="surface"><SectionTitle title="Letzte Belege" action={<button className="text-action" onClick={()=>setTab("docs")}>Alle anzeigen</button>}/><div className="compact-list"><div><b>RE-2026-019</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></div><div><b>AN-2026-012</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></div><div><b>RE-2026-015</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></div></div></section>
     </div>}
     {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div><div><span className="record-avatar">SB</span><div><b>Sarah Baumann</b><small>Buchhaltung · finance@acme.ch · +41 44 123 45 68</small></div></div></div></section>}
     {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link><Link href="/angebote/AN-2026-012"><b>AN-2026-012</b><span>05.09.2026 · CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link><Link href="/rechnungen/RE-2026-015"><b>RE-2026-015</b><span>20.08.2026 · CHF 1’200.00</span><Status tone="warning">Offen</Status></Link></div></section>}
     {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Rechnung bezahlt</b><small>RE-2026-019 · heute, 10:24</small></div></div><div><i/><div><b>Angebot gesendet</b><small>AN-2026-012 · 05.09.2026</small></div></div><div><i/><div><b>Kundendaten aktualisiert</b><small>Thomas Müller · 01.09.2026</small></div></div></div></section>}
-    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input/></Field><Field label="Nachname"><input/></Field><Field label="E-Mail"><input type="email"/></Field><Field label="Telefon"><input type="tel"/></Field><Field label="Funktion" className="full"><input placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>{setContactOpen(false);setContactToast(true);window.setTimeout(()=>setContactToast(false),2200)}}>Kontakt speichern</Button></div></section></div>}
+    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt {name} zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input/></Field><Field label="Nachname"><input/></Field><Field label="E-Mail"><input type="email"/></Field><Field label="Telefon"><input type="tel"/></Field><Field label="Funktion" className="full"><input placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>{setContactOpen(false);setContactToast(true);window.setTimeout(()=>setContactToast(false),2200)}}>Kontakt speichern</Button></div></section></div>}
     {contactToast&&<Toast title="Kontakt gespeichert."/>}
   </AppShell>;
 }
 
-export function CustomerForm() {
+export function CustomerForm({ existingId }: { existingId?: string }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
-  const [company,setCompany]=useState("");
+  const { addRecord, data, updateRecord, removeRecord }=useDemoData();
+  const existingIndex=existingId ? data.customers.findIndex(row=>slugify(row[0]??"")===existingId) : -1;
+  const existing=existingIndex>=0 ? data.customers[existingIndex] : undefined;
+  const [company,setCompany]=useState(existing?.[0]??"");
+  const [sector,setSector]=useState(existing?.[1]??"Unternehmen");
+  const [city,setCity]=useState(existing?.[2]??"");
+  const [status,setStatus]=useState(existing?.[3]??"Aktiv");
   const [email,setEmail]=useState("");
   const [phone,setPhone]=useState("");
-  const [city,setCity]=useState("");
   const [error,setError]=useState("");
 
   const save=()=>{
     if(!company.trim()){setError("Firmenname ist erforderlich.");return;}
-    addRecord("customers",[company.trim(),"Unternehmen",city.trim()||"–","Aktiv"]);
+    const row=[company.trim(),sector.trim()||"Unternehmen",city.trim()||"–",status];
+    if(existingIndex>=0) updateRecord("customers",existingIndex,row); else addRecord("customers",row);
+    router.push(`/kunden/${slugify(company)}`);
+  };
+  const remove=()=>{
+    if(existingIndex<0) return;
+    removeRecord("customers",existingIndex);
     router.push("/kunden");
   };
 
-  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
+  return <AppShell title={existing?"Kunde bearbeiten":"Kunde erstellen"} subtitle={existing?"Stammdaten und Status aktualisieren.":"Nur die wichtigsten Angaben. Details kannst du später ergänzen."} active="kunden" backHref={existing?`/kunden/${existingId}`:"/kunden"} backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <section className="form-section clean">
         <h2>Grundangaben</h2>
         <div className="form-grid two">
           <Field label="Firmenname"><input autoFocus value={company} onChange={e=>{setCompany(e.target.value);setError("")}} placeholder="Firma oder Name"/></Field>
+          <Field label="Branche"><input value={sector} onChange={e=>setSector(e.target.value)} placeholder="z. B. Bauunternehmen"/></Field>
           <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
           <Field label="Telefon"><input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
           <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
+          <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
         </div>
         {error&&<p className="form-error">{error}</p>}
       </section>
       <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><input placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><input inputMode="numeric" placeholder="8000"/></Field><Field label="UID"><input placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><input placeholder="Optional"/></Field></div></details>
-      <div className="mobile-sticky-save"><Button onClick={save}>Kunde speichern</Button></div>
+      {existing&&<div className="danger-zone compact-danger"><div><b>Kunde löschen</b><p>Entfernt den Kunden aus den lokalen Demo-Daten.</p></div><Button variant="danger" onClick={remove}>Löschen</Button></div>}
+      <div className="mobile-sticky-save"><Button onClick={save}>{existing?"Änderungen speichern":"Kunde speichern"}</Button></div>
     </div>
   </AppShell>;
 }
