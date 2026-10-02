@@ -1,37 +1,80 @@
 # Binso One
 
-App-first UI prototype for Binso One by Binso GmbH.
+Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
 
-## Included
+## Current release: v0.7 backend foundation
 
-- Marketing site, product page and pricing
-- Demo access, login and minimal registration
-- Responsive customer app with mobile bottom navigation
-- Dashboard, customers, offers, invoices, payments, products, employees, expenses and time tracking
-- Responsive invoice editor with live document preview
-- Support experience
-- Separate Binso operator environment for support, monitoring, payments, suspensions and audit
-- PWA manifest and safe-area aware mobile layout
-- Original Binso brand assets
+The UI prototype remains available without backend configuration, including the isolated demo mode. When Supabase configuration is present, Binso One now switches core customer workflows to the production backend foundation.
 
-## Architecture
+### Connected production foundations
 
-- Next.js App Router with React and TypeScript
-- Centralized UI shell and shared components
-- Reusable record browser for search and status filtering
-- Dedicated document editor/preview module
-- Centralized demo data and public site configuration
-- Security headers and production-aware Content Security Policy
-- Private no-store caching for authenticated-style routes
-- PWA service worker with conservative public-shell caching only
-- Marketing-only robots and sitemap exposure
+- Supabase email/password authentication through server-side API routes
+- HttpOnly, SameSite session cookies with refresh-token handling
+- Password recovery and password reset flow
+- Protected customer routes when the backend is configured
+- Explicit server-side operator authorization
+- Multi-tenant PostgreSQL schema with tenant memberships
+- Row Level Security for tenant data
+- Hardened support RLS that excludes internal notes from customer access
+- Customers, products, employees, expenses, payments and time entries APIs
+- Support tickets and customer message APIs
+- Company and personal profile settings APIs
+- Atomic invoice and offer create/update database functions
+- Audit-log foundation for document mutations
+- Real tenant data loading for core lists
+- Demo data remains isolated from authenticated production data
+
+### Still intentionally not marked production-complete
+
+The following integrations need the actual external production services or business configuration before they can be called complete:
+
+- Stripe subscription billing and webhooks
+- Resend / transactional email delivery for invoices and support
+- Supabase Storage for receipts, company logos and support attachments
+- Standards-compliant Swiss QR bill generation
+- Real bank synchronization
+- Operator data aggregation and actions beyond authorization
+- Full localization content for DE / FR / IT / EN / TR
+
+The UI never labels these integrations as completed when they are still placeholders.
+
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Supabase Auth + PostgreSQL/PostgREST backend foundation
+- PostgreSQL RLS for tenant isolation
+- PWA manifest and conservative service-worker caching
+- Azure App Service deployment through GitHub Actions
+
+No Supabase service-role key is used by customer-facing request paths. Tenant authorization is performed with the authenticated user's JWT and PostgreSQL RLS.
+
+## Backend setup
+
+1. Create or select the Supabase project for Binso One.
+2. Apply the SQL files in `supabase/migrations` in filename order.
+3. Configure locally in `.env.local`:
+
+```env
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_MARKETING_URL=https://www.binso.ch
+NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+```
+
+4. Configure the same public Supabase values in the Azure production application settings.
+5. Configure the Supabase Auth Site URL / redirect allowlist for the actual Binso One app URL and `/passwort-zuruecksetzen`.
+6. Create the first authenticated Binso operator deliberately, then provision it in `public.operator_users`. The migration contains the example SQL; do not grant operator access through client metadata.
+
+When the Supabase values are absent, Binso One stays in prototype/demo mode so CI and local UI review continue to work without pretending a backend exists.
 
 ## Local development
 
 ```powershell
 corepack enable
 corepack prepare pnpm@latest --activate
-pnpm install
+pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm build
@@ -42,12 +85,14 @@ Then open http://localhost:3000.
 
 ## Main routes
 
-- `/` marketing
+- `/`
 - `/produkt`
 - `/preise`
 - `/demo`
 - `/login`
 - `/registrieren`
+- `/passwort-vergessen`
+- `/passwort-zuruecksetzen`
 - `/dashboard`
 - `/kunden`
 - `/angebote`
@@ -61,8 +106,28 @@ Then open http://localhost:3000.
 - `/einstellungen`
 - `/operator`
 
-The current UI release intentionally uses demo data, but the prototype now includes functional search and direct sorting, local demo persistence for core create flows, customer detail tabs, document hub, notification center, account/security/subscription interaction flows, operator action feedback, and a live document editor whose totals and previews update from the entered positions.
+## Security posture
 
-Backend authentication, database persistence, billing provider integration, email delivery and real Swiss QR generation remain separate production integrations and are not represented as completed until connected to real services.
+- CSP and security headers are centralized in `next.config.ts`.
+- Authenticated-style routes and APIs use private/no-store caching and noindex.
+- Mutation endpoints check same-origin requests and bounded request sizes.
+- Login errors do not reveal whether a user exists.
+- Password recovery returns a uniform public response.
+- Customer data access uses the authenticated JWT plus RLS; tenant IDs are resolved server-side.
+- Internal support notes are excluded by RLS, not only by UI filtering.
+- Operator access is stored in a dedicated server-checked table.
+- Demo access and authenticated production data are isolated.
 
-Security-sensitive routes are configured with private no-store caching and explicit noindex headers. CI now performs lint, typecheck, production build, runtime route smoke tests, security-header checks and the `/api/health` application health check. The Azure workflow verifies `/api/health` after deployment. The current authentication screens are still prototype UI and do not claim to enforce access control until a real identity backend is connected.
+## CI
+
+GitHub Actions performs:
+
+- frozen-lockfile install
+- ESLint
+- TypeScript typecheck
+- production build
+- runtime route smoke tests
+- `/api/health`
+- security-header checks
+
+Azure deployment performs an application health check after deployment.
