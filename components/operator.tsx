@@ -100,8 +100,8 @@ export function OperatorPage({ section = "" }: { section?: string }) {
       </header>
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={17}/><span>{label}</span></Link>)}</nav>
 
-      {detail && key === "tickets" ? <TicketDetail/> :
-        detail && key === "kunden" ? <OperatorCustomerDetail/> :
+      {detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
+        detail && key === "kunden" ? <OperatorCustomerDetail tenantId={detail}/> :
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
         key === "zahlungen" ? <PaymentsView/> :
