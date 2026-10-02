@@ -186,12 +186,31 @@ function OperatorDashboard() {
 }
 
 function TicketsView() {
-  return <section className="surface operator-table-card">
+  const {production,items}=useOperatorTickets();
+  const [query,setQuery]=useState("");
+  const [filter,setFilter]=useState("all");
+
+  if(!production) return <section className="surface operator-table-card">
     <div className="operator-toolbar"><div className="chips"><button className="active">Alle 124</button><button>Offen 12</button><button>In Bearbeitung 8</button><button>Wartet auf Kunde 6</button><button>Gelöst 98</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Tickets suchen..."/></label></div>
-    <div className="operator-table">
-      <div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>
-      {tickets.concat([["#8413","Frage zu Abonnement","Schmid Consulting","In Bearbeitung"],["#8410","Datenexport fehlerhaft","Meier Handel AG","Offen"]]).map(([nr,subject,customer,status],i)=><Link href={`/operator/tickets/${nr.replace("#","")}`} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>vor {12+i*18} Min.</span></Link>)}
+    <div className="operator-table"><div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>{tickets.map(([nr,subject,customer,status],i)=><Link href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+  </section>;
+
+  const visible=items.filter(item=>{
+    const text=(item.subject+" "+(item.tenant?.name??"")+" "+item.id).toLowerCase();
+    const matchesQuery=!query.trim()||text.includes(query.trim().toLowerCase());
+    const matchesFilter=filter==="all"||item.status===filter;
+    return matchesQuery&&matchesFilter;
+  });
+
+  return <section className="surface operator-table-card">
+    <div className="operator-toolbar">
+      <div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {items.length}</button><button className={filter==="open"?"active":""} onClick={()=>setFilter("open")}>Offen</button><button className={filter==="in_progress"?"active":""} onClick={()=>setFilter("in_progress")}>In Bearbeitung</button><button className={filter==="waiting_customer"?"active":""} onClick={()=>setFilter("waiting_customer")}>Wartet auf Kunde</button><button className={filter==="resolved"?"active":""} onClick={()=>setFilter("resolved")}>Gelöst</button></div>
+      <label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tickets suchen..."/></label>
     </div>
+    {visible.length?<div className="operator-table">
+      <div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>
+      {visible.map(item=><Link href={"/operator/tickets/"+item.id} className="operator-table-row" key={item.id}><span><i className={["high","critical"].includes(item.priority)?"priority high":"priority"}/>{item.priority==="critical"?"Kritisch":item.priority==="high"?"Hoch":item.priority==="low"?"Niedrig":"Normal"}</span><span><b>{"#"+item.id.slice(0,8)}</b><small>{item.subject}</small></span><span>{item.tenant?.name??"Kunde"}</span><span><Status tone={item.status==="resolved"||item.status==="closed"?"success":item.status==="open"?"warning":"info"}>{operatorStatus(item.status)}</Status></span><span>{new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span></Link>)}
+    </div>:<EmptyState icon="search" title="Keine Tickets" text="Für die aktuelle Auswahl wurden keine Tickets gefunden."/>}
   </section>;
 }
 
