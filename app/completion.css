@@ -738,3 +738,10 @@ html[data-theme="dark"] .paper {
   .metrics-grid.three,
   .support-summary { grid-template-columns:1fr; }
 }
+
+
+.password-field{position:relative}
+.password-field input{width:100%;padding-right:92px}
+.password-field button{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:34px;border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:0 8px}
+.bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px}
+.bottom-nav button.active{color:var(--ink);font-weight:700}
