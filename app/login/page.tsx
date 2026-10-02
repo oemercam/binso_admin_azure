@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { Button, Logo } from "@/components/ui";
+export default function Login(){return <main className="auth-page"><section className="auth-card"><Logo/><h1>Willkommen zurück</h1><p>Melde dich in deinem Binso One Konto an.</p><form><label>E-Mail<input type="email" placeholder="name@firma.ch"/></label><label>Passwort<input type="password" placeholder="••••••••"/></label><div className="form-link"><Link href="#">Passwort vergessen?</Link></div><Button href="/dashboard">Anmelden</Button></form><div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button><p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Account erstellen</Link></p></section></main>}
