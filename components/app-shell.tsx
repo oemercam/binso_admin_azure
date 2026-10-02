@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
-import { apiGet, apiPost, clearDemoClientSession, useProductionBackend } from "@/lib/client/backend";
+import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -72,7 +72,7 @@ export function AppShell({
   }, [dark]);
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{authenticated:boolean;user?:{email?:string}}>("/api/auth/session")
       .then(session=>{
         const email=session.user?.email??"";
@@ -129,7 +129,7 @@ export function AppShell({
     window.localStorage.setItem("binso.timer.running", "false");
     window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
     window.localStorage.removeItem("binso.timer.startedAt");
-    if(useProductionBackend()){
+    if(isProductionBackendEnabled()){
       try{
         const ended=new Date();
         const started=new Date(ended.getTime()-timerSeconds*1000);
