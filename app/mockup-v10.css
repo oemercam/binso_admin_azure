@@ -515,3 +515,16 @@ html[data-theme="dark"] .auth-page .button-secondary{
 /* Detail headers: never repeat the same entity name directly below the page title. */
 .app-section-kunden .page-head-detail + .entity-hero h2{display:none}
 .app-section-kunden .page-head-detail + .entity-hero>div p{margin-top:0}
+
+
+.global-timer-main i{background:#111}
+html[data-theme="dark"] .global-timer-main i{background:#fff}
+.priority,.priority.high{background:#111}
+@media(max-width:760px){
+  .app-main:has(.global-timer) .mobile-sticky-save{
+    bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 66px)
+  }
+  .app-main:has(.global-timer) .page-actions{
+    bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 72px)
+  }
+}
