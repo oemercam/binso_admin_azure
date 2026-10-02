@@ -50,8 +50,8 @@ export async function signUp(email:string,password:string,companyName:string){
   });
   const payload=await response.json().catch(()=>({}));
   if(!response.ok){
-    const message=typeof payload?.msg==="string" ? payload.msg : "Registrierung nicht möglich.";
-    throw new ApiError(400,"signup_failed",message);
+    console.error("Supabase signup failed",response.status,typeof payload?.code==="string"?payload.code:"unknown");
+    throw new ApiError(400,"signup_failed","Registrierung konnte nicht abgeschlossen werden. Prüfe deine Angaben oder melde dich an.");
   }
   return payload as Partial<TokenResponse>&{user?:SupabaseUser};
 }

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { operatorAudit, operatorUpdate } from "@/lib/server/database";
+import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
 
 type Body={plan?:unknown;subscriptionStatus?:unknown;accountStatus?:unknown;userLimit?:unknown};
 
@@ -31,6 +31,16 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
       patch.user_limit=limit;
     }
     if(!Object.keys(patch).length) return json({error:"empty_patch",message:"Keine Änderung angegeben."},400);
+    if(accountStatus==="active"){
+      const restrictions=await operatorList<{starts_at:string;ends_at:string|null}>("tenant_restrictions","starts_at,ends_at","tenant_id=eq."+encodeURIComponent(id)+"&active=eq.true&limit=100");
+      const now=Date.now();
+      const effective=restrictions.some(item=>{
+        const starts=new Date(item.starts_at).getTime();
+        const ends=item.ends_at?new Date(item.ends_at).getTime():Number.POSITIVE_INFINITY;
+        return starts<=now&&ends>now;
+      });
+      if(effective) return json({error:"restriction_active",message:"Aktive Einschränkungen müssen zuerst aufgehoben werden."},409);
+    }
     const rows=await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(id),patch);
     if(!rows[0]) return json({error:"not_found",message:"Konto wurde nicht gefunden."},404);
     await operatorAudit("tenant.account.updated","tenant",id,patch);

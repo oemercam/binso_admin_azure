@@ -23,8 +23,12 @@ export async function POST(request:NextRequest){
     const tenantId=cleanText(body.tenantId,80),scope=cleanText(body.scope,20),reason=cleanText(body.reason,160),note=cleanText(body.note,2000);
     if(!tenantId||!["all","write"].includes(scope)||!reason||!note) return json({error:"invalid_restriction",message:"Angaben zur Einschränkung sind unvollständig."},400);
     const session=await requireOperatorSession();
+    const accounts=await operatorList<{account_status:string}>("tenant_accounts","account_status","tenant_id=eq."+encodeURIComponent(tenantId)+"&limit=1");
+    if(!accounts[0]) return json({error:"tenant_not_found",message:"Kundenkonto wurde nicht gefunden."},404);
     const rows=await operatorInsert("tenant_restrictions",{tenant_id:tenantId,scope,reason,note,ends_at:cleanText(body.endsAt,40)||null,active:true,created_by:session.user.id});
-    await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(tenantId),{account_status:scope==="all"?"suspended":"restricted"});
+    if(accounts[0].account_status!=="cancelled"){
+      await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(tenantId),{account_status:scope==="all"?"suspended":"restricted"});
+    }
     await operatorAudit("tenant.restriction.created","tenant",tenantId,{restriction_id:rows[0]?.id,scope,reason});
     return json({item:rows[0]},201);
   }catch(error){return apiError(error);}

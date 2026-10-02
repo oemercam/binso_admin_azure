@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson, validEmail } from "@/lib/server/http";
 import { requestPasswordRecovery } from "@/lib/server/auth";
 import { getBackendEnv, isBackendConfigured } from "@/lib/server/env";
+import { enforcePublicRateLimit } from "@/lib/server/rate-limit";
 
 type Body={email?:unknown};
 
@@ -11,6 +12,7 @@ export async function POST(request:NextRequest){
     assertSameOrigin(request);
     const body=await readJson<Body>(request,8192);
     const email=cleanText(body.email,320).toLowerCase();
+    await enforcePublicRateLimit(request,"auth.recover",email);
     if(!validEmail(email)) return json({error:"email_invalid",message:"Bitte gültige E-Mail-Adresse eingeben."},400);
     const {appUrl}=getBackendEnv();
     await requestPasswordRecovery(email,appUrl+"/passwort-zuruecksetzen");

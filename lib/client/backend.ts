@@ -32,10 +32,13 @@ async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   return payload as T;
 }
 
-export async function apiPost<T>(path:string,body:unknown):Promise<T>{
+export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
   const response=await fetch(path,{
     method:"POST",
-    headers:{"Content-Type":"application/json"},
+    headers:{
+      "Content-Type":"application/json",
+      ...(options.idempotencyKey?{"Idempotency-Key":options.idempotencyKey}:{}),
+    },
     body:JSON.stringify(body),
   });
   return parseResponse<T>(response,"Die Anfrage konnte nicht verarbeitet werden.");

@@ -57,6 +57,8 @@ jobs:
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/files)" = "403"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"

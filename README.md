@@ -2,75 +2,68 @@
 
 Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
 
-## Current release: v0.9 integration-ready foundation
+## Current release: v0.10 security hardening
 
-The standalone demo continues to work without external services. With Supabase configured, the core customer and operator workflows use tenant-isolated production persistence. v0.9 adds the first real external-service integration layer for SaaS billing and transactional email readiness.
+The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe and Resend remain opt-in production integrations and are only shown as connected when their server configuration is present.
 
-### Production foundations implemented
+### Production foundations
 
 - Supabase email/password authentication through server API routes
 - HttpOnly SameSite sessions with refresh-token handling
 - password recovery and password reset
-- protected customer and operator routes
+- protected customer and Operator routes
 - tenant memberships and PostgreSQL Row Level Security
-- account restrictions enforced at the RLS boundary
-- private tenant-aware file storage policies
-- customers and customer contacts
+- account restrictions enforced at the database boundary
+- private tenant-aware file storage
+- customers and contacts
 - products and services
 - employees
 - expenses and private receipt uploads
 - customer-invoice payments
 - time entries
-- support tickets, replies, internal operator notes and private attachments
+- support tickets, replies, internal Operator notes and private attachments
 - company and personal profile settings
 - offers and invoices with atomic database create/update functions
-- tenant dashboard aggregates and global tenant search
-- dynamic record detail/edit flows
-- operator dashboard, tenants, tickets, account lifecycle, restrictions, announcements, monitoring state and audit
-- isolated demo data when the backend is not configured
+- dashboard aggregates and global tenant search
+- Operator dashboard, customers, tickets, account lifecycle, restrictions, announcements, monitoring and audit
+- Stripe Checkout, Billing Portal and signed/idempotent webhook foundation
+- Resend server integration and authorized Operator test email
 
-### v0.9 external integration layer
+### v0.10 security hardening
 
-Stripe Billing foundation:
-- hosted Stripe Checkout for Start, Business and Pro
-- existing Stripe Customer reuse
-- duplicate-subscription protection
-- Stripe Billing Portal handoff for plan, payment method and invoice management
-- signed webhook verification using the raw request body
-- five-minute signature tolerance
-- idempotent billing-event processing in PostgreSQL
-- subscription/customer references stored without card data
-- Stripe subscription status and period-end synchronization
-- server-only Supabase service-role access restricted to trusted webhook processing
+- composite tenant foreign keys prevent cross-tenant references even if another UUID is guessed
+- distributed PostgreSQL-backed auth rate limiting for login, registration and password recovery
+- rate-limit identifiers are stored only as SHA-256/HMAC fingerprints
+- rate-limit policy is allowlisted and fixed in PostgreSQL so callers cannot raise their own limits
+- standard `Retry-After` headers for throttled authentication requests
+- refresh-token-only sessions may pass the route guard so the server can refresh them
+- payment creation requires an idempotency key and PostgreSQL enforces one financial write per tenant/key
+- payment retry uses the same browser-generated idempotency key
+- Operator support replies/status changes have explicit RLS mutation policies
+- active account state cannot be restored while a live restriction still exists
+- restriction create/remove keeps account lifecycle state consistent
+- private upload mutations require same-origin requests
+- multipart uploads are rejected before parsing when the request is oversized
+- upload purpose must match a real entity in the same tenant
+- PNG, JPEG, WebP and PDF signatures are validated instead of trusting only MIME headers
+- user-supplied SVG uploads are not accepted
+- signup errors no longer expose provider-specific account-existence details
+- mutation-route audit confirms same-origin checks across customer and Operator API writes
 
-Resend foundation:
-- server-side REST email client
-- explicit configuration detection
-- authorized Operator test-email endpoint
-- Operator monitoring shows whether email is actually configured
-- no customer-facing document email is marked complete until the production document/PDF delivery flow is finalized
+### Explicitly not marked complete
 
-Integration monitoring:
-- differentiates Operational, Configured, Not connected and Not implemented
-- never invents availability percentages for services without telemetry
-- customer integration-status endpoint requires authentication
-- billing mutation routes require an authenticated tenant session
-- webhook route rejects unsigned requests
+The following still require real provider configuration or final domain implementation:
 
-### Still intentionally not marked complete
-
-These areas still need real provider configuration, credentials, or final domain implementation before they can be called production-complete:
-
-- production Stripe account, products/prices, customer portal settings and webhook secret
-- verified Resend sending domain and production sender address
-- final invoice/offer email delivery with production PDF attachment
+- live Stripe account, products/prices, Portal settings and webhook secret
+- verified Resend domain and production sender
+- final offer/invoice PDF generation and email attachment delivery
 - standards-compliant Swiss QR bill generation
 - bank synchronization
 - secure Operator impersonation/support access
-- verified cross-device auth-session management and MFA enrollment
+- verified cross-device session management and MFA enrollment
 - full production translations for DE / FR / IT / EN / TR
 
-Binso One does not display invented production payment cards, SaaS invoices, system SLA values, user devices or Operator identities when those data sources are not connected.
+Binso One does not invent payment cards, SaaS invoices, SLA values, device sessions or Operator identities when those data sources are not connected.
 
 ## Stack
 
@@ -86,17 +79,20 @@ Binso One does not display invented production payment cards, SaaS invoices, sys
 - PWA manifest and conservative service-worker caching
 - Azure App Service deployment through GitHub Actions
 
-Customer-facing request paths use the authenticated user JWT and RLS. The Supabase service-role key is reserved for trusted server-to-server integration processing such as verified Stripe webhooks.
+Customer-facing data requests use the authenticated user JWT and RLS. The Supabase service-role key is reserved for narrowly scoped trusted server operations such as verified Stripe webhooks and distributed public-auth rate limiting.
 
 ## Backend setup
 
-1. Create or select the Supabase project for Binso One.
-2. Apply all SQL files in `supabase/migrations` in filename order.
-3. Configure local development in `.env.local`:
+Apply all files in `supabase/migrations` in filename order.
+
+Local `.env.local`:
 
 ```env
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_MARKETING_URL=https://www.binso.ch
+
+# Generate a long random server-only value.
+RATE_LIMIT_SECRET=<random-secret>
 
 NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
@@ -112,30 +108,23 @@ RESEND_API_KEY=<resend-api-key>
 BINSO_EMAIL_FROM=Binso One <no-reply@binso.ch>
 ```
 
-4. Configure the same values in Azure App Settings. Do not expose the service-role key, Stripe secret, webhook secret or Resend API key as `NEXT_PUBLIC_*`.
-5. Configure the Supabase Auth Site URL and redirect allowlist for the real Binso One app URL and `/passwort-zuruecksetzen`.
-6. Provision the first Operator deliberately in `public.operator_users` after the authenticated user exists.
-7. Verify the private Storage buckets and RLS policies created by the storage migration.
-8. In Stripe, create recurring monthly Prices for Start, Business and Pro and copy their Price IDs to the corresponding environment variables.
-9. Enable/configure the Stripe Customer Portal.
-10. Configure the Stripe webhook endpoint:
+Do not expose `RATE_LIMIT_SECRET`, the Supabase service-role key, Stripe secrets or Resend API key through `NEXT_PUBLIC_*`.
+
+For Stripe, configure monthly recurring Prices for Start, Business and Pro, enable the Customer Portal, and register:
 
 ```text
 https://<your-app-host>/api/billing/webhook
 ```
 
-Recommended events for the current handler:
+Current billing webhook events:
+
 - `checkout.session.completed`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
 - `invoice.paid`
 - `invoice.payment_failed`
 
-11. Add the Stripe webhook signing secret to `STRIPE_WEBHOOK_SECRET`.
-12. Verify the sending domain in Resend and set `BINSO_EMAIL_FROM` to a verified sender.
-13. In Operator → Monitoring, use the E-Mail Service test action to verify the configured Resend path.
-
-When Supabase values are absent, the application remains in prototype/demo mode for UI review and CI without pretending persistence or authorization is active.
+For Resend, verify the sending domain and use Operator → Monitoring to test the configured sender path.
 
 ## Local QA
 
@@ -149,47 +138,25 @@ pnpm build
 pnpm dev
 ```
 
-## Main routes
-
-- `/`
-- `/produkt`
-- `/preise`
-- `/demo`
-- `/login`
-- `/registrieren`
-- `/passwort-vergessen`
-- `/passwort-zuruecksetzen`
-- `/dashboard`
-- `/kunden`
-- `/angebote`
-- `/rechnungen`
-- `/zahlungen`
-- `/produkte`
-- `/mitarbeiter`
-- `/spesen`
-- `/zeit`
-- `/support`
-- `/einstellungen`
-- `/operator`
-
 ## Security posture
 
-- CSP and security headers are centralized in `next.config.ts`.
-- Authenticated-style routes and APIs use private/no-store caching and noindex.
-- Mutation endpoints use same-origin checks and bounded request bodies.
-- Login and password recovery avoid account enumeration.
-- Tenant IDs are resolved server-side.
-- Tenant restrictions are enforced by RLS for core data and private Storage.
-- Support remains available while a customer account is restricted.
-- Internal support notes are excluded from customer RLS.
-- Private files use tenant-prefixed paths, allowlisted MIME types, size limits and short-lived download URLs.
-- Operator access is held in a dedicated authorization table and checked server-side.
-- Critical Operator lifecycle changes are written to the Operator audit log.
-- Stripe webhooks are signature-verified before any service-role database action.
-- Stripe events are idempotently recorded before subscription state updates.
-- Billing routes do not store full card details.
-- External integration configuration state is not exposed publicly.
-- Demo access is isolated from authenticated production data.
+- centralized CSP and security headers
+- private/no-store caching for authenticated-style routes and APIs
+- same-origin enforcement on browser mutations
+- bounded JSON and multipart request sizes
+- account-enumeration-resistant login/recovery/signup errors
+- distributed auth throttling through a service-role-only RPC
+- server-side tenant resolution
+- RLS plus composite tenant foreign keys
+- private tenant-prefixed storage
+- signature/MIME/size validation for user uploads
+- support internal notes excluded from customer RLS
+- dedicated server-checked Operator authorization
+- Operator audit trail for critical actions
+- idempotent payment writes
+- signed Stripe webhooks and idempotent billing events
+- no full card-data storage
+- isolated demo state
 
 ## CI
 
@@ -200,10 +167,9 @@ GitHub Actions runs:
 - TypeScript typecheck
 - production build
 - runtime route smoke tests
-- `/api/health`
-- auth and demo-state checks
+- health/auth/demo checks
 - billing/integration authorization checks
 - unsigned Stripe-webhook rejection
 - security-header checks
 
-Azure deployment performs a production application health check after deployment.
+Azure deployment performs a production health check after deployment.
