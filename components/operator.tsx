@@ -37,11 +37,12 @@ export function OperatorPage({ section = "" }: { section?: string }) {
 
     <main className="operator-main">
       <header>
-        <div><h1>{detail ? `Ticket #${detail}` : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
+        <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
         <div className="operator-user"><button aria-label="Suche"><Icon name="search"/></button><button aria-label="Benachrichtigungen"><Icon name="bell"/></button><span className="avatar">OC</span></div>
       </header>
 
       {detail && key === "tickets" ? <TicketDetail/> :
+        detail && key === "kunden" ? <OperatorCustomerDetail/> :
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
         key === "zahlungen" ? <PaymentsView/> :
@@ -57,7 +58,8 @@ export function OperatorPage({ section = "" }: { section?: string }) {
 }
 
 function operatorSubtitle(key: string, detail: string) {
-  if (detail) return "Kundenanfrage prüfen und beantworten.";
+  if (detail && key === "tickets") return "Kundenanfrage prüfen und beantworten.";
+  if (detail && key === "kunden") return "Kundenkonto, Abonnement, Zahlungen, Tickets und Einschränkungen.";
   const subtitles: Record<string, string> = {
     "": "Betrieb und Kundenumgebung von Binso One.",
     tickets: "Kundenanfragen verwalten und beantworten.",
@@ -132,8 +134,24 @@ function TicketDetail() {
 function CustomersView() {
   return <section className="surface">
     <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input placeholder="Kunden suchen..."/></label><div className="chips"><button className="active">Alle</button><button>Aktiv</button><button>Eingeschränkt</button><button>Gesperrt</button></div></div>
-    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status])=><div className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>heute</span></div>)}</div>
+    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>heute</span></Link>)}</div>
   </section>;
+}
+
+function OperatorCustomerDetail() {
+  return <>
+    <div className="operator-customer-hero">
+      <div className="operator-customer-main"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>K-1001 · CHE-123.456.789 · Zürich</p></div></div>
+      <div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary">Support-Zugriff</Button><Button variant="danger">Einschränken</Button></div>
+    </div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value="Business" hint="CHF 49 / Monat" icon="card"/><Metric label="Benutzer" value="8 / 10" hint="2 Plätze frei" icon="users"/><Metric label="Offene Tickets" value="1" hint="#8421" icon="support"/><Metric label="Zahlungsstatus" value="Bezahlt" hint="Nächste Abbuchung 01.11." icon="wallet"/></div>
+    <div className="operator-customer-grid">
+      <section className="surface"><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>Kontakt</dt><dd>Thomas Meier · thomas@acme.ch</dd></div><div><dt>Erstellt</dt><dd>14.02.2025</dd></div><div><dt>Letzte Anmeldung</dt><dd>Heute, 10:31</dd></div><div><dt>Mandant</dt><dd>tenant_acme_ch</dd></div></dl></section>
+      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div><div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b><span>Letzte Zahlung 01.10.2026</span></div><Button variant="secondary">Abonnement öffnen</Button></section>
+      <section className="surface"><SectionTitle title="Support"/><div className="compact-list"><div><b>#8421 · Rechnungsstellung unklar</b><span>Heute 10:42</span><Status tone="warning">Offen</Status></div><div><b>#8112 · Datenexport</b><span>18.08.2026</span><Status tone="success">Gelöst</Status></div></div></section>
+      <section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Ticket #8421 erstellt</span><span><b>09:18</b> Benutzer angemeldet</span><span><b>01.10.</b> Zahlung CHF 49.00 verbucht</span><span><b>28.09.</b> Rechnungseinstellungen geändert</span></div></section>
+    </div>
+  </>;
 }
 
 function PaymentsView() {
