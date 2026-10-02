@@ -51,6 +51,18 @@ const expenses = [
   ["Büromaterial","Nina Schmid","CHF 64.50","Entwurf"],
 ];
 
+const payments = [
+  ["1","02.10.2026","Acme AG","RE-2026-019 · Banküberweisung","CHF 4’346.40","Verbucht"],
+  ["2","30.09.2026","Müller GmbH","RE-2026-018 · Karte","CHF 1’200.00","Verbucht"],
+  ["3","28.09.2026","Schmid Consulting","RE-2026-015","CHF 1’745.00","Ausstehend"],
+];
+
+const supportTickets = [
+  ["5832","Frage zur Rechnung","vor 12 Minuten","Offen"],
+  ["5828","Zeiterfassung","vor 1 Stunde","In Bearbeitung"],
+  ["5814","Datenexport","vor 1 Tag","Gelöst"],
+];
+
 function tone(s: string): "success"|"danger"|"warning"|"neutral"|"info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(s)) return "success";
   if (["Überfällig","Abgelehnt","Abgelaufen"].includes(s)) return "danger";
@@ -349,12 +361,7 @@ export function OfferPreview() {
 export function PaymentsPage() {
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus">Zahlung erfassen</Button>}>
     <div className="metrics-grid three"><Metric label="Eingegangen" value="CHF 49’820" hint="diesen Monat" icon="wallet"/><Metric label="Offen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Überfällig" value="CHF 3’700" hint="1 Rechnung" icon="clock"/></div>
-    <ListToolbar placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}/>
-    <div className="records">
-      <RecordRow href="/zahlungen/1" icon="wallet" title="02.10.2026 · Acme AG" meta="RE-2026-019 · Banküberweisung" value="CHF 4’346.40" status="Verbucht"/>
-      <RecordRow href="/zahlungen/2" icon="wallet" title="30.09.2026 · Müller GmbH" meta="RE-2026-018 · Karte" value="CHF 1’200.00" status="Verbucht"/>
-      <RecordRow icon="wallet" title="28.09.2026 · Schmid Consulting" meta="RE-2026-015" value="CHF 1’745.00" status="Ausstehend"/>
-    </div>
+    <RecordsView items={payments} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -482,11 +489,7 @@ export function SupportPage() {
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <div className="records">
-        <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
-        <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
-        <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
-      </div>
+      <RecordsView items={supportTickets} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
       <aside className="tablet-detail support-tablet-preview surface">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
         <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
