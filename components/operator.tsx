@@ -105,11 +105,21 @@ function OperatorDashboard() {
 }
 
 function TicketsView() {
+  const allTickets=tickets.concat([["#8413","Frage zu Abonnement","Schmid Consulting","In Bearbeitung"],["#8410","Datenexport fehlerhaft","Meier Handel AG","Offen"]]);
+  const [query,setQuery]=useState("");
+  const [status,setStatus]=useState("Alle");
+  const visible=allTickets.filter(([nr,subject,customer,state])=>{
+    const matchesQuery=!query.trim() || `${nr} ${subject} ${customer}`.toLowerCase().includes(query.toLowerCase());
+    const matchesStatus=status==="Alle" || state===status;
+    return matchesQuery&&matchesStatus;
+  });
+  const chip=(value:string,label:string)=><button className={status===value?"active":""} type="button" onClick={()=>setStatus(value)}>{label}</button>;
   return <section className="surface operator-table-card">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Alle 124</button><button>Offen 12</button><button>In Bearbeitung 8</button><button>Wartet auf Kunde 6</button><button>Gelöst 98</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Tickets suchen..."/></label></div>
+    <div className="operator-toolbar"><div className="chips">{chip("Alle","Alle")}{chip("Offen","Offen")}{chip("In Bearbeitung","In Bearbeitung")}{chip("Wartet auf Kunde","Wartet auf Kunde")}{chip("Gelöst","Gelöst")}</div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tickets suchen..."/></label></div>
     <div className="operator-table">
       <div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>
-      {tickets.concat([["#8413","Frage zu Abonnement","Schmid Consulting","In Bearbeitung"],["#8410","Datenexport fehlerhaft","Meier Handel AG","Offen"]]).map(([nr,subject,customer,status],i)=><Link href={`/operator/tickets/${nr.replace("#","")}`} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>vor {12+i*18} Min.</span></Link>)}
+      {visible.map(([nr,subject,customer,state],i)=><Link href={`/operator/tickets/${nr.replace("#","")}`} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={state==="Offen"?"warning":state==="Gelöst"?"success":"info"}>{state}</Status></span><span>vor {12+i*18} Min.</span></Link>)}
+      {!visible.length&&<div className="operator-empty"><Icon name="search"/><b>Keine Tickets gefunden</b><span>Suche oder Statusfilter anpassen.</span></div>}
     </div>
   </section>;
 }
@@ -118,7 +128,11 @@ function TicketDetail() {
   const [reply,setReply]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [supportAccess,setSupportAccess]=useState(false);
+  const [tab,setTab]=useState<"conversation"|"notes"|"activity">("conversation");
+  const [note,setNote]=useState("");
+  const [notes,setNotes]=useState(["Rechnung RE-2026-019 prüfen, Kunde wartet auf Rückmeldung."]);
   const send=()=>{if(!reply.trim())return;setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);};
+  const addNote=()=>{if(!note.trim())return;setNotes(current=>[note.trim(),...current]);setNote("");setToast("Interne Notiz gespeichert.");window.setTimeout(()=>setToast(null),2200);};
   return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
       <div className="ticket-meta-bar">
@@ -126,11 +140,14 @@ function TicketDetail() {
         <label>Priorität<select defaultValue="high"><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></select></label>
         <label>Zugewiesen<select defaultValue="mb"><option value="mb">Maria Bianchi</option><option value="ls">Luca Schneider</option></select></label>
       </div>
-      <div className="tabs"><button className="active">Konversation</button><button>Interne Notizen</button><button>Aktivitäten</button></div>
-      <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
-      <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
-      <div className="internal-note"><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>Nur für Operator sichtbar. Kundendaten und Abklärungen hier dokumentieren.</span></div><button className="text-action" onClick={()=>{setToast("Interne Notiz kann jetzt erfasst werden.");window.setTimeout(()=>setToast(null),2200)}}>Notiz hinzufügen</button></div>
-      <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><Button onClick={send}>Senden</Button></div></div>
+      <div className="tabs"><button className={tab==="conversation"?"active":""} onClick={()=>setTab("conversation")}>Konversation</button><button className={tab==="notes"?"active":""} onClick={()=>setTab("notes")}>Interne Notizen</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivitäten</button></div>
+      {tab==="conversation"&&<>
+        <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
+        <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
+        <div className="operator-reply"><textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><Button onClick={send}>Senden</Button></div></div>
+      </>}
+      {tab==="notes"&&<div className="operator-notes"><div className="operator-note-compose"><textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Interne Notiz – niemals für Kunden sichtbar"/><Button onClick={addNote}>Notiz speichern</Button></div>{notes.map((value,index)=><div className="internal-note" key={`${value}-${index}`}><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>{value}</span><small>Maria Bianchi · {index===0?"jetzt":"10:40"}</small></div></div>)}</div>}
+      {tab==="activity"&&<div className="operator-activity"><div><i/><div><b>Status auf In Bearbeitung geändert</b><small>Maria Bianchi · 10:38</small></div></div><div><i/><div><b>Ticket zugewiesen</b><small>System · 10:25</small></div></div><div><i/><div><b>Ticket erstellt</b><small>Thomas Meier · 10:24</small></div></div></div>}
     </section>
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
@@ -145,9 +162,17 @@ function TicketDetail() {
 }
 
 function CustomersView() {
+  const rows=[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]];
+  const [query,setQuery]=useState("");
+  const [status,setStatus]=useState("Alle");
+  const visible=rows.filter(([name,plan,,state])=>{
+    const matchesQuery=!query.trim() || `${name} ${plan}`.toLowerCase().includes(query.toLowerCase());
+    const matchesStatus=status==="Alle" || state===status;
+    return matchesQuery&&matchesStatus;
+  });
   return <section className="surface">
-    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input placeholder="Kunden suchen..."/></label><div className="chips"><button className="active">Alle</button><button>Aktiv</button><button>Eingeschränkt</button><button>Gesperrt</button></div></div>
-    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>heute</span></Link>)}</div>
+    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden suchen..."/></label><div className="chips">{["Alle","Aktiv","Eingeschränkt","Gesperrt"].map(value=><button type="button" className={status===value?"active":""} onClick={()=>setStatus(value)} key={value}>{value}</button>)}</div></div>
+    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{visible.map(([name,plan,mrr,state],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>CHE-123.456.789</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={state==="Aktiv"?"success":"warning"}>{state}</Status></span><span>heute</span></Link>)}{!visible.length&&<div className="operator-empty"><Icon name="search"/><b>Keine Kunden gefunden</b><span>Suche oder Statusfilter anpassen.</span></div>}</div>
   </section>;
 }
 
