@@ -9,7 +9,7 @@ import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
-import { apiGet, apiPost, useProductionBackend } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, useProductionBackend } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 function moneyChf(value:unknown){
@@ -669,50 +669,122 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
+  const [firstName,setFirstName]=useState("Thomas");
+  const [lastName,setLastName]=useState("Müller");
+  const [email,setEmail]=useState("thomas@musterwerk.ch");
+  const [phone,setPhone]=useState("+41 79 123 45 67");
+  const [jobTitle,setJobTitle]=useState("Geschäftsführer");
+  const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
-  const save=(message="Persönliche Daten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
+
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
+      .then(payload=>{
+        const item=payload.item??{};
+        queueMicrotask(()=>{
+          setFirstName(String(item.first_name??""));
+          setLastName(String(item.last_name??""));
+          setEmail(payload.email??"");
+          setPhone(String(item.phone??""));
+          setJobTitle(String(item.job_title??""));
+          setLanguage(String(item.language??"de-CH"));
+        });
+      }).catch(()=>undefined);
+  },[]);
+
+  const save=async(message="Persönliche Daten gespeichert.")=>{
+    try{
+      if(useProductionBackend()) await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
+      setToast(message);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Persönliche Daten konnten nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
+  const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary" onClick={()=>save("Profilbild-Auswahl geöffnet.")}>Bild ändern</Button>
+        <div className="profile-avatar">{initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div><Button variant="secondary" onClick={()=>void save("Profilbild wird mit Storage angebunden.")}>Bild ändern</Button>
       </section>
       <section className="settings-form">
         <div className="form-grid two">
-          <Field label="Vorname"><input defaultValue="Thomas"/></Field>
-          <Field label="Nachname"><input defaultValue="Müller"/></Field>
-          <Field label="E-Mail"><input type="email" defaultValue="thomas@musterwerk.ch"/></Field>
-          <Field label="Telefon"><input type="tel" defaultValue="+41 79 123 45 67"/></Field>
-          <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
-          <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
+          <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
+          <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
+          <Field label="E-Mail"><input type="email" value={email} readOnly/></Field>
+          <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
+          <Field label="Funktion"><input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
+          <Field label="Sprache"><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="de-CH">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
       </section>
     </div>
-    {toast&&<Toast title={toast}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
 }
 
 export function CompanySettingsPage() {
+  const [name,setName]=useState("Musterwerk AG");
+  const [uid,setUid]=useState("CHE-123.456.789");
+  const [street,setStreet]=useState("Bahnhofstrasse 12");
+  const [postalCode,setPostalCode]=useState("3000");
+  const [city,setCity]=useState("Bern");
+  const [email,setEmail]=useState("info@musterwerk.ch");
+  const [phone,setPhone]=useState("+41 31 123 45 67");
+  const [vatRate,setVatRate]=useState("8.1");
+  const [paymentTerms,setPaymentTerms]=useState("30");
   const [toast,setToast]=useState<string|null>(null);
-  const save=(message="Firmendaten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
+
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
+      const item=payload.item;
+      queueMicrotask(()=>{
+        setName(String(item.name??""));
+        setUid(String(item.uid??""));
+        setStreet(String(item.street??""));
+        setPostalCode(String(item.postal_code??""));
+        setCity(String(item.city??""));
+        setEmail(String(item.email??""));
+        setPhone(String(item.phone??""));
+        setVatRate(String(item.vat_rate??"8.1"));
+        setPaymentTerms(String(item.payment_terms_days??"30"));
+      });
+    }).catch(()=>undefined);
+  },[]);
+
+  const save=async(message="Firmendaten gespeichert.")=>{
+    try{
+      if(useProductionBackend()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
+      setToast(message);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>save("Logo-Auswahl geöffnet.")}>Logo ändern</Button></section>
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>{name}</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>void save("Logo wird mit Storage angebunden.")}>Logo ändern</Button></section>
       <section className="settings-form">
         <div className="form-grid two">
-          <Field label="Firmenname"><input defaultValue="Musterwerk AG"/></Field>
-          <Field label="UID"><input defaultValue="CHE-123.456.789"/></Field>
-          <Field label="Strasse"><input defaultValue="Bahnhofstrasse 12"/></Field>
-          <Field label="PLZ / Ort"><input defaultValue="3000 Bern"/></Field>
-          <Field label="E-Mail"><input type="email" defaultValue="info@musterwerk.ch"/></Field>
-          <Field label="Telefon"><input type="tel" defaultValue="+41 31 123 45 67"/></Field>
-          <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
-          <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
+          <Field label="Firmenname"><input value={name} onChange={e=>setName(e.target.value)}/></Field>
+          <Field label="UID"><input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
+          <Field label="Strasse"><input value={street} onChange={e=>setStreet(e.target.value)}/></Field>
+          <Field label="PLZ"><input value={postalCode} onChange={e=>setPostalCode(e.target.value)}/></Field>
+          <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)}/></Field>
+          <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
+          <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
+          <Field label="Standard MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="Zahlungsziel"><select value={paymentTerms} onChange={e=>setPaymentTerms(e.target.value)}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
       </section>
     </div>
-    {toast&&<Toast title={toast}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
 }
 
