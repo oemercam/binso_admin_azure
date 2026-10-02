@@ -6,6 +6,7 @@ type SendEmailInput={
   html:string;
   text?:string;
   replyTo?:string;
+  idempotencyKey?:string;
 };
 
 export function isEmailConfigured(){
@@ -18,7 +19,11 @@ export async function sendEmail(input:SendEmailInput){
   if(!key||!from) throw new ApiError(503,"email_not_configured","E-Mail-Versand ist noch nicht konfiguriert.");
   const response=await fetch("https://api.resend.com/emails",{
     method:"POST",
-    headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},
+    headers:{
+      Authorization:"Bearer "+key,
+      "Content-Type":"application/json",
+      ...(input.idempotencyKey?{"Idempotency-Key":input.idempotencyKey.slice(0,256)}:{}),
+    },
     body:JSON.stringify({
       from,
       to:Array.isArray(input.to)?input.to:[input.to],
