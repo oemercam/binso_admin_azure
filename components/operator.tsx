@@ -434,10 +434,59 @@ function MonitoringView() {
 }
 
 function AnnouncementsView() {
-  const [published,setPublished]=useState(false);
+  const production=useBackendMode();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  const [title,setTitle]=useState("");
+  const [kind,setKind]=useState("information");
+  const [audience,setAudience]=useState("all");
+  const [body,setBody]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+
+  const load=()=>{
+    if(!production) return;
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/announcements")
+      .then(payload=>setItems(payload.items))
+      .catch(()=>undefined);
+  };
+
+  useEffect(()=>{load();},[production]);
+
+  const publish=async()=>{
+    if(!title.trim()||!body.trim()){
+      setToast("Titel und Nachricht sind erforderlich.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    if(!production){
+      setToast("Ankündigung im Demo-Modus simuliert.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/announcements",{title,body,kind,audience,published:true});
+      setItems(current=>[payload.item,...current]);
+      setTitle("");setBody("");
+      setToast("Ankündigung veröffentlicht.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Ankündigung konnte nicht veröffentlicht werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  const kindLabel:Record<string,string>={information:"Information",maintenance:"Wartung",incident:"Störung",feature:"Neue Funktion"};
+  const audienceLabel:Record<string,string>={all:"Alle Kunden",start:"Start",business:"Business",pro:"Pro"};
+
   return <div className="operator-grid">
-    <section className="surface"><SectionTitle title="Neue Ankündigung"/><div className="form-grid"><label className="full">Titel<input placeholder="Kurzer Titel"/></label><label className="full">Typ<select><option>Information</option><option>Wartung</option><option>Störung</option><option>Neue Funktion</option></select></label><label className="full">Zielgruppe<select><option>Alle Kunden</option><option>Business</option><option>Pro</option></select></label><label className="full">Nachricht<textarea placeholder="Nachricht..."/></label></div><Button onClick={()=>setPublished(true)}>Veröffentlichen</Button></section>
-    <section className="surface"><SectionTitle title="Aktiv"/><div className="announcement-card"><Status tone="info">Information</Status><b>Neue Rechnungsansicht</b><p>Die neue mobile Rechnungsvorschau ist verfügbar.</p><small>Heute · alle Kunden</small></div>{published&&<div className="announcement-card"><Status tone="success">Veröffentlicht</Status><b>Neue Ankündigung</b><p>Die Ankündigung wurde für alle Kunden veröffentlicht.</p><small>gerade eben</small></div>}</section>
+    <section className="surface">
+      <SectionTitle title="Neue Ankündigung"/>
+      <div className="form-grid"><label className="full">Titel<input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Kurzer Titel"/></label><label className="full">Typ<select value={kind} onChange={e=>setKind(e.target.value)}><option value="information">Information</option><option value="maintenance">Wartung</option><option value="incident">Störung</option><option value="feature">Neue Funktion</option></select></label><label className="full">Zielgruppe<select value={audience} onChange={e=>setAudience(e.target.value)}><option value="all">Alle Kunden</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></select></label><label className="full">Nachricht<textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="Nachricht..."/></label></div>
+      <Button onClick={()=>void publish()}>Veröffentlichen</Button>
+    </section>
+    <section className="surface">
+      <SectionTitle title="Ankündigungen"/>
+      {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.published===true?"success":"neutral"}>{item.published===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.body??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {audienceLabel[String(item.audience)]??String(item.audience)} · {new Date(String(item.created_at)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
+    </section>
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </div>;
 }
 
