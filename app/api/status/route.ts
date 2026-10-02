@@ -1,0 +1,1 @@
+import {apiOk} from "@/lib/security";import {modules} from "@/lib/modules";export const dynamic="force-dynamic";export function GET(){return apiOk({status:"ok",service:"binso-one",architecture:"modular-monolith",modules})}

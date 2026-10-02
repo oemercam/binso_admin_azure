@@ -1,0 +1,1 @@
+export type NumberSeries={prefix:string;year:number;next:number;padding:number};export function nextDocumentNumber(s:NumberSeries){const number=s.prefix+"-"+s.year+"-"+String(s.next).padStart(s.padding,"0");return {number,series:{...s,next:s.next+1}}}

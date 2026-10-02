@@ -1,0 +1,1 @@
+export function toSwissDate(value:string|Date,locale="de-CH"){const d=typeof value==="string"?new Date(value):value;return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(d)}export function daysBetween(a:Date,b:Date){return Math.floor((b.getTime()-a.getTime())/86400000)}

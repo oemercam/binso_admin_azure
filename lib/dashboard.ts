@@ -1,0 +1,1 @@
+export type DashboardInput={openInvoiceMinor:number;paidThisMonthMinor:number;activeProjects:number;minutesToday:number};export function dashboardMetrics(i:DashboardInput){return {...i,hoursToday:Math.round(i.minutesToday/6)/10}}

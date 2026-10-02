@@ -1,0 +1,1 @@
+import {permissions,type Permission,type UserRole} from "./domain";export function hasPermission(role:UserRole,permission:Permission){return permissions[role].includes(permission)}export function requirePermission(role:UserRole,permission:Permission){if(!hasPermission(role,permission))throw new Error("FORBIDDEN")}

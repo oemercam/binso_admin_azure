@@ -1,0 +1,1 @@
+import type {EmailMessage} from "./email";export interface EmailProvider{send(message:EmailMessage):Promise<{id:string}>}export function emailConfigured(){return Boolean(process.env.EMAIL_API_KEY)}

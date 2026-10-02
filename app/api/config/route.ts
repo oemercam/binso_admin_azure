@@ -1,0 +1,1 @@
+import {apiOk} from "@/lib/security";import {binsoContact} from "@/lib/contact";import {defaultLocale,supportedLocales} from "@/lib/locales";export function GET(){return apiOk({product:"Binso One",operator:binsoContact,defaultLocale,supportedLocales})}

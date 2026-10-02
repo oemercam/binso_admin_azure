@@ -1,0 +1,1 @@
+const optional=["DATABASE_URL","AUTH_SECRET","BILLING_SECRET","EMAIL_API_KEY"] as const;export function runtimeCapabilities(){return Object.fromEntries(optional.map(k=>[k,Boolean(process.env[k])]))}

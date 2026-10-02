@@ -1,0 +1,1 @@
+import {toCsv} from "./csv";export type ExportFormat="csv"|"pdf"|"xlsx";export type ExportJob={id:string;organisationId:string;format:ExportFormat;kind:string;status:"queued"|"running"|"ready"|"failed";createdAt:string};export function exportCsv(rows:Record<string,unknown>[]){return toCsv(rows)}

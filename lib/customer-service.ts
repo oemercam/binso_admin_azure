@@ -1,0 +1,1 @@
+import {newId} from "./ids";import {validateCustomer,type CustomerInput} from "./customer";export function createCustomer(organisationId:string,input:CustomerInput,now=new Date()){const v=validateCustomer(input);return {id:newId(),organisationId,...v,status:"Aktiv" as const,createdAt:now.toISOString(),updatedAt:now.toISOString()}}

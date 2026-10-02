@@ -1,0 +1,1 @@
+export const currencies=["CHF","EUR","USD"] as const;export type Currency=(typeof currencies)[number];export function isCurrency(value:string):value is Currency{return (currencies as readonly string[]).includes(value)}

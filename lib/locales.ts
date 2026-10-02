@@ -1,0 +1,1 @@
+export const supportedLocales=["de-CH","fr","it","en","tr"] as const;export type SupportedLocale=(typeof supportedLocales)[number];export const defaultLocale:SupportedLocale="de-CH";export function localeSupported(v:string):v is SupportedLocale{return (supportedLocales as readonly string[]).includes(v)}

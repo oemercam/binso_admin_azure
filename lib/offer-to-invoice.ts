@@ -1,0 +1,1 @@
+import type {Offer} from "./offers";import {createInvoice} from "./invoice-service";export function convertOfferToInvoice(offer:Offer,number:string,dueAt:string,now=new Date()){if(offer.status!=="Angenommen")throw new Error("OFFER_NOT_ACCEPTED");return createInvoice(offer.organisationId,number,{customerId:offer.customerId,dueAt,lines:offer.lines},now)}
