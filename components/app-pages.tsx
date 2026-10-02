@@ -527,20 +527,49 @@ export function ExpensesPage() {
   </AppShell>;
 }
 
-export function ExpenseForm({ existing = false }: { existing?: boolean }) {
+export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
+  const production=useBackendMode();
   const [person,setPerson]=useState("Thomas Müller");
+  const [date,setDate]=useState("2026-10-02");
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState(existing?"280.00":"");
+  const [currency,setCurrency]=useState("CHF");
+  const [vatRate,setVatRate]=useState("8.1");
   const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
+  const [status,setStatus]=useState(existing?"Eingereicht":"Eingereicht");
   const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!production||!existing||!expenseId) return;
+    apiGet<{item:Record<string,unknown>}>("/api/expenses/"+encodeURIComponent(expenseId)).then(payload=>{
+      const item=payload.item;
+      const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
+      queueMicrotask(()=>{
+        if(employee) setPerson([employee.first_name,employee.last_name].filter(Boolean).join(" "));
+        setDate(String(item.expense_date??""));
+        setCategory(String(item.category??"Reise"));
+        setAmount(String(item.amount??"0.00"));
+        setCurrency(String(item.currency??"CHF"));
+        setVatRate(String(item.vat_rate??"8.1"));
+        setDescription(String(item.description??item.merchant??""));
+        const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
+        setStatus(map[String(item.status)]??"Eingereicht");
+      });
+    }).catch(()=>undefined);
+  },[production,existing,expenseId]);
+
   const save=async()=>{
     const value=Number(amount.replace(",","."));
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
+    const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
     try{
-      if(!existing){
-        if(isProductionBackendEnabled()) await apiPost("/api/expenses",{employeeName:person,merchant:description.trim()||category,expenseDate:"2026-10-02",category,amount:value,currency:"CHF",vatRate:8.1,description,status:"submitted"});
-        else appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
+      const payload={employeeName:person,merchant:description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
+      if(production){
+        if(existing&&expenseId) await apiPatch("/api/expenses/"+encodeURIComponent(expenseId),payload);
+        else await apiPost("/api/expenses",payload);
+      }else if(!existing){
+        appendDemoRow("expenses",[description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
       setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
       window.setTimeout(()=>router.push("/spesen"),700);
@@ -549,23 +578,25 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
+
+  return <AppShell title={existing ? description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
-      <button className="receipt-upload" type="button" onClick={()=>{setToast("Dateiauswahl geöffnet.");window.setTimeout(()=>setToast(null),2200)}}><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
+      <button className="receipt-upload" type="button" onClick={()=>{setToast("Dateiupload wird mit Supabase Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
       <div className="form-page">
         <div className="form-grid two">
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
-          <Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field>
+          <Field label="Datum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
           <Field label="Kategorie"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
           <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
-          <Field label="Währung"><select><option>CHF</option><option>EUR</option></select></Field>
-          <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
+          <Field label="Währung"><select value={currency} onChange={e=>setCurrency(e.target.value)}><option>CHF</option><option>EUR</option></select></Field>
+          <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          {existing&&<Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Entwurf</option><option>Eingereicht</option><option>Genehmigt</option><option>Abgelehnt</option></select></Field>}
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("gültigen")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("gültigen")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
