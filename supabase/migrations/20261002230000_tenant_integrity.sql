@@ -34,13 +34,13 @@ do $$ begin
   if not exists(select 1 from pg_constraint where conname='expenses_employee_tenant_fk') then
     alter table public.expenses
       add constraint expenses_employee_tenant_fk
-      foreign key(tenant_id,employee_id) references public.employees(tenant_id,id) on delete set null;
+      foreign key(tenant_id,employee_id) references public.employees(tenant_id,id) on delete set null (employee_id);
   end if;
 
   if not exists(select 1 from pg_constraint where conname='time_entries_customer_tenant_fk') then
     alter table public.time_entries
       add constraint time_entries_customer_tenant_fk
-      foreign key(tenant_id,customer_id) references public.customers(tenant_id,id) on delete set null;
+      foreign key(tenant_id,customer_id) references public.customers(tenant_id,id) on delete set null (customer_id);
   end if;
 
   if not exists(select 1 from pg_constraint where conname='support_messages_ticket_tenant_fk') then
