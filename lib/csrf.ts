@@ -1,0 +1,1 @@
+import {timingSafeEqual} from "node:crypto";export function csrfValid(cookie:string|undefined,header:string|undefined){if(!cookie||!header)return false;const a=Buffer.from(cookie),b=Buffer.from(header);return a.length===b.length&&timingSafeEqual(a,b)}
