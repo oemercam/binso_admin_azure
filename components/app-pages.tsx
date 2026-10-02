@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status } from "./ui";
+import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toggle } from "./ui";
 
 const customers = [
   ["Acme AG","Bauunternehmen","Zürich","Aktiv"],
@@ -60,11 +60,27 @@ function tone(s: string): "success"|"danger"|"warning"|"neutral"|"info" {
 }
 
 function ListToolbar({ placeholder, chips = ["Alle","Aktiv","Inaktiv"] }: { placeholder: string; chips?: string[] }) {
-  return <div className="toolbar">
-    <label className="searchbox"><Icon name="search"/><input placeholder={placeholder}/></label>
-    <div className="chips">{chips.map((x,i)=><button type="button" className={i===0?"active":""} key={x}>{x}</button>)}</div>
-    <button className="filter-button" type="button"><Icon name="filter" size={17}/><span>Filter</span></button>
-  </div>;
+  const [activeChip, setActiveChip] = useState(chips[0] ?? "Alle");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [period, setPeriod] = useState("Alle");
+  const [owner, setOwner] = useState("Alle");
+
+  return <>
+    <div className="toolbar">
+      <label className="searchbox"><Icon name="search"/><input placeholder={placeholder}/></label>
+      <div className="chips">{chips.map((x)=><button type="button" onClick={() => setActiveChip(x)} className={x===activeChip?"active":""} key={x}>{x}</button>)}</div>
+      <button className="filter-button" type="button" onClick={() => setFiltersOpen(true)}><Icon name="filter" size={17}/><span>Filter</span></button>
+    </div>
+    {filtersOpen && <div className="sheet-layer filter-layer" onMouseDown={(e)=>{if(e.target===e.currentTarget)setFiltersOpen(false)}}>
+      <section className="bottom-sheet filter-sheet" role="dialog" aria-modal="true" aria-label="Filter">
+        <div className="sheet-handle"/>
+        <header className="sheet-header"><div><h2>Filter</h2><p>Ansicht eingrenzen, ohne die Seite zu verlassen.</p></div><button className="icon-button" type="button" onClick={()=>setFiltersOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header>
+        <div className="filter-section"><b>Zeitraum</b><div className="segmented">{["Alle","30 Tage","90 Tage","Dieses Jahr"].map(x=><button type="button" className={period===x?"active":""} onClick={()=>setPeriod(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-section"><b>Zuständigkeit</b><div className="segmented">{["Alle","Ich","Team"].map(x=><button type="button" className={owner===x?"active":""} onClick={()=>setOwner(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-sheet-actions"><button type="button" className="button button-secondary" onClick={()=>{setPeriod("Alle");setOwner("Alle");setActiveChip(chips[0] ?? "Alle")}}>Zurücksetzen</button><button type="button" className="button button-primary" onClick={()=>setFiltersOpen(false)}>Anwenden</button></div>
+      </section>
+    </div>}
+  </>;
 }
 
 function RecordRow({ href, icon, title, meta, value, status }: { href?: string; icon?: string; title: string; meta: string; value?: string; status?: string }) {
