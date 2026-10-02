@@ -58,5 +58,5 @@ begin
   return new_count<=request_limit;
 end $$;
 
-revoke all on function public.consume_api_rate_limit(text,text) from public;
-grant execute on function public.consume_api_rate_limit(text,text) to anon,authenticated;
+revoke all on function public.consume_api_rate_limit(text,text) from public,anon,authenticated;
+grant execute on function public.consume_api_rate_limit(text,text) to service_role;
