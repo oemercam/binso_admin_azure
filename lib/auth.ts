@@ -1,0 +1,1 @@
+import type {UserRole} from "./domain";export type Session={userId:string;organisationId:string;role:UserRole;expiresAt:string};export function sessionIsValid(s:Session,now=Date.now()){return Boolean(s.userId&&s.organisationId)&&Date.parse(s.expiresAt)>now}export function requireSession(s:Session|undefined){if(!s||!sessionIsValid(s))throw new Error("UNAUTHENTICATED");return s}
