@@ -1183,3 +1183,11 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
 .pwa-update>div{flex:1}.pwa-update b,.pwa-update span{display:block}.pwa-update b{font-size:11px}.pwa-update span{color:var(--muted);font-size:9px;margin-top:3px}
 .pwa-update button{min-height:34px;border:0;border-radius:8px;background:var(--ink);color:var(--bg);padding:0 10px;font-size:10px;font-weight:700}
 @media(max-width:760px){.pwa-update{left:10px;right:10px;bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 10px);min-width:0}}
+
+
+.mobile-document-bar{display:none}
+@media(max-width:760px){
+  .mobile-document-bar{position:sticky;bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 8px);z-index:12;display:grid;grid-template-columns:1fr 1.35fr;gap:8px;padding:8px 0;background:var(--bg)}
+  .mobile-document-bar .button{width:100%;min-height:48px}
+  .app-main:has(.global-timer) .mobile-document-bar{bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 66px)}
+}
