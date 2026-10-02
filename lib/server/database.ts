@@ -57,3 +57,9 @@ export async function tenantUpdate<T extends Record<string,unknown>>(table:strin
   const {token,tenantId}=await currentTenant();
   return requestDb<Array<T&{id:string}>>(table+"?id=eq."+encodeURIComponent(id)+"&tenant_id=eq."+tenantId,"PATCH",token,data,"return=representation");
 }
+
+
+export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){
+  const {token,tenantId}=await currentTenant();
+  return requestDb<T>("rpc/"+fn,"POST",token,{...args,p_tenant_id:tenantId});
+}
