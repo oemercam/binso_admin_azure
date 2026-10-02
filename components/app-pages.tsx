@@ -227,25 +227,34 @@ export function PaymentDetail() {
 export function ProductsPage() {
   const { data } = useDemoData();
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus">Neues Produkt</Button>}>
-    <RecordsView items={data.products} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
+    <RecordsView items={data.products} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href={`/produkte/${slugify(name)}`} icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
-export function ProductForm({ existing = false }: { existing?: boolean }) {
+export function ProductForm({ existingId }: { existingId?: string }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
-  const [name,setName]=useState(existing?"Beratung":"");
-  const [type,setType]=useState("Dienstleistung");
-  const [price,setPrice]=useState(existing?"120.00":"");
+  const { addRecord, data, updateRecord, removeRecord }=useDemoData();
+  const existingIndex=existingId ? data.products.findIndex(row=>slugify(row[0]??"")===existingId) : -1;
+  const existing=existingIndex>=0 ? data.products[existingIndex] : undefined;
+  const [name,setName]=useState(existing?.[0]??"");
+  const [type,setType]=useState(existing?.[1]??"Dienstleistung");
+  const [price,setPrice]=useState((existing?.[2]??"").replace("CHF ",""));
+  const [status,setStatus]=useState(existing?.[3]??"Aktiv");
   const [error,setError]=useState("");
 
   const save=()=>{
     if(!name.trim()){setError("Name ist erforderlich.");return;}
-    if(!existing) addRecord("products",[name.trim(),type,`CHF ${price || "0.00"}`,"Aktiv"]);
+    const row=[name.trim(),type,`CHF ${price||"0.00"}`,status];
+    if(existingIndex>=0) updateRecord("products",existingIndex,row); else addRecord("products",row);
+    router.push("/produkte");
+  };
+  const remove=()=>{
+    if(existingIndex<0) return;
+    removeRecord("products",existingIndex);
     router.push("/produkte");
   };
 
-  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
+  return <AppShell title={existing ? existing[0] : "Produkt erstellen"} subtitle={existing ? `${existing[1]} · ${existing[3]}` : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <div className="form-grid two">
         <Field label="Name"><input value={name} onChange={e=>{setName(e.target.value);setError("")}} placeholder="Name"/></Field>
@@ -254,9 +263,11 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
         <Field label="Einheit"><select><option>Stunde</option><option>Stück</option><option>Pauschal</option></select></Field>
         <Field label="Verkaufspreis"><input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
         <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+        <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
       </div>
       {error&&<p className="form-error">{error}</p>}
+      {existing&&<div className="danger-zone compact-danger"><div><b>Produkt löschen</b><p>Entfernt den Eintrag aus den lokalen Demo-Daten.</p></div><Button variant="danger" onClick={remove}>Löschen</Button></div>}
       <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
   </AppShell>;
@@ -265,28 +276,37 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
 export function EmployeesPage() {
   const { data } = useDemoData();
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus">Mitarbeiter</Button>}>
-    <RecordsView items={data.employees} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
+    <RecordsView items={data.employees} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href={`/mitarbeiter/${slugify(name)}`} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
-export function EmployeeForm({ existing = false }: { existing?: boolean }) {
+export function EmployeeForm({ existingId }: { existingId?: string }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
-  const [firstName,setFirstName]=useState(existing?"Thomas":"");
-  const [lastName,setLastName]=useState(existing?"Müller":"");
-  const [role,setRole]=useState(existing?"Inhaber":"");
-  const [load,setLoad]=useState(existing?"100":"");
-  const [status,setStatus]=useState("Aktiv");
+  const { addRecord, data, updateRecord, removeRecord }=useDemoData();
+  const existingIndex=existingId ? data.employees.findIndex(row=>slugify(row[0]??"")===existingId) : -1;
+  const existing=existingIndex>=0 ? data.employees[existingIndex] : undefined;
+  const existingNames=(existing?.[0]??"").split(" ");
+  const [firstName,setFirstName]=useState(existingNames.shift()??"");
+  const [lastName,setLastName]=useState(existingNames.join(" "));
+  const [role,setRole]=useState(existing?.[1]??"");
+  const [load,setLoad]=useState((existing?.[2]??"100%").replace("%",""));
+  const [status,setStatus]=useState(existing?.[3]??"Aktiv");
   const [error,setError]=useState("");
 
   const save=()=>{
     const fullName=`${firstName} ${lastName}`.trim();
     if(!fullName){setError("Name ist erforderlich.");return;}
-    if(!existing) addRecord("employees",[fullName,role||"Mitarbeiter",`${load||"100"}%`,status]);
+    const row=[fullName,role||"Mitarbeiter",`${load||"100"}%`,status];
+    if(existingIndex>=0) updateRecord("employees",existingIndex,row); else addRecord("employees",row);
+    router.push("/mitarbeiter");
+  };
+  const remove=()=>{
+    if(existingIndex<0) return;
+    removeRecord("employees",existingIndex);
     router.push("/mitarbeiter");
   };
 
-  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
+  return <AppShell title={existing ? existing[0] : "Mitarbeiter hinzufügen"} subtitle={existing ? `${existing[1]} · ${existing[2]}` : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
     {existing&&<div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
     <div className="form-page">
       <div className="form-grid two">
@@ -300,6 +320,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
       {error&&<p className="form-error">{error}</p>}
+      {existing&&<div className="danger-zone compact-danger"><div><b>Mitarbeiter entfernen</b><p>Entfernt den Eintrag aus den lokalen Demo-Daten.</p></div><Button variant="danger" onClick={remove}>Entfernen</Button></div>}
       <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
   </AppShell>;
@@ -308,36 +329,46 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
 export function ExpensesPage() {
   const { data } = useDemoData();
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus">Spese erfassen</Button>}>
-    <RecordsView items={data.expenses} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={data.expenses} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href={`/spesen/${slugify(title)}`} icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
-export function ExpenseForm({ existing = false }: { existing?: boolean }) {
+export function ExpenseForm({ existingId }: { existingId?: string }) {
   const router=useRouter();
-  const { addRecord }=useDemoData();
-  const [employee,setEmployee]=useState("Thomas Müller");
-  const [amount,setAmount]=useState(existing?"280.00":"");
-  const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
-  const [receipt,setReceipt]=useState(false);
+  const { addRecord, data, updateRecord, removeRecord }=useDemoData();
+  const existingIndex=existingId ? data.expenses.findIndex(row=>slugify(row[0]??"")===existingId) : -1;
+  const existing=existingIndex>=0 ? data.expenses[existingIndex] : undefined;
+  const [employee,setEmployee]=useState(existing?.[1]??"Thomas Müller");
+  const [amount,setAmount]=useState((existing?.[2]??"").replace("CHF ",""));
+  const [description,setDescription]=useState(existing?.[0]??"");
+  const [status,setStatus]=useState(existing?.[3]??"Eingereicht");
+  const [receipt,setReceipt]=useState(Boolean(existing));
 
   const save=()=>{
-    if(!existing) addRecord("expenses",[description.trim()||"Neue Spese",employee,`CHF ${amount||"0.00"}`,"Eingereicht"]);
+    const row=[description.trim()||"Neue Spese",employee,`CHF ${amount||"0.00"}`,status];
+    if(existingIndex>=0) updateRecord("expenses",existingIndex,row); else addRecord("expenses",row);
+    router.push("/spesen");
+  };
+  const remove=()=>{
+    if(existingIndex<0) return;
+    removeRecord("expenses",existingIndex);
     router.push("/spesen");
   };
 
-  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
+  return <AppShell title={existing ? existing[0] : "Spese erfassen"} subtitle={existing ? `${existing[1]} · ${existing[3]}` : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
       <button className={receipt?"receipt-upload has-receipt":"receipt-upload"} type="button" onClick={()=>setReceipt(true)}><span><Icon name={receipt?"check":"upload"} size={25}/></span><b>{receipt?"Beleg hinzugefügt":"Beleg hinzufügen"}</b><small>{receipt?"beleg-2026-10-02.jpg":"Kamera oder Datei verwenden"}</small></button>
       <div className="form-page">
         <div className="form-grid two">
-          <Field label="Mitarbeiter"><select value={employee} onChange={e=>setEmployee(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
+          <Field label="Mitarbeiter"><select value={employee} onChange={e=>setEmployee(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option><option>Lukas Weber</option><option>Nina Schmid</option></select></Field>
           <Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field>
           <Field label="Kategorie"><select><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
           <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
           <Field label="Währung"><select><option>CHF</option><option>EUR</option></select></Field>
-          <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
+          <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Entwurf</option><option>Eingereicht</option><option>Genehmigt</option></select></Field>
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
+        {existing&&<div className="danger-zone compact-danger"><div><b>Spese löschen</b><p>Entfernt den Eintrag aus den lokalen Demo-Daten.</p></div><Button variant="danger" onClick={remove}>Löschen</Button></div>}
         <div className="mobile-sticky-save"><Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
