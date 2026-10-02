@@ -1014,33 +1014,59 @@ export function CompanySettingsPage() {
 }
 
 export function SubscriptionSettingsPage() {
+  const production=useBackendMode();
   const [dialog,setDialog]=useState<"plan"|"payment"|"cancel"|null>(null);
   const [plan,setPlan]=useState("Business");
+  const [subscription,setSubscription]=useState<Record<string,unknown>|null>(null);
   const [toast,setToast]=useState<string|null>(null);
   const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89"};
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{item:Record<string,unknown>}>("/api/settings/subscription")
+      .then(payload=>queueMicrotask(()=>setSubscription(payload.item)))
+      .catch(()=>undefined);
+  },[production]);
+
+  if(!production){
+    return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+      <section className="plan-hero"><div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div><div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div><Button onClick={()=>setDialog("plan")}>Plan ändern</Button></section>
+      <div className="subscription-detail-grid"><section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section><section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary" onClick={()=>setDialog("payment")}>Ändern</Button></div></section></div>
+      <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
+      <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger" onClick={()=>setDialog("cancel")}>Kündigung starten</Button></div>
+      {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{dialog==="plan"?"Plan ändern":dialog==="payment"?"Zahlungsmittel ändern":"Abonnement kündigen"}</h2><p>Demo-Aktion ohne produktive Zahlungsabwicklung.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>{dialog==="plan"&&<div className="plan-choice-list">{["Start","Business","Pro"].map(name=><button type="button" className={plan===name?"selected":""} onClick={()=>setPlan(name)} key={name}><div><b>{name}</b><small>CHF {prices[name]} / Monat</small></div>{plan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>confirm("Demo-Aktion gespeichert.")}>Speichern</Button></div></section></div>}
+      {toast&&<Toast title={toast}/>}
+    </AppShell>;
+  }
+
+  if(!subscription) return <AppShell title="Abonnement" subtitle="Daten werden geladen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><EmptyState icon="card" title="Abonnement wird geladen" text="Die Kontodaten werden abgerufen."/></AppShell>;
+
+  const planKey=String(subscription.plan??"trial");
+  const planLabel:Record<string,string>={trial:"Testphase",start:"Start",business:"Business",pro:"Pro"};
+  const planPrice:Record<string,string>={trial:"0",start:"19",business:"49",pro:"89"};
+  const statusLabel:Record<string,string>={trial:"Testphase",active:"Aktiv",past_due:"Überfällig",suspended:"Pausiert",cancelled:"Gekündigt"};
+  const accountLabel:Record<string,string>={active:"Aktiv",restricted:"Eingeschränkt",suspended:"Gesperrt",cancelled:"Gekündigt"};
+  const subscriptionStatus=String(subscription.subscription_status??"trial");
+  const accountStatus=String(subscription.account_status??"active");
+  const billingConnected=Boolean(subscription.billing_customer_ref&&subscription.billing_subscription_ref);
+  const storageLimit=Number(subscription.storage_limit_bytes??0);
+  const storageLabel=storageLimit>0?(storageLimit/1024/1024/1024).toLocaleString("de-CH",{maximumFractionDigits:1})+" GB":"—";
+  const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString("de-CH"):"—";
+  const trialEnd=subscription.trial_ends_at?new Date(String(subscription.trial_ends_at)).toLocaleDateString("de-CH"):"—";
+
+  return <AppShell title="Abonnement" subtitle="Plan, Nutzung und Kontostatus." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
-      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div>
-      <div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div>
-      <Button onClick={()=>setDialog("plan")}>Plan ändern</Button>
+      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{planLabel[planKey]??planKey}</h2><p>{subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</p></div>
+      <div className="plan-price"><strong>{"CHF "+(planPrice[planKey]??"—")}</strong><span>/ Monat</span></div>
+      <Status tone={subscriptionStatus==="active"||subscriptionStatus==="trial"?"success":subscriptionStatus==="past_due"?"warning":"neutral"}>{statusLabel[subscriptionStatus]??subscriptionStatus}</Status>
     </section>
     <div className="subscription-detail-grid">
-      <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section>
-      <section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary" onClick={()=>setDialog("payment")}>Ändern</Button></div></section>
+      <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzerlimit</span><b>{String(subscription.user_limit??"—")}</b></div><div className="usage-row"><span>Dateispeicher</span><b>{storageLabel}</b></div><div className="usage-row"><span>Kontostatus</span><b>{accountLabel[accountStatus]??accountStatus}</b></div><div className="usage-row"><span>{subscriptionStatus==="trial"?"Testphase bis":"Aktuelle Periode bis"}</span><b>{subscriptionStatus==="trial"?trialEnd:periodEnd}</b></div></section>
+      <section className="surface"><SectionTitle title="Zahlungsabwicklung"/>{billingConnected?<div className="context-block"><Status tone="success">Verbunden</Status><b>Billing-Konto hinterlegt</b><span>Externe Zahlungsdetails werden nicht in Binso One gespeichert.</span></div>:<div className="context-block"><Status tone="warning">Noch nicht verbunden</Status><b>Keine produktive Zahlungsabwicklung</b><span>Planwechsel, Zahlungsmittel, SaaS-Rechnungen und Kündigung werden erst aktiviert, wenn Stripe produktiv angebunden ist.</span></div>}</section>
     </div>
-    <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.08.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
-    <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger" onClick={()=>setDialog("cancel")}>Kündigung starten</Button></div>
-
-    {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true">
-      <div className="sheet-handle"/>
-      <header className="sheet-header"><div><h2>{dialog==="plan"?"Plan ändern":dialog==="payment"?"Zahlungsmittel ändern":"Abonnement kündigen"}</h2><p>{dialog==="cancel"?"Die Kündigung wird erst nach deiner Bestätigung vorgemerkt.":"Änderungen werden vor Abschluss nochmals bestätigt."}</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>
-      {dialog==="plan"&&<div className="plan-choice-list">{["Start","Business","Pro"].map(name=><button type="button" className={plan===name?"selected":""} onClick={()=>setPlan(name)} key={name}><div><b>{name}</b><small>CHF {prices[name]} / Monat</small></div>{plan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>}
-      {dialog==="payment"&&<div className="form-grid two"><Field label="Karteninhaber"><input defaultValue="Thomas Müller"/></Field><Field label="Kartennummer"><input inputMode="numeric" placeholder="•••• •••• •••• 4242"/></Field><Field label="Ablauf"><input placeholder="MM / JJ"/></Field><Field label="CVC"><input inputMode="numeric" placeholder="•••"/></Field></div>}
-      {dialog==="cancel"&&<div className="cancel-summary"><Icon name="lock"/><div><b>Zugriff bleibt bis 31.10.2026 aktiv</b><p>Danach wird das Abonnement beendet. Deine Daten werden nicht sofort gelöscht.</p></div></div>}
-      <div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button variant={dialog==="cancel"?"danger":"primary"} onClick={()=>confirm(dialog==="plan"?"Planänderung gespeichert.":dialog==="payment"?"Zahlungsmittel aktualisiert.":"Kündigung vorgemerkt.")}>{dialog==="cancel"?"Kündigung bestätigen":"Speichern"}</Button></div>
-    </section></div>}
-    {toast&&<Toast title={toast}/>}
+    <section className="surface invoices-panel"><SectionTitle title="Abrechnungen"/>{billingConnected?<p>Billing-Historie wird mit der Stripe-Anbindung geladen.</p>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/ >}</section>
+    <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Änderungen werden über die produktive Zahlungsabwicklung ausgeführt.":"Diese Funktion wird erst mit der produktiven Stripe-Anbindung freigeschaltet."}</p></div><Button variant="secondary" disabled={!billingConnected}>Abonnement verwalten</Button></div>
   </AppShell>;
 }
 
