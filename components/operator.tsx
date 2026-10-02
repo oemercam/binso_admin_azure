@@ -397,22 +397,38 @@ function RestrictionsView() {
 }
 
 function MonitoringView() {
+  const production=useBackendMode();
+  const [data,setData]=useState<{services?:Array<{name:string;status:string}>;incidents?:Array<Record<string,unknown>>}>({});
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<typeof data>("/api/operator/monitoring").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+  },[production]);
+
+  if(!production) return <>
+    <div className="operator-monitor-metrics"><Metric label="Verfügbarkeit" value="99.99%" hint="Demo" icon="chart"/><Metric label="API Antwortzeit" value="182 ms" hint="Demo" icon="clock"/><Metric label="Fehlerrate" value="0.08%" hint="Demo" icon="support"/><Metric label="Aktive Nutzer" value="1’284" hint="Demo" icon="users"/></div>
+    <div className="monitoring-panel"><div className="monitoring-head"><div><span className="monitoring-dot"/><b>Demo-Monitoring</b></div><small>Keine Live-Telemetrie verbunden</small></div><div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i<3?"Binso One":"Nicht verbunden"}</small></span></div><strong>{i<3?"Operational":"—"}</strong><div className="spark"/></div>)}</div></div>
+  </>;
+
+  const services=data.services??[];
+  const incidents=data.incidents??[];
+  const connected=services.filter(service=>service.status==="operational").length;
+  const missing=services.filter(service=>service.status==="not_connected").length;
+
   return <>
     <div className="operator-monitor-metrics">
-      <Metric label="Verfügbarkeit" value="99.99%" hint="letzte 30 Tage" icon="chart"/>
-      <Metric label="API Antwortzeit" value="182 ms" hint="p95" icon="clock"/>
-      <Metric label="Fehlerrate" value="0.08%" hint="letzte Stunde" icon="support"/>
-      <Metric label="Aktive Nutzer" value="1’284" hint="letzte 15 Minuten" icon="users"/>
+      <Metric label="Core Services" value={String(connected)} hint="als operational hinterlegt" icon="chart"/>
+      <Metric label="Externe Integrationen" value={String(missing)} hint="noch nicht verbunden" icon="clock"/>
+      <Metric label="Aktive Ereignisse" value={String(incidents.filter(item=>String(item.status)!=="resolved").length)} hint="nicht gelöst" icon="support"/>
+      <Metric label="Telemetrie" value="App Health" hint="Azure Health Check aktiv" icon="users"/>
     </div>
     <div className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Alle Systeme verfügbar</b></div><small>Aktualisiert vor 1 Minute</small></div>
-      <div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i===4?"Stripe":"Binso One"}</small></span></div><strong>{i===4?"99.98%":"99.99%"}</strong><div className="spark">{[30,42,36,58,52,70,66,80].map((h,n)=><i key={n} style={{height:h/2}}/>)}</div></div>)}</div>
+      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>Keine erfundenen SLA-Werte</small></div>
+      <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.status==="operational"?"Binso One":"Externe Integration"}</small></span></div><strong>{service.status==="operational"?"Operational":"Nicht verbunden"}</strong><div className="spark"/></div>)}</div>
     </div>
     <section className="surface incident-history">
-      <SectionTitle title="Letzte Ereignisse"/>
-      <div className="incident-row"><span className="incident-dot resolved"/><div><b>Erhöhte API-Latenz</b><small>Heute, 07:42–07:48 · automatisch behoben</small></div><Status tone="success">Gelöst</Status></div>
-      <div className="incident-row"><span className="incident-dot resolved"/><div><b>Zahlungsprovider verzögert</b><small>29.09.2026, 13:14–13:22</small></div><Status tone="success">Gelöst</Status></div>
-      <div className="incident-row"><span className="incident-dot maintenance"/><div><b>Geplante Wartung Datenbank</b><small>27.09.2026, 02:00–02:12</small></div><Status tone="info">Wartung</Status></div>
+      <SectionTitle title="Ereignisse"/>
+      {incidents.length?incidents.map(item=><div className="incident-row" key={String(item.id)}><span className={"incident-dot "+(String(item.status)==="resolved"?"resolved":"maintenance")}/><div><b>{String(item.title??"Ereignis")}</b><small>{String(item.service??"")} · {new Date(String(item.started_at)).toLocaleString("de-CH")}</small></div><Status tone={String(item.status)==="resolved"?"success":"warning"}>{operatorStatus(String(item.status))}</Status></div>):<EmptyState icon="chart" title="Keine Ereignisse" text="Es sind keine Plattform-Ereignisse erfasst."/>}
     </section>
   </>;
 }
