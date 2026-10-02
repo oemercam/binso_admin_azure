@@ -334,6 +334,7 @@ export function PaymentForm() {
   const [date,setDate]=useState("2026-10-02");
   const [amount,setAmount]=useState("4346.40");
   const [method,setMethod]=useState("Banküberweisung");
+  const [idempotencyKey,setIdempotencyKey]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const save=async()=>{
     const value=Number(amount.replace(",","."));
@@ -343,7 +344,11 @@ export function PaymentForm() {
       return;
     }
     try{
-      if(isProductionBackendEnabled()) await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""});
+      if(isProductionBackendEnabled()){
+        const key=idempotencyKey||window.crypto.randomUUID();
+        if(!idempotencyKey) setIdempotencyKey(key);
+        await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""},{idempotencyKey:key});
+      }
       else{
         const id=String(Date.now());
         const displayDate=date.split("-").reverse().join(".");
