@@ -55,6 +55,7 @@ const sensitiveRoutes = [
   "/login/:path*",
   "/registrieren/:path*",
   "/passwort-vergessen/:path*",
+  "/passwort-zuruecksetzen/:path*",
   "/willkommen/:path*",
   "/demo/:path*",
   "/api/:path*",
