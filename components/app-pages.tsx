@@ -228,6 +228,8 @@ export function CustomersPage() {
 
 export function CustomerDetail() {
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
+  const [contactOpen,setContactOpen]=useState(false);
+  const [contactToast,setContactToast]=useState(false);
   return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
     <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
     <div className="tabs">
@@ -240,9 +242,11 @@ export function CustomerDetail() {
       <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section>
       <section className="surface"><SectionTitle title="Letzte Belege" action={<button className="text-action" onClick={()=>setTab("docs")}>Alle anzeigen</button>}/><div className="compact-list"><div><b>RE-2026-019</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></div><div><b>AN-2026-012</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></div><div><b>RE-2026-015</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></div></div></section>
     </div>}
-    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus">Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div><div><span className="record-avatar">SB</span><div><b>Sarah Baumann</b><small>Buchhaltung · finance@acme.ch · +41 44 123 45 68</small></div></div></div></section>}
+    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div><div><span className="record-avatar">SB</span><div><b>Sarah Baumann</b><small>Buchhaltung · finance@acme.ch · +41 44 123 45 68</small></div></div></div></section>}
     {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link><Link href="/angebote/AN-2026-012"><b>AN-2026-012</b><span>05.09.2026 · CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link><Link href="/rechnungen/RE-2026-015"><b>RE-2026-015</b><span>20.08.2026 · CHF 1’200.00</span><Status tone="warning">Offen</Status></Link></div></section>}
     {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Rechnung bezahlt</b><small>RE-2026-019 · heute, 10:24</small></div></div><div><i/><div><b>Angebot gesendet</b><small>AN-2026-012 · 05.09.2026</small></div></div><div><i/><div><b>Kundendaten aktualisiert</b><small>Thomas Müller · 01.09.2026</small></div></div></div></section>}
+    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input/></Field><Field label="Nachname"><input/></Field><Field label="E-Mail"><input type="email"/></Field><Field label="Telefon"><input type="tel"/></Field><Field label="Funktion" className="full"><input placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>{setContactOpen(false);setContactToast(true);window.setTimeout(()=>setContactToast(false),2200)}}>Kontakt speichern</Button></div></section></div>}
+    {contactToast&&<Toast title="Kontakt gespeichert."/>}
   </AppShell>;
 }
 
@@ -776,5 +780,5 @@ export function SimpleModule({ kind }: { kind: "angebote"|"zahlungen"|"produkte"
 }
 
 export function EmptyDemoPage() {
-  return <AppShell title="Noch keine Einträge" active="dashboard"><EmptyState icon="file" title="Noch nichts vorhanden" text="Erstelle deinen ersten Eintrag, um loszulegen." action={<Button icon="plus">Erstellen</Button>}/></AppShell>;
+  return <AppShell title="Noch keine Einträge" active="dashboard"><EmptyState icon="file" title="Noch nichts vorhanden" text="Erstelle deinen ersten Eintrag, um loszulegen." action={<Button href="/kunden/neu" icon="plus">Erstellen</Button>}/></AppShell>;
 }
