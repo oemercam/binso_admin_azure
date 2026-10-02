@@ -128,3 +128,9 @@ export async function operatorAudit(action:string,targetType?:string,targetId?:s
     metadata,
   },"return=representation");
 }
+
+
+export async function operatorRpc<T>(fn:string,args:Record<string,unknown>={}){
+  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
+  return requestDb<T>("rpc/"+fn,"POST",token,args);
+}
