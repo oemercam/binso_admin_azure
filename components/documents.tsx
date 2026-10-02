@@ -190,6 +190,7 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
 
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   const router=useRouter();
+  const production=useBackendMode();
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [draft,setDraft]=useStoredDraft("binso.demo.offer.AN-2026-012",createInitialDraft("Angebot","AN-2026-012"));
@@ -226,7 +227,7 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
     }
   };
 
-  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : isProductionBackendEnabled() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
+  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : production ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
     <DocumentEditor type="Angebot" draft={draft} onChange={setDraft} directory={directory}/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
     {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft} directory={directory}/></DocumentModal>}
@@ -236,6 +237,7 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
 
 export function InvoiceEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   const router=useRouter();
+  const production=useBackendMode();
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [draft,setDraft]=useStoredDraft("binso.demo.invoice.RE-2026-019",createInitialDraft("Rechnung","RE-2026-019"));
@@ -270,7 +272,7 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
     }
   };
 
-  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : isProductionBackendEnabled() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
+  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : production ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
     {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Versand wird mit dem E-Mail-Dienst angebunden.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Duplizieren wird als eigener Dokument-Workflow angebunden.")}>Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" draft={draft} onChange={setDraft} directory={directory}/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
@@ -280,6 +282,7 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
 }
 
 function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory }) {
+  const production=useBackendMode();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
   const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
@@ -298,7 +301,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
     onChange({...draft,positions:draft.positions.filter(item=>item.id!==id)});
   };
 
-  if(isProductionBackendEnabled()&&names.length===0){
+  if(production&&names.length===0){
     return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu">Kunde erfassen</Button>}/></section></div>;
   }
 
