@@ -29,3 +29,20 @@
 @media(max-width:760px){
  .toolbar-reset{position:absolute;right:48px;top:46px;min-height:30px}
 }
+
+.operator-empty{min-height:150px;display:grid;place-items:center;align-content:center;gap:7px;color:var(--muted);text-align:center;padding:24px}
+.operator-empty b{color:var(--ink);font-size:12px}
+.operator-empty span{font-size:10px}
+.operator-notes{display:grid;gap:12px;padding-top:12px}
+.operator-note-compose{display:grid;gap:8px}
+.operator-note-compose textarea{min-height:96px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:10px;resize:vertical}
+.operator-note-compose .button{justify-self:end}
+.internal-note small{display:block;color:var(--muted);font-size:9px;margin-top:4px}
+.operator-activity{display:grid;padding-top:14px}
+.operator-activity>div{display:grid;grid-template-columns:16px 1fr;gap:10px;min-height:56px;position:relative}
+.operator-activity>div:before{content:"";position:absolute;left:4px;top:15px;bottom:-5px;width:1px;background:var(--line)}
+.operator-activity>div:last-child:before{display:none}
+.operator-activity i{width:9px;height:9px;border-radius:50%;background:var(--ink);margin-top:4px;z-index:1}
+.operator-activity b,.operator-activity small{display:block}
+.operator-activity b{font-size:11px}
+.operator-activity small{font-size:9px;color:var(--muted);margin-top:3px}
