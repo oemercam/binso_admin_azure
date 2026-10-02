@@ -191,10 +191,24 @@ function RestrictionsView() {
 }
 
 function MonitoringView() {
-  return <div className="monitoring-panel">
-    <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Alle Systeme verfügbar</b></div><small>Aktualisiert vor 1 Minute</small></div>
-    <div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i===4?"Stripe":"Binso One"}</small></span></div><strong>{i===4?"99.98%":"99.99%"}</strong><div className="spark">{[30,42,36,58,52,70,66,80].map((h,n)=><i key={n} style={{height:h/2}}/>)}</div></div>)}</div>
-  </div>;
+  return <>
+    <div className="operator-monitor-metrics">
+      <Metric label="Verfügbarkeit" value="99.99%" hint="letzte 30 Tage" icon="chart"/>
+      <Metric label="API Antwortzeit" value="182 ms" hint="p95" icon="clock"/>
+      <Metric label="Fehlerrate" value="0.08%" hint="letzte Stunde" icon="support"/>
+      <Metric label="Aktive Nutzer" value="1’284" hint="letzte 15 Minuten" icon="users"/>
+    </div>
+    <div className="monitoring-panel">
+      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Alle Systeme verfügbar</b></div><small>Aktualisiert vor 1 Minute</small></div>
+      <div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i===4?"Stripe":"Binso One"}</small></span></div><strong>{i===4?"99.98%":"99.99%"}</strong><div className="spark">{[30,42,36,58,52,70,66,80].map((h,n)=><i key={n} style={{height:h/2}}/>)}</div></div>)}</div>
+    </div>
+    <section className="surface incident-history">
+      <SectionTitle title="Letzte Ereignisse"/>
+      <div className="incident-row"><span className="incident-dot resolved"/><div><b>Erhöhte API-Latenz</b><small>Heute, 07:42–07:48 · automatisch behoben</small></div><Status tone="success">Gelöst</Status></div>
+      <div className="incident-row"><span className="incident-dot resolved"/><div><b>Zahlungsprovider verzögert</b><small>29.09.2026, 13:14–13:22</small></div><Status tone="success">Gelöst</Status></div>
+      <div className="incident-row"><span className="incident-dot maintenance"/><div><b>Geplante Wartung Datenbank</b><small>27.09.2026, 02:00–02:12</small></div><Status tone="info">Wartung</Status></div>
+    </section>
+  </>;
 }
 
 function AnnouncementsView() {
