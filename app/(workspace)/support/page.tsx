@@ -1,1 +1,0 @@
-import SupportList from "@/components/support/support-list";export default function Page(){return <SupportList/>}

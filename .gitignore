@@ -1,18 +1,7 @@
-node_modules/
 .next/
+node_modules/
 .env*
 !.env.example
-*.log
-.DS_Store
-coverage/
-*.pem
-*.pfx
-tsconfig.tsbuildinfo
-
-# Local build and diagnostic artifacts
-azure-webapp-logs/
-azure-webapp-logs-new/
-azure-webapp-logs*.zip
-azure-webapp-logs*/
-.lint-current.txt
-deploy/
+artifacts/
+playwright-report/
+test-results/

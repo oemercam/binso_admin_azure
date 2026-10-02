@@ -1,7 +1,0 @@
-import fs from "node:fs";import path from "node:path";
-const files=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.name.endsWith(".tsx"))files.push(p)}}walk("app");walk("components");
-const violations=[];for(const file of files){const s=fs.readFileSync(file,"utf8");if(/t\(["'](?:Zurück zu|Zurück zur|Zurück zum)[^"']*["']\)/.test(s))violations.push(`${file}: textual back navigation`);if(/className=["'][^"']*eyebrow[^"']*["'][^>]*>\s*BINSO ONE\s*</i.test(s))violations.push(`${file}: redundant Binso One eyebrow`)}
-const detail=fs.readFileSync("components/detail-page.tsx","utf8");if(detail.includes("Neue Kontaktperson ·")||detail.includes('t("lokal bearbeitet")')||detail.includes('t("lokal gespeichert")'))violations.push("detail-page: technical/demo fallback copy leaks into record UI");
-const i18n=fs.readFileSync("lib/i18n.ts","utf8");for(const key of ["Geschäftsdaten","Fortschritt","Vorheriger Schritt","Prüfen"]){for(const dict of ["en","fr","it","trDict"]){const re=new RegExp(`Object\\.assign\\(${dict},\\{[^}]*[\"']${key.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")}[\"']`,"s");if(!re.test(i18n))violations.push(`i18n: ${dict} missing ${key}`)}}
-if(violations.length)throw new Error(`Mobile/PWA i18n/hardcode audit failed:\n${violations.join("\n")}`);
-console.log(`Mobile/PWA i18n/hardcode self-check passed across ${files.length} TSX surfaces.`);

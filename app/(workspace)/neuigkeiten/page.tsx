@@ -1,1 +1,0 @@
-import ChangelogPage from "@/components/announcements/changelog-page";export default function Page(){return <ChangelogPage/>}

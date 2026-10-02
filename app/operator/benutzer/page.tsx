@@ -1,1 +1,0 @@
-import OperatorShell from "@/components/operator/operator-shell";import OperatorUsers from "@/components/operator/operator-users";export default function Page(){return <OperatorShell><OperatorUsers/></OperatorShell>}

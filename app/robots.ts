@@ -1,3 +1,0 @@
-import type {MetadataRoute} from "next";
-import {siteConfig} from "@/lib/site-config";
-export default function robots():MetadataRoute.Robots{return {rules:[{userAgent:"*",allow:["/","/features","/preise","/demo","/kontakt","/impressum","/datenschutz","/agb","/cookies","/auftragsbearbeitung","/unterauftragsbearbeiter","/sicherheit","/status"],disallow:["/api/","/dashboard","/operator/","/portal/","/admin/","/checkout","/onboarding","/einstellungen","/feedback","/support/","/abo","/benachrichtigungen","/einladung","/passwort-"]}],sitemap:`${siteConfig.url.replace(/\/$/,"")}/sitemap.xml`,host:siteConfig.url}}

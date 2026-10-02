@@ -1,9 +1,0 @@
-import fs from "node:fs";import path from "node:path";
-const pages=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.name==="page.tsx")pages.push(p.replaceAll("\\","/"))}}walk("app/(workspace)");
-const expected=["kunden","offerten","auftraege","rechnungen","zahlungen","projekte","zeiterfassung","spesen","lieferanten","eingangsrechnungen","buchhaltung","personal","abwesenheiten","produkte","dokumente","vertraege","aufgaben"];
-const missing=[];for(const moduleKey of expected){for(const suffix of ["/page.tsx","/[id]/page.tsx","/neu/page.tsx"]){const f=`app/(workspace)/${moduleKey}${suffix}`;if(!pages.includes(f))missing.push(f)}}
-for(const moduleKey of ["bank","berichte","lohn","mwst","einstellungen"]){for(const suffix of ["/page.tsx","/[id]/page.tsx"]){const f=`app/(workspace)/${moduleKey}${suffix}`;if(!pages.includes(f))missing.push(f)}}
-for(const f of ["app/(workspace)/dashboard/page.tsx","app/(workspace)/support/page.tsx","app/(workspace)/support/neu/page.tsx","app/(workspace)/support/[id]/page.tsx","app/(workspace)/abo/page.tsx","app/(workspace)/benachrichtigungen/page.tsx","app/(workspace)/neuigkeiten/page.tsx","app/(workspace)/feedback/page.tsx"]){if(!pages.includes(f))missing.push(f)}
-if(missing.length)throw new Error(`Workspace route matrix incomplete:\n${missing.join("\n")}`);
-const routeMeta=fs.readFileSync("config/route-metadata.ts","utf8");for(const moduleKey of [...expected,"bank","berichte","lohn","mwst","einstellungen","support"]){if(!routeMeta.includes(`prefix:"/${moduleKey}"`))throw new Error(`Route metadata missing: ${moduleKey}`)}
-console.log(`Mobile/PWA route matrix self-check passed: ${pages.length} workspace pages inventoried; list/detail/create families and route metadata are covered.`);

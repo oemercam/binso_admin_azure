@@ -1,1 +1,0 @@
-import OperatorShell from "@/components/operator/operator-shell";import OperatorOrganizations from "@/components/operator/operator-organizations";export default function Page(){return <OperatorShell><OperatorOrganizations/></OperatorShell>}

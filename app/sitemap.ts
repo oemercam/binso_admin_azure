@@ -1,3 +1,0 @@
-import type {MetadataRoute} from "next";
-import {siteConfig} from "@/lib/site-config";
-export default function sitemap():MetadataRoute.Sitemap{const base=siteConfig.url.replace(/\/$/,"");const now=new Date();const pages:[string,number,"daily"|"weekly"|"monthly"|"yearly"][]=[["",1,"weekly"],["/features",.9,"weekly"],["/preise",.9,"weekly"],["/demo",.8,"monthly"],["/kontakt",.7,"monthly"],["/sicherheit",.7,"monthly"],["/status",.5,"daily"],["/impressum",.3,"yearly"],["/datenschutz",.4,"monthly"],["/agb",.4,"monthly"],["/cookies",.3,"monthly"],["/auftragsbearbeitung",.3,"monthly"],["/unterauftragsbearbeiter",.3,"monthly"]];return pages.map(([path,priority,changeFrequency])=>({url:`${base}${path}`,lastModified:now,changeFrequency,priority}))}

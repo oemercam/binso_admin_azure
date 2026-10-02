@@ -1,2 +1,0 @@
-import { getOperatorSession } from "@/lib/server/operator/session";import { operatorPermissions } from "@/lib/permissions";import { json } from "@/lib/server/http";
-export const runtime="nodejs";export async function GET(){const s=await getOperatorSession();if(!s)return json({authenticated:false},401);return json({authenticated:true,user:{id:s.userId,name:s.name,email:s.email,role:s.role},permissions:operatorPermissions(s.role)})}
