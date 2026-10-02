@@ -67,6 +67,7 @@ export function Button({
   onClick,
   type = "button",
   className = "",
+  disabled = false,
 }: {
   href?: string;
   children: React.ReactNode;
@@ -75,10 +76,11 @@ export function Button({
   onClick?: () => void;
   type?: "button" | "submit";
   className?: string;
+  disabled?: boolean;
 }) {
   const cls = `button button-${variant} ${className}`.trim();
   const body = <>{icon && <Icon name={icon} size={17} />}<span>{children}</span></>;
-  return href ? <Link className={cls} href={href}>{body}</Link> : <button className={cls} onClick={onClick} type={type}>{body}</button>;
+  return href && !disabled ? <Link className={cls} href={href}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled}>{body}</button>;
 }
 
 export function IconButton({ label, icon, onClick }: { label: string; icon: string; onClick?: () => void }) {
