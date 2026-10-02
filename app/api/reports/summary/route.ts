@@ -1,0 +1,1 @@
+import {apiOk} from "@/lib/security";import {totals} from "@/lib/reporting";export function GET(){const points=[{period:"2026-09",invoicedMinor:2840000,paidMinor:2498000},{period:"2026-10",invoicedMinor:845000,paidMinor:280000}];return apiOk({points,totals:totals(points)})}
