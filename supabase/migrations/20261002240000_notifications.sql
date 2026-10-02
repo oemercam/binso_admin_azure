@@ -3,7 +3,7 @@
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
-  user_id uuid references auth.users(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
   event_key text,
   kind text not null check (kind in ('support','billing','document','payment','system','announcement')),
   title text not null,
@@ -14,7 +14,7 @@ create table if not exists public.notifications (
 );
 
 create unique index if not exists uq_notifications_event
-  on public.notifications(tenant_id,coalesce(user_id,'00000000-0000-0000-0000-000000000000'::uuid),event_key)
+  on public.notifications(tenant_id,user_id,event_key)
   where event_key is not null;
 
 create index if not exists idx_notifications_user_created
@@ -26,17 +26,17 @@ drop policy if exists notifications_member_select on public.notifications;
 create policy notifications_member_select on public.notifications
 for select using(
   public.is_tenant_member(tenant_id)
-  and (user_id is null or user_id=auth.uid())
+  and user_id=auth.uid()
 );
 
 drop policy if exists notifications_member_update on public.notifications;
 create policy notifications_member_update on public.notifications
 for update using(
   public.is_tenant_member(tenant_id)
-  and (user_id is null or user_id=auth.uid())
+  and user_id=auth.uid()
 ) with check(
   public.is_tenant_member(tenant_id)
-  and (user_id is null or user_id=auth.uid())
+  and user_id=auth.uid()
 );
 
 drop policy if exists notifications_operator_select on public.notifications;
@@ -79,15 +79,17 @@ security definer
 set search_path=public
 as $$
 begin
-  insert into public.notifications(tenant_id,event_key,kind,title,body,href)
-  values(
+  insert into public.notifications(tenant_id,user_id,event_key,kind,title,body,href)
+  select
     new.tenant_id,
+    m.user_id,
     'payment:'||new.id::text,
     'payment',
     'Zahlung erfasst',
     'CHF '||to_char(new.amount,'FM9999999990.00')||' wurde verbucht.',
     '/zahlungen/'||new.id::text
-  )
+  from public.tenant_memberships m
+  where m.tenant_id=new.tenant_id
   on conflict do nothing;
   return new;
 end $$;
@@ -107,7 +109,7 @@ as $$
   select n.*
   from public.notifications n
   where public.is_tenant_member(n.tenant_id)
-    and (n.user_id is null or n.user_id=auth.uid())
+    and n.user_id=auth.uid()
   order by n.created_at desc
   limit greatest(1,least(coalesce(p_limit,50),100));
 $$;
