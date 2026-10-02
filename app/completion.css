@@ -1266,3 +1266,5 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
  .two-factor-setup{grid-template-columns:1fr}
  .two-factor-code{margin:auto}
 }
+
+.contact-sheet{max-width:620px}
