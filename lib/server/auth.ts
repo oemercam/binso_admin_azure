@@ -125,6 +125,7 @@ export function setAuthCookies(response:NextResponse,session:TokenResponse){
 export function clearAuthCookies(response:NextResponse){
   response.cookies.set(accessCookie,"",{httpOnly:true,path:"/",maxAge:0});
   response.cookies.set(refreshCookie,"",{httpOnly:true,path:"/",maxAge:0});
+  response.cookies.set("binso_demo","",{httpOnly:true,path:"/",maxAge:0});
 }
 
 export { accessCookie, refreshCookie };
