@@ -378,19 +378,46 @@ export function ProductsPage() {
   </AppShell>;
 }
 
-export function ProductForm({ existing = false }: { existing?: boolean }) {
+export function ProductForm({ existing = false, productId }: { existing?: boolean; productId?: string }) {
   const router=useRouter();
+  const production=useBackendMode();
   const [name,setName]=useState(existing?"Beratung":"");
   const [type,setType]=useState("Dienstleistung");
+  const [sku,setSku]=useState("");
+  const [unit,setUnit]=useState("hour");
   const [price,setPrice]=useState(existing?"120.00":"");
+  const [vatRate,setVatRate]=useState("8.1");
+  const [description,setDescription]=useState("");
+  const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!production||!existing||!productId) return;
+    apiGet<{item:Record<string,unknown>}>("/api/products/"+encodeURIComponent(productId)).then(payload=>{
+      const item=payload.item;
+      queueMicrotask(()=>{
+        setName(String(item.name??""));
+        setType(item.kind==="product"?"Produkt":"Dienstleistung");
+        setSku(String(item.sku??""));
+        setUnit(String(item.unit??"hour"));
+        setPrice(String(item.unit_price??"0.00"));
+        setVatRate(String(item.vat_rate??"8.1"));
+        setDescription(String(item.description??""));
+        setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
+      });
+    }).catch(()=>undefined);
+  },[production,existing,productId]);
+
   const save=async()=>{
     if(!name.trim()||!price.trim()){setToast("Name und Verkaufspreis sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       const numericPrice=Number(price.replace(",","."));
-      if(!existing){
-        if(isProductionBackendEnabled()) await apiPost("/api/products",{name:name.trim(),kind:type==="Produkt"?"product":"service",unitPrice:numericPrice,vatRate:8.1,unit:type==="Produkt"?"piece":"hour"});
-        else appendDemoRow("products",[name.trim(),type,`CHF ${numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
+      const payload={name:name.trim(),kind:type==="Produkt"?"product":"service",sku,unit,unitPrice:numericPrice,vatRate:Number(vatRate),description,status:status==="Inaktiv"?"inactive":"active"};
+      if(production){
+        if(existing&&productId) await apiPatch("/api/products/"+encodeURIComponent(productId),payload);
+        else await apiPost("/api/products",payload);
+      }else if(!existing){
+        appendDemoRow("products",[name.trim(),type,"CHF "+numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Aktiv"]);
       }
       setToast("Produkt gespeichert.");
       window.setTimeout(()=>router.push("/produkte"),700);
@@ -399,20 +426,22 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
+
+  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="form-page">
       <div className="form-grid two">
         <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
         <Field label="Typ"><select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></select></Field>
-        <Field label="Artikelnummer"><input placeholder="Optional"/></Field>
-        <Field label="Einheit"><select><option>Stunde</option><option>Stück</option><option>Pauschal</option></select></Field>
+        <Field label="Artikelnummer"><input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
+        <Field label="Einheit"><select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour">Stunde</option><option value="piece">Stück</option><option value="flat">Pauschal</option></select></Field>
         <Field label="Verkaufspreis"><input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
-        <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
-        <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
+        <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+        <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
+        <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
