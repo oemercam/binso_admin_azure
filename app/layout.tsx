@@ -3,11 +3,37 @@ import "./globals.css";
 import "./completion.css";
 import "./completion-v04.css";
 import { PwaRegister } from "@/components/pwa-register";
+import { siteConfig } from "@/lib/config";
+
+const metadataBase = new URL(siteConfig.marketingUrl);
 
 export const metadata: Metadata = {
-  title: { default: "Binso One", template: "%s | Binso One" },
-  description: "Die moderne Business-Plattform für Schweizer KMU.",
-  applicationName: "Binso One",
+  metadataBase,
+  title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  category: "business",
+  authors: [{ name: "Binso GmbH", url: "https://www.binso.ch" }],
+  creator: "Binso GmbH",
+  publisher: "Binso GmbH",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "de_CH",
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: "/",
+  },
+  twitter: {
+    card: "summary",
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
