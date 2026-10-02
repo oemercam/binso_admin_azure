@@ -51,6 +51,7 @@ jobs:
             curl -fsS "http://127.0.0.1:3000$route" > /dev/null
           done
 
+          curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
