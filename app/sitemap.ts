@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_MARKETING_URL ?? "https://www.binso.ch";
+import { siteConfig } from "@/lib/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
@@ -10,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   return routes.map((route) => ({
-    url: `${siteUrl}${route.path}`,
+    url: `${siteConfig.marketingUrl}${route.path}`,
     lastModified: new Date("2026-10-02"),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
