@@ -14,9 +14,10 @@ export async function POST(request:NextRequest){
 
     const tenant=await currentTenant();
     const company=await currentCompany();
-    const accounts=await tenantList<{billing_customer_ref?:string|null}>(
-      "tenant_accounts","billing_customer_ref","limit=1"
+    const accounts=await tenantList<{billing_customer_ref?:string|null;billing_subscription_ref?:string|null}>(
+      "tenant_accounts","billing_customer_ref,billing_subscription_ref","limit=1"
     );
+    if(accounts[0]?.billing_subscription_ref) return json({error:"subscription_exists",message:"Ein Abonnement ist bereits verbunden. Verwende das Billing-Portal für Änderungen."},409);
     let customerId=accounts[0]?.billing_customer_ref??null;
 
     if(!customerId){
