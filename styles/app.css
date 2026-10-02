@@ -146,3 +146,18 @@ button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell b
  .form input,.form select,.form textarea{font-size:12px}
  .form input{padding:8px 10px}
 }
+
+/* Final approved-board parity refinements */
+.company-card{display:grid;grid-template-columns:30px 1fr;align-items:start;gap:8px}.company-card>svg{margin-top:2px}.company-card>div{display:grid;gap:1px}
+.rows a span span{display:grid;gap:2px}.rows a span span small{font-size:9px;color:var(--muted);font-weight:400}
+@media(max-width:760px){
+ .content>.rows:first-child,.content>.settings-list:first-child,.content>.team-list:first-child{margin-top:2px}
+ .rows a,.settings-list a{padding-left:1px;padding-right:1px}
+ .rows a svg,.settings-list a>svg{stroke-width:1.7}
+ .profile strong{font-size:11px}.profile span{font-size:9px}
+ .company-card strong{font-size:11px}.company-card span{font-size:9px}
+ .sticky-action{left:16px;right:16px;bottom:calc(67px + var(--safe));width:auto}
+ .public-mobile-menu{background:#fff}
+ .public-mobile-menu nav{display:grid}
+ .public-mobile-menu nav:after{content:"Sicherheit   Kontakt   Datenschutz   Impressum   AGB";white-space:pre-wrap;font-size:9px;line-height:2;color:#666;border-top:1px solid var(--line);padding-top:12px;margin-top:5px}
+}
