@@ -85,7 +85,14 @@ jobs:
           az webapp config appsettings list --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --query "[?name=='WEBSITE_RUN_FROM_PACKAGE' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='PORT' || name=='WEBSITES_PORT']" -o table
           echo "=== Recent application logs ==="
           az webapp log config --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --application-logging filesystem --level information --web-server-logging filesystem || true
-          az webapp log tail --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --provider Application --timeout 20 || true
+          echo "=== Kudu log files ==="
+          TOKEN=$(az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv)
+          az rest --method post --url "https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$AZURE_WEBAPP_RG/providers/Microsoft.Web/sites/binso-admin-prod/config/publishingcredentials/list?api-version=2024-04-01" --headers "Authorization=Bearer $TOKEN" > /tmp/pub.json
+          KUDU_USER=$(jq -r .publishingUserName /tmp/pub.json)
+          KUDU_PASS=$(jq -r .publishingPassword /tmp/pub.json)
+          curl -fsS -u "$KUDU_USER:$KUDU_PASS" "https://binso-admin-prod-asctesfvhnd5b6ay.scm.switzerlandnorth-01.azurewebsites.net/api/vfs/LogFiles/" || true
+          echo "=== Docker startup log ==="
+          curl -fsS -u "$KUDU_USER:$KUDU_PASS" "https://binso-admin-prod-asctesfvhnd5b6ay.scm.switzerlandnorth-01.azurewebsites.net/api/vfs/LogFiles/default_docker.log" || true
       - name: Verify deployed application
         shell: bash
         run: |
