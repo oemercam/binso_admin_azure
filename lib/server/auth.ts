@@ -56,6 +56,29 @@ export async function signUp(email:string,password:string,companyName:string){
   return payload as Partial<TokenResponse>&{user?:SupabaseUser};
 }
 
+export async function requestPasswordRecovery(email:string,redirectTo:string){
+  const {supabaseUrl}=getBackendEnv();
+  const response=await fetch(supabaseUrl + "/auth/v1/recover?redirect_to=" + encodeURIComponent(redirectTo),{
+    method:"POST",
+    headers:authHeaders(),
+    body:JSON.stringify({email}),
+    cache:"no-store",
+  });
+  if(!response.ok) throw new ApiError(400,"recovery_failed","Link konnte nicht gesendet werden.");
+}
+
+export async function updatePassword(accessToken:string,password:string){
+  const {supabaseUrl}=getBackendEnv();
+  const response=await fetch(supabaseUrl + "/auth/v1/user",{
+    method:"PUT",
+    headers:authHeaders(accessToken),
+    body:JSON.stringify({password}),
+    cache:"no-store",
+  });
+  if(!response.ok) throw new ApiError(400,"password_update_failed","Passwort konnte nicht geändert werden.");
+  return response.json() as Promise<SupabaseUser>;
+}
+
 export async function fetchUser(accessToken:string):Promise<SupabaseUser>{
   const {supabaseUrl}=getBackendEnv();
   const response=await fetch(supabaseUrl + "/auth/v1/user",{
