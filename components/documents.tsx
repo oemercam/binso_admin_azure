@@ -188,46 +188,94 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   },[documentKey,kind,setDraft]);
 }
 
-export function OfferEditor({ existing = false }: { existing?: boolean }) {
+export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   const router=useRouter();
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [draft,setDraft]=useStoredDraft("binso.demo.offer.AN-2026-012",createInitialDraft("Angebot","AN-2026-012"));
+  const directory=useCustomerDirectory();
+  useExistingDocument("Angebot",existing?documentKey:undefined,setDraft);
 
-  const save=()=>{
-    setToast(existing ? "Angebot gespeichert." : "Angebot erstellt.");
-    window.setTimeout(()=>{
-      setToast(null);
-      if(!existing) router.push("/angebote/AN-2026-012");
-    },900);
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    const names=Object.keys(directory);
+    if(names.length && (!draft.customer || !directory[draft.customer])){
+      queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
+    }
+  },[directory,draft.customer,setDraft]);
+
+  const save=async()=>{
+    if(useProductionBackend()&&!draft.customer){
+      setToast("Bitte zuerst einen Kunden erfassen.");
+      window.setTimeout(()=>setToast(null),2400);
+      return;
+    }
+    try{
+      if(useProductionBackend()){
+        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Angebot",draft));
+        else await apiPost("/api/documents",documentPayload("Angebot",draft));
+      }
+      setToast(existing?"Angebot gespeichert.":"Angebot erstellt.");
+      window.setTimeout(()=>{
+        setToast(null);
+        if(!existing) router.push("/angebote/"+encodeURIComponent(draft.number));
+      },900);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Angebot konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
 
-  return <AppShell title={existing ? `Angebot ${draft.number}` : "Angebot erstellen"} subtitle={existing ? "Gesendet · gültig bis 31.10.2026" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={save}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
-    <DocumentEditor type="Angebot" draft={draft} onChange={setDraft}/>
-    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={save}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
-    {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft}/></DocumentModal>}
-    {toast&&<Toast title={toast}/>}
+  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : useProductionBackend() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
+    <DocumentEditor type="Angebot" draft={draft} onChange={setDraft} directory={directory}/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
+    {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft} directory={directory}/></DocumentModal>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
   </AppShell>;
 }
 
-export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
+export function InvoiceEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   const router=useRouter();
   const [preview,setPreview]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [draft,setDraft]=useStoredDraft("binso.demo.invoice.RE-2026-019",createInitialDraft("Rechnung","RE-2026-019"));
+  const directory=useCustomerDirectory();
+  useExistingDocument("Rechnung",existing?documentKey:undefined,setDraft);
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
-  const save=()=>{
-    show(existing ? "Rechnung gespeichert." : "Rechnung erstellt.");
-    if(!existing) window.setTimeout(()=>router.push("/rechnungen/RE-2026-019"),900);
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    const names=Object.keys(directory);
+    if(names.length && (!draft.customer || !directory[draft.customer])){
+      queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
+    }
+  },[directory,draft.customer,setDraft]);
+
+  const save=async()=>{
+    if(useProductionBackend()&&!draft.customer){
+      setToast("Bitte zuerst einen Kunden erfassen.");
+      window.setTimeout(()=>setToast(null),2400);
+      return;
+    }
+    try{
+      if(useProductionBackend()){
+        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Rechnung",draft));
+        else await apiPost("/api/documents",documentPayload("Rechnung",draft));
+      }
+      show(existing?"Rechnung gespeichert.":"Rechnung erstellt.");
+      if(!existing) window.setTimeout(()=>router.push("/rechnungen/"+encodeURIComponent(draft.number)),900);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Rechnung konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
 
-  return <AppShell title={existing ? `Rechnung ${draft.number}` : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={save}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
-    {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Rechnung wurde zum Versand vorbereitet.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Rechnung wurde als neuer Entwurf dupliziert.")}>Duplizieren</Button></div>}
-    <DocumentEditor type="Rechnung" draft={draft} onChange={setDraft}/>
-    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={save}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
-    {preview&&<DocumentModal title="Rechnungsvorschau" onClose={()=>setPreview(false)}><InvoicePreview draft={draft}/></DocumentModal>}
-    {toast&&<Toast title={toast}/>}
+  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : useProductionBackend() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
+    {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Versand wird mit dem E-Mail-Dienst angebunden.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Duplizieren wird als eigener Dokument-Workflow angebunden.")}>Duplizieren</Button></div>}
+    <DocumentEditor type="Rechnung" draft={draft} onChange={setDraft} directory={directory}/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
+    {preview&&<DocumentModal title="Rechnungsvorschau" onClose={()=>setPreview(false)}><InvoicePreview draft={draft} directory={directory}/></DocumentModal>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
   </AppShell>;
 }
 
