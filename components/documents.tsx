@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { Button, EmptyState, Field, Icon, Toast } from "./ui";
-import { apiGet, apiPatch, apiPost, useProductionBackend } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
 
@@ -36,7 +36,7 @@ type CustomerDirectory = typeof customerData;
 function useCustomerDirectory() {
   const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>(customerData);
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>("/api/customers")
       .then(payload=>{
         const next:Record<string,{sector:string;city:string;address:string;zip:string}>={};
@@ -116,7 +116,7 @@ function useStoredDraft(key:string, initial:DocumentDraft) {
   const [ready,setReady]=useState(false);
 
   useEffect(()=>{
-    if(useProductionBackend()){
+    if(isProductionBackendEnabled()){
       queueMicrotask(()=>setReady(true));
       return;
     }
@@ -135,7 +135,7 @@ function useStoredDraft(key:string, initial:DocumentDraft) {
   },[key]);
 
   useEffect(()=>{
-    if(!ready || useProductionBackend()) return;
+    if(!ready || isProductionBackendEnabled()) return;
     window.localStorage.setItem(key,JSON.stringify(draft));
   },[draft,key,ready]);
 
@@ -181,7 +181,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
 
 function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setDraft:(draft:DocumentDraft)=>void){
   useEffect(()=>{
-    if(!useProductionBackend()||!documentKey) return;
+    if(!isProductionBackendEnabled()||!documentKey) return;
     apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey))
       .then(payload=>queueMicrotask(()=>setDraft(remoteDraftFromItem(payload.item,kind))))
       .catch(()=>undefined);
@@ -197,7 +197,7 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
   useExistingDocument("Angebot",existing?documentKey:undefined,setDraft);
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     const names=Object.keys(directory);
     if(names.length && (!draft.customer || !directory[draft.customer])){
       queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
@@ -205,13 +205,13 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
   },[directory,draft.customer,setDraft]);
 
   const save=async()=>{
-    if(useProductionBackend()&&!draft.customer){
+    if(isProductionBackendEnabled()&&!draft.customer){
       setToast("Bitte zuerst einen Kunden erfassen.");
       window.setTimeout(()=>setToast(null),2400);
       return;
     }
     try{
-      if(useProductionBackend()){
+      if(isProductionBackendEnabled()){
         if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Angebot",draft));
         else await apiPost("/api/documents",documentPayload("Angebot",draft));
       }
@@ -226,7 +226,7 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
     }
   };
 
-  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : useProductionBackend() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
+  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : isProductionBackendEnabled() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
     <DocumentEditor type="Angebot" draft={draft} onChange={setDraft} directory={directory}/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
     {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft} directory={directory}/></DocumentModal>}
@@ -244,7 +244,7 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     const names=Object.keys(directory);
     if(names.length && (!draft.customer || !directory[draft.customer])){
       queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
@@ -252,13 +252,13 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
   },[directory,draft.customer,setDraft]);
 
   const save=async()=>{
-    if(useProductionBackend()&&!draft.customer){
+    if(isProductionBackendEnabled()&&!draft.customer){
       setToast("Bitte zuerst einen Kunden erfassen.");
       window.setTimeout(()=>setToast(null),2400);
       return;
     }
     try{
-      if(useProductionBackend()){
+      if(isProductionBackendEnabled()){
         if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Rechnung",draft));
         else await apiPost("/api/documents",documentPayload("Rechnung",draft));
       }
@@ -270,7 +270,7 @@ export function InvoiceEditor({ existing = false, documentKey }: { existing?: bo
     }
   };
 
-  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : useProductionBackend() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
+  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : isProductionBackendEnabled() ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
     {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Versand wird mit dem E-Mail-Dienst angebunden.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Duplizieren wird als eigener Dokument-Workflow angebunden.")}>Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" draft={draft} onChange={setDraft} directory={directory}/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
@@ -298,7 +298,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
     onChange({...draft,positions:draft.positions.filter(item=>item.id!==id)});
   };
 
-  if(useProductionBackend()&&names.length===0){
+  if(isProductionBackendEnabled()&&names.length===0){
     return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu">Kunde erfassen</Button>}/></section></div>;
   }
 
