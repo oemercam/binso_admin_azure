@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status } from "./ui";
+import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toggle } from "./ui";
 
 const customers = [
   ["Acme AG","Bauunternehmen","Zürich","Aktiv"],
@@ -60,11 +60,27 @@ function tone(s: string): "success"|"danger"|"warning"|"neutral"|"info" {
 }
 
 function ListToolbar({ placeholder, chips = ["Alle","Aktiv","Inaktiv"] }: { placeholder: string; chips?: string[] }) {
-  return <div className="toolbar">
-    <label className="searchbox"><Icon name="search"/><input placeholder={placeholder}/></label>
-    <div className="chips">{chips.map((x,i)=><button type="button" className={i===0?"active":""} key={x}>{x}</button>)}</div>
-    <button className="filter-button" type="button"><Icon name="filter" size={17}/><span>Filter</span></button>
-  </div>;
+  const [activeChip, setActiveChip] = useState(chips[0] ?? "Alle");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [period, setPeriod] = useState("Alle");
+  const [owner, setOwner] = useState("Alle");
+
+  return <>
+    <div className="toolbar">
+      <label className="searchbox"><Icon name="search"/><input placeholder={placeholder}/></label>
+      <div className="chips">{chips.map((x)=><button type="button" onClick={() => setActiveChip(x)} className={x===activeChip?"active":""} key={x}>{x}</button>)}</div>
+      <button className="filter-button" type="button" onClick={() => setFiltersOpen(true)}><Icon name="filter" size={17}/><span>Filter</span></button>
+    </div>
+    {filtersOpen && <div className="sheet-layer filter-layer" onMouseDown={(e)=>{if(e.target===e.currentTarget)setFiltersOpen(false)}}>
+      <section className="bottom-sheet filter-sheet" role="dialog" aria-modal="true" aria-label="Filter">
+        <div className="sheet-handle"/>
+        <header className="sheet-header"><div><h2>Filter</h2><p>Ansicht eingrenzen, ohne die Seite zu verlassen.</p></div><button className="icon-button" type="button" onClick={()=>setFiltersOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header>
+        <div className="filter-section"><b>Zeitraum</b><div className="segmented">{["Alle","30 Tage","90 Tage","Dieses Jahr"].map(x=><button type="button" className={period===x?"active":""} onClick={()=>setPeriod(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-section"><b>Zuständigkeit</b><div className="segmented">{["Alle","Ich","Team"].map(x=><button type="button" className={owner===x?"active":""} onClick={()=>setOwner(x)} key={x}>{x}</button>)}</div></div>
+        <div className="filter-sheet-actions"><button type="button" className="button button-secondary" onClick={()=>{setPeriod("Alle");setOwner("Alle");setActiveChip(chips[0] ?? "Alle")}}>Zurücksetzen</button><button type="button" className="button button-primary" onClick={()=>setFiltersOpen(false)}>Anwenden</button></div>
+      </section>
+    </div>}
+  </>;
 }
 
 function RecordRow({ href, icon, title, meta, value, status }: { href?: string; icon?: string; title: string; meta: string; value?: string; status?: string }) {
@@ -190,14 +206,24 @@ export function OfferEditor({ existing = false }: { existing?: boolean }) {
   const [preview, setPreview] = useState(false);
   return <AppShell title={existing ? "Angebot AN-2026-012" : "Angebot erstellen"} subtitle={existing ? "Gesendet · gültig bis 31.10.2026" : "Entwurf automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/angebote/AN-2026-012">{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
     <DocumentEditor type="Angebot" number="AN-2026-012"/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/angebote/AN-2026-012">{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
     {preview && <DocumentModal title="Angebotsvorschau" onClose={() => setPreview(false)}><OfferPreview/></DocumentModal>}
   </AppShell>;
 }
 
 export function InvoicesPage() {
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
-    <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
-    <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+    <div className="tablet-master-detail invoice-master-detail">
+      <div>
+        <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
+        <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+      </div>
+      <aside className="tablet-detail invoice-tablet-preview">
+        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
+        <div className="tablet-document-actions"><Button href="/rechnungen/RE-2026-019" variant="secondary">Öffnen</Button><Button href="/zahlungen/neu">Zahlung</Button></div>
+        <InvoicePreview/>
+      </aside>
+    </div>
   </AppShell>;
 }
 
@@ -206,6 +232,7 @@ export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
     {existing && <div className="document-actions"><Button variant="secondary" icon="mail">Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost">Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" number="RE-2026-019"/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
     {preview && <DocumentModal title="Rechnungsvorschau" onClose={() => setPreview(false)}><InvoicePreview/></DocumentModal>}
   </AppShell>;
 }
@@ -247,12 +274,19 @@ function DocumentModal({ title, onClose, children }: { title: string; onClose: (
 }
 
 export function InvoicePreview() {
-  return <div className="paper">
+  return <div className="paper invoice-paper">
     <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div>
+    <div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div>
     <div className="paper-meta"><div><b>Acme AG</b><span>Bahnhofstrasse 123</span><span>8001 Zürich</span></div><div><small>Rechnung Nr.</small><b>RE-2026-019</b><small>Datum</small><b>02.10.2026</b><small>Zahlbar bis</small><b>01.11.2026</b></div></div>
-    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Website Konzept</td><td>24</td><td>120.00</td><td>2’880.00</td></tr><tr><td>Design & Umsetzung</td><td>12</td><td>95.00</td><td>1’140.00</td></tr></tbody></table>
+    <div className="paper-intro"><b>Website Redesign</b><p>Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen.</p></div>
+    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Website Konzept</td><td>24 h</td><td>120.00</td><td>2’880.00</td></tr><tr><td>Design & Umsetzung</td><td>12 h</td><td>95.00</td><td>1’140.00</td></tr></tbody></table>
     <div className="paper-total"><span>Zwischentotal <b>4’020.00</b></span><span>MwSt. 8.1% <b>326.40</b></span><strong>Total CHF <b>4’346.40</b></strong></div>
-    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz</footer>
+    <section className="qr-payment">
+      <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
+      <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
+      <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>4’346.40</b></div>
+    </section>
+    <footer>Binso GmbH · CHE-173.401.068 · www.binso.ch · +41 58 510 88 58</footer>
   </div>;
 }
 
@@ -319,6 +353,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
         <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
       </div>
+      <div className="mobile-sticky-save"><Button href="/produkte">Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -344,6 +379,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
         <Field label="Eintritt"><input type="date" defaultValue={existing ? "2024-01-01" : ""}/></Field>
         <Field label="Status"><select><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
+      <div className="mobile-sticky-save"><Button href="/mitarbeiter">Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -369,36 +405,51 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
           <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
           <Field label="Beschreibung" className="full"><textarea defaultValue={existing ? "Übernachtung Kundentermin Zürich" : ""} placeholder="Kurze Beschreibung"/></Field>
         </div>
+        <div className="mobile-sticky-save"><Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
   </AppShell>;
 }
 
 export function TimePage() {
+  const [running,setRunning]=useState(true);
+  const [seconds,setSeconds]=useState(8067);
+  const [manualOpen,setManualOpen]=useState(false);
+  useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
+  const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs"><button className="active">Timer</button><button>Einträge</button></div>
         <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
-        <div className="timer-ring"><div><small>Läuft</small><strong>02:14:27</strong><span>Heute, 09:27</span></div></div>
-        <Button icon="pause">Pause</Button>
+        <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Heute, 09:27</span></div></div>
+        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>setRunning(false)}>Stoppen</Button></div>
       </section>
       <section className="surface">
         <SectionTitle title="Heute" action={<strong>4:28 h</strong>}/>
         <div className="compact-list"><div><b>Website Redesign</b><span>Acme AG</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern</span><strong>0:44</strong></div></div>
-        <Button variant="secondary" icon="plus" className="full-button">Manuell erfassen</Button>
+        <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
       </section>
     </div>
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field><Field label="Dauer"><input type="time" defaultValue="01:00"/></Field><Field label="Kunde"><select><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>setManualOpen(false)}>Speichern</Button></div></section></div>}
   </AppShell>;
 }
 
 export function SupportPage() {
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
-    <div className="records">
-      <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
-      <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
-      <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
+    <div className="tablet-master-detail support-master-detail">
+      <div className="records">
+        <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
+        <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
+        <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
+      </div>
+      <aside className="tablet-detail support-tablet-preview surface">
+        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
+        <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
+        <div className="support-preview-message support"><small>Binso Support · 10:37</small><p>Gerne. Um welche Rechnung geht es genau?</p></div>
+        <Button href="/support/5832" variant="secondary">Konversation öffnen</Button>
+      </aside>
     </div>
   </AppShell>;
 }
@@ -413,11 +464,15 @@ export function SupportTicketForm() {
       </div>
       <button className="attachment-button" type="button"><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
+      <div className="mobile-sticky-save"><Button href="/support/5832">Ticket erstellen</Button></div>
     </div>
   </AppShell>;
 }
 
 export function SupportChat() {
+  const [draft,setDraft]=useState("");
+  const [sent,setSent]=useState<string[]>([]);
+  const send=()=>{const value=draft.trim();if(!value)return;setSent(current=>[...current,value]);setDraft("");};
   return <AppShell title="Ticket #5832" subtitle="Frage zur Rechnung" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
@@ -425,29 +480,140 @@ export function SupportChat() {
       <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
       <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
       <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
-      <div className="thread-composer"><button type="button" aria-label="Datei anhängen"><Icon name="upload"/></button><input placeholder="Nachricht schreiben..."/><button type="button" aria-label="Senden"><Icon name="arrow"/></button></div>
+      {sent.map((text,i)=><article className="message message-user" key={`${text}-${i}`}><div>{text}</div><small>jetzt</small></article>)}
+      <div className="thread-composer"><button type="button" aria-label="Datei anhängen"><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={send} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div>
   </AppShell>;
 }
 
 export function SettingsPage() {
+  const rows = [
+    ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
+    ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
+    ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
+    ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
+    ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
+    ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
+    ["/einstellungen/darstellung","moon","Darstellung","Hell oder Dunkel"],
+    ["/support","support","Hilfe und Support","Tickets und Kontakt"],
+  ];
   return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">
     <div className="settings-list">
-      {[
-        ["user","Persönliche Daten","Name, E-Mail und Sprache"],
-        ["users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
-        ["card","Abonnement","Business · CHF 49 / Monat"],
-        ["bell","Benachrichtigungen","E-Mail und Push"],
-        ["settings","Sprache","Deutsch (Schweiz) · Französisch · Italienisch · Englisch · Türkisch"],
-        ["lock","Sicherheit","Passwort, Sitzungen und Geräte"],
-        ["settings","Darstellung","Hell oder Dunkel"],
-        ["support","Hilfe und Support","Tickets und Kontakt"],
-      ].map(([icon,title,text])=><Link href="#" key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
+      {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
     </div>
     <section className="subscription-panel">
       <div><small>Aktueller Plan</small><h2>Business</h2><p>CHF 49 / Monat · nächste Rechnung am 01.11.2026</p></div>
-      <Button variant="secondary">Plan verwalten</Button>
+      <Button href="/einstellungen/abonnement" variant="secondary">Plan verwalten</Button>
     </section>
+  </AppShell>;
+}
+
+export function AccountSettingsPage() {
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+    <div className="settings-detail-grid">
+      <section className="surface settings-profile">
+        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary">Bild ändern</Button>
+      </section>
+      <section className="settings-form">
+        <div className="form-grid two">
+          <Field label="Vorname"><input defaultValue="Thomas"/></Field>
+          <Field label="Nachname"><input defaultValue="Müller"/></Field>
+          <Field label="E-Mail"><input type="email" defaultValue="thomas@musterwerk.ch"/></Field>
+          <Field label="Telefon"><input type="tel" defaultValue="+41 79 123 45 67"/></Field>
+          <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
+          <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
+        </div>
+        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function CompanySettingsPage() {
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button>Speichern</Button>}>
+    <div className="settings-detail-grid">
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary">Logo ändern</Button></section>
+      <section className="settings-form">
+        <div className="form-grid two">
+          <Field label="Firmenname"><input defaultValue="Musterwerk AG"/></Field>
+          <Field label="UID"><input defaultValue="CHE-123.456.789"/></Field>
+          <Field label="Strasse"><input defaultValue="Bahnhofstrasse 12"/></Field>
+          <Field label="PLZ / Ort"><input defaultValue="3000 Bern"/></Field>
+          <Field label="E-Mail"><input type="email" defaultValue="info@musterwerk.ch"/></Field>
+          <Field label="Telefon"><input type="tel" defaultValue="+41 31 123 45 67"/></Field>
+          <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
+        </div>
+        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
+      </section>
+    </div>
+  </AppShell>;
+}
+
+export function SubscriptionSettingsPage() {
+  return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="plan-hero">
+      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>Business</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div>
+      <div className="plan-price"><strong>CHF 49</strong><span>/ Monat</span></div>
+      <Button>Plan ändern</Button>
+    </section>
+    <div className="subscription-detail-grid">
+      <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section>
+      <section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary">Ändern</Button></div></section>
+    </div>
+    <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.08.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
+    <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger">Kündigung starten</Button></div>
+  </AppShell>;
+}
+
+export function NotificationSettingsPage() {
+  const rows = [
+    ["Rechnungen","Zahlungen, Überfälligkeit und Mahnungen"],
+    ["Angebote","Angenommen, abgelehnt oder abgelaufen"],
+    ["Support","Neue Antworten und Statusänderungen"],
+    ["Zeiterfassung","Erinnerungen und laufende Timer"],
+    ["Produktupdates","Neue Funktionen und wichtige Hinweise"],
+  ] as const;
+  const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
+    Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
+  });
+  const toggle = (title:string, channel:"email"|"push") => setPrefs(current=>({...current,[title]:{...current[title],[channel]:!current[title][channel]}}));
+  return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
+  </AppShell>;
+}
+
+export function LanguageSettingsPage() {
+  const [language,setLanguage] = useState("de");
+  const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
+  return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>setLanguage(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
+  </AppShell>;
+}
+
+export function SecuritySettingsPage() {
+  return <AppShell title="Sicherheit" subtitle="Passwort, Sitzungen und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="surface security-card"><SectionTitle title="Passwort"/><p>Zuletzt geändert vor 63 Tagen.</p><Button variant="secondary">Passwort ändern</Button></section>
+    <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>Zusätzlicher Schutz für dein Konto.</p></div><Status tone="warning">Nicht aktiv</Status><Button>Aktivieren</Button></div></section>
+    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Biel/Bienne · Dieses Gerät · jetzt aktiv</small></div><Status tone="success">Aktiv</Status></div><div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Bern · vor 2 Stunden</small></div><button className="text-action">Abmelden</button></div></div></section>
+  </AppShell>;
+}
+
+export function AppearanceSettingsPage() {
+  const [theme,setTheme] = useState<"light"|"dark"|"system">("light");
+  const choose=(next:"light"|"dark"|"system")=>{
+    setTheme(next);
+    const resolved=next==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):next;
+    document.documentElement.dataset.theme=resolved;
+    window.localStorage.setItem("binso.theme",resolved);
+  };
+  return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="appearance-grid">
+      <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
+      <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>
+      <button className={`appearance-card ${theme==="system"?"selected":""}`} onClick={()=>choose("system")}><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button>
+    </div>
   </AppShell>;
 }
 

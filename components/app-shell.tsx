@@ -42,8 +42,16 @@ export function AppShell({
 }) {
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
-  const [timerRunning, setTimerRunning] = useState(() => typeof window === "undefined" ? true : window.localStorage.getItem("binso.timer.running") !== "false");
-  const [dark, setDark] = useState(() => typeof window === "undefined" ? false : window.localStorage.getItem("binso.theme") === "dark");
+  const [timerRunning, setTimerRunning] = useState(true);
+  const [dark, setDark] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(8067);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setTimerRunning(window.localStorage.getItem("binso.timer.running") !== "false");
+      setDark(window.localStorage.getItem("binso.theme") === "dark");
+    });
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
@@ -53,6 +61,12 @@ export function AppShell({
     document.body.style.overflow = sheet ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [sheet]);
+
+  useEffect(() => {
+    if (!timerRunning) return;
+    const id = window.setInterval(() => setTimerSeconds(value => value + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [timerRunning]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return searchItems;
@@ -71,6 +85,8 @@ export function AppShell({
     setTimerRunning(false);
     window.localStorage.setItem("binso.timer.running", "false");
   }
+
+  const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <div className="app-root">
     <aside className="app-sidebar">
@@ -97,7 +113,7 @@ export function AppShell({
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <IconButton label="Benachrichtigungen" icon="bell" onClick={() => setSheet("notifications")}/>
-          <span className="avatar">TM</span>
+          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">TM</Link>
         </div>
       </header>
 
@@ -115,7 +131,7 @@ export function AppShell({
 
       {timerRunning && <div className="global-timer" role="status">
         <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
-        <b>02:14:27</b>
+        <b>{formattedTimer}</b>
         <button type="button" onClick={stopTimer} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
@@ -171,8 +187,9 @@ export function AppShell({
 
           {sheet === "notifications" && <div className="notification-list">
             <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
-            <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div></Link>
+            <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
             <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
+            <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Benachrichtigungen verwalten <Icon name="arrow" size={15}/></Link>
           </div>}
         </section>
       </div>}
