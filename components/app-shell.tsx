@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
+import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -40,6 +42,7 @@ export function AppShell({
   backHref?: string;
   backLabel?: string;
 }) {
+  const router=useRouter();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
   const [timerRunning, setTimerRunning] = useState(true);
@@ -47,6 +50,7 @@ export function AppShell({
   const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
   const [timerNow, setTimerNow] = useState(0);
+  const [accountInitials,setAccountInitials]=useState("TM");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -68,6 +72,19 @@ export function AppShell({
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
+
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{authenticated:boolean;user?:{email?:string}}>("/api/auth/session")
+      .then(session=>{
+        const email=session.user?.email??"";
+        const local=email.split("@")[0]??"";
+        const parts=local.split(/[._-]+/).filter(Boolean);
+        const initials=(parts.length>1?(parts[0][0]+parts[1][0]):local.slice(0,2)).toUpperCase();
+        if(initials) queueMicrotask(()=>setAccountInitials(initials));
+      })
+      .catch(()=>undefined);
+  },[]);
 
   useEffect(() => {
     document.body.style.overflow = sheet ? "hidden" : "";
@@ -107,13 +124,28 @@ export function AppShell({
 
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
 
-  function stopTimer() {
+  async function stopTimer() {
     setTimerRunning(false);
     setTimerBaseSeconds(timerSeconds);
     setTimerStartedAt(null);
     window.localStorage.setItem("binso.timer.running", "false");
     window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
     window.localStorage.removeItem("binso.timer.startedAt");
+    if(isProductionBackendEnabled()){
+      try{
+        const ended=new Date();
+        const started=new Date(ended.getTime()-timerSeconds*1000);
+        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(timerSeconds/60))});
+      }catch{
+        // The timer remains stopped locally; failed persistence can be surfaced by the time page.
+      }
+    }
+  }
+
+  async function logout(){
+    clearDemoClientSession();
+    try{ await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}}); }
+    finally{ router.push("/login"); router.refresh(); }
   }
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
@@ -143,7 +175,7 @@ export function AppShell({
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <IconButton label="Benachrichtigungen" icon="bell" onClick={() => setSheet("notifications")}/>
-          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">TM</Link>
+          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">{accountInitials}</Link>
         </div>
       </header>
 
@@ -162,7 +194,7 @@ export function AppShell({
       {timerRunning && <div className="global-timer" role="status">
         <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
         <b>{formattedTimer}</b>
-        <button type="button" onClick={stopTimer} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
+        <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
       <nav className="bottom-nav" aria-label="Hauptnavigation">
@@ -201,7 +233,7 @@ export function AppShell({
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <Link href="/login"><Icon name="logout"/><span>Abmelden</span></Link>
+              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button>
             </div>
           </>}
 

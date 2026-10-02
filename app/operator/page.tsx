@@ -1,2 +1,7 @@
 import { OperatorPage } from "@/components/operator";
-export default function Page(){return <OperatorPage/>}
+import { requireOperator } from "@/lib/server/operator";
+
+export default async function Page(){
+  await requireOperator();
+  return <OperatorPage/>;
+}

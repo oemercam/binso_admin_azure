@@ -9,12 +9,57 @@ import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
+import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
+
+function moneyChf(value:unknown){
+  const amount=Number(value);
+  return `CHF ${Number.isFinite(amount)?amount.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}):"0.00"}`;
+}
+
+function swissDate(value:unknown){
+  if(typeof value!=="string") return "";
+  const parts=value.split("-");
+  return parts.length===3?`${parts[2]}.${parts[1]}.${parts[0]}`:value;
+}
+
+function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
+  if(collection==="customers") return items.map(item=>[
+    String(item.name??""),String(item.sector??"—"),String(item.city??"—"),item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="products") return items.map(item=>[
+    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="employees") return items.map(item=>[
+    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),`${String(item.workload_percent??0)}%`,item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="expenses") return items.map(item=>{
+    const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
+    const person=employee?[employee.first_name,employee.last_name].filter(Boolean).join(" "):"Nicht zugewiesen";
+    const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
+    return [String(item.merchant??""),person,moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+  });
+  if(collection==="payments") return items.map(item=>{
+    const customer=item.customer as {name?:string}|null|undefined;
+    const invoice=item.invoice as {number?:string}|null|undefined;
+    const statusMap:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
+    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,item.method].filter(Boolean).join(" · "),moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+  });
+  return [];
+}
 
 function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   const [rows,setRows]=useState(defaults);
 
   useEffect(()=>{
+    if(isProductionBackendEnabled()){
+      const controller=new AbortController();
+      apiGet<{items:Record<string,unknown>[]}>(`/api/${collection==="payments"?"payments":collection}`)
+        .then(payload=>queueMicrotask(()=>setRows(mapRemoteRows(collection,payload.items))))
+        .catch(()=>queueMicrotask(()=>setRows(defaults)));
+      return()=>controller.abort();
+    }
+
     const sync=()=>{
       const stored=readDemoRows(collection);
       queueMicrotask(()=>setRows([...stored,...defaults]));
@@ -139,15 +184,21 @@ export function CustomerForm() {
   const [city,setCity]=useState("");
   const [sector,setSector]=useState("Dienstleistung");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
-    setToast("Kunde gespeichert.");
-    window.setTimeout(()=>router.push("/kunden"),700);
+    try{
+      if(isProductionBackendEnabled()) await apiPost("/api/customers",{name:company.trim(),sector,email,phone,city});
+      else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
+      setToast("Kunde gespeichert.");
+      window.setTimeout(()=>router.push("/kunden"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
@@ -168,17 +219,39 @@ export function CustomerForm() {
   </AppShell>;
 }
 
+function useDocumentRows(kind:"offer"|"invoice",defaults:string[][]){
+  const [rows,setRows]=useState(defaults);
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
+      .then(payload=>{
+        const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
+        const mapped=payload.items.map(item=>{
+          const customer=item.customer?.name??"Kunde";
+          const status=statusMap[item.status]??item.status;
+          if(kind==="offer") return [item.number,customer,moneyChf(item.total),status];
+          return [item.number,customer,swissDate(item.issue_date),moneyChf(item.total),status];
+        });
+        queueMicrotask(()=>setRows(mapped));
+      })
+      .catch(()=>undefined);
+  },[kind,defaults]);
+  return rows;
+}
+
 export function OffersPage() {
+  const offerRows=useDocumentRows("offer",offers);
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
-    <RecordsView items={offers} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function InvoicesPage() {
+  const invoiceRows=useDocumentRows("invoice",invoices);
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
-        <RecordsView items={invoices} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
+        <RecordsView items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
       <aside className="tablet-detail invoice-tablet-preview">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
@@ -203,18 +276,26 @@ export function PaymentForm() {
   const [amount,setAmount]=useState("4346.40");
   const [method,setMethod]=useState("Banküberweisung");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     const value=Number(amount.replace(",","."));
     if(!Number.isFinite(value)||value<=0){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    const id=String(Date.now());
-    const swissDate=date.split("-").reverse().join(".");
-    appendDemoRow("payments",[id,swissDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
-    setToast("Zahlung gespeichert.");
-    window.setTimeout(()=>router.push("/zahlungen"),700);
+    try{
+      if(isProductionBackendEnabled()) await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""});
+      else{
+        const id=String(Date.now());
+        const displayDate=date.split("-").reverse().join(".");
+        appendDemoRow("payments",[id,displayDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
+      }
+      setToast("Zahlung gespeichert.");
+      window.setTimeout(()=>router.push("/zahlungen"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
@@ -251,11 +332,20 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
   const [type,setType]=useState("Dienstleistung");
   const [price,setPrice]=useState(existing?"120.00":"");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!name.trim()||!price.trim()){setToast("Name und Verkaufspreis sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("products",[name.trim(),type,`CHF ${Number(price.replace(",",".")).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
-    setToast("Produkt gespeichert.");
-    window.setTimeout(()=>router.push("/produkte"),700);
+    try{
+      const numericPrice=Number(price.replace(",","."));
+      if(!existing){
+        if(isProductionBackendEnabled()) await apiPost("/api/products",{name:name.trim(),kind:type==="Produkt"?"product":"service",unitPrice:numericPrice,vatRate:8.1,unit:type==="Produkt"?"piece":"hour"});
+        else appendDemoRow("products",[name.trim(),type,`CHF ${numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
+      }
+      setToast("Produkt gespeichert.");
+      window.setTimeout(()=>router.push("/produkte"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Produkt konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
@@ -289,11 +379,19 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
   const [load,setLoad]=useState(existing?"100":"100");
   const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
-    setToast("Mitarbeiter gespeichert.");
-    window.setTimeout(()=>router.push("/mitarbeiter"),700);
+    try{
+      if(!existing){
+        if(isProductionBackendEnabled()) await apiPost("/api/employees",{firstName:firstName.trim(),lastName:lastName.trim(),jobTitle:role.trim(),workloadPercent:Number(load),status:status==="Inaktiv"?"inactive":"active"});
+        else appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
+      }
+      setToast("Mitarbeiter gespeichert.");
+      window.setTimeout(()=>router.push("/mitarbeiter"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Mitarbeiter konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
     {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
@@ -328,12 +426,20 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
   const [amount,setAmount]=useState(existing?"280.00":"");
   const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
   const [toast,setToast]=useState<string|null>(null);
-  const save=()=>{
+  const save=async()=>{
     const value=Number(amount.replace(",","."));
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
-    if(!existing) appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
-    setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
-    window.setTimeout(()=>router.push("/spesen"),700);
+    try{
+      if(!existing){
+        if(isProductionBackendEnabled()) await apiPost("/api/expenses",{employeeName:person,merchant:description.trim()||category,expenseDate:"2026-10-02",category,amount:value,currency:"CHF",vatRate:8.1,description,status:"submitted"});
+        else appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
+      }
+      setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
+      window.setTimeout(()=>router.push("/spesen"),700);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
   };
   return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
@@ -359,15 +465,56 @@ export function TimePage() {
   const [running,setRunning]=useState(true);
   const [seconds,setSeconds]=useState(8067);
   const [manualOpen,setManualOpen]=useState(false);
+  const [manualDate,setManualDate]=useState("2026-10-02");
+  const [manualDuration,setManualDuration]=useState("01:00");
+  const [manualCustomer,setManualCustomer]=useState("Acme AG");
+  const [manualProject,setManualProject]=useState("Website Redesign");
+  const [manualDescription,setManualDescription]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
+
+  const stop=async()=>{
+    setRunning(false);
+    try{
+      if(isProductionBackendEnabled()){
+        const ended=new Date();
+        const started=new Date(ended.getTime()-seconds*1000);
+        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
+      }
+      setToast("Zeiteintrag gespeichert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  const saveManual=async()=>{
+    const [hours,minutes]=manualDuration.split(":").map(Number);
+    const durationMinutes=(Number.isFinite(hours)?hours:0)*60+(Number.isFinite(minutes)?minutes:0);
+    if(durationMinutes<=0){
+      setToast("Bitte eine gültige Dauer erfassen.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      if(isProductionBackendEnabled()) await apiPost("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+      setManualOpen(false);
+      setToast("Zeiteintrag gespeichert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs"><button className="active">Timer</button><button>Einträge</button></div>
         <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
         <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Heute, 09:27</span></div></div>
-        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>setRunning(false)}>Stoppen</Button></div>
+        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
       </section>
       <section className="surface">
         <SectionTitle title="Heute" action={<strong>4:28 h</strong>}/>
@@ -375,15 +522,31 @@ export function TimePage() {
         <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
       </section>
     </div>
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field><Field label="Dauer"><input type="time" defaultValue="01:00"/></Field><Field label="Kunde"><select><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>setManualOpen(false)}>Speichern</Button></div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field><Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")?"danger":"success"}/>}
   </AppShell>;
 }
 
+function useSupportRows(){
+  const [rows,setRows]=useState(supportTickets);
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>("/api/support/tickets")
+      .then(payload=>{
+        const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject,new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status])));
+      })
+      .catch(()=>undefined);
+  },[]);
+  return rows;
+}
+
 export function SupportPage() {
+  const ticketRows=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView items={supportTickets} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
       <aside className="tablet-detail support-tablet-preview surface">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
         <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
@@ -395,34 +558,91 @@ export function SupportPage() {
 }
 
 export function SupportTicketForm() {
-  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button href="/support/5832">Ticket erstellen</Button>}>
+  const router=useRouter();
+  const [subject,setSubject]=useState("");
+  const [category,setCategory]=useState("Allgemeine Frage");
+  const [message,setMessage]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=async()=>{
+    if(!subject.trim()||!message.trim()){
+      setToast("Betreff und Nachricht sind erforderlich.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      if(isProductionBackendEnabled()){
+        const payload=await apiPost<{item:{id:string}}>("/api/support/tickets",{subject,category,priority:"normal",message});
+        router.push("/support/"+payload.item.id);
+      }else{
+        setToast("Ticket erstellt.");
+        window.setTimeout(()=>router.push("/support/5832"),700);
+      }
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Ticket konnte nicht erstellt werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
+  };
+  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save}>Ticket erstellen</Button>}>
     <div className="form-page narrow">
       <div className="form-grid">
-        <Field label="Betreff" className="full"><input autoFocus placeholder="Worum geht es?"/></Field>
-        <Field label="Kategorie" className="full"><select><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
-        <Field label="Nachricht" className="full"><textarea placeholder="Beschreibe dein Anliegen kurz..."/></Field>
+        <Field label="Betreff" className="full"><input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
+        <Field label="Kategorie" className="full"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
+        <Field label="Nachricht" className="full"><textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
-      <button className="attachment-button" type="button"><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
+      <button className="attachment-button" type="button" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <div className="mobile-sticky-save"><Button href="/support/5832">Ticket erstellen</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
-export function SupportChat() {
+export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [draft,setDraft]=useState("");
   const [sent,setSent]=useState<string[]>([]);
-  const send=()=>{const value=draft.trim();if(!value)return;setSent(current=>[...current,value]);setDraft("");};
-  return <AppShell title="Ticket #5832" subtitle="Frage zur Rechnung" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
+  const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
+  const [toast,setToast]=useState<string|null>(null);
+
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages")
+      .then(payload=>queueMicrotask(()=>setRemote(payload.items)))
+      .catch(()=>undefined);
+  },[ticketId]);
+
+  const send=async()=>{
+    const value=draft.trim();
+    if(!value)return;
+    setDraft("");
+    if(isProductionBackendEnabled()){
+      try{
+        const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
+        setRemote(current=>[...current,payload.item]);
+      }catch(error){
+        setDraft(value);
+        setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
+        window.setTimeout(()=>setToast(null),2600);
+      }
+      return;
+    }
+    setSent(current=>[...current,value]);
+  };
+
+  const production=useBackendMode();
+  return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
-      <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
-      <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
-      <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
-      {sent.map((text,i)=><article className="message message-user" key={`${text}-${i}`}><div>{text}</div><small>jetzt</small></article>)}
-      <div className="thread-composer"><button type="button" aria-label="Datei anhängen"><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={send} aria-label="Senden"><Icon name="arrow"/></button></div>
+      {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
+        <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
+        <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
+        <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
+        <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
+        {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
+      </>}
+      {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
+      <div className="thread-composer"><button type="button" aria-label="Datei anhängen" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/></button><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div>
+    {toast&&<Toast title={toast} tone="danger"/>}
   </AppShell>;
 }
 
@@ -449,50 +669,122 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
+  const [firstName,setFirstName]=useState("Thomas");
+  const [lastName,setLastName]=useState("Müller");
+  const [email,setEmail]=useState("thomas@musterwerk.ch");
+  const [phone,setPhone]=useState("+41 79 123 45 67");
+  const [jobTitle,setJobTitle]=useState("Geschäftsführer");
+  const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
-  const save=(message="Persönliche Daten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
+
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
+      .then(payload=>{
+        const item=payload.item??{};
+        queueMicrotask(()=>{
+          setFirstName(String(item.first_name??""));
+          setLastName(String(item.last_name??""));
+          setEmail(payload.email??"");
+          setPhone(String(item.phone??""));
+          setJobTitle(String(item.job_title??""));
+          setLanguage(String(item.language??"de-CH"));
+        });
+      }).catch(()=>undefined);
+  },[]);
+
+  const save=async(message="Persönliche Daten gespeichert.")=>{
+    try{
+      if(isProductionBackendEnabled()) await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
+      setToast(message);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Persönliche Daten konnten nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
+  const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <div className="profile-avatar">TM</div><div><h2>Thomas Müller</h2><p>Administrator · Musterwerk AG</p></div><Button variant="secondary" onClick={()=>save("Profilbild-Auswahl geöffnet.")}>Bild ändern</Button>
+        <div className="profile-avatar">{initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div><Button variant="secondary" onClick={()=>void save("Profilbild wird mit Storage angebunden.")}>Bild ändern</Button>
       </section>
       <section className="settings-form">
         <div className="form-grid two">
-          <Field label="Vorname"><input defaultValue="Thomas"/></Field>
-          <Field label="Nachname"><input defaultValue="Müller"/></Field>
-          <Field label="E-Mail"><input type="email" defaultValue="thomas@musterwerk.ch"/></Field>
-          <Field label="Telefon"><input type="tel" defaultValue="+41 79 123 45 67"/></Field>
-          <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
-          <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
+          <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
+          <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
+          <Field label="E-Mail"><input type="email" value={email} readOnly/></Field>
+          <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
+          <Field label="Funktion"><input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
+          <Field label="Sprache"><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="de-CH">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
       </section>
     </div>
-    {toast&&<Toast title={toast}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
 }
 
 export function CompanySettingsPage() {
+  const [name,setName]=useState("Musterwerk AG");
+  const [uid,setUid]=useState("CHE-123.456.789");
+  const [street,setStreet]=useState("Bahnhofstrasse 12");
+  const [postalCode,setPostalCode]=useState("3000");
+  const [city,setCity]=useState("Bern");
+  const [email,setEmail]=useState("info@musterwerk.ch");
+  const [phone,setPhone]=useState("+41 31 123 45 67");
+  const [vatRate,setVatRate]=useState("8.1");
+  const [paymentTerms,setPaymentTerms]=useState("30");
   const [toast,setToast]=useState<string|null>(null);
-  const save=(message="Firmendaten gespeichert.")=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>save()}>Speichern</Button>}>
+
+  useEffect(()=>{
+    if(!isProductionBackendEnabled()) return;
+    apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
+      const item=payload.item;
+      queueMicrotask(()=>{
+        setName(String(item.name??""));
+        setUid(String(item.uid??""));
+        setStreet(String(item.street??""));
+        setPostalCode(String(item.postal_code??""));
+        setCity(String(item.city??""));
+        setEmail(String(item.email??""));
+        setPhone(String(item.phone??""));
+        setVatRate(String(item.vat_rate??"8.1"));
+        setPaymentTerms(String(item.payment_terms_days??"30"));
+      });
+    }).catch(()=>undefined);
+  },[]);
+
+  const save=async(message="Firmendaten gespeichert.")=>{
+    try{
+      if(isProductionBackendEnabled()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
+      setToast(message);
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setToast(null),2400);
+  };
+
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Musterwerk AG</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>save("Logo-Auswahl geöffnet.")}>Logo ändern</Button></section>
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>{name}</b><small>Logo für Angebote und Rechnungen</small></div><Button variant="secondary" onClick={()=>void save("Logo wird mit Storage angebunden.")}>Logo ändern</Button></section>
       <section className="settings-form">
         <div className="form-grid two">
-          <Field label="Firmenname"><input defaultValue="Musterwerk AG"/></Field>
-          <Field label="UID"><input defaultValue="CHE-123.456.789"/></Field>
-          <Field label="Strasse"><input defaultValue="Bahnhofstrasse 12"/></Field>
-          <Field label="PLZ / Ort"><input defaultValue="3000 Bern"/></Field>
-          <Field label="E-Mail"><input type="email" defaultValue="info@musterwerk.ch"/></Field>
-          <Field label="Telefon"><input type="tel" defaultValue="+41 31 123 45 67"/></Field>
-          <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
-          <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
+          <Field label="Firmenname"><input value={name} onChange={e=>setName(e.target.value)}/></Field>
+          <Field label="UID"><input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
+          <Field label="Strasse"><input value={street} onChange={e=>setStreet(e.target.value)}/></Field>
+          <Field label="PLZ"><input value={postalCode} onChange={e=>setPostalCode(e.target.value)}/></Field>
+          <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)}/></Field>
+          <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
+          <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
+          <Field label="Standard MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="Zahlungsziel"><select value={paymentTerms} onChange={e=>setPaymentTerms(e.target.value)}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
       </section>
     </div>
-    {toast&&<Toast title={toast}/>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
 }
 

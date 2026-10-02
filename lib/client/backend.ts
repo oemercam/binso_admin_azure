@@ -1,0 +1,56 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+const configured=Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+export function isProductionBackendEnabled(){
+  if(!configured || typeof window==="undefined") return false;
+  return window.localStorage.getItem("binso.demo.session")!=="1";
+}
+
+export function useBackendMode(){
+  const [enabled,setEnabled]=useState(false);
+  useEffect(()=>{
+    queueMicrotask(()=>setEnabled(isProductionBackendEnabled()));
+  },[]);
+  return enabled;
+}
+
+export function clearDemoClientSession(){
+  if(typeof window!=="undefined") window.localStorage.removeItem("binso.demo.session");
+}
+
+async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok){
+    const message=typeof payload?.message==="string"?payload.message:fallback;
+    throw new Error(message);
+  }
+  return payload as T;
+}
+
+export async function apiPost<T>(path:string,body:unknown):Promise<T>{
+  const response=await fetch(path,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body),
+  });
+  return parseResponse<T>(response,"Die Anfrage konnte nicht verarbeitet werden.");
+}
+
+export async function apiGet<T>(path:string):Promise<T>{
+  const response=await fetch(path,{method:"GET",cache:"no-store"});
+  return parseResponse<T>(response,"Daten konnten nicht geladen werden.");
+}
+
+export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
+  const response=await fetch(path,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body),
+  });
+  return parseResponse<T>(response,"Änderung konnte nicht gespeichert werden.");
+}
