@@ -21,7 +21,7 @@ drop policy if exists billing_events_operator_select on public.billing_events;
 create policy billing_events_operator_select on public.billing_events
 for select using(public.is_operator());
 
-create or replace function public.set_current_tenant_billing_customer(p_customer_ref text)
+create or replace function public.set_current_tenant_billing_customer(p_tenant_id uuid, p_customer_ref text)
 returns void
 language plpgsql
 security definer
@@ -36,8 +36,7 @@ begin
 
   select tenant_id into target_tenant
   from public.tenant_memberships
-  where user_id=auth.uid()
-  order by created_at asc
+  where user_id=auth.uid() and tenant_id=p_tenant_id
   limit 1;
 
   if target_tenant is null then raise exception 'tenant missing'; end if;
@@ -51,8 +50,8 @@ begin
   where tenant_id=target_tenant;
 end $$;
 
-revoke all on function public.set_current_tenant_billing_customer(text) from public;
-grant execute on function public.set_current_tenant_billing_customer(text) to authenticated;
+revoke all on function public.set_current_tenant_billing_customer(uuid,text) from public;
+grant execute on function public.set_current_tenant_billing_customer(uuid,text) to authenticated;
 
 create or replace function public.apply_stripe_billing_event(
   p_event_id text,
