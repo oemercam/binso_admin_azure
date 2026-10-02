@@ -1075,3 +1075,15 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
  .loading-metrics{grid-template-columns:1fr 1fr;gap:8px}
  .skeleton-panel{height:240px}
 }
+
+
+.timer-actions{display:flex;justify-content:center;gap:8px}
+.timer-ring.is-paused{border-color:var(--line);box-shadow:none}
+.manual-time-sheet{max-width:620px}
+.manual-time-sheet .form-grid{padding-top:6px}
+.settings-note{max-width:680px;color:var(--muted);font-size:11px;line-height:1.55;margin-top:18px}
+@media(max-width:760px){
+  .timer-actions{display:grid;grid-template-columns:1fr 1fr}
+  .timer-actions .button{width:100%}
+  .manual-time-sheet .form-grid.two{grid-template-columns:1fr}
+}
