@@ -46,7 +46,7 @@ export function AppShell({
   const [dark, setDark] = useState(false);
   const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
-  const [timerNow, setTimerNow] = useState(Date.now());
+  const [timerNow, setTimerNow] = useState(0);
 
   useEffect(() => {
     queueMicrotask(() => {
