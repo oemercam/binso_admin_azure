@@ -2,59 +2,68 @@
 
 Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
 
-## Current release: v0.7 backend foundation
+## Current release: v0.8 product-completion foundation
 
-The UI prototype remains available without backend configuration, including the isolated demo mode. When Supabase configuration is present, Binso One now switches core customer workflows to the production backend foundation.
+This release keeps the standalone demo available without external services and connects the core customer and operator workflows to the production data model when Supabase is configured.
 
-### Connected production foundations
+### Production foundations implemented
 
-- Supabase email/password authentication through server-side API routes
-- HttpOnly, SameSite session cookies with refresh-token handling
-- Password recovery and password reset flow
-- Protected customer routes when the backend is configured
-- Explicit server-side operator authorization
-- Multi-tenant PostgreSQL schema with tenant memberships
-- Row Level Security for tenant data
-- Hardened support RLS that excludes internal notes from customer access
-- Customers, products, employees, expenses, payments and time entries APIs
-- Support tickets and customer message APIs
-- Company and personal profile settings APIs
-- Atomic invoice and offer create/update database functions
-- Audit-log foundation for document mutations
-- Real tenant data loading for core lists
-- Demo data remains isolated from authenticated production data
+- Supabase email/password authentication through server API routes
+- HttpOnly SameSite sessions with refresh-token handling
+- password recovery and password reset
+- protected customer and operator routes
+- tenant memberships and PostgreSQL Row Level Security
+- account restrictions enforced at the RLS boundary
+- private tenant-aware file storage policies
+- customers and customer contacts
+- products and services
+- employees
+- expenses and private receipt uploads
+- payments against customer invoices
+- time entries
+- support tickets, replies, internal operator notes and private attachments
+- company and personal profile settings
+- offers and invoices with atomic database create/update functions
+- tenant dashboard aggregates and global tenant search
+- dynamic record detail/edit flows
+- operator dashboard, tenants, tickets, account lifecycle, restrictions, announcements, monitoring state and audit
+- customer subscription/account-state display without fake billing data
+- real password change flow
+- isolated demo data when the backend is not configured
 
-### Still intentionally not marked production-complete
+### Explicitly not marked complete
 
-The following integrations need the actual external production services or business configuration before they can be called complete:
+These areas still require their real external production services or final domain implementation:
 
-- Stripe subscription billing and webhooks
-- Resend / transactional email delivery for invoices and support
-- Supabase Storage for receipts, company logos and support attachments
-- Standards-compliant Swiss QR bill generation
-- Real bank synchronization
-- Operator data aggregation and actions beyond authorization
-- Full localization content for DE / FR / IT / EN / TR
+- Stripe SaaS subscription checkout, payment methods, invoices and webhooks
+- transactional email delivery for invoices, support and system messages
+- standards-compliant Swiss QR bill generation
+- bank synchronization
+- secure operator impersonation/support access
+- verified cross-device auth-session management and MFA enrollment
+- full production translations for DE / FR / IT / EN / TR
 
-The UI never labels these integrations as completed when they are still placeholders.
+Binso One does not display invented production payment cards, billing invoices, system SLA values, user devices or operator identities when those data sources are not connected.
 
 ## Stack
 
 - Next.js 16 App Router
 - React 19
 - TypeScript
-- Supabase Auth + PostgreSQL/PostgREST backend foundation
+- Supabase Auth
+- PostgreSQL / PostgREST
+- Supabase private Storage
 - PostgreSQL RLS for tenant isolation
 - PWA manifest and conservative service-worker caching
 - Azure App Service deployment through GitHub Actions
 
-No Supabase service-role key is used by customer-facing request paths. Tenant authorization is performed with the authenticated user's JWT and PostgreSQL RLS.
+Customer-facing request paths use the authenticated user JWT and RLS. They do not require a Supabase service-role key.
 
 ## Backend setup
 
 1. Create or select the Supabase project for Binso One.
-2. Apply the SQL files in `supabase/migrations` in filename order.
-3. Configure locally in `.env.local`:
+2. Apply all SQL files in `supabase/migrations` in filename order.
+3. Configure local development in `.env.local`:
 
 ```env
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -64,12 +73,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
 ```
 
 4. Configure the same public Supabase values in the Azure production application settings.
-5. Configure the Supabase Auth Site URL / redirect allowlist for the actual Binso One app URL and `/passwort-zuruecksetzen`.
-6. Create the first authenticated Binso operator deliberately, then provision it in `public.operator_users`. The migration contains the example SQL; do not grant operator access through client metadata.
+5. Configure the Supabase Auth Site URL and redirect allowlist for the actual Binso One app URL and `/passwort-zuruecksetzen`.
+6. Provision the first operator deliberately in `public.operator_users` after the authenticated user exists. Never grant operator rights from client-editable user metadata.
+7. Verify the private Storage buckets and RLS policies created by the storage migration.
 
-When the Supabase values are absent, Binso One stays in prototype/demo mode so CI and local UI review continue to work without pretending a backend exists.
+When Supabase values are absent, the application remains in prototype/demo mode for UI review and CI without pretending that persistence or authorization is active.
 
-## Local development
+## Local QA
 
 ```powershell
 corepack enable
@@ -80,8 +90,6 @@ pnpm typecheck
 pnpm build
 pnpm dev
 ```
-
-Then open http://localhost:3000.
 
 ## Main routes
 
@@ -110,24 +118,27 @@ Then open http://localhost:3000.
 
 - CSP and security headers are centralized in `next.config.ts`.
 - Authenticated-style routes and APIs use private/no-store caching and noindex.
-- Mutation endpoints check same-origin requests and bounded request sizes.
-- Login errors do not reveal whether a user exists.
-- Password recovery returns a uniform public response.
-- Customer data access uses the authenticated JWT plus RLS; tenant IDs are resolved server-side.
-- Internal support notes are excluded by RLS, not only by UI filtering.
-- Operator access is stored in a dedicated server-checked table.
-- Demo access and authenticated production data are isolated.
+- Mutation endpoints use same-origin checks and bounded JSON bodies.
+- Login and password recovery avoid account enumeration.
+- Tenant IDs are resolved server-side.
+- Tenant restrictions are enforced by RLS for core data and private Storage, not only by UI.
+- Support remains available while a customer account is restricted.
+- Internal support notes are excluded from customer RLS.
+- Private files use tenant-prefixed paths, allowlisted MIME types, size limits and short-lived download URLs.
+- Operator access is held in a dedicated authorization table and checked server-side.
+- Critical operator lifecycle changes are written to the operator audit log.
+- Demo access is isolated from authenticated production data.
 
 ## CI
 
-GitHub Actions performs:
+GitHub Actions runs:
 
 - frozen-lockfile install
-- ESLint
+- ESLint with zero warnings
 - TypeScript typecheck
 - production build
 - runtime route smoke tests
 - `/api/health`
 - security-header checks
 
-Azure deployment performs an application health check after deployment.
+Azure deployment performs a production application health check after deployment.

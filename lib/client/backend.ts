@@ -54,3 +54,9 @@ export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
   });
   return parseResponse<T>(response,"Änderung konnte nicht gespeichert werden.");
 }
+
+
+export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
+  const response=await fetch(path,{method:"POST",body:form});
+  return parseResponse<T>(response,"Datei konnte nicht hochgeladen werden.");
+}
