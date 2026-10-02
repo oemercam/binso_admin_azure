@@ -510,3 +510,8 @@ html[data-theme="dark"] .auth-page textarea,
 html[data-theme="dark"] .auth-page .button-secondary{
   background:#fff!important;color:#111!important;border-color:#dcdcd9!important
 }
+
+
+/* Detail headers: never repeat the same entity name directly below the page title. */
+.app-section-kunden .page-head-detail + .entity-hero h2{display:none}
+.app-section-kunden .page-head-detail + .entity-hero>div p{margin-top:0}
