@@ -1,0 +1,1 @@
+export type RetentionPolicy={auditDays:number;softDeletedBusinessDataDays:number;supportDays:number};export const defaultRetention:RetentionPolicy={auditDays:3650,softDeletedBusinessDataDays:90,supportDays:730};export function purgeBefore(days:number,now=new Date()){return new Date(now.getTime()-days*86400000)}
