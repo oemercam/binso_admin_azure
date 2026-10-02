@@ -6,7 +6,7 @@ const routes = [
   "/angebote", "/angebote/neu", "/angebote/1", "/rechnungen", "/rechnungen/neu", "/rechnungen/1", "/dokumente", "/dokumente/neu", "/dokumente/1",
   "/berichte", "/unternehmen", "/team", "/support", "/support/neu", "/mehr", "/einstellungen",
   "/einstellungen/profil", "/einstellungen/sprache", "/einstellungen/darstellung", "/einstellungen/sicherheit", "/einstellungen/daten", "/einstellungen/ueber",
-  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/login", "/passwort-vergessen", "/registrieren", "/rechtliches", "/impressum", "/datenschutz", "/agb",
+  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/sprache", "/login", "/passwort-vergessen", "/registrieren", "/rechtliches", "/impressum", "/datenschutz", "/agb",
   "/offline", "/maintenance",
 ];
 
