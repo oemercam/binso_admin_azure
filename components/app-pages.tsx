@@ -1097,17 +1097,42 @@ export function LanguageSettingsPage() {
 }
 
 export function SecuritySettingsPage() {
+  const production=useBackendMode();
   const [dialog,setDialog]=useState<"password"|"2fa"|null>(null);
   const [twoFactor,setTwoFactor]=useState(false);
   const [sessionVisible,setSessionVisible]=useState(true);
+  const [newPassword,setNewPassword]=useState("");
+  const [confirmPassword,setConfirmPassword]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
-  return <AppShell title="Sicherheit" subtitle="Passwort, Sitzungen und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+
+  const changePassword=async()=>{
+    if(newPassword.length<8){setToast("Das Passwort muss mindestens 8 Zeichen haben.");window.setTimeout(()=>setToast(null),2400);return;}
+    if(newPassword!==confirmPassword){setToast("Die Passwörter stimmen nicht überein.");window.setTimeout(()=>setToast(null),2400);return;}
+    try{
+      if(production) await apiPatch("/api/auth/password",{password:newPassword});
+      setNewPassword("");setConfirmPassword("");
+      confirm("Passwort geändert.");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
+  };
+
+  if(!production) return <AppShell title="Sicherheit" subtitle="Passwort, Sitzungen und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="surface security-card"><SectionTitle title="Passwort"/><p>Zuletzt geändert vor 63 Tagen.</p><Button variant="secondary" onClick={()=>setDialog("password")}>Passwort ändern</Button></section>
     <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>Zusätzlicher Schutz für dein Konto.</p></div><Status tone={twoFactor?"success":"warning"}>{twoFactor?"Aktiv":"Nicht aktiv"}</Status><Button onClick={()=>setDialog("2fa")}>{twoFactor?"Verwalten":"Aktivieren"}</Button></div></section>
-    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Biel/Bienne · Dieses Gerät · jetzt aktiv</small></div><Status tone="success">Aktiv</Status></div>{sessionVisible&&<div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Bern · vor 2 Stunden</small></div><button className="text-action" onClick={()=>{setSessionVisible(false);setToast("iPhone-Sitzung wurde abgemeldet.");window.setTimeout(()=>setToast(null),2200)}}>Abmelden</button></div>}</div></section>
-    {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet security-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{dialog==="password"?"Passwort ändern":"Zwei-Faktor-Authentifizierung"}</h2><p>{dialog==="password"?"Verwende ein einzigartiges, starkes Passwort.":"Zusätzlicher Schutz für dein Benutzerkonto."}</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>{dialog==="password"?<div className="form-grid"><Field label="Aktuelles Passwort"><input type="password"/></Field><Field label="Neues Passwort"><input type="password"/></Field><Field label="Neues Passwort bestätigen"><input type="password"/></Field></div>:<div className="two-factor-setup"><div className="two-factor-code">BINSO<br/>2FA</div><div><b>Authenticator-App verbinden</b><p>Scanne den Code mit deiner Authenticator-App und bestätige anschliessend einen sechsstelligen Code.</p><Field label="Bestätigungscode"><input inputMode="numeric" placeholder="000000"/></Field></div></div>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>{if(dialog==="2fa")setTwoFactor(true);confirm(dialog==="password"?"Passwort geändert.":"Zwei-Faktor-Authentifizierung aktiviert.")}}>Bestätigen</Button></div></section></div>}
+    <section className="surface security-card"><SectionTitle title="Aktive Sitzungen"/><div className="session-list"><div><span className="activity-icon"><Icon name="user"/></span><div><b>Chrome · Windows 11</b><small>Dieses Gerät · Demo</small></div><Status tone="success">Aktiv</Status></div>{sessionVisible&&<div><span className="activity-icon"><Icon name="user"/></span><div><b>Safari · iPhone</b><small>Demo-Sitzung</small></div><button className="text-action" onClick={()=>{setSessionVisible(false);setToast("Demo-Sitzung abgemeldet.");window.setTimeout(()=>setToast(null),2200)}}>Abmelden</button></div>}</div></section>
+    {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet security-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{dialog==="password"?"Passwort ändern":"Zwei-Faktor-Authentifizierung"}</h2><p>Demo-Einstellung ohne produktive Sicherheitswirkung.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>{dialog==="password"?<div className="form-grid"><Field label="Neues Passwort"><input type="password"/></Field><Field label="Neues Passwort bestätigen"><input type="password"/></Field></div>:<div className="two-factor-setup"><div className="two-factor-code">BINSO<br/>2FA</div><div><b>Demo</b><p>Die echte MFA-Aktivierung wird erst mit dem produktiven Auth-Enrollment aktiviert.</p></div></div>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>{if(dialog==="2fa")setTwoFactor(true);confirm("Demo-Einstellung gespeichert.")}}>Bestätigen</Button></div></section></div>}
     {toast&&<Toast title={toast}/>}
+  </AppShell>;
+
+  return <AppShell title="Sicherheit" subtitle="Passwort und Kontoschutz." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="surface security-card"><SectionTitle title="Passwort"/><p>Ändere dein Passwort direkt über die sichere Authentifizierung.</p><Button variant="secondary" onClick={()=>setDialog("password")}>Passwort ändern</Button></section>
+    <section className="surface security-card"><div className="security-row"><div><b>Zwei-Faktor-Authentifizierung</b><p>MFA wird erst angezeigt, wenn das Authenticator-Enrollment vollständig implementiert und geprüft ist.</p></div><Status tone="neutral">Noch nicht verfügbar</Status><Button variant="secondary" disabled>Aktivieren</Button></div></section>
+    <section className="surface security-card"><SectionTitle title="Sitzungen"/><div className="context-block"><Status tone="success">Aktuelle Sitzung aktiv</Status><b>Angemeldetes Gerät</b><span>Eine verlässliche geräteübergreifende Sitzungsübersicht wird erst angezeigt, wenn die Auth-Session-Verwaltung angebunden ist. Es werden keine erfundenen Geräte oder Standorte angezeigt.</span></div></section>
+    {dialog==="password"&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet security-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Passwort ändern</h2><p>Verwende mindestens acht Zeichen und ein einzigartiges Passwort.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid"><Field label="Neues Passwort"><input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field><Field label="Neues Passwort bestätigen"><input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void changePassword()}>Passwort speichern</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("nicht")||toast.includes("mindestens")?"danger":"success"}/>}
   </AppShell>;
 }
 
