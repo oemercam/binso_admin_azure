@@ -515,16 +515,19 @@ export function DocumentsHubPage() {
 
 export function NotificationsPage() {
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
+  const [view,setView]=useState<"all"|"unread">("all");
   const items=[
     ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
     ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
     ["offer","file","Angebot angenommen","Acme AG · AN-2026-012","heute","/angebote/AN-2026-012"],
     ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
   ];
+  const visible=view==="all"?items:items.filter(([id])=>!read.includes(id));
+  const unreadCount=items.length-read.length;
   return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
     <div className="notification-center">
-      <div className="notification-center-tabs"><button className="active">Alle</button><button>Ungelesen</button></div>
-      <div className="notification-center-list">{items.map(([id,icon,title,text,time,href])=>{
+      <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}>Alle</button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}>Ungelesen{unreadCount>0?` (${unreadCount})`:""}</button></div>
+      {visible.length?<div className="notification-center-list">{visible.map(([id,icon,title,text,time,href])=>{
         const isRead=read.includes(id);
         return <Link href={href} className={isRead?"notification-center-row":"notification-center-row unread"} key={id} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}>
           <span className="activity-icon"><Icon name={icon}/></span>
@@ -532,7 +535,7 @@ export function NotificationsPage() {
           {!isRead&&<i className="unread-dot"/>}
           <Icon name="arrow" size={16}/>
         </Link>;
-      })}</div>
+      })}</div>:<EmptyState icon="bell" title="Alles gelesen" text="Es gibt aktuell keine ungelesenen Benachrichtigungen."/>}
       <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
     </div>
   </AppShell>;
