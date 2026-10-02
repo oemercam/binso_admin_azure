@@ -58,7 +58,7 @@ export function OperatorPage({ section = "" }: { section?: string }) {
 
 function operatorSubtitle(key: string, detail: string) {
   if (detail) return "Kundenanfrage prüfen und beantworten.";
-  return {
+  const subtitles: Record<string, string> = {
     "": "Betrieb und Kundenumgebung von Binso One.",
     tickets: "Kundenanfragen verwalten und beantworten.",
     kunden: "Kundenkonten, Status und Supportkontext.",
@@ -69,7 +69,8 @@ function operatorSubtitle(key: string, detail: string) {
     ankuendigungen: "Hinweise für Kunden veröffentlichen.",
     sicherheit: "Interne Benutzer, Rollen und Sicherheitsstatus.",
     audit: "Kritische Operator-Aktionen nachvollziehen.",
-  }[key] ?? "Binso One Operator";
+  };
+  return subtitles[key] ?? "Binso One Operator";
 }
 
 function OperatorDashboard() {
