@@ -12,7 +12,7 @@ export async function POST(request:NextRequest){
     assertSameOrigin(request);
     const body=await readJson<Body>(request,8192);
     const email=cleanText(body.email,320).toLowerCase();
-    await enforcePublicRateLimit(request,"auth.recover",email,{windowSeconds:3600,ipLimit:10,identityLimit:5});
+    await enforcePublicRateLimit(request,"auth.recover",email);
     if(!validEmail(email)) return json({error:"email_invalid",message:"Bitte gültige E-Mail-Adresse eingeben."},400);
     const {appUrl}=getBackendEnv();
     await requestPasswordRecovery(email,appUrl+"/passwort-zuruecksetzen");
