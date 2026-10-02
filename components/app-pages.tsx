@@ -414,6 +414,8 @@ export function SupportChat() {
 }
 
 export function SettingsPage() {
+  const { resetDemoData }=useDemoData();
+  const [toast,setToast]=useState<string|null>(null);
   const rows = [
     ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
     ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
@@ -424,6 +426,11 @@ export function SettingsPage() {
     ["/einstellungen/darstellung","moon","Darstellung","Hell oder Dunkel"],
     ["/support","support","Hilfe und Support","Tickets und Kontakt"],
   ];
+  const reset=()=>{
+    resetDemoData();
+    setToast("Demo-Daten wurden zurückgesetzt.");
+    window.setTimeout(()=>setToast(null),2200);
+  };
   return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">
     <div className="settings-list">
       {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
@@ -432,6 +439,11 @@ export function SettingsPage() {
       <div><small>Aktueller Plan</small><h2>Business</h2><p>CHF 49 / Monat · nächste Rechnung am 01.11.2026</p></div>
       <Button href="/einstellungen/abonnement" variant="secondary">Plan verwalten</Button>
     </section>
+    <section className="demo-data-panel">
+      <div><small>Demo-Modus</small><h2>Lokale Beispieldaten</h2><p>Neu erfasste Kunden, Belege, Zahlungen, Produkte, Mitarbeiter, Spesen und Tickets bleiben auf diesem Gerät erhalten.</p></div>
+      <Button variant="secondary" onClick={reset}>Demo-Daten zurücksetzen</Button>
+    </section>
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
