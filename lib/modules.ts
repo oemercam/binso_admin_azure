@@ -1,0 +1,1 @@
+export const modules=["auth","organisations","users","customers","projects","time","offers","invoices","payments","documents","notifications","support","reporting","audit","billing","integrations"] as const;export type ModuleName=(typeof modules)[number];
