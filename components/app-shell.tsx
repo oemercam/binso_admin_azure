@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
-import { apiGet, clearDemoClientSession, useProductionBackend } from "@/lib/client/backend";
+import { apiGet, apiPost, clearDemoClientSession, useProductionBackend } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -122,13 +122,22 @@ export function AppShell({
 
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
 
-  function stopTimer() {
+  async function stopTimer() {
     setTimerRunning(false);
     setTimerBaseSeconds(timerSeconds);
     setTimerStartedAt(null);
     window.localStorage.setItem("binso.timer.running", "false");
     window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
     window.localStorage.removeItem("binso.timer.startedAt");
+    if(useProductionBackend()){
+      try{
+        const ended=new Date();
+        const started=new Date(ended.getTime()-timerSeconds*1000);
+        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(timerSeconds/60))});
+      }catch{
+        // The timer remains stopped locally; failed persistence can be surfaced by the time page.
+      }
+    }
   }
 
   async function logout(){
@@ -183,7 +192,7 @@ export function AppShell({
       {timerRunning && <div className="global-timer" role="status">
         <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
         <b>{formattedTimer}</b>
-        <button type="button" onClick={stopTimer} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
+        <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
       <nav className="bottom-nav" aria-label="Hauptnavigation">
