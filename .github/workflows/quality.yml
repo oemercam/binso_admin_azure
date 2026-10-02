@@ -47,11 +47,13 @@ jobs:
             exit 1
           fi
 
-          for route in / /produkt /preise /dashboard /kunden /angebote /rechnungen /belege /benachrichtigungen /zeit /support /einstellungen /operator; do
+          for route in / /produkt /preise /login /registrieren /passwort-vergessen /passwort-zuruecksetzen /dashboard /kunden /angebote /rechnungen /belege /benachrichtigungen /zeit /support /einstellungen /operator; do
             curl -fsS "http://127.0.0.1:3000$route" > /dev/null
           done
 
           curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
+          curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"configured":false'
+          curl -fsS -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
