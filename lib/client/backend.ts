@@ -1,6 +1,16 @@
-export const backendConfigured=Boolean(
+const configured=Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
+
+export function useProductionBackend(){
+  if(!configured) return false;
+  if(typeof window!=="undefined" && window.localStorage.getItem("binso.demo.session")==="1") return false;
+  return true;
+}
+
+export function clearDemoClientSession(){
+  if(typeof window!=="undefined") window.localStorage.removeItem("binso.demo.session");
+}
 
 export async function apiPost<T>(path:string,body:unknown):Promise<T>{
   const response=await fetch(path,{
