@@ -68,21 +68,42 @@ create policy customer_contacts_member_update on public.customer_contacts for up
 
 drop policy if exists files_member_select on public.files;
 drop policy if exists files_member_insert on public.files;
-create policy files_member_select on public.files for select using(public.tenant_can_read(tenant_id));
-create policy files_member_insert on public.files for insert with check(public.tenant_can_write(tenant_id) and created_by=auth.uid());
+create policy files_member_select on public.files for select using(
+  (purpose='support_attachment' and public.is_tenant_member(tenant_id))
+  or public.tenant_can_read(tenant_id)
+);
+create policy files_member_insert on public.files for insert with check(
+  created_by=auth.uid()
+  and (
+    (purpose='support_attachment' and public.is_tenant_member(tenant_id))
+    or public.tenant_can_write(tenant_id)
+  )
+);
 
 drop policy if exists binso_storage_member_select on storage.objects;
 create policy binso_storage_member_select on storage.objects
 for select to authenticated
 using(
-  bucket_id in ('company-assets','expense-receipts','support-files')
-  and public.tenant_can_read(((storage.foldername(name))[1])::uuid)
+  (
+    bucket_id='support-files'
+    and public.is_tenant_member(((storage.foldername(name))[1])::uuid)
+  )
+  or (
+    bucket_id in ('company-assets','expense-receipts')
+    and public.tenant_can_read(((storage.foldername(name))[1])::uuid)
+  )
 );
 
 drop policy if exists binso_storage_member_insert on storage.objects;
 create policy binso_storage_member_insert on storage.objects
 for insert to authenticated
 with check(
-  bucket_id in ('company-assets','expense-receipts','support-files')
-  and public.tenant_can_write(((storage.foldername(name))[1])::uuid)
+  (
+    bucket_id='support-files'
+    and public.is_tenant_member(((storage.foldername(name))[1])::uuid)
+  )
+  or (
+    bucket_id in ('company-assets','expense-receipts')
+    and public.tenant_can_write(((storage.foldername(name))[1])::uuid)
+  )
 );
