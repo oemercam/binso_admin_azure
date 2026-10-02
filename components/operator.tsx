@@ -172,10 +172,14 @@ function SubscriptionsView() {
 }
 
 function RestrictionsView() {
-  return <div className="operator-grid">
-    <section className="surface restriction-form"><SectionTitle title="Sperrung erstellen"/><div className="form-grid two"><label>Kunde<select><option>Meier Handel AG</option></select></label><label>Grund<select><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option></select></label><label>Umfang<select><option>Gesamter Zugriff</option><option>Nur Schreibzugriff</option></select></label><label>Ablaufdatum<input type="date"/></label><label className="full">Interne Begründung<textarea defaultValue="Ausstehende Zahlung seit 14 Tagen. Mehrfache Mahnung ohne Reaktion."/></label></div><Button variant="danger">Sperrung erstellen</Button></section>
-    <section className="surface"><SectionTitle title="Aktive Einschränkungen"/><div className="notice"><Status tone="warning">Eingeschränkt</Status><b>Meier Handel AG</b><span>Zahlungsausstand · seit 18.09.2026</span><Button variant="secondary">Aufheben</Button></div></section>
-  </div>;
+  const [confirm,setConfirm]=useState<"create"|"remove"|null>(null);
+  return <>
+    <div className="operator-grid">
+      <section className="surface restriction-form"><SectionTitle title="Sperrung erstellen"/><div className="form-grid two"><label>Kunde<select><option>Meier Handel AG</option></select></label><label>Grund<select><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option></select></label><label>Umfang<select><option>Gesamter Zugriff</option><option>Nur Schreibzugriff</option></select></label><label>Ablaufdatum<input type="date"/></label><label className="full">Interne Begründung<textarea defaultValue="Ausstehende Zahlung seit 14 Tagen. Mehrfache Mahnung ohne Reaktion."/></label></div><Button variant="danger" onClick={()=>setConfirm("create")}>Sperrung erstellen</Button></section>
+      <section className="surface"><SectionTitle title="Aktive Einschränkungen"/><div className="notice"><Status tone="warning">Eingeschränkt</Status><b>Meier Handel AG</b><span>Zahlungsausstand · seit 18.09.2026</span><Button variant="secondary" onClick={()=>setConfirm("remove")}>Aufheben</Button></div></section>
+    </div>
+    {confirm&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirm(null)}}><section className="operator-confirm" role="dialog" aria-modal="true"><span className="confirm-icon"><Icon name="lock"/></span><h2>{confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"}</h2><p>{confirm==="create"?"Der Kunde kann je nach Umfang nicht mehr auf Binso One zugreifen. Die Aktion wird mit Begründung im Audit protokolliert.":"Der normale Zugriff für Meier Handel AG wird wiederhergestellt. Auch diese Aktion wird protokolliert."}</p><div><Button variant="secondary" onClick={()=>setConfirm(null)}>Abbrechen</Button><Button variant={confirm==="create"?"danger":"primary"} onClick={()=>setConfirm(null)}>{confirm==="create"?"Einschränken":"Aufheben"}</Button></div></section></div>}
+  </>;
 }
 
 function MonitoringView() {
