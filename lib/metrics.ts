@@ -1,1 +1,0 @@
-export type Counter={name:string;value:number};export function increment(c:Counter,by=1):Counter{return {...c,value:c.value+by}}export function percentage(part:number,total:number){return total<=0?0:Math.round(part/total*1000)/10}

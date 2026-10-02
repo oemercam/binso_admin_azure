@@ -1,1 +1,0 @@
-import Link from "next/link";import {AppShell} from "@/components/app-shell";import {TeamTabs} from "@/components/team-tabs";export default function Team(){return <AppShell title="Benutzer & Team" back="/mehr"><TeamTabs/><Link className="primary sticky-action" href="/team/neu">Neuer Benutzer</Link></AppShell>}

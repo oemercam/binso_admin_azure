@@ -1,1 +1,0 @@
-import {createHmac,timingSafeEqual} from "node:crypto";export function verifyWebhook(body:string,signature:string,secret:string){const expected=createHmac("sha256",secret).update(body).digest("hex");const a=Buffer.from(expected),b=Buffer.from(signature);return a.length===b.length&&timingSafeEqual(a,b)}

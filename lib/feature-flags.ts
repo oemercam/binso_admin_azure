@@ -1,1 +1,0 @@
-export type FeatureFlag={key:string;enabled:boolean;tenantIds?:string[]};export function featureEnabled(flag:FeatureFlag,tenantId:string){return flag.enabled&&(flag.tenantIds==null||flag.tenantIds.includes(tenantId))}

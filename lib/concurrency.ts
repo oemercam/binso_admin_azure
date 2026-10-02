@@ -1,1 +1,0 @@
-export type Versioned={version:number};export function updateVersion<T extends Versioned>(current:T,expectedVersion:number,patch:Partial<Omit<T,"version">>):T{if(current.version!==expectedVersion)throw new Error("VERSION_CONFLICT");return {...current,...patch,version:current.version+1}}

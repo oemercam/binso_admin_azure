@@ -1,1 +1,0 @@
-export type JobStatus="queued"|"running"|"succeeded"|"failed";export type Job={id:string;organisationId:string;type:string;status:JobStatus;attempts:number;createdAt:string;lastError?:string};export function retryable(job:Job,maxAttempts=5){return job.status==="failed"&&job.attempts<maxAttempts}

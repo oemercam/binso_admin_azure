@@ -1,1 +1,0 @@
-import type {Metadata} from "next";import "./globals.css";export const metadata:Metadata={title:"Binso One",description:"Business Software für Schweizer Unternehmen"};export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="de-CH"><body>{children}</body></html>}

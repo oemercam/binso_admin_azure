@@ -1,1 +1,0 @@
-export type DemoSession={id:string;expiresAt:string;readOnly:boolean};export function demoSession(minutes=30,now=new Date()):DemoSession{return {id:crypto.randomUUID(),expiresAt:new Date(now.getTime()+minutes*60000).toISOString(),readOnly:true}}

@@ -1,1 +1,0 @@
-import type {UserRole} from "./domain";export type Member={organisationId:string;userId:string;email:string;name:string;role:UserRole;active:boolean};export function canRemoveMember(actor:Member,target:Member){if(actor.organisationId!==target.organisationId)return false;if(target.role==="owner")return false;return actor.role==="owner"||actor.role==="admin"}

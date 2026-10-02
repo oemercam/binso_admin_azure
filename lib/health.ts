@@ -1,1 +1,0 @@
-export type DependencyHealth={name:string;configured:boolean;required:boolean};export function overallHealth(items:DependencyHealth[]){return items.some(x=>x.required&&!x.configured)?"degraded":"ok"}

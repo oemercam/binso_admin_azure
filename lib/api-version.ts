@@ -1,1 +1,0 @@
-export const apiVersion="2026-10-02";export const apiHeaders={"X-Binso-API-Version":apiVersion} as const

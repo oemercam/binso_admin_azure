@@ -1,1 +1,0 @@
-import Link from "next/link";export default function NotFound(){return <main className="state"><div className="state-brand">binso <span>One</span></div><h1>Seite nicht gefunden</h1><p>Die angeforderte Seite ist nicht verfügbar.</p><Link className="primary" href="/">Zur Startseite</Link></main>}

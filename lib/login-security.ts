@@ -1,1 +1,0 @@
-export const loginPolicy={maxAttempts:5,windowMs:15*60*1000,lockMs:15*60*1000};export function genericAuthError(){return "E-Mail oder Passwort ist ungültig."}

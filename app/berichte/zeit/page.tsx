@@ -1,1 +1,0 @@
-import {AppShell} from "@/components/app-shell";export default function Page(){return <AppShell title="Zeiterfassung" back="/berichte"><div className="metrics"><article><span>Diese Woche</span><strong>31.5 h</strong><small>5 Arbeitstage</small></article><article><span>Verrechenbar</span><strong>26.0 h</strong><small>82.5 %</small></article></div></AppShell>}

@@ -1,1 +1,0 @@
-export type Entity={id:string;organisationId:string;createdAt:string;updatedAt:string};export interface Repository<T extends Entity>{list(organisationId:string):Promise<T[]>;get(organisationId:string,id:string):Promise<T|null>;create(value:T):Promise<T>;update(organisationId:string,id:string,patch:Partial<T>):Promise<T>;remove(organisationId:string,id:string):Promise<void>}

@@ -1,1 +1,0 @@
-import {AppShell} from "@/components/app-shell";import {ThemeSettings} from "@/components/theme-settings";export default function Darstellung(){return <AppShell title="Darstellung" back="/einstellungen"><ThemeSettings/></AppShell>}

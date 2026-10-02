@@ -1,1 +1,0 @@
-export async function inBatches<T,R>(items:T[],size:number,worker:(item:T)=>Promise<R>){if(size<1)throw new Error("BATCH_SIZE_INVALID");const out:R[]=[];for(let i=0;i<items.length;i+=size)out.push(...await Promise.all(items.slice(i,i+size).map(worker)));return out}

@@ -1,1 +1,0 @@
-export type SoftDeleted={deletedAt?:string|null};export function active<T extends SoftDeleted>(rows:T[]){return rows.filter(x=>!x.deletedAt)}export function softDelete<T extends SoftDeleted>(row:T,now=new Date()):T{return {...row,deletedAt:now.toISOString()}}

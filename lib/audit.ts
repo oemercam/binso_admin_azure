@@ -1,1 +1,0 @@
-export type AuditEvent={organisationId:string;actorId:string;action:string;entity:string;entityId?:string;at:string;metadata?:Record<string,string|number|boolean>};export function auditEvent(event:Omit<AuditEvent,"at">):AuditEvent{return {...event,at:new Date().toISOString()}}

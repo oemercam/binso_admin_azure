@@ -1,1 +1,0 @@
-import {apiError,apiOk,readJson} from "@/lib/security";import {validateDocument} from "@/lib/documents";export async function POST(request:Request){try{const b=await readJson<{mimeType:string;size:number}>(request);validateDocument(b);return apiOk({valid:true})}catch(e){return apiError(e instanceof Error?e.message:"Ungültiges Dokument",400)}}

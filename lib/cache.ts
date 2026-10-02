@@ -1,1 +1,0 @@
-export const privateNoStore={"Cache-Control":"private, no-store, max-age=0","Pragma":"no-cache"} as const;export const immutableAssetCache={"Cache-Control":"public, max-age=31536000, immutable"} as const

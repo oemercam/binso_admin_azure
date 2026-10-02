@@ -1,1 +1,0 @@
-import {apiOk} from "@/lib/security";import {runtimeCapabilities} from "@/lib/env";export const dynamic="force-dynamic";export function GET(){return apiOk({status:"ok",service:"binso-one",capabilities:runtimeCapabilities()})}

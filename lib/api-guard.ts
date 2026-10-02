@@ -1,1 +1,0 @@
-import {clientIp} from "./http";import {rateLimit} from "./rate-limit";import {apiError} from "./security";export function guardPublicWrite(request:Request,scope:string,limit=20,windowMs=60000){const r=rateLimit(scope+":"+clientIp(request),limit,windowMs);return r.allowed?null:apiError("Zu viele Anfragen",429)}

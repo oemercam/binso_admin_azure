@@ -1,1 +1,0 @@
-export const locales=["de-CH","fr","it","en","tr"] as const;export type Locale=typeof locales[number];export const localeNames:Record<Locale,string>={"de-CH":"Deutsch","fr":"Français","it":"Italiano","en":"English","tr":"Türkçe"};export const defaultLocale:Locale="de-CH";

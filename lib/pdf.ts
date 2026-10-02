@@ -1,1 +1,0 @@
-export type DocumentSnapshot={organisationName:string;documentNumber:string;locale:string;currency:string;customerName:string;issuedAt:string;dueAt?:string;lines:{description:string;quantity:number;unitPriceMinor:number;vatRate:number}[]};export function freezeDocument<T extends DocumentSnapshot>(doc:T){return Object.freeze({...doc,lines:doc.lines.map(x=>Object.freeze({...x}))})}

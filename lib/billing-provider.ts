@@ -1,1 +1,0 @@
-import type {Plan} from "./product";export interface BillingProvider{createCheckout(organisationId:string,plan:Plan):Promise<{url:string}>;createPortal(organisationId:string):Promise<{url:string}>;syncSubscription(externalId:string):Promise<void>}export function billingConfigured(){return Boolean(process.env.BILLING_SECRET)}

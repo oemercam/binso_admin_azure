@@ -1,1 +1,0 @@
-import {apiOk} from "@/lib/security";import {demo} from "@/lib/demo-store";export const dynamic="force-dynamic";export function GET(){return apiOk({items:demo.projects})}

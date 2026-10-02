@@ -1,1 +1,0 @@
-import {AppShell} from "@/components/app-shell";import {LanguageSettings} from "@/components/language-settings";export default function Sprache(){return <AppShell title="Sprache" back="/einstellungen"><LanguageSettings/></AppShell>}

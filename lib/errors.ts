@@ -1,1 +1,0 @@
-export class AppError extends Error{constructor(public code:string,public status:number,message:string){super(message)}}export function publicMessage(error:unknown){if(error instanceof AppError)return error.message;return "Ein unerwarteter Fehler ist aufgetreten."}

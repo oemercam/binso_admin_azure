@@ -1,1 +1,0 @@
-import {reminderFeeMinor,reminderLevel} from "./reminders";export function dunningFor(daysOverdue:number){const level=reminderLevel(daysOverdue);return level?{level,feeMinor:reminderFeeMinor(level)}:null}

@@ -1,1 +1,0 @@
-"use client";import {useState} from "react";export function SaveButton({label="Speichern"}:{label?:string}){const[state,setState]=useState<"idle"|"done">("idle");return <button className="primary" type="button" onClick={()=>setState("done")}>{state==="done"?"Gespeichert ✓":label}</button>}

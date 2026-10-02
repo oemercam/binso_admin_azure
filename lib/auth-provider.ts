@@ -1,1 +1,0 @@
-export interface AuthProvider{signIn(email:string,password:string):Promise<{userId:string}|null>;signOut(sessionId:string):Promise<void>;requestPasswordReset(email:string):Promise<void>;verifySession(token:string):Promise<{userId:string}|null>}export function authConfigured(){return Boolean(process.env.AUTH_SECRET)}

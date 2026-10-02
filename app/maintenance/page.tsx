@@ -1,1 +1,0 @@
-import {Wrench} from "lucide-react";export default function Maintenance(){return <main className="state"><div className="state-brand">binso <span>One</span></div><Wrench size={38}/><h1>Kurze Wartung</h1><p>Binso One wird gerade aktualisiert. Bitte versuche es in wenigen Minuten erneut.</p></main>}

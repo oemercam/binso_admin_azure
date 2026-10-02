@@ -1,1 +1,0 @@
-export type ReminderLevel=1|2|3;export function reminderLevel(daysOverdue:number):ReminderLevel|null{return daysOverdue>=30?3:daysOverdue>=14?2:daysOverdue>=7?1:null}export function reminderFeeMinor(level:ReminderLevel){return level===1?0:level===2?2000:4000}

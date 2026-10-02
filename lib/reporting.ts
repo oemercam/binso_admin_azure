@@ -1,1 +1,0 @@
-export type RevenuePoint={period:string;invoicedMinor:number;paidMinor:number};export function totals(points:RevenuePoint[]){return points.reduce((a,p)=>({invoicedMinor:a.invoicedMinor+p.invoicedMinor,paidMinor:a.paidMinor+p.paidMinor}),{invoicedMinor:0,paidMinor:0})}

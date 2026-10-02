@@ -1,1 +1,0 @@
-import {WifiOff} from "lucide-react";export default function Offline(){return <main className="state"><div className="state-brand">binso <span>One</span></div><WifiOff size={38}/><h1>Du bist offline</h1><p>Einige Funktionen sind derzeit nicht verfügbar. Deine Daten werden synchronisiert, sobald du wieder online bist.</p><button>Erneut versuchen</button></main>}

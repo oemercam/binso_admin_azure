@@ -1,1 +1,0 @@
-import {redact} from "./redact";export type LogLevel="info"|"warn"|"error";export function logRecord(level:LogLevel,event:string,data:Record<string,unknown>={}){return {level,event,data:redact(data),at:new Date().toISOString()}}

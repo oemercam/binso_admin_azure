@@ -1,1 +1,0 @@
-export const binsoContact={company:"Binso GmbH",address:"Weissbadstrasse 8b",postalCode:"9050",city:"Appenzell",country:"Schweiz",uid:"CHE-173.401.068",phone:"+41 58 510 88 58",email:"info@binso.ch"} as const

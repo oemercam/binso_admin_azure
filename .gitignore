@@ -1,7 +1,0 @@
-.next/
-node_modules/
-.env*
-!.env.example
-artifacts/
-playwright-report/
-test-results/

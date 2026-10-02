@@ -1,1 +1,0 @@
-export function normalizeSearch(v:string){return v.trim().toLocaleLowerCase("de-CH").normalize("NFKC")}export function containsSearch(values:(string|undefined)[],q:string){const n=normalizeSearch(q);return !n||values.some(v=>normalizeSearch(v??"").includes(n))}

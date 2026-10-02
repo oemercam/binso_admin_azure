@@ -1,1 +1,0 @@
-export const sessionCookie={name:"__Host-binso_session",httpOnly:true,secure:true,sameSite:"lax" as const,path:"/",maxAge:60*60*24*30};export function clearSessionCookie(){return {...sessionCookie,maxAge:0}}

@@ -1,1 +1,0 @@
-import {AppShell} from "@/components/app-shell";import {SaveButton} from "@/components/save-button";export default function Page(){return <AppShell title="Rechnungsvorlagen" back="/unternehmen"><form className="form"><label>Titel<input defaultValue="Rechnung"/></label><label>Fusstext<textarea defaultValue="Vielen Dank für Ihren Auftrag."/></label><SaveButton/></form></AppShell>}

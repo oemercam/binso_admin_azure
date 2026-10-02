@@ -1,1 +1,0 @@
-export const passwordPolicy={minLength:12,maxLength:128};export function validatePassword(value:string){if(value.length<passwordPolicy.minLength||value.length>passwordPolicy.maxLength)return false;return /[A-Za-z]/.test(value)&&/\d/.test(value)}

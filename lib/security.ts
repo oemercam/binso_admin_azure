@@ -1,6 +1,0 @@
-export const securityHeaders=[{key:"X-Content-Type-Options",value:"nosniff"},{key:"X-Frame-Options",value:"DENY"},{key:"Referrer-Policy",value:"strict-origin-when-cross-origin"},{key:"Permissions-Policy",value:"camera=(), microphone=(), geolocation=(), payment=()"},{key:"Cross-Origin-Opener-Policy",value:"same-origin"},{key:"Cross-Origin-Resource-Policy",value:"same-origin"},{key:"Strict-Transport-Security",value:"max-age=63072000; includeSubDomains; preload"}];
-import {NextResponse} from "next/server";
-export const noStore={"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","Referrer-Policy":"strict-origin-when-cross-origin"} as const;
-export function apiOk<T>(data:T,status=200){return NextResponse.json(data,{status,headers:noStore})}
-export function apiError(message="Ungültige Anfrage",status=400){return NextResponse.json({error:message},{status,headers:noStore})}
-export async function readJson<T>(request:Request,maxBytes=64_000):Promise<T>{const length=Number(request.headers.get("content-length")||0);if(length>maxBytes)throw new Error("PAYLOAD_TOO_LARGE");const text=await request.text();if(text.length>maxBytes)throw new Error("PAYLOAD_TOO_LARGE");return JSON.parse(text) as T}

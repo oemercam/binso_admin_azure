@@ -1,1 +1,0 @@
-const keyPattern=/^[A-Za-z0-9._:-]{8,128}$/;export function requireIdempotencyKey(request:Request){const key=request.headers.get("idempotency-key");if(!key||!keyPattern.test(key))throw new Error("IDEMPOTENCY_KEY_REQUIRED");return key}

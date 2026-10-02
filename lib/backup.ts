@@ -1,1 +1,0 @@
-export type BackupStatus="pending"|"running"|"verified"|"failed";export type BackupRecord={id:string;startedAt:string;completedAt?:string;status:BackupStatus;checksum?:string};export function backupVerified(b:BackupRecord){return b.status==="verified"&&Boolean(b.checksum&&b.completedAt)}

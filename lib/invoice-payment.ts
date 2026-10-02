@@ -1,1 +1,0 @@
-import {paymentState} from "./payments";export function applyPayment(invoice:{status:string;totalMinor:number},paidMinor:number){if(invoice.status==="Storniert")throw new Error("INVOICE_CANCELLED");return {...invoice,status:paymentState(invoice.totalMinor,paidMinor)}}

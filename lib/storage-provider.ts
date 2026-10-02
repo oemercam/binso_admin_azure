@@ -1,1 +1,0 @@
-export interface StorageProvider{put(key:string,data:ArrayBuffer,contentType:string):Promise<void>;getUrl(key:string):Promise<string>;remove(key:string):Promise<void>}export function storageConfigured(){return Boolean(process.env.STORAGE_CONNECTION_STRING)}

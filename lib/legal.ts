@@ -1,1 +1,0 @@
-export type LegalDocument="terms"|"privacy"|"imprint";export type LegalAcceptance={userId:string;document:LegalDocument;version:string;acceptedAt:string};export function acceptance(userId:string,document:LegalDocument,version:string,now=new Date()):LegalAcceptance{return {userId,document,version,acceptedAt:now.toISOString()}}

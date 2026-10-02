@@ -1,1 +1,0 @@
-function csvCell(v:unknown){const s=String(v??"");return s.includes(";")?'"'+s+'"':s}export function toCsv(rows:Record<string,unknown>[]){if(!rows.length)return "";const headers=Object.keys(rows[0]);return [headers.join(";"),...rows.map(r=>headers.map(h=>csvCell(r[h])).join(";"))].join("\n")}

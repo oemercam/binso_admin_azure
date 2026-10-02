@@ -1,1 +1,0 @@
-export type TenantContext={organisationId:string;userId:string};export function requireTenant(input:Partial<TenantContext>):TenantContext{if(!input.organisationId||!input.userId)throw new Error("TENANT_CONTEXT_REQUIRED");return {organisationId:input.organisationId,userId:input.userId}}

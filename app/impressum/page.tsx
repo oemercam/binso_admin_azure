@@ -1,1 +1,0 @@
-import {PublicShell} from "@/components/public-shell";export default function Impressum(){return <PublicShell><section className="marketing legal"><p className="eyebrow">IMPRESSUM</p><h1>Impressum</h1><h2>Binso GmbH</h2><p>Weissbadstrasse 8b<br/>9050 Appenzell<br/>Schweiz</p><p>CHE-173.401.068<br/>+41 58 510 88 58</p><p>Kontakt: info@binso.ch</p></section></PublicShell>}

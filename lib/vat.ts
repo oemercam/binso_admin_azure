@@ -1,1 +1,0 @@
-export const swissVatRates=[8.1,3.8,2.6,0] as const;export function isSwissVatRate(rate:number){return (swissVatRates as readonly number[]).includes(rate)}
