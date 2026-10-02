@@ -6,8 +6,8 @@ const routes = [
   "/angebote", "/angebote/neu", "/angebote/1", "/rechnungen", "/rechnungen/neu", "/rechnungen/1", "/dokumente", "/dokumente/neu", "/dokumente/1",
   "/berichte", "/unternehmen", "/team", "/support", "/support/neu", "/mehr", "/einstellungen",
   "/einstellungen/profil", "/einstellungen/sprache", "/einstellungen/darstellung", "/einstellungen/sicherheit", "/einstellungen/daten", "/einstellungen/ueber",
-  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/sprache", "/login", "/passwort-vergessen", "/registrieren", "/rechtliches", "/impressum", "/datenschutz", "/agb",
-  "/offline", "/maintenance",
+  "/einstellungen/benachrichtigungen", "/einstellungen/pwa", "/einstellungen/abonnement", "/einstellungen/berechtigungen", "/zahlungen", "/sprache", "/login", "/passwort-vergessen", "/registrieren", "/onboarding", "/rechtliches", "/impressum", "/datenschutz", "/agb",
+  "/offline", "/maintenance", "/control", "/control/firmen", "/control/abonnements", "/control/zahlungen", "/control/support", "/control/betrieb", "/control/sicherheit", "/control/kommunikation", "/control/konfiguration",
 ];
 
 for (const route of routes) {
