@@ -263,12 +263,19 @@ function DocumentModal({ title, onClose, children }: { title: string; onClose: (
 }
 
 export function InvoicePreview() {
-  return <div className="paper">
+  return <div className="paper invoice-paper">
     <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div>
+    <div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div>
     <div className="paper-meta"><div><b>Acme AG</b><span>Bahnhofstrasse 123</span><span>8001 Zürich</span></div><div><small>Rechnung Nr.</small><b>RE-2026-019</b><small>Datum</small><b>02.10.2026</b><small>Zahlbar bis</small><b>01.11.2026</b></div></div>
-    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Website Konzept</td><td>24</td><td>120.00</td><td>2’880.00</td></tr><tr><td>Design & Umsetzung</td><td>12</td><td>95.00</td><td>1’140.00</td></tr></tbody></table>
+    <div className="paper-intro"><b>Website Redesign</b><p>Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen.</p></div>
+    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Website Konzept</td><td>24 h</td><td>120.00</td><td>2’880.00</td></tr><tr><td>Design & Umsetzung</td><td>12 h</td><td>95.00</td><td>1’140.00</td></tr></tbody></table>
     <div className="paper-total"><span>Zwischentotal <b>4’020.00</b></span><span>MwSt. 8.1% <b>326.40</b></span><strong>Total CHF <b>4’346.40</b></strong></div>
-    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz</footer>
+    <section className="qr-payment">
+      <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
+      <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
+      <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>4’346.40</b></div>
+    </section>
+    <footer>Binso GmbH · CHE-173.401.068 · www.binso.ch · +41 58 510 88 58</footer>
   </div>;
 }
 
