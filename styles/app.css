@@ -28,3 +28,5 @@ body{min-height:100vh;overflow-x:hidden}.shell{max-width:430px;min-height:100vh;
 
 .setting-row{min-height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:12px}.setting-row b{font-weight:400;color:#999}
 @media(min-width:761px){.public-shell{min-width:100%}.marketing{padding-top:72px}.hero{padding-top:72px}.product-shot{height:380px}.plans article{min-height:330px}.contact-form{max-width:520px}}
+
+.status-inline{display:inline-block;padding:3px 7px;border-radius:5px;font-size:10px}.identity .status-inline{margin:6px auto 0;width:max-content}.action-list{border-top:1px solid var(--line)}.action-list button{width:100%;min-height:50px;border:0;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0;font-size:12px;text-align:left}.action-list button span{display:flex;align-items:center;gap:10px}.action-list button b{font-size:18px;font-weight:400;color:#999}.action-list .destructive{color:var(--red)}
