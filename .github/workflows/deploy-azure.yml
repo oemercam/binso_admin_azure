@@ -35,3 +35,17 @@ jobs:
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           package: .
+      - name: Verify production health
+        shell: bash
+        run: |
+          set -euo pipefail
+          HEALTH_URL="https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/health"
+          for attempt in {1..24}; do
+            if curl -fsS "$HEALTH_URL" | grep -q '"status":"ok"'; then
+              echo "Binso One production health check passed."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Production health check failed: $HEALTH_URL"
+          exit 1
