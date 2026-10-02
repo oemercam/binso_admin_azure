@@ -206,6 +206,7 @@ export function OfferEditor({ existing = false }: { existing?: boolean }) {
   const [preview, setPreview] = useState(false);
   return <AppShell title={existing ? "Angebot AN-2026-012" : "Angebot erstellen"} subtitle={existing ? "Gesendet · gültig bis 31.10.2026" : "Entwurf automatisch gespeichert"} active="angebote" backHref="/angebote" backLabel="Angebote" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/angebote/AN-2026-012">{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
     <DocumentEditor type="Angebot" number="AN-2026-012"/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/angebote/AN-2026-012">{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
     {preview && <DocumentModal title="Angebotsvorschau" onClose={() => setPreview(false)}><OfferPreview/></DocumentModal>}
   </AppShell>;
 }
@@ -231,6 +232,7 @@ export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
     {existing && <div className="document-actions"><Button variant="secondary" icon="mail">Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost">Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" number="RE-2026-019"/>
+    <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
     {preview && <DocumentModal title="Rechnungsvorschau" onClose={() => setPreview(false)}><InvoicePreview/></DocumentModal>}
   </AppShell>;
 }
@@ -351,6 +353,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
         <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
       </div>
+      <div className="mobile-sticky-save"><Button href="/produkte">Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -376,6 +379,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
         <Field label="Eintritt"><input type="date" defaultValue={existing ? "2024-01-01" : ""}/></Field>
         <Field label="Status"><select><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
+      <div className="mobile-sticky-save"><Button href="/mitarbeiter">Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -401,6 +405,7 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
           <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
           <Field label="Beschreibung" className="full"><textarea defaultValue={existing ? "Übernachtung Kundentermin Zürich" : ""} placeholder="Kurze Beschreibung"/></Field>
         </div>
+        <div className="mobile-sticky-save"><Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
   </AppShell>;
@@ -459,6 +464,7 @@ export function SupportTicketForm() {
       </div>
       <button className="attachment-button" type="button"><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
+      <div className="mobile-sticky-save"><Button href="/support/5832">Ticket erstellen</Button></div>
     </div>
   </AppShell>;
 }
@@ -517,6 +523,7 @@ export function AccountSettingsPage() {
           <Field label="Funktion"><input defaultValue="Geschäftsführer"/></Field>
           <Field label="Sprache"><select defaultValue="de"><option value="de">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
+        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
       </section>
     </div>
   </AppShell>;
@@ -537,6 +544,7 @@ export function CompanySettingsPage() {
           <Field label="Standard MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
           <Field label="Zahlungsziel"><select defaultValue="30"><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
+        <div className="mobile-sticky-save"><Button>Speichern</Button></div>
       </section>
     </div>
   </AppShell>;
