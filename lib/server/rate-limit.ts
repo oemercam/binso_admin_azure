@@ -1,13 +1,13 @@
 import crypto from "node:crypto";
 import { NextRequest } from "next/server";
 import { ApiError } from "./http";
-import { getBackendEnv, isBackendConfigured } from "./env";
+import { isBackendConfigured } from "./env";
+import { privilegedSupabase } from "./service-role";
 
 function fingerprint(value:string){
   const secret=process.env.RATE_LIMIT_SECRET;
-  return secret
-    ? crypto.createHmac("sha256",secret).update(value,"utf8").digest("hex")
-    : crypto.createHash("sha256").update(value,"utf8").digest("hex");
+  if(!secret) throw new ApiError(503,"rate_limit_not_configured","Sicherheitskonfiguration ist unvollständig.",{"Retry-After":"60"});
+  return crypto.createHmac("sha256",secret).update(value,"utf8").digest("hex");
 }
 
 function clientIp(request:NextRequest){
@@ -22,30 +22,20 @@ function clientIp(request:NextRequest){
 
 async function consume(route:string,key:string){
   if(!isBackendConfigured()) return true;
-  const {supabaseUrl,supabaseAnonKey}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/rest/v1/rpc/consume_api_rate_limit",{
-    method:"POST",
-    headers:{
-      apikey:supabaseAnonKey,
-      Authorization:"Bearer "+supabaseAnonKey,
-      "Content-Type":"application/json",
-    },
-    body:JSON.stringify({
-      p_route:route,
-      p_key_hash:fingerprint(key),
-    }),
-    cache:"no-store",
-  });
-  if(!response.ok){
-    console.error("Rate limit backend failed",response.status);
+  try{
+    return await privilegedSupabase<boolean>("rpc/consume_api_rate_limit",{
+      method:"POST",
+      body:{p_route:route,p_key_hash:fingerprint(key)},
+    });
+  }catch(error){
+    if(error instanceof ApiError) throw error;
     throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.",{"Retry-After":"60"});
   }
-  return response.json() as Promise<boolean>;
 }
 
 export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover",identity?:string){
-  const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
   const retryAfter=route==="auth.login"?"900":"3600";
+  const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
   if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
 
   if(identity){
