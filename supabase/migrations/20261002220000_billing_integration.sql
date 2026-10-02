@@ -60,6 +60,7 @@ create or replace function public.apply_stripe_billing_event(
   p_customer_ref text,
   p_subscription_ref text,
   p_subscription_status text,
+  p_plan text,
   p_current_period_end timestamptz
 )
 returns boolean
@@ -92,6 +93,7 @@ begin
   set billing_customer_ref=coalesce(nullif(p_customer_ref,''),billing_customer_ref),
       billing_subscription_ref=coalesce(nullif(p_subscription_ref,''),billing_subscription_ref),
       subscription_status=coalesce(nullif(p_subscription_status,''),subscription_status),
+      plan=case when p_plan in ('trial','start','business','pro') then p_plan else plan end,
       current_period_ends_at=coalesce(p_current_period_end,current_period_ends_at),
       updated_at=now()
   where tenant_id=target_tenant;
@@ -99,5 +101,5 @@ begin
   return true;
 end $$;
 
-revoke all on function public.apply_stripe_billing_event(text,text,uuid,text,text,text,timestamptz) from public;
-grant execute on function public.apply_stripe_billing_event(text,text,uuid,text,text,text,timestamptz) to service_role;
+revoke all on function public.apply_stripe_billing_event(text,text,uuid,text,text,text,text,timestamptz) from public;
+grant execute on function public.apply_stripe_billing_event(text,text,uuid,text,text,text,text,timestamptz) to service_role;
