@@ -79,7 +79,7 @@ Binso One does not invent payment cards, SaaS invoices, SLA values, device sessi
 - PWA manifest and conservative service-worker caching
 - Azure App Service deployment through GitHub Actions
 
-Customer-facing requests use the authenticated user JWT and RLS. The Supabase service-role key is reserved for trusted server-to-server processing such as verified Stripe webhooks.
+Customer-facing data requests use the authenticated user JWT and RLS. The Supabase service-role key is reserved for narrowly scoped trusted server operations such as verified Stripe webhooks and distributed public-auth rate limiting.
 
 ## Backend setup
 
@@ -145,7 +145,7 @@ pnpm dev
 - same-origin enforcement on browser mutations
 - bounded JSON and multipart request sizes
 - account-enumeration-resistant login/recovery/signup errors
-- distributed auth throttling
+- distributed auth throttling through a service-role-only RPC
 - server-side tenant resolution
 - RLS plus composite tenant foreign keys
 - private tenant-prefixed storage
