@@ -1,0 +1,1 @@
+export function requestId(request:Request){return request.headers.get("x-request-id")||crypto.randomUUID()}
