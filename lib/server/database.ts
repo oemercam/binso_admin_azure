@@ -100,3 +100,31 @@ export async function updateProfile(data:Record<string,unknown>){
     "PATCH",token,data,"return=representation"
   );
 }
+
+
+export async function operatorList<T>(table:string,select="*",extra=""){
+  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
+  const suffix=extra?"&"+extra:"";
+  return requestDb<T[]>(table+"?select="+encodeURIComponent(select)+suffix,"GET",token);
+}
+
+export async function operatorInsert<T extends Record<string,unknown>>(table:string,data:T){
+  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
+  return requestDb<Array<T&{id:string}>>(table,"POST",token,data,"return=representation");
+}
+
+export async function operatorUpdate<T extends Record<string,unknown>>(table:string,filter:string,data:T){
+  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
+  return requestDb<Array<T>>(table+"?"+filter,"PATCH",token,data,"return=representation");
+}
+
+export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Record<string,unknown>={}){
+  const session=await import("./operator").then(module=>module.requireOperatorSession());
+  return requestDb<Array<Record<string,unknown>>>("operator_audit","POST",session.token,{
+    operator_user_id:session.user.id,
+    action,
+    target_type:targetType??null,
+    target_id:targetId??null,
+    metadata,
+  },"return=representation");
+}
