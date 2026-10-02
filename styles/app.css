@@ -193,3 +193,14 @@ button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell b
  .public-header nav,.public-actions{display:none}.hero,.marketing{padding:34px 18px}.hero{display:block;min-height:auto}.hero h1,.marketing h1{font-size:27px;line-height:1.06;letter-spacing:-.045em}.hero>div:first-child>p:not(.eyebrow),.marketing>p:not(.eyebrow){font-size:12px;line-height:1.5}.hero-actions{display:grid;gap:8px}.hero-actions a{width:100%;min-height:42px}.product-shot{margin-top:28px;min-height:225px;transform:rotate(-2deg)}.benefits{grid-template-columns:1fr 1fr;padding:18px}.benefits article{min-height:54px}.marketing-list{margin-top:24px}.marketing-list article{min-height:60px}.steps{margin-top:25px}.steps article{min-height:72px}.plans{display:grid;grid-template-columns:1fr;gap:10px}.plans article{min-height:auto;padding:18px}.contact{display:block}.contact-form{margin-top:28px;padding:16px}
  .control{display:block}.control>aside{display:none}.control>section>header{height:58px;padding:0 16px}.control>section>header h1{font-size:16px}.control-content{padding:14px 16px}.control-content .metrics{grid-template-columns:1fr 1fr}.control-content .metrics article{min-height:80px}
 }
+
+/* UX completion pass: secondary screens inherit the approved component language */
+.action-list button,.setting-row{width:100%;min-height:49px;border:0;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 1px;text-align:left}.action-list button>span,.setting-row>span{display:flex;align-items:center;gap:10px}.setting-row>span{display:grid;gap:2px}.setting-row strong{font-size:11px}.setting-row small{font-size:9px;color:var(--muted)}
+.document-preview{border:1px solid var(--line);border-radius:6px;min-height:280px;display:grid;place-items:center;align-content:center;gap:7px;background:#fafafa}.document-preview>div{font-size:10px;border:1px solid #bbb;border-radius:4px;padding:5px 7px}.document-preview strong{font-size:12px}.document-preview p,.page-count{font-size:9px;color:var(--muted)}.page-count{text-align:center;margin:8px 0}
+.settings-note{font-size:9px;line-height:1.45;color:var(--muted);margin-top:12px}
+@media(max-width:760px){
+ .upload-zone{display:grid;place-items:center;align-content:center;gap:7px;border:1px dashed #cfcfcf;background:#fafafa;text-align:center}.upload-zone strong{font-size:11px}.upload-zone span{font-size:9px;color:var(--muted)}.upload-zone .secondary{width:auto;min-width:120px}
+ .action-list button{font-size:11px}.action-list button svg{width:17px}
+ .document-preview{min-height:300px}
+ .choice-list button>span{font-size:11px}
+}
