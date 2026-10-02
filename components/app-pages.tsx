@@ -1020,17 +1020,57 @@ export function SubscriptionSettingsPage() {
   const production=useBackendMode();
   const [dialog,setDialog]=useState<"plan"|"payment"|"cancel"|null>(null);
   const [plan,setPlan]=useState("Business");
+  const [selectedPlan,setSelectedPlan]=useState<"start"|"business"|"pro">("business");
   const [subscription,setSubscription]=useState<Record<string,unknown>|null>(null);
+  const [integrations,setIntegrations]=useState<Array<Record<string,unknown>>>([]);
+  const [billingLoading,setBillingLoading]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89"};
+  const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89",start:"19",business:"49",pro:"89"};
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
   useEffect(()=>{
     if(!production) return;
-    apiGet<{item:Record<string,unknown>}>("/api/settings/subscription")
-      .then(payload=>queueMicrotask(()=>setSubscription(payload.item)))
-      .catch(()=>undefined);
+    Promise.all([
+      apiGet<{item:Record<string,unknown>}>("/api/settings/subscription"),
+      apiGet<{items:Array<Record<string,unknown>>}>("/api/integrations/status"),
+    ]).then(([subscriptionPayload,integrationPayload])=>queueMicrotask(()=>{
+      setSubscription(subscriptionPayload.item);
+      setIntegrations(integrationPayload.items);
+    })).catch(()=>undefined);
+
+    const result=new URLSearchParams(window.location.search).get("checkout");
+    if(result==="success"){
+      queueMicrotask(()=>setToast("Stripe Checkout abgeschlossen. Der Abostatus wird über den signierten Webhook aktualisiert."));
+      window.setTimeout(()=>setToast(null),4200);
+    }else if(result==="cancelled"){
+      queueMicrotask(()=>setToast("Planwechsel abgebrochen."));
+      window.setTimeout(()=>setToast(null),2200);
+    }
   },[production]);
+
+  const startCheckout=async()=>{
+    setBillingLoading(true);
+    try{
+      const payload=await apiPost<{url:string}>("/api/billing/checkout",{plan:selectedPlan});
+      window.open(payload.url,"_self");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Stripe Checkout konnte nicht geöffnet werden.");
+      setBillingLoading(false);
+      window.setTimeout(()=>setToast(null),2800);
+    }
+  };
+
+  const openPortal=async()=>{
+    setBillingLoading(true);
+    try{
+      const payload=await apiPost<{url:string}>("/api/billing/portal",{});
+      window.open(payload.url,"_self");
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Billing-Portal konnte nicht geöffnet werden.");
+      setBillingLoading(false);
+      window.setTimeout(()=>setToast(null),2800);
+    }
+  };
 
   if(!production){
     return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
@@ -1053,6 +1093,8 @@ export function SubscriptionSettingsPage() {
   const subscriptionStatus=String(subscription.subscription_status??"trial");
   const accountStatus=String(subscription.account_status??"active");
   const billingConnected=Boolean(subscription.billing_customer_ref&&subscription.billing_subscription_ref);
+  const billingIntegration=integrations.find(item=>item.key==="billing");
+  const billingConfigured=billingIntegration?.configured===true;
   const storageLimit=Number(subscription.storage_limit_bytes??0);
   const storageLabel=storageLimit>0?(storageLimit/1024/1024/1024).toLocaleString("de-CH",{maximumFractionDigits:1})+" GB":"—";
   const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString("de-CH"):"—";
@@ -1062,14 +1104,17 @@ export function SubscriptionSettingsPage() {
     <section className="plan-hero">
       <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{planLabel[planKey]??planKey}</h2><p>{subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</p></div>
       <div className="plan-price"><strong>{"CHF "+(planPrice[planKey]??"—")}</strong><span>/ Monat</span></div>
-      <Status tone={subscriptionStatus==="active"||subscriptionStatus==="trial"?"success":subscriptionStatus==="past_due"?"warning":"neutral"}>{statusLabel[subscriptionStatus]??subscriptionStatus}</Status>
+      {billingConfigured?(billingConnected?<Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing verwalten</Button>:<Button onClick={()=>setDialog("plan")}>Plan aktivieren</Button>):<Status tone="warning">Stripe nicht konfiguriert</Status>}
     </section>
     <div className="subscription-detail-grid">
       <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzerlimit</span><b>{String(subscription.user_limit??"—")}</b></div><div className="usage-row"><span>Dateispeicher</span><b>{storageLabel}</b></div><div className="usage-row"><span>Kontostatus</span><b>{accountLabel[accountStatus]??accountStatus}</b></div><div className="usage-row"><span>{subscriptionStatus==="trial"?"Testphase bis":"Aktuelle Periode bis"}</span><b>{subscriptionStatus==="trial"?trialEnd:periodEnd}</b></div></section>
-      <section className="surface"><SectionTitle title="Zahlungsabwicklung"/>{billingConnected?<div className="context-block"><Status tone="success">Verbunden</Status><b>Billing-Konto hinterlegt</b><span>Externe Zahlungsdetails werden nicht in Binso One gespeichert.</span></div>:<div className="context-block"><Status tone="warning">Noch nicht verbunden</Status><b>Keine produktive Zahlungsabwicklung</b><span>Planwechsel, Zahlungsmittel, SaaS-Rechnungen und Kündigung werden erst aktiviert, wenn Stripe produktiv angebunden ist.</span></div>}</section>
+      <section className="surface"><SectionTitle title="Zahlungsabwicklung"/>{billingConnected?<div className="context-block"><Status tone="success">Verbunden</Status><b>Stripe Billing verbunden</b><span>Zahlungsmittel und SaaS-Rechnungen bleiben bei Stripe und werden über das sichere Kundenportal verwaltet.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal öffnen</Button></div>:billingConfigured?<div className="context-block"><Status tone="info">Bereit</Status><b>Stripe ist konfiguriert</b><span>Wähle einen Plan, um das produktive Abonnement über Stripe Checkout zu starten.</span><Button onClick={()=>setDialog("plan")}>Plan auswählen</Button></div>:<div className="context-block"><Status tone="warning">Noch nicht verbunden</Status><b>Keine produktive Zahlungsabwicklung</b><span>Stripe-Schlüssel, Webhook und Preis-IDs müssen in der Produktionsumgebung konfiguriert werden.</span></div>}</section>
     </div>
-    <section className="surface invoices-panel"><SectionTitle title="Abrechnungen"/>{billingConnected?<p>Billing-Historie wird mit der Stripe-Anbindung geladen.</p>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/>}</section>
-    <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Änderungen werden über die produktive Zahlungsabwicklung ausgeführt.":"Diese Funktion wird erst mit der produktiven Stripe-Anbindung freigeschaltet."}</p></div><Button variant="secondary" disabled={!billingConnected}>Abonnement verwalten</Button></div>
+    <section className="surface invoices-panel"><SectionTitle title="SaaS-Abrechnungen"/>{billingConnected?<div className="context-block"><b>Rechnungen und Zahlungsmittel in Stripe</b><span>Binso One speichert keine vollständigen Kartendaten. Öffne das Billing-Portal für Rechnungsdownloads und Zahlungsmittel.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal</Button></div>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/>}</section>
+    <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Planwechsel, Zahlungsmittel und Kündigung werden über Stripe Billing ausgeführt.":"Ohne verbundenes Billing gibt es hier keine produktive Kündigungsaktion."}</p></div><Button variant="secondary" disabled={!billingConnected||billingLoading} onClick={()=>void openPortal()}>Abonnement verwalten</Button></div>
+
+    {dialog==="plan"&&billingConfigured&&!billingConnected&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Plan auswählen</h2><p>Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=><button type="button" className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{"CHF "+prices[name]+" / Monat"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading}>{billingLoading?"Checkout wird geöffnet…":"Weiter zu Stripe"}</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("nicht")?"danger":"success"}/>}
   </AppShell>;
 }
 
