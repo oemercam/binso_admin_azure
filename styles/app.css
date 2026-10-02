@@ -25,3 +25,6 @@ body{min-height:100vh;overflow-x:hidden}.shell{max-width:430px;min-height:100vh;
 .product-shot{margin-left:0;margin-right:-18px}
 }
 .status-paid{background:var(--green-soft)!important;color:#087a46!important}.status-open{background:var(--blue-soft)!important;color:var(--blue)!important}.status-overdue{background:var(--red-soft)!important;color:var(--red)!important}.status-draft{background:#f2f2f2!important;color:#666!important}
+
+.setting-row{min-height:52px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:12px}.setting-row b{font-weight:400;color:#999}
+@media(min-width:761px){.public-shell{min-width:100%}.marketing{padding-top:72px}.hero{padding-top:72px}.product-shot{height:380px}.plans article{min-height:330px}.contact-form{max-width:520px}}
