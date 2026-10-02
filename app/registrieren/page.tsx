@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button, Logo } from "@/components/ui";
+import { clearDemoClientSession } from "@/lib/client/backend";
 
 export default function Register() {
   const router=useRouter();
@@ -25,6 +26,7 @@ export default function Register() {
       });
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
+      clearDemoClientSession();
       if(payload.requiresConfirmation){
         setConfirmation(true);
         setLoading(false);
