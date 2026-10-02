@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
+import { useDemoTimer } from "@/hooks/use-demo-timer";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -42,25 +43,11 @@ export function AppShell({
 }) {
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
-  const [timerRunning, setTimerRunning] = useState(true);
   const [dark, setDark] = useState(false);
-  const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
-  const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
-  const [timerNow, setTimerNow] = useState(0);
+  const timer=useDemoTimer();
 
   useEffect(() => {
     queueMicrotask(() => {
-      const running=window.localStorage.getItem("binso.timer.running") !== "false";
-      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "8067");
-      let startedAt=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
-      if(running && !startedAt){
-        startedAt=Date.now();
-        window.localStorage.setItem("binso.timer.startedAt",String(startedAt));
-      }
-      setTimerRunning(running);
-      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 8067);
-      setTimerStartedAt(running ? startedAt : null);
-      setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
     });
   }, []);
@@ -86,12 +73,6 @@ export function AppShell({
     return()=>window.removeEventListener("keydown",onKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (!timerRunning) return;
-    const id = window.setInterval(() => setTimerNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [timerRunning]);
-
   const filtered = useMemo(() => {
     if (!query.trim()) return searchItems;
     const q = query.toLowerCase();
@@ -104,19 +85,6 @@ export function AppShell({
     document.documentElement.dataset.theme = next ? "dark" : "light";
     window.localStorage.setItem("binso.theme", next ? "dark" : "light");
   }
-
-  const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
-
-  function stopTimer() {
-    setTimerRunning(false);
-    setTimerBaseSeconds(timerSeconds);
-    setTimerStartedAt(null);
-    window.localStorage.setItem("binso.timer.running", "false");
-    window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
-    window.localStorage.removeItem("binso.timer.startedAt");
-  }
-
-  const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <div className="app-root">
     <aside className="app-sidebar">
@@ -159,10 +127,10 @@ export function AppShell({
         {children}
       </main>
 
-      {timerRunning && <div className="global-timer" role="status">
+      {timer.running && <div className="global-timer" role="status">
         <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
-        <b>{formattedTimer}</b>
-        <button type="button" onClick={stopTimer} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
+        <b>{timer.formatted}</b>
+        <button type="button" onClick={timer.stop} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
       <nav className="bottom-nav" aria-label="Hauptnavigation">
