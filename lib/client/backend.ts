@@ -36,3 +36,18 @@ export async function apiGet<T>(path:string):Promise<T>{
   }
   return payload as T;
 }
+
+
+export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
+  const response=await fetch(path,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body),
+  });
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok){
+    const message=typeof payload?.message==="string"?payload.message:"Änderung konnte nicht gespeichert werden.";
+    throw new Error(message);
+  }
+  return payload as T;
+}
