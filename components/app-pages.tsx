@@ -25,19 +25,19 @@ function swissDate(value:unknown){
 
 function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
-    String(item.name??""),String(item.sector??"—"),String(item.city??"—"),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),String(item.sector??"—"),String(item.city??"—"),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="products") return items.map(item=>[
-    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="employees") return items.map(item=>[
-    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),`${String(item.workload_percent??0)}%`,item.status==="inactive"?"Inaktiv":"Aktiv"
+    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),`${String(item.workload_percent??0)}%`,String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="expenses") return items.map(item=>{
     const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
     const person=employee?[employee.first_name,employee.last_name].filter(Boolean).join(" "):"Nicht zugewiesen";
     const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
-    return [String(item.merchant??""),person,moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+    return [String(item.merchant??""),person,moneyChf(item.amount),String(item.id??""),statusMap[String(item.status)]??String(item.status??"")];
   });
   if(collection==="payments") return items.map(item=>{
     const customer=item.customer as {name?:string}|null|undefined;
@@ -136,7 +136,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
     <div className="tablet-master-detail">
       <div>
-        <RecordsView items={customerRows} placeholder="Kunden suchen...">{([name,sector,city,status])=><RecordRow href="/kunden/acme" title={name} meta={`${sector} · ${city}`} status={status}/>}</RecordsView>
+        <RecordsView items={customerRows} placeholder="Kunden suchen...">{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
       </div>
       <aside className="tablet-detail surface">
         <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
@@ -322,7 +322,7 @@ export function PaymentDetail() {
 export function ProductsPage() {
   const productRows=useDemoRows("products",products);
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus">Neues Produkt</Button>}>
-    <RecordsView items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{([name,type,price,status])=><RecordRow href="/produkte/beratung" icon="box" title={name} meta={type} value={price} status={status}/>}</RecordsView>
+    <RecordsView items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -367,7 +367,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
 export function EmployeesPage() {
   const employeeRows=useDemoRows("employees",employees);
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus">Mitarbeiter</Button>}>
-    <RecordsView items={employeeRows} placeholder="Mitarbeiter suchen...">{([name,role,load,status])=><RecordRow href="/mitarbeiter/thomas" icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}</RecordsView>
+    <RecordsView items={employeeRows} placeholder="Mitarbeiter suchen...">{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -415,7 +415,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
 export function ExpensesPage() {
   const expenseRows=useDemoRows("expenses",expenses);
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus">Spese erfassen</Button>}>
-    <RecordsView items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{([title,person,amount,status])=><RecordRow href="/spesen/1" icon="card" title={title} meta={person} value={amount} status={status}/>}</RecordsView>
+    <RecordsView items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
