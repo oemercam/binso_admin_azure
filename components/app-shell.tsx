@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled } from "@/lib/client/backend";
@@ -41,6 +42,7 @@ export function AppShell({
   backHref?: string;
   backLabel?: string;
 }) {
+  const router=useRouter();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
   const [timerRunning, setTimerRunning] = useState(true);
@@ -143,7 +145,7 @@ export function AppShell({
   async function logout(){
     clearDemoClientSession();
     try{ await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}}); }
-    finally{ window.location.assign("/login"); }
+    finally{ router.push("/login"); router.refresh(); }
   }
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
