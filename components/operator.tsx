@@ -117,17 +117,24 @@ function TicketsView() {
 function TicketDetail() {
   return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
+      <div className="ticket-meta-bar">
+        <label>Status<select defaultValue="progress"><option value="open">Offen</option><option value="progress">In Bearbeitung</option><option value="waiting">Wartet auf Kunde</option><option value="solved">Gelöst</option></select></label>
+        <label>Priorität<select defaultValue="high"><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></select></label>
+        <label>Zugewiesen<select defaultValue="mb"><option value="mb">Maria Bianchi</option><option value="ls">Luca Schneider</option></select></label>
+      </div>
       <div className="tabs"><button className="active">Konversation</button><button>Interne Notizen</button><button>Aktivitäten</button></div>
       <article className="operator-message customer"><header><b>Thomas Meier</b><small>10:24</small></header><p>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</p></article>
       <article className="operator-message support"><header><b>Binso Support</b><small>10:37</small></header><p>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</p></article>
+      <div className="internal-note"><Icon name="lock" size={15}/><div><b>Interne Notiz</b><span>Nur für Operator sichtbar. Kundendaten und Abklärungen hier dokumentieren.</span></div><button className="text-action">Notiz hinzufügen</button></div>
       <div className="operator-reply"><textarea placeholder="Antwort schreiben..."/><div><button aria-label="Datei anhängen"><Icon name="upload"/></button><Button>Senden</Button></div></div>
     </section>
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
       <h3>Acme AG</h3><p>K-1001 · CHE-123.456.789</p>
-      <Link href="/operator/kunden">Kundendetails öffnen →</Link>
+      <Link href="/operator/kunden/acme">Kundendetails öffnen →</Link>
       <div className="context-block"><small>Abonnement</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div>
       <div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b></div>
+      <div className="context-block"><small>Support-Zugriff</small><b>Nicht aktiv</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary">Zugriff starten</Button></div>
     </aside>
   </div>;
 }
