@@ -3,14 +3,15 @@ import "./globals.css";
 import "./completion.css";
 import "./completion-v04.css";
 import { PwaRegister } from "@/components/pwa-register";
+import { siteConfig } from "@/lib/config";
 
-const metadataBase = new URL(process.env.NEXT_PUBLIC_MARKETING_URL ?? "https://www.binso.ch");
+const metadataBase = new URL(siteConfig.marketingUrl);
 
 export const metadata: Metadata = {
   metadataBase,
-  title: { default: "Binso One", template: "%s | Binso One" },
-  description: "Die moderne Business-Plattform für Schweizer KMU.",
-  applicationName: "Binso One",
+  title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
   category: "business",
   authors: [{ name: "Binso GmbH", url: "https://www.binso.ch" }],
   creator: "Binso GmbH",
@@ -19,15 +20,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "de_CH",
-    siteName: "Binso One",
-    title: "Binso One",
-    description: "Die moderne Business-Plattform für Schweizer KMU.",
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
     url: "/",
   },
   twitter: {
     card: "summary",
-    title: "Binso One",
-    description: "Die moderne Business-Plattform für Schweizer KMU.",
+    title: siteConfig.name,
+    description: siteConfig.description,
   },
   robots: {
     index: true,
