@@ -528,3 +528,17 @@ html[data-theme="dark"] .global-timer-main i{background:#fff}
     bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 72px)
   }
 }
+
+
+.app-root .activity-icon,
+.app-root .settings-icon,
+.app-root .welcome-grid>a>span,
+.app-root .record-avatar{
+  background:#fff;border:1px solid var(--line)
+}
+html[data-theme="dark"] .app-root .activity-icon,
+html[data-theme="dark"] .app-root .settings-icon,
+html[data-theme="dark"] .app-root .welcome-grid>a>span,
+html[data-theme="dark"] .app-root .record-avatar{
+  background:#000!important;border-color:#2b2b2b!important
+}
