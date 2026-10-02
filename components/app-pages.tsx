@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toggle } from "./ui";
+import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 const customers = [
   ["Acme AG","Bauunternehmen","Zürich","Aktiv"],
@@ -296,11 +296,14 @@ export function InvoicesPage() {
 
 export function InvoiceEditor({ existing = false }: { existing?: boolean }) {
   const [preview, setPreview] = useState(false);
-  return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
-    {existing && <div className="document-actions"><Button variant="secondary" icon="mail">Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost">Duplizieren</Button></div>}
+  const [toast,setToast]=useState<string|null>(null);
+  const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+  return <AppShell title={existing ? "Rechnung RE-2026-019" : "Rechnung erstellen"} subtitle={existing ? "Bezahlt · Acme AG" : "Entwurf automatisch gespeichert"} active="rechnungen" backHref="/rechnungen" backLabel="Rechnungen" actions={<><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
+    {existing && <div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Rechnung wurde zum Versand vorbereitet.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Rechnung wurde als neuer Entwurf dupliziert.")}>Duplizieren</Button></div>}
     <DocumentEditor type="Rechnung" number="RE-2026-019"/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={() => setPreview(true)}>Vorschau</Button><Button href="/rechnungen/RE-2026-019">{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
     {preview && <DocumentModal title="Rechnungsvorschau" onClose={() => setPreview(false)}><InvoicePreview/></DocumentModal>}
+    {toast&&<Toast title={toast}/>}
   </AppShell>;
 }
 
