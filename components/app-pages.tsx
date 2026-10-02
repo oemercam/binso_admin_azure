@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
@@ -106,19 +107,34 @@ export function CustomerDetail() {
 }
 
 export function CustomerForm() {
-  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button href="/kunden/acme">Speichern</Button>}>
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [company,setCompany]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
+  const [city,setCity]=useState("");
+  const [error,setError]=useState("");
+
+  const save=()=>{
+    if(!company.trim()){setError("Firmenname ist erforderlich.");return;}
+    addRecord("customers",[company.trim(),"Unternehmen",city.trim()||"–","Aktiv"]);
+    router.push("/kunden");
+  };
+
+  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <section className="form-section clean">
         <h2>Grundangaben</h2>
         <div className="form-grid two">
-          <Field label="Firmenname"><input autoFocus placeholder="Firma oder Name"/></Field>
-          <Field label="E-Mail"><input type="email" placeholder="name@firma.ch"/></Field>
-          <Field label="Telefon"><input type="tel" inputMode="tel" placeholder="+41 00 000 00 00"/></Field>
-          <Field label="Ort"><input placeholder="Zürich"/></Field>
+          <Field label="Firmenname"><input autoFocus value={company} onChange={e=>{setCompany(e.target.value);setError("")}} placeholder="Firma oder Name"/></Field>
+          <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
+          <Field label="Telefon"><input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
+          <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
         </div>
+        {error&&<p className="form-error">{error}</p>}
       </section>
       <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><input placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><input inputMode="numeric" placeholder="8000"/></Field><Field label="UID"><input placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><input placeholder="Optional"/></Field></div></details>
-      <div className="mobile-sticky-save"><Button href="/kunden/acme">Kunde speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Kunde speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -155,16 +171,30 @@ export function PaymentsPage() {
 }
 
 export function PaymentForm() {
-  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button href="/zahlungen">Zahlung speichern</Button>}>
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [date,setDate]=useState("2026-10-02");
+  const [amount,setAmount]=useState("4346.40");
+  const [method,setMethod]=useState("Banküberweisung");
+
+  const save=()=>{
+    const id=String(Date.now());
+    const normalized=Number(amount.replace("'","").replace(",","."));
+    const formatted=Number.isFinite(normalized) ? `CHF ${normalized.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}` : `CHF ${amount}`;
+    addRecord("payments",[id,date,"Acme AG",`RE-2026-019 · ${method}`,formatted,"Verbucht"]);
+    router.push("/zahlungen");
+  };
+
+  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
       <section className="payment-context"><span className="activity-icon"><Icon name="receipt"/></span><div><small>Rechnung</small><b>RE-2026-019 · Acme AG</b><span>Offener Betrag CHF 4’346.40</span></div></section>
       <div className="form-grid two">
-        <Field label="Zahlungsdatum"><input type="date" defaultValue="2026-10-02"/></Field>
-        <Field label="Betrag"><input inputMode="decimal" defaultValue="4346.40"/></Field>
-        <Field label="Zahlungsmethode"><select defaultValue="bank"><option value="bank">Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
+        <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
+        <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field>
+        <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
         <Field label="Notiz"><input placeholder="Optional"/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/zahlungen">Zahlung speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Zahlung speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -184,18 +214,32 @@ export function ProductsPage() {
 }
 
 export function ProductForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button href="/produkte">Speichern</Button>}>
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [name,setName]=useState(existing?"Beratung":"");
+  const [type,setType]=useState("Dienstleistung");
+  const [price,setPrice]=useState(existing?"120.00":"");
+  const [error,setError]=useState("");
+
+  const save=()=>{
+    if(!name.trim()){setError("Name ist erforderlich.");return;}
+    if(!existing) addRecord("products",[name.trim(),type,`CHF ${price || "0.00"}`,"Aktiv"]);
+    router.push("/produkte");
+  };
+
+  return <AppShell title={existing ? "Beratung" : "Produkt erstellen"} subtitle={existing ? "Dienstleistung · Aktiv" : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <div className="form-grid two">
-        <Field label="Name"><input defaultValue={existing ? "Beratung" : ""} placeholder="Name"/></Field>
-        <Field label="Typ"><select defaultValue="service"><option value="service">Dienstleistung</option><option value="product">Produkt</option></select></Field>
+        <Field label="Name"><input value={name} onChange={e=>{setName(e.target.value);setError("")}} placeholder="Name"/></Field>
+        <Field label="Typ"><select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></select></Field>
         <Field label="Artikelnummer"><input placeholder="Optional"/></Field>
         <Field label="Einheit"><select><option>Stunde</option><option>Stück</option><option>Pauschal</option></select></Field>
-        <Field label="Verkaufspreis"><input inputMode="decimal" defaultValue={existing ? "120.00" : ""} placeholder="0.00"/></Field>
+        <Field label="Verkaufspreis"><input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
         <Field label="MwSt."><select defaultValue="8.1"><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea placeholder="Kurze Beschreibung"/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/produkte">Speichern</Button></div>
+      {error&&<p className="form-error">{error}</p>}
+      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -208,20 +252,37 @@ export function EmployeesPage() {
 }
 
 export function EmployeeForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button href="/mitarbeiter">Speichern</Button>}>
-    {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [firstName,setFirstName]=useState(existing?"Thomas":"");
+  const [lastName,setLastName]=useState(existing?"Müller":"");
+  const [role,setRole]=useState(existing?"Inhaber":"");
+  const [load,setLoad]=useState(existing?"100":"");
+  const [status,setStatus]=useState("Aktiv");
+  const [error,setError]=useState("");
+
+  const save=()=>{
+    const fullName=`${firstName} ${lastName}`.trim();
+    if(!fullName){setError("Name ist erforderlich.");return;}
+    if(!existing) addRecord("employees",[fullName,role||"Mitarbeiter",`${load||"100"}%`,status]);
+    router.push("/mitarbeiter");
+  };
+
+  return <AppShell title={existing ? "Thomas Müller" : "Mitarbeiter hinzufügen"} subtitle={existing ? "Inhaber · 100%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={save}>Speichern</Button>}>
+    {existing&&<div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
     <div className="form-page">
       <div className="form-grid two">
-        <Field label="Vorname"><input defaultValue={existing ? "Thomas" : ""}/></Field>
-        <Field label="Nachname"><input defaultValue={existing ? "Müller" : ""}/></Field>
+        <Field label="Vorname"><input value={firstName} onChange={e=>{setFirstName(e.target.value);setError("")}}/></Field>
+        <Field label="Nachname"><input value={lastName} onChange={e=>{setLastName(e.target.value);setError("")}}/></Field>
         <Field label="E-Mail"><input type="email" defaultValue={existing ? "thomas@firma.ch" : ""}/></Field>
         <Field label="Telefon"><input type="tel" inputMode="tel"/></Field>
-        <Field label="Funktion"><input defaultValue={existing ? "Inhaber" : ""}/></Field>
-        <Field label="Pensum"><input inputMode="numeric" defaultValue={existing ? "100" : ""} placeholder="%"/></Field>
+        <Field label="Funktion"><input value={role} onChange={e=>setRole(e.target.value)}/></Field>
+        <Field label="Pensum"><input inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
         <Field label="Eintritt"><input type="date" defaultValue={existing ? "2024-01-01" : ""}/></Field>
-        <Field label="Status"><select><option>Aktiv</option><option>Inaktiv</option></select></Field>
+        <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
-      <div className="mobile-sticky-save"><Button href="/mitarbeiter">Speichern</Button></div>
+      {error&&<p className="form-error">{error}</p>}
+      <div className="mobile-sticky-save"><Button onClick={save}>Speichern</Button></div>
     </div>
   </AppShell>;
 }
@@ -234,20 +295,32 @@ export function ExpensesPage() {
 }
 
 export function ExpenseForm({ existing = false }: { existing?: boolean }) {
-  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button>}>
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [employee,setEmployee]=useState("Thomas Müller");
+  const [amount,setAmount]=useState(existing?"280.00":"");
+  const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
+  const [receipt,setReceipt]=useState(false);
+
+  const save=()=>{
+    if(!existing) addRecord("expenses",[description.trim()||"Neue Spese",employee,`CHF ${amount||"0.00"}`,"Eingereicht"]);
+    router.push("/spesen");
+  };
+
+  return <AppShell title={existing ? "Hotel Schweizerhof" : "Spese erfassen"} subtitle={existing ? "Thomas Müller · Eingereicht" : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
-      <button className="receipt-upload" type="button"><span><Icon name="upload" size={25}/></span><b>Beleg hinzufügen</b><small>Kamera oder Datei verwenden</small></button>
+      <button className={receipt?"receipt-upload has-receipt":"receipt-upload"} type="button" onClick={()=>setReceipt(true)}><span><Icon name={receipt?"check":"upload"} size={25}/></span><b>{receipt?"Beleg hinzugefügt":"Beleg hinzufügen"}</b><small>{receipt?"beleg-2026-10-02.jpg":"Kamera oder Datei verwenden"}</small></button>
       <div className="form-page">
         <div className="form-grid two">
-          <Field label="Mitarbeiter"><select><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
+          <Field label="Mitarbeiter"><select value={employee} onChange={e=>setEmployee(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
           <Field label="Datum"><input type="date" defaultValue="2026-10-02"/></Field>
           <Field label="Kategorie"><select><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
-          <Field label="Betrag"><input inputMode="decimal" defaultValue={existing ? "280.00" : ""} placeholder="0.00"/></Field>
+          <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
           <Field label="Währung"><select><option>CHF</option><option>EUR</option></select></Field>
           <Field label="MwSt."><select><option>8.1%</option><option>2.6%</option><option>0%</option></select></Field>
-          <Field label="Beschreibung" className="full"><textarea defaultValue={existing ? "Übernachtung Kundentermin Zürich" : ""} placeholder="Kurze Beschreibung"/></Field>
+          <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button href="/spesen">{existing ? "Speichern" : "Einreichen"}</Button></div>
+        <div className="mobile-sticky-save"><Button onClick={save}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
     </div>
   </AppShell>;
@@ -294,16 +367,31 @@ export function SupportPage() {
 }
 
 export function SupportTicketForm() {
-  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button href="/support/5832">Ticket erstellen</Button>}>
+  const router=useRouter();
+  const { addRecord }=useDemoData();
+  const [subject,setSubject]=useState("");
+  const [message,setMessage]=useState("");
+  const [attached,setAttached]=useState(false);
+  const [error,setError]=useState("");
+
+  const save=()=>{
+    if(!subject.trim()||!message.trim()){setError("Betreff und Nachricht sind erforderlich.");return;}
+    const id=String(5900+Math.floor(Math.random()*90));
+    addRecord("supportTickets",[id,subject.trim(),"gerade eben","Offen"]);
+    router.push("/support");
+  };
+
+  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save}>Ticket erstellen</Button>}>
     <div className="form-page narrow">
       <div className="form-grid">
-        <Field label="Betreff" className="full"><input autoFocus placeholder="Worum geht es?"/></Field>
+        <Field label="Betreff" className="full"><input autoFocus value={subject} onChange={e=>{setSubject(e.target.value);setError("")}} placeholder="Worum geht es?"/></Field>
         <Field label="Kategorie" className="full"><select><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
-        <Field label="Nachricht" className="full"><textarea placeholder="Beschreibe dein Anliegen kurz..."/></Field>
+        <Field label="Nachricht" className="full"><textarea value={message} onChange={e=>{setMessage(e.target.value);setError("")}} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
-      <button className="attachment-button" type="button"><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
+      <button className={attached?"attachment-button attached":"attachment-button"} type="button" onClick={()=>setAttached(!attached)}><Icon name={attached?"check":"upload"}/><span>{attached?"Screenshot angehängt":"Screenshot oder Datei hinzufügen"}</span></button>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <div className="mobile-sticky-save"><Button href="/support/5832">Ticket erstellen</Button></div>
+      {error&&<p className="form-error">{error}</p>}
+      <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
     </div>
   </AppShell>;
 }
