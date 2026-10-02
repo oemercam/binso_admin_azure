@@ -1,2 +1,0 @@
-ChatGPT GitHub connector write test.
-Created only to verify repository write access.
