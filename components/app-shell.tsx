@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Icon, IconButton, Logo } from "./ui";
-import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled } from "@/lib/client/backend";
+import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -44,7 +44,9 @@ export function AppShell({
 }) {
   const router=useRouter();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
+  const production=useBackendMode();
   const [query, setQuery] = useState("");
+  const [remoteSearch,setRemoteSearch]=useState<typeof searchItems>([]);
   const [timerRunning, setTimerRunning] = useState(true);
   const [dark, setDark] = useState(false);
   const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
@@ -109,11 +111,28 @@ export function AppShell({
     return () => window.clearInterval(id);
   }, [timerRunning]);
 
+  useEffect(()=>{
+    if(!production||query.trim().length<2){
+      queueMicrotask(()=>setRemoteSearch([]));
+      return;
+    }
+    const timer=window.setTimeout(()=>{
+      apiGet<{items:typeof searchItems}>("/api/search?q="+encodeURIComponent(query.trim()))
+        .then(payload=>setRemoteSearch(payload.items))
+        .catch(()=>setRemoteSearch([]));
+    },180);
+    return()=>window.clearTimeout(timer);
+  },[production,query]);
+
   const filtered = useMemo(() => {
+    if(production){
+      if(!query.trim()) return [];
+      return remoteSearch;
+    }
     if (!query.trim()) return searchItems;
     const q = query.toLowerCase();
     return searchItems.filter(item => `${item.type} ${item.title} ${item.meta}`.toLowerCase().includes(q));
-  }, [query]);
+  }, [production,query,remoteSearch]);
 
   function toggleTheme() {
     const next = !dark;
@@ -240,6 +259,8 @@ export function AppShell({
           {sheet === "search" && <div className="global-search">
             <label className="searchbox large"><Icon name="search"/><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden, Rechnungen, Angebote oder Tickets suchen..."/></label>
             <div className="search-results">
+              {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
+              {production&&query.trim().length>=2&&filtered.length===0&&<p className="technical-hint">Keine Treffer gefunden.</p>}
               {filtered.map(item => <Link key={item.href} href={item.href} onClick={() => setSheet(null)}>
                 <span className="activity-icon"><Icon name={item.icon}/></span>
                 <div><small>{item.type}</small><b>{item.title}</b><span>{item.meta}</span></div>
