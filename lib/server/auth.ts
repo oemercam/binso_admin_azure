@@ -66,16 +66,42 @@ export async function fetchUser(accessToken:string):Promise<SupabaseUser>{
   return response.json() as Promise<SupabaseUser>;
 }
 
+export async function refreshSession(refreshToken:string):Promise<TokenResponse>{
+  const {supabaseUrl}=getBackendEnv();
+  const response=await fetch(supabaseUrl + "/auth/v1/token?grant_type=refresh_token",{
+    method:"POST",
+    headers:authHeaders(),
+    body:JSON.stringify({refresh_token:refreshToken}),
+    cache:"no-store",
+  });
+  if(!response.ok) throw new ApiError(401,"session_expired","Sitzung abgelaufen.");
+  return response.json() as Promise<TokenResponse>;
+}
+
 export async function getAccessToken(){
   const store=await cookies();
   return store.get(accessCookie)?.value ?? null;
 }
 
 export async function requireUser(){
-  const token=await getAccessToken();
-  if(!token) throw new ApiError(401,"unauthorized","Nicht angemeldet.");
-  const user=await fetchUser(token);
-  return {user,token};
+  const store=await cookies();
+  const token=store.get(accessCookie)?.value;
+  if(token){
+    try{
+      const user=await fetchUser(token);
+      return {user,token};
+    }catch(error){
+      if(!(error instanceof ApiError) || error.status!==401) throw error;
+    }
+  }
+
+  const refresh=store.get(refreshCookie)?.value;
+  if(!refresh) throw new ApiError(401,"unauthorized","Nicht angemeldet.");
+  const session=await refreshSession(refresh);
+  const secure=process.env.NODE_ENV==="production";
+  store.set(accessCookie,session.access_token,{httpOnly:true,secure,sameSite:"lax",path:"/",maxAge:Math.max(60,session.expires_in)});
+  store.set(refreshCookie,session.refresh_token,{httpOnly:true,secure,sameSite:"lax",path:"/",maxAge:60*60*24*30});
+  return {user:session.user,token:session.access_token};
 }
 
 export function setAuthCookies(response:NextResponse,session:TokenResponse){
