@@ -115,3 +115,41 @@ as $$
 $$;
 
 grant execute on function public.current_notifications(int) to authenticated;
+
+
+create or replace function public.mark_notification_read(p_notification_id uuid)
+returns void
+language plpgsql
+security invoker
+set search_path=public
+as $$
+begin
+  update public.notifications
+  set read_at=coalesce(read_at,now())
+  where id=p_notification_id
+    and user_id=auth.uid()
+    and public.is_tenant_member(tenant_id);
+end $$;
+
+create or replace function public.mark_all_notifications_read()
+returns int
+language plpgsql
+security invoker
+set search_path=public
+as $$
+declare
+  changed int;
+begin
+  update public.notifications
+  set read_at=now()
+  where user_id=auth.uid()
+    and read_at is null
+    and public.is_tenant_member(tenant_id);
+  get diagnostics changed=row_count;
+  return changed;
+end $$;
+
+revoke all on function public.mark_notification_read(uuid) from public;
+revoke all on function public.mark_all_notifications_read() from public;
+grant execute on function public.mark_notification_read(uuid) to authenticated;
+grant execute on function public.mark_all_notifications_read() to authenticated;
