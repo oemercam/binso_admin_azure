@@ -1,0 +1,1 @@
+import {apiOk} from "@/lib/security";import {demoSession} from "@/lib/demo-access";export function POST(){return apiOk({session:demoSession()})}
