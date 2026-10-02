@@ -49,4 +49,6 @@ Then open http://localhost:3000.
 - `/einstellungen`
 - `/operator`
 
-This first release intentionally uses demo data. Backend, authentication, database and billing integrations are the next layer and can be added without redesigning the UI shell.
+The current UI release intentionally uses demo data, but the prototype now includes functional search and status filtering, persistent timer state, customer detail tabs, document hub, notification center, account/security/subscription interaction flows and operator action feedback.
+
+Backend authentication, database persistence, billing provider integration, email delivery and real Swiss QR generation remain separate production integrations and are not represented as completed until connected to real services.
