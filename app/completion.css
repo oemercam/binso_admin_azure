@@ -1132,3 +1132,10 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
   .operator-modal-layer{align-items:end;padding:0}
   .operator-confirm{width:100%;border-radius:20px 20px 0 0;padding:22px 16px calc(22px + env(safe-area-inset-bottom))}
 }
+
+
+/* Keep support composer clear of the persistent timer */
+.app-main:has(.global-timer) .thread-composer{bottom:88px}
+@media(max-width:760px){
+  .app-main:has(.global-timer) .thread-composer{bottom:calc(var(--mobile-nav) + env(safe-area-inset-bottom) + 66px)}
+}
