@@ -1,0 +1,1 @@
+export type PwaInstallState="browser"|"installable"|"installed";export function pwaState(displayModeStandalone:boolean,canPrompt:boolean):PwaInstallState{return displayModeStandalone?"installed":canPrompt?"installable":"browser"}
