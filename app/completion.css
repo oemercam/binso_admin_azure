@@ -1087,3 +1087,48 @@ html[data-theme="dark"] .chips button.active,html[data-theme="dark"] .tabs butto
   .timer-actions .button{width:100%}
   .manual-time-sheet .form-grid.two{grid-template-columns:1fr}
 }
+
+
+.workflow-section{margin-top:88px;border-top:1px solid var(--line);padding-top:34px}
+.workflow-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.workflow-strip article{min-height:110px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:18px;border-right:1px solid var(--line)}
+.workflow-strip article:last-child{border-right:0}
+.workflow-strip article>span{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--muted)}
+.workflow-strip b,.workflow-strip small{display:block}
+.workflow-strip b{font-size:14px}
+.workflow-strip small{color:var(--muted);font-size:10px;margin-top:4px;line-height:1.4}
+.workflow-strip svg{color:#aaa}
+.product-cta,.pricing-foot{margin-top:80px;padding:34px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:30px}
+.product-cta h2,.pricing-foot h2{font-size:28px;margin:0 0 8px;letter-spacing:-.03em}
+.product-cta p,.pricing-foot p{margin:0;color:var(--muted);font-size:13px}
+.product-cta .eyebrow{margin-bottom:10px}
+.product-cta>div:last-child{display:flex;gap:8px}
+.pricing-trust{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px;color:var(--muted);font-size:11px}
+.pricing-trust span{display:flex;align-items:center;gap:6px}
+.plan-name{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.plan-name h2{margin:0}
+.plan-name small{font-size:9px;color:var(--muted);padding-top:4px}
+.price-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.price-card:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(0,0,0,.06)}
+.price-card ul li{display:flex;align-items:center;gap:8px}
+.pricing-foot{margin-top:54px}
+.operator-modal-layer{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.48);display:grid;place-items:center;padding:20px}
+.operator-confirm{width:min(100%,430px);background:#fff;color:#111;border-radius:16px;padding:24px;box-shadow:0 20px 70px rgba(0,0,0,.25)}
+.confirm-icon{width:44px;height:44px;border-radius:12px;background:#f3f3f1;display:grid;place-items:center;margin-bottom:16px}
+.operator-confirm h2{font-size:20px;margin:0 0 8px}
+.operator-confirm p{color:#666;font-size:12px;line-height:1.55;margin:0}
+.operator-confirm>div{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:22px}
+@media(max-width:760px){
+  .workflow-section{margin-top:58px}
+  .workflow-strip{grid-template-columns:1fr}
+  .workflow-strip article{min-height:72px;border-right:0;border-bottom:1px solid var(--line);padding:12px 4px}
+  .workflow-strip article:last-child{border-bottom:0}
+  .workflow-strip article>svg{transform:rotate(90deg)}
+  .product-cta,.pricing-foot{margin-top:52px;align-items:flex-start;flex-direction:column}
+  .product-cta>div:last-child{width:100%;display:grid}
+  .product-cta .button,.pricing-foot .button{width:100%}
+  .pricing-trust{gap:10px}
+  .price-card:hover{transform:none}
+  .operator-modal-layer{align-items:end;padding:0}
+  .operator-confirm{width:100%;border-radius:20px 20px 0 0;padding:22px 16px calc(22px + env(safe-area-inset-bottom))}
+}
