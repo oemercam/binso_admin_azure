@@ -152,27 +152,79 @@ export function CustomersPage() {
   </AppShell>;
 }
 
-export function CustomerDetail() {
+export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
+  const production=useBackendMode();
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
   const [contactOpen,setContactOpen]=useState(false);
-  const [contactToast,setContactToast]=useState(false);
-  return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
-    <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
-    <div className="tabs">
-      <button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button>
-      <button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button>
-      <button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button>
-      <button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button>
-    </div>
-    {tab==="overview"&&<div className="detail-grid">
-      <section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section>
-      <section className="surface"><SectionTitle title="Letzte Belege" action={<button className="text-action" onClick={()=>setTab("docs")}>Alle anzeigen</button>}/><div className="compact-list"><div><b>RE-2026-019</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></div><div><b>AN-2026-012</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></div><div><b>RE-2026-015</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></div></div></section>
-    </div>}
-    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div><div><span className="record-avatar">SB</span><div><b>Sarah Baumann</b><small>Buchhaltung · finance@acme.ch · +41 44 123 45 68</small></div></div></div></section>}
-    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link><Link href="/angebote/AN-2026-012"><b>AN-2026-012</b><span>05.09.2026 · CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link><Link href="/rechnungen/RE-2026-015"><b>RE-2026-015</b><span>20.08.2026 · CHF 1’200.00</span><Status tone="warning">Offen</Status></Link></div></section>}
-    {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Rechnung bezahlt</b><small>RE-2026-019 · heute, 10:24</small></div></div><div><i/><div><b>Angebot gesendet</b><small>AN-2026-012 · 05.09.2026</small></div></div><div><i/><div><b>Kundendaten aktualisiert</b><small>Thomas Müller · 01.09.2026</small></div></div></div></section>}
-    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input/></Field><Field label="Nachname"><input/></Field><Field label="E-Mail"><input type="email"/></Field><Field label="Telefon"><input type="tel"/></Field><Field label="Funktion" className="full"><input placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>{setContactOpen(false);setContactToast(true);window.setTimeout(()=>setContactToast(false),2200)}}>Kontakt speichern</Button></div></section></div>}
-    {contactToast&&<Toast title="Kontakt gespeichert."/>}
+  const [contactToast,setContactToast]=useState<string|null>(null);
+  const [customer,setCustomer]=useState<Record<string,unknown>|null>(null);
+  const [contacts,setContacts]=useState<Array<Record<string,unknown>>>([]);
+  const [firstName,setFirstName]=useState("");
+  const [lastName,setLastName]=useState("");
+  const [contactEmail,setContactEmail]=useState("");
+  const [contactPhone,setContactPhone]=useState("");
+  const [contactRole,setContactRole]=useState("");
+
+  useEffect(()=>{
+    if(!production) return;
+    Promise.all([
+      apiGet<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)),
+      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts"),
+    ]).then(([customerPayload,contactPayload])=>queueMicrotask(()=>{
+      setCustomer(customerPayload.item);
+      setContacts(contactPayload.items);
+    })).catch(()=>undefined);
+  },[production,customerId]);
+
+  const saveContact=async()=>{
+    if(!production){
+      setContactOpen(false);
+      setContactToast("Kontakt gespeichert.");
+      window.setTimeout(()=>setContactToast(null),2200);
+      return;
+    }
+    try{
+      const payload=await apiPost<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts",{
+        firstName,lastName,email:contactEmail,phone:contactPhone,jobTitle:contactRole,isPrimary:contacts.length===0,
+      });
+      setContacts(current=>[...current,payload.item]);
+      setFirstName("");setLastName("");setContactEmail("");setContactPhone("");setContactRole("");
+      setContactOpen(false);
+      setContactToast("Kontakt gespeichert.");
+    }catch(error){
+      setContactToast(error instanceof Error?error.message:"Kontakt konnte nicht gespeichert werden.");
+    }
+    window.setTimeout(()=>setContactToast(null),2600);
+  };
+
+  if(!production){
+    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
+      <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
+      <div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+      {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section></div>}
+      {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
+      {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link></div></section>}
+      {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kundendaten aktualisiert</b><small>Demo</small></div></div></div></section>}
+      {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
+      {contactToast&&<Toast title={contactToast}/>}
+    </AppShell>;
+  }
+
+  if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref="/kunden" backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
+
+  const name=String(customer.name??"Kunde");
+  const sector=String(customer.sector??"—");
+  const city=String(customer.city??"—");
+  const status=String(customer.status??"active");
+  return <AppShell title={name} subtitle={sector+" · "+city} active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
+    <div className="entity-hero"><span className="record-avatar large">{name.slice(0,1)}</span><div><h2>{name}</h2><p>{sector+" · "+city}</p></div><Status tone={status==="active"?"success":"neutral"}>{status==="active"?"Aktiv":"Inaktiv"}</Status></div>
+    <div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+    {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>E-Mail</dt><dd>{String(customer.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(customer.phone??"—")}</dd></div><div><dt>Adresse</dt><dd>{String(customer.street??"—")}<br/>{[customer.postal_code,customer.city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>UID</dt><dd>{String(customer.uid??"—")}</dd></div></dl></section><section className="surface"><SectionTitle title="Status"/><div className="context-block"><small>Kundenstatus</small><b>{status==="active"?"Aktiv":"Inaktiv"}</b><span>Erstellt {new Date(String(customer.created_at)).toLocaleDateString("de-CH")}</span></div></section></div>}
+    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div>})}</div>:<EmptyState icon="users" title="Noch keine Kontakte" text="Füge den ersten Ansprechpartner für diesen Kunden hinzu."/>}</section>}
+    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><p>Die kundenspezifische Belegliste wird im nächsten Dokument-Query zusammengeführt.</p></section>}
+    {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kunde erstellt</b><small>{new Date(String(customer.created_at)).toLocaleString("de-CH")}</small></div></div><div><i/><div><b>Zuletzt aktualisiert</b><small>{new Date(String(customer.updated_at)).toLocaleString("de-CH")}</small></div></div></div></section>}
+    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
+    {contactToast&&<Toast title={contactToast} tone={contactToast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
