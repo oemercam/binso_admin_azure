@@ -1,0 +1,1 @@
+export type IncidentStatus="investigating"|"identified"|"monitoring"|"resolved";export type Incident={id:string;title:string;status:IncidentStatus;startedAt:string;resolvedAt?:string;publicMessage:string};export function incidentOpen(i:Incident){return i.status!=="resolved"}
