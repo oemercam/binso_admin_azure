@@ -606,7 +606,6 @@ function AnnouncementsView() {
 function SecurityView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
-  const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
     if(!production) return;
@@ -630,7 +629,6 @@ function SecurityView() {
       {items.length?<div className="operator-table"><div className="operator-table-head security"><span>Benutzer-ID</span><span>Rolle</span><span>Status</span><span>Erstellt</span></div>{items.map(item=><div className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.user_id).slice(0,12)}…</b></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{new Date(String(item.created_at)).toLocaleDateString("de-CH")}</span></div>)}</div>:<EmptyState icon="lock" title="Keine Operator-Zugriffe" text="Es sind keine autorisierten internen Benutzer hinterlegt."/>}
     </section>
     <section className="surface security-card"><div className="security-row"><div><b>Operator-Benutzer hinzufügen</b><p>Neue Operator-Konten müssen bewusst über den sicheren Auth- und Berechtigungsprozess provisioniert werden.</p></div><Status tone="neutral">Manuell provisionieren</Status><Button variant="secondary" disabled>Einladen</Button></div></section>
-    {toast&&<Toast title={toast}/>}
   </>;
 }
 
