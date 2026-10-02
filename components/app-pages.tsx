@@ -463,11 +463,26 @@ export function TimePage() {
   </AppShell>;
 }
 
+function useSupportRows(){
+  const [rows,setRows]=useState(supportTickets);
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>("/api/support/tickets")
+      .then(payload=>{
+        const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject,new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status])));
+      })
+      .catch(()=>undefined);
+  },[]);
+  return rows;
+}
+
 export function SupportPage() {
+  const ticketRows=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView items={supportTickets} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
       <aside className="tablet-detail support-tablet-preview surface">
         <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
         <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
@@ -479,17 +494,42 @@ export function SupportPage() {
 }
 
 export function SupportTicketForm() {
-  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button href="/support/5832">Ticket erstellen</Button>}>
+  const router=useRouter();
+  const [subject,setSubject]=useState("");
+  const [category,setCategory]=useState("Allgemeine Frage");
+  const [message,setMessage]=useState("");
+  const [toast,setToast]=useState<string|null>(null);
+  const save=async()=>{
+    if(!subject.trim()||!message.trim()){
+      setToast("Betreff und Nachricht sind erforderlich.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
+    try{
+      if(useProductionBackend()){
+        const payload=await apiPost<{item:{id:string}}>("/api/support/tickets",{subject,category,priority:"normal",message});
+        router.push("/support/"+payload.item.id);
+      }else{
+        setToast("Ticket erstellt.");
+        window.setTimeout(()=>router.push("/support/5832"),700);
+      }
+    }catch(error){
+      setToast(error instanceof Error?error.message:"Ticket konnte nicht erstellt werden.");
+      window.setTimeout(()=>setToast(null),2600);
+    }
+  };
+  return <AppShell title="Neue Support-Anfrage" subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save}>Ticket erstellen</Button>}>
     <div className="form-page narrow">
       <div className="form-grid">
-        <Field label="Betreff" className="full"><input autoFocus placeholder="Worum geht es?"/></Field>
-        <Field label="Kategorie" className="full"><select><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
-        <Field label="Nachricht" className="full"><textarea placeholder="Beschreibe dein Anliegen kurz..."/></Field>
+        <Field label="Betreff" className="full"><input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
+        <Field label="Kategorie" className="full"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></select></Field>
+        <Field label="Nachricht" className="full"><textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
-      <button className="attachment-button" type="button"><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
+      <button className="attachment-button" type="button" onClick={()=>{setToast("Dateiupload wird mit Storage angebunden.");window.setTimeout(()=>setToast(null),2200)}}><Icon name="upload"/><span>Screenshot oder Datei hinzufügen</span></button>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <div className="mobile-sticky-save"><Button href="/support/5832">Ticket erstellen</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
     </div>
+    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
 
