@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBackendEnv } from "./env";
 
 export const jsonHeaders = {
   "Cache-Control":"private, no-store, max-age=0, must-revalidate",
@@ -22,7 +21,8 @@ export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>
 export function assertSameOrigin(request:NextRequest){
   const origin=request.headers.get("origin");
   if(!origin) return;
-  const allowed=new URL(getBackendEnv().appUrl).origin;
+  const configured=process.env.NEXT_PUBLIC_APP_URL;
+  const allowed=configured ? new URL(configured).origin : request.nextUrl.origin;
   if(origin!==allowed) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
 }
 
