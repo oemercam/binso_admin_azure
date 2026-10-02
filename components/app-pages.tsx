@@ -212,8 +212,17 @@ export function OfferEditor({ existing = false }: { existing?: boolean }) {
 
 export function InvoicesPage() {
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
-    <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
-    <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+    <div className="tablet-master-detail invoice-master-detail">
+      <div>
+        <ListToolbar placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}/>
+        <div className="records invoices">{invoices.map(([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} key={nr} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>)}</div>
+      </div>
+      <aside className="tablet-detail invoice-tablet-preview">
+        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
+        <div className="tablet-document-actions"><Button href="/rechnungen/RE-2026-019" variant="secondary">Öffnen</Button><Button href="/zahlungen/neu">Zahlung</Button></div>
+        <InvoicePreview/>
+      </aside>
+    </div>
   </AppShell>;
 }
 
@@ -418,10 +427,18 @@ export function TimePage() {
 export function SupportPage() {
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
-    <div className="records">
-      <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
-      <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
-      <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
+    <div className="tablet-master-detail support-master-detail">
+      <div className="records">
+        <RecordRow href="/support/5832" icon="support" title="#5832 · Frage zur Rechnung" meta="vor 12 Minuten" status="Offen"/>
+        <RecordRow href="/support/5828" icon="support" title="#5828 · Zeiterfassung" meta="vor 1 Stunde" status="In Bearbeitung"/>
+        <RecordRow href="/support/5814" icon="support" title="#5814 · Datenexport" meta="vor 1 Tag" status="Gelöst"/>
+      </div>
+      <aside className="tablet-detail support-tablet-preview surface">
+        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
+        <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
+        <div className="support-preview-message support"><small>Binso Support · 10:37</small><p>Gerne. Um welche Rechnung geht es genau?</p></div>
+        <Button href="/support/5832" variant="secondary">Konversation öffnen</Button>
+      </aside>
     </div>
   </AppShell>;
 }
