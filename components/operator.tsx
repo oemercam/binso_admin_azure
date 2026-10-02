@@ -315,20 +315,50 @@ function CustomersView() {
   </section>;
 }
 
-function OperatorCustomerDetail() {
+function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
+  const production=useBackendMode();
   const [toast,setToast]=useState<string|null>(null);
+  const [data,setData]=useState<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>({});
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<typeof data>("/api/operator/customers/"+encodeURIComponent(tenantId))
+      .then(payload=>queueMicrotask(()=>setData(payload)))
+      .catch(()=>undefined);
+  },[production,tenantId]);
+
   const notify=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+
+  if(!production) return <>
+    <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Demo-Kunde · Zürich</p></div></div><div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff ist im Demo-Modus nur simuliert.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div></div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value="Business" hint="Demo" icon="card"/><Metric label="Benutzer" value="8 / 10" hint="Demo" icon="users"/><Metric label="Offene Tickets" value="1" hint="Demo" icon="support"/><Metric label="Zahlungsstatus" value="Bezahlt" hint="Demo" icon="wallet"/></div>
+    {toast&&<Toast title={toast}/>}
+  </>;
+
+  const overview=data.overview??{};
+  const tenant=overview.tenant as Record<string,unknown>|null|undefined;
+  const account=overview.account as Record<string,unknown>|null|undefined;
+  const restrictions=Array.isArray(overview.active_restrictions)?overview.active_restrictions as Array<Record<string,unknown>>:[];
+  if(!tenant) return <section className="surface"><EmptyState icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></section>;
+
+  const plan=String(account?.plan??"trial");
+  const accountStatus=String(account?.account_status??"active");
+  const planPrice:Record<string,string>={trial:"CHF 0",start:"CHF 19",business:"CHF 49",pro:"CHF 89"};
+  const userLimit=Number(account?.user_limit??0);
+  const users=Number(overview.users??0);
+  const openTickets=Number(overview.open_tickets??0);
+
   return <>
     <div className="operator-customer-hero">
-      <div className="operator-customer-main"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>K-1001 · CHE-123.456.789 · Zürich</p></div></div>
-      <div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary" onClick={()=>notify("Zeitlich begrenzter Support-Zugriff vorbereitet.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
+      <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} {tenant.city?"· "+String(tenant.city):""}</p></div></div>
+      <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff bleibt deaktiviert, bis die Impersonation sicher implementiert ist.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
     </div>
-    <div className="operator-customer-metrics"><Metric label="Plan" value="Business" hint="CHF 49 / Monat" icon="card"/><Metric label="Benutzer" value="8 / 10" hint="2 Plätze frei" icon="users"/><Metric label="Offene Tickets" value="1" hint="#8421" icon="support"/><Metric label="Zahlungsstatus" value="Bezahlt" hint="Nächste Abbuchung 01.11." icon="wallet"/></div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={planPrice[plan]+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={String(openTickets)} hint="Aktuelle Anfragen" icon="support"/><Metric label="Kundenzahlungen" value={"CHF "+Number(overview.payments_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="wallet"/></div>
     <div className="operator-customer-grid">
-      <section className="surface"><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>Kontakt</dt><dd>Thomas Meier · thomas@acme.ch</dd></div><div><dt>Erstellt</dt><dd>14.02.2025</dd></div><div><dt>Letzte Anmeldung</dt><dd>Heute, 10:31</dd></div><div><dt>Mandant</dt><dd>tenant_acme_ch</dd></div></dl></section>
-      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>Business</b><span>CHF 49 / Monat</span><Status tone="success">Aktiv</Status></div><div className="context-block"><small>Zahlungsmittel</small><b>Visa •••• 4242</b><span>Letzte Zahlung 01.10.2026</span></div><Button href="/operator/abonnemente" variant="secondary">Abonnement öffnen</Button></section>
-      <section className="surface"><SectionTitle title="Support"/><div className="compact-list"><Link href="/operator/tickets/8421"><b>#8421 · Rechnungsstellung unklar</b><span>Heute 10:42</span><Status tone="warning">Offen</Status></Link><div><b>#8112 · Datenexport</b><span>18.08.2026</span><Status tone="success">Gelöst</Status></div></div></section>
-      <section className="surface"><SectionTitle title="Audit"/><div className="audit-list"><span><b>10:42</b> Ticket #8421 erstellt</span><span><b>09:18</b> Benutzer angemeldet</span><span><b>01.10.</b> Zahlung CHF 49.00 verbucht</span><span><b>28.09.</b> Rechnungseinstellungen geändert</span></div></section>
+      <section className="surface"><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>{String(tenant.name??"—")}</dd></div><div><dt>E-Mail</dt><dd>{String(tenant.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(tenant.phone??"—")}</dd></div><div><dt>Erstellt</dt><dd>{new Date(String(tenant.created_at)).toLocaleDateString("de-CH")}</dd></div><div><dt>Mandant</dt><dd>{String(tenant.id)}</dd></div></dl></section>
+      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{planPrice[plan]??"—"} / Monat</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"trial"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"}</span></div></section>
+      <section className="surface"><SectionTitle title="Support"/>{(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</section>
+      <section className="surface"><SectionTitle title="Audit"/>{(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</section>
     </div>
     {toast&&<Toast title={toast}/>}
   </>;
