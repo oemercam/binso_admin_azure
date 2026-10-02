@@ -108,3 +108,33 @@ body{min-height:100vh;overflow-x:hidden}.shell{max-width:430px;min-height:100vh;
  .form input{height:38px;margin-top:4px;color:#111;}
  .form .secondary{margin-top:8px;}
 }
+
+/* UX parity system — shared across every app, form, detail, public and control screen */
+:root{--ux-radius:6px;--ux-row:48px;--ux-control:40px;--ux-border:#e5e5e5;--ux-muted:#777}
+button,input,select,textarea{font:inherit}.shell button,.shell a,.public-shell button,.public-shell a{touch-action:manipulation}
+@media(max-width:760px){
+ .toolbar{min-height:44px}.toolbar .search,.toolbar>button,.toolbar .icon-action{height:38px;border-radius:6px}.search{height:38px;border-radius:6px}
+ .segments{margin:9px 0;padding:2px;border-radius:6px}.segments button{height:30px;font-size:10px}
+ .project-list a{padding:11px 0}.doclist>a{padding:11px 0;min-height:54px}.file-list a{min-height:52px}
+ .field{margin-top:11px}.field label{font-size:10px;margin-bottom:5px}.field select,.field textarea{border-radius:6px}
+ .detail{margin-top:8px}.detail dl>div{min-height:45px;padding:9px 0}
+ .primary,.auth-submit,.secondary{min-height:42px;border-radius:6px}
+ .upload-zone{min-height:180px;border-radius:6px}
+ .pwa{padding:26px 0}.pwa h2{font-size:15px}.pwa ol{margin-top:22px;border-radius:6px}
+ .toggle-list label,.choice-list button{height:49px;font-size:11px}
+ .theme-grid{gap:9px}.theme-grid button{border-radius:5px;padding:8px}.theme{height:82px}
+ .time-entries article{min-height:49px}
+ .auth{max-width:430px;padding:18px 16px;}.auth-brand{height:40px;display:flex;align-items:center;justify-content:center;margin:0 0 36px;font-size:17px}
+ .auth section h1{font-size:18px}.auth section>p{font-size:11px;margin-bottom:20px}.auth section>label{font-size:10px;margin:11px 0}
+ .auth label input:not([type=checkbox]),.auth select{height:40px;border-radius:6px;margin-top:5px}.auth-submit{margin-top:17px}
+ .state{padding:70px 22px}.state h1{font-size:18px}
+}
+@media(min-width:761px){
+ .shell{padding-left:264px}.desktop-nav{width:224px;padding:24px 18px}.desktop-nav .brand{margin-bottom:24px}.desktop-nav a{height:40px}
+ .shell>header{height:62px}.content{padding-top:18px}
+ .toolbar{max-width:1100px}.rows,.project-list,.doclist,.file-list,.settings-list,.team-list,.detail,.form,.toggle-list,.choice-list,.theme-grid,.pwa{max-width:920px}
+ .public-header{height:64px;padding:0 clamp(24px,3vw,48px)}.hero{min-height:500px;padding:48px clamp(34px,6vw,90px)}.hero h1,.marketing h1{font-size:clamp(30px,3vw,50px)}
+ .marketing{padding:52px clamp(34px,6vw,90px)}.plans article{min-height:310px}
+ .auth{max-width:980px;padding:26px 32px}.auth-brand{text-align:left;margin:0 0 42px}.auth section{max-width:440px}
+ .control{grid-template-columns:220px 1fr}.control>aside{padding:24px 16px}.control>aside a{height:40px}.control>section>header{height:62px;padding:0 26px}.control-content{padding:24px 26px}
+}
