@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { getBackendEnv, isBackendConfigured } from "./env";
-import { requireUser } from "./auth";
+import { requireUserNoRefresh } from "./auth";
 
 export async function requireOperator(){
   if(!isBackendConfigured()) return {prototype:true,role:"prototype"};
-  const {user,token}=await requireUser();
+  const {user,token}=await requireUserNoRefresh();
   const {supabaseUrl,supabaseAnonKey}=getBackendEnv();
   const response=await fetch(supabaseUrl+"/rest/v1/operator_users?select=role,active&user_id=eq."+encodeURIComponent(user.id)+"&active=eq.true&limit=1",{
     headers:{apikey:supabaseAnonKey,Authorization:"Bearer "+token},
