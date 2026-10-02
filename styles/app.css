@@ -90,3 +90,21 @@ body{min-height:100vh;overflow-x:hidden}.shell{max-width:430px;min-height:100vh;
   .theme-grid.three{grid-template-columns:1fr 1fr;}
   .theme-grid.three button:last-child{grid-column:1/-1;}
 }
+
+/* Mockup parity corrections for public navigation and profile */
+@media(max-width:760px){
+ .public-header{display:grid;grid-template-columns:34px 1fr 34px;height:58px;padding:0 16px;}
+ .public-header:before{display:none;content:none;}
+ .public-menu-leading{display:grid;grid-column:1;margin:0;}
+ .public-brand{grid-column:2;justify-self:center;margin:0;}
+ .public-mobile-menu{inset:58px 0 0;padding:8px 24px 24px;}
+ .public-mobile-menu nav a{padding:13px 0;font-size:12px;font-weight:500;}
+ .public-mobile-menu>div{display:grid;grid-template-columns:repeat(3,auto);gap:18px;align-items:center;margin-top:12px;}
+ .public-mobile-menu>div a{border:0;min-height:auto;display:block;padding:0;font-size:10px;}
+ .public-mobile-menu>div .black{grid-column:1/-1;grid-row:2;min-height:44px;display:grid;place-items:center;border-radius:6px;}
+ .identity{padding:4px 0 12px;}
+ .identity .profile-avatar{width:58px;height:58px;margin-bottom:0;}
+ .form>label{margin:10px 0;font-size:10px;color:var(--muted);}
+ .form input{height:38px;margin-top:4px;color:#111;}
+ .form .secondary{margin-top:8px;}
+}
