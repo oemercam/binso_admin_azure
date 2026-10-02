@@ -38,18 +38,19 @@ async function consume(route:string,key:string){
   });
   if(!response.ok){
     console.error("Rate limit backend failed",response.status);
-    throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.");
+    throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.",{"Retry-After":"60"});
   }
   return response.json() as Promise<boolean>;
 }
 
 export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover",identity?:string){
   const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
-  if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.");
+  const retryAfter=route==="auth.login"?"900":"3600";
+  if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
 
   if(identity){
     const normalized=identity.trim().toLowerCase().slice(0,320);
     const identityAllowed=await consume(route+":identity","identity|"+normalized);
-    if(!identityAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.");
+    if(!identityAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
   }
 }
