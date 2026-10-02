@@ -57,11 +57,24 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Resolve Azure resource group
+        shell: bash
+        run: |
+          RG=$(az webapp list --query "[?name=='binso-admin-prod'].resourceGroup | [0]" -o tsv)
+          test -n "$RG"
+          echo "AZURE_WEBAPP_RG=$RG" >> "$GITHUB_ENV"
+      - name: Configure App Service runtime
+        shell: bash
+        run: |
+          az webapp config set --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod --linux-fx-version "NODE|24-lts" --startup-file "node server.js"
       - uses: azure/webapps-deploy@v3
         with:
           app-name: binso-admin-prod
           package: binso-one.zip
           startup-command: node server.js
+      - name: Restart App Service
+        shell: bash
+        run: az webapp restart --resource-group "$AZURE_WEBAPP_RG" --name binso-admin-prod
       - name: Verify deployed application
         shell: bash
         run: |
