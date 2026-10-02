@@ -150,6 +150,44 @@ function useDocumentTotals(draft:DocumentDraft) {
   },[draft]);
 }
 
+function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):DocumentDraft {
+  const customer=item.customer as {name?:string}|null|undefined;
+  const rawItems=Array.isArray(item.items)?item.items as Array<Record<string,unknown>>:[];
+  const issueDate=String(item.issue_date??new Date().toISOString().slice(0,10));
+  const dueDate=String(item.due_date??"");
+  let due="30";
+  if(kind==="Angebot") due=String(item.valid_until??issueDate);
+  else if(dueDate){
+    const start=new Date(issueDate+"T12:00:00");
+    const end=new Date(dueDate+"T12:00:00");
+    const days=Math.round((end.getTime()-start.getTime())/86400000);
+    due=["10","30","45"].includes(String(days))?String(days):"30";
+  }
+  return {
+    customer:String(customer?.name??""),
+    number:String(item.number??""),
+    date:issueDate,
+    due,
+    vatRate:String(item.vat_rate??"8.1"),
+    note:String(item.note??""),
+    positions:rawItems.sort((a,b)=>Number(a.position??0)-Number(b.position??0)).map((line,index)=>({
+      id:String(line.id??("line-"+(index+1))),
+      description:String(line.description??""),
+      quantity:String(line.quantity??"1"),
+      price:String(line.unit_price??"0.00"),
+    })),
+  };
+}
+
+function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setDraft:(draft:DocumentDraft)=>void){
+  useEffect(()=>{
+    if(!useProductionBackend()||!documentKey) return;
+    apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey))
+      .then(payload=>queueMicrotask(()=>setDraft(remoteDraftFromItem(payload.item,kind))))
+      .catch(()=>undefined);
+  },[documentKey,kind,setDraft]);
+}
+
 export function OfferEditor({ existing = false }: { existing?: boolean }) {
   const router=useRouter();
   const [preview,setPreview]=useState(false);
