@@ -1,0 +1,1 @@
+import type {SupportedLocale} from "./locales";export type ThemePreference="light"|"dark"|"system";export type UserPreferences={locale:SupportedLocale;theme:ThemePreference;push:boolean;email:boolean};export const defaultPreferences:UserPreferences={locale:"de-CH",theme:"system",push:true,email:true}
