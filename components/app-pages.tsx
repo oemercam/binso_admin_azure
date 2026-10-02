@@ -9,7 +9,7 @@ import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
-import { apiGet, apiPatch, apiPost, useProductionBackend } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 function moneyChf(value:unknown){
@@ -52,7 +52,7 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   const [rows,setRows]=useState(defaults);
 
   useEffect(()=>{
-    if(useProductionBackend()){
+    if(isProductionBackendEnabled()){
       const controller=new AbortController();
       apiGet<{items:Record<string,unknown>[]}>(`/api/${collection==="payments"?"payments":collection}`)
         .then(payload=>queueMicrotask(()=>setRows(mapRemoteRows(collection,payload.items))))
@@ -191,7 +191,7 @@ export function CustomerForm() {
       return;
     }
     try{
-      if(useProductionBackend()) await apiPost("/api/customers",{name:company.trim(),sector,email,phone,city});
+      if(isProductionBackendEnabled()) await apiPost("/api/customers",{name:company.trim(),sector,email,phone,city});
       else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
       window.setTimeout(()=>router.push("/kunden"),700);
@@ -222,7 +222,7 @@ export function CustomerForm() {
 function useDocumentRows(kind:"offer"|"invoice",defaults:string[][]){
   const [rows,setRows]=useState(defaults);
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
       .then(payload=>{
         const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
@@ -284,7 +284,7 @@ export function PaymentForm() {
       return;
     }
     try{
-      if(useProductionBackend()) await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""});
+      if(isProductionBackendEnabled()) await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""});
       else{
         const id=String(Date.now());
         const displayDate=date.split("-").reverse().join(".");
@@ -337,7 +337,7 @@ export function ProductForm({ existing = false }: { existing?: boolean }) {
     try{
       const numericPrice=Number(price.replace(",","."));
       if(!existing){
-        if(useProductionBackend()) await apiPost("/api/products",{name:name.trim(),kind:type==="Produkt"?"product":"service",unitPrice:numericPrice,vatRate:8.1,unit:type==="Produkt"?"piece":"hour"});
+        if(isProductionBackendEnabled()) await apiPost("/api/products",{name:name.trim(),kind:type==="Produkt"?"product":"service",unitPrice:numericPrice,vatRate:8.1,unit:type==="Produkt"?"piece":"hour"});
         else appendDemoRow("products",[name.trim(),type,`CHF ${numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Aktiv"]);
       }
       setToast("Produkt gespeichert.");
@@ -383,7 +383,7 @@ export function EmployeeForm({ existing = false }: { existing?: boolean }) {
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       if(!existing){
-        if(useProductionBackend()) await apiPost("/api/employees",{firstName:firstName.trim(),lastName:lastName.trim(),jobTitle:role.trim(),workloadPercent:Number(load),status:status==="Inaktiv"?"inactive":"active"});
+        if(isProductionBackendEnabled()) await apiPost("/api/employees",{firstName:firstName.trim(),lastName:lastName.trim(),jobTitle:role.trim(),workloadPercent:Number(load),status:status==="Inaktiv"?"inactive":"active"});
         else appendDemoRow("employees",[`${firstName.trim()} ${lastName.trim()}`,role.trim(),`${load}%`,status]);
       }
       setToast("Mitarbeiter gespeichert.");
@@ -431,7 +431,7 @@ export function ExpenseForm({ existing = false }: { existing?: boolean }) {
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       if(!existing){
-        if(useProductionBackend()) await apiPost("/api/expenses",{employeeName:person,merchant:description.trim()||category,expenseDate:"2026-10-02",category,amount:value,currency:"CHF",vatRate:8.1,description,status:"submitted"});
+        if(isProductionBackendEnabled()) await apiPost("/api/expenses",{employeeName:person,merchant:description.trim()||category,expenseDate:"2026-10-02",category,amount:value,currency:"CHF",vatRate:8.1,description,status:"submitted"});
         else appendDemoRow("expenses",[description.trim()||category,person,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Eingereicht"]);
       }
       setToast(existing?"Spese gespeichert.":"Spese eingereicht.");
@@ -478,7 +478,7 @@ export function TimePage() {
   const stop=async()=>{
     setRunning(false);
     try{
-      if(useProductionBackend()){
+      if(isProductionBackendEnabled()){
         const ended=new Date();
         const started=new Date(ended.getTime()-seconds*1000);
         await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
@@ -499,7 +499,7 @@ export function TimePage() {
       return;
     }
     try{
-      if(useProductionBackend()) await apiPost("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+      if(isProductionBackendEnabled()) await apiPost("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
       setManualOpen(false);
       setToast("Zeiteintrag gespeichert.");
     }catch(error){
@@ -530,7 +530,7 @@ export function TimePage() {
 function useSupportRows(){
   const [rows,setRows]=useState(supportTickets);
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>("/api/support/tickets")
       .then(payload=>{
         const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
@@ -570,7 +570,7 @@ export function SupportTicketForm() {
       return;
     }
     try{
-      if(useProductionBackend()){
+      if(isProductionBackendEnabled()){
         const payload=await apiPost<{item:{id:string}}>("/api/support/tickets",{subject,category,priority:"normal",message});
         router.push("/support/"+payload.item.id);
       }else{
@@ -604,7 +604,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages")
       .then(payload=>queueMicrotask(()=>setRemote(payload.items)))
       .catch(()=>undefined);
@@ -614,7 +614,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     const value=draft.trim();
     if(!value)return;
     setDraft("");
-    if(useProductionBackend()){
+    if(isProductionBackendEnabled()){
       try{
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
         setRemote(current=>[...current,payload.item]);
@@ -628,7 +628,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     setSent(current=>[...current,value]);
   };
 
-  const production=useProductionBackend();
+  const production=isProductionBackendEnabled();
   return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
     <div className="support-thread">
       <div className="thread-day">Heute</div>
@@ -678,7 +678,7 @@ export function AccountSettingsPage() {
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
       .then(payload=>{
         const item=payload.item??{};
@@ -695,7 +695,7 @@ export function AccountSettingsPage() {
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
     try{
-      if(useProductionBackend()) await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
+      if(isProductionBackendEnabled()) await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
       setToast(message);
     }catch(error){
       setToast(error instanceof Error?error.message:"Persönliche Daten konnten nicht gespeichert werden.");
@@ -739,7 +739,7 @@ export function CompanySettingsPage() {
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
-    if(!useProductionBackend()) return;
+    if(!isProductionBackendEnabled()) return;
     apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
       const item=payload.item;
       queueMicrotask(()=>{
@@ -758,7 +758,7 @@ export function CompanySettingsPage() {
 
   const save=async(message="Firmendaten gespeichert.")=>{
     try{
-      if(useProductionBackend()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
+      if(isProductionBackendEnabled()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
       setToast(message);
     }catch(error){
       setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
