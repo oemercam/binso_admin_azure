@@ -3,12 +3,6 @@ import { NextRequest } from "next/server";
 import { ApiError } from "./http";
 import { getBackendEnv, isBackendConfigured } from "./env";
 
-type RateConfig={
-  windowSeconds:number;
-  ipLimit:number;
-  identityLimit?:number;
-};
-
 function fingerprint(value:string){
   const secret=process.env.RATE_LIMIT_SECRET;
   return secret
@@ -26,7 +20,7 @@ function clientIp(request:NextRequest){
   return real?real.slice(0,128):"unknown";
 }
 
-async function consume(route:string,key:string,limit:number,windowSeconds:number){
+async function consume(route:string,key:string){
   if(!isBackendConfigured()) return true;
   const {supabaseUrl,supabaseAnonKey}=getBackendEnv();
   const response=await fetch(supabaseUrl+"/rest/v1/rpc/consume_api_rate_limit",{
@@ -39,8 +33,6 @@ async function consume(route:string,key:string,limit:number,windowSeconds:number
     body:JSON.stringify({
       p_route:route,
       p_key_hash:fingerprint(key),
-      p_limit:limit,
-      p_window_seconds:windowSeconds,
     }),
     cache:"no-store",
   });
@@ -51,19 +43,13 @@ async function consume(route:string,key:string,limit:number,windowSeconds:number
   return response.json() as Promise<boolean>;
 }
 
-export async function enforcePublicRateLimit(
-  request:NextRequest,
-  route:string,
-  identity:string|undefined,
-  config:RateConfig,
-){
-  const ip=clientIp(request);
-  const ipAllowed=await consume(route+":ip","ip|"+ip,config.ipLimit,config.windowSeconds);
+export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover",identity?:string){
+  const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
   if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.");
 
-  if(identity&&config.identityLimit){
+  if(identity){
     const normalized=identity.trim().toLowerCase().slice(0,320);
-    const identityAllowed=await consume(route+":identity","identity|"+normalized,config.identityLimit,config.windowSeconds);
+    const identityAllowed=await consume(route+":identity","identity|"+normalized);
     if(!identityAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.");
   }
 }
