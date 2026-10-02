@@ -42,18 +42,12 @@ export function AppShell({
 }) {
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | null>(null);
   const [query, setQuery] = useState("");
-  const [timerRunning, setTimerRunning] = useState(true);
-  const [dark, setDark] = useState(false);
+  const [timerRunning, setTimerRunning] = useState(() => typeof window === "undefined" ? true : window.localStorage.getItem("binso.timer.running") !== "false");
+  const [dark, setDark] = useState(() => typeof window === "undefined" ? false : window.localStorage.getItem("binso.theme") === "dark");
 
   useEffect(() => {
-    const savedTimer = window.localStorage.getItem("binso.timer.running");
-    const savedTheme = window.localStorage.getItem("binso.theme");
-    if (savedTimer === "false") setTimerRunning(false);
-    if (savedTheme === "dark") {
-      setDark(true);
-      document.documentElement.dataset.theme = "dark";
-    }
-  }, []);
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  }, [dark]);
 
   useEffect(() => {
     document.body.style.overflow = sheet ? "hidden" : "";
