@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
-import { Button, Field, Icon, Toast } from "./ui";
+import { Button, EmptyState, Field, Icon, Toast } from "./ui";
+import { apiGet, apiPatch, apiPost, useProductionBackend } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
 
@@ -29,6 +30,25 @@ const customerData: Record<string,{ sector:string; city:string; address:string; 
   "Müller GmbH": { sector:"Immobilien", city:"Bern", address:"Bundesplatz 8", zip:"3011" },
   "Berger Bau AG": { sector:"Bauunternehmen", city:"Luzern", address:"Pilatusstrasse 20", zip:"6003" },
 };
+
+type CustomerDirectory = typeof customerData;
+
+function useCustomerDirectory() {
+  const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>(customerData);
+  useEffect(()=>{
+    if(!useProductionBackend()) return;
+    apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>("/api/customers")
+      .then(payload=>{
+        const next:Record<string,{sector:string;city:string;address:string;zip:string}>={};
+        for(const item of payload.items){
+          next[item.name]={sector:item.sector??"—",city:item.city??"—",address:item.street??"",zip:item.postal_code??""};
+        }
+        queueMicrotask(()=>setDirectory(next));
+      })
+      .catch(()=>queueMicrotask(()=>setDirectory({})));
+  },[]);
+  return directory;
+}
 
 function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
   return {
@@ -68,11 +88,38 @@ function invoiceDueDate(date:string, days:string) {
   return `${String(base.getDate()).padStart(2,"0")}.${String(base.getMonth()+1).padStart(2,"0")}.${base.getFullYear()}`;
 }
 
+function invoiceDueIso(date:string,days:string) {
+  const base=new Date(`${date}T12:00:00`);
+  const amount=Number(days);
+  if(Number.isNaN(base.getTime()) || !Number.isFinite(amount)) return date;
+  base.setDate(base.getDate()+amount);
+  return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,"0")}-${String(base.getDate()).padStart(2,"0")}`;
+}
+
+function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
+  return {
+    kind:kind==="Rechnung"?"invoice":"offer",
+    customerName:draft.customer,
+    number:draft.number,
+    issueDate:draft.date,
+    dueDate:kind==="Rechnung"?invoiceDueIso(draft.date,draft.due):null,
+    validUntil:kind==="Angebot"?draft.due:null,
+    vatRate:numberValue(draft.vatRate),
+    note:draft.note,
+    currency:"CHF",
+    items:draft.positions.map(item=>({description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price)})),
+  };
+}
+
 function useStoredDraft(key:string, initial:DocumentDraft) {
   const [draft,setDraft]=useState(initial);
   const [ready,setReady]=useState(false);
 
   useEffect(()=>{
+    if(useProductionBackend()){
+      queueMicrotask(()=>setReady(true));
+      return;
+    }
     const stored=window.localStorage.getItem(key);
     queueMicrotask(()=>{
       if(stored){
@@ -88,7 +135,7 @@ function useStoredDraft(key:string, initial:DocumentDraft) {
   },[key]);
 
   useEffect(()=>{
-    if(!ready) return;
+    if(!ready || useProductionBackend()) return;
     window.localStorage.setItem(key,JSON.stringify(draft));
   },[draft,key,ready]);
 
