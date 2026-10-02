@@ -97,7 +97,7 @@ export function AppShell({
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <IconButton label="Benachrichtigungen" icon="bell" onClick={() => setSheet("notifications")}/>
-          <span className="avatar">TM</span>
+          <Link className="avatar avatar-link" href="/einstellungen/konto" aria-label="Benutzerkonto">TM</Link>
         </div>
       </header>
 
@@ -171,8 +171,9 @@ export function AppShell({
 
           {sheet === "notifications" && <div className="notification-list">
             <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
-            <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div></Link>
+            <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
             <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
+            <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Benachrichtigungen verwalten <Icon name="arrow" size={15}/></Link>
           </div>}
         </section>
       </div>}
