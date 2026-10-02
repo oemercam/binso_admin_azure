@@ -1,7 +1,7 @@
 name: Binso One Visual QA
 on:
   push:
-    branches: [main, feature/mockup-90-percent, feature/visual-polish-bundle, feature/full-product-bundle]
+    branches: [main, feature/mockup-90-percent, feature/visual-polish-bundle, feature/full-product-bundle, feature/ux-mockup-parity]
   workflow_dispatch:
 permissions:
   contents: read
