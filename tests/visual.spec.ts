@@ -1,1 +1,23 @@
-import {test,expect} from "@playwright/test";const routes=["/dashboard","/kunden","/kunden/1","/projekte","/projekte/1","/zeiterfassung","/angebote","/angebote/1","/rechnungen","/rechnungen/1","/dokumente","/dokumente/1","/berichte","/unternehmen","/team","/support","/support/neu","/mehr","/einstellungen","/einstellungen/sprache","/einstellungen/darstellung","/einstellungen/benachrichtigungen","/einstellungen/pwa","/login","/registrieren","/offline","/maintenance"];for(const route of routes)test(route,async({page},testInfo)=>{await page.goto(route);await expect(page.locator("body")).toBeVisible();await page.screenshot({path:testInfo.outputPath(route.replaceAll("/","_").replace(/^_/,"")+".png"),fullPage:true});});
+import { expect, test } from "@playwright/test";
+
+const routes = [
+  "/dashboard", "/kunden", "/kunden/1", "/projekte", "/projekte/1",
+  "/zeiterfassung", "/angebote", "/angebote/1", "/rechnungen", "/rechnungen/1",
+  "/dokumente", "/dokumente/1", "/berichte", "/unternehmen", "/team",
+  "/support", "/support/neu", "/mehr", "/einstellungen", "/einstellungen/profil",
+  "/einstellungen/sprache", "/einstellungen/darstellung",
+  "/einstellungen/benachrichtigungen", "/einstellungen/pwa",
+  "/login", "/registrieren", "/offline", "/maintenance",
+];
+
+for (const route of routes) {
+  test(route, async ({ page }, testInfo) => {
+    await page.goto(route);
+    await expect(page.locator("body")).toBeVisible();
+    await expect(page.locator("body")).not.toHaveCSS("overflow-x", "scroll");
+    await page.screenshot({
+      path: testInfo.outputPath(route.replaceAll("/", "_").replace(/^_/, "") + ".png"),
+      fullPage: true,
+    });
+  });
+}
