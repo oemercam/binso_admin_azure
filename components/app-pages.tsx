@@ -81,41 +81,45 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
 }
 
 export function DashboardPage() {
-  return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
-    <div className="metrics-grid">
-      <Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/>
-      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
-      <Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/>
-      <Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/>
-    </div>
+  const production=useBackendMode();
+  const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>}>({});
 
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<typeof data>("/api/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+  },[production]);
+
+  if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+    <div className="metrics-grid"><Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/><Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/><Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/></div>
+    <div className="dashboard-grid"><section className="surface"><SectionTitle title="Umsatzentwicklung"/><div className="big-chart">{[42,54,47,68,61,76,70,84,72,90,86,96].map((h,i)=><div key={i}><i style={{height:h+"%"}}/><span>{["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"][i]}</span></div>)}</div></section><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt"],["Neuer Kunde","Berger Bau AG","users"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file"],["Zeit erfasst","Website Redesign · 4:30 h","clock"]].map(([a,b,icon])=><div key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></div>)}</div></section></div>
+    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+  </AppShell>;
+
+  const stats=data.stats??{};
+  const minutes=Number(stats.time_week_minutes??0);
+  const hours=Math.floor(minutes/60);
+  const mins=minutes%60;
+  const invoices=data.invoices??[];
+  const paymentsData=data.payments??[];
+
+  return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+    <div className="metrics-grid">
+      <Metric label="Eingegangen im Monat" value={moneyChf(stats.payments_month_total)} hint="Verbuchte Kundenzahlungen" icon="chart"/>
+      <Metric label="Offene Rechnungen" value={moneyChf(stats.invoice_open_total)} hint={String(stats.invoice_open_count??0)+" Rechnungen"} icon="receipt"/>
+      <Metric label="Kunden" value={String(stats.customers_total??0)} hint="Aktive Kunden" icon="users"/>
+      <Metric label="Zeit diese Woche" value={String(hours)+":"+String(mins).padStart(2,"0")+" h"} hint="Erfasste Arbeitszeit" icon="clock"/>
+    </div>
     <div className="dashboard-grid">
       <section className="surface">
-        <SectionTitle title="Umsatzentwicklung"/>
-        <div className="big-chart">{[42,54,47,68,61,76,70,84,72,90,86,96].map((h,i)=><div key={i}><i style={{height:`${h}%`}}/><span>{["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"][i]}</span></div>)}</div>
+        <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
+        {invoices.length?<div className="compact-list">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{customer?.name??"Kunde"} · {swissDate(item.issue_date)}</span><Status tone={String(item.status)==="paid"?"success":String(item.status)==="overdue"?"danger":"warning"}>{String(item.status)==="paid"?"Bezahlt":String(item.status)==="overdue"?"Überfällig":String(item.status)==="draft"?"Entwurf":"Offen"}</Status><strong>{moneyChf(item.total)}</strong></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Rechnungen" text="Erstelle die erste Rechnung für einen Kunden." action={<Button href="/rechnungen/neu">Rechnung erstellen</Button>}/>}
       </section>
       <section className="surface">
-        <SectionTitle title="Letzte Aktivitäten" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
-        <div className="activity-list">
-          {[
-            ["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt"],
-            ["Neuer Kunde","Berger Bau AG","users"],
-            ["Angebot angenommen","Müller GmbH · CHF 3’200.00","file"],
-            ["Zeit erfasst","Website Redesign · 4:30 h","clock"],
-          ].map(([a,b,c])=><div key={a}><span className="activity-icon"><Icon name={c}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></div>)}
-        </div>
+        <SectionTitle title="Letzte Zahlungen" action={<Link href="/zahlungen">Alle Zahlungen</Link>}/>
+        {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<EmptyState icon="wallet" title="Noch keine Zahlungen" text="Erfasste Zahlungen erscheinen hier."/>}
       </section>
     </div>
-
-    <section className="quick-section">
-      <SectionTitle title="Schnellzugriff"/>
-      <div className="quick-grid">
-        <Button href="/kunden/neu" variant="secondary" icon="users">Kunde erfassen</Button>
-        <Button href="/angebote/neu" variant="secondary" icon="file">Angebot erstellen</Button>
-        <Button href="/rechnungen/neu" variant="secondary" icon="receipt">Rechnung erstellen</Button>
-        <Button href="/zeit" variant="secondary" icon="clock">Zeit erfassen</Button>
-      </div>
-    </section>
+    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 }
 
