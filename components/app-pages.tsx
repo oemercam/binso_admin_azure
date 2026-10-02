@@ -9,12 +9,57 @@ import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
+import { apiGet, apiPost, useProductionBackend } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
+
+function moneyChf(value:unknown){
+  const amount=Number(value);
+  return `CHF ${Number.isFinite(amount)?amount.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}):"0.00"}`;
+}
+
+function swissDate(value:unknown){
+  if(typeof value!=="string") return "";
+  const parts=value.split("-");
+  return parts.length===3?`${parts[2]}.${parts[1]}.${parts[0]}`:value;
+}
+
+function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
+  if(collection==="customers") return items.map(item=>[
+    String(item.name??""),String(item.sector??"—"),String(item.city??"—"),item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="products") return items.map(item=>[
+    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="employees") return items.map(item=>[
+    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),`${String(item.workload_percent??0)}%`,item.status==="inactive"?"Inaktiv":"Aktiv"
+  ]);
+  if(collection==="expenses") return items.map(item=>{
+    const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
+    const person=employee?[employee.first_name,employee.last_name].filter(Boolean).join(" "):"Nicht zugewiesen";
+    const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
+    return [String(item.merchant??""),person,moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+  });
+  if(collection==="payments") return items.map(item=>{
+    const customer=item.customer as {name?:string}|null|undefined;
+    const invoice=item.invoice as {number?:string}|null|undefined;
+    const statusMap:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
+    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,item.method].filter(Boolean).join(" · "),moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+  });
+  return [];
+}
 
 function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   const [rows,setRows]=useState(defaults);
 
   useEffect(()=>{
+    if(useProductionBackend()){
+      const controller=new AbortController();
+      apiGet<{items:Record<string,unknown>[]}>(`/api/${collection==="payments"?"payments":collection}`)
+        .then(payload=>queueMicrotask(()=>setRows(mapRemoteRows(collection,payload.items))))
+        .catch(()=>queueMicrotask(()=>setRows(defaults)));
+      return()=>controller.abort();
+    }
+
     const sync=()=>{
       const stored=readDemoRows(collection);
       queueMicrotask(()=>setRows([...stored,...defaults]));
