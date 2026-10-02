@@ -63,3 +63,40 @@ export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){
   const {token,tenantId}=await currentTenant();
   return requestDb<T>("rpc/"+fn,"POST",token,{...args,p_tenant_id:tenantId});
 }
+
+
+export async function currentCompany(){
+  const {token,tenantId}=await currentTenant();
+  const rows=await requestDb<Array<Record<string,unknown>>>(
+    "tenants?select=id,name,uid,street,postal_code,city,email,phone,vat_rate,payment_terms_days&" +
+    "id=eq." + tenantId + "&limit=1",
+    "GET",token
+  );
+  if(!rows[0]) throw new ApiError(404,"company_not_found","Firma wurde nicht gefunden.");
+  return rows[0];
+}
+
+export async function updateCompany(data:Record<string,unknown>){
+  const {token,tenantId}=await currentTenant();
+  return requestDb<Array<Record<string,unknown>>>(
+    "tenants?id=eq." + tenantId,
+    "PATCH",token,data,"return=representation"
+  );
+}
+
+export async function currentProfile(){
+  const {user,token}=await requireUser();
+  const rows=await requestDb<Array<Record<string,unknown>>>(
+    "profiles?select=user_id,display_name,first_name,last_name,phone,job_title,language&user_id=eq." + encodeURIComponent(user.id) + "&limit=1",
+    "GET",token
+  );
+  return rows[0] ?? null;
+}
+
+export async function updateProfile(data:Record<string,unknown>){
+  const {user,token}=await requireUser();
+  return requestDb<Array<Record<string,unknown>>>(
+    "profiles?user_id=eq." + encodeURIComponent(user.id),
+    "PATCH",token,data,"return=representation"
+  );
+}
