@@ -1,0 +1,1 @@
+import {demo} from "@/lib/demo-store";import {toCsv} from "@/lib/csv";export function GET(){const csv=toCsv(demo.customers.map(x=>({Name:x.name,Status:x.status})));return new Response(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Cache-Control":"no-store"}})}
