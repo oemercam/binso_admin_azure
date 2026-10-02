@@ -61,16 +61,13 @@ export default function ModulePage({config}:{config:ModuleConfig}){
  const [loadError,setLoadError]=useState("");
  const [actionsOpen,setActionsOpen]=useState(false);
  const [selectionMode,setSelectionMode]=useState(false);
- const [selectedIds,setSelectedIds]=useState<string[]>([]);
- const [listState,setListState]=useSessionJsonState<ModuleListState>(`binso:list:${config.key}`,defaultModuleListState);
+ const [selectedIds,setSelectedIds]=useState<string[]>([]); const [listState,setListState]=useSessionJsonState<ModuleListState>(`binso:list:${config.key}`,defaultModuleListState);
  const {query,statusFilter,sort,view,timeScope}=listState;
  const setQuery=(value:string)=>setListState(current=>({...current,query:value}));
  const setStatusFilter=(value:string)=>setListState(current=>({...current,statusFilter:value}));
  const setSort=(value:"asc"|"desc")=>setListState(current=>({...current,sort:value}));
  const setView=(value:"table"|"cards")=>setListState(current=>({...current,view:value}));
- const setTimeScope=(value:"Woche"|"Monat")=>setListState(current=>({...current,timeScope:value}));
-
- useEffect(()=>{
+ const setTimeScope=(value:"Woche"|"Monat")=>setListState(current=>({...current,timeScope:value}));useEffect(()=>{
   let active=true;
   const load=()=>{setLoadError("");void listAppRecords(config.key).then(items=>{if(active){setLocal(items);setLoading(false)}}).catch(error=>{if(active){setLoadError(error instanceof Error?error.message:t("Daten konnten nicht geladen werden."));setLoading(false)}})};
   const timer=window.setTimeout(load,0);
@@ -89,13 +86,13 @@ export default function ModulePage({config}:{config:ModuleConfig}){
   const q=query.trim().toLowerCase();
   if(q)all=all.filter(x=>x.row.some(c=>(x.local?String(c):t(String(c))).toLowerCase().includes(q)));
   if(statusFilter!=="Alle")all=all.filter(x=>x.row[x.row.length-1]===statusFilter);
-  if(config.key==="zeiterfassung"&&timeScope==="Woche"){
+  if(config.key==="zeiterfassung"&&timeScope==="Woche"&&!loading){
    const weekStart=startOfCurrentWeekIso();
    all=all.filter(x=>{const raw=String(x.row[0]);const iso=raw.includes(".")?raw.split(".").reverse().join("-"):raw;return iso>=weekStart});
   }
   all.sort((a,b)=>sort==="asc"?String(a.row[0]).localeCompare(String(b.row[0]),localeTags[locale]):String(b.row[0]).localeCompare(String(a.row[0]),localeTags[locale]));
   return all;
- },[seedRows,config.key,local,query,statusFilter,sort,sourceSeedIds,timeScope,locale,t]);
+ },[seedRows,config.key,local,query,statusFilter,sort,sourceSeedIds,timeScope,loading,locale,t]);
 
  const canCreate=!["berichte","einstellungen","mwst","lohn"].includes(config.key)&&permissions.canModule(config.key,"write");
  const createHref=canCreate?`${config.href}/neu`:config.href;
