@@ -1,0 +1,110 @@
+﻿name: Visual QA
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+      - feature/visual-qa-github
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  visual-qa:
+
+    name: Binso One Visual QA
+
+    runs-on:
+      ubuntu-latest
+
+    timeout-minutes:
+      30
+
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Production build
+        run: pnpm build
+
+      - name: Visual QA
+        run: pnpm visual:qa
+
+      - name: Create QA manifest
+        if: always()
+        run: pnpm visual:manifest
+
+      - name: GitHub summary
+        if: always()
+        shell: bash
+        run: |
+          COUNT=$(
+            find artifacts/visual-qa/screenshots \
+              -maxdepth 1 \
+              -name '*.png' \
+              2>/dev/null |
+            wc -l
+          )
+
+          {
+            echo "## Binso One Visual QA"
+            echo ""
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Screenshots: ${COUNT}"
+            echo "- Viewport: 390 x 844"
+            echo "- Locale: de-CH"
+            echo "- Browser: Chromium"
+            echo "- Artifact: \`binso-one-visual-qa\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Visual QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binso-one-visual-qa
+          path: artifacts/visual-qa/
+          if-no-files-found: warn
+          retention-days: 14

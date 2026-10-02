@@ -16,3 +16,8 @@ azure-webapp-logs*.zip
 azure-webapp-logs*/
 .lint-current.txt
 deploy/
+
+# Visual QA
+artifacts/visual-qa/
+playwright-report/
+test-results/
