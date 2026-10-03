@@ -135,3 +135,41 @@ if(failures.length){
 }
 
 console.log(`Route/CSS integrity OK: ${routes.length} routes, ${seenAssets.size} unique stylesheets.`);
+
+
+async function verifyDemoFlow(){
+  const origin=new URL(base).origin;
+  const response=await fetch(origin+"/api/demo/session",{
+    method:"POST",
+    redirect:"manual",
+    headers:{
+      "content-type":"application/json",
+      "origin":origin,
+      "referer":origin+"/demo",
+      "user-agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1",
+    },
+    body:"{}",
+  });
+  const cookie=response.headers.get("set-cookie")||"";
+  if(!response.ok) failures.push(`/api/demo/session: POST returned ${response.status}`);
+  if(!cookie.includes("binso_demo=1")) failures.push("/api/demo/session: demo cookie was not issued");
+  if(response.ok&&cookie.includes("binso_demo=1")){
+    const dashboard=await fetch(origin+"/willkommen",{
+      redirect:"manual",
+      headers:{cookie:"binso_demo=1","cache-control":"no-cache"},
+    });
+    if(dashboard.status>=300&&dashboard.status<400){
+      failures.push(`/willkommen: demo cookie was rejected with redirect ${dashboard.status}`);
+    }else if(!dashboard.ok){
+      failures.push(`/willkommen: demo session returned ${dashboard.status}`);
+    }
+  }
+}
+await verifyDemoFlow();
+
+if(failures.length){
+  console.error("Demo flow integrity check failed:");
+  for(const failure of failures) console.error("- "+failure);
+  process.exit(1);
+}
+console.log("Demo flow integrity OK.");
