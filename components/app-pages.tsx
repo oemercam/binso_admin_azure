@@ -988,6 +988,7 @@ export function SettingsPage() {
   const rows = [
     ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
     ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
+    ["/einstellungen/team","users","Team","Benutzer, Rollen und Einladungen"],
     ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
     ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
     ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
