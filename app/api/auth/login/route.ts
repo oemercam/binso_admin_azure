@@ -46,5 +46,5 @@ export async function POST(request:NextRequest){
   await query(`update platform_tenants set last_active_at=now() where organization_id=$1`,[user.organization_id]);
   await createSession({userId:user.id,organizationId:user.organization_id,email:user.email,name:user.name,role:user.role});
   return json({ok:true,onboardingComplete:user.onboarding_complete,emailVerified:Boolean(user.email_verified_at)});
- }catch(error){return apiError(error,request)}
+ }catch(error){return apiError(error)}
 }
