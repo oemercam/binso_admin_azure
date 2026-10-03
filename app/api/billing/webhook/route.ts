@@ -1,90 +1,39 @@
 import { NextRequest } from "next/server";
 import { apiError, ApiError, json } from "@/lib/server/http";
-import { mapStripeSubscriptionStatus, verifyStripeWebhook } from "@/lib/server/stripe";
-import { privilegedSupabase } from "@/lib/server/service-role";
+import { verifyStripeSignature } from "@/lib/server/stripe";
+import { withPlatform } from "@/lib/server/db";
 
-function stringValue(value:unknown){
-  return typeof value==="string"?value:"";
-}
+export const runtime="nodejs";
 
-function metadataValue(object:Record<string,unknown>,key:string){
-  const metadata=object.metadata;
-  if(!metadata||typeof metadata!=="object") return "";
-  return stringValue((metadata as Record<string,unknown>)[key]);
-}
-
-function unixToIso(value:unknown){
-  const seconds=Number(value);
-  return Number.isFinite(seconds)&&seconds>0?new Date(seconds*1000).toISOString():null;
-}
-
-
-function invoiceSubscriptionRef(object:Record<string,unknown>){
-  const direct=stringValue(object.subscription);
-  if(direct) return direct;
-  const parent=object.parent;
-  if(!parent||typeof parent!=="object") return "";
-  const subscriptionDetails=(parent as Record<string,unknown>).subscription_details;
-  if(!subscriptionDetails||typeof subscriptionDetails!=="object") return "";
-  return stringValue((subscriptionDetails as Record<string,unknown>).subscription);
-}
+function objectValue(value:unknown):Record<string,unknown>{return value&&typeof value==="object"?value as Record<string,unknown>:{}}
+function str(value:unknown){return typeof value==="string"?value:""}
+function meta(object:Record<string,unknown>,key:string){return str(objectValue(object.metadata)[key])}
+function unixIso(value:unknown){const n=Number(value);return Number.isFinite(n)&&n>0?new Date(n*1000).toISOString():null}
 
 export async function POST(request:NextRequest){
-  try{
-    const length=Number(request.headers.get("content-length")??"0");
-    if(length&&length>262144) throw new ApiError(413,"request_too_large","Webhook ist zu gross.");
-    const body=await request.text();
-    if(body.length>262144) throw new ApiError(413,"request_too_large","Webhook ist zu gross.");
-
-    const event=verifyStripeWebhook(body,request.headers.get("stripe-signature"));
-    const object=event.data.object;
-    let tenantId=metadataValue(object,"tenant_id")||null;
-    let plan=metadataValue(object,"plan")||null;
-    let customerRef=stringValue(object.customer)||null;
-    let subscriptionRef=stringValue(object.subscription)||null;
-    let subscriptionStatus:string|null=null;
-    let currentPeriodEnd:string|null=null;
-
-    if(event.type.startsWith("customer.subscription.")){
-      customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=stringValue(object.id)||subscriptionRef;
-      subscriptionStatus=mapStripeSubscriptionStatus(object.status);
-      currentPeriodEnd=unixToIso(object.current_period_end);
-      tenantId=metadataValue(object,"tenant_id")||tenantId;
-      plan=metadataValue(object,"plan")||plan;
-    }else if(event.type==="checkout.session.completed"){
-      customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=stringValue(object.subscription)||subscriptionRef;
-      subscriptionStatus="active";
-      tenantId=metadataValue(object,"tenant_id")||stringValue(object.client_reference_id)||tenantId;
-      plan=metadataValue(object,"plan")||plan;
-    }else if(event.type==="invoice.payment_failed"){
-      customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=invoiceSubscriptionRef(object)||subscriptionRef;
-      if(!subscriptionRef) return json({received:true,ignored:true});
-      subscriptionStatus="past_due";
-    }else if(event.type==="invoice.paid"){
-      customerRef=stringValue(object.customer)||customerRef;
-      subscriptionRef=invoiceSubscriptionRef(object)||subscriptionRef;
-      if(!subscriptionRef) return json({received:true,ignored:true});
-      subscriptionStatus="active";
-    }else{
-      return json({received:true,ignored:true});
-    }
-
-    const result=await privilegedSupabase<boolean>("rpc/apply_stripe_billing_event",{
-      method:"POST",
-      body:{
-        p_event_id:event.id,
-        p_event_type:event.type,
-        p_tenant_id:tenantId,
-        p_customer_ref:customerRef,
-        p_subscription_ref:subscriptionRef,
-        p_subscription_status:subscriptionStatus,
-        p_plan:plan,
-        p_current_period_end:currentPeriodEnd,
-      },
-    });
-    return json({received:true,processed:result});
-  }catch(error){return apiError(error);}
+ try{
+  const length=Number(request.headers.get("content-length")??"0");
+  if(length&&length>262144)throw new ApiError(413,"request_too_large","Webhook ist zu gross.");
+  const body=await request.text();
+  if(body.length>262144)throw new ApiError(413,"request_too_large","Webhook ist zu gross.");
+  const signature=request.headers.get("stripe-signature")??"";
+  if(!signature)throw new ApiError(400,"invalid_signature","Ungültige Stripe-Signatur.");
+  if(!verifyStripeSignature(body,signature))throw new ApiError(400,"invalid_signature","Ungültige Stripe-Signatur.");
+  const event=JSON.parse(body) as {id?:string;type?:string;data?:{object?:unknown}};
+  const object=objectValue(event.data?.object);const type=str(event.type);const eventId=str(event.id);
+  if(!eventId||!type)return json({received:false},400);
+  let organizationId=meta(object,"organization_id")||meta(object,"tenant_id")||str(object.client_reference_id);
+  let customerId=str(object.customer);let subscriptionId=type.startsWith("customer.subscription.")?str(object.id):str(object.subscription);
+  let status=type.startsWith("customer.subscription.")?str(object.status):type==="checkout.session.completed"?"active":type==="invoice.payment_failed"?"past_due":type==="invoice.paid"?"active":"";
+  const periodEnd=unixIso(object.current_period_end);
+  if(!organizationId&&customerId){
+    const found=await withPlatform(async client=>(await client.query<{id:string}>("select id from organizations where stripe_customer_id=$1 limit 1",[customerId])).rows[0]);
+    organizationId=found?.id??"";
+  }
+  if(!organizationId)return json({received:true,ignored:true});
+  await withPlatform(async client=>{
+    await client.query(`update organizations set stripe_customer_id=coalesce(nullif($2,''),stripe_customer_id), stripe_subscription_id=coalesce(nullif($3,''),stripe_subscription_id), subscription_status=coalesce(nullif($4,''),subscription_status), subscription_current_period_end=coalesce($5,subscription_current_period_end), updated_at=now() where id=$1`,[organizationId,customerId,subscriptionId,status,periodEnd]);
+  });
+  return json({received:true,processed:true});
+ }catch(error){return apiError(error);}
 }

@@ -29,7 +29,7 @@ export function MarketingHeader() {
           <Link href="/portal/login">Anmelden</Link>
           <Button href="/registrieren">30 Tage kostenlos testen</Button>
           <button className="marketing-menu-button" type="button" aria-label={open ? "Menü schliessen" : "Menü öffnen"} onClick={() => setOpen(!open)}>
-            <Icon name={open ? "close" : "menu"} size={23}/>
+            <span className={`menu-morph ${open ? "is-open" : ""}`} aria-hidden="true"><i/><i/><i/></span>
           </button>
         </div>
       </div>
@@ -46,11 +46,15 @@ export function MarketingHeader() {
         <Button href="/registrieren">30 Tage kostenlos testen</Button>
         <Button href="/demo" variant="ghost">Demo starten</Button>
       </div>
+      <div className="marketing-mobile-social" aria-label="Binso Social Media">
+        <a href="https://ch.linkedin.com/company/binsogmbh" target="_blank" rel="noreferrer" aria-label="Binso auf LinkedIn"><span aria-hidden="true">in</span></a>
+        <span className="marketing-social-placeholder" aria-label="Instagram Profil folgt">◎</span>
+        <span className="marketing-social-placeholder marketing-social-xing" aria-label="XING Profil folgt">X</span>
+      </div>
       <div className="marketing-mobile-secondary">
-        <Link href="/#sicherheit" onClick={() => setOpen(false)}>Sicherheit</Link>
         <Link href="/operator" onClick={() => setOpen(false)}>Admin</Link>
       </div>
-      <small>Binso GmbH · Appenzell · Schweiz</small>
+      <small className="marketing-mobile-copyright">© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
     </div>}
   </>;
 }

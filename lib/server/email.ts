@@ -1,43 +1,15 @@
-import { ApiError } from "./http";
+import "server-only";
+import {env} from "@/lib/server/env";
+import {log} from "@/lib/server/logger";
 
-type SendEmailInput={
-  to:string|string[];
-  subject:string;
-  html:string;
-  text?:string;
-  replyTo?:string;
-  idempotencyKey?:string;
-};
-
-export function isEmailConfigured(){
-  return Boolean(process.env.RESEND_API_KEY&&process.env.BINSO_EMAIL_FROM);
+type Mail={to:string;subject:string;html:string;text:string};
+export async function sendMail(mail:Mail){
+ if(!env.resendApiKey){log("info","email_skipped_not_configured",{toDomain:mail.to.split("@")[1],subject:mail.subject});return {delivered:false,provider:"none" as const}}
+ const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{authorization:`Bearer ${env.resendApiKey}`,"content-type":"application/json"},body:JSON.stringify({from:env.emailFrom,to:[mail.to],subject:mail.subject,html:mail.html,text:mail.text}),cache:"no-store"});
+ if(!response.ok){const body=await response.text();log("error","email_provider_error",{status:response.status,body:body.slice(0,300)});throw new Error("E-Mail konnte nicht versendet werden.")}
+ return {delivered:true,provider:"resend" as const};
 }
-
-export async function sendEmail(input:SendEmailInput){
-  const key=process.env.RESEND_API_KEY;
-  const from=process.env.BINSO_EMAIL_FROM;
-  if(!key||!from) throw new ApiError(503,"email_not_configured","E-Mail-Versand ist noch nicht konfiguriert.");
-  const response=await fetch("https://api.resend.com/emails",{
-    method:"POST",
-    headers:{
-      Authorization:"Bearer "+key,
-      "Content-Type":"application/json",
-      ...(input.idempotencyKey?{"Idempotency-Key":input.idempotencyKey.slice(0,256)}:{}),
-    },
-    body:JSON.stringify({
-      from,
-      to:Array.isArray(input.to)?input.to:[input.to],
-      subject:input.subject,
-      html:input.html,
-      ...(input.text?{text:input.text}:{}),
-      ...(input.replyTo?{reply_to:input.replyTo}:{}),
-    }),
-    cache:"no-store",
-  });
-  const payload=await response.json().catch(()=>({}));
-  if(!response.ok){
-    console.error("Resend request failed",response.status,typeof payload?.name==="string"?payload.name:"unknown");
-    throw new ApiError(502,"email_provider_error","E-Mail konnte nicht versendet werden.");
-  }
-  return payload as {id?:string};
+export function mailLayout(title:string,body:string,cta?:{label:string;url:string}){
+ const button=cta?`<p style="margin:28px 0"><a href="${cta.url}" style="background:#111;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none">${cta.label}</a></p>`:"";
+ return `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#111;line-height:1.55"><div style="max-width:620px;margin:auto;padding:32px"><h1 style="font-size:24px">${title}</h1>${body}${button}<hr style="border:0;border-top:1px solid #ddd;margin:32px 0"><small>Binso One · Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</small></div></body></html>`;
 }

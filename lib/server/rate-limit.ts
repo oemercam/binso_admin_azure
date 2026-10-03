@@ -1,46 +1,17 @@
-import crypto from "node:crypto";
-import { NextRequest } from "next/server";
-import { ApiError } from "./http";
-import { isBackendConfigured } from "./env";
-import { privilegedSupabase } from "./service-role";
+import "server-only";
+import {createHash} from "node:crypto";
+import {NextRequest} from "next/server";
+import {env} from "@/lib/server/env";
+import {query} from "@/lib/server/db";
 
-function fingerprint(value:string){
-  const secret=process.env.RATE_LIMIT_SECRET;
-  if(!secret) throw new ApiError(503,"rate_limit_not_configured","Sicherheitskonfiguration ist unvollständig.",{"Retry-After":"60"});
-  return crypto.createHmac("sha256",secret).update(value,"utf8").digest("hex");
-}
-
-function clientIp(request:NextRequest){
-  const forwarded=request.headers.get("x-forwarded-for");
-  if(forwarded){
-    const first=forwarded.split(",")[0]?.trim();
-    if(first) return first.slice(0,128);
-  }
-  const real=request.headers.get("x-real-ip")?.trim();
-  return real?real.slice(0,128):"unknown";
-}
-
-async function consume(route:string,key:string){
-  if(!isBackendConfigured()) return true;
-  try{
-    return await privilegedSupabase<boolean>("rpc/consume_api_rate_limit",{
-      method:"POST",
-      body:{p_route:route,p_key_hash:fingerprint(key)},
-    });
-  }catch(error){
-    if(error instanceof ApiError) throw error;
-    throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.",{"Retry-After":"60"});
-  }
-}
-
-export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover"|"telemetry.web_vitals",identity?:string){
-  const retryAfter=route==="auth.login"?"900":route==="telemetry.web_vitals"?"60":"3600";
-  const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
-  if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
-
-  if(identity){
-    const normalized=identity.trim().toLowerCase().slice(0,320);
-    const identityAllowed=await consume(route+":identity","identity|"+normalized);
-    if(!identityAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
-  }
+type Bucket={count:number;resetAt:number};const buckets=new Map<string,Bucket>();
+function ip(request:NextRequest){return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()||request.headers.get("x-real-ip")||"unknown"}
+function bucketKey(request:NextRequest,scope:string){return createHash("sha256").update(`${scope}:${ip(request)}`).digest("hex")}
+export async function enforceRateLimit(request:NextRequest,scope:string,limit:number,windowMs:number){
+ const key=bucketKey(request,scope);const now=Date.now();
+ if(env.appMode==="production"&&env.databaseUrl){
+   const seconds=Math.ceil(windowMs/1000);const r=await query<{count:number;reset_at:Date}>(`insert into rate_limit_buckets(bucket_key,count,reset_at) values($1,1,now()+($2||' seconds')::interval) on conflict(bucket_key) do update set count=case when rate_limit_buckets.reset_at<=now() then 1 else rate_limit_buckets.count+1 end,reset_at=case when rate_limit_buckets.reset_at<=now() then now()+($2||' seconds')::interval else rate_limit_buckets.reset_at end,updated_at=now() returning count,reset_at`,[key,String(seconds)]);const b=r.rows[0];if(b&&b.count>limit)throw new Response("Too Many Requests",{status:429,headers:{"retry-after":String(Math.max(1,Math.ceil((new Date(b.reset_at).getTime()-now)/1000)))}});return;
+ }
+ const current=buckets.get(key);if(!current||current.resetAt<=now){buckets.set(key,{count:1,resetAt:now+windowMs});return}if(current.count>=limit)throw new Response("Too Many Requests",{status:429,headers:{"retry-after":String(Math.ceil((current.resetAt-now)/1000))}});current.count++;
+ if(buckets.size>5000)for(const [k,v] of buckets)if(v.resetAt<=now)buckets.delete(k);
 }

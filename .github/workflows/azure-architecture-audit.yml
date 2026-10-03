@@ -1,0 +1,67 @@
+name: Azure Architecture Audit
+on:
+  push:
+    branches:
+      - fix/restore-azure-postgres-backend-20261003
+    paths:
+      - .github/workflows/azure-architecture-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Audit Azure architecture without secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_NAME="binso-admin-prod"
+          PG_NAME="binso-platform-db"
+
+          APP_RG="$(az resource list --name "$APP_NAME" --resource-type Microsoft.Web/sites --query "[0].resourceGroup" -o tsv)"
+          PG_RG="$(az resource list --name "$PG_NAME" --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[0].resourceGroup" -o tsv)"
+          echo "App resource group: ${APP_RG:-NOT_FOUND}"
+          echo "PostgreSQL resource group: ${PG_RG:-NOT_FOUND}"
+          test -n "$APP_RG"
+
+          echo "=== App Service ==="
+          az webapp show -g "$APP_RG" -n "$APP_NAME" --query "{name:name,state:state,httpsOnly:httpsOnly,kind:kind,location:location,identity:identity.type,clientAffinityEnabled:clientAffinityEnabled}" -o json
+          echo "=== App Service identity ==="
+          az webapp identity show -g "$APP_RG" -n "$APP_NAME" --query "{type:type,principalId:principalId,tenantId:tenantId}" -o json
+          echo "=== App setting names only ==="
+          az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
+
+          echo "=== PostgreSQL connection from configured App Service setting ==="
+          DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          if [ -n "$DATABASE_URL" ]; then
+            echo "::add-mask::$DATABASE_URL"
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+          else
+            echo "DATABASE_URL is not configured."
+          fi
+
+          echo "=== PostgreSQL Flexible Servers visible to deployment identity ==="
+          az resource list --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[].{name:name,resourceGroup:resourceGroup,location:location}" -o json
+          if [ -n "$PG_RG" ]; then
+            echo "=== PostgreSQL Flexible Server ==="
+            az postgres flexible-server show -g "$PG_RG" -n "$PG_NAME" --query "{name:name,state:state,version:version,location:location,publicNetworkAccess:network.publicNetworkAccess,delegatedSubnetResourceId:network.delegatedSubnetResourceId,privateDnsZoneArmResourceId:network.privateDnsZoneArmResourceId,authConfig:authConfig,backup:backup,highAvailability:highAvailability,storage:storage}" -o json
+            echo "=== PostgreSQL databases ==="
+            az postgres flexible-server db list -g "$PG_RG" -s "$PG_NAME" --query "[].name" -o tsv | sort
+          fi
+
+          echo "=== Storage accounts in App resource group ==="
+          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json || echo "Deployment identity cannot read Storage resources."
+
+          echo "=== Application Insights in App resource group ==="
+          az monitor app-insights component show --app "$APP_NAME" -g "$APP_RG" --query "{name:name,provisioningState:provisioningState,location:location}" -o json 2>/dev/null || echo "No App Insights component named $APP_NAME"

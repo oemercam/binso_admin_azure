@@ -1,12 +1,8 @@
 import { NextRequest } from "next/server";
+import { destroySession } from "@/lib/server/session";
 import { apiError, assertSameOrigin, json } from "@/lib/server/http";
-import { clearAuthCookies } from "@/lib/server/auth";
-
+export const runtime="nodejs";
 export async function POST(request:NextRequest){
-  try{
-    assertSameOrigin(request);
-    const response=json({ok:true});
-    clearAuthCookies(response);
-    return response;
-  }catch(error){return apiError(error);}
+ try{assertSameOrigin(request);await destroySession();return json({ok:true})}
+ catch(error){return apiError(error)}
 }

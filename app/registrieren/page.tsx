@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button, Logo } from "@/components/ui";
 import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
 
@@ -57,7 +58,7 @@ export default function Register() {
 
   return <main className="auth-page">
     <section className="auth-card">
-      <Logo/>
+      <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/">Abbrechen</Link></div>
       <h1>Konto erstellen</h1>
       <p>Nur das Nötigste. Weitere Angaben kannst du später ergänzen.</p>
       <form onSubmit={submit}>
@@ -66,15 +67,17 @@ export default function Register() {
         <label>Passwort
           <div className="password-field">
             <input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 8 Zeichen"/>
-            <button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?"Ausblenden":"Anzeigen"}</button>
+            <button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button>
           </div>
           <small className="password-hint">Mindestens 8 Zeichen.</small>
         </label>
         {error&&<p className="auth-error" role="alert">{error}</p>}
         <Button type="submit">{loading?"Account wird erstellt…":"Account erstellen"}</Button>
       </form>
-      <small className="auth-legal">Mit der Registrierung bestätigst du, dass du die rechtlichen Hinweise gelesen hast.</small>
-      <p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p>
+      <div className="auth-after-submit">
+        <p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> zur Kenntnis genommen zu haben.</p>
+        <p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p>
+      </div>
     </section>
   </main>;
 }

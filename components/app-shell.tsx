@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
@@ -57,6 +58,7 @@ export function AppShell({
   actions,
   backHref,
   backLabel = "Zurück",
+  preview = false,
 }: {
   title: string;
   subtitle?: string;
@@ -65,6 +67,7 @@ export function AppShell({
   actions?: React.ReactNode;
   backHref?: string;
   backLabel?: string;
+  preview?: boolean;
 }) {
   const router=useRouter();
   const pathname=usePathname();
@@ -83,6 +86,8 @@ export function AppShell({
   const [notifications,setNotifications]=useState<NotificationItem[]>([]);
   const [notificationsLoading,setNotificationsLoading]=useState(false);
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
+  const [navCompact,setNavCompact]=useState(false);
+  const [showLaunch,setShowLaunch]=useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -130,6 +135,16 @@ export function AppShell({
   }, [dark]);
 
   useEffect(()=>{
+    if(preview||window.sessionStorage.getItem("binso.launch.seen")==="1") return;
+    const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.sessionStorage.setItem("binso.launch.seen","1");
+    if(reduceMotion) return;
+    queueMicrotask(()=>setShowLaunch(true));
+    const timer=window.setTimeout(()=>setShowLaunch(false),900);
+    return()=>window.clearTimeout(timer);
+  },[preview]);
+
+  useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
     apiGet<{authenticated:boolean;user?:{email?:string}}>("/api/auth/session")
       .then(session=>{
@@ -143,13 +158,60 @@ export function AppShell({
   },[]);
 
   useEffect(() => {
-    document.body.style.overflow = sheet ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!sheet) return;
+    const scrollY=window.scrollY;
+    const body=document.body;
+    const root=document.documentElement;
+    const previous={
+      bodyPosition:body.style.position,
+      bodyTop:body.style.top,
+      bodyWidth:body.style.width,
+      bodyOverflow:body.style.overflow,
+      rootOverflow:root.style.overflow,
+    };
+    body.style.position="fixed";
+    body.style.top=`-${scrollY}px`;
+    body.style.width="100%";
+    body.style.overflow="hidden";
+    root.style.overflow="hidden";
+    return () => {
+      body.style.position=previous.bodyPosition;
+      body.style.top=previous.bodyTop;
+      body.style.width=previous.bodyWidth;
+      body.style.overflow=previous.bodyOverflow;
+      root.style.overflow=previous.rootOverflow;
+      window.scrollTo({top:scrollY,left:0,behavior:"auto"});
+    };
   }, [sheet]);
 
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
   }, [pathname]);
+
+  useEffect(() => {
+    if(preview) return;
+    let lastY=window.scrollY;
+    let compact=false;
+    let ticking=false;
+    const update=()=>{
+      const currentY=Math.max(0,window.scrollY);
+      const delta=currentY-lastY;
+      if(currentY<24) compact=false;
+      else if(delta>7) compact=true;
+      else if(delta<-7) compact=false;
+      setNavCompact(value=>value===compact?value:compact);
+      lastY=currentY;
+      ticking=false;
+    };
+    const onScroll=()=>{
+      if(!ticking){
+        ticking=true;
+        window.requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[preview]);
 
 
   useEffect(() => {
@@ -276,7 +338,8 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <div className={`app-root app-section-${active} ${timerRunning ? "timer-active" : ""}`}>
+  return <div className={`app-root app-section-${active} ${timerRunning ? "timer-active" : ""} ${preview ? "app-preview" : ""}`}>
+    {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
@@ -331,15 +394,15 @@ export function AppShell({
         <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
-      <nav className="bottom-nav" aria-label="Hauptnavigation">
+      {!preview && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
         <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
         <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
         <Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
-      </nav>
+      </nav>}
 
-      {sheet && <div className="sheet-layer" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
+      {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
         <section className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">

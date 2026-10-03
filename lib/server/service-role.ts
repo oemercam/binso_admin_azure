@@ -1,49 +1,22 @@
+import "server-only";
+import { randomUUID } from "node:crypto";
 import { ApiError } from "./http";
-import { getBackendEnv } from "./env";
+import { withPlatform } from "./db";
+import { createAuthToken } from "./auth-tokens";
+import { hashPassword } from "./password";
+import { sendMail, mailLayout } from "./email";
+import { env } from "./env";
 
-function serviceKey(){
-  const value=process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if(!value) throw new ApiError(503,"service_role_not_configured","Serverintegration ist nicht vollständig konfiguriert.");
-  return value;
+export async function inviteUser(email:string,data:Record<string,string>){
+ const organizationId=data.organization_id||data.tenant_id;if(!organizationId)throw new ApiError(400,"organization_required","Organisation fehlt.");
+ const existing=await withPlatform(async c=>(await c.query<{id:string}>("select id from app_users where lower(email)=lower($1) limit 1",[email])).rows[0]);
+ const userId=existing?.id??randomUUID();
+ if(!existing)await withPlatform(async c=>c.query("insert into app_users(id,email,display_name,status,password_hash) values($1,$2,$3,'invited',$4)",[userId,email,data.name||email,await hashPassword(randomUUID()+randomUUID())]));
+ await withPlatform(async c=>c.query("insert into organization_memberships(organization_id,user_id,role,status) values($1,$2,$3,'invited') on conflict(organization_id,user_id) do update set role=excluded.role,status='invited'",[organizationId,userId,data.role||"member"]));
+ const token=await createAuthToken({type:"invitation",email,userId,organizationId,metadata:data,ttlMinutes:60*24*7});
+ const url=`${env.appUrl}/einladung?token=${encodeURIComponent(token)}`;
+ await sendMail({to:email,subject:"Einladung zu Binso One",text:`Einladung annehmen: ${url}`,html:mailLayout("Einladung zu Binso One","<p>Du wurdest zu einem Binso One Firmenkonto eingeladen.</p>",{label:"Einladung annehmen",url})});
+ return {id:userId,email};
 }
-
-export async function privilegedSupabase<T>(path:string,options:{method?:"GET"|"POST"|"PATCH"|"DELETE";body?:unknown;prefer?:string}={}):Promise<T>{
-  const {supabaseUrl}=getBackendEnv();
-  const key=serviceKey();
-  const response=await fetch(supabaseUrl+"/rest/v1/"+path,{
-    method:options.method??"GET",
-    headers:{
-      apikey:key,
-      Authorization:"Bearer "+key,
-      "Content-Type":"application/json",
-      ...(options.prefer?{Prefer:options.prefer}:{}),
-    },
-    body:options.body===undefined?undefined:JSON.stringify(options.body),
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Privileged Supabase request failed",response.status,typeof payload?.code==="string"?payload.code:"unknown");
-    throw new ApiError(500,"privileged_database_error","Serverintegration konnte die Daten nicht verarbeiten.");
-  }
-  if(response.status===204) return undefined as T;
-  return response.json() as Promise<T>;
-}
-
-
-export async function inviteSupabaseUser(email:string,data:Record<string,string>){
-  const {supabaseUrl}=getBackendEnv();
-  const key=serviceKey();
-  const response=await fetch(supabaseUrl+"/auth/v1/invite",{
-    method:"POST",
-    headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"},
-    body:JSON.stringify({email,data}),
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Supabase invitation failed",response.status,typeof payload?.code==="string"?payload.code:"unknown");
-    throw new ApiError(400,"invitation_failed","Einladung konnte nicht gesendet werden.");
-  }
-  return response.json() as Promise<{id?:string;email?:string}>;
-}
+export async function privilegedSupabase<T>():Promise<T>{throw new ApiError(410,"legacy_backend_removed","Die frühere Backend-Schnittstelle wurde entfernt.")}
+export const inviteSupabaseUser=inviteUser;

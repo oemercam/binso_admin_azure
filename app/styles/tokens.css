@@ -20,6 +20,15 @@
   --shadow-float:0 12px 32px rgba(0,0,0,.10);
   --shadow-modal:0 20px 70px rgba(0,0,0,.20);
 
+  --motion-fast:140ms;
+  --motion-base:220ms;
+  --motion-slow:420ms;
+  --motion-ease:cubic-bezier(.22,1,.36,1);
+  --motion-ease-standard:cubic-bezier(.2,0,0,1);
+  --glass-bg:rgba(255,255,255,.76);
+  --glass-line:rgba(10,10,10,.10);
+  --glass-blur:18px;
+
   --sidebar-w:228px;
   --content-max:1480px;
   --marketing-max:1240px;
@@ -27,7 +36,8 @@
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
   --mobile-header-h:48px;
-  --mobile-nav-h:64px;
+  --mobile-nav-h:68px;
+  --mobile-nav-compact-h:52px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
   --mobile-toolbar-gap:10px;
@@ -66,10 +76,18 @@ html[data-theme="dark"]{
   --color-subtle:#000;
   --color-inverse-bg:#fff;
   --color-inverse-fg:#000;
+  --glass-bg:rgba(0,0,0,.72);
+  --glass-line:rgba(255,255,255,.16);
 
   --bg:var(--color-bg);
   --ink:var(--color-fg);
   --muted:var(--color-muted);
   --line:var(--color-line);
   --soft:var(--color-subtle);
+}
+
+
+@media (prefers-reduced-motion:reduce){
+  :root{--motion-fast:0ms;--motion-base:0ms;--motion-slow:0ms}
+  html{scroll-behavior:auto}
 }

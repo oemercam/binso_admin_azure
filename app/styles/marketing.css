@@ -180,7 +180,8 @@
   margin:20px 0 0;
   border-top:1px solid var(--color-line);
 }
-.feature-list>div,
+ .feature-list>div,
+.feature-list>.feature-list-link,
 .product-module-list>div{
   min-height:58px;
   padding:10px 0;
@@ -201,7 +202,18 @@
 }
 .security-points>div>svg{width:20px;height:20px;justify-self:center}
 .security-points>div>span{min-width:0}
-.feature-list>div>div{min-width:0}
+.feature-list>div>div,
+.feature-list>.feature-list-link>span{min-width:0}
+.feature-list>.feature-list-link{
+  color:var(--color-fg);
+  text-decoration:none;
+  cursor:pointer;
+}
+.feature-list>.feature-list-link:focus-visible{
+  outline:2px solid var(--color-fg);
+  outline-offset:3px;
+}
+.feature-list>.feature-list-link:hover b{text-decoration:underline;text-underline-offset:3px}
 .feature-list b,
 .workflow-list b,
 .product-module-list b,
@@ -290,8 +302,17 @@
   background:#0b0b0b;
   color:#fff;
 }
-.product-callout p{color:#bdbdbd}
+.product-callout p{color:#d0d0d0}
 .mobile-callout-copy{max-width:560px}
+.mobile-callout-copy>div{
+  display:grid;
+  grid-template-columns:minmax(72px,auto) minmax(0,1fr);
+  gap:12px;
+  align-items:baseline;
+  padding:7px 0;
+}
+.mobile-callout-copy b{font-size:13px}
+.mobile-callout-copy span{color:#d0d0d0;font-size:12px;line-height:1.45}
 
 .pricing-grid,
 .marketing-pricing-grid{
@@ -396,6 +417,10 @@
   align-items:stretch;
 }
 .auth-card>.logo{margin-bottom:56px}
+.auth-topbar{margin-bottom:56px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.auth-topbar .logo{flex:0 0 auto}
+.auth-cancel{color:var(--color-muted);font-size:11px;font-weight:650}
+.auth-cancel:hover{text-decoration:underline;text-underline-offset:3px}
 .auth-card h1{margin:0 0 8px;font-size:32px;letter-spacing:-.04em}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:13px;line-height:1.55}
 .auth-card form{display:grid;gap:16px}
@@ -403,26 +428,33 @@
 .auth-card input{height:45px}
 .password-field{position:relative}
 .password-field input{padding-right:80px}
-.password-field button{
+.password-field .password-visibility{
   position:absolute;
   top:0;
   right:0;
+  width:45px;
   height:45px;
-  padding:0 12px;
+  padding:0;
+  display:grid;
+  place-items:center;
   border:0;
   background:transparent;
   color:var(--color-muted);
-  font-size:11px;
 }
+.password-field .password-visibility svg{width:18px;height:18px;stroke-width:1.8}
+.password-field .password-visibility:focus-visible{outline:2px solid var(--color-fg);outline-offset:-4px;border-radius:8px}
 .password-hint,
 .auth-legal{color:var(--color-muted);font-size:10px;line-height:1.45}
+.auth-after-submit{margin-top:16px;display:grid;gap:18px}
+.auth-legal{margin:0;text-align:left}
+.auth-legal a{color:var(--color-fg);font-weight:650;text-decoration:underline;text-underline-offset:2px}
 .form-link{text-align:right;font-size:12px}
 .auth-divider,
 .portal-divider{margin:24px 0;border-top:1px solid var(--color-line);text-align:center;line-height:0}
 .auth-divider span,
 .portal-divider span{padding:0 10px;background:#fff;color:var(--color-muted);font-size:10px}
 .auth-bottom,
-.portal-bottom{margin-top:20px;text-align:center;font-size:11px}
+.portal-bottom{margin:0;text-align:center;font-size:11px}
 .auth-bottom a,
 .form-link a,
 .portal-bottom a{font-weight:700}
@@ -561,4 +593,79 @@
 .pricing-page,
 .product-page{display:block}
 .product-subhero{max-width:900px}
-.marketing-text-link{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
+.marketing-text-link{min-height:44px;margin-top:8px;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700}
+
+.marketing-mobile-social{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:22px;
+}
+.marketing-mobile-social>a,
+.marketing-mobile-social>span{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--color-line);
+  border-radius:50%;
+  color:var(--color-fg);
+  font-size:15px;
+  font-weight:750;
+  text-decoration:none;
+}
+.marketing-social-placeholder{opacity:.42}
+.marketing-social-xing{font-size:12px}
+.marketing-mobile-copyright{
+  margin-top:auto;
+  padding-top:24px;
+  color:var(--color-muted);
+}
+.marketing-mobile-copyright a{color:inherit;text-decoration:none}
+.marketing-mobile-copyright a:hover{text-decoration:underline}
+
+
+/* Motion is progressive enhancement: content remains fully usable without it. */
+.hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta{
+  animation:marketing-enter var(--motion-slow) var(--motion-ease) both;
+}
+.hero-product-preview{animation-delay:70ms}
+.marketing-benefits>article:nth-child(2){animation-delay:45ms}
+.marketing-benefits>article:nth-child(3){animation-delay:90ms}
+.marketing-benefits>article:nth-child(4){animation-delay:135ms}
+@keyframes marketing-enter{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero-product-desktop,.hero-product-mobile,.section-product-shot{
+  transition:transform var(--motion-slow) var(--motion-ease),box-shadow var(--motion-slow) var(--motion-ease);
+}
+.menu-morph{
+  position:relative;
+  width:22px;
+  height:18px;
+  display:block;
+}
+.menu-morph i{
+  position:absolute;
+  left:1px;
+  width:20px;
+  height:1.5px;
+  border-radius:2px;
+  background:currentColor;
+  transform-origin:center;
+  transition:transform var(--motion-base) var(--motion-ease),opacity var(--motion-fast) ease,top var(--motion-base) var(--motion-ease);
+}
+.menu-morph i:nth-child(1){top:2px}
+.menu-morph i:nth-child(2){top:8px}
+.menu-morph i:nth-child(3){top:14px}
+.menu-morph.is-open i:nth-child(1){top:8px;transform:rotate(45deg)}
+.menu-morph.is-open i:nth-child(2){opacity:0;transform:scaleX(.35)}
+.menu-morph.is-open i:nth-child(3){top:8px;transform:rotate(-45deg)}
+.marketing-mobile-menu{
+  animation:marketing-menu-enter var(--motion-base) var(--motion-ease) both;
+}
+@keyframes marketing-menu-enter{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}

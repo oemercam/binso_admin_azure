@@ -25,7 +25,7 @@ export async function POST(request:NextRequest){
     const session=await requireOperatorSession();
     const accounts=await operatorList<{account_status:string}>("tenant_accounts","account_status","tenant_id=eq."+encodeURIComponent(tenantId)+"&limit=1");
     if(!accounts[0]) return json({error:"tenant_not_found",message:"Kundenkonto wurde nicht gefunden."},404);
-    const rows=await operatorInsert("tenant_restrictions",{tenant_id:tenantId,scope,reason,note,ends_at:cleanText(body.endsAt,40)||null,active:true,created_by:session.user.id});
+    const rows=await operatorInsert("tenant_restrictions",{tenant_id:tenantId,scope,reason,note,ends_at:cleanText(body.endsAt,40)||null,active:true,created_by:session.userId});
     if(accounts[0].account_status!=="cancelled"){
       await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(tenantId),{account_status:scope==="all"?"suspended":"restricted"});
     }
