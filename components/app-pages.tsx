@@ -193,6 +193,9 @@ export function CustomersPage() {
 
 export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const production=useBackendMode();
+  const searchParams=useSearchParams();
+  const requestedReturnTo=searchParams.get("returnTo");
+  const returnTo=requestedReturnTo==="/dashboard"?"/dashboard":"/kunden";
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
   const [contactOpen,setContactOpen]=useState(false);
   const [contactToast,setContactToast]=useState<string|null>(null);
