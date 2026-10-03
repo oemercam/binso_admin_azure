@@ -292,6 +292,11 @@ html[data-theme="dark"] ::selection{background:#fff;color:#000}
 .global-search .searchbox.large{max-width:none;width:100%;height:46px}
 .search-results>a{min-height:62px}
 .notification-list>a{min-height:66px}
+.notification-mark-all{
+  width:100%;min-height:42px;margin:6px 0 2px;border:0;border-top:1px solid var(--line);
+  background:transparent;color:var(--ink);font:inherit;font-size:10px;font-weight:700;text-align:left;cursor:pointer
+}
+.notification-mark-all:hover{background:var(--soft)}
 
 /* Toast */
 .toast{
