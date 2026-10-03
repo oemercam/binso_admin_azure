@@ -48,7 +48,7 @@ export function PortalHome(){
     </div>
 
     <div className="portal-demo-card">
-      <span className="portal-demo-icon"><Icon name="play" size={18}/></span>
+      <span className="portal-demo-icon"><Icon name="home" size={18}/></span>
       <div><b>Binso One zuerst ansehen</b><small>Ohne Verifikation und ohne Kreditkarte durch die komplette Demo klicken.</small></div>
       <Button href="/demo" variant="secondary">Demo starten</Button>
     </div>
