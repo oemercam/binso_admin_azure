@@ -149,9 +149,6 @@ jobs:
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
           echo "Binso One production health check passed."
 
-          for route in / /portal /portal/login /portal/registrieren /demo /dashboard /kunden /belege /zeit /einstellungen; do
-            echo "Live smoke: $PRODUCTION_URL$route"
-            curl -fsS --max-time 20 "$PRODUCTION_URL$route" > /dev/null
-          done
+          BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"
