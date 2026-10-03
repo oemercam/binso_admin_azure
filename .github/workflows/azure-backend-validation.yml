@@ -1,0 +1,32 @@
+name: Azure Backend Validation
+on:
+  push:
+    branches: [fix/azure-postgres-clean-20261003]
+    paths: [.github/workflows/azure-backend-validation.yml]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Validate Azure runtime prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_NAME=binso-admin-prod
+          APP_RG="$(az resource list --name "$APP_NAME" --resource-type Microsoft.Web/sites --query "[0].resourceGroup" -o tsv)"
+          DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          echo "::add-mask::$DATABASE_URL"
+          test -n "$DATABASE_URL"
+          PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,(select rolcreaterole from pg_roles where rolname=current_user);"
+          SETTINGS="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv)"
+          for required in DATABASE_URL APP_URL GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PRICE_STARTER STRIPE_PRICE_BUSINESS STRIPE_PRICE_PROFESSIONAL; do
+            echo "$SETTINGS" | grep -qx "$required" || { echo "::error::Missing App Service setting $required"; exit 1; }
+          done
