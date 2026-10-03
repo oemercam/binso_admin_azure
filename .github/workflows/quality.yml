@@ -113,6 +113,8 @@ jobs:
             curl -fsS "http://127.0.0.1:3000$route" > /dev/null
           done
 
+          BINSO_BASE_URL=http://127.0.0.1:3000 pnpm routes:css-check
+
           curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
           curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"configured":false'
           curl -fsS -c /tmp/binso-demo.cookies -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
