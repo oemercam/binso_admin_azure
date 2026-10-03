@@ -17,9 +17,9 @@ const workflow=[
 ] as const;
 
 const plans=[
-  ["Start","CHF 19","Für Einzelunternehmen und kleine Teams.","Kunden, Angebote, Rechnungen, Zeit"],
-  ["Business","CHF 49","Für wachsende KMU mit mehr Prozessen.","Zusätzlich Mitarbeiter, Spesen und mehr"],
-  ["Pro","CHF 89","Für Teams mit höheren Anforderungen.","Erweiterte Funktionen und mehr Automatisierung"],
+  {name:"Start",price:"19",description:"Für Selbstständige und kleine Unternehmen.",features:["1 Benutzer","Kunden und Kontakte","Angebote und Rechnungen","Zahlungen","Produkte"]},
+  {name:"Business",price:"49",description:"Für wachsende Schweizer KMU.",features:["Bis 20 Benutzer","Alle Start Funktionen","Mitarbeiter und Spesen","Zeiterfassung","Erweiterte Auswertungen"],featured:true},
+  {name:"Pro",price:"89",description:"Für Unternehmen mit erweiterten Anforderungen.",features:["Mehr Benutzer","Alle Business Funktionen","Erweiterte Rollen","Prioritäts-Support","Zukünftige Integrationen"]},
 ] as const;
 
 export default function Home() {
@@ -116,13 +116,13 @@ export default function Home() {
           <p>Alle Pläne bleiben bewusst übersichtlich. Keine versteckten Pflichtmodule.</p>
         </div>
         <div className="pricing-grid marketing-pricing-grid">
-          {plans.map(([name,price,text,features],index)=><article className={index===1?"price-card featured":"price-card"} key={name}>
-            {index===1&&<span className="popular">BELIEBT</span>}
-            <h3>{name}</h3>
-            <p>{text}</p>
-            <div className="price"><strong>{price}</strong><span>/ Monat</span></div>
-            <Button href="/registrieren" variant={index===1?"primary":"secondary"}>Kostenlos testen</Button>
-            <small>{features}</small>
+          {plans.map(plan=><article className={plan.featured?"price-card featured":"price-card"} key={plan.name}>
+            {plan.featured&&<span className="popular">BELIEBT</span>}
+            <h3>{plan.name}</h3>
+            <p>{plan.description}</p>
+            <div className="price"><strong>CHF {plan.price}</strong><span>/ Monat</span></div>
+            <Button href="/registrieren" variant={plan.featured?"primary":"secondary"}>30 Tage kostenlos testen</Button>
+            <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
           </article>)}
         </div>
       </section>
