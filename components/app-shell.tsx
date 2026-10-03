@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { useI18n } from "@/lib/i18n/provider";
-import { formatDate } from "@/lib/i18n/config";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
