@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     url: "/",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
   },
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
-    icon: "/brand/icon-black.svg",
-    apple: "/brand/icon-black.svg",
+    icon: [{ url: "/brand/icon-black.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/brand/icon-black.svg", type: "image/svg+xml" }],
   },
 };
 
