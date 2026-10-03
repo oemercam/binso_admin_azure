@@ -39,7 +39,7 @@ export function MarketingHeader() {
   }, [open]);
 
   return <>
-    <header className={`marketing-header ${open ? "is-menu-open" : ""}`}>
+    <header className="marketing-header">
       <div className="marketing-nav">
         <Link href="/" onClick={() => setOpen(false)}><Logo /></Link>
         <nav>
