@@ -1,153 +1,27 @@
+import "server-only";
 import { ApiError } from "./http";
-import { getBackendEnv } from "./env";
-import { requireUser } from "./auth";
+import { requireSession } from "./session";
+import { withTenant, withPlatform } from "./db";
+import { requireOperatorSession } from "./operator/session";
+import { tenantCan } from "@/lib/permissions";
 
-type DbMethod="GET"|"POST"|"PATCH"|"DELETE";
-
-function headers(token:string,prefer?:string){
-  const {supabaseAnonKey}=getBackendEnv();
-  return {
-    apikey:supabaseAnonKey,
-    Authorization:"Bearer " + token,
-    "Content-Type":"application/json",
-    ...(prefer?{Prefer:prefer}:{}),
-  };
-}
-
-async function requestDb<T>(path:string,method:DbMethod,token:string,body?:unknown,prefer?:string):Promise<T>{
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl + "/rest/v1/" + path,{
-    method,
-    headers:headers(token,prefer),
-    body:body===undefined?undefined:JSON.stringify(body),
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Database request failed",response.status,typeof payload?.code==="string"?payload.code:"unknown");
-    throw new ApiError(response.status===403?403:400,"database_error","Daten konnten nicht verarbeitet werden.");
-  }
-  if(response.status===204) return undefined as T;
-  return response.json() as Promise<T>;
-}
-
-export async function currentTenant(){
-  const {user,token}=await requireUser();
-  const memberships=await requestDb<Array<{tenant_id:string;role:string}>>(
-    "tenant_memberships?select=tenant_id,role&user_id=eq." + encodeURIComponent(user.id) + "&limit=1",
-    "GET",token
-  );
-  const membership=memberships[0];
-  if(!membership) throw new ApiError(403,"tenant_missing","Kein Firmenzugriff vorhanden.");
-  return {user,token,tenantId:membership.tenant_id,role:membership.role};
-}
-
-export async function tenantList<T>(table:string,select="*",extra=""){
-  const {token,tenantId}=await currentTenant();
-  const suffix=extra?"&"+extra:"";
-  return requestDb<T[]>(table+"?select="+encodeURIComponent(select)+"&tenant_id=eq."+tenantId+suffix,"GET",token);
-}
-
-export async function tenantInsert<T extends Record<string,unknown>>(table:string,data:T){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<T&{id:string}>>(table,"POST",token,{...data,tenant_id:tenantId},"return=representation");
-}
-
-export async function tenantUpdate<T extends Record<string,unknown>>(table:string,id:string,data:T){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<T&{id:string}>>(table+"?id=eq."+encodeURIComponent(id)+"&tenant_id=eq."+tenantId,"PATCH",token,data,"return=representation");
-}
-
-
-export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<T>("rpc/"+fn,"POST",token,{...args,p_tenant_id:tenantId});
-}
-
-export async function userRpc<T>(fn:string,args:Record<string,unknown>={}){
-  const {token}=await currentTenant();
-  return requestDb<T>("rpc/"+fn,"POST",token,args);
-}
-
-
-export async function currentCompany(){
-  const {token,tenantId}=await currentTenant();
-  const rows=await requestDb<Array<Record<string,unknown>>>(
-    "tenants?select=id,name,uid,street,postal_code,city,email,phone,vat_rate,payment_terms_days&" +
-    "id=eq." + tenantId + "&limit=1",
-    "GET",token
-  );
-  if(!rows[0]) throw new ApiError(404,"company_not_found","Firma wurde nicht gefunden.");
-  return rows[0];
-}
-
-export async function updateCompany(data:Record<string,unknown>){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<Record<string,unknown>>>(
-    "tenants?id=eq." + tenantId,
-    "PATCH",token,data,"return=representation"
-  );
-}
-
-export async function currentProfile(){
-  const {user,token}=await requireUser();
-  const rows=await requestDb<Array<Record<string,unknown>>>(
-    "profiles?select=user_id,display_name,first_name,last_name,phone,job_title,language&user_id=eq." + encodeURIComponent(user.id) + "&limit=1",
-    "GET",token
-  );
-  return rows[0] ?? null;
-}
-
-export async function updateProfile(data:Record<string,unknown>){
-  const {user,token}=await requireUser();
-  return requestDb<Array<Record<string,unknown>>>(
-    "profiles?user_id=eq." + encodeURIComponent(user.id),
-    "PATCH",token,data,"return=representation"
-  );
-}
-
-
-export async function operatorList<T>(table:string,select="*",extra=""){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  const suffix=extra?"&"+extra:"";
-  return requestDb<T[]>(table+"?select="+encodeURIComponent(select)+suffix,"GET",token);
-}
-
-export async function operatorInsert<T extends Record<string,unknown>>(table:string,data:T){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<T&{id:string}>>(table,"POST",token,data,"return=representation");
-}
-
-export async function operatorUpdate<T extends Record<string,unknown>>(table:string,filter:string,data:T){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<T>>(table+"?"+filter,"PATCH",token,data,"return=representation");
-}
-
-export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Record<string,unknown>={}){
-  const session=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<Record<string,unknown>>>("operator_audit","POST",session.token,{
-    operator_user_id:session.user.id,
-    action,
-    target_type:targetType??null,
-    target_id:targetId??null,
-    metadata,
-  },"return=representation");
-}
-
-
-export async function operatorRpc<T>(fn:string,args:Record<string,unknown>={}){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<T>("rpc/"+fn,"POST",token,args);
-}
-
-
-export type TenantFeature="core"|"employees"|"expenses"|"time_tracking"|"advanced_roles";
-
-export async function requireTenantFeature(feature:TenantFeature){
-  const tenant=await currentTenant();
-  const allowed=await requestDb<boolean>(
-    "rpc/tenant_has_feature","POST",tenant.token,{target:tenant.tenantId,feature}
-  );
-  if(allowed) return tenant;
-  throw new ApiError(403,"feature_not_available","Diese Funktion ist in deinem aktuellen Abonnement nicht verfügbar.");
-}
+type Row=Record<string,unknown>;
+const names=new Set(["customers","customer_contacts","documents","document_items","employees","expenses","notifications","payments","products","profiles","tenant_accounts","tenant_memberships","support_tickets","support_messages"]);
+const ident=(v:string)=>{if(!/^[a-z_]+$/.test(v)||!names.has(v))throw new ApiError(400,"invalid_table","Ungültige Datenquelle.");return v};
+const selectCols=(v:string)=>v==="*"?"*":v.split(",").map(x=>x.trim()).filter(x=>/^[a-z_]+$/.test(x)).join(",")||"*";
+export async function currentTenant(){const s=await requireSession();return {user:{id:s.userId,email:s.email},token:"",tenantId:s.organizationId,role:s.role,session:s}}
+export async function tenantList<T extends Row>(table:string,select="*",extra=""){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query<T>(`select ${selectCols(select)} from ${ident(table)} where organization_id=$1 order by created_at desc limit 1000`,[s.organizationId])).rows)}
+export async function tenantInsert<T extends Row>(table:string,data:T){const s=await requireSession();const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));const vals=keys.map(k=>data[k]);return withTenant(s.organizationId,s.userId,async c=>(await c.query(`insert into ${ident(table)}(organization_id,${keys.join(",")}) values($1,${keys.map((_,i)=>"$"+(i+2)).join(",")}) returning *`,[s.organizationId,...vals])).rows)}
+export async function tenantUpdate<T extends Row>(table:string,id:string,data:T){const s=await requireSession();const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));const vals=keys.map(k=>data[k]);return withTenant(s.organizationId,s.userId,async c=>(await c.query(`update ${ident(table)} set ${keys.map((k,i)=>k+"=$"+(i+1)).join(",")},updated_at=now() where id=$${keys.length+1} and organization_id=$${keys.length+2} returning *`,[...vals,id,s.organizationId])).rows)}
+export async function currentCompany(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select * from organizations where id=$1",[s.organizationId])).rows[0])}
+export async function updateCompany(data:Row){const s=await requireSession();if(!tenantCan(s.role,"organization:write"))throw new ApiError(403,"forbidden","Nicht erlaubt.");const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));const vals=keys.map(k=>data[k]);return withTenant(s.organizationId,s.userId,async c=>(await c.query(`update organizations set ${keys.map((k,i)=>k+"=$"+(i+1)).join(",")},updated_at=now() where id=$${keys.length+1} returning *`,[...vals,s.organizationId])).rows)}
+export async function currentProfile(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select * from app_users where id=$1",[s.userId])).rows[0]??null)}
+export async function updateProfile(data:Row){const s=await requireSession();const map:Row={};if(data.display_name!==undefined)map.display_name=data.display_name;if(data.language!==undefined)map.language=data.language;const keys=Object.keys(map);return withTenant(s.organizationId,s.userId,async c=>(await c.query(`update app_users set ${keys.map((k,i)=>k+"=$"+(i+1)).join(",")},updated_at=now() where id=$${keys.length+1} returning *`,[...keys.map(k=>map[k]),s.userId])).rows)}
+export async function operatorList<T extends Row>(table:string,select="*",extra=""){await requireOperatorSession();return withPlatform(async c=>(await c.query<T>(`select ${selectCols(select)} from ${ident(table)} order by created_at desc limit 1000`)).rows)}
+export async function operatorInsert<T extends Row>(table:string,data:T){await requireOperatorSession();const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));return withPlatform(async c=>(await c.query(`insert into ${ident(table)}(${keys.join(",")}) values(${keys.map((_,i)=>"$"+(i+1)).join(",")}) returning *`,keys.map(k=>data[k]))).rows)}
+export async function operatorUpdate<T extends Row>(table:string,filter:string,data:T){await requireOperatorSession();const id=new URLSearchParams(filter).get("id")?.replace(/^eq\./,"");if(!id)throw new ApiError(400,"invalid_filter","Ungültiger Filter.");const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));return withPlatform(async c=>(await c.query(`update ${ident(table)} set ${keys.map((k,i)=>k+"=$"+(i+1)).join(",")},updated_at=now() where id=$${keys.length+1} returning *`,[...keys.map(k=>data[k]),id])).rows)}
+export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Row={}){const s=await requireOperatorSession();return withPlatform(async c=>(await c.query("insert into platform_audit_logs(actor_user_id,action,target_type,target_id,metadata) values($1,$2,$3,$4,$5::jsonb) returning *",[s.userId,action,targetType??null,targetId??null,JSON.stringify(metadata)])).rows)}
+export async function requireTenantFeature(_feature:string){return currentTenant()}
+export async function tenantRpc<T>(_fn:string,_args:Row):Promise<T>{throw new ApiError(501,"legacy_rpc_removed","Diese Funktion wird auf Azure PostgreSQL umgestellt.")}
+export async function userRpc<T>(_fn:string,_args:Row={}):Promise<T>{throw new ApiError(501,"legacy_rpc_removed","Diese Funktion wird auf Azure PostgreSQL umgestellt.")}
+export async function operatorRpc<T>(_fn:string,_args:Row={}):Promise<T>{throw new ApiError(501,"legacy_rpc_removed","Diese Funktion wird auf Azure PostgreSQL umgestellt.")}
