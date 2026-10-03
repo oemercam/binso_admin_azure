@@ -216,6 +216,11 @@
   }
   .auth-card{max-width:420px;padding-top:0}
   .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
+  .auth-topbar{margin-bottom:28px}
+  .auth-topbar .logo{width:88px;height:28px}
+  .auth-cancel{min-height:40px;display:inline-flex;align-items:center}
+  .auth-after-submit{margin-top:16px;gap:18px}
+  .auth-legal{max-width:38rem}
   .auth-card h1{font-size:28px;line-height:1.05}
   .auth-card>p{margin-bottom:24px;font-size:13px}
   .auth-card input,
