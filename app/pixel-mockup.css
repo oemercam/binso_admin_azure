@@ -1267,3 +1267,19 @@ html[data-theme="dark"] .form-grid textarea:focus{
     padding-top:2px;
   }
 }
+
+
+/* Demo state */
+.app-demo-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:22px;padding:0 7px;border:1px solid var(--pixel-line);
+  border-radius:999px;background:#fff;color:#111;
+  font-size:8px;font-weight:800;letter-spacing:.04em
+}
+.app-demo-badge.mobile{min-height:20px;padding:0 6px;font-size:7px}
+html[data-theme="dark"] .app-demo-badge{
+  background:#000;color:#fff;border-color:#333
+}
+@media(max-width:390px){
+  .app-demo-badge.mobile{display:none}
+}
