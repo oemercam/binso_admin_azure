@@ -1,16 +1,18 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList } from "@/lib/server/database";
+import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
 
 type EmployeeBody={firstName?:unknown;lastName?:unknown;email?:unknown;phone?:unknown;jobTitle?:unknown;workloadPercent?:unknown;entryDate?:unknown;status?:unknown};
 
 export async function GET(){
-  try{return json({items:await tenantList("employees","id,first_name,last_name,email,phone,job_title,workload_percent,entry_date,status,created_at","order=created_at.desc")});}
+  try{
+    await requireTenantFeature("employees");return json({items:await tenantList("employees","id,first_name,last_name,email,phone,job_title,workload_percent,entry_date,status,created_at","order=created_at.desc")});}
   catch(error){return apiError(error);}
 }
 
 export async function POST(request:NextRequest){
   try{
+    await requireTenantFeature("employees");
     assertSameOrigin(request);
     const body=await readJson<EmployeeBody>(request,16384);
     const firstName=cleanText(body.firstName,120),lastName=cleanText(body.lastName,120),jobTitle=cleanText(body.jobTitle,160);
