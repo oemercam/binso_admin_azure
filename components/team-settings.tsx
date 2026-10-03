@@ -22,7 +22,7 @@ export function TeamSettingsPage(){
     catch(error){setToast(error instanceof Error?error.message:"Team konnte nicht geladen werden.");}
     finally{setLoading(false);}
   };
-  useEffect(()=>{void load();},[]);
+  useEffect(()=>{queueMicrotask(()=>void load());},[]);
 
   const invite=async()=>{
     if(!email.trim()) return;
