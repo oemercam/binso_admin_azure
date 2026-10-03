@@ -1,0 +1,712 @@
+/* Binso One – mobile precision layer
+   Final mobile geometry for 320–480 CSS px.
+   iPhone 17 Pro Max: 440 × 956 CSS px, DPR 3.
+   Keep all phone gutters, safe-area spacing, controls and section rhythm here. */
+
+@media (max-width: 760px) {
+  :root {
+    --mobile-page-x: 18px;
+    --mobile-section-gap: 20px;
+    --mobile-block-gap: 14px;
+    --mobile-control-h: 44px;
+    --mobile-icon-hit: 40px;
+    --mobile-header-content: 54px;
+    --mobile-nav-content: 64px;
+    --mobile-radius: 10px;
+  }
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  /* Large-phone class: iPhone 16/17 Pro Max and similar 430–480 px viewports. */
+  @media (min-width: 430px) and (max-width: 480px) {
+    :root {
+      --mobile-page-x: 20px;
+      --mobile-section-gap: 22px;
+      --mobile-block-gap: 16px;
+    }
+  }
+
+  /* Compact phones. */
+  @media (max-width: 389px) {
+    :root {
+      --mobile-page-x: 16px;
+      --mobile-section-gap: 18px;
+      --mobile-block-gap: 12px;
+    }
+  }
+
+  /* ---------- Authenticated app shell ---------- */
+  .app-root,
+  .app-main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .app-root .mobile-header {
+    box-sizing: border-box!important;
+    min-height: calc(var(--mobile-header-content) + env(safe-area-inset-top))!important;
+    height: calc(var(--mobile-header-content) + env(safe-area-inset-top))!important;
+    padding-top: env(safe-area-inset-top)!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    gap: 10px!important;
+  }
+
+  .app-root .mobile-header-leading,
+  .app-root .mobile-header-actions {
+    min-width: 0!important;
+    gap: 4px!important;
+  }
+
+  .app-root .mobile-header .logo {
+    width: 82px!important;
+    height: 28px!important;
+    flex: 0 0 auto!important;
+  }
+
+  .app-root .mobile-header-title {
+    max-width: min(46vw, 176px)!important;
+    overflow: hidden!important;
+    text-overflow: ellipsis!important;
+    white-space: nowrap!important;
+    font-size: 12px!important;
+    line-height: 1.2!important;
+  }
+
+  .app-root .mobile-header .icon-button,
+  .app-root .mobile-header .mobile-notification-button,
+  .app-root .mobile-header .avatar-button {
+    width: var(--mobile-icon-hit)!important;
+    height: var(--mobile-icon-hit)!important;
+    min-width: var(--mobile-icon-hit)!important;
+    min-height: var(--mobile-icon-hit)!important;
+    border-radius: 10px!important;
+  }
+
+  .app-root .page-container {
+    width: 100%!important;
+    max-width: none!important;
+    margin: 0!important;
+    padding-top: 20px!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 30px)!important;
+  }
+
+  .app-root .page-head {
+    width: 100%!important;
+    min-width: 0!important;
+    margin: 0 0 var(--mobile-section-gap)!important;
+    gap: 12px!important;
+  }
+
+  .app-root .page-head > div {
+    min-width: 0!important;
+  }
+
+  .app-root .page-head h1 {
+    margin: 0!important;
+    font-size: 21px!important;
+    line-height: 1.12!important;
+    letter-spacing: -.035em!important;
+  }
+
+  .app-root .page-head p {
+    max-width: 34rem!important;
+    margin: 6px 0 0!important;
+    font-size: 11px!important;
+    line-height: 1.45!important;
+  }
+
+  .app-root .page-head-detail {
+    margin-bottom: 10px!important;
+  }
+
+  .app-root .page-actions {
+    right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 12px)!important;
+    gap: 8px!important;
+  }
+
+  .app-root .page-actions .button {
+    min-height: 46px!important;
+    height: 46px!important;
+    padding-inline: 14px!important;
+    border-radius: 11px!important;
+  }
+
+  .app-root .button {
+    min-height: var(--mobile-control-h)!important;
+    height: var(--mobile-control-h)!important;
+    padding-inline: 14px!important;
+    border-radius: 10px!important;
+  }
+
+  .app-root .icon-button {
+    width: var(--mobile-icon-hit)!important;
+    height: var(--mobile-icon-hit)!important;
+    min-width: var(--mobile-icon-hit)!important;
+    min-height: var(--mobile-icon-hit)!important;
+  }
+
+  /* Vertical rhythm between page blocks. */
+  .app-root .page-container > :is(
+    .metrics-grid,
+    .dashboard-grid,
+    .tablet-master-detail,
+    .detail-grid,
+    .form-page,
+    .time-layout,
+    .expense-layout,
+    .support-master-detail,
+    .settings-list,
+    .settings-detail-grid,
+    .subscription-detail-grid,
+    .appearance-grid,
+    .notification-center,
+    .documents-hub-grid,
+    .plan-hero,
+    .preference-table,
+    .security-card,
+    .danger-zone
+  ) {
+    margin-top: 0!important;
+  }
+
+  .app-root .page-container > :is(
+    .metrics-grid,
+    .dashboard-grid,
+    .tablet-master-detail,
+    .detail-grid,
+    .form-page,
+    .time-layout,
+    .expense-layout,
+    .support-master-detail,
+    .settings-list,
+    .settings-detail-grid,
+    .subscription-detail-grid,
+    .appearance-grid,
+    .notification-center,
+    .documents-hub-grid,
+    .plan-hero,
+    .preference-table,
+    .security-card,
+    .danger-zone
+  ) + * {
+    margin-top: var(--mobile-section-gap)!important;
+  }
+
+  .app-root .metrics-grid,
+  .app-root .quick-grid {
+    gap: 10px!important;
+  }
+
+  .app-root .metric {
+    min-height: 104px!important;
+    padding: 15px!important;
+    border-radius: 12px!important;
+  }
+
+  .app-root .metric strong {
+    margin-top: 14px!important;
+    font-size: 21px!important;
+  }
+
+  .app-root .dashboard-grid,
+  .app-root .detail-grid {
+    gap: var(--mobile-section-gap)!important;
+    margin-top: var(--mobile-section-gap)!important;
+  }
+
+  .app-root .surface {
+    padding-top: 18px!important;
+    padding-bottom: 18px!important;
+  }
+
+  .app-root .section-title {
+    margin-bottom: 12px!important;
+  }
+
+  .app-root .section-title h2 {
+    font-size: 14px!important;
+  }
+
+  .app-root .quick-section {
+    margin-top: var(--mobile-section-gap)!important;
+  }
+
+  .app-root .quick-grid .button {
+    min-height: 44px!important;
+    height: 44px!important;
+    padding-inline: 12px!important;
+  }
+
+  /* Lists / filters */
+  .app-root .toolbar {
+    gap: 10px!important;
+    margin-bottom: 14px!important;
+  }
+
+  .app-root .searchbox,
+  .app-root .filter-button {
+    min-height: 42px!important;
+    height: 42px!important;
+    border-radius: 10px!important;
+  }
+
+  .app-root .chips {
+    gap: 6px!important;
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+    scrollbar-width: none!important;
+  }
+
+  .app-root .chips::-webkit-scrollbar {
+    display: none!important;
+  }
+
+  .app-root .chips button,
+  .app-root .tabs button {
+    min-height: 36px!important;
+    height: 36px!important;
+    padding-inline: 11px!important;
+    border-radius: 9px!important;
+  }
+
+  .app-root .records {
+    margin-top: 2px!important;
+  }
+
+  .app-root .record {
+    min-height: 70px!important;
+    padding: 12px 0!important;
+    gap: 11px!important;
+  }
+
+  .app-root .record-avatar {
+    width: 38px!important;
+    height: 38px!important;
+    min-width: 38px!important;
+  }
+
+  .app-root .record-main b {
+    font-size: 13px!important;
+  }
+
+  .app-root .record-main small,
+  .app-root .record > small,
+  .app-root .record > strong {
+    font-size: 10px!important;
+  }
+
+  /* Detail pages */
+  .app-root .entity-hero {
+    min-height: 60px!important;
+    margin-bottom: 16px!important;
+    gap: 11px!important;
+  }
+
+  .app-root .record-avatar.large {
+    width: 46px!important;
+    height: 46px!important;
+    min-width: 46px!important;
+  }
+
+  .app-root .entity-hero h2 {
+    font-size: 18px!important;
+  }
+
+  .app-root .entity-hero p {
+    font-size: 11px!important;
+  }
+
+  .app-root .tabs {
+    gap: 6px!important;
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+    padding-bottom: 10px!important;
+    scrollbar-width: none!important;
+  }
+
+  .app-root .tabs::-webkit-scrollbar {
+    display: none!important;
+  }
+
+  .app-root .detail-list > div {
+    grid-template-columns: minmax(94px, 31%) 1fr!important;
+    gap: 12px!important;
+    padding: 12px 0!important;
+  }
+
+  /* Forms */
+  .app-root .form-page,
+  .app-root .form-page.narrow,
+  .app-root .settings-detail-grid {
+    width: 100%!important;
+    max-width: none!important;
+  }
+
+  .app-root .form-section,
+  .app-root .form-section.clean,
+  .app-root .settings-form {
+    padding-left: 0!important;
+    padding-right: 0!important;
+    padding-top: 18px!important;
+    padding-bottom: 18px!important;
+  }
+
+  .app-root .form-section:first-child,
+  .app-root .form-section.clean:first-child,
+  .app-root .settings-form:first-child {
+    padding-top: 0!important;
+  }
+
+  .app-root .form-grid {
+    gap: 14px!important;
+  }
+
+  .app-root .form-grid label,
+  .app-root .form-field {
+    gap: 7px!important;
+    font-size: 12px!important;
+  }
+
+  .app-root .form-grid input,
+  .app-root .form-grid select,
+  .app-root .form-grid textarea,
+  .app-root .form-field input,
+  .app-root .form-field select,
+  .app-root .form-field textarea {
+    min-height: 46px!important;
+    height: 46px!important;
+    padding-inline: 12px!important;
+    border-radius: 10px!important;
+    font-size: 16px!important; /* prevents iOS Safari focus zoom */
+  }
+
+  .app-root .form-grid textarea,
+  .app-root .form-field textarea {
+    height: 118px!important;
+    padding-top: 12px!important;
+  }
+
+  .app-root .mobile-sticky-save,
+  .app-root .mobile-document-bar {
+    bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 10px)!important;
+    margin-top: var(--mobile-section-gap)!important;
+    padding: 8px 0!important;
+  }
+
+  .app-root.timer-active .mobile-sticky-save,
+  .app-root.timer-active .mobile-document-bar {
+    bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 66px)!important;
+  }
+
+  /* Bottom navigation: content height separated from home-indicator safe area. */
+  .app-root .bottom-nav {
+    box-sizing: border-box!important;
+    height: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom))!important;
+    min-height: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom))!important;
+    padding-top: 5px!important;
+    padding-bottom: env(safe-area-inset-bottom)!important;
+    padding-left: max(2px, env(safe-area-inset-left))!important;
+    padding-right: max(2px, env(safe-area-inset-right))!important;
+  }
+
+  .app-root .bottom-nav > a,
+  .app-root .bottom-nav > button {
+    min-width: 0!important;
+    gap: 3px!important;
+    padding: 2px 0!important;
+    font-size: 9px!important;
+    line-height: 1.05!important;
+  }
+
+  .app-root .bottom-nav svg {
+    width: 20px!important;
+    height: 20px!important;
+  }
+
+  /* Running timer / support composer / PWA controls align to the same gutter. */
+  .app-root .global-timer,
+  .app-root .thread-composer {
+    left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 10px)!important;
+  }
+
+  .app-root .global-timer {
+    min-height: 52px!important;
+    border-radius: 12px!important;
+  }
+
+  .app-root .thread-composer {
+    min-height: 52px!important;
+    border-radius: 12px!important;
+  }
+
+  /* Sheets are edge-to-edge by design, content follows same horizontal gutter. */
+  .app-root .sheet-layer {
+    padding-left: env(safe-area-inset-left)!important;
+    padding-right: env(safe-area-inset-right)!important;
+  }
+
+  .app-root .bottom-sheet {
+    width: 100%!important;
+    max-width: none!important;
+    max-height: min(84dvh, 760px)!important;
+    padding-top: 8px!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom))!important;
+    border-radius: 18px 18px 0 0!important;
+  }
+
+  .app-root .sheet-header {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+  }
+
+  /* Documents / previews */
+  .app-root .document-actions {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+  }
+
+  .app-root .invoice-preview,
+  .app-root .desktop-document-preview,
+  .app-root .invoice-tablet-preview {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    border-radius: 0!important;
+  }
+
+  /* ---------- Public portal / auth ---------- */
+  .portal-page,
+  .auth-page {
+    min-height: 100dvh!important;
+    padding-top: calc(18px + env(safe-area-inset-top))!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom))!important;
+  }
+
+  .portal-header {
+    min-height: 48px!important;
+    margin-bottom: 28px!important;
+  }
+
+  .portal-header .logo,
+  .auth-card > .logo {
+    width: 92px!important;
+    height: auto!important;
+  }
+
+  .portal-close {
+    width: 40px!important;
+    height: 40px!important;
+    display: grid!important;
+    place-items: center!important;
+  }
+
+  .portal-card,
+  .portal-card.compact,
+  .auth-card {
+    width: 100%!important;
+    max-width: 420px!important;
+    margin-left: auto!important;
+    margin-right: auto!important;
+  }
+
+  .portal-card h1,
+  .auth-card h1 {
+    font-size: 28px!important;
+    line-height: 1.05!important;
+    letter-spacing: -.04em!important;
+  }
+
+  .portal-card > p,
+  .auth-card > p {
+    margin-bottom: 24px!important;
+    font-size: 13px!important;
+    line-height: 1.5!important;
+  }
+
+  .portal-form,
+  .auth-card form {
+    gap: 15px!important;
+  }
+
+  .portal-form input,
+  .auth-card input {
+    min-height: 46px!important;
+    height: 46px!important;
+    border-radius: 10px!important;
+    font-size: 16px!important;
+  }
+
+  .portal-primary-actions {
+    gap: 10px!important;
+  }
+
+  .portal-primary-actions .button,
+  .portal-form .button,
+  .auth-card .button {
+    width: 100%!important;
+    min-height: 46px!important;
+    height: 46px!important;
+  }
+
+  .portal-demo-card {
+    gap: 12px!important;
+    padding: 16px 0!important;
+  }
+
+  /* ---------- Marketing / public pages ---------- */
+  .marketing-header {
+    box-sizing: border-box!important;
+    height: calc(58px + env(safe-area-inset-top))!important;
+    min-height: calc(58px + env(safe-area-inset-top))!important;
+    padding-top: env(safe-area-inset-top)!important;
+  }
+
+  .marketing-nav {
+    width: 100%!important;
+    height: 58px!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+  }
+
+  .marketing-mobile-menu {
+    top: calc(58px + env(safe-area-inset-top))!important;
+    inset-inline: 0!important;
+    padding-top: 22px!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom))!important;
+  }
+
+  .hero,
+  .marketing-section,
+  .subpage,
+  .product-callout,
+  .marketing-footer {
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+  }
+
+  .hero {
+    padding-top: 46px!important;
+    padding-bottom: 54px!important;
+  }
+
+  .hero-copy h1,
+  .subhero h1 {
+    font-size: clamp(38px, 10.3vw, 45px)!important;
+  }
+
+  .hero-actions {
+    gap: 10px!important;
+  }
+
+  .hero-actions .button {
+    min-height: 46px!important;
+    height: 46px!important;
+  }
+
+  .marketing-section,
+  .subpage {
+    padding-top: 62px!important;
+    padding-bottom: 62px!important;
+  }
+
+  .section-intro {
+    margin-bottom: 28px!important;
+  }
+
+  .feature-grid article {
+    padding: 20px 0!important;
+  }
+
+  .marketing-footer {
+    padding-top: 30px!important;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom))!important;
+  }
+
+  /* ---------- Operator mobile ---------- */
+  .operator-main {
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom))!important;
+  }
+
+  .operator-main > header {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+  }
+
+  .operator-mobile-nav {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+  }
+
+  .operator-root .monitoring-panel {
+    margin-left: calc(-1 * var(--mobile-page-x))!important;
+    margin-right: calc(-1 * var(--mobile-page-x))!important;
+    padding-left: var(--mobile-page-x)!important;
+    padding-right: var(--mobile-page-x)!important;
+  }
+
+  /* ---------- PWA update / toast ---------- */
+  .pwa-update {
+    left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    bottom: calc(var(--mobile-nav-content) + env(safe-area-inset-bottom) + 10px)!important;
+  }
+
+  .app-root .toast {
+    top: calc(var(--mobile-header-content) + env(safe-area-inset-top) + 10px)!important;
+    left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+  }
+}
+
+/* Landscape: keep content out of rounded corners / sensor-safe side areas. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .app-root .page-container,
+  .marketing-nav,
+  .hero,
+  .marketing-section,
+  .subpage,
+  .product-callout,
+  .marketing-footer,
+  .portal-page,
+  .auth-page,
+  .operator-main {
+    padding-left: max(20px, env(safe-area-inset-left))!important;
+    padding-right: max(20px, env(safe-area-inset-right))!important;
+  }
+}
