@@ -1253,3 +1253,17 @@ html[data-theme="dark"] .form-grid textarea:focus{
   border-color:#fff!important;
   box-shadow:0 0 0 2px rgba(255,255,255,.12)!important;
 }
+
+
+/* Customer detail title ownership: one visible company name per breakpoint */
+.app-section-kunden .page-head-detail + .entity-hero h2{
+  display:none;
+}
+@media(max-width:760px){
+  .app-section-kunden .page-head-detail + .entity-hero h2{
+    display:block!important;
+  }
+  .app-section-kunden .entity-hero{
+    padding-top:2px;
+  }
+}
