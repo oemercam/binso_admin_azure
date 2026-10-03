@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { useI18n } from "@/lib/i18n/provider";
+import { formatDate } from "@/lib/i18n/config";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -70,6 +72,8 @@ export function AppShell({
   preview?: boolean;
 }) {
   const router=useRouter();
+  const {locale,messages:m}=useI18n();
+  const navLabels:Record<string,string>={"/dashboard":m.nav.home,"/kunden":m.nav.customers,"/angebote":m.nav.offers,"/rechnungen":m.nav.invoices,"/zahlungen":m.nav.payments,"/produkte":m.nav.products,"/zeit":m.nav.time,"/spesen":m.nav.expenses,"/mitarbeiter":m.nav.employees};
   const pathname=usePathname();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
   const production=useBackendMode();
@@ -345,23 +349,23 @@ export function AppShell({
       <nav>
         {desktopNav.map(([href,label,icon]) =>
           <Link key={href} href={href} className={active===href.slice(1) ? "active" : ""}>
-            <Icon name={icon}/><span>{label}</span>
+            <Icon name={icon}/><span>{navLabels[href]??label}</span>
           </Link>
         )}
       </nav>
       <div className="sidebar-bottom">
-        <Link href="/support" className={active==="support" ? "active" : ""}><Icon name="support"/><span>Support</span></Link>
-        <Link href="/einstellungen" className={active==="einstellungen" ? "active" : ""}><Icon name="settings"/><span>Einstellungen</span></Link>
+        <Link href="/support" className={active==="support" ? "active" : ""}><Icon name="support"/><span>{m.common.support}</span></Link>
+        <Link href="/einstellungen" className={active==="einstellungen" ? "active" : ""}><Icon name="settings"/><span>{m.common.settings}</span></Link>
       </div>
     </aside>
 
     <div className="app-main">
       <div className="desktop-appbar">
-        <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
+        <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>{m.common.search}</span><kbd>⌘ K</kbd></button>
         <div className="desktop-appbar-actions">{demoSession&&<span className="app-demo-badge">Demo</span>}
-          <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
-          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
+          <Button icon="plus" onClick={() => setSheet("quick")}>{m.common.create}</Button>
+          <button className="desktop-notification-button" type="button" aria-label={m.common.notifications} onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
+          <button className="avatar avatar-button" type="button" aria-label={m.common.account} onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </div>
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
@@ -370,7 +374,7 @@ export function AppShell({
           {backHref && <span className="mobile-header-title">{title}</span>}
         </div>
         <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
-          <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
+          <IconButton label={m.common.search} icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
@@ -395,11 +399,11 @@ export function AppShell({
       </div>}
 
       {!preview && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
-        <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
-        <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
-        <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
-        <Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>
-        <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
+        <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>{m.nav.home}</span></Link>
+        <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>{m.nav.customers}</span></Link>
+        <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>{m.common.documents}</span></button>
+        <Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>{m.nav.time}</span></Link>
+        <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>{m.common.more}</span></button>
       </nav>}
 
       {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
@@ -412,7 +416,7 @@ export function AppShell({
               {sheet === "quick" && <p>Häufige Aufgaben ohne Umweg starten.</p>}
               {sheet === "account" && <p>Profil, Darstellung und Sitzung.</p>}
             </div>
-            <IconButton label="Schliessen" icon="close" onClick={() => setSheet(null)}/>
+            <IconButton label={m.common.close} icon="close" onClick={() => setSheet(null)}/>
           </header>
 
           {sheet === "docs" && <div className="sheet-menu">
@@ -434,7 +438,7 @@ export function AppShell({
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button>
+              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>{m.common.logout}</span></button>
             </div>
           </>}
 
