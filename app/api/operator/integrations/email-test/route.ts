@@ -7,7 +7,7 @@ export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);
     const session=await requireOperatorSession();
-    const email=session.user.email;
+    const email=session.email;
     if(!email) return json({error:"email_missing",message:"Operator-Konto hat keine E-Mail-Adresse."},400);
     const result=await sendMail({
       to:email,
