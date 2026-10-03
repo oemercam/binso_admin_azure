@@ -2,7 +2,7 @@ type BackendEnv={databaseUrl:string;appUrl:string;azureStorageAccount:string;azu
 function clean(value:string|undefined){return (value??"").trim();}
 export function getBackendEnv():BackendEnv{return {
  databaseUrl:clean(process.env.DATABASE_URL),
- appUrl:clean(process.env.NEXT_PUBLIC_APP_URL)||"http://localhost:3000",
+ appUrl:clean(process.env.APP_URL)||clean(process.env.NEXT_PUBLIC_APP_URL)||"http://localhost:3000",
  azureStorageAccount:clean(process.env.AZURE_STORAGE_ACCOUNT),
  azureStorageContainer:clean(process.env.AZURE_STORAGE_CONTAINER)||"binso-one",
  azureStorageSas:clean(process.env.AZURE_STORAGE_SAS),
