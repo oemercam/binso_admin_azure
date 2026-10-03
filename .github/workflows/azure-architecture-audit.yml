@@ -61,7 +61,7 @@ jobs:
           fi
 
           echo "=== Storage accounts in App resource group ==="
-          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json
+          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json || echo "Deployment identity cannot read Storage resources."
 
           echo "=== Application Insights in App resource group ==="
           az monitor app-insights component show --app "$APP_NAME" -g "$APP_RG" --query "{name:name,provisioningState:provisioningState,location:location}" -o json 2>/dev/null || echo "No App Insights component named $APP_NAME"
