@@ -13,6 +13,14 @@ create table if not exists public.notifications (
   created_at timestamptz not null default now()
 );
 
+do $ begin
+  if not exists(select 1 from pg_constraint where conname='notifications_membership_tenant_fk') then
+    alter table public.notifications
+      add constraint notifications_membership_tenant_fk
+      foreign key(tenant_id,user_id) references public.tenant_memberships(tenant_id,user_id) on delete cascade;
+  end if;
+end $;
+
 create unique index if not exists uq_notifications_event
   on public.notifications(tenant_id,user_id,event_key)
   where event_key is not null;
