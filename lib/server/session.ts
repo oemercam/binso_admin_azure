@@ -62,6 +62,6 @@ export async function getSession():Promise<SessionUser|null>{
 
 export async function requireSession(){
  const session=await getSession();
- if(!session)throw new Response("Unauthorized",{status:401});
+ if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
  return session;
 }
