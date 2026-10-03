@@ -1,5 +1,6 @@
 name: Refresh product screenshots
-on:\n  workflow_dispatch:
+on:
+  workflow_dispatch:
 concurrency:
   group: product-screenshots-${{ github.ref }}
   cancel-in-progress: true
