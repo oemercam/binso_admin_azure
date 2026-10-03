@@ -39,7 +39,7 @@ try{
    const checksum=crypto.createHash("sha256").update(sql).digest("hex");
    const existing=await pool.query("select checksum from schema_migrations where version=$1",[file]);
    if(existing.rowCount){
-     if(existing.rows[0].checksum!==checksum)throw new Error(`Migration ${file} was modified after being applied.`);
+     if(existing.rows[0].checksum!==null&&existing.rows[0].checksum!==checksum)throw new Error(`Migration ${file} was modified after being applied.`);
      console.log(`Skipping ${file} (already applied)`);
      continue;
    }
