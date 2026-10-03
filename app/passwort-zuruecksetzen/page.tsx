@@ -7,6 +7,7 @@ export default function Page(){
   const [ready,setReady]=useState(false);
   const [invalid,setInvalid]=useState(false);
   const [password,setPassword]=useState("");
+  const [showPassword,setShowPassword]=useState(false);
   const [confirm,setConfirm]=useState("");
   const [loading,setLoading]=useState(false);
   const [done,setDone]=useState(false);
@@ -55,8 +56,8 @@ export default function Page(){
     {!ready?<><h1>Link wird geprüft</h1><p>Einen Moment bitte.</p></>:invalid?<><h1>Link nicht gültig</h1><p>Der Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.</p><Button href="/passwort-vergessen">Neuen Link anfordern</Button></>:done?<><h1>Passwort geändert</h1><p>Du kannst dich jetzt mit deinem neuen Passwort anmelden.</p><Button href="/login">Zur Anmeldung</Button></>:<>
       <h1>Neues Passwort</h1><p>Lege ein neues Passwort für dein Binso One Konto fest.</p>
       <form onSubmit={submit}>
-        <label>Neues Passwort<input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type="password" autoComplete="new-password"/></label>
-        <label>Passwort bestätigen<input required minLength={8} value={confirm} onChange={e=>setConfirm(e.target.value)} type="password" autoComplete="new-password"/></label>
+        <label>Neues Passwort<div className="password-field"><input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?"Ausblenden":"Anzeigen"}</button></div><small className="password-hint">Mindestens 8 Zeichen.</small></label>
+        <label>Passwort bestätigen<input required minLength={8} value={confirm} onChange={e=>setConfirm(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/></label>
         {error&&<p className="auth-error" role="alert">{error}</p>}
         <Button type="submit">{loading?"Wird gespeichert…":"Passwort speichern"}</Button>
       </form>

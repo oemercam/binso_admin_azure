@@ -96,7 +96,7 @@ export function OperatorPage({ section = "" }: { section?: string }) {
     <main className="operator-main">
       <header>
         <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
-        <div className="operator-user"><button aria-label="Suche"><Icon name="search"/></button><button aria-label="Benachrichtigungen"><Icon name="bell"/></button><span className="avatar">OC</span></div>
+        <div className="operator-user"><Link className="operator-back-app" href="/dashboard"><Icon name="back" size={15}/><span>Zur App</span></Link><span className="avatar">OC</span></div>
       </header>
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={17}/><span>{label}</span></Link>)}</nav>
 
@@ -189,10 +189,15 @@ function TicketsView() {
   const {production,items}=useOperatorTickets();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
+  const demoTicketVisible=tickets.filter(([nr,subject,customer,status])=>{
+    const matchQuery=!query.trim()||(`${nr} ${subject} ${customer}`).toLowerCase().includes(query.trim().toLowerCase());
+    const matchFilter=filter==="all"||status===filter;
+    return matchQuery&&matchFilter;
+  });
 
   if(!production) return <section className="surface operator-table-card">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Alle 124</button><button>Offen 12</button><button>In Bearbeitung 8</button><button>Wartet auf Kunde 6</button><button>Gelöst 98</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Tickets suchen..."/></label></div>
-    <div className="operator-table"><div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>{tickets.map(([nr,subject,customer,status],i)=><Link href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+    <div className="operator-toolbar"><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {tickets.length}</button><button className={filter==="Offen"?"active":""} onClick={()=>setFilter("Offen")}>Offen</button><button className={filter==="In Bearbeitung"?"active":""} onClick={()=>setFilter("In Bearbeitung")}>In Bearbeitung</button><button className={filter==="Wartet auf Kunde"?"active":""} onClick={()=>setFilter("Wartet auf Kunde")}>Wartet auf Kunde</button></div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tickets suchen..."/></label></div>
+    <div className="operator-table"><div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>{demoTicketVisible.map(([nr,subject,customer,status],i)=><Link href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></Link>)}</div>
   </section>;
 
   const visible=items.filter(item=>{
@@ -297,10 +302,16 @@ function CustomersView() {
   const {production,items}=useOperatorCustomers();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
+  const demoCustomers=[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]];
+  const demoCustomerVisible=demoCustomers.filter(([name,,,status])=>{
+    const matchQuery=!query.trim()||name.toLowerCase().includes(query.trim().toLowerCase());
+    const matchFilter=filter==="all"||status===filter;
+    return matchQuery&&matchFilter;
+  });
 
   if(!production) return <section className="surface">
-    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input placeholder="Kunden suchen..."/></label><div className="chips"><button className="active">Alle</button><button>Aktiv</button><button>Eingeschränkt</button><button>Gesperrt</button></div></div>
-    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]].map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+    <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden suchen..."/></label><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="Aktiv"?"active":""} onClick={()=>setFilter("Aktiv")}>Aktiv</button><button className={filter==="Eingeschränkt"?"active":""} onClick={()=>setFilter("Eingeschränkt")}>Eingeschränkt</button></div></div>
+    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{demoCustomerVisible.map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></Link>)}</div>
   </section>;
 
   const visible=items.filter(item=>{
@@ -651,6 +662,7 @@ function AuditView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [query,setQuery]=useState("");
+  const demoAuditRows=[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].filter(row=>!query.trim()||row.join(" ").toLowerCase().includes(query.trim().toLowerCase()));
 
   useEffect(()=>{
     if(!production) return;
@@ -660,13 +672,13 @@ function AuditView() {
   },[production]);
 
   if(!production) return <section className="surface">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Letzte 7 Tage</button><button>Alle Kategorien</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Audit durchsuchen..."/></label></div>
-    <div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></div>{[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].map(r=><div className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</div>)}</div>
+    <div className="operator-toolbar"><span className="operator-demo-filter">Demo · letzte 7 Tage</span><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
+    <div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></div>{demoAuditRows.map(r=><div className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</div>)}</div>
   </section>;
 
   const visible=items.filter(item=>!query.trim()||JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase()));
   return <section className="surface">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Operator Audit</button></div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
+    <div className="operator-toolbar"><span className="operator-demo-filter">Operator Audit</span><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
     {visible.length?<div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Operator</span><span>Aktion</span><span>Ziel</span></div>{visible.map(item=><div className="operator-table-row audit" key={String(item.id)}><span>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><span>{String(item.operator_user_id).slice(0,8)}</span><span><b>{String(item.action)}</b></span><span>{[item.target_type,item.target_id].filter(Boolean).map(String).join(" · ")||"—"}</span></div>)}</div>:<EmptyState icon="file" title="Keine Audit-Einträge" text="Operator-Aktionen werden hier nachvollziehbar protokolliert."/>}
   </section>;
 }

@@ -124,14 +124,27 @@ export function DashboardPage() {
 }
 
 export function WelcomePage() {
-  return <AppShell title="Willkommen bei Binso One" subtitle="Was möchtest du zuerst machen?" active="dashboard">
-    <div className="welcome-grid">
-      <Link href="/kunden/neu"><span><Icon name="users"/></span><div><b>Kunde erfassen</b><small>Neuen Kunden anlegen</small></div><Icon name="arrow"/></Link>
-      <Link href="/angebote/neu"><span><Icon name="file"/></span><div><b>Angebot erstellen</b><small>Professionelles Angebot in wenigen Schritten</small></div><Icon name="arrow"/></Link>
-      <Link href="/rechnungen/neu"><span><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Direkt mit Live-Vorschau</small></div><Icon name="arrow"/></Link>
-      <Link href="/dashboard"><span><Icon name="home"/></span><div><b>Binso One kennenlernen</b><small>Mit Beispieldaten starten</small></div><Icon name="arrow"/></Link>
+  return <AppShell title="Willkommen bei Binso One" subtitle="Starte mit dem, was du gerade brauchst." active="dashboard">
+    <div className="onboarding-progress" aria-label="Einrichtung">
+      <div><span>1</span><b>Konto erstellt</b></div><i/>
+      <div className="active"><span>2</span><b>Erster Schritt</b></div><i/>
+      <div><span>3</span><b>Binso One nutzen</b></div>
     </div>
-    <p className="onboarding-hint">Du kannst Firmendaten, Logo, MwSt. und Zahlungsbedingungen später unter Einstellungen ergänzen.</p>
+    <section className="onboarding-intro">
+      <span className="eyebrow">SCHNELLSTART</span>
+      <h2>Was möchtest du zuerst machen?</h2>
+      <p>Du musst nicht zuerst alles einrichten. Wähle eine Aufgabe und ergänze Firmendaten später.</p>
+    </section>
+    <div className="welcome-grid">
+      <Link href="/kunden/neu"><span><Icon name="users"/></span><div><b>Kunde erfassen</b><small>Lege deinen ersten Kunden mit den wichtigsten Angaben an.</small></div><Icon name="arrow"/></Link>
+      <Link href="/angebote/neu"><span><Icon name="file"/></span><div><b>Angebot erstellen</b><small>Erstelle direkt ein Angebot mit Live-Vorschau.</small></div><Icon name="arrow"/></Link>
+      <Link href="/rechnungen/neu"><span><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Erstelle eine Rechnung und prüfe sie vor dem Versand.</small></div><Icon name="arrow"/></Link>
+      <Link href="/dashboard"><span><Icon name="home"/></span><div><b>Erst umsehen</b><small>Öffne das Dashboard und lerne Binso One kennen.</small></div><Icon name="arrow"/></Link>
+    </div>
+    <div className="onboarding-footer">
+      <p>Firmendaten, Logo, MwSt. und Zahlungsbedingungen kannst du jederzeit unter Einstellungen ergänzen.</p>
+      <Button href="/dashboard" variant="ghost">Zum Dashboard</Button>
+    </div>
   </AppShell>;
 }
 
@@ -496,6 +509,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [load,setLoad]=useState(existing?"100":"100");
   const [entryDate,setEntryDate]=useState(existing?"2024-01-01":"");
   const [status,setStatus]=useState("Aktiv");
+  const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -534,9 +548,14 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
-    {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
-    <div className="form-page">
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={(!existing||employeeTab==="overview")?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
+      <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
+      <button role="tab" aria-selected={employeeTab==="time"} className={employeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}>Arbeitszeit</button>
+      <button role="tab" aria-selected={employeeTab==="expenses"} className={employeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}>Spesen</button>
+      <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
+    </div>}
+    {(!existing||employeeTab==="overview")&&<div className="form-page">
       <div className="form-grid two">
         <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -548,7 +567,10 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-    </div>
+    </div>}
+    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href="/zeit" variant="secondary">Zeiterfassung öffnen</Button>}/><div className="metrics-grid three"><Metric label="Diese Woche" value="28:15 h" hint="erfasst" icon="clock"/><Metric label="Dieser Monat" value="121:40 h" hint="erfasst" icon="clock"/><Metric label="Pensum" value={load+"%"} hint="hinterlegt" icon="users"/></div><div className="compact-list"><div><b>Website Redesign</b><span>Heute</span><strong>2:14 h</strong></div><div><b>Kundenmeeting</b><span>Gestern</span><strong>1:30 h</strong></div></div></section>}
+    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list"><Link href="/spesen/1"><b>Übernachtung Kundentermin</b><span>02.10.2026 · CHF 280.00</span><Status tone="warning">Eingereicht</Status></Link></div></section>}
+    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><EmptyState icon="file" title="Noch keine Dokumente" text="Mitarbeiterdokumente werden hier übersichtlich angezeigt, sobald welche vorhanden sind."/></section>}
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -648,9 +670,12 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
 }
 
 export function TimePage() {
+  const [timeTab,setTimeTab]=useState<"timer"|"entries">("timer");
   const [running,setRunning]=useState(true);
   const [seconds,setSeconds]=useState(8067);
   const [manualOpen,setManualOpen]=useState(false);
+  const [projectOpen,setProjectOpen]=useState(false);
+  const [timerProject,setTimerProject]=useState("Website Redesign · Acme AG");
   const [manualDate,setManualDate]=useState("2026-10-02");
   const [manualDuration,setManualDuration]=useState("01:00");
   const [manualCustomer,setManualCustomer]=useState("Acme AG");
@@ -658,11 +683,34 @@ export function TimePage() {
   const [manualDescription,setManualDescription]=useState("");
   const [toast,setToast]=useState<string|null>(null);
 
+  useEffect(()=>{
+    queueMicrotask(()=>{
+      const storedRunning=window.localStorage.getItem("binso.timer.running")!=="false";
+      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"8067");
+      const started=Number(window.localStorage.getItem("binso.timer.startedAt")??"0");
+      const elapsed=storedRunning&&started?Math.max(0,Math.floor((Date.now()-started)/1000)):0;
+      setRunning(storedRunning);
+      setSeconds((Number.isFinite(base)?base:8067)+elapsed);
+    });
+  },[]);
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
+  const toggleTimer=()=>{
+    const next=!running;
+    setRunning(next);
+    window.localStorage.setItem("binso.timer.running",String(next));
+    window.localStorage.setItem("binso.timer.baseSeconds",String(seconds));
+    if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
+    else window.localStorage.removeItem("binso.timer.startedAt");
+    window.dispatchEvent(new Event("binso-timer-change"));
+  };
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
 
   const stop=async()=>{
     setRunning(false);
+    window.localStorage.setItem("binso.timer.running","false");
+    window.localStorage.setItem("binso.timer.baseSeconds","0");
+    window.localStorage.removeItem("binso.timer.startedAt");
+    window.dispatchEvent(new Event("binso-timer-change"));
     try{
       if(isProductionBackendEnabled()){
         const ended=new Date();
@@ -697,17 +745,24 @@ export function TimePage() {
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
-        <div className="tabs"><button className="active">Timer</button><button>Einträge</button></div>
-        <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
-        <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Heute, 09:27</span></div></div>
-        <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
+        <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
+        {timeTab==="timer"?<>
+          <div className="timer-project"><small>Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
+          <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Acme AG · Website Redesign</span></div></div>
+          <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
+        </>:<>
+          <SectionTitle title="Heutige Einträge" action={<strong>4:28 h</strong>}/>
+          <div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>
+          <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
+        </>}
       </section>
       <section className="surface">
-        <SectionTitle title="Heute" action={<strong>4:28 h</strong>}/>
-        <div className="compact-list"><div><b>Website Redesign</b><span>Acme AG</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern</span><strong>0:44</strong></div></div>
-        <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
+        <SectionTitle title={timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
+        {timeTab==="timer"?<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern</span><strong>0:44</strong></div></div>:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
+        {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>
     </div>
+    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Website Redesign · Acme AG","Support · Müller GmbH","Interne Planung"].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>{setTimerProject(project);setProjectOpen(false)}}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
     {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field><Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")?"danger":"success"}/>}
   </AppShell>;

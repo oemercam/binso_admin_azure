@@ -11,6 +11,7 @@ export default function Register() {
   const [companyName,setCompanyName]=useState("");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
+  const [showPassword,setShowPassword]=useState(false);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [confirmation,setConfirmation]=useState(false);
@@ -50,11 +51,17 @@ export default function Register() {
       <form onSubmit={submit}>
         <label>Firmenname<input required autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
         <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
-        <label>Passwort<input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type="password" autoComplete="new-password" placeholder="Mindestens 8 Zeichen"/></label>
+        <label>Passwort
+          <div className="password-field">
+            <input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 8 Zeichen"/>
+            <button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?"Ausblenden":"Anzeigen"}</button>
+          </div>
+          <small className="password-hint">Mindestens 8 Zeichen.</small>
+        </label>
         {error&&<p className="auth-error" role="alert">{error}</p>}
         <Button type="submit">{loading?"Account wird erstellt…":"Account erstellen"}</Button>
       </form>
-      <small>Mit der Registrierung akzeptierst du die AGB und Datenschutzerklärung.</small>
+      <small className="auth-legal">Mit der Registrierung bestätigst du, dass du die rechtlichen Hinweise gelesen hast.</small>
       <p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p>
     </section>
   </main>;

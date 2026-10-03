@@ -351,8 +351,26 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
 }
 
 function DocumentModal({ title, onClose, children }: { title:string; onClose:()=>void; children:React.ReactNode }) {
-  return <div className="document-modal" role="dialog" aria-modal="true">
-    <header><button type="button" onClick={onClose}><Icon name="back"/>Schliessen</button><strong>{title}</strong><button type="button" aria-label="Teilen"><Icon name="upload"/></button></header>
+  useEffect(()=>{
+    const previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.body.style.overflow=previous};
+  },[]);
+  useEffect(()=>{
+    const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};
+    window.addEventListener("keydown",close);
+    return()=>window.removeEventListener("keydown",close);
+  },[onClose]);
+  const share=async()=>{
+    const url=window.location.href;
+    if(navigator.share){
+      try{await navigator.share({title,url});}catch{/* share dialog closed */}
+      return;
+    }
+    try{await navigator.clipboard.writeText(url);}catch{/* clipboard unavailable */}
+  };
+  return <div className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
+    <header><button type="button" onClick={onClose}><Icon name="back"/>Schliessen</button><strong>{title}</strong><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button></header>
     <div className="document-modal-body">{children}</div>
   </div>;
 }
