@@ -12,12 +12,34 @@ export function MarketingHeader() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!open) return;
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const root = document.documentElement;
+    const previous = {
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      rootOverflow: root.style.overflow,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    root.style.overflow = "hidden";
+    return () => {
+      body.style.position = previous.position;
+      body.style.top = previous.top;
+      body.style.width = previous.width;
+      body.style.overflow = previous.overflow;
+      root.style.overflow = previous.rootOverflow;
+      window.scrollTo({ top: scrollY, left: 0, behavior: "auto" });
+    };
   }, [open]);
 
   return <>
-    <header className="marketing-header">
+    <header className={`marketing-header ${open ? "is-menu-open" : ""}`}>
       <div className="marketing-nav">
         <Link href="/" onClick={() => setOpen(false)}><Logo /></Link>
         <nav>
