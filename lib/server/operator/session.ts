@@ -27,5 +27,5 @@ export async function getOperatorSession():Promise<OperatorSession|null>{
  if(session)void query(`update platform_auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }
-export async function requireOperatorSession(){const session=await getOperatorSession();if(!session)throw new Response("Unauthorized",{status:401});return session}
+export async function requireOperatorSession(){const session=await getOperatorSession();if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}return session}
 export async function destroyOperatorSession(){const jar=await cookies();const token=jar.get(env.operatorSessionCookieName)?.value;if(token)await query("delete from platform_auth_sessions where token_hash=$1",[tokenHash(token)]);jar.delete(env.operatorSessionCookieName)}
