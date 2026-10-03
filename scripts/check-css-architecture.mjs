@@ -28,6 +28,21 @@ function walk(dir,extensions){
   return out;
 }
 
+const appCssFiles=fs.readdirSync(path.join(root,"app"))
+  .filter(name=>name.endsWith(".css"))
+  .sort();
+if(JSON.stringify(appCssFiles)!==JSON.stringify(["binso-ui.css"])){
+  throw new Error(`Only app/binso-ui.css may live in app/. Found: ${appCssFiles.join(", ")}`);
+}
+
+const styleCssFiles=fs.readdirSync(styleDir)
+  .filter(name=>name.endsWith(".css"))
+  .sort();
+const expectedCss=[...runtimeCss].sort();
+if(JSON.stringify(styleCssFiles)!==JSON.stringify(expectedCss)){
+  throw new Error(`Unexpected CSS file in app/styles. Expected ${expectedCss.join(", ")}; found ${styleCssFiles.join(", ")}`);
+}
+
 const entry=fs.readFileSync(path.join(root,"app","binso-ui.css"),"utf8");
 for(const file of runtimeCss){
   if(!entry.includes(`./styles/${file}`))throw new Error(`Missing runtime CSS import: ${file}`);
