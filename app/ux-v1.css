@@ -591,3 +591,25 @@ html[data-theme="dark"] .settings-list>a:hover{background:#050505}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+
+/* Timer-aware mobile action spacing and Operator mobile navigation */
+.operator-mobile-nav{display:none}
+@media(max-width:760px){
+  .timer-active .page-actions,
+  .timer-active .mobile-sticky-save,
+  .timer-active .mobile-document-bar{
+    bottom:calc(136px + env(safe-area-inset-bottom))
+  }
+  .operator-mobile-nav{
+    display:flex;position:sticky;top:61px;z-index:18;
+    gap:4px;margin:0 -14px 16px;padding:7px 14px;
+    overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #e5e5e2;background:#fff
+  }
+  .operator-mobile-nav::-webkit-scrollbar{display:none}
+  .operator-mobile-nav a{
+    flex:0 0 auto;min-height:38px;padding:0 10px;border-radius:7px;
+    display:flex;align-items:center;gap:6px;color:#666;font-size:9px;font-weight:700
+  }
+  .operator-mobile-nav a.active{background:#090909;color:#fff}
+}
