@@ -19,7 +19,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{id:stri
     const rows=await operatorInsert("support_messages",{
       tenant_id:tickets[0].tenant_id,
       ticket_id:id,
-      author_user_id:session.user.id,
+      author_user_id:session.userId,
       author_type:"operator",
       body,
       internal,
