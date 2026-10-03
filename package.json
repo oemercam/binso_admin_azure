@@ -1,12 +1,12 @@
 {
-  "name": "binso-one-local",
-  "version": "1.5.0",
+  "name": "binso-one",
+  "version": "0.11.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "check": "pnpm test && pnpm lint && pnpm typecheck && pnpm build",
     "security:scan": "pnpm audit --audit-level high",
@@ -19,7 +19,9 @@
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
     "architecture:check": "node scripts/architecture-selfcheck.mjs",
-    "architecture:hardcoding": "node scripts/architecture-hardcoding-selfcheck.mjs"
+    "architecture:hardcoding": "node scripts/architecture-hardcoding-selfcheck.mjs",
+    "css:check": "node scripts/check-css-architecture.mjs",
+    "routes:css-check": "node scripts/check-route-css.mjs"
   },
   "dependencies": {
     "next": "16.3.6",
