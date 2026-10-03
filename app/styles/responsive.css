@@ -190,6 +190,9 @@
   .price-card>p{min-height:0}
   .price strong{font-size:30px}
   .marketing-cta{
+    width:100%;
+    max-width:none;
+    margin:0;
     padding-top:54px;
     padding-bottom:54px;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
@@ -319,6 +322,13 @@
   .mobile-header .mobile-notification-button,
   .mobile-header .avatar-button{width:40px;height:40px;min-width:40px;min-height:40px}
   .app-demo-badge.mobile{display:none}
+
+  .app-preview .mobile-header{display:none}
+  .app-preview .page-container{
+    padding-top:18px;
+    padding-bottom:24px;
+  }
+  .app-preview .page-head{display:none}
 
   .page-container{
     max-width:none;
