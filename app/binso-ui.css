@@ -1,10 +1,9 @@
 /* Binso One CSS architecture.
-   One source of truth: tokens -> base -> marketing -> app -> operator -> responsive. */
-@layer tokens, base, marketing, app, operator, responsive;
-
-@import "./styles/tokens.css" layer(tokens);
-@import "./styles/base.css" layer(base);
-@import "./styles/marketing.css" layer(marketing);
-@import "./styles/app.css" layer(app);
-@import "./styles/operator.css" layer(operator);
-@import "./styles/responsive.css" layer(responsive);
+   One source of truth. Imports intentionally stay unlayered so Safari/iOS and
+   the Next.js production CSS pipeline apply the same cascade as local builds. */
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/marketing.css";
+@import "./styles/app.css";
+@import "./styles/operator.css";
+@import "./styles/responsive.css";
