@@ -96,7 +96,7 @@ export function OperatorPage({ section = "" }: { section?: string }) {
     <main className="operator-main">
       <header>
         <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
-        <div className="operator-user"><button aria-label="Suche"><Icon name="search"/></button><button aria-label="Benachrichtigungen"><Icon name="bell"/></button><span className="avatar">OC</span></div>
+        <div className="operator-user"><Link className="operator-back-app" href="/dashboard"><Icon name="back" size={15}/><span>Zur App</span></Link><span className="avatar">OC</span></div>
       </header>
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={17}/><span>{label}</span></Link>)}</nav>
 
