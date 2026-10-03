@@ -17,6 +17,7 @@ permissions:
 
 env:
   AZURE_WEBAPP_NAME: binso-admin-prod
+  AZURE_RESOURCE_GROUP: rg-binso-admin-prod
   PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
 
 jobs:
@@ -138,6 +139,39 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
+
+      - name: Restart Azure App Service and wait for worker convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp restart --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME"
+
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          VERSION_URL="$PRODUCTION_URL/deployment.json"
+          CONSECUTIVE=0
+
+          for attempt in {1..90}; do
+            code=$(curl -sS -o /tmp/binso-convergence.json -w "%{http_code}" --max-time 20 -H 'Cache-Control: no-cache' "$VERSION_URL?probe=$attempt" || true)
+
+            if [ "$code" = "200" ] && grep -q "$DEPLOY_SHA" /tmp/binso-convergence.json; then
+              CONSECUTIVE=$((CONSECUTIVE+1))
+              echo "Current commit observed ($CONSECUTIVE/5): $DEPLOY_SHA"
+              if [ "$CONSECUTIVE" -ge 5 ]; then
+                break
+              fi
+            else
+              CONSECUTIVE=0
+              echo "Waiting for all App Service workers to converge ($attempt/90)..."
+            fi
+
+            if [ "$attempt" -eq 90 ]; then
+              echo "::error::Azure App Service did not converge on $DEPLOY_SHA."
+              cat /tmp/binso-convergence.json 2>/dev/null || true
+              exit 1
+            fi
+
+            sleep 3
+          done
 
       - name: Verify current production build and routes
         shell: bash
