@@ -56,7 +56,11 @@ jobs:
 
           if [ -d public ]; then
             cp -R public deploy/app/public
+          else
+            mkdir -p deploy/app/public
           fi
+
+          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
 
           cp package.json deploy/app/package.json
           cp pnpm-lock.yaml deploy/app/pnpm-lock.yaml
@@ -89,6 +93,11 @@ jobs:
             exit 1
           fi
 
+          curl -fsS http://127.0.0.1:3100/portal > /dev/null
+          curl -fsS http://127.0.0.1:3100/demo > /dev/null
+          curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
+          curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$GITHUB_SHA"
+
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
 
@@ -111,30 +120,34 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
 
-      - name: Verify production health and routes
+      - name: Verify current production build and routes
         shell: bash
         run: |
           set -euo pipefail
 
-          HEALTH_URL="$PRODUCTION_URL/api/health"
+          VERSION_URL="$PRODUCTION_URL/deployment.json"
 
-          for attempt in {1..36}; do
-            code=$(curl -sS -o /tmp/binso-health.json -w "%{http_code}" --max-time 20 "$HEALTH_URL" || true)
+          for attempt in {1..60}; do
+            code=$(curl -sS -o /tmp/binso-version.json -w "%{http_code}" --max-time 20 -H 'Cache-Control: no-cache' "$VERSION_URL" || true)
 
-            if [ "$code" = "200" ] && grep -q '"status":"ok"' /tmp/binso-health.json; then
-              echo "Binso One production health check passed."
+            if [ "$code" = "200" ] && grep -q "$GITHUB_SHA" /tmp/binso-version.json; then
+              echo "Current commit is live: $GITHUB_SHA"
               break
             fi
 
-            if [ "$attempt" -eq 36 ]; then
-              echo "Production health check failed: $HEALTH_URL"
-              cat /tmp/binso-health.json 2>/dev/null || true
+            if [ "$attempt" -eq 60 ]; then
+              echo "Current deployment did not become active: $VERSION_URL"
+              cat /tmp/binso-version.json 2>/dev/null || true
               exit 1
             fi
 
-            echo "Attempt $attempt/36 returned HTTP $code; retrying..."
+            echo "Waiting for current commit to become live ($attempt/60)..."
             sleep 5
           done
+
+          HEALTH_URL="$PRODUCTION_URL/api/health"
+          curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
+          echo "Binso One production health check passed."
 
           for route in / /portal /portal/login /portal/registrieren /demo /dashboard /kunden /belege /zeit /einstellungen; do
             echo "Live smoke: $PRODUCTION_URL$route"
