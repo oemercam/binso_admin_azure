@@ -220,6 +220,16 @@
     white-space:nowrap;
     font-size:12px;
   }
+  .mobile-header-detail .mobile-header-leading{width:100%;gap:0}
+  .mobile-header-detail .mobile-header-actions{display:none}
+  .mobile-header-detail .mobile-header-title{
+    max-width:none;
+    flex:1;
+    padding-right:40px;
+    font-size:15px;
+    font-weight:700;
+    text-align:center;
+  }
   .mobile-back{width:40px;height:40px;display:grid;place-items:center;margin-left:-8px}
   .mobile-header .icon-button,
   .mobile-header .mobile-notification-button,
@@ -237,7 +247,7 @@
   .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
   .page-head h1{font-size:21px;line-height:1.12}
   .page-head p{max-width:34rem;margin-top:6px;font-size:11px}
-  .page-head-detail{margin-bottom:10px}
+  .page-head-detail{display:none}
   .page-head-detail>div>h1,
   .page-head-detail>div>p,
   .page-head-detail .page-actions{display:none}
