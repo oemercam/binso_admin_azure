@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button, Logo } from "@/components/ui";
-import { clearDemoClientSession } from "@/lib/client/backend";
+import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
 
 export default function Login() {
   const router=useRouter();
@@ -24,7 +24,20 @@ export default function Login() {
         body:JSON.stringify({email,password}),
       });
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
+      if(!response.ok){
+        if(response.status===503&&payload?.error==="backend_not_configured"){
+          await startDemoClientSession({
+            name:email.split("@")[0]||"Demo",
+            company:"Demo Firma",
+            focus:"overview",
+          });
+          const next=new URLSearchParams(window.location.search).get("next");
+          router.push(next&&next.startsWith("/")?next:"/dashboard");
+          router.refresh();
+          return;
+        }
+        throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
+      }
       clearDemoClientSession();
       const next=new URLSearchParams(window.location.search).get("next");
       router.push(next&&next.startsWith("/")?next:"/dashboard");
