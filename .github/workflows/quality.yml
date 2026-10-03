@@ -20,10 +20,12 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm test
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck
       - run: pnpm build
+      - run: pnpm security:scan
       - name: Runtime smoke test
         shell: bash
         run: |
