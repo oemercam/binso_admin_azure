@@ -18,8 +18,8 @@ const workflow=[
 
 const plans=[
   ["Start","CHF 19","Für Einzelunternehmen und kleine Teams.","Kunden, Angebote, Rechnungen, Zeit"],
-  ["Business","CHF 39","Für wachsende KMU mit mehr Prozessen.","Zusätzlich Mitarbeiter, Spesen und mehr"],
-  ["Pro","CHF 69","Für Teams mit höheren Anforderungen.","Erweiterte Funktionen und mehr Automatisierung"],
+  ["Business","CHF 49","Für wachsende KMU mit mehr Prozessen.","Zusätzlich Mitarbeiter, Spesen und mehr"],
+  ["Pro","CHF 89","Für Teams mit höheren Anforderungen.","Erweiterte Funktionen und mehr Automatisierung"],
 ] as const;
 
 export default function Home() {
