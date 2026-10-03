@@ -5,8 +5,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
-import { useI18n } from "@/lib/i18n/provider";
-import { formatDate } from "@/lib/i18n/config";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 const desktopNav = [
@@ -46,10 +44,10 @@ function notificationIcon(kind:string){
   return "bell";
 }
 
-function notificationTime(value:string,locale:Parameters<typeof formatDate>[1]){
+function notificationTime(value:string){
   const date=new Date(value);
   if(Number.isNaN(date.getTime())) return "";
-  return formatDate(date,locale,{dateStyle:"short",timeStyle:"short"});
+  return date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
 }
 
 export function AppShell({
@@ -59,7 +57,7 @@ export function AppShell({
   children,
   actions,
   backHref,
-  backLabel,
+  backLabel = "Zurück",
   preview = false,
 }: {
   title: string;
@@ -72,7 +70,6 @@ export function AppShell({
   preview?: boolean;
 }) {
   const router=useRouter();
-  const {locale,messages:m}=useI18n();
   const pathname=usePathname();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
   const production=useBackendMode();
@@ -382,7 +379,7 @@ export function AppShell({
       <main className="page-container" data-section={active}>
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
           <div>
-            {backHref && <Link className="desktop-back" href={backHref}><Icon name="back" size={16}/>{backLabel??m.common.back}</Link>}
+            {backHref && <Link className="desktop-back" href={backHref}><Icon name="back" size={16}/>{backLabel}</Link>}
             <h1>{title}</h1>
             {subtitle && <p>{subtitle}</p>}
           </div>
@@ -484,7 +481,7 @@ export function AppShell({
               {!notificationsLoading&&!notificationsError&&notifications.length===0&&<EmptyState icon="bell" title="Keine Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/>}
               {!notificationsError&&notifications.slice(0,5).map(item=><Link href={item.href||"/benachrichtigungen"} key={item.id} onClick={()=>{void markNotificationRead(item.id);setSheet(null)}}>
                 <span className="activity-icon"><Icon name={notificationIcon(item.kind)}/></span>
-                <div><b>{item.title}</b><p>{item.body}</p><small>{notificationTime(item.created_at,locale)}</small></div>
+                <div><b>{item.title}</b><p>{item.body}</p><small>{notificationTime(item.created_at)}</small></div>
                 {!item.read_at&&<i className="unread-dot"/>}
               </Link>)}
               {unreadNotifications>0&&<button className="notification-mark-all" type="button" onClick={()=>void markAllNotificationsRead()}>Alle als gelesen markieren</button>}

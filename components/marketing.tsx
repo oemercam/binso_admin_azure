@@ -3,12 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
-import { LanguageSwitcher } from "./language-switcher";
-import { useI18n } from "@/lib/i18n/provider";
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
-  const {messages:m}=useI18n();
 
   useEffect(() => {
     document.documentElement.removeAttribute("data-theme");
@@ -24,13 +21,13 @@ export function MarketingHeader() {
       <div className="marketing-nav">
         <Link href="/" onClick={() => setOpen(false)}><Logo /></Link>
         <nav>
-          <Link href="/produkt">{m.nav.products}</Link>
-          <Link href="/#funktionen">{m.nav.features}</Link>
-          <Link href="/preise">{m.nav.pricing}</Link>
+          <Link href="/produkt">Produkt</Link>
+          <Link href="/#funktionen">Funktionen</Link>
+          <Link href="/preise">Preise</Link>
         </nav>
-        <div className="marketing-actions"><LanguageSwitcher compact/>
-          <Link href="/portal/login">{m.nav.login}</Link>
-          <Button href="/registrieren">{m.marketing.trial}</Button>
+        <div className="marketing-actions">
+          <Link href="/portal/login">Anmelden</Link>
+          <Button href="/registrieren">30 Tage kostenlos testen</Button>
           <button className="marketing-menu-button" type="button" aria-label={open ? "Menü schliessen" : "Menü öffnen"} onClick={() => setOpen(!open)}>
             <span className={`menu-morph ${open ? "is-open" : ""}`} aria-hidden="true"><i/><i/><i/></span>
           </button>
@@ -40,14 +37,14 @@ export function MarketingHeader() {
 
     {open && <div className="marketing-mobile-menu">
       <nav>
-        <Link href="/produkt" onClick={() => setOpen(false)}>{m.nav.products} <Icon name="arrow"/></Link>
-        <Link href="/#funktionen" onClick={() => setOpen(false)}>{m.nav.features} <Icon name="arrow"/></Link>
-        <Link href="/preise" onClick={() => setOpen(false)}>{m.nav.pricing} <Icon name="arrow"/></Link>
+        <Link href="/produkt" onClick={() => setOpen(false)}>Produkt <Icon name="arrow"/></Link>
+        <Link href="/#funktionen" onClick={() => setOpen(false)}>Funktionen <Icon name="arrow"/></Link>
+        <Link href="/preise" onClick={() => setOpen(false)}>Preise <Icon name="arrow"/></Link>
       </nav>
-      <div className="marketing-mobile-actions"><LanguageSwitcher/>
-        <Button href="/portal/login" variant="secondary">{m.nav.login}</Button>
+      <div className="marketing-mobile-actions">
+        <Button href="/portal/login" variant="secondary">Anmelden</Button>
         <Button href="/registrieren">30 Tage kostenlos testen</Button>
-        <Button href="/demo" variant="ghost">{m.marketing.demo}</Button>
+        <Button href="/demo" variant="ghost">Demo starten</Button>
       </div>
       <div className="marketing-mobile-social" aria-label="Binso Social Media">
         <a href="https://ch.linkedin.com/company/binsogmbh" target="_blank" rel="noreferrer" aria-label="Binso auf LinkedIn"><span aria-hidden="true">in</span></a>
