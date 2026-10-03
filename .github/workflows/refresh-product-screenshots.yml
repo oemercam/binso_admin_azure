@@ -1,9 +1,5 @@
 name: Refresh product screenshots
-on:
-  push:
-    branches: [feature/public-launch-i18n-social-20261003]
-    paths-ignore:
-      - "public/screenshots/**"
+on:\n  workflow_dispatch:
 concurrency:
   group: product-screenshots-${{ github.ref }}
   cancel-in-progress: true
