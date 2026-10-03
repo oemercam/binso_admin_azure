@@ -67,27 +67,12 @@ export function MarketingFooter() {
 }
 
 export function ProductPreview() {
-  return <div className="hero-preview">
-    <div className="preview-window">
-      <div className="preview-top"><Logo/><div className="fake-dots">•••</div></div>
-      <div className="preview-body">
-        <aside><span className="active">Übersicht</span><span>Kunden</span><span>Rechnungen</span><span>Zeiterfassung</span></aside>
-        <main>
-          <div className="preview-greeting"><div><small>Guten Morgen</small><h3>Thomas</h3></div><span className="avatar">TM</span></div>
-          <div className="preview-metrics">
-            <div><small>Umsatz</small><b>CHF 24’500</b></div>
-            <div><small>Offene Rechnungen</small><b>8</b></div>
-            <div><small>Kunden</small><b>42</b></div>
-          </div>
-          <div className="preview-chart"><div className="bars">{[38,58,44,77,64,88,70].map((h,i)=><i key={i} style={{height:`${h}%`}} />)}</div></div>
-        </main>
-      </div>
+  return <div className="hero-product-preview" aria-label="Binso One Produktvorschau">
+    <div className="hero-product-desktop" aria-hidden="true">
+      <iframe src="/preview/dashboard" title="Binso One Desktop Vorschau" tabIndex={-1}/>
     </div>
-    <div className="preview-phone">
-      <div className="phone-top">9:41</div>
-      <h4>Rechnungen</h4>
-      {["Acme AG","Müller GmbH","Huber & Söhne"].map((x,i)=><div className="phone-row" key={x}><div><b>RE-2026-00{18-i}</b><span>{x}</span></div><strong>CHF {(2450-i*650).toLocaleString("de-CH")}.00</strong></div>)}
-      <div className="phone-nav"><Icon name="home"/><Icon name="users"/><Icon name="receipt"/><Icon name="clock"/><Icon name="more"/></div>
+    <div className="hero-product-mobile" aria-hidden="true">
+      <iframe src="/preview/dashboard" title="Binso One Mobile Vorschau" tabIndex={-1}/>
     </div>
   </div>;
 }
