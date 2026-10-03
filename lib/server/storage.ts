@@ -1,51 +1,12 @@
-import { ApiError } from "./http";
-import { getBackendEnv } from "./env";
-
-function storageHeaders(token:string,contentType?:string){
-  const {supabaseAnonKey}=getBackendEnv();
-  return {
-    apikey:supabaseAnonKey,
-    Authorization:"Bearer "+token,
-    ...(contentType?{"Content-Type":contentType}:{}),
-  };
-}
-
-export async function uploadStorageObject(bucket:string,path:string,token:string,bytes:ArrayBuffer,contentType:string){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"POST",
-    headers:{...storageHeaders(token,contentType),"x-upsert":"false"},
-    body:bytes,
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Storage upload failed",response.status,typeof payload?.statusCode==="string"?payload.statusCode:"unknown");
-    throw new ApiError(400,"storage_upload_failed","Datei konnte nicht gespeichert werden.");
-  }
-}
-
-export async function deleteStorageObject(bucket:string,path:string,token:string){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"DELETE",
-    headers:storageHeaders(token),
-    cache:"no-store",
-  });
-  return response.ok;
-}
-
-export async function signStorageObject(bucket:string,path:string,token:string,expiresIn=300){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/sign/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"POST",
-    headers:{...storageHeaders(token),"Content-Type":"application/json"},
-    body:JSON.stringify({expiresIn}),
-    cache:"no-store",
-  });
-  if(!response.ok) throw new ApiError(400,"storage_sign_failed","Datei konnte nicht geöffnet werden.");
-  const payload=await response.json() as {signedURL?:string;signedUrl?:string};
-  const relative=payload.signedURL??payload.signedUrl;
-  if(!relative) throw new ApiError(500,"storage_sign_failed","Datei konnte nicht geöffnet werden.");
-  return relative.startsWith("http")?relative:supabaseUrl+"/storage/v1"+relative;
-}
+import {createHmac,timingSafeEqual} from "node:crypto";import {ApiError} from "./http";import {getBackendEnv} from "./env";
+let cached:{token:string;expires:number}|null=null;
+async function bearer(){if(cached&&cached.expires>Date.now()+60000)return cached.token;const endpoint=process.env.IDENTITY_ENDPOINT,header=process.env.IDENTITY_HEADER;if(!endpoint||!header)return null;const u=new URL(endpoint);u.searchParams.set("resource","https://storage.azure.com/");u.searchParams.set("api-version","2019-08-01");const r=await fetch(u,{headers:{"X-IDENTITY-HEADER":header},cache:"no-store"});if(!r.ok)throw new ApiError(502,"storage_identity_failed","Dateispeicher ist nicht erreichbar.");const j=await r.json() as {access_token:string;expires_on?:string};cached={token:j.access_token,expires:Number(j.expires_on||0)*1000||Date.now()+2700000};return cached.token;}
+function config(){const e=getBackendEnv();if(!e.azureStorageAccount)throw new ApiError(503,"storage_not_configured","Dateispeicher ist nicht konfiguriert.");return e;}
+function url(bucket:string,path:string){const e=config(),safe=path.split("/").map(encodeURIComponent).join("/");return `https://${e.azureStorageAccount}.blob.core.windows.net/${encodeURIComponent(bucket)}/${safe}`;}
+async function authUrl(bucket:string,path:string){const e=config(),base=url(bucket,path);if(e.azureStorageSas)return {target:base+"?"+e.azureStorageSas.replace(/^\?/,""),headers:{"x-ms-version":"2023-11-03"}};const token=await bearer();if(!token)throw new ApiError(503,"storage_not_configured","Azure Blob Storage benötigt Managed Identity oder SAS.");return {target:base,headers:{authorization:"Bearer "+token,"x-ms-version":"2023-11-03"}};}
+export async function uploadStorageObject(bucket:string,path:string,_token:string,bytes:ArrayBuffer,contentType:string){const a=await authUrl(bucket,path);const r=await fetch(a.target,{method:"PUT",headers:{...a.headers,"x-ms-blob-type":"BlockBlob","content-type":contentType,"content-length":String(bytes.byteLength)},body:bytes,cache:"no-store"});if(!r.ok)throw new ApiError(502,"storage_upload_failed","Datei konnte nicht gespeichert werden.");}
+export async function deleteStorageObject(bucket:string,path:string,_token:string){const a=await authUrl(bucket,path);const r=await fetch(a.target,{method:"DELETE",headers:a.headers,cache:"no-store"});return r.ok||r.status===404;}
+function signingSecret(){const s=process.env.FILE_SIGNING_SECRET||process.env.RATE_LIMIT_SECRET;if(!s)throw new ApiError(503,"storage_signing_not_configured","Dateizugriff ist nicht konfiguriert.");return s;}
+export async function signStorageObject(bucket:string,path:string,_token:string,expiresIn=300){const expires=Math.floor(Date.now()/1000)+Math.max(30,Math.min(900,expiresIn));const payload=`${bucket}\n${path}\n${expires}`;const sig=createHmac("sha256",signingSecret()).update(payload).digest("hex");return `/api/files/content?bucket=${encodeURIComponent(bucket)}&path=${encodeURIComponent(path)}&expires=${expires}&sig=${sig}`;}
+export function verifyStorageSignature(bucket:string,path:string,expires:number,sig:string){if(!Number.isFinite(expires)||expires<Math.floor(Date.now()/1000))return false;const expected=createHmac("sha256",signingSecret()).update(`${bucket}\n${path}\n${expires}`).digest("hex");const a=Buffer.from(expected,"hex"),b=Buffer.from(sig,"hex");return a.length===b.length&&timingSafeEqual(a,b);}
+export async function readStorageObject(bucket:string,path:string){const a=await authUrl(bucket,path);const r=await fetch(a.target,{headers:a.headers,cache:"no-store"});if(!r.ok)throw new ApiError(r.status===404?404:502,"storage_read_failed","Datei konnte nicht geöffnet werden.");return {body:await r.arrayBuffer(),contentType:r.headers.get("content-type")||"application/octet-stream"};}
