@@ -67,7 +67,9 @@
     z-index:29;
     display:flex;
     flex-direction:column;
-    overflow:auto;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
     padding:22px max(var(--mobile-page-x),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));
     background:#fff;
   }
