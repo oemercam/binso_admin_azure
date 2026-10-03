@@ -27,19 +27,22 @@ export default function Demo(){
 
   const start=async()=>{
     setLoading(true);setError("");
+    const now=Date.now();
+    window.localStorage.setItem("binso.demo.session","1");
+    window.localStorage.setItem("binso.demo.name",name.trim()||"Thomas Muster");
+    window.localStorage.setItem("binso.demo.company",company.trim()||"Musterwerk AG");
+    window.localStorage.setItem("binso.demo.focus",focus);
+    window.localStorage.setItem("binso.demo.startedAt",String(now));
+    window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
+
     try{
-      window.localStorage.setItem("binso.demo.session","1");
-      window.localStorage.setItem("binso.demo.name",name.trim()||"Thomas Muster");
-      window.localStorage.setItem("binso.demo.company",company.trim()||"Musterwerk AG");
-      window.localStorage.setItem("binso.demo.focus",focus);
-      const response=await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
-      if(!response.ok) throw new Error("Demo konnte nicht gestartet werden.");
-      router.push("/willkommen");
-      router.refresh();
-    }catch(error){
-      setError(error instanceof Error?error.message:"Demo konnte nicht gestartet werden.");
-      setLoading(false);
+      await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
+    }catch{
+      // UX demo remains available locally while the production backend is intentionally deferred.
     }
+
+    router.push("/willkommen");
+    router.refresh();
   };
 
   return <main className="demo-onboarding">

@@ -1308,10 +1308,21 @@ export function SecuritySettingsPage() {
 
 export function AppearanceSettingsPage() {
   const [theme,setTheme] = useState<"light"|"dark"|"system">("light");
+
+  useEffect(()=>{
+    const storedMode=window.localStorage.getItem("binso.theme.mode");
+    const storedResolved=window.localStorage.getItem("binso.theme");
+    const next=storedMode==="system"||storedMode==="dark"||storedMode==="light"
+      ? storedMode
+      : storedResolved==="dark" ? "dark" : "light";
+    queueMicrotask(()=>setTheme(next));
+  },[]);
+
   const choose=(next:"light"|"dark"|"system")=>{
     setTheme(next);
     const resolved=next==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):next;
     document.documentElement.dataset.theme=resolved;
+    window.localStorage.setItem("binso.theme.mode",next);
     window.localStorage.setItem("binso.theme",resolved);
   };
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">

@@ -79,6 +79,7 @@ export function AppShell({
   const [timerNow, setTimerNow] = useState(0);
   const [timerProjectLabel,setTimerProjectLabel]=useState("");
   const [accountInitials,setAccountInitials]=useState("TM");
+  const [demoSession,setDemoSession]=useState(false);
   const [notifications,setNotifications]=useState<NotificationItem[]>([]);
   const [notificationsLoading,setNotificationsLoading]=useState(false);
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
@@ -98,6 +99,14 @@ export function AppShell({
       setTimerStartedAt(running ? startedAt : null);
       setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
+      const demo=window.localStorage.getItem("binso.demo.session")==="1";
+      const expiresAt=Number(window.localStorage.getItem("binso.demo.expiresAt")??"0");
+      const validDemo=demo&&(!expiresAt||expiresAt>Date.now());
+      setDemoSession(validDemo);
+      if(demo&&!validDemo){
+        window.localStorage.removeItem("binso.demo.session");
+        window.localStorage.removeItem("binso.demo.expiresAt");
+      }
     });
   }, []);
 
@@ -232,9 +241,11 @@ export function AppShell({
 
   function toggleTheme() {
     const next = !dark;
+    const mode = next ? "dark" : "light";
     setDark(next);
-    document.documentElement.dataset.theme = next ? "dark" : "light";
-    window.localStorage.setItem("binso.theme", next ? "dark" : "light");
+    document.documentElement.dataset.theme = mode;
+    window.localStorage.setItem("binso.theme", mode);
+    window.localStorage.setItem("binso.theme.mode", mode);
   }
 
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
@@ -284,7 +295,7 @@ export function AppShell({
     <div className="app-main">
       <div className="desktop-appbar">
         <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
-        <div className="desktop-appbar-actions">
+        <div className="desktop-appbar-actions">{demoSession&&<span className="app-demo-badge">Demo</span>}
           <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
           <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
@@ -295,7 +306,7 @@ export function AppShell({
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
           {backHref && <span className="mobile-header-title">{title}</span>}
         </div>
-        <div className="mobile-header-actions">
+        <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
@@ -379,6 +390,7 @@ export function AppShell({
               <SheetLink href="/einstellungen/konto" icon="user" title="Persönliche Daten" text="Profil und Sprache" onSelect={() => setSheet(null)}/>
               <SheetLink href="/einstellungen/sicherheit" icon="lock" title="Sicherheit" text="Passwort und Sitzungen" onSelect={() => setSheet(null)}/>
               <SheetLink href="/einstellungen/abonnement" icon="card" title="Abonnement" text="Plan und Abrechnung" onSelect={() => setSheet(null)}/>
+              {demoSession&&<SheetLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" text="Demo verlassen und mit eigenem Konto starten" onSelect={() => setSheet(null)}/>}
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
