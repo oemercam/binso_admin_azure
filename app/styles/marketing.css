@@ -127,6 +127,11 @@
   border-top:1px solid var(--color-line);
   border-left:1px solid var(--color-line);
 }
+.marketing-benefits{
+  width:100%;
+  max-width:var(--marketing-max);
+  margin-inline:auto;
+}
 .marketing-benefits article,
 .feature-grid article{
   min-height:152px;
@@ -158,6 +163,12 @@
   gap:56px;
   align-items:start;
 }
+.workflow-section{
+  width:100%;
+  max-width:var(--marketing-max);
+  margin-inline:auto;
+  padding:74px 28px;
+}
 .feature-showcase-copy,
 .workflow-copy,
 .subhero-copy{max-width:560px}
@@ -170,36 +181,91 @@
   border-top:1px solid var(--color-line);
 }
 .feature-list>div,
-.workflow-list>div,
 .product-module-list>div,
 .security-points>div{
   min-height:58px;
   padding:10px 0;
   display:grid;
-  grid-template-columns:auto minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) auto;
   gap:12px;
-  align-items:start;
+  align-items:center;
   border-bottom:1px solid var(--color-line);
 }
+.feature-list>div>div{min-width:0}
 .feature-list b,
 .workflow-list b,
 .product-module-list b,
 .security-points b{font-size:12px}
+.feature-list small,
+.product-module-list small,
+.security-points small{
+  display:block;
+  margin-top:3px;
+  color:var(--color-muted);
+  font-size:10px;
+  line-height:1.45;
+}
 .feature-list p,
 .workflow-list p,
 .product-module-list p,
 .security-points p{margin:3px 0 0;color:var(--color-muted);font-size:10px;line-height:1.45}
+.workflow-list>article{
+  min-height:76px;
+  padding:12px 0;
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+  border-bottom:1px solid var(--color-line);
+}
+.workflow-list>article>span{
+  padding-top:1px;
+  color:var(--color-muted);
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+}
+.workflow-list h3{margin:0;font-size:14px;line-height:1.25}
+.workflow-list p{margin-top:5px}
 
 .section-product-shot,
 .desktop-shot,
 .mobile-shot{
+  min-width:0;
   overflow:hidden;
   border:1px solid var(--color-line);
   background:#fff;
 }
+.section-product-shot iframe{
+  display:block;
+  border:0;
+  background:#fff;
+  pointer-events:none;
+}
 .section-product-shot,
 .desktop-shot{border-radius:12px}
-.mobile-shot{border-radius:24px}
+.desktop-shot{
+  width:100%;
+  height:380px;
+}
+.desktop-shot iframe{
+  width:1440px;
+  height:900px;
+  transform:scale(.43);
+  transform-origin:top left;
+}
+.mobile-shot{
+  width:244px;
+  height:526px;
+  margin-inline:auto;
+  border:6px solid #111;
+  border-radius:28px;
+}
+.mobile-shot iframe{
+  width:440px;
+  height:956px;
+  transform:scale(.55);
+  transform-origin:top left;
+}
 
 .product-callout{
   max-width:none;
@@ -267,7 +333,20 @@
 .faq-list summary{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:12px;font-weight:700;cursor:pointer}
 .faq-list p{margin:0 0 16px;color:var(--color-muted);font-size:11px;line-height:1.5}
 
-.marketing-cta{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.marketing-cta{
+  width:100%;
+  max-width:var(--marketing-max);
+  margin-inline:auto;
+  padding:74px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+.marketing-cta>div{min-width:0}
+.marketing-cta>div:last-child{display:flex;gap:8px}
+.marketing-cta h2{margin:8px 0 10px;font-size:34px;line-height:1.05;letter-spacing:-.04em}
+.marketing-cta p{margin:0;color:var(--color-muted);font-size:13px;line-height:1.55}
 .marketing-cta .hero-actions{margin:0}
 
 .marketing-footer{
@@ -451,8 +530,19 @@
 .demo-focus-list small{display:block;margin-top:3px;color:var(--color-muted);font-size:10px}
 .demo-step-actions{display:flex;gap:8px;margin-top:22px}
 .demo-summary-list{display:grid;border-top:1px solid var(--color-line)}
-.demo-summary-list>div{min-height:48px;display:flex;justify-content:space-between;gap:18px;align-items:center;border-bottom:1px solid var(--color-line);font-size:11px}
-.demo-summary-list span{color:var(--color-muted)}
+.demo-summary-list>div{
+  min-height:58px;
+  padding:9px 0;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+  border-bottom:1px solid var(--color-line);
+  font-size:11px;
+}
+.demo-summary-list>div>span{min-width:0;color:var(--color-muted)}
+.demo-summary-list b{display:block;color:#111;font-size:11px}
+.demo-summary-list small{display:block;margin-top:3px;font-size:9px;line-height:1.4}
 .demo-privacy{margin-top:16px;color:var(--color-muted);font-size:9px;line-height:1.45}
 
 

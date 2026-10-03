@@ -45,15 +45,15 @@ export default function Demo(){
     router.refresh();
   };
 
-  return <main className="demo-onboarding">
+  return <main className="demo-onboarding-shell">
     <header className="demo-onboarding-header">
       <Link href="/"><Logo/></Link>
       <Link href="/" className="demo-close" aria-label="Demo schliessen"><Icon name="close" size={18}/></Link>
     </header>
 
-    <section className="demo-onboarding-shell">
-      <div className="demo-progress" aria-label="Demo Einrichtung">
-        {[1,2,3].map(value=><span key={value} className={step>=value?"active":""}>{value}</span>)}
+    <section className="demo-onboarding">
+      <div className="demo-progress" aria-label={"Demo Einrichtung, Schritt "+step+" von 3"}>
+        {[1,2,3].map(value=><span key={value} className={step>=value?"active":""} aria-hidden="true"/>)}
       </div>
 
       {step===1&&<div className="demo-step">
