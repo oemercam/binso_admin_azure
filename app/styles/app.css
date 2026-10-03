@@ -1063,16 +1063,9 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .button,.icon-button,.record,.sheet-menu>a,.sheet-menu>button{
   transition:transform var(--motion-fast) var(--motion-ease),background-color var(--motion-fast) ease,border-color var(--motion-fast) ease,opacity var(--motion-fast) ease;
 }
-@media (hover:hover) and (pointer:fine){
-  .record:hover{transform:translateY(-1px)}
-}
 .button:active,.icon-button:active,.sheet-menu>a:active,.sheet-menu>button:active{transform:scale(.975)}
 .bottom-sheet{animation:sheet-enter var(--motion-base) var(--motion-ease) both}
 @keyframes sheet-enter{
   from{opacity:.7;transform:translateY(24px)}
   to{opacity:1;transform:translateY(0)}
-}
-@media (prefers-reduced-motion:reduce){
-  .app-launch{display:none}
-  .bottom-sheet{animation:none}
 }
