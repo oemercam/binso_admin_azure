@@ -998,3 +998,258 @@ html[data-theme="dark"] .auth-page{
   .pricing-page .pricing-foot{margin:0 16px 52px;padding:26px 0;display:block}
   .pricing-page .pricing-foot .button{width:100%;margin-top:18px}
 }
+
+
+/* Final interaction polish */
+:where(a,button,input,select,textarea):focus-visible{
+  outline:2px solid #111;
+  outline-offset:2px;
+}
+.icon-button:focus-visible,
+.button:focus-visible,
+.bottom-nav>a:focus-visible,
+.bottom-nav>button:focus-visible{
+  outline-offset:1px;
+}
+button:disabled,.button[aria-disabled="true"]{
+  opacity:.45;
+  cursor:not-allowed;
+}
+input::placeholder,textarea::placeholder{color:#9a9a9a}
+select{background-image:none}
+textarea{resize:vertical}
+.searchbox:focus-within,
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus,
+.auth-card input:focus{
+  border-color:#111!important;
+  box-shadow:0 0 0 2px rgba(0,0,0,.05)!important;
+}
+
+/* Keep sheets usable with keyboard and small screens */
+.sheet-layer{
+  overscroll-behavior:contain;
+}
+.bottom-sheet{
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+}
+.bottom-sheet::-webkit-scrollbar{display:none}
+.sheet-header{
+  position:sticky;
+  top:-8px;
+  z-index:2;
+  background:#fff;
+  padding-top:8px;
+}
+.sheet-menu>a,
+.sheet-secondary>button{
+  touch-action:manipulation;
+}
+.sheet-menu>a:last-child{border-bottom:0}
+
+/* Prevent accidental horizontal overflow */
+.app-root,
+.app-main,
+.page-container,
+.invoice-workspace,
+.form-page,
+.settings-detail-grid,
+.notification-center,
+.operator-main{
+  min-width:0;
+}
+.record-main,
+.section-title,
+.page-head>div,
+.settings-list>a>div,
+.sheet-menu>a>div{
+  min-width:0;
+}
+.record-main b,
+.record-main small,
+.settings-list b,
+.settings-list small,
+.sheet-menu b,
+.sheet-menu small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Actions remain reachable without becoming oversized */
+.page-actions{align-items:center}
+.mobile-sticky-save,
+.mobile-document-bar{
+  pointer-events:none;
+}
+.mobile-sticky-save>*,
+.mobile-document-bar>*{
+  pointer-events:auto;
+}
+.mobile-document-bar{
+  gap:7px;
+}
+.mobile-document-bar .button{
+  flex:1;
+}
+
+/* Cleaner empty states */
+.empty-state{
+  min-height:180px;
+  padding:24px 16px;
+  border:0;
+  background:transparent;
+}
+.empty-state h3{font-size:13px}
+.empty-state p{font-size:10px;max-width:360px}
+.empty-state .button{margin-top:8px}
+
+/* Detail sections: separator-first instead of cards */
+.customer-tab-panel,
+.settings-form,
+.support-composer,
+.operator-thread,
+.customer-context{
+  box-shadow:none!important;
+}
+.customer-tab-panel{
+  border-left:0!important;
+  border-right:0!important;
+  border-radius:0!important;
+}
+.contact-list>div,
+.timeline>div{
+  border-bottom:1px solid var(--pixel-line);
+}
+
+/* Dense forms */
+.optional-details{
+  border-top:1px solid var(--pixel-line);
+  border-bottom:1px solid var(--pixel-line);
+}
+.optional-details summary{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  font-size:10px;
+  font-weight:700;
+}
+.optional-details[open] summary{border-bottom:1px solid var(--pixel-line)}
+.optional-details>.form-grid{padding:14px 0}
+.form-field small,
+.form-grid small{
+  font-size:8px;
+  color:var(--pixel-muted);
+}
+
+/* Touch devices: no hover-only grey surfaces */
+@media(hover:none){
+  .record:hover,
+  .settings-list>a:hover,
+  .welcome-grid>a:hover,
+  .operator-table-row:hover,
+  .feature-grid article:hover,
+  .line-remove:hover:not(:disabled),
+  .notification-mark-all:hover{
+    background:inherit!important;
+  }
+}
+
+/* Phone ergonomics */
+@media(max-width:760px){
+  :root{
+    --pixel-mobile-header:54px;
+    --pixel-mobile-nav:64px;
+  }
+  .page-container{
+    padding-top:14px;
+    padding-bottom:calc(var(--pixel-mobile-nav) + env(safe-area-inset-bottom) + 18px);
+  }
+  .page-actions{
+    position:static!important;
+    margin-top:8px;
+  }
+  .page-head:not(.page-head-detail){
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:start;
+  }
+  .page-head:not(.page-head-detail) .page-actions{
+    margin-top:0;
+  }
+  .page-head:not(.page-head-detail) .page-actions .button{
+    min-width:38px;
+    padding:0 10px;
+  }
+  .page-head:not(.page-head-detail) .page-actions .button svg+span{
+    display:none;
+  }
+
+  .bottom-sheet{
+    max-height:min(84dvh,720px);
+    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  }
+  .sheet-header{
+    top:-8px;
+    margin-bottom:2px;
+  }
+
+  .mobile-sticky-save{
+    left:10px;
+    right:10px;
+    bottom:calc(var(--pixel-mobile-nav) + env(safe-area-inset-bottom) + 8px);
+  }
+  .mobile-document-bar{
+    left:10px;
+    right:10px;
+  }
+  .timer-active .mobile-sticky-save,
+  .timer-active .mobile-document-bar{
+    bottom:calc(var(--pixel-mobile-nav) + env(safe-area-inset-bottom) + 64px);
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea,
+  .auth-card input{
+    font-size:16px;
+  }
+  .form-grid textarea{min-height:92px}
+
+  .record{
+    min-height:60px;
+  }
+  .record-main b{font-size:10px}
+  .record-main small{font-size:8px}
+  .record>.status{font-size:7px}
+  .record>strong{font-size:8px}
+
+  .tabs button,
+  .chips button{
+    flex:0 0 auto;
+  }
+
+  .operator-table-row{
+    border-radius:0!important;
+    background:#fff!important;
+  }
+}
+
+/* Pure black interaction states */
+html[data-theme="dark"] :where(a,button,input,select,textarea):focus-visible{
+  outline-color:#fff;
+}
+html[data-theme="dark"] .sheet-header{
+  background:#000!important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{color:#737373}
+html[data-theme="dark"] .searchbox:focus-within,
+html[data-theme="dark"] .form-grid input:focus,
+html[data-theme="dark"] .form-grid select:focus,
+html[data-theme="dark"] .form-grid textarea:focus{
+  border-color:#fff!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.12)!important;
+}
