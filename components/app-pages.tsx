@@ -1365,7 +1365,7 @@ export function NotificationsPage() {
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
   const [view,setView]=useState<"all"|"unread">("all");
   const [remoteItems,setRemoteItems]=useState<NotificationRecord[]>([]);
-  const [loading,setLoading]=useState(false);
+  const [loading,setLoading]=useState(true);
   const [error,setError]=useState<string|null>(null);
   const items=[
     ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
@@ -1388,7 +1388,12 @@ export function NotificationsPage() {
     }
   };
 
-  useEffect(()=>{if(production) void load();},[production]);
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:NotificationRecord[]}>("/api/notifications")
+      .then(payload=>queueMicrotask(()=>{setRemoteItems(payload.items);setLoading(false);}))
+      .catch(err=>queueMicrotask(()=>{setError(err instanceof Error?err.message:"Benachrichtigungen konnten nicht geladen werden.");setLoading(false);}));
+  },[production]);
 
   const markRead=async(id:string)=>{
     setRemoteItems(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
