@@ -817,3 +817,65 @@
     top: calc(54px + env(safe-area-inset-top))!important;
   }
 }
+
+
+/* Safari browser vs installed PWA:
+   Normal Safari already reserves browser/status chrome; do not add top safe-area there.
+   Only standalone/fullscreen PWA owns the physical screen top and needs the inset. */
+@media (max-width:760px) {
+  .marketing-header{
+    height:54px!important;
+    min-height:54px!important;
+    padding-top:0!important;
+  }
+  .marketing-nav{
+    height:54px!important;
+  }
+  .marketing-mobile-menu{
+    top:54px!important;
+  }
+
+  .portal-header{
+    height:50px!important;
+    min-height:50px!important;
+    padding-top:0!important;
+  }
+
+  .app-root .mobile-header{
+    height:50px!important;
+    min-height:50px!important;
+    padding-top:0!important;
+  }
+
+  .auth-page{
+    padding-top:12px!important;
+  }
+}
+
+@media (max-width:760px) and (display-mode:standalone),
+       (max-width:760px) and (display-mode:fullscreen) {
+  .marketing-header{
+    height:calc(54px + env(safe-area-inset-top))!important;
+    min-height:calc(54px + env(safe-area-inset-top))!important;
+    padding-top:env(safe-area-inset-top)!important;
+  }
+  .marketing-mobile-menu{
+    top:calc(54px + env(safe-area-inset-top))!important;
+  }
+
+  .portal-header{
+    height:calc(50px + env(safe-area-inset-top))!important;
+    min-height:calc(50px + env(safe-area-inset-top))!important;
+    padding-top:env(safe-area-inset-top)!important;
+  }
+
+  .app-root .mobile-header{
+    height:calc(50px + env(safe-area-inset-top))!important;
+    min-height:calc(50px + env(safe-area-inset-top))!important;
+    padding-top:env(safe-area-inset-top)!important;
+  }
+
+  .auth-page{
+    padding-top:calc(12px + env(safe-area-inset-top))!important;
+  }
+}
