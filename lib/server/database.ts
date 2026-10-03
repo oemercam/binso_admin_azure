@@ -1,153 +1,29 @@
-import { ApiError } from "./http";
-import { getBackendEnv } from "./env";
-import { requireUser } from "./auth";
-
-type DbMethod="GET"|"POST"|"PATCH"|"DELETE";
-
-function headers(token:string,prefer?:string){
-  const {supabaseAnonKey}=getBackendEnv();
-  return {
-    apikey:supabaseAnonKey,
-    Authorization:"Bearer " + token,
-    "Content-Type":"application/json",
-    ...(prefer?{Prefer:prefer}:{}),
-  };
-}
-
-async function requestDb<T>(path:string,method:DbMethod,token:string,body?:unknown,prefer?:string):Promise<T>{
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl + "/rest/v1/" + path,{
-    method,
-    headers:headers(token,prefer),
-    body:body===undefined?undefined:JSON.stringify(body),
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Database request failed",response.status,typeof payload?.code==="string"?payload.code:"unknown");
-    throw new ApiError(response.status===403?403:400,"database_error","Daten konnten nicht verarbeitet werden.");
-  }
-  if(response.status===204) return undefined as T;
-  return response.json() as Promise<T>;
-}
-
-export async function currentTenant(){
-  const {user,token}=await requireUser();
-  const memberships=await requestDb<Array<{tenant_id:string;role:string}>>(
-    "tenant_memberships?select=tenant_id,role&user_id=eq." + encodeURIComponent(user.id) + "&limit=1",
-    "GET",token
-  );
-  const membership=memberships[0];
-  if(!membership) throw new ApiError(403,"tenant_missing","Kein Firmenzugriff vorhanden.");
-  return {user,token,tenantId:membership.tenant_id,role:membership.role};
-}
-
-export async function tenantList<T>(table:string,select="*",extra=""){
-  const {token,tenantId}=await currentTenant();
-  const suffix=extra?"&"+extra:"";
-  return requestDb<T[]>(table+"?select="+encodeURIComponent(select)+"&tenant_id=eq."+tenantId+suffix,"GET",token);
-}
-
-export async function tenantInsert<T extends Record<string,unknown>>(table:string,data:T){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<T&{id:string}>>(table,"POST",token,{...data,tenant_id:tenantId},"return=representation");
-}
-
-export async function tenantUpdate<T extends Record<string,unknown>>(table:string,id:string,data:T){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<T&{id:string}>>(table+"?id=eq."+encodeURIComponent(id)+"&tenant_id=eq."+tenantId,"PATCH",token,data,"return=representation");
-}
-
-
-export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<T>("rpc/"+fn,"POST",token,{...args,p_tenant_id:tenantId});
-}
-
-export async function userRpc<T>(fn:string,args:Record<string,unknown>={}){
-  const {token}=await currentTenant();
-  return requestDb<T>("rpc/"+fn,"POST",token,args);
-}
-
-
-export async function currentCompany(){
-  const {token,tenantId}=await currentTenant();
-  const rows=await requestDb<Array<Record<string,unknown>>>(
-    "tenants?select=id,name,uid,street,postal_code,city,email,phone,vat_rate,payment_terms_days&" +
-    "id=eq." + tenantId + "&limit=1",
-    "GET",token
-  );
-  if(!rows[0]) throw new ApiError(404,"company_not_found","Firma wurde nicht gefunden.");
-  return rows[0];
-}
-
-export async function updateCompany(data:Record<string,unknown>){
-  const {token,tenantId}=await currentTenant();
-  return requestDb<Array<Record<string,unknown>>>(
-    "tenants?id=eq." + tenantId,
-    "PATCH",token,data,"return=representation"
-  );
-}
-
-export async function currentProfile(){
-  const {user,token}=await requireUser();
-  const rows=await requestDb<Array<Record<string,unknown>>>(
-    "profiles?select=user_id,display_name,first_name,last_name,phone,job_title,language&user_id=eq." + encodeURIComponent(user.id) + "&limit=1",
-    "GET",token
-  );
-  return rows[0] ?? null;
-}
-
-export async function updateProfile(data:Record<string,unknown>){
-  const {user,token}=await requireUser();
-  return requestDb<Array<Record<string,unknown>>>(
-    "profiles?user_id=eq." + encodeURIComponent(user.id),
-    "PATCH",token,data,"return=representation"
-  );
-}
-
-
-export async function operatorList<T>(table:string,select="*",extra=""){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  const suffix=extra?"&"+extra:"";
-  return requestDb<T[]>(table+"?select="+encodeURIComponent(select)+suffix,"GET",token);
-}
-
-export async function operatorInsert<T extends Record<string,unknown>>(table:string,data:T){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<T&{id:string}>>(table,"POST",token,data,"return=representation");
-}
-
-export async function operatorUpdate<T extends Record<string,unknown>>(table:string,filter:string,data:T){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<T>>(table+"?"+filter,"PATCH",token,data,"return=representation");
-}
-
-export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Record<string,unknown>={}){
-  const session=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<Array<Record<string,unknown>>>("operator_audit","POST",session.token,{
-    operator_user_id:session.user.id,
-    action,
-    target_type:targetType??null,
-    target_id:targetId??null,
-    metadata,
-  },"return=representation");
-}
-
-
-export async function operatorRpc<T>(fn:string,args:Record<string,unknown>={}){
-  const {token}=await import("./operator").then(module=>module.requireOperatorSession());
-  return requestDb<T>("rpc/"+fn,"POST",token,args);
-}
-
-
+import {ApiError} from "./http";
+import {requireUser} from "./auth";
+import {withUser,withPrivileged} from "./db";
+const tables=new Set(["tenants","profiles","tenant_memberships","customers","customer_contacts","products","employees","documents","document_items","payments","expenses","time_entries","support_tickets","support_messages","audit_log","tenant_accounts","tenant_restrictions","tenant_invitations","platform_announcements","platform_incidents","operator_audit","operator_users","billing_events","notifications","files","web_vitals"]);
+const rpcs=new Set(["tenant_dashboard_stats","create_document_atomic","update_document_atomic","create_payment_idempotent","current_notifications","mark_notification_read","mark_all_notifications_read","create_tenant_invitation","tenant_has_feature","operator_dashboard_stats","operator_customer_overview","set_current_tenant_billing_customer","apply_stripe_billing_event"]);
+function ident(value:string,set:Set<string>){if(!set.has(value))throw new ApiError(400,"database_error","Ungültige Datenabfrage.");return '"'+value+'"';}
+function splitSelect(value:string){let depth=0,current="",out:string[]=[];for(const ch of value){if(ch==="(")depth++;if(ch===")")depth--;if(ch===","&&depth===0){out.push(current);current="";}else current+=ch;}if(current)out.push(current);return out;}
+function selectSql(select:string){const parts=splitSelect(select||"*"),plain:string[]=[],nested:string[]=[];for(const p of parts){if(p.includes(":"))nested.push(p);else plain.push(p);}const cols=plain[0]==="*"?["t.*"]:plain.map(x=>{if(!/^[a-z_][a-z0-9_]*$/i.test(x))throw new ApiError(400,"database_error","Ungültige Feldauswahl.");return 't."'+x+'"';});for(const n of nested){if(n==="customer:customers(name)")cols.push(`(select jsonb_build_object('name',c.name) from customers c where c.id=t.customer_id) as customer`);else if(n==="employee:employees(first_name,last_name)")cols.push(`(select jsonb_build_object('first_name',e.first_name,'last_name',e.last_name) from employees e where e.id=t.employee_id) as employee`);else if(n==="invoice:documents(number)")cols.push(`(select jsonb_build_object('number',d.number) from documents d where d.id=t.invoice_id) as invoice`);else if(n==="invoice:documents(number,total)")cols.push(`(select jsonb_build_object('number',d.number,'total',d.total) from documents d where d.id=t.invoice_id) as invoice`);}return cols.join(",");}
+function filters(extra:string,start=1){const where:string[]=[],values:unknown[]=[],order:string[]=[],parts=new URLSearchParams(extra);let limit="";for(const [key,raw] of parts){if(key==="order"){const [col,dir]=raw.split(".");if(!/^[a-z_][a-z0-9_]*$/i.test(col))continue;order.push('t."'+col+'" '+(dir==="asc"?"asc":"desc"));continue;}if(key==="limit"){const n=Math.max(1,Math.min(500,Number(raw)||100));limit=" limit "+n;continue;}if(!/^[a-z_][a-z0-9_]*$/i.test(key))continue;const dot=raw.indexOf(".");const op=dot<0?"eq":raw.slice(0,dot),value=decodeURIComponent(dot<0?raw:raw.slice(dot+1));if(op==="is"&&value==="null"){where.push('t."'+key+'" is null');continue;}const sqlOp=op==="gte"?">=":op==="lte"?"<=":op==="gt"?">":op==="lt"?"<":op==="neq"?"<>":"=";values.push(value==="true"?true:value==="false"?false:value);where.push('t."'+key+'" '+sqlOp+" $"+(start+values.length-1));}return {where,values,tail:(order.length?" order by "+order.join(","):"")+limit};}
+async function userIdForToken(){return (await requireUser()).user.id;}
+export async function currentTenant(){const {user,token}=await requireUser();return withUser(user.id,async client=>{const r=await client.query<{tenant_id:string;role:string}>(`select tenant_id,role from tenant_memberships where user_id=$1 order by created_at limit 1`,[user.id]);if(!r.rows[0])throw new ApiError(403,"tenant_missing","Kein Firmenzugriff vorhanden.");return {user,token,tenantId:r.rows[0].tenant_id,role:r.rows[0].role};});}
+export async function tenantList<T>(table:string,select="*",extra=""){const tenant=await currentTenant();return withUser(tenant.user.id,async client=>{const name=ident(table,tables);const parsed=filters(extra,2);const sql=`select ${selectSql(select)} from ${name} t where t.tenant_id=$1${parsed.where.length?" and "+parsed.where.join(" and "):""}${parsed.tail}`;return (await client.query<T>(sql,[tenant.tenantId,...parsed.values])).rows;});}
+export async function tenantInsert<T extends Record<string,unknown>>(table:string,data:T){const tenant=await currentTenant();return withUser(tenant.user.id,async client=>{const name=ident(table,tables),payload={...data,tenant_id:tenant.tenantId};const keys=Object.keys(payload);if(!keys.length)throw new ApiError(400,"database_error","Keine Daten.");for(const k of keys)if(!/^[a-z_][a-z0-9_]*$/i.test(k))throw new ApiError(400,"database_error","Ungültiges Feld.");const vals=Object.values(payload);const r=await client.query<T&{id:string}>(`insert into ${name}(${keys.map(k=>'"'+k+'"').join(",")}) values(${keys.map((_,i)=>"$"+(i+1)).join(",")}) returning *`,vals);return r.rows;});}
+export async function tenantUpdate<T extends Record<string,unknown>>(table:string,id:string,data:T){const tenant=await currentTenant();return withUser(tenant.user.id,async client=>{const name=ident(table,tables),keys=Object.keys(data);for(const k of keys)if(!/^[a-z_][a-z0-9_]*$/i.test(k))throw new ApiError(400,"database_error","Ungültiges Feld.");if(!keys.length)return [] as Array<T&{id:string}>;const vals=Object.values(data);const r=await client.query<T&{id:string}>(`update ${name} set ${keys.map((k,i)=>'"'+k+'"=$'+(i+1)).join(",")} where id=$${keys.length+1} and tenant_id=$${keys.length+2} returning *`,[...vals,id,tenant.tenantId]);return r.rows;});}
+async function callRpc<T>(fn:string,args:Record<string,unknown>,userId:string|null){if(!rpcs.has(fn))throw new ApiError(400,"database_error","Unbekannte Datenoperation.");const entries=Object.entries(args);return (userId?withUser(userId,run=>rpcRun<T>(run,fn,entries)):withPrivileged(run=>rpcRun<T>(run,fn,entries)));}
+async function rpcRun<T>(client:import("pg").PoolClient,fn:string,entries:Array<[string,unknown]>){const named=entries.map(([k],i)=>{if(!/^p_[a-z0-9_]+$/i.test(k))throw new ApiError(400,"database_error","Ungültiges Argument.");return k+"=>$"+(i+1);}).join(",");if(fn==="current_notifications"){const r=await client.query(`select * from ${fn}(${named})`,entries.map(x=>x[1]));return r.rows as T;}const r=await client.query<{result:T}>(`select ${fn}(${named}) as result`,entries.map(x=>x[1]));return r.rows[0]?.result as T;}
+export async function tenantRpc<T>(fn:string,args:Record<string,unknown>){const t=await currentTenant();return callRpc<T>(fn,{...args,p_tenant_id:t.tenantId},t.user.id);}
+export async function userRpc<T>(fn:string,args:Record<string,unknown>={}){return callRpc<T>(fn,args,await userIdForToken());}
+export async function currentCompany(){const t=await currentTenant();return withUser(t.user.id,async c=>(await c.query(`select id,name,uid,street,postal_code,city,email,phone,vat_rate,payment_terms_days from tenants where id=$1`,[t.tenantId])).rows[0]??null);}
+export async function updateCompany(data:Record<string,unknown>){const t=await currentTenant(),keys=Object.keys(data);return withUser(t.user.id,async c=>(await c.query(`update tenants set ${keys.map((k,i)=>'"'+k+'"=$'+(i+1)).join(",")} where id=$${keys.length+1} returning *`,[...Object.values(data),t.tenantId])).rows);}
+export async function currentProfile(){const {user}=await requireUser();return withUser(user.id,async c=>(await c.query(`select user_id,display_name,first_name,last_name,phone,job_title,language from profiles where user_id=$1`,[user.id])).rows[0]??null);}
+export async function updateProfile(data:Record<string,unknown>){const {user}=await requireUser(),keys=Object.keys(data);return withUser(user.id,async c=>(await c.query(`update profiles set ${keys.map((k,i)=>'"'+k+'"=$'+(i+1)).join(",")} where user_id=$${keys.length+1} returning *`,[...Object.values(data),user.id])).rows);}
+export async function operatorList<T>(table:string,select="*",extra=""){const s=await import("./operator").then(m=>m.requireOperatorSession());return withUser(s.user.id,async c=>{const parsed=filters(extra,1);const r=await c.query<T>(`select ${selectSql(select)} from ${ident(table,tables)} t${parsed.where.length?" where "+parsed.where.join(" and "):""}${parsed.tail}`,parsed.values);return r.rows;});}
+export async function operatorInsert<T extends Record<string,unknown>>(table:string,data:T){const s=await import("./operator").then(m=>m.requireOperatorSession());return withUser(s.user.id,async c=>{const keys=Object.keys(data),vals=Object.values(data);return (await c.query<T&{id:string}>(`insert into ${ident(table,tables)}(${keys.map(k=>'"'+k+'"').join(",")}) values(${keys.map((_,i)=>"$"+(i+1)).join(",")}) returning *`,vals)).rows;});}
+export async function operatorUpdate<T extends Record<string,unknown>>(table:string,filter:string,data:T){const s=await import("./operator").then(m=>m.requireOperatorSession());return withUser(s.user.id,async c=>{const parsed=filters(filter,Object.keys(data).length+1),keys=Object.keys(data),vals=Object.values(data);return (await c.query<T>(`update ${ident(table,tables)} t set ${keys.map((k,i)=>'"'+k+'"=$'+(i+1)).join(",")}${parsed.where.length?" where "+parsed.where.join(" and "):""} returning *`,[...vals,...parsed.values])).rows;});}
+export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Record<string,unknown>={}){const s=await import("./operator").then(m=>m.requireOperatorSession());return withUser(s.user.id,async c=>(await c.query(`insert into operator_audit(operator_user_id,action,target_type,target_id,metadata) values($1,$2,$3,$4,$5) returning *`,[s.user.id,action,targetType??null,targetId??null,metadata])).rows);}
+export async function operatorRpc<T>(fn:string,args:Record<string,unknown>={}){const s=await import("./operator").then(m=>m.requireOperatorSession());return callRpc<T>(fn,args,s.user.id);}
 export type TenantFeature="core"|"employees"|"expenses"|"time_tracking"|"advanced_roles";
-
-export async function requireTenantFeature(feature:TenantFeature){
-  const tenant=await currentTenant();
-  const allowed=await requestDb<boolean>(
-    "rpc/tenant_has_feature","POST",tenant.token,{target:tenant.tenantId,feature}
-  );
-  if(allowed) return tenant;
-  throw new ApiError(403,"feature_not_available","Diese Funktion ist in deinem aktuellen Abonnement nicht verfügbar.");
-}
+export async function requireTenantFeature(feature:TenantFeature){const t=await currentTenant();const allowed=await callRpc<boolean>("tenant_has_feature",{target:t.tenantId,feature},t.user.id).catch(async()=>callRpc<boolean>("tenant_has_feature",{p_tenant_id:t.tenantId,p_feature:feature},t.user.id));if(allowed)return t;throw new ApiError(403,"feature_not_available","Diese Funktion ist in deinem aktuellen Abonnement nicht verfügbar.");}
