@@ -1,3 +1,5 @@
+import { requireOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { apiError, json } from "@/lib/server/http";
 import { operatorList } from "@/lib/server/database";
 import { getOperationalIntegrationStatus } from "@/lib/server/integrations";
@@ -10,7 +12,7 @@ function percentile(values:number[],p:number){
 
 export async function GET(){
   const started=performance.now();
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"platform:read");
     const dbStarted=performance.now();
     const [incidents,vitals,billingEvents]=await Promise.all([
       operatorList<Record<string,unknown>>("platform_incidents","id,service,title,status,started_at,resolved_at,note,created_at","order=started_at.desc&limit=100"),
