@@ -44,23 +44,21 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
 
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Apply production database migrations
+      - name: Validate and migrate Azure PostgreSQL
         shell: bash
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: "true"
+          DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
         run: |
           set -euo pipefail
-          if [ -z "$SUPABASE_DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL is required so application code and the production database cannot drift."
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
-          supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
-          supabase db push --db-url "$SUPABASE_DB_URL"
+          pnpm db:check
+          pnpm db:migrate
+          pnpm db:check
 
       - name: Prepare standalone deploy artifact
         shell: bash
