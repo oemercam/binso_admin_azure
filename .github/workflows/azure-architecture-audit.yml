@@ -34,7 +34,6 @@ jobs:
           echo "App resource group: ${APP_RG:-NOT_FOUND}"
           echo "PostgreSQL resource group: ${PG_RG:-NOT_FOUND}"
           test -n "$APP_RG"
-          test -n "$PG_RG"
 
           echo "=== App Service ==="
           az webapp show -g "$APP_RG" -n "$APP_NAME" --query "{name:name,state:state,httpsOnly:httpsOnly,kind:kind,location:location,identity:identity.type,clientAffinityEnabled:clientAffinityEnabled}" -o json
@@ -43,10 +42,14 @@ jobs:
           echo "=== App setting names only ==="
           az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
 
-          echo "=== PostgreSQL Flexible Server ==="
-          az postgres flexible-server show -g "$PG_RG" -n "$PG_NAME" --query "{name:name,state:state,version:version,location:location,publicNetworkAccess:network.publicNetworkAccess,delegatedSubnetResourceId:network.delegatedSubnetResourceId,privateDnsZoneArmResourceId:network.privateDnsZoneArmResourceId,authConfig:authConfig,backup:backup,highAvailability:highAvailability,storage:storage}" -o json
-          echo "=== PostgreSQL databases ==="
-          az postgres flexible-server db list -g "$PG_RG" -s "$PG_NAME" --query "[].name" -o tsv | sort
+          echo "=== PostgreSQL Flexible Servers visible to deployment identity ==="
+          az resource list --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[].{name:name,resourceGroup:resourceGroup,location:location}" -o json
+          if [ -n "$PG_RG" ]; then
+            echo "=== PostgreSQL Flexible Server ==="
+            az postgres flexible-server show -g "$PG_RG" -n "$PG_NAME" --query "{name:name,state:state,version:version,location:location,publicNetworkAccess:network.publicNetworkAccess,delegatedSubnetResourceId:network.delegatedSubnetResourceId,privateDnsZoneArmResourceId:network.privateDnsZoneArmResourceId,authConfig:authConfig,backup:backup,highAvailability:highAvailability,storage:storage}" -o json
+            echo "=== PostgreSQL databases ==="
+            az postgres flexible-server db list -g "$PG_RG" -s "$PG_NAME" --query "[].name" -o tsv | sort
+          fi
 
           echo "=== Storage accounts in App resource group ==="
           az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json
