@@ -428,7 +428,7 @@
 .auth-card input{height:45px}
 .password-field{position:relative}
 .password-field input{padding-right:80px}
-.password-field button{
+.password-field .password-visibility{
   position:absolute;
   top:0;
   right:0;
@@ -441,8 +441,8 @@
   background:transparent;
   color:var(--color-muted);
 }
-.password-field button svg{width:18px;height:18px;stroke-width:1.8}
-.password-field button:focus-visible{outline:2px solid var(--color-fg);outline-offset:-4px;border-radius:8px}
+.password-field .password-visibility svg{width:18px;height:18px;stroke-width:1.8}
+.password-field .password-visibility:focus-visible{outline:2px solid var(--color-fg);outline-offset:-4px;border-radius:8px}
 .password-hint,
 .auth-legal{color:var(--color-muted);font-size:10px;line-height:1.45}
 .auth-after-submit{margin-top:16px;display:grid;gap:18px}
