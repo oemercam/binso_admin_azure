@@ -1,3 +1,5 @@
+import { requireOperatorSession as requireRbacOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { operatorAudit, operatorInsert, operatorList, operatorUpdate } from "@/lib/server/database";
@@ -6,7 +8,7 @@ import { requireOperatorSession } from "@/lib/server/operator";
 type Body={tenantId?:unknown;scope?:unknown;reason?:unknown;note?:unknown;endsAt?:unknown};
 
 export async function GET(){
-  try{
+  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"restrictions:manage");
     const items=await operatorList<Record<string,unknown>>(
       "tenant_restrictions",
       "id,tenant_id,scope,reason,note,starts_at,ends_at,active,created_at,tenant:tenants(name)",
@@ -17,7 +19,7 @@ export async function GET(){
 }
 
 export async function POST(request:NextRequest){
-  try{
+  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"restrictions:manage");
     assertSameOrigin(request);
     const body=await readJson<Body>(request,16384);
     const tenantId=cleanText(body.tenantId,80),scope=cleanText(body.scope,20),reason=cleanText(body.reason,160),note=cleanText(body.note,2000);
