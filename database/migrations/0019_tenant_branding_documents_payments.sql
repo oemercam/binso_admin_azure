@@ -35,3 +35,13 @@ alter table quotes add column if not exists document_snapshot jsonb not null def
 comment on column invoices.issuer_snapshot is 'Immutable issuer identity and branding captured when the invoice is issued.';
 comment on column invoices.customer_snapshot is 'Immutable recipient identity and address captured when the invoice is issued.';
 comment on column invoices.payment_snapshot is 'Immutable IBAN/QR-IBAN/reference settings captured when the invoice is issued.';
+
+create table if not exists web_vitals (
+ id bigserial primary key,
+ metric text not null,
+ value numeric not null,
+ rating text not null,
+ route text not null,
+ created_at timestamptz not null default now()
+);
+create index if not exists idx_web_vitals_created on web_vitals(created_at desc);
