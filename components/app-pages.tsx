@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
@@ -111,10 +111,10 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
     apiGet<typeof data>("/api/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
   },[production]);
 
-  if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+  if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard">
     <div className="metrics-grid"><Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/><Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/><Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/></div>
-    <div className="dashboard-grid"><section className="surface"><SectionTitle title="Umsatzentwicklung"/><div className="big-chart">{[42,54,47,68,61,76,70,84,72,90,86,96].map((h,i)=><div key={i}><i style={{height:h+"%"}}/><span>{["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"][i]}</span></div>)}</div></section><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt"],["Neuer Kunde","Berger Bau AG","users"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file"],["Zeit erfasst","Website Redesign · 4:30 h","clock"]].map(([a,b,icon])=><div key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></div>)}</div></section></div>
-    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+    <div className="dashboard-grid"><section className="surface"><SectionTitle title="Umsatzentwicklung"/><div className="big-chart">{[42,54,47,68,61,76,70,84,72,90,86,96].map((h,i)=><div key={i}><i style={{height:h+"%"}}/><span>{["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"][i]}</span></div>)}</div></section><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
+    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 
   const stats=data.stats??{};
@@ -124,7 +124,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const invoices=data.invoices??[];
   const paymentsData=data.payments??[];
 
-  return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+  return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
     <div className="metrics-grid">
       <Metric label="Eingegangen im Monat" value={moneyChf(stats.payments_month_total)} hint="Verbuchte Kundenzahlungen" icon="chart"/>
       <Metric label="Offene Rechnungen" value={moneyChf(stats.invoice_open_total)} hint={String(stats.invoice_open_count??0)+" Rechnungen"} icon="receipt"/>
@@ -141,7 +141,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
         {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<EmptyState icon="wallet" title="Noch keine Zahlungen" text="Erfasste Zahlungen erscheinen hier."/>}
       </section>
     </div>
-    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 }
 
@@ -240,7 +240,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   };
 
   if(!production){
-    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
+    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Kunden"} actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
       <div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
       <div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
       {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section></div>}
@@ -272,6 +272,8 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 
 export function CustomerForm() {
   const router=useRouter();
+  const searchParams=useSearchParams();
+  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/kunden";
   const [company,setCompany]=useState("");
   const [email,setEmail]=useState("");
   const [phone,setPhone]=useState("");
@@ -692,6 +694,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
 }
 
 export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
+  const searchParams=useSearchParams();
+  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":undefined;
   const production=useBackendMode()&&!forceDemo;
   const [timeTab,setTimeTab]=useState<"timer"|"entries">("timer");
   const [running,setRunning]=useState(false);
@@ -804,7 +808,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
   const productionEntries=remoteEntries.length?<div className="compact-list">{remoteEntries.map(item=><div key={item.id}><b>{item.project_name||"Zeiteintrag"}</b><span>{item.description||"Erfasste Arbeitszeit"}</span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong></div>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
 
-  return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
+  return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
