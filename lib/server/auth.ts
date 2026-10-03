@@ -143,6 +143,7 @@ export function setAuthCookies(response:NextResponse,session:TokenResponse){
   response.cookies.set(refreshCookie,session.refresh_token,{
     httpOnly:true,secure,sameSite:"lax",path:"/",maxAge:60*60*24*30,
   });
+  response.cookies.set("binso_demo","",{httpOnly:true,secure,sameSite:"lax",path:"/",maxAge:0});
 }
 
 export function clearAuthCookies(response:NextResponse){
