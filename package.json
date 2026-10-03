@@ -9,12 +9,16 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "css:check": "node scripts/check-css-architecture.mjs",
-    "routes:css-check": "node scripts/check-route-css.mjs"
+    "routes:css-check": "node scripts/check-route-css.mjs",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:reset": "node scripts/reset-db.mjs",
+    "db:check": "node scripts/check-db.mjs"
   },
   "dependencies": {
     "next": "16.3.6",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "pg": "8.16.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -22,6 +26,7 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "16.3.6",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "@types/pg": "8.15.5"
   }
 }
