@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
@@ -24,7 +26,6 @@ const plans=[
 ] as const;
 
 export default function Home() {
-  "use client";
   const {locale,messages:m}=useI18n();
   const hero={de:["Mehr Zeit für das Wesentliche.","Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.","Schweizer Business-Software","In wenigen Minuten startklar"],fr:["Plus de temps pour l’essentiel.","Clients, offres, factures, paiements, collaborateurs, frais et temps de travail – clairement organisés dans une application moderne.","Logiciel de gestion suisse","Prêt en quelques minutes"],it:["Più tempo per ciò che conta.","Clienti, offerte, fatture, pagamenti, collaboratori, spese e ore di lavoro – organizzati con chiarezza in un’app moderna.","Software gestionale svizzero","Operativo in pochi minuti"],en:["More time for what matters.","Customers, quotes, invoices, payments, employees, expenses and working time – clearly organised in one modern business app.","Swiss business software","Ready in minutes"],tr:["Önemli işlere daha fazla zaman.","Müşteriler, teklifler, faturalar, ödemeler, çalışanlar, masraflar ve çalışma süreleri modern bir iş uygulamasında düzenli şekilde yönetilir.","İsviçre iş yazılımı","Dakikalar içinde hazır"]}[locale];
   const structuredData={
