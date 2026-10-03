@@ -68,12 +68,27 @@ export function PortalLogin(){
   const [show,setShow]=useState(false);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  const [backendConfigured,setBackendConfigured]=useState<boolean|null>(null);
+
+  useEffect(()=>{
+    fetch("/api/auth/session",{cache:"no-store"})
+      .then(response=>response.json())
+      .then(payload=>setBackendConfigured(Boolean(payload?.configured)))
+      .catch(()=>setBackendConfigured(false));
+  },[]);
 
   const submit=async(event:FormEvent)=>{
     event.preventDefault();
     setLoading(true);
     setError("");
     try{
+      if(backendConfigured===false){
+        await startDemoSession({name:email.split("@")[0]||"Demo",company:"Demo Firma",focus:"overview"});
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
       const response=await fetch("/api/auth/login",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -94,6 +109,7 @@ export function PortalLogin(){
     <span className="portal-kicker">KUNDENPORTAL</span>
     <h1>Anmelden</h1>
     <p>Öffne dein Binso One Konto.</p>
+    {backendConfigured===false&&<div className="portal-demo-notice"><b>Demo-Betrieb</b><span>Die produktive Datenbank ist noch nicht verbunden. Die Anmeldung öffnet deshalb eine isolierte Demo-Sitzung.</span></div>}
 
     <form className="portal-form" onSubmit={submit}>
       <label>E-Mail<input required type="email" inputMode="email" autoComplete="email" value={email} onChange={event=>setEmail(event.target.value)} placeholder="name@firma.ch"/></label>
@@ -123,12 +139,27 @@ export function PortalRegister(){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [confirmation,setConfirmation]=useState(false);
+  const [backendConfigured,setBackendConfigured]=useState<boolean|null>(null);
+
+  useEffect(()=>{
+    fetch("/api/auth/session",{cache:"no-store"})
+      .then(response=>response.json())
+      .then(payload=>setBackendConfigured(Boolean(payload?.configured)))
+      .catch(()=>setBackendConfigured(false));
+  },[]);
 
   const submit=async(event:FormEvent)=>{
     event.preventDefault();
     setLoading(true);
     setError("");
     try{
+      if(backendConfigured===false){
+        await startDemoSession({name:email.split("@")[0]||"Demo",company:companyName,focus:"overview"});
+        router.push("/willkommen");
+        router.refresh();
+        return;
+      }
+
       const response=await fetch("/api/auth/register",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -161,6 +192,7 @@ export function PortalRegister(){
     <span className="portal-kicker">KUNDENPORTAL</span>
     <h1>Account erstellen</h1>
     <p>Nur die wichtigsten Angaben. Den Rest richtest du danach in Binso One ein.</p>
+    {backendConfigured===false&&<div className="portal-demo-notice"><b>Demo-Registrierung</b><span>Die Angaben werden nur für deine isolierte Demo verwendet. Es wird noch kein produktives Konto erstellt.</span></div>}
 
     <form className="portal-form" onSubmit={submit}>
       <label>Firmenname<input required autoFocus value={companyName} onChange={event=>setCompanyName(event.target.value)} placeholder="Meine Firma GmbH"/></label>
@@ -179,6 +211,22 @@ export function PortalRegister(){
     <Button href="/demo" variant="secondary">Ohne Verifikation Demo starten</Button>
     <p className="portal-bottom">Bereits registriert? <Link href="/portal/login">Anmelden</Link></p>
   </PortalFrame>;
+}
+
+async function startDemoSession({name,company,focus}:{name:string;company:string;focus:string}){
+  const now=Date.now();
+  window.localStorage.setItem("binso.demo.session","1");
+  window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
+  window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
+  window.localStorage.setItem("binso.demo.focus",focus);
+  window.localStorage.setItem("binso.demo.startedAt",String(now));
+  window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
+
+  const response=await fetch("/api/demo/session",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+  });
+  if(!response.ok) throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
 }
 
 function PortalFrame({children,compact=false}:{children:React.ReactNode;compact?:boolean}){
