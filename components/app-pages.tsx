@@ -670,42 +670,72 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
 }
 
 export function TimePage() {
+  const production=useBackendMode();
   const [timeTab,setTimeTab]=useState<"timer"|"entries">("timer");
-  const [running,setRunning]=useState(true);
-  const [seconds,setSeconds]=useState(8067);
+  const [running,setRunning]=useState(false);
+  const [seconds,setSeconds]=useState(0);
   const [manualOpen,setManualOpen]=useState(false);
   const [projectOpen,setProjectOpen]=useState(false);
-  const [timerProject,setTimerProject]=useState("Website Redesign · Acme AG");
-  const [manualDate,setManualDate]=useState("2026-10-02");
+  const [timerProject,setTimerProject]=useState("Interne Planung");
+  const [manualDate,setManualDate]=useState("");
   const [manualDuration,setManualDuration]=useState("01:00");
-  const [manualCustomer,setManualCustomer]=useState("Acme AG");
-  const [manualProject,setManualProject]=useState("Website Redesign");
+  const [manualCustomer,setManualCustomer]=useState("");
+  const [manualProject,setManualProject]=useState("Interne Planung");
   const [manualDescription,setManualDescription]=useState("");
   const [toast,setToast]=useState<string|null>(null);
+  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>>([]);
 
   useEffect(()=>{
     queueMicrotask(()=>{
-      const storedRunning=window.localStorage.getItem("binso.timer.running")!=="false";
-      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"8067");
+      const storedRunning=window.localStorage.getItem("binso.timer.running")==="true";
+      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"0");
       const started=Number(window.localStorage.getItem("binso.timer.startedAt")??"0");
       const elapsed=storedRunning&&started?Math.max(0,Math.floor((Date.now()-started)/1000)):0;
+      const storedProject=window.localStorage.getItem("binso.timer.project");
       setRunning(storedRunning);
-      setSeconds((Number.isFinite(base)?base:8067)+elapsed);
+      setSeconds((Number.isFinite(base)?base:0)+elapsed);
+      setTimerProject(storedProject||"Interne Planung");
+      setManualDate(new Date().toLocaleDateString("en-CA"));
     });
   },[]);
+
+  useEffect(()=>{
+    if(!production) return;
+    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>("/api/time-entries")
+      .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
+      .catch(()=>undefined);
+  },[production]);
+
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
+
+  const setProject=(project:string)=>{
+    setTimerProject(project);
+    window.localStorage.setItem("binso.timer.project",project);
+    window.dispatchEvent(new Event("binso-timer-change"));
+    setProjectOpen(false);
+  };
+
   const toggleTimer=()=>{
     const next=!running;
     setRunning(next);
     window.localStorage.setItem("binso.timer.running",String(next));
     window.localStorage.setItem("binso.timer.baseSeconds",String(seconds));
+    window.localStorage.setItem("binso.timer.project",timerProject);
     if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
     else window.localStorage.removeItem("binso.timer.startedAt");
     window.dispatchEvent(new Event("binso-timer-change"));
   };
+
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
+  const formatMinutes=(value:number)=>`${Math.floor(value/60)}:${String(value%60).padStart(2,"0")}`;
+  const remoteTotal=remoteEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
 
   const stop=async()=>{
+    if(seconds<=0){
+      setToast("Es läuft noch keine Zeitmessung.");
+      window.setTimeout(()=>setToast(null),2200);
+      return;
+    }
     setRunning(false);
     window.localStorage.setItem("binso.timer.running","false");
     window.localStorage.setItem("binso.timer.baseSeconds","0");
@@ -715,10 +745,14 @@ export function TimePage() {
       if(isProductionBackendEnabled()){
         const ended=new Date();
         const started=new Date(ended.getTime()-seconds*1000);
-        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
+        const [projectName,customerName=""]=timerProject.split(" · ");
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName,projectName,description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
+        setRemoteEntries(current=>[payload.item,...current]);
       }
+      setSeconds(0);
       setToast("Zeiteintrag gespeichert.");
     }catch(error){
+      setSeconds(0);
       setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
     }
     window.setTimeout(()=>setToast(null),2400);
@@ -733,7 +767,10 @@ export function TimePage() {
       return;
     }
     try{
-      if(isProductionBackendEnabled()) await apiPost("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+      if(isProductionBackendEnabled()){
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+        setRemoteEntries(current=>[payload.item,...current]);
+      }
       setManualOpen(false);
       setToast("Zeiteintrag gespeichert.");
     }catch(error){
@@ -742,29 +779,32 @@ export function TimePage() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
+  const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
+  const productionEntries=remoteEntries.length?<div className="compact-list">{remoteEntries.map(item=><div key={item.id}><b>{item.project_name||"Zeiteintrag"}</b><span>{item.description||"Erfasste Arbeitszeit"}</span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong></div>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
+
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit">
     <div className="time-layout">
       <section className="surface timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
           <div className="timer-project"><small>Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
-          <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Acme AG · Website Redesign</span></div></div>
-          <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
+          <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
+          <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
-          <SectionTitle title="Heutige Einträge" action={<strong>4:28 h</strong>}/>
-          <div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>
+          <SectionTitle title={production?"Einträge":"Heutige Einträge"} action={<strong>{production?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
+          {production?productionEntries:demoEntries}
           <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
         </>}
       </section>
       <section className="surface">
-        <SectionTitle title={timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
-        {timeTab==="timer"?<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern</span><strong>0:44</strong></div></div>:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
+        <SectionTitle title={production?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{production?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
+        {production?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>
     </div>
-    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Website Redesign · Acme AG","Support · Müller GmbH","Interne Planung"].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>{setTimerProject(project);setProjectOpen(false)}}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field><Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field><Field label="Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")?"danger":"success"}/>}
+    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{(production?["Interne Planung"]:["Website Redesign · Acme AG","Support · Müller GmbH","Interne Planung"]).map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><input value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)} placeholder="Optional"/></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Projekt"><input value={manualProject} onChange={e=>setManualProject(e.target.value)} placeholder="Projekt"/></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
 }
 
@@ -1299,6 +1339,7 @@ export function DocumentsHubPage() {
 }
 
 export function NotificationsPage() {
+  const production=useBackendMode();
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
   const [view,setView]=useState<"all"|"unread">("all");
   const items=[
@@ -1309,6 +1350,14 @@ export function NotificationsPage() {
   ];
   const visible=view==="all"?items:items.filter(([id])=>!read.includes(id));
   const unreadCount=items.length-read.length;
+
+  if(production) return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start">
+    <div className="notification-center">
+      <EmptyState icon="bell" title="Keine neuen Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/>
+      <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
+    </div>
+  </AppShell>;
+
   return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
     <div className="notification-center">
       <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}>Alle</button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}>Ungelesen{unreadCount>0?` (${unreadCount})`:""}</button></div>
