@@ -645,3 +645,7 @@ html[data-theme="dark"] .settings-list>a:hover{background:#050505}
 @media(max-width:760px){
   .records-count{grid-column:1/2;grid-row:auto;margin-left:0;align-self:center}
 }
+
+
+.employee-tab-panel{max-width:900px}
+.employee-tab-panel .metrics-grid{margin:8px 0 14px}
