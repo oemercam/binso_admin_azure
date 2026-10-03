@@ -10,7 +10,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
     const rows=await operatorList<{id:string;tenant_id:string;active:boolean}>("tenant_restrictions","id,tenant_id,active","id=eq."+encodeURIComponent(id)+"&limit=1");
     if(!rows[0]) return json({error:"not_found",message:"Einschränkung wurde nicht gefunden."},404);
     const session=await requireOperatorSession();
-    const updated=await operatorUpdate("tenant_restrictions","id=eq."+encodeURIComponent(id),{active:false,removed_at:new Date().toISOString(),removed_by:session.user.id});
+    const updated=await operatorUpdate("tenant_restrictions","id=eq."+encodeURIComponent(id),{active:false,removed_at:new Date().toISOString(),removed_by:session.userId});
     const remaining=await operatorList<{id:string;scope:string;starts_at:string;ends_at:string|null}>("tenant_restrictions","id,scope,starts_at,ends_at","tenant_id=eq."+encodeURIComponent(rows[0].tenant_id)+"&active=eq.true&limit=100");
     const now=Date.now();
     const effective=remaining.filter(item=>{
