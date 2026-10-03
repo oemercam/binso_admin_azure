@@ -3271,3 +3271,20 @@ html[data-theme="dark"] .pricing-section .marketing-pricing-grid .price-card.fea
   .portal-form input{font-size:16px}
   .portal-links{flex-wrap:wrap}
 }
+
+
+.portal-demo-notice{
+  margin:0 0 18px;
+  padding:10px 0;
+  border-top:1px solid var(--pixel-line);
+  border-bottom:1px solid var(--pixel-line);
+}
+.portal-demo-notice b,
+.portal-demo-notice span{display:block}
+.portal-demo-notice b{font-size:9px}
+.portal-demo-notice span{
+  margin-top:3px;
+  color:var(--pixel-muted);
+  font-size:8px;
+  line-height:1.45;
+}
