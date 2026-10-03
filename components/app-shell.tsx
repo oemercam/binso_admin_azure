@@ -86,6 +86,7 @@ export function AppShell({
   const [notificationsLoading,setNotificationsLoading]=useState(false);
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
   const [navCompact,setNavCompact]=useState(false);
+  const [showLaunch,setShowLaunch]=useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -131,6 +132,16 @@ export function AppShell({
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
+
+  useEffect(()=>{
+    if(preview||window.sessionStorage.getItem("binso.launch.seen")==="1") return;
+    const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.sessionStorage.setItem("binso.launch.seen","1");
+    if(reduceMotion) return;
+    setShowLaunch(true);
+    const timer=window.setTimeout(()=>setShowLaunch(false),900);
+    return()=>window.clearTimeout(timer);
+  },[preview]);
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
@@ -327,6 +338,7 @@ export function AppShell({
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <div className={`app-root app-section-${active} ${timerRunning ? "timer-active" : ""} ${preview ? "app-preview" : ""}`}>
+    {showLaunch&&<div className="app-launch" aria-hidden="true"><span><img src="/brand/icon-black.svg" alt=""/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
