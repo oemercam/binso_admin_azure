@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmDialog from "@/components/confirm-dialog";
+import { startDemoClientSession } from "@/lib/client/backend";
 import { Button, Icon, Logo } from "@/components/ui";
 
 type DemoFocus="overview"|"customers"|"documents"|"time";
@@ -28,23 +29,19 @@ export default function Demo(){
   };
 
   const start=async()=>{
+    if(loading)return;
     setLoading(true);setError("");
-    const now=Date.now();
-    window.localStorage.setItem("binso.demo.session","1");
-    window.localStorage.setItem("binso.demo.name",name.trim()||"Thomas Muster");
-    window.localStorage.setItem("binso.demo.company",company.trim()||"Musterwerk AG");
-    window.localStorage.setItem("binso.demo.focus",focus);
-    window.localStorage.setItem("binso.demo.startedAt",String(now));
-    window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
-
     try{
-      await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
+      await startDemoClientSession({
+        name:name.trim()||"Thomas Muster",
+        company:company.trim()||"Musterwerk AG",
+        focus,
+      });
+      window.location.assign("/willkommen");
     }catch{
-      // UX demo remains available locally while the production backend is intentionally deferred.
+      setError("Demo konnte nicht gestartet werden. Bitte erneut versuchen.");
+      setLoading(false);
     }
-
-    router.push("/willkommen");
-    router.refresh();
   };
 
   return <main className="demo-onboarding-shell">
