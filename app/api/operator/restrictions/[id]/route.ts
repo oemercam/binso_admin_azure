@@ -1,10 +1,12 @@
+import { requireOperatorSession as requireRbacOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, json } from "@/lib/server/http";
 import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
 import { requireOperatorSession } from "@/lib/server/operator";
 
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
-  try{
+  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"restrictions:manage");
     assertSameOrigin(request);
     const {id}=await params;
     const rows=await operatorList<{id:string;tenant_id:string;active:boolean}>("tenant_restrictions","id,tenant_id,active","id=eq."+encodeURIComponent(id)+"&limit=1");
