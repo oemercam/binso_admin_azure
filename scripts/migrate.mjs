@@ -23,11 +23,12 @@ try{
  const canonicalLineage=applied.has("0001_baseline.sql")||applied.has("0016_self_service_signup.sql");
  const divergentLineage=[...divergent].some(v=>applied.has(v));
  if(divergentLineage&&!canonicalLineage){
-   throw new Error("Database uses the retired divergent migration lineage (001_initial..009_platform_foundation). Automatic migration is blocked. Migrate to the canonical binso_platform lineage before continuing.");
+   throw new Error("Database uses the retired divergent migration lineage. Use the guarded reset workflow before applying canonical migrations.");
  }
- if(!canonicalLineage){
-   throw new Error("Canonical database baseline 0001_baseline.sql..0016_self_service_signup.sql is required. Refusing to bootstrap from the retired divergent migration set.");
+ if(applied.size>0&&!canonicalLineage){
+   throw new Error("Unknown database lineage detected. Refusing automatic migration.");
  }
+ if(applied.size===0) console.log("Fresh database detected; applying canonical Azure PostgreSQL lineage.");
  const files=(await fs.readdir("database/migrations")).filter(x=>x.endsWith(".sql")).sort();
  for(const file of files){
    if(divergent.has(file)){
