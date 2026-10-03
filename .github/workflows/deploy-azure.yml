@@ -1,13 +1,15 @@
 name: Deploy Azure App Service
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Quality"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
 concurrency:
   group: production-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -19,11 +21,14 @@ env:
 
 jobs:
   deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: production
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -60,7 +65,7 @@ jobs:
             mkdir -p deploy/app/public
           fi
 
-          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
+          printf '{"sha":"%s"}\n' "$DEPLOY_SHA" > deploy/app/public/deployment.json
 
           cp package.json deploy/app/package.json
           cp pnpm-lock.yaml deploy/app/pnpm-lock.yaml
@@ -96,7 +101,7 @@ jobs:
           curl -fsS http://127.0.0.1:3100/portal > /dev/null
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
-          curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$GITHUB_SHA"
+          curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -124,14 +129,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
 
           VERSION_URL="$PRODUCTION_URL/deployment.json"
 
           for attempt in {1..60}; do
             code=$(curl -sS -o /tmp/binso-version.json -w "%{http_code}" --max-time 20 -H 'Cache-Control: no-cache' "$VERSION_URL" || true)
 
-            if [ "$code" = "200" ] && grep -q "$GITHUB_SHA" /tmp/binso-version.json; then
-              echo "Current commit is live: $GITHUB_SHA"
+            if [ "$code" = "200" ] && grep -q "$DEPLOY_SHA" /tmp/binso-version.json; then
+              echo "Current commit is live: $DEPLOY_SHA"
               break
             fi
 
