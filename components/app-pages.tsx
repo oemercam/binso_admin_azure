@@ -435,6 +435,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [vatRate,setVatRate]=useState("8.1");
   const [description,setDescription]=useState("");
   const [status,setStatus]=useState("Aktiv");
+  const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -547,9 +548,14 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
-    {existing && <div className="tabs"><button className="active">Übersicht</button><button>Arbeitszeit</button><button>Spesen</button><button>Dokumente</button></div>}
-    <div className="form-page">
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={(!existing||employeeTab==="overview")?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
+      <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
+      <button role="tab" aria-selected={employeeTab==="time"} className={employeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}>Arbeitszeit</button>
+      <button role="tab" aria-selected={employeeTab==="expenses"} className={employeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}>Spesen</button>
+      <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
+    </div>}
+    {(!existing||employeeTab==="overview")&&<div className="form-page">
       <div className="form-grid two">
         <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -561,7 +567,10 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-    </div>
+    </div>}
+    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href="/zeit" variant="secondary">Zeiterfassung öffnen</Button>}/><div className="metrics-grid three"><Metric label="Diese Woche" value="28:15 h" hint="erfasst" icon="clock"/><Metric label="Dieser Monat" value="121:40 h" hint="erfasst" icon="clock"/><Metric label="Pensum" value={load+"%"} hint="hinterlegt" icon="users"/></div><div className="compact-list"><div><b>Website Redesign</b><span>Heute</span><strong>2:14 h</strong></div><div><b>Kundenmeeting</b><span>Gestern</span><strong>1:30 h</strong></div></div></section>}
+    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list"><Link href="/spesen/1"><b>Übernachtung Kundentermin</b><span>02.10.2026 · CHF 280.00</span><Status tone="warning">Eingereicht</Status></Link></div></section>}
+    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><EmptyState icon="file" title="Noch keine Dokumente" text="Mitarbeiterdokumente werden hier übersichtlich angezeigt, sobald welche vorhanden sind."/></section>}
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
