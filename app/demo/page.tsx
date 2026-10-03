@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ConfirmDialog from "@/components/confirm-dialog";
 import { Button, Icon, Logo } from "@/components/ui";
 
 type DemoFocus="overview"|"customers"|"documents"|"time";
@@ -15,6 +16,7 @@ export default function Demo(){
   const [focus,setFocus]=useState<DemoFocus>("overview");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  const [confirmClose,setConfirmClose]=useState(false);
 
   const next=()=>{
     if(step===2&&(!name.trim()||!company.trim())){
@@ -48,7 +50,7 @@ export default function Demo(){
   return <main className="demo-onboarding-shell">
     <header className="demo-onboarding-header">
       <Link href="/"><Logo/></Link>
-      <Link href="/" className="demo-close" aria-label="Demo schliessen"><Icon name="close" size={18}/></Link>
+      <button type="button" className="demo-close" aria-label="Demo schliessen" onClick={()=>setConfirmClose(true)}><Icon name="close" size={18}/></button>
     </header>
 
     <section className="demo-onboarding">
@@ -108,5 +110,6 @@ export default function Demo(){
 
       <small className="demo-privacy">Demo-Daten sind von produktiven Firmendaten getrennt.</small>
     </section>
+    <ConfirmDialog open={confirmClose} title="Demo wirklich abbrechen?" message="Deine Eingaben in der Demo-Einrichtung gehen verloren." confirmLabel="Demo abbrechen" cancelLabel="Weiter bearbeiten" danger onCancel={()=>setConfirmClose(false)} onConfirm={()=>router.push("/")}/>
   </main>;
 }
