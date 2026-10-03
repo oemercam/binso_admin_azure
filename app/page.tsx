@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 import { useI18n } from "@/lib/i18n/provider";
@@ -103,7 +104,7 @@ export default function Home() {
           <Link className="marketing-text-link" href="/produkt">{p.allFeatures} <Icon name="arrow" size={15}/></Link>
         </div>
         <div className="section-product-shot desktop-shot">
-          <iframe src="/preview/rechnungen" title="Binso One Rechnungen" tabIndex={-1}/>
+          <Image src="/screenshots/rechnungen-desktop.png" alt="Binso One Rechnungsübersicht" width={1440} height={900}/>
         </div>
       </section>
 
@@ -122,7 +123,7 @@ export default function Home() {
           </div>
         </div>
         <div className="section-product-shot mobile-shot">
-          <iframe src="/preview/zeit" title="Binso One Zeiterfassung" tabIndex={-1}/>
+          <Image src="/screenshots/zeit-mobile.png" alt="Binso One Zeiterfassung auf Mobile" width={390} height={844}/>
         </div>
       </section>
 
