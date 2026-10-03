@@ -435,7 +435,6 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [vatRate,setVatRate]=useState("8.1");
   const [description,setDescription]=useState("");
   const [status,setStatus]=useState("Aktiv");
-  const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -510,6 +509,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [load,setLoad]=useState(existing?"100":"100");
   const [entryDate,setEntryDate]=useState(existing?"2024-01-01":"");
   const [status,setStatus]=useState("Aktiv");
+  const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
