@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson, validEmail } from "@/lib/server/http";
 import { currentTenant, tenantList, tenantRpc } from "@/lib/server/database";
-import { inviteSupabaseUser, privilegedSupabase } from "@/lib/server/service-role";
+import { provisionInvitedUser, revokeInvitation } from "@/lib/server/invitations";
 
 type InviteBody={email?:unknown;role?:unknown};
 
@@ -29,11 +29,11 @@ export async function POST(request:NextRequest){
     const role=body.role==="admin"?"admin":"member";
     if(!validEmail(email)) return json({error:"email_invalid",message:"Bitte gültige E-Mail-Adresse eingeben."},400);
     invitationId=await tenantRpc<string>("create_tenant_invitation",{p_email:email,p_role:role});
-    await inviteSupabaseUser(email,{invited_tenant_id:tenant.tenantId,invited_role:role,invitation_id:invitationId});
+    await provisionInvitedUser(invitationId);
     return json({ok:true,id:invitationId},201);
   }catch(error){
     if(invitationId){
-      await privilegedSupabase("tenant_invitations?id=eq."+encodeURIComponent(invitationId),{method:"PATCH",body:{status:"revoked"}}).catch(()=>undefined);
+      await revokeInvitation(invitationId).catch(()=>undefined);
     }
     return apiError(error);
   }
