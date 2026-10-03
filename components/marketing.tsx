@@ -24,7 +24,6 @@ export function MarketingHeader() {
           <Link href="/produkt">Produkt</Link>
           <Link href="/#funktionen">Funktionen</Link>
           <Link href="/preise">Preise</Link>
-          <Link href="/#sicherheit">Sicherheit</Link>
         </nav>
         <div className="marketing-actions">
           <Link href="/login">Anmelden</Link>
@@ -41,12 +40,15 @@ export function MarketingHeader() {
         <Link href="/produkt" onClick={() => setOpen(false)}>Produkt <Icon name="arrow"/></Link>
         <Link href="/#funktionen" onClick={() => setOpen(false)}>Funktionen <Icon name="arrow"/></Link>
         <Link href="/preise" onClick={() => setOpen(false)}>Preise <Icon name="arrow"/></Link>
-        <Link href="/#sicherheit" onClick={() => setOpen(false)}>Sicherheit <Icon name="arrow"/></Link>
       </nav>
       <div className="marketing-mobile-actions">
         <Button href="/login" variant="secondary">Anmelden</Button>
         <Button href="/registrieren">30 Tage kostenlos testen</Button>
         <Button href="/demo" variant="ghost">Demo starten</Button>
+      </div>
+      <div className="marketing-mobile-secondary">
+        <Link href="/#sicherheit" onClick={() => setOpen(false)}>Sicherheit</Link>
+        <Link href="/operator" onClick={() => setOpen(false)}>Admin</Link>
       </div>
       <small>Binso GmbH · Appenzell · Schweiz</small>
     </div>}
@@ -59,8 +61,10 @@ export function MarketingFooter() {
     <div className="footer-links">
       <Link href="/produkt">Produkt</Link>
       <Link href="/preise">Preise</Link>
+      <Link href="/#sicherheit">Sicherheit</Link>
       <Link href="/demo">Demo</Link>
       <Link href="/login">Anmelden</Link>
+      <Link href="/operator">Admin</Link>
     </div>
     <small>© 2026 Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz</small>
   </footer>;
