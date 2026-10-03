@@ -165,7 +165,7 @@ export function WelcomePage() {
     </div>
     <div className="onboarding-footer">
       <p>Firmendaten, Logo, MwSt. und Zahlungsbedingungen kannst du jederzeit unter Einstellungen ergänzen.</p>
-      <Button href="/dashboard" variant="ghost">Zum Dashboard</Button>
+      <Button href="/dashboard">Zum Dashboard</Button>
     </div>
   </AppShell>;
 }
@@ -1147,6 +1147,7 @@ export function SubscriptionSettingsPage() {
   const [integrations,setIntegrations]=useState<Array<Record<string,unknown>>>([]);
   const [billingLoading,setBillingLoading]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
+  const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
   const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89",start:"19",business:"49",pro:"89"};
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
@@ -1198,10 +1199,14 @@ export function SubscriptionSettingsPage() {
     return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
       <section className="plan-hero"><div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div><div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div><Button onClick={()=>setDialog("plan")}>Plan ändern</Button></section>
       <div className="subscription-detail-grid"><section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section><section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary" onClick={()=>setDialog("payment")}>Ändern</Button></div></section></div>
-      <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><div><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div><div><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status></div></div></section>
+      <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div className="compact-list"><button type="button" onClick={()=>setBillingInvoice({date:"01.10.2026",amount:"CHF 49.00"})}><b>01.10.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status><Icon name="arrow" size={16}/></button><button type="button" onClick={()=>setBillingInvoice({date:"01.09.2026",amount:"CHF 49.00"})}><b>01.09.2026</b><span>CHF 49.00</span><Status tone="success">Bezahlt</Status><Icon name="arrow" size={16}/></button></div></section>
       <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger" onClick={()=>setDialog("cancel")}>Kündigung starten</Button></div>
       {dialog&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{dialog==="plan"?"Plan ändern":dialog==="payment"?"Zahlungsmittel ändern":"Abonnement kündigen"}</h2><p>Demo-Aktion ohne produktive Zahlungsabwicklung.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header>{dialog==="plan"&&<div className="plan-choice-list">{["Start","Business","Pro"].map(name=><button type="button" className={plan===name?"selected":""} onClick={()=>setPlan(name)} key={name}><div><b>{name}</b><small>CHF {prices[name]} / Monat</small></div>{plan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>confirm("Demo-Aktion gespeichert.")}>Speichern</Button></div></section></div>}
-      {toast&&<Toast title={toast}/>}
+      {billingInvoice&&<div className="document-modal billing-invoice-modal" role="dialog" aria-modal="true" aria-label="Rechnungsvorschau">
+        <header><button type="button" onClick={()=>setBillingInvoice(null)}><Icon name="back"/>Schliessen</button><strong>Rechnungsvorschau</strong><button type="button" aria-label="Teilen" onClick={()=>{const text=`Binso One · Rechnung ${billingInvoice.date} · ${billingInvoice.amount}`;if(navigator.share)void navigator.share({title:"Binso One Rechnung",text}).catch(()=>undefined);else void navigator.clipboard?.writeText(text)}}><Icon name="upload"/></button></header>
+        <div className="document-modal-body"><div className="paper billing-invoice-paper"><div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div><div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div><div className="paper-meta"><div><b>Musterwerk AG</b><span>Demo-Firma</span></div><div><small>Datum</small><b>{billingInvoice.date}</b><small>Status</small><b>Bezahlt</b></div></div><div className="paper-intro"><b>Binso One</b><p>Business Abonnement · monatliche Nutzung</p></div><table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Binso One Business</td><td>1</td><td>49.00</td><td>49.00</td></tr></tbody></table><div className="paper-total"><strong>Total CHF <b>49.00</b></strong></div><footer>Binso GmbH · CHE-173.401.068 · www.binso.ch · +41 58 510 88 58</footer></div></div>
+      </div>}
+      {toast&&<Toast title={toast}/>} 
     </AppShell>;
   }
 
