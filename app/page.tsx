@@ -83,6 +83,24 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="product-gallery-section">
+        <div className="section-intro">
+          <span className="eyebrow">ECHTE OBERFLÄCHE</span>
+          <h2>So sieht Binso One wirklich aus.</h2>
+          <p>Keine Illustrationen und keine erfundenen Produktbilder. Die Vorschauen verwenden dieselben Oberflächen wie die Anwendung.</p>
+        </div>
+        <div className="product-gallery">
+          <article>
+            <div className="product-gallery-frame desktop-frame"><iframe src="/preview/rechnungen" title="Binso One Rechnungen" tabIndex={-1}/></div>
+            <div><b>Rechnungen</b><span>Listen, Status und Belege im gleichen kompakten System.</span></div>
+          </article>
+          <article>
+            <div className="product-gallery-frame mobile-frame"><iframe src="/preview/zeit" title="Binso One Zeiterfassung" tabIndex={-1}/></div>
+            <div><b>Zeiterfassung</b><span>Timer und Einträge mit derselben Mobile-Navigation wie in der App.</span></div>
+          </article>
+        </div>
+      </section>
+
       <section className="product-callout">
         <div>
           <span className="eyebrow">APP-FIRST</span>
