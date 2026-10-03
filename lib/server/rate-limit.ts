@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { NextRequest } from "next/server";
 import { ApiError } from "./http";
 import { isBackendConfigured } from "./env";
-import { privilegedSupabase } from "./service-role";
+import { query } from "./db";
 
 function fingerprint(value:string){
   const secret=process.env.RATE_LIMIT_SECRET;
@@ -23,10 +23,7 @@ function clientIp(request:NextRequest){
 async function consume(route:string,key:string){
   if(!isBackendConfigured()) return true;
   try{
-    return await privilegedSupabase<boolean>("rpc/consume_api_rate_limit",{
-      method:"POST",
-      body:{p_route:route,p_key_hash:fingerprint(key)},
-    });
+    const result=await query<{allowed:boolean}>("select consume_api_rate_limit($1,$2) as allowed",[route,fingerprint(key)]);\n    return Boolean(result.rows[0]?.allowed);
   }catch(error){
     if(error instanceof ApiError) throw error;
     throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.",{"Retry-After":"60"});
