@@ -67,13 +67,11 @@
   background:#fff;
   box-shadow:0 20px 54px rgba(0,0,0,.09);
 }
-.hero-product-desktop iframe{
-  width:1440px;
-  height:900px;
-  border:0;
-  transform:scale(.62);
-  transform-origin:top left;
-  pointer-events:none;
+.hero-product-desktop img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top left;
 }
 .hero-product-mobile{
   position:absolute;
@@ -87,13 +85,11 @@
   background:#fff;
   box-shadow:0 26px 55px rgba(0,0,0,.15);
 }
-.hero-product-mobile iframe{
-  width:440px;
-  height:956px;
-  border:0;
-  transform:scale(.4);
-  transform-origin:top left;
-  pointer-events:none;
+.hero-product-mobile img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top left;
 }
 
 .marketing-section,
@@ -257,11 +253,13 @@
   border:1px solid var(--color-line);
   background:#fff;
 }
-.section-product-shot iframe{
+.section-product-shot img{
   display:block;
-  border:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top left;
   background:#fff;
-  pointer-events:none;
 }
 .section-product-shot,
 .desktop-shot{border-radius:12px}
@@ -269,12 +267,7 @@
   width:100%;
   height:380px;
 }
-.desktop-shot iframe{
-  width:1440px;
-  height:900px;
-  transform:scale(.43);
-  transform-origin:top left;
-}
+.desktop-shot img{width:100%;height:100%;object-fit:cover;object-position:top left;}
 .mobile-shot{
   width:244px;
   height:526px;
@@ -282,12 +275,7 @@
   border:6px solid #111;
   border-radius:28px;
 }
-.mobile-shot iframe{
-  width:440px;
-  height:956px;
-  transform:scale(.55);
-  transform-origin:top left;
-}
+.mobile-shot img{width:100%;height:100%;object-fit:cover;object-position:top left;}
 
 .product-callout{
   max-width:none;
