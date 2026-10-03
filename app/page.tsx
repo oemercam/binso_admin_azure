@@ -23,7 +23,34 @@ const plans=[
 ] as const;
 
 export default function Home() {
+  const structuredData={
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    name:"Binso One",
+    applicationCategory:"BusinessApplication",
+    operatingSystem:"Web, iOS PWA, Android PWA",
+    offers:{
+      "@type":"AggregateOffer",
+      priceCurrency:"CHF",
+      lowPrice:"19",
+      highPrice:"89",
+      offerCount:"3"
+    },
+    publisher:{
+      "@type":"Organization",
+      name:"Binso GmbH",
+      url:"https://www.binso.ch",
+      address:{
+        "@type":"PostalAddress",
+        streetAddress:"Weissbadstrasse 8b",
+        postalCode:"9050",
+        addressLocality:"Appenzell",
+        addressCountry:"CH"
+      }
+    }
+  };
   return <>
+    <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
     <MarketingHeader/>
     <main>
       <section className="hero">
