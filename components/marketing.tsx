@@ -26,7 +26,7 @@ export function MarketingHeader() {
           <Link href="/preise">Preise</Link>
         </nav>
         <div className="marketing-actions">
-          <Link href="/login">Anmelden</Link>
+          <Link href="/portal/login">Anmelden</Link>
           <Button href="/registrieren">30 Tage kostenlos testen</Button>
           <button className="marketing-menu-button" type="button" aria-label={open ? "Menü schliessen" : "Menü öffnen"} onClick={() => setOpen(!open)}>
             <Icon name={open ? "close" : "menu"} size={23}/>
@@ -42,7 +42,7 @@ export function MarketingHeader() {
         <Link href="/preise" onClick={() => setOpen(false)}>Preise <Icon name="arrow"/></Link>
       </nav>
       <div className="marketing-mobile-actions">
-        <Button href="/login" variant="secondary">Anmelden</Button>
+        <Button href="/portal/login" variant="secondary">Anmelden</Button>
         <Button href="/registrieren">30 Tage kostenlos testen</Button>
         <Button href="/demo" variant="ghost">Demo starten</Button>
       </div>
@@ -63,7 +63,8 @@ export function MarketingFooter() {
       <Link href="/preise">Preise</Link>
       <Link href="/#sicherheit">Sicherheit</Link>
       <Link href="/demo">Demo</Link>
-      <Link href="/login">Anmelden</Link>
+      <Link href="/portal">Kundenportal</Link>
+      <Link href="/portal/login">Anmelden</Link>
       <Link href="/operator">Admin</Link>
     </div>
     <small>© 2026 Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz</small>

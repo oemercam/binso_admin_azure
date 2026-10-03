@@ -20,7 +20,15 @@ export function useBackendMode(){
 }
 
 export function clearDemoClientSession(){
-  if(typeof window!=="undefined") window.localStorage.removeItem("binso.demo.session");
+  if(typeof window==="undefined") return;
+  [
+    "binso.demo.session",
+    "binso.demo.name",
+    "binso.demo.company",
+    "binso.demo.focus",
+    "binso.demo.startedAt",
+    "binso.demo.expiresAt",
+  ].forEach(key=>window.localStorage.removeItem(key));
 }
 
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
