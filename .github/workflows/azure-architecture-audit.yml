@@ -42,6 +42,15 @@ jobs:
           echo "=== App setting names only ==="
           az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
 
+          echo "=== PostgreSQL connection from configured App Service setting ==="
+          DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          if [ -n "$DATABASE_URL" ]; then
+            echo "::add-mask::$DATABASE_URL"
+            PGCONNECT_TIMEOUT=10 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+          else
+            echo "DATABASE_URL is not configured."
+          fi
+
           echo "=== PostgreSQL Flexible Servers visible to deployment identity ==="
           az resource list --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[].{name:name,resourceGroup:resourceGroup,location:location}" -o json
           if [ -n "$PG_RG" ]; then
