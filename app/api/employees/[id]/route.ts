@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantList, tenantUpdate } from "@/lib/server/database";
+import { tenantList, tenantUpdate, requireTenantFeature } from "@/lib/server/database";
 
 type Body={firstName?:unknown;lastName?:unknown;email?:unknown;phone?:unknown;jobTitle?:unknown;workloadPercent?:unknown;entryDate?:unknown;status?:unknown};
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
   try{
+    await requireTenantFeature("employees");
     const {id}=await params;
     const rows=await tenantList<Record<string,unknown>>("employees","id,first_name,last_name,email,phone,job_title,workload_percent,entry_date,status,created_at,updated_at","id=eq."+encodeURIComponent(id)+"&limit=1");
     if(!rows[0]) return json({error:"not_found",message:"Mitarbeiter wurde nicht gefunden."},404);
@@ -15,6 +16,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
 
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
   try{
+    await requireTenantFeature("employees");
     assertSameOrigin(request);
     const {id}=await params;
     const body=await readJson<Body>(request,16384);
