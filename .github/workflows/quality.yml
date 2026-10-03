@@ -47,7 +47,68 @@ jobs:
             exit 1
           fi
 
-          for route in / /produkt /preise /login /registrieren /portal /portal/login /portal/registrieren /passwort-vergessen /passwort-zuruecksetzen /dashboard /kunden /angebote /rechnungen /belege /benachrichtigungen /zeit /support /einstellungen /operator; do
+          ROUTES=(
+            /
+            /produkt
+            /preise
+            /login
+            /registrieren
+            /portal
+            /portal/login
+            /portal/registrieren
+            /passwort-vergessen
+            /passwort-zuruecksetzen
+            /demo
+            /offline
+            /willkommen
+            /dashboard
+            /kunden
+            /kunden/acme
+            /kunden/neu
+            /angebote
+            /angebote/AN-2026-012
+            /angebote/neu
+            /rechnungen
+            /rechnungen/RE-2026-019
+            /rechnungen/neu
+            /zahlungen
+            /zahlungen/1
+            /zahlungen/neu
+            /produkte
+            /produkte/beratung
+            /produkte/neu
+            /mitarbeiter
+            /mitarbeiter/thomas
+            /mitarbeiter/neu
+            /spesen
+            /spesen/1
+            /spesen/neu
+            /support
+            /support/5832
+            /support/neu
+            /belege
+            /benachrichtigungen
+            /zeit
+            /einstellungen
+            /einstellungen/konto
+            /einstellungen/firma
+            /einstellungen/abonnement
+            /einstellungen/benachrichtigungen
+            /einstellungen/sprache
+            /einstellungen/sicherheit
+            /einstellungen/darstellung
+            /operator
+            /operator/kunden
+            /operator/support
+            /operator/sicherheit
+            /operator/audit
+            /preview/dashboard
+            /preview/rechnungen
+            /preview/zeit
+          )
+
+          for route in "${ROUTES[@]}"; do
+            echo "Smoke: $route"
             curl -fsS "http://127.0.0.1:3000$route" > /dev/null
           done
 
