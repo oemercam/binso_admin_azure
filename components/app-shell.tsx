@@ -232,9 +232,11 @@ export function AppShell({
 
   function toggleTheme() {
     const next = !dark;
+    const mode = next ? "dark" : "light";
     setDark(next);
-    document.documentElement.dataset.theme = next ? "dark" : "light";
-    window.localStorage.setItem("binso.theme", next ? "dark" : "light");
+    document.documentElement.dataset.theme = mode;
+    window.localStorage.setItem("binso.theme", mode);
+    window.localStorage.setItem("binso.theme.mode", mode);
   }
 
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
