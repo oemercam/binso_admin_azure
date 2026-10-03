@@ -86,6 +86,7 @@ export function OperatorPage({ section = "" }: { section?: string }) {
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
+  const [mobileMore,setMobileMore]=useState(false);
 
   return <div className="operator-root">
     <aside className="operator-sidebar">
@@ -98,7 +99,16 @@ export function OperatorPage({ section = "" }: { section?: string }) {
         <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
         <div className="operator-user"><Link className="operator-back-app" href="/dashboard"><Icon name="back" size={15}/><span>Zur App</span></Link><span className="avatar">OC</span></div>
       </header>
-      <nav className="operator-mobile-nav" aria-label="Operator Navigation">{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={17}/><span>{label}</span></Link>)}</nav>
+      <nav className="operator-mobile-nav" aria-label="Operator Navigation">
+        {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
+        <button type="button" className={["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
+      </nav>
+      {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
+        <section className="operator-mobile-more" role="dialog" aria-modal="true" aria-label="Weitere Admin-Bereiche">
+          <header><div><h2>Mehr</h2><p>Weitere Bereiche von One Admin.</p></div><button type="button" className="icon-button" aria-label="Schliessen" onClick={()=>setMobileMore(false)}><Icon name="close"/></button></header>
+          <nav>{operatorNav.filter(([slug])=>["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
+        </section>
+      </div>}
 
       {detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
         detail && key === "kunden" ? <OperatorCustomerDetail tenantId={detail}/> :
