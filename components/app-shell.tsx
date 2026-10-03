@@ -143,8 +143,30 @@ export function AppShell({
   },[]);
 
   useEffect(() => {
-    document.body.style.overflow = sheet ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!sheet) return;
+    const scrollY=window.scrollY;
+    const body=document.body;
+    const root=document.documentElement;
+    const previous={
+      bodyPosition:body.style.position,
+      bodyTop:body.style.top,
+      bodyWidth:body.style.width,
+      bodyOverflow:body.style.overflow,
+      rootOverflow:root.style.overflow,
+    };
+    body.style.position="fixed";
+    body.style.top=`-${scrollY}px`;
+    body.style.width="100%";
+    body.style.overflow="hidden";
+    root.style.overflow="hidden";
+    return () => {
+      body.style.position=previous.bodyPosition;
+      body.style.top=previous.bodyTop;
+      body.style.width=previous.bodyWidth;
+      body.style.overflow=previous.bodyOverflow;
+      root.style.overflow=previous.rootOverflow;
+      window.scrollTo({top:scrollY,left:0,behavior:"auto"});
+    };
   }, [sheet]);
 
   useEffect(() => {
@@ -339,7 +361,7 @@ export function AppShell({
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
       </nav>
 
-      {sheet && <div className="sheet-layer" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
+      {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
         <section className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">
