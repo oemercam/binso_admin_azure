@@ -532,3 +532,185 @@ html[data-theme="dark"] .chips button.active{background:#fff;color:#000}
   .demo-step-actions .button{width:100%;justify-content:center;min-height:44px}
   .demo-focus-list button{min-height:64px}
 }
+
+
+/* Final legacy-neutralisation for the approved black/white mockup */
+.app-root .invoice-preview,
+.app-root .desktop-document-preview,
+.app-root .line-items .line-head,
+.app-root .profile-avatar,
+.app-root .choice-list button>span,
+.app-root .toast-icon,
+.app-root .invoice-tablet-preview,
+.app-root .support-preview-message p,
+.app-root .message-support>div,
+.app-root .internal-note,
+.operator-root,
+.operator-main,
+.operator-main>header,
+.operator-message p,
+.monitoring-panel{
+  background:#fff!important;
+}
+.app-root .invoice-preview,
+.app-root .desktop-document-preview,
+.app-root .invoice-tablet-preview{
+  border:1px solid var(--pixel-line);
+  border-radius:var(--pixel-radius);
+}
+.app-root .line-items .line-head{
+  border-bottom:1px solid var(--pixel-line);
+}
+.app-root .record:hover,
+.app-root .settings-list>a:hover,
+.app-root .welcome-grid>a:hover,
+.app-root .notification-mark-all:hover,
+.operator-table-row:hover,
+.app-root .line-remove:hover:not(:disabled){
+  background:#fff!important;
+}
+.app-root .paper th{background:#fff!important}
+.app-root .document-modal{background:#fff!important}
+.app-root .document-modal-body{background:#fff!important}
+.operator-root{color:#111!important}
+.operator-message p{border:1px solid var(--pixel-line)}
+.operator-message.support p{background:#111!important;color:#fff!important;border-color:#111}
+.operator-sidebar em{background:#111!important;border:1px solid #333}
+.priority,.priority.high{background:#111!important}
+.app-root .success-panel>span,
+.app-root .payment-context .activity-icon{
+  background:#fff!important;border:1px solid var(--pixel-line)
+}
+
+/* No visual card-inside-card effect */
+.app-root .surface .surface,
+.app-root .invoice-form .surface,
+.app-root .settings-detail-grid .surface{
+  border-left:0;border-right:0;border-radius:0;box-shadow:none
+}
+
+/* Detail pages: mobile Back Header owns the title; body must not repeat it. */
+@media(max-width:760px){
+  .page-head-detail>div>h1,
+  .page-head-detail>div>p,
+  .page-head-detail .desktop-back{display:none!important}
+  .page-head-detail{min-height:0;margin-bottom:8px}
+  .page-head-detail:not(:has(.page-actions)){display:none}
+  .page-head-detail .page-actions{margin-left:auto}
+
+  .app-root .invoice-preview,
+  .app-root .desktop-document-preview,
+  .app-root .invoice-tablet-preview,
+  .app-root .document-modal,
+  .app-root .document-modal-body{
+    background:#fff!important
+  }
+
+  .app-root .surface,
+  .app-root .invoice-preview,
+  .app-root .invoice-tablet-preview,
+  .operator-main>.surface,
+  .operator-table-card{
+    box-shadow:none!important
+  }
+
+  .operator-root{background:#fff!important}
+  .operator-main{background:#fff!important}
+  .operator-main>header{background:#fff!important}
+  .operator-mobile-nav{background:#fff!important}
+  .operator-mobile-nav a{background:#fff!important;border:0!important}
+  .operator-mobile-nav a.active{background:#111!important;color:#fff!important}
+
+  .records{margin-left:0;margin-right:0}
+  .record-wrapper{display:block}
+  .record{gap:9px}
+  .record>.activity-icon{width:30px;height:30px}
+  .record>svg:last-child{width:15px;height:15px}
+  .record>strong{margin-left:auto}
+  .record>.status{margin-left:2px}
+
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+  .toolbar .searchbox{grid-column:1/-1;max-width:none}
+  .toolbar .chips{grid-column:1/-1}
+  .toolbar .filter-button{grid-column:1}
+  .toolbar .records-count{grid-column:2;justify-self:end}
+  .toolbar .toolbar-reset{grid-column:1/-1;justify-self:start}
+
+  .document-line-items{border-left:0;border-right:0;border-radius:0}
+  .document-line-items .line-head{display:none}
+  .document-line-items>div:not(.line-head){
+    min-width:0;grid-template-columns:minmax(0,1fr) 64px 84px auto auto;
+    gap:6px;padding:9px 0
+  }
+  .document-line-items>div:not(.line-head)>input:first-child{grid-column:1/-1}
+  .document-line-items>div:not(.line-head)>input{border-bottom:1px solid var(--pixel-line);border-radius:0}
+  .invoice-totals{max-width:none;width:100%;margin-left:0}
+
+  .settings-list,
+  .documents-hub-grid,
+  .subscription-panel{
+    margin-left:0!important;margin-right:0!important
+  }
+}
+
+/* Explicit widths from the QA matrix */
+@media(max-width:430px){
+  .page-container{padding-left:14px;padding-right:14px}
+  .bottom-sheet{padding-left:14px;padding-right:14px}
+  .page-head p{max-width:250px}
+}
+@media(max-width:390px){
+  .mobile-header-title{max-width:132px}
+  .record-main small{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:375px){
+  .mobile-header-title{max-width:120px}
+  .bottom-nav>a,.bottom-nav>button{gap:1px}
+}
+@media(max-width:320px){
+  .page-container{padding-left:12px;padding-right:12px}
+  .mobile-header{padding-left:10px;padding-right:10px}
+  .mobile-header-title{max-width:92px}
+  .mobile-header-actions .icon-button{width:34px;height:34px}
+  .mobile-header-actions .avatar{width:32px;height:32px}
+  .record-main small{max-width:142px}
+  .bottom-nav>a,.bottom-nav>button{font-size:7px}
+  .bottom-nav svg{width:17px;height:17px}
+}
+
+/* Tablet: master/detail only where it genuinely helps. */
+@media(min-width:761px) and (max-width:1024px){
+  :root{--pixel-sidebar:188px;--pixel-page-x:22px}
+  .app-sidebar{width:var(--pixel-sidebar)}
+  .app-main{margin-left:var(--pixel-sidebar)}
+  .page-container{padding-left:22px;padding-right:22px}
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .dashboard-grid{grid-template-columns:1fr}
+  .tablet-master-detail{grid-template-columns:minmax(0,1fr) 330px}
+  .invoice-workspace{grid-template-columns:minmax(0,1fr) 340px}
+}
+
+/* Large desktop */
+@media(min-width:1440px){
+  :root{--pixel-content:1240px}
+}
+@media(min-width:1920px){
+  :root{--pixel-content:1320px}
+}
+
+/* Dark mode must stay pure black even for legacy components */
+html[data-theme="dark"] .app-root .invoice-preview,
+html[data-theme="dark"] .app-root .desktop-document-preview,
+html[data-theme="dark"] .app-root .line-items .line-head,
+html[data-theme="dark"] .app-root .profile-avatar,
+html[data-theme="dark"] .app-root .choice-list button>span,
+html[data-theme="dark"] .app-root .toast-icon,
+html[data-theme="dark"] .app-root .invoice-tablet-preview,
+html[data-theme="dark"] .app-root .support-preview-message p,
+html[data-theme="dark"] .app-root .message-support>div,
+html[data-theme="dark"] .app-root .internal-note{
+  background:#000!important;color:#fff!important;border-color:#292929!important
+}
+html[data-theme="dark"] .app-root .document-modal,
+html[data-theme="dark"] .app-root .document-modal-body{background:#000!important}
+html[data-theme="dark"] .operator-message:not(.support) p{background:#000!important;color:#fff!important;border-color:#292929!important}
