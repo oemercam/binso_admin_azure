@@ -120,3 +120,40 @@ begin
   insert into public.tenant_memberships(tenant_id,user_id,role) values(new_tenant_id,new.id,'owner');
   return new;
 end $$;
+
+
+-- Keep all mutations aligned with account restrictions and plan entitlements.
+drop policy if exists tenants_admin_update on public.tenants;
+create policy tenants_admin_update on public.tenants for update
+using(public.is_tenant_admin(id) and public.tenant_can_write(id))
+with check(public.is_tenant_admin(id) and public.tenant_can_write(id));
+
+do $$ declare t text;
+begin
+  foreach t in array array['customers','products','documents','document_items','payments','support_tickets','support_messages','customer_contacts','files']
+  loop
+    execute format('drop policy if exists %I_admin_delete on public.%I',t,t);
+    execute format('create policy %I_admin_delete on public.%I for delete using(public.is_tenant_admin(tenant_id) and public.tenant_can_write(tenant_id))',t,t);
+  end loop;
+end $$;
+drop policy if exists employees_admin_delete on public.employees;
+create policy employees_admin_delete on public.employees for delete using(public.is_tenant_admin(tenant_id) and public.tenant_can_write(tenant_id) and public.tenant_has_feature(tenant_id,'employees'));
+drop policy if exists expenses_admin_delete on public.expenses;
+create policy expenses_admin_delete on public.expenses for delete using(public.is_tenant_admin(tenant_id) and public.tenant_can_write(tenant_id) and public.tenant_has_feature(tenant_id,'expenses'));
+drop policy if exists time_entries_admin_delete on public.time_entries;
+create policy time_entries_admin_delete on public.time_entries for delete using(public.is_tenant_admin(tenant_id) and public.tenant_can_write(tenant_id) and public.tenant_has_feature(tenant_id,'time_tracking'));
+
+create or replace function public.sync_tenant_plan_limits()
+returns trigger language plpgsql set search_path=public
+as $$
+begin
+  if tg_op='INSERT' or new.plan is distinct from old.plan then
+    new.user_limit:=case new.plan when 'start' then 1 when 'business' then 20 when 'pro' then 100 else 3 end;
+  end if;
+  return new;
+end $$;
+drop trigger if exists trg_sync_tenant_plan_limits on public.tenant_accounts;
+create trigger trg_sync_tenant_plan_limits before insert or update of plan on public.tenant_accounts
+for each row execute function public.sync_tenant_plan_limits();
+
+update public.tenant_accounts set user_limit=case plan when 'start' then 1 when 'business' then 20 when 'pro' then 100 else 3 end;
