@@ -38,7 +38,6 @@
 @media (max-width:760px){
   :root{
     --page-x:var(--mobile-page-x);
-    --mobile-section-gap:20px;
   }
 
   html,body{width:100%;max-width:100%;min-width:0;overflow-x:clip}
@@ -230,12 +229,12 @@
   .page-container{
     max-width:none;
     margin:0;
-    padding-top:16px;
+    padding-top:var(--mobile-page-top);
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
     padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 30px);
   }
-  .page-head{margin-bottom:20px;gap:12px}
+  .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
   .page-head h1{font-size:21px;line-height:1.12}
   .page-head p{max-width:34rem;margin-top:6px;font-size:11px}
   .page-head-detail{margin-bottom:10px}
@@ -299,7 +298,7 @@
   .quick-grid{grid-template-columns:1fr 1fr;gap:10px}
   .quick-grid .button{min-height:44px;height:44px;padding-inline:12px}
 
-  .toolbar{min-height:0;margin-bottom:14px;flex-direction:column;align-items:stretch;gap:10px}
+  .toolbar{min-height:0;margin-bottom:var(--mobile-toolbar-gap);flex-direction:column;align-items:stretch;gap:8px}
   .searchbox,.filter-button{height:42px;min-height:42px;max-width:none}
   .chips,
   .tabs{
