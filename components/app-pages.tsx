@@ -102,8 +102,8 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   return rows;
 }
 
-export function DashboardPage() {
-  const production=useBackendMode();
+export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
+  const production=useBackendMode()&&!forceDemo;
   const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>}>({});
 
   useEffect(()=>{
