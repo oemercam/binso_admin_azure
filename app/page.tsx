@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
+import { useI18n } from "@/lib/i18n/provider";
+import { publicMessages } from "@/lib/i18n/public";
 
 const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
@@ -23,6 +27,8 @@ const plans=[
 ] as const;
 
 export default function Home() {
+  const {locale,messages:m}=useI18n();
+  const p=publicMessages[locale];
   const structuredData={
     "@context":"https://schema.org",
     "@type":"SoftwareApplication",
@@ -56,15 +62,15 @@ export default function Home() {
       <section className="hero">
         <div className="hero-copy">
           <span className="eyebrow">BINSO ONE</span>
-          <h1>Mehr Zeit für das Wesentliche.</h1>
-          <p className="hero-lead">Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.</p>
+          <h1>{p.hero[0]}</h1>
+          <p className="hero-lead">{p.hero[1]}</p>
           <div className="hero-actions">
-            <Button href="/registrieren">30 Tage kostenlos testen</Button>
-            <Button href="/demo" variant="secondary">Demo starten</Button>
+            <Button href="/registrieren">{m.marketing.trial}</Button>
+            <Button href="/demo" variant="secondary">{m.marketing.demo}</Button>
           </div>
           <div className="trust-row">
-            <span><Icon name="lock"/> Schweizer Business-Software</span>
-            <span><Icon name="clock"/> In wenigen Minuten startklar</span>
+            <span><Icon name="lock"/> {p.hero[2]}</span>
+            <span><Icon name="clock"/> {p.hero[3]}</span>
           </div>
         </div>
         <ProductPreview/>
@@ -80,9 +86,9 @@ export default function Home() {
       <section id="funktionen" className="marketing-section feature-showcase">
         <div className="feature-showcase-copy">
           <div className="section-intro">
-            <span className="eyebrow">ALLES AN EINEM ORT</span>
-            <h2>Einfach arbeiten. Ohne Umwege.</h2>
-            <p>Die wichtigsten Abläufe eines Schweizer KMU sind in einer Oberfläche verbunden.</p>
+            <span className="eyebrow">{p.all}</span>
+            <h2>{p.simple}</h2>
+            <p>{p.simpleText}</p>
           </div>
           <div className="feature-list">
             {[
@@ -94,7 +100,7 @@ export default function Home() {
               ["Mitarbeiter","Teamdaten und Zuständigkeiten.","/mitarbeiter"],
             ].map(([title,text,href])=><Link className="feature-list-link" href={href} key={title}><span><b>{title}</b><small>{text}</small></span><Icon name="arrow" size={15}/></Link>)}
           </div>
-          <Link className="marketing-text-link" href="/produkt">Alle Funktionen ansehen <Icon name="arrow" size={15}/></Link>
+          <Link className="marketing-text-link" href="/produkt">{p.allFeatures} <Icon name="arrow" size={15}/></Link>
         </div>
         <div className="section-product-shot desktop-shot">
           <iframe src="/preview/rechnungen" title="Binso One Rechnungen" tabIndex={-1}/>
@@ -104,9 +110,9 @@ export default function Home() {
       <section className="workflow-section">
         <div className="workflow-copy">
           <div className="section-intro">
-            <span className="eyebrow">VOM KUNDEN BIS ZUR RECHNUNG</span>
-            <h2>Ein Ablauf. Kein Systemwechsel.</h2>
-            <p>Die wichtigsten Schritte bauen direkt aufeinander auf.</p>
+            <span className="eyebrow">{p.flow}</span>
+            <h2>{p.flowTitle}</h2>
+            <p>{p.flowText}</p>
           </div>
           <div className="workflow-list">
             {workflow.map(([nr,title,text])=><article key={nr}>
@@ -123,9 +129,9 @@ export default function Home() {
       <section className="product-callout">
         <div>
           <span className="eyebrow">APP-FIRST</span>
-          <h2>Auf Mobile wie eine echte App.</h2>
-          <p>Klare Bottom Navigation, Touch-first Bedienung, sichere iOS Safe Areas und reduzierte Ansichten statt verkleinerter Desktop-Seiten.</p>
-          <Button href="/demo">Demo starten</Button>
+          <h2>{p.appTitle}</h2>
+          <p>{p.appText}</p>
+          <Button href="/demo">{m.marketing.demo}</Button>
         </div>
         <div className="mobile-callout-copy">
           <div><b>Start</b><span>Übersicht und Schnellzugriffe</span></div>
@@ -138,16 +144,16 @@ export default function Home() {
 
       <section className="marketing-section pricing-section" id="preise">
         <div className="section-intro">
-          <span className="eyebrow">PREISE</span>
-          <h2>Einfach starten. Später erweitern.</h2>
-          <p>Alle Pläne bleiben bewusst übersichtlich. Keine versteckten Pflichtmodule.</p>
+          <span className="eyebrow">{p.pricing}</span>
+          <h2>{p.pricingTitle}</h2>
+          <p>{p.pricingText}</p>
         </div>
         <div className="pricing-grid marketing-pricing-grid">
           {plans.map(plan=><article className={plan.featured?"price-card featured":"price-card"} key={plan.name}>
-            {plan.featured&&<span className="popular">BELIEBT</span>}
+            {plan.featured&&<span className="popular">{p.popular}</span>}
             <h3>{plan.name}</h3>
             <p>{plan.description}</p>
-            <div className="price"><strong>CHF {plan.price}</strong><span>/ Monat</span></div>
+            <div className="price"><strong>CHF {plan.price}</strong><span>{p.month}</span></div>
             <Button href="/registrieren" variant={plan.featured?"primary":"secondary"}>30 Tage kostenlos testen</Button>
             <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
           </article>)}
@@ -156,9 +162,9 @@ export default function Home() {
 
       <section id="sicherheit" className="marketing-section security-split">
         <div>
-          <span className="eyebrow">SCHWEIZ</span>
-          <h2>Entwickelt für Schweizer KMU.</h2>
-          <p>Binso One wird von der Binso GmbH in Appenzell entwickelt. Klare Prozesse, reduzierte Oberfläche und Schweizer Schreibweise stehen im Mittelpunkt.</p>
+          <span className="eyebrow">{p.switzerland}</span>
+          <h2>{p.swissTitle}</h2>
+          <p>{p.swissText}</p>
         </div>
         <div className="security-points">
           <div><Icon name="lock"/><span><b>Sicher aufgebaut</b><small>Klare Rollen, getrennte Bereiche und nachvollziehbare Aktionen.</small></span></div>
@@ -170,7 +176,7 @@ export default function Home() {
       <section className="marketing-section faq-section">
         <div className="section-intro">
           <span className="eyebrow">FAQ</span>
-          <h2>Die wichtigsten Fragen.</h2>
+          <h2>{p.faqTitle}</h2>
         </div>
         <div className="faq-list">
           <details><summary>Kann ich Binso One zuerst ausprobieren?</summary><p>Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen.</p></details>
@@ -181,8 +187,8 @@ export default function Home() {
       </section>
 
       <section className="marketing-cta">
-        <div><span className="eyebrow">BINSO ONE</span><h2>Einfach selbst ansehen.</h2><p>Starte direkt mit der Demo oder richte dein eigenes Konto ein.</p></div>
-        <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
+        <div><span className="eyebrow">BINSO ONE</span><h2>{p.ctaTitle}</h2><p>{p.ctaText}</p></div>
+        <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">{m.marketing.demo}</Button></div>
       </section>
     </main>
     <MarketingFooter/>
