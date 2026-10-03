@@ -196,8 +196,24 @@
 .chips button.active,
 .tabs button.active,
 .notification-center-tabs button.active{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
-.filter-button{min-height:42px;height:42px}
-.records-count{margin-left:auto;color:var(--color-muted);font-size:11px}
+.filter-button{
+  min-height:36px;
+  height:36px;
+  padding:0 10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border:1px solid var(--color-line);
+  border-radius:9px;
+  background:var(--color-bg);
+  color:var(--color-fg);
+  font-size:11px;
+  font-weight:650;
+  white-space:nowrap;
+}
+.filter-button.active{border-color:var(--color-fg)}
+.records-count{margin-left:auto;color:var(--color-muted);font-size:11px;line-height:1.2}
 .toolbar-reset{border:0;background:transparent;color:var(--color-muted);font-size:11px}
 .records{border-top:1px solid var(--color-line)}
 .record-wrapper{display:block}
