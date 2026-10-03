@@ -30,8 +30,12 @@
   --mobile-nav-h:64px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
-  --mobile-toolbar-gap:12px;
+  --mobile-toolbar-gap:10px;
   --mobile-section-gap:18px;
+  --mobile-search-h:40px;
+  --mobile-chip-h:34px;
+  --mobile-row-h:64px;
+  --mobile-sheet-row-h:56px;
   --touch:44px;
 
   --safe-top:0px;
