@@ -2,7 +2,7 @@ export type IntegrationStatus = {
   key:"database"|"storage"|"billing"|"email"|"banking"|"swiss_qr";
   label:string;
   configured:boolean;
-  status:"operational"|"configured"|"not_connected"|"not_implemented";
+  status:"operational"|"degraded"|"configured"|"not_connected"|"not_implemented";
   detail:string;
 };
 
@@ -18,4 +18,31 @@ export function getIntegrationStatus():IntegrationStatus[] {
     {key:"banking",label:"Bankanbindung",configured:false,status:"not_implemented",detail:"Noch kein Bankprovider verbunden"},
     {key:"swiss_qr",label:"Swiss QR",configured:false,status:"not_implemented",detail:"Normkonforme QR-Erzeugung noch nicht produktiv implementiert"},
   ];
+}
+
+
+async function providerReachable(url:string,authorization:string){
+  const started=performance.now();
+  try{
+    const response=await fetch(url,{headers:{Authorization:authorization},cache:"no-store",signal:AbortSignal.timeout(4000)});
+    return {ok:response.ok,latencyMs:Math.round(performance.now()-started)};
+  }catch{
+    return {ok:false,latencyMs:Math.round(performance.now()-started)};
+  }
+}
+
+export async function getOperationalIntegrationStatus(){
+  const base=getIntegrationStatus();
+  const checks=await Promise.all(base.map(async item=>{
+    if(item.key==="billing"&&item.configured){
+      const health=await providerReachable("https://api.stripe.com/v1/account","Bearer "+process.env.STRIPE_SECRET_KEY);
+      return {...item,status:health.ok?"operational" as const:"degraded" as const,detail:health.ok?`Stripe erreichbar · ${health.latencyMs} ms`:"Stripe aktuell nicht erreichbar",latencyMs:health.latencyMs};
+    }
+    if(item.key==="email"&&item.configured){
+      const health=await providerReachable("https://api.resend.com/domains","Bearer "+process.env.RESEND_API_KEY);
+      return {...item,status:health.ok?"operational" as const:"degraded" as const,detail:health.ok?`Resend erreichbar · ${health.latencyMs} ms`:"Resend aktuell nicht erreichbar",latencyMs:health.latencyMs};
+    }
+    return {...item,latencyMs:null};
+  }));
+  return checks;
 }

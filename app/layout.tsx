@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./binso-ui.css";
 import { PwaRegister } from "@/components/pwa-register";
+import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import { siteConfig } from "@/lib/config";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   manifest: "/manifest.webmanifest",
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   appleWebApp: {
     capable: true,
     title: "Binso One",
@@ -60,6 +62,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <PwaRegister />
+        <WebVitalsReporter />
       </body>
     </html>
   );

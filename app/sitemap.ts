@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${siteConfig.marketingUrl}${route.path}`,
-    lastModified: new Date("2026-10-02"),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

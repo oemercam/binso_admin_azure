@@ -93,6 +93,7 @@ jobs:
             /einstellungen
             /einstellungen/konto
             /einstellungen/firma
+            /einstellungen/team
             /einstellungen/abonnement
             /einstellungen/benachrichtigungen
             /einstellungen/sprache
@@ -130,3 +131,6 @@ jobs:
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
+          curl -fsS http://127.0.0.1:3000/manifest.webmanifest | grep -q "Binso One"
+          curl -fsS http://127.0.0.1:3000/manifest-admin.webmanifest | grep -q "One Admin"
+          curl -fsS http://127.0.0.1:3000/brand/icon-black.svg | grep -q "viewBox=\\\"370 430 280 340\\\""

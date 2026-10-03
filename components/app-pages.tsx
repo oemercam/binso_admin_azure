@@ -988,6 +988,7 @@ export function SettingsPage() {
   const rows = [
     ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
     ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
+    ["/einstellungen/team","users","Team","Benutzer, Rollen und Einladungen"],
     ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
     ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
     ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
@@ -1125,7 +1126,7 @@ export function CompanySettingsPage() {
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Firmenlogo</b><small>Für Angebote, Rechnungen und Dokumente</small></div><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e=>void uploadLogo(e.target.files?.[0])}/></section>
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Firmenlogo</b><small>Für Angebote, Rechnungen und Dokumente</small></div><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></section>
       <section className="settings-form">
         <div className="form-grid two">
           <Field label="Firmenname"><input value={name} onChange={e=>setName(e.target.value)}/></Field>

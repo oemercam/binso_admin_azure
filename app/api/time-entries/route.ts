@@ -1,17 +1,19 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList } from "@/lib/server/database";
+import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
 import { requireUser } from "@/lib/server/auth";
 
 type TimeBody={customerId?:unknown;customerName?:unknown;projectName?:unknown;description?:unknown;startedAt?:unknown;endedAt?:unknown;durationMinutes?:unknown};
 
 export async function GET(){
-  try{return json({items:await tenantList("time_entries","id,user_id,customer_id,project_name,description,started_at,ended_at,duration_minutes,created_at","order=created_at.desc")});}
+  try{
+    await requireTenantFeature("time_tracking");return json({items:await tenantList("time_entries","id,user_id,customer_id,project_name,description,started_at,ended_at,duration_minutes,created_at","order=created_at.desc")});}
   catch(error){return apiError(error);}
 }
 
 export async function POST(request:NextRequest){
   try{
+    await requireTenantFeature("time_tracking");
     assertSameOrigin(request);
     const body=await readJson<TimeBody>(request,16384);
     const {user}=await requireUser();
