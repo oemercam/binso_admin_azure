@@ -11,6 +11,16 @@
   --pixel-line:#e8e8e5;
   --pixel-muted:#6a6a6a;
   --pixel-radius:10px;
+  --bg:#fff;
+  --ink:#0a0a0a;
+  --muted:#6a6a6a;
+  --line:#e8e8e5;
+  --soft:#fff;
+  --success-bg:#fff;
+  --warning-bg:#fff;
+  --danger-bg:#fff;
+  --info-bg:#fff;
+  --shadow:none;
 }
 
 /* Global geometry */
@@ -1282,4 +1292,18 @@ html[data-theme="dark"] .app-demo-badge{
 }
 @media(max-width:390px){
   .app-demo-badge.mobile{display:none}
+}
+
+
+html[data-theme="dark"]{
+  --bg:#000;
+  --ink:#fff;
+  --muted:#a0a0a0;
+  --line:#292929;
+  --soft:#000;
+  --success-bg:#000;
+  --warning-bg:#000;
+  --danger-bg:#000;
+  --info-bg:#000;
+  --shadow:none;
 }
