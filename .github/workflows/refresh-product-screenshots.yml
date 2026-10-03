@@ -1,0 +1,45 @@
+name: Refresh product screenshots
+on:
+  push:
+    branches: [feature/public-launch-i18n-social-20261003]
+    paths-ignore:
+      - "public/screenshots/**"
+permissions:
+  contents: write
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start Binso One
+        run: |
+          pnpm start > /tmp/binso-screenshots.log 2>&1 &
+          echo $! > /tmp/binso-screenshots.pid
+          for attempt in {1..30}; do
+            curl -fsS http://127.0.0.1:3000/preview/dashboard >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/binso-screenshots.log
+          exit 1
+      - name: Capture real product UI
+        run: |
+          npx --yes playwright@1.55.0 install chromium
+          mkdir -p public/screenshots
+          npx --yes playwright@1.55.0 screenshot --browser chromium --viewport-size "1440,900" --wait-for-timeout 1000 http://127.0.0.1:3000/preview/dashboard public/screenshots/dashboard-desktop.png
+          npx --yes playwright@1.55.0 screenshot --browser chromium --viewport-size "1440,900" --wait-for-timeout 1000 http://127.0.0.1:3000/preview/rechnungen public/screenshots/rechnungen-desktop.png
+          npx --yes playwright@1.55.0 screenshot --browser chromium --viewport-size "390,844" --wait-for-timeout 1000 http://127.0.0.1:3000/preview/zeit public/screenshots/zeit-mobile.png
+      - name: Commit screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/screenshots
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore: refresh real Binso One screenshots [skip ci]"
+          git push
