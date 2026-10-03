@@ -23,7 +23,8 @@ function clientIp(request:NextRequest){
 async function consume(route:string,key:string){
   if(!isBackendConfigured()) return true;
   try{
-    const result=await query<{allowed:boolean}>("select consume_api_rate_limit($1,$2) as allowed",[route,fingerprint(key)]);\n    return Boolean(result.rows[0]?.allowed);
+    const result=await query<{allowed:boolean}>("select consume_api_rate_limit($1,$2) as allowed",[route,fingerprint(key)]);
+    return Boolean(result.rows[0]?.allowed);
   }catch(error){
     if(error instanceof ApiError) throw error;
     throw new ApiError(503,"rate_limit_unavailable","Anmeldung ist vorübergehend nicht verfügbar.",{"Retry-After":"60"});
