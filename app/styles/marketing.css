@@ -454,3 +454,11 @@
 .demo-summary-list>div{min-height:48px;display:flex;justify-content:space-between;gap:18px;align-items:center;border-bottom:1px solid var(--color-line);font-size:11px}
 .demo-summary-list span{color:var(--color-muted)}
 .demo-privacy{margin-top:16px;color:var(--color-muted);font-size:9px;line-height:1.45}
+
+
+.faq-section,
+.pricing-section,
+.pricing-page,
+.product-page{display:block}
+.product-subhero{max-width:900px}
+.marketing-text-link{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
