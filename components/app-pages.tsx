@@ -11,8 +11,6 @@ import { customers, employees, expenses, invoices, offers, payments, products, s
 import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
-import { useI18n } from "@/lib/i18n/provider";
-import { localeLabels, locales, type AppLocale } from "@/lib/i18n/config";
 
 function moneyChf(value:unknown){
   const amount=Number(value);
@@ -1273,11 +1271,14 @@ export function NotificationSettingsPage() {
 }
 
 export function LanguageSettingsPage() {
-  const {locale,setLocale,messages:m}=useI18n();
-  return <AppShell title={m.common.language} subtitle={locale==="de"?"Sprache für Oberfläche und Kommunikation wählen.":locale==="fr"?"Choisissez la langue de l’interface et des communications.":locale==="it"?"Scegli la lingua dell’interfaccia e delle comunicazioni.":locale==="tr"?"Arayüz ve iletişim dilini seçin.":"Choose the language for the interface and communications."} active="einstellungen" backHref="/einstellungen" backLabel={m.common.settings}>
-    <div className="choice-list">{locales.map(code=><button className={locale===code?"selected":""} onClick={()=>setLocale(code as AppLocale)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{localeLabels[code]}</b><small>{locale===code?(locale==="de"?"Aktiv":locale==="fr"?"Actif":locale==="it"?"Attiva":locale==="tr"?"Etkin":"Active"):(locale==="de"?"Auswählen":locale==="fr"?"Sélectionner":locale==="it"?"Seleziona":locale==="tr"?"Seç":"Select")}</small></div>{locale===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+  const [language,setLanguage] = useState("de");
+  const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
+  return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>setLanguage(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
   </AppShell>;
 }
+
 export function SecuritySettingsPage() {
   const production=useBackendMode();
   const [dialog,setDialog]=useState<"password"|"2fa"|null>(null);

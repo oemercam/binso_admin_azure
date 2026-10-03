@@ -1,9 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
-import { useI18n } from "@/lib/i18n/provider";
 
 const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
@@ -26,8 +23,6 @@ const plans=[
 ] as const;
 
 export default function Home() {
-  const {locale,messages:m}=useI18n();
-  const hero={de:["Mehr Zeit für das Wesentliche.","Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.","Schweizer Business-Software","In wenigen Minuten startklar"],fr:["Plus de temps pour l’essentiel.","Clients, offres, factures, paiements, collaborateurs, frais et temps de travail – clairement organisés dans une application moderne.","Logiciel de gestion suisse","Prêt en quelques minutes"],it:["Più tempo per ciò che conta.","Clienti, offerte, fatture, pagamenti, collaboratori, spese e ore di lavoro – organizzati con chiarezza in un’app moderna.","Software gestionale svizzero","Operativo in pochi minuti"],en:["More time for what matters.","Customers, quotes, invoices, payments, employees, expenses and working time – clearly organised in one modern business app.","Swiss business software","Ready in minutes"],tr:["Önemli işlere daha fazla zaman.","Müşteriler, teklifler, faturalar, ödemeler, çalışanlar, masraflar ve çalışma süreleri modern bir iş uygulamasında düzenli şekilde yönetilir.","İsviçre iş yazılımı","Dakikalar içinde hazır"]}[locale];
   const structuredData={
     "@context":"https://schema.org",
     "@type":"SoftwareApplication",
@@ -61,15 +56,15 @@ export default function Home() {
       <section className="hero">
         <div className="hero-copy">
           <span className="eyebrow">BINSO ONE</span>
-          <h1>{hero[0]}</h1>
-          <p className="hero-lead">{hero[1]}</p>
+          <h1>Mehr Zeit für das Wesentliche.</h1>
+          <p className="hero-lead">Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.</p>
           <div className="hero-actions">
-            <Button href="/registrieren">{m.marketing.trial}</Button>
-            <Button href="/demo" variant="secondary">{m.marketing.demo}</Button>
+            <Button href="/registrieren">30 Tage kostenlos testen</Button>
+            <Button href="/demo" variant="secondary">Demo starten</Button>
           </div>
           <div className="trust-row">
-            <span><Icon name="lock"/> {hero[2]}</span>
-            <span><Icon name="clock"/> {hero[3]}</span>
+            <span><Icon name="lock"/> Schweizer Business-Software</span>
+            <span><Icon name="clock"/> In wenigen Minuten startklar</span>
           </div>
         </div>
         <ProductPreview/>
@@ -130,7 +125,7 @@ export default function Home() {
           <span className="eyebrow">APP-FIRST</span>
           <h2>Auf Mobile wie eine echte App.</h2>
           <p>Klare Bottom Navigation, Touch-first Bedienung, sichere iOS Safe Areas und reduzierte Ansichten statt verkleinerter Desktop-Seiten.</p>
-          <Button href="/demo">{m.marketing.demo}</Button>
+          <Button href="/demo">Demo starten</Button>
         </div>
         <div className="mobile-callout-copy">
           <div><b>Start</b><span>Übersicht und Schnellzugriffe</span></div>
@@ -187,7 +182,7 @@ export default function Home() {
 
       <section className="marketing-cta">
         <div><span className="eyebrow">BINSO ONE</span><h2>Einfach selbst ansehen.</h2><p>Starte direkt mit der Demo oder richte dein eigenes Konto ein.</p></div>
-        <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">{m.marketing.demo}</Button></div>
+        <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
       </section>
     </main>
     <MarketingFooter/>
