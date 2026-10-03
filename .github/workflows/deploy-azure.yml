@@ -44,23 +44,36 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
 
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
+      - name: Azure login (OIDC)
+        uses: azure/login@v3
         with:
-          version: latest
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Apply production database migrations
+      - name: Load production database connection
         shell: bash
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
-          if [ -z "$SUPABASE_DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL is required so application code and the production database cannot drift."
-            exit 1
+          APP_RG="$(az resource list --name "$AZURE_WEBAPP_NAME" --resource-type Microsoft.Web/sites --query "[0].resourceGroup" -o tsv)"
+          DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$AZURE_WEBAPP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          test -n "$DATABASE_URL"
+          echo "::add-mask::$DATABASE_URL"
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
+          echo "DATABASE_SSL=true" >> "$GITHUB_ENV"
+          echo "DATABASE_SSL_REJECT_UNAUTHORIZED=true" >> "$GITHUB_ENV"
+
+      - name: Reset legacy schema once and migrate Azure PostgreSQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          MARKER="$(PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -Atc "select case when to_regclass('public.schema_migrations') is not null and exists(select 1 from public.schema_migrations where version='0000_azure_runtime.sql') then 'current' else 'legacy' end" 2>/dev/null || echo legacy)"
+          if [ "$MARKER" != "current" ]; then
+            echo "Legacy database schema detected. Performing the explicitly approved one-time reset of binso_platform."
+            ALLOW_DATABASE_RESET=binso-platform-db pnpm db:reset
           fi
-          supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
-          supabase db push --db-url "$SUPABASE_DB_URL"
+          pnpm db:migrate
+          pnpm db:check
 
       - name: Prepare standalone deploy artifact
         shell: bash
@@ -130,13 +143,6 @@ jobs:
           cd ..
           test -s binso-one.zip
           unzip -l binso-one.zip | grep -q 'server.js'
-
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
