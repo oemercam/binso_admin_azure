@@ -40,5 +40,5 @@ export async function POST(request:NextRequest){
   try{await sendMail({to:email,subject:mailText("E-Mail für Binso One bestätigen",locale),text:`${mailText("Bitte bestätige deine E-Mail-Adresse:",locale)} ${url}`,html:mailLayout(mailText("E-Mail-Adresse bestätigen",locale),`<p>${mailText("Bestätige deine geschäftliche E-Mail-Adresse, damit dein Binso-One-Konto vollständig aktiviert ist.",locale)}</p>`,{label:mailText("E-Mail bestätigen",locale),url})})}catch{emailSent=false}
   await createSession({userId,organizationId:provisioned.organizationId,email,name,role:"owner"});
   return json({ok:true,organizationId:provisioned.organizationId,onboardingComplete:false,requiresEmailVerification:true,emailSent},201);
- }catch(error){return apiError(error,request)}
+ }catch(error){return apiError(error)}
 }
