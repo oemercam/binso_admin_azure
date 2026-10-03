@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { apiError, ApiError, json } from "@/lib/server/http";
 import { mapStripeSubscriptionStatus, verifyStripeWebhook } from "@/lib/server/stripe";
-import { privilegedSupabase } from "@/lib/server/service-role";
+import { query } from "@/lib/server/db";
 
 function stringValue(value:unknown){
   return typeof value==="string"?value:"";
@@ -72,19 +72,11 @@ export async function POST(request:NextRequest){
       return json({received:true,ignored:true});
     }
 
-    const result=await privilegedSupabase<boolean>("rpc/apply_stripe_billing_event",{
-      method:"POST",
-      body:{
-        p_event_id:event.id,
-        p_event_type:event.type,
-        p_tenant_id:tenantId,
-        p_customer_ref:customerRef,
-        p_subscription_ref:subscriptionRef,
-        p_subscription_status:subscriptionStatus,
-        p_plan:plan,
-        p_current_period_end:currentPeriodEnd,
-      },
-    });
+    const applied=await query<{processed:boolean}>(
+      "select apply_stripe_billing_event($1,$2,$3,$4,$5,$6,$7,$8) as processed",
+      [event.id,event.type,tenantId,customerRef,subscriptionRef,subscriptionStatus,plan,currentPeriodEnd]
+    );
+    const result=Boolean(applied.rows[0]?.processed);
     return json({received:true,processed:result});
   }catch(error){return apiError(error);}
 }
