@@ -17,5 +17,5 @@ export async function POST(request:NextRequest){
   const email=body.email?emailField(body):"";
   const item=await createCustomer(s.organizationId,s.userId,{name,email:email||undefined,contact:stringField(body,"contact",{required:false,max:160}),phone:stringField(body,"phone",{required:false,max:80}),address:stringField(body,"address",{required:false,max:240}),zipCity:stringField(body,"zipCity",{required:false,max:120}),uid:stringField(body,"uid",{required:false,max:80})});
   return json({item},201);
- }catch(e){return apiError(e,request)}
+ }catch(e){return apiError(e)}
 }
