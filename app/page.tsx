@@ -86,13 +86,13 @@ export default function Home() {
           </div>
           <div className="feature-list">
             {[
-              ["Kunden","Kontakte, Notizen und Belege zentral."],
-              ["Angebote","Schnell erstellen und nachverfolgen."],
-              ["Rechnungen","Saubere Vorschau und klare Status."],
-              ["Zahlungen","Eingänge und offene Beträge im Blick."],
-              ["Zeiterfassung","Timer oder manuelle Erfassung."],
-              ["Mitarbeiter","Teamdaten und Zuständigkeiten."],
-            ].map(([title,text])=><div key={title}><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={15}/></div>)}
+              ["Kunden","Kontakte, Notizen und Belege zentral.","/kunden"],
+              ["Angebote","Schnell erstellen und nachverfolgen.","/angebote"],
+              ["Rechnungen","Saubere Vorschau und klare Status.","/rechnungen"],
+              ["Zahlungen","Eingänge und offene Beträge im Blick.","/zahlungen"],
+              ["Zeiterfassung","Timer oder manuelle Erfassung.","/zeit"],
+              ["Mitarbeiter","Teamdaten und Zuständigkeiten.","/mitarbeiter"],
+            ].map(([title,text,href])=><Link className="feature-list-link" href={href} key={title}><span><b>{title}</b><small>{text}</small></span><Icon name="arrow" size={15}/></Link>)}
           </div>
           <Link className="marketing-text-link" href="/produkt">Alle Funktionen ansehen <Icon name="arrow" size={15}/></Link>
         </div>
