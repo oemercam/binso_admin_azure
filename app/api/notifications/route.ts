@@ -1,23 +1,8 @@
-import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, json, readJson } from "@/lib/server/http";
-import { userRpc } from "@/lib/server/database";
-
-type Body={action?:unknown};
-
-export async function GET(request:NextRequest){
-  try{
-    const unreadOnly=request.nextUrl.searchParams.get("unread")==="1";
-    const items=await userRpc<Array<Record<string,unknown>>>("current_notifications",{p_limit:100});
-    return json({items:unreadOnly?items.filter(item=>item.read_at==null):items});
-  }catch(error){return apiError(error);}
-}
-
-export async function PATCH(request:NextRequest){
-  try{
-    assertSameOrigin(request);
-    const body=await readJson<Body>(request,4096);
-    if(body.action!=="read_all") return json({error:"action_invalid",message:"Ungültige Aktion."},400);
-    const changed=await userRpc<number>("mark_all_notifications_read",{});
-    return json({ok:true,changed});
-  }catch(error){return apiError(error);}
-}
+import {NextRequest} from "next/server";
+import {requireSession} from "@/lib/server/session";
+import {withTenant} from "@/lib/server/db";
+import {apiError,assertSameOrigin,json,readJson} from "@/lib/server/http";
+import {asObject,stringField} from "@/lib/server/validation";
+export const runtime="nodejs";
+export async function GET(){try{const s=await requireSession();const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select id,kind,title,body as message,href,read_at as "readAt",created_at as "createdAt" from in_app_notifications where organization_id=$1 and (user_id is null or user_id=$2) order by created_at desc limit 100`,[s.organizationId,s.userId])).rows);return json({items,unread:items.filter((x:{readAt?:string|null})=>!x.readAt).length})}catch(e){return apiError(e)}}
+export async function PATCH(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();const b=asObject(await readJson(request,8_000));if(b.all===true){await withTenant(s.organizationId,s.userId,async c=>c.query(`update in_app_notifications set read_at=coalesce(read_at,now()) where organization_id=$1 and (user_id is null or user_id=$2) and read_at is null`,[s.organizationId,s.userId]));return json({ok:true})}const id=stringField(b,"id",{min:10,max:100});await withTenant(s.organizationId,s.userId,async c=>c.query(`update in_app_notifications set read_at=coalesce(read_at,now()) where id=$1 and organization_id=$2 and (user_id is null or user_id=$3)`,[id,s.organizationId,s.userId]));return json({ok:true})}catch(e){return apiError(e,request)}}
