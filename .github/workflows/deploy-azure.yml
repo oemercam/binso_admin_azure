@@ -15,11 +15,13 @@ permissions:
 
 env:
   AZURE_WEBAPP_NAME: binso-admin-prod
+  PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +39,65 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
 
+      - name: Prepare standalone deploy artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f .next/standalone/server.js
+
+          rm -rf deploy
+          mkdir -p deploy/app
+
+          cp -R .next/standalone/. deploy/app/
+
+          mkdir -p deploy/app/.next
+          cp -R .next/static deploy/app/.next/static
+
+          if [ -d public ]; then
+            cp -R public deploy/app/public
+          fi
+
+          cp package.json deploy/app/package.json
+          cp pnpm-lock.yaml deploy/app/pnpm-lock.yaml
+
+          rm -rf deploy/app/node_modules
+
+          pnpm install             --dir deploy/app             --prod             --frozen-lockfile             --config.node-linker=hoisted
+
+          test -f deploy/app/server.js
+
+          cd deploy/app
+
+          node -e "require.resolve('next')"
+
+          PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-standalone.log 2>&1 &
+          APP_PID=$!
+          trap 'kill $APP_PID 2>/dev/null || true' EXIT
+
+          READY=0
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:3100/api/health | grep -q '"status":"ok"'; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            cat /tmp/binso-standalone.log
+            exit 1
+          fi
+
+          kill $APP_PID 2>/dev/null || true
+          trap - EXIT
+
+          zip -qr ../binso-one.zip .
+
+          cd ..
+          test -s binso-one.zip
+          unzip -l binso-one.zip | grep -q 'server.js'
+
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
@@ -44,51 +105,40 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Resolve Azure App Service hostname
-        id: azure_app
-        shell: bash
-        run: |
-          set -euo pipefail
-          HOSTNAME="$(az webapp show --name "$AZURE_WEBAPP_NAME" --query defaultHostName -o tsv)"
-          if [ -z "$HOSTNAME" ]; then
-            echo "Azure App Service hostname konnte nicht ermittelt werden."
-            exit 1
-          fi
-          echo "hostname=$HOSTNAME" >> "$GITHUB_OUTPUT"
-          echo "Azure App Service: $AZURE_WEBAPP_NAME"
-          echo "Hostname: $HOSTNAME"
-
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: .
+          package: deploy/binso-one.zip
 
-      - name: Verify production health
+      - name: Verify production health and routes
         shell: bash
-        env:
-          PROD_HOSTNAME: ${{ steps.azure_app.outputs.hostname }}
         run: |
           set -euo pipefail
-          HEALTH_URL="https://$PROD_HOSTNAME/api/health"
+
+          HEALTH_URL="$PRODUCTION_URL/api/health"
 
           for attempt in {1..36}; do
-            if curl -fsS "$HEALTH_URL" | grep -q '"status":"ok"'; then
+            code=$(curl -sS -o /tmp/binso-health.json -w "%{http_code}" --max-time 20 "$HEALTH_URL" || true)
+
+            if [ "$code" = "200" ] && grep -q '"status":"ok"' /tmp/binso-health.json; then
               echo "Binso One production health check passed."
               break
             fi
 
             if [ "$attempt" -eq 36 ]; then
               echo "Production health check failed: $HEALTH_URL"
+              cat /tmp/binso-health.json 2>/dev/null || true
               exit 1
             fi
 
+            echo "Attempt $attempt/36 returned HTTP $code; retrying..."
             sleep 5
           done
 
-          for route in / /portal /demo /dashboard; do
-            echo "Live smoke: https://$PROD_HOSTNAME$route"
-            curl -fsS "https://$PROD_HOSTNAME$route" > /dev/null
+          for route in / /portal /portal/login /portal/registrieren /demo /dashboard /kunden /belege /zeit /einstellungen; do
+            echo "Live smoke: $PRODUCTION_URL$route"
+            curl -fsS --max-time 20 "$PRODUCTION_URL$route" > /dev/null
           done
 
-          echo "Production URL: https://$PROD_HOSTNAME"
+          echo "Production URL: $PRODUCTION_URL"
