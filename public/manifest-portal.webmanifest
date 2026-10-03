@@ -1,0 +1,23 @@
+{
+  "id": "/portal?pwa=portal",
+  "name": "Binso One",
+  "short_name": "Binso One",
+  "description": "Binso One Kundenportal.",
+  "start_url": "/portal?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "de-CH",
+  "icons": [
+    {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Dashboard","url":"/dashboard","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"Rechnung erstellen","url":"/rechnungen/neu","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"Zeit erfassen","url":"/zeit","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]}
+  ]
+}
