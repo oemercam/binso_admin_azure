@@ -37,7 +37,8 @@ export default function Demo(){
         company:company.trim()||"Musterwerk AG",
         focus,
       });
-      window.location.assign("/willkommen");
+      router.push("/willkommen");
+      router.refresh();
     }catch{
       setError("Demo konnte nicht gestartet werden. Bitte erneut versuchen.");
       setLoading(false);
