@@ -662,6 +662,7 @@ function AuditView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [query,setQuery]=useState("");
+  const demoAuditRows=[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].filter(row=>!query.trim()||row.join(" ").toLowerCase().includes(query.trim().toLowerCase()));
 
   useEffect(()=>{
     if(!production) return;
@@ -671,13 +672,13 @@ function AuditView() {
   },[production]);
 
   if(!production) return <section className="surface">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Letzte 7 Tage</button><button>Alle Kategorien</button></div><label className="searchbox"><Icon name="search"/><input placeholder="Audit durchsuchen..."/></label></div>
-    <div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></div>{[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].map(r=><div className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</div>)}</div>
+    <div className="operator-toolbar"><span className="operator-demo-filter">Demo · letzte 7 Tage</span><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
+    <div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></div>{demoAuditRows.map(r=><div className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</div>)}</div>
   </section>;
 
   const visible=items.filter(item=>!query.trim()||JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase()));
   return <section className="surface">
-    <div className="operator-toolbar"><div className="chips"><button className="active">Operator Audit</button></div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
+    <div className="operator-toolbar"><span className="operator-demo-filter">Operator Audit</span><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>
     {visible.length?<div className="operator-table"><div className="operator-table-head audit"><span>Zeit</span><span>Operator</span><span>Aktion</span><span>Ziel</span></div>{visible.map(item=><div className="operator-table-row audit" key={String(item.id)}><span>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><span>{String(item.operator_user_id).slice(0,8)}</span><span><b>{String(item.action)}</b></span><span>{[item.target_type,item.target_id].filter(Boolean).map(String).join(" · ")||"—"}</span></div>)}</div>:<EmptyState icon="file" title="Keine Audit-Einträge" text="Operator-Aktionen werden hier nachvollziehbar protokolliert."/>}
   </section>;
 }
