@@ -24,7 +24,7 @@ export async function passwordLogin(email:string,password:string):Promise<TokenR
  const row=r.rows[0];if(!row||!row.email_confirmed_at||!(await verifyPassword(password,row.password_hash)))throw new ApiError(401,"invalid_credentials","E-Mail oder Passwort ist nicht korrekt.");
  return createSession({id:row.id,email:row.email,user_metadata:row.raw_user_meta_data});
 }
-export async function signUp(email:string,password:string,companyName:string){
+export async function signUp(email:string,password:string,companyName:string):Promise<Partial<TokenResponse>&{user:AppUser}>{
  const passwordHash=await hashPassword(password);let user:AppUser;
  try{user=await withPrivileged(async client=>{const r=await client.query<{id:string;email:string;raw_user_meta_data:Record<string,unknown>}>(`insert into auth.users(email,password_hash,raw_user_meta_data) values(lower($1),$2,jsonb_build_object('company_name',$3)) returning id,email,raw_user_meta_data`,[email,passwordHash,companyName]);return {id:r.rows[0].id,email:r.rows[0].email,user_metadata:r.rows[0].raw_user_meta_data};});}
  catch(error){if((error as {code?:string})?.code==="23505")throw new ApiError(400,"signup_failed","Registrierung konnte nicht abgeschlossen werden. Prüfe deine Angaben oder melde dich an.");throw error;}
