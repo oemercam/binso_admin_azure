@@ -46,7 +46,7 @@ export function MarketingHeader() {
       <div className="marketing-mobile-actions">
         <Button href="/login" variant="secondary">Anmelden</Button>
         <Button href="/registrieren">30 Tage kostenlos testen</Button>
-        <Button href="/demo" variant="ghost">Demo ansehen</Button>
+        <Button href="/demo" variant="ghost">Demo starten</Button>
       </div>
       <small>Binso GmbH · Appenzell · Schweiz</small>
     </div>}
