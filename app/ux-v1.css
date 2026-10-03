@@ -649,3 +649,20 @@ html[data-theme="dark"] .settings-list>a:hover{background:#050505}
 
 .employee-tab-panel{max-width:900px}
 .employee-tab-panel .metrics-grid{margin:8px 0 14px}
+
+
+/* Monochrome status language: meaning is carried by text, never by decorative colour. */
+.status,
+.status-success,.status-warning,.status-danger,.status-info,.status-neutral{
+  background:transparent!important;color:var(--ink)!important;border:1px solid var(--line)!important;
+  box-shadow:none!important
+}
+.status::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;margin-right:5px;vertical-align:1px}
+.notification-center-row.unread{background:transparent!important;border-left:2px solid var(--ink);padding-left:10px}
+.unread-dot{background:var(--ink)!important}
+html[data-theme="dark"] .status,
+html[data-theme="dark"] .status-success,
+html[data-theme="dark"] .status-warning,
+html[data-theme="dark"] .status-danger,
+html[data-theme="dark"] .status-info,
+html[data-theme="dark"] .status-neutral{color:#fff!important;border-color:#333!important}
