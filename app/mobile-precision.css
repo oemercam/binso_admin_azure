@@ -710,3 +710,110 @@
     padding-right: max(20px, env(safe-area-inset-right))!important;
   }
 }
+
+
+/* iOS top safe-area correction:
+   Safe area belongs to the header OR page, never both. */
+@media (max-width: 760px) {
+  /* Customer portal: header owns the top safe area. */
+  .portal-page {
+    padding-top: 0!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom))!important;
+  }
+
+  .portal-header {
+    box-sizing: border-box!important;
+    width: 100%!important;
+    height: calc(50px + env(safe-area-inset-top))!important;
+    min-height: calc(50px + env(safe-area-inset-top))!important;
+    margin: 0!important;
+    padding-top: env(safe-area-inset-top)!important;
+    padding-left: 0!important;
+    padding-right: 0!important;
+    padding-bottom: 0!important;
+  }
+
+  .portal-header .logo {
+    width: 88px!important;
+    height: 28px!important;
+  }
+
+  .portal-close {
+    width: 38px!important;
+    height: 38px!important;
+  }
+
+  .portal-card,
+  .portal-card.compact {
+    width: 100%!important;
+    max-width: 420px!important;
+    margin: 0 auto!important;
+    padding-top: 24px!important;
+    padding-left: 0!important;
+    padding-right: 0!important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom))!important;
+  }
+
+  .portal-kicker {
+    margin-bottom: 10px!important;
+  }
+
+  .portal-card h1 {
+    margin-bottom: 8px!important;
+  }
+
+  .portal-card > p {
+    margin-bottom: 20px!important;
+  }
+
+  .portal-demo-card {
+    margin-top: 4px!important;
+  }
+
+  /* Standalone auth pages have no separate header: the page owns safe-area once. */
+  .auth-page {
+    padding-top: calc(env(safe-area-inset-top) + 12px)!important;
+    padding-left: max(var(--mobile-page-x), env(safe-area-inset-left))!important;
+    padding-right: max(var(--mobile-page-x), env(safe-area-inset-right))!important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom))!important;
+    place-items: start center!important;
+  }
+
+  .auth-card {
+    padding-top: 0!important;
+  }
+
+  .auth-card > .logo {
+    width: 88px!important;
+    height: 28px!important;
+    margin-bottom: 28px!important;
+  }
+
+  /* Logged-in app header owns top safe-area once. */
+  .app-root .mobile-header {
+    height: calc(50px + env(safe-area-inset-top))!important;
+    min-height: calc(50px + env(safe-area-inset-top))!important;
+    padding-top: env(safe-area-inset-top)!important;
+  }
+
+  .app-root .page-container {
+    padding-top: 16px!important;
+  }
+
+  /* Marketing header also owns top safe-area once. */
+  .marketing-header {
+    height: calc(54px + env(safe-area-inset-top))!important;
+    min-height: calc(54px + env(safe-area-inset-top))!important;
+    padding-top: env(safe-area-inset-top)!important;
+  }
+
+  .marketing-nav {
+    height: 54px!important;
+  }
+
+  .marketing-mobile-menu {
+    top: calc(54px + env(safe-area-inset-top))!important;
+  }
+}
