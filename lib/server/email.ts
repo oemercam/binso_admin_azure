@@ -1,43 +1,6 @@
-import { ApiError } from "./http";
-
-type SendEmailInput={
-  to:string|string[];
-  subject:string;
-  html:string;
-  text?:string;
-  replyTo?:string;
-  idempotencyKey?:string;
-};
-
-export function isEmailConfigured(){
-  return Boolean(process.env.RESEND_API_KEY&&process.env.BINSO_EMAIL_FROM);
-}
-
-export async function sendEmail(input:SendEmailInput){
-  const key=process.env.RESEND_API_KEY;
-  const from=process.env.BINSO_EMAIL_FROM;
-  if(!key||!from) throw new ApiError(503,"email_not_configured","E-Mail-Versand ist noch nicht konfiguriert.");
-  const response=await fetch("https://api.resend.com/emails",{
-    method:"POST",
-    headers:{
-      Authorization:"Bearer "+key,
-      "Content-Type":"application/json",
-      ...(input.idempotencyKey?{"Idempotency-Key":input.idempotencyKey.slice(0,256)}:{}),
-    },
-    body:JSON.stringify({
-      from,
-      to:Array.isArray(input.to)?input.to:[input.to],
-      subject:input.subject,
-      html:input.html,
-      ...(input.text?{text:input.text}:{}),
-      ...(input.replyTo?{reply_to:input.replyTo}:{}),
-    }),
-    cache:"no-store",
-  });
-  const payload=await response.json().catch(()=>({}));
-  if(!response.ok){
-    console.error("Resend request failed",response.status,typeof payload?.name==="string"?payload.name:"unknown");
-    throw new ApiError(502,"email_provider_error","E-Mail konnte nicht versendet werden.");
-  }
-  return payload as {id?:string};
-}
+import {ApiError} from "./http";
+type SendEmailInput={to:string|string[];subject:string;html:string;text?:string;replyTo?:string;idempotencyKey?:string};
+function graphConfigured(){return Boolean(process.env.GRAPH_TENANT_ID&&process.env.GRAPH_CLIENT_ID&&process.env.GRAPH_CLIENT_SECRET&&process.env.GRAPH_SENDER_USER_ID);}
+export function isEmailConfigured(){return graphConfigured();}
+async function graphToken(){const tenant=process.env.GRAPH_TENANT_ID!;const body=new URLSearchParams({client_id:process.env.GRAPH_CLIENT_ID!,client_secret:process.env.GRAPH_CLIENT_SECRET!,scope:"https://graph.microsoft.com/.default",grant_type:"client_credentials"});const r=await fetch(`https://login.microsoftonline.com/${encodeURIComponent(tenant)}/oauth2/v2.0/token`,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body,cache:"no-store"});if(!r.ok)throw new ApiError(502,"email_provider_error","E-Mail konnte nicht versendet werden.");return (await r.json() as {access_token:string}).access_token;}
+export async function sendEmail(input:SendEmailInput){if(!graphConfigured())throw new ApiError(503,"email_not_configured","Microsoft Graph E-Mail ist noch nicht konfiguriert.");const token=await graphToken();const sender=process.env.GRAPH_SENDER_USER_ID!;const to=(Array.isArray(input.to)?input.to:[input.to]).map(address=>({emailAddress:{address}}));const message={subject:input.subject,body:{contentType:"HTML",content:input.html},toRecipients:to,...(input.replyTo?{replyTo:[{emailAddress:{address:input.replyTo}}]}:{})};const r=await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(sender)}/sendMail`,{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({message,saveToSentItems:true}),cache:"no-store"});if(!r.ok){console.error("Microsoft Graph sendMail failed",r.status);throw new ApiError(502,"email_provider_error","E-Mail konnte nicht versendet werden.");}return {id:input.idempotencyKey};}
