@@ -57,7 +57,7 @@ export default function Register() {
 
   return <main className="auth-page">
     <section className="auth-card">
-      <Logo/>
+      <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/">Abbrechen</Link></div>
       <h1>Konto erstellen</h1>
       <p>Nur das Nötigste. Weitere Angaben kannst du später ergänzen.</p>
       <form onSubmit={submit}>
@@ -73,8 +73,10 @@ export default function Register() {
         {error&&<p className="auth-error" role="alert">{error}</p>}
         <Button type="submit">{loading?"Account wird erstellt…":"Account erstellen"}</Button>
       </form>
-      <small className="auth-legal">Mit der Registrierung bestätigst du, dass du die rechtlichen Hinweise gelesen hast.</small>
-      <p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p>
+      <div className="auth-after-submit">
+        <p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> zur Kenntnis genommen zu haben.</p>
+        <p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p>
+      </div>
     </section>
   </main>;
 }
