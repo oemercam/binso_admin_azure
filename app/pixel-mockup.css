@@ -922,3 +922,12 @@ html[data-theme="dark"] .auth-page{
   .section-product-shot.mobile-shot{width:170px;height:350px}
   .section-product-shot.mobile-shot iframe{transform:scale(.42)}
 }
+
+
+.marketing-mobile-secondary{display:none}
+@media(max-width:760px){
+  .marketing-mobile-secondary{
+    display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--pixel-line)
+  }
+  .marketing-mobile-secondary a{font-size:9px;color:var(--pixel-muted);font-weight:650}
+}
