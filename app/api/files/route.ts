@@ -1,90 +1,12 @@
-import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, cleanText, json } from "@/lib/server/http";
-import { currentTenant, tenantInsert, tenantList } from "@/lib/server/database";
-import { deleteStorageObject, uploadStorageObject } from "@/lib/server/storage";
-
-const allowed:Record<string,{bucket:string;max:number;types:Set<string>}>={
-  company_logo:{bucket:"company-assets",max:5*1024*1024,types:new Set(["image/png","image/jpeg","image/webp"])},
-  expense_receipt:{bucket:"expense-receipts",max:10*1024*1024,types:new Set(["image/png","image/jpeg","image/webp","application/pdf"])},
-  support_attachment:{bucket:"support-files",max:10*1024*1024,types:new Set(["image/png","image/jpeg","image/webp","application/pdf","text/plain"])},
-};
-
-
-function matchesSignature(type:string,bytes:ArrayBuffer){
-  const data=new Uint8Array(bytes);
-  if(type==="image/png") return data.length>=8&&[0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a].every((value,index)=>data[index]===value);
-  if(type==="image/jpeg") return data.length>=3&&data[0]===0xff&&data[1]===0xd8&&data[2]===0xff;
-  if(type==="image/webp") return data.length>=12&&String.fromCharCode(...data.slice(0,4))==="RIFF"&&String.fromCharCode(...data.slice(8,12))==="WEBP";
-  if(type==="application/pdf") return data.length>=5&&String.fromCharCode(...data.slice(0,5))==="%PDF-";
-  if(type==="text/plain") return !data.slice(0,4096).some(value=>value===0);
-  return false;
-}
-
-async function validateEntity(purpose:string,entityId:string|null){
-  if(purpose==="company_logo") return true;
-  if(!entityId) return false;
-  if(purpose==="expense_receipt"){
-    const rows=await tenantList<{id:string}>("expenses","id","id=eq."+encodeURIComponent(entityId)+"&limit=1");
-    return Boolean(rows[0]);
-  }
-  if(purpose==="support_attachment"){
-    const rows=await tenantList<{id:string}>("support_tickets","id","id=eq."+encodeURIComponent(entityId)+"&limit=1");
-    return Boolean(rows[0]);
-  }
-  return false;
-}
-
-export async function GET(request:NextRequest){
-  try{
-    const purpose=cleanText(request.nextUrl.searchParams.get("purpose"),40);
-    const entityId=cleanText(request.nextUrl.searchParams.get("entityId"),120);
-    const filters=[purpose?"purpose=eq."+encodeURIComponent(purpose):"",entityId?"entity_id=eq."+encodeURIComponent(entityId):"","order=created_at.desc"].filter(Boolean).join("&");
-    const items=await tenantList<Record<string,unknown>>("files","id,purpose,entity_id,bucket,original_name,content_type,size_bytes,created_at",filters);
-    return json({items});
-  }catch(error){return apiError(error);}
-}
-
-export async function POST(request:NextRequest){
-  let cleanup:{bucket:string;path:string;token:string}|null=null;
-  try{
-    assertSameOrigin(request);
-    const length=Number(request.headers.get("content-length")??"0");
-    if(length&&length>11*1024*1024) return json({error:"request_too_large",message:"Upload ist zu gross."},413);
-    const tenant=await currentTenant();
-    const form=await request.formData();
-    const file=form.get("file");
-    const purpose=cleanText(form.get("purpose"),40);
-    const entityId=cleanText(form.get("entityId"),120)||null;
-    if(!(file instanceof File)) return json({error:"file_required",message:"Bitte Datei auswählen."},400);
-    const config=allowed[purpose];
-    if(!config) return json({error:"purpose_invalid",message:"Ungültiger Dateityp."},400);
-    if(file.size<=0||file.size>config.max) return json({error:"file_size_invalid",message:"Datei ist zu gross oder leer."},400);
-    if(!config.types.has(file.type)) return json({error:"file_type_invalid",message:"Dateiformat wird nicht unterstützt."},400);
-    if(!(await validateEntity(purpose,entityId))) return json({error:"entity_invalid",message:"Datei kann diesem Datensatz nicht zugeordnet werden."},400);
-
-    const safeOriginal=file.name.replace(/[^\p{L}\p{N}._ -]/gu,"_").slice(0,180)||"datei";
-    const extension=safeOriginal.includes(".")?"."+safeOriginal.split(".").pop()!.toLowerCase():"";
-    const objectId=crypto.randomUUID();
-    const path=tenant.tenantId+"/"+purpose+"/"+(entityId??"general")+"/"+objectId+extension;
-    const bytes=await file.arrayBuffer();
-    if(!matchesSignature(file.type,bytes)) return json({error:"file_signature_invalid",message:"Dateiinhalt passt nicht zum Dateiformat."},400);
-    await uploadStorageObject(config.bucket,path,tenant.token,bytes,file.type);
-    cleanup={bucket:config.bucket,path,token:tenant.token};
-
-    const rows=await tenantInsert("files",{
-      purpose,
-      entity_id:entityId,
-      bucket:config.bucket,
-      storage_path:path,
-      original_name:safeOriginal,
-      content_type:file.type,
-      size_bytes:file.size,
-      created_by:tenant.user.id,
-    });
-    cleanup=null;
-    return json({item:rows[0]},201);
-  }catch(error){
-    if(cleanup) await deleteStorageObject(cleanup.bucket,cleanup.path,cleanup.token).catch(()=>false);
-    return apiError(error);
-  }
-}
+import {createHash,randomUUID} from "node:crypto";
+import {limitsConfig,megabytes} from "@/config/limits";
+import {NextRequest} from "next/server";
+import {requireSession} from "@/lib/server/session";
+import {authorize} from "@/lib/server/rbac";
+import {putBlob} from "@/lib/server/storage";
+import {withTenant} from "@/lib/server/db";
+import {apiError,assertSameOrigin,json} from "@/lib/server/http";
+export const runtime="nodejs";
+const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
+export async function GET(){try{const s=await requireSession();authorize(s,"documents:read");const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select id,purpose,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",blob_url as "storagePath",scan_status as "scanStatus",created_at as "createdAt" from file_objects where organization_id=$1 order by created_at desc limit 500`,[s.organizationId])).rows);return json({items})}catch(e){return apiError(e)}}
+export async function POST(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();authorize(s,"documents:write");const form=await request.formData();const file=form.get("file");const purpose=String(form.get("purpose")||"document").slice(0,80);if(!(file instanceof File))return json({error:"Datei fehlt."},400);if(file.size>limitsConfig.maxFileUploadBytes)return json({error:`Datei ist grösser als ${megabytes(limitsConfig.maxFileUploadBytes)} MB.`},413);if(!allowed.has(file.type))return json({error:"Dateityp ist nicht erlaubt."},400);const id=randomUUID();const ext=(file.name.split(".").pop()||"bin").replace(/[^a-zA-Z0-9]/g,"").slice(0,8);const objectKey=`${s.organizationId}/files/${id}.${ext}`;const buffer=Buffer.from(await file.arrayBuffer());const url=await putBlob({path:objectKey,contentType:file.type,body:buffer});if(!url)return json({error:"Azure Blob Storage ist nicht konfiguriert."},503);const sha256=createHash("sha256").update(buffer).digest("hex");const item=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose) values($1,$2,$3,$4,$5,$6,$7,'clean',$8,$9,$10) returning id,purpose,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",blob_url as "storagePath",scan_status as "scanStatus",created_at as "createdAt"`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,url,purpose])).rows[0]);return json({item},201)}catch(e){return apiError(e,request)}}
