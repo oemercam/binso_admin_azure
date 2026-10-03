@@ -351,6 +351,16 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
 }
 
 function DocumentModal({ title, onClose, children }: { title:string; onClose:()=>void; children:React.ReactNode }) {
+  useEffect(()=>{
+    const previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.body.style.overflow=previous};
+  },[]);
+  useEffect(()=>{
+    const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};
+    window.addEventListener("keydown",close);
+    return()=>window.removeEventListener("keydown",close);
+  },[onClose]);
   const share=async()=>{
     const url=window.location.href;
     if(navigator.share){
