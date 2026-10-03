@@ -1,16 +1,18 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList } from "@/lib/server/database";
+import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
 
 type ExpenseBody={employeeId?:unknown;employeeName?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
 
 export async function GET(){
-  try{return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)","order=expense_date.desc")});}
+  try{
+    await requireTenantFeature("expenses");return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)","order=expense_date.desc")});}
   catch(error){return apiError(error);}
 }
 
 export async function POST(request:NextRequest){
   try{
+    await requireTenantFeature("expenses");
     assertSameOrigin(request);
     const body=await readJson<ExpenseBody>(request,16384);
     const merchant=cleanText(body.merchant,200);
