@@ -518,9 +518,19 @@
   .document-actions .button{width:100%;min-width:0;padding-inline:10px}
   .document-actions .button:last-child{grid-column:1/-1}
   .line-items,
-  .document-line-items{overflow-x:auto;border-left:0;border-right:0;border-radius:0}
+  .document-line-items{width:100%;overflow:visible;border-left:0;border-right:0;border-radius:0}
   .line-items>div,
-  .document-line-items>div{min-width:590px}
+  .document-line-items>div{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) 46px 68px 82px 28px;
+    gap:4px;
+    padding-inline:0;
+  }
+  .document-line-items input{min-width:0;width:100%;padding-inline:3px;font-size:14px}
+  .document-line-items b{min-width:0;text-align:right;font-size:11px;white-space:nowrap}
+  .document-line-items .line-head{font-size:9px}
+  .invoice-totals{width:min(100%,310px)}
   .desktop-document-preview,
   .invoice-tablet-preview{display:none}
   .document-modal-body{
