@@ -138,7 +138,7 @@ console.log(`Route/CSS integrity OK: ${routes.length} routes, ${seenAssets.size}
 
 
 async function verifyDemoFlow(){
-  const origin=new URL(baseUrl).origin;
+  const origin=new URL(base).origin;
   const response=await fetch(origin+"/api/demo/session",{
     method:"POST",
     redirect:"manual",
@@ -166,3 +166,10 @@ async function verifyDemoFlow(){
   }
 }
 await verifyDemoFlow();
+
+if(failures.length){
+  console.error("Demo flow integrity check failed:");
+  for(const failure of failures) console.error("- "+failure);
+  process.exit(1);
+}
+console.log("Demo flow integrity OK.");
