@@ -40,7 +40,7 @@ export function TeamSettingsPage(){
     <section className="surface settings-form">
       <div className="form-grid two">
         <Field label="E-Mail"><input type="email" value={email} onChange={event=>setEmail(event.target.value)} placeholder="name@firma.ch"/></Field>
-        <Field label="Rolle"><select value={role} onChange={event=>setRole(event.target.value==="admin"?"admin":"member")}><option value="member">Benutzer</option><option value="admin">Administrator</option></select></Field>
+        <Field label="Rolle"><select value={role} onChange={event=>setRole(event.target.value==="admin"?"admin":"member")}><option value="member">Benutzer</option>{data.plan==="pro"&&<option value="admin">Administrator</option>}</select></Field>
       </div>
       <p>{occupied} von {data.userLimit} Plätzen belegt · Plan {data.plan}</p>
       <Button onClick={()=>void invite()} disabled={occupied>=data.userLimit}>Einladung senden</Button>
