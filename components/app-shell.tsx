@@ -184,12 +184,15 @@ export function AppShell({
 
   useEffect(()=>{
     if(!production) return;
-    void loadNotifications();
+    apiGet<{items:NotificationItem[]}>("/api/notifications")
+      .then(payload=>queueMicrotask(()=>setNotifications(payload.items)))
+      .catch(()=>undefined);
   },[production]);
 
-  useEffect(()=>{
-    if(sheet==="notifications"&&production) void loadNotifications();
-  },[sheet,production]);
+  function openNotifications(){
+    setSheet("notifications");
+    if(production) void loadNotifications();
+  }
 
   async function markNotificationRead(id:string){
     setNotifications(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
@@ -277,7 +280,7 @@ export function AppShell({
         <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
         <div className="desktop-appbar-actions">
           <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
-          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
+          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </div>
@@ -288,7 +291,7 @@ export function AppShell({
         </div>
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
-          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
+          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </header>
