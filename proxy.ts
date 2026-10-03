@@ -7,16 +7,13 @@ const protectedPrefixes=[
 ];
 
 export function proxy(request:NextRequest){
-  if(!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return NextResponse.next();
-
   const pathname=request.nextUrl.pathname;
   const isProtected=protectedPrefixes.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"));
   if(!isProtected) return NextResponse.next();
 
   const demo=request.cookies.get("binso_demo")?.value==="1";
-  const access=request.cookies.get("binso_access_token")?.value;
-  const refresh=request.cookies.get("binso_refresh_token")?.value;
-  if(demo||access||refresh) return NextResponse.next();
+  const session=request.cookies.get(process.env.SESSION_COOKIE_NAME||"binso_session")?.value;
+  if(demo||session) return NextResponse.next();
 
   const login=new URL("/login",request.url);
   login.searchParams.set("next",pathname);
