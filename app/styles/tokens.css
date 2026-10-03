@@ -26,7 +26,7 @@
   --page-x:38px;
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
-  --mobile-header-h:50px;
+  --mobile-header-h:48px;
   --mobile-nav-h:64px;
   --mobile-section-gap:20px;
   --touch:44px;
@@ -43,7 +43,7 @@
   --soft:var(--color-subtle);
 }
 
-@media (display-mode:standalone),(display-mode:fullscreen){
+@media (display-mode:standalone){
   :root{
     --safe-top:env(safe-area-inset-top,0px);
     --safe-bottom:env(safe-area-inset-bottom,0px);
