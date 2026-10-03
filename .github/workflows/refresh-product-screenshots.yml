@@ -4,6 +4,9 @@ on:
     branches: [feature/public-launch-i18n-social-20261003]
     paths-ignore:
       - "public/screenshots/**"
+concurrency:
+  group: product-screenshots-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
