@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
-import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -24,6 +24,30 @@ const searchItems = [
   { type: "Angebot", title: "AN-2026-012", meta: "Acme AG · CHF 7’264.32", href: "/angebote/AN-2026-012", icon: "file" },
   { type: "Ticket", title: "#5832 · Frage zur Rechnung", meta: "Offen", href: "/support/5832", icon: "support" },
 ];
+
+type NotificationItem={
+  id:string;
+  kind:string;
+  title:string;
+  body:string;
+  href?:string|null;
+  read_at?:string|null;
+  created_at:string;
+};
+
+function notificationIcon(kind:string){
+  if(kind==="support") return "support";
+  if(kind==="payment"||kind==="billing") return "wallet";
+  if(kind==="document") return "file";
+  if(kind==="announcement") return "bell";
+  return "bell";
+}
+
+function notificationTime(value:string){
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
+}
 
 export function AppShell({
   title,
@@ -54,6 +78,9 @@ export function AppShell({
   const [timerNow, setTimerNow] = useState(0);
   const [timerProjectLabel,setTimerProjectLabel]=useState("");
   const [accountInitials,setAccountInitials]=useState("TM");
+  const [notifications,setNotifications]=useState<NotificationItem[]>([]);
+  const [notificationsLoading,setNotificationsLoading]=useState(false);
+  const [notificationsError,setNotificationsError]=useState<string|null>(null);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -141,6 +168,49 @@ export function AppShell({
     return()=>window.clearTimeout(timer);
   },[production,query]);
 
+  async function loadNotifications(){
+    if(!production) return;
+    setNotificationsLoading(true);
+    setNotificationsError(null);
+    try{
+      const payload=await apiGet<{items:NotificationItem[]}>("/api/notifications");
+      setNotifications(payload.items);
+    }catch(error){
+      setNotificationsError(error instanceof Error?error.message:"Benachrichtigungen konnten nicht geladen werden.");
+    }finally{
+      setNotificationsLoading(false);
+    }
+  }
+
+  useEffect(()=>{
+    if(!production) return;
+    void loadNotifications();
+  },[production]);
+
+  useEffect(()=>{
+    if(sheet==="notifications"&&production) void loadNotifications();
+  },[sheet,production]);
+
+  async function markNotificationRead(id:string){
+    setNotifications(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
+    try{
+      await apiPatch("/api/notifications/"+encodeURIComponent(id),{});
+    }catch{
+      void loadNotifications();
+    }
+  }
+
+  async function markAllNotificationsRead(){
+    setNotifications(current=>current.map(item=>({...item,read_at:item.read_at??new Date().toISOString()})));
+    try{
+      await apiPatch("/api/notifications",{action:"read_all"});
+    }catch{
+      void loadNotifications();
+    }
+  }
+
+  const unreadNotifications=production?notifications.filter(item=>!item.read_at).length:1;
+
   const filtered = useMemo(() => {
     if(production){
       if(!query.trim()) return [];
@@ -207,7 +277,7 @@ export function AppShell({
         <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
         <div className="desktop-appbar-actions">
           <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
-          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{!production&&<i className="notification-badge">1</i>}</button>
+          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </div>
@@ -218,7 +288,7 @@ export function AppShell({
         </div>
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
-          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{!production&&<i className="notification-badge">1</i>}</button>
+          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </header>
@@ -321,7 +391,17 @@ export function AppShell({
           </div>}
 
           {sheet === "notifications" && <div className="notification-list">
-            {production ? <EmptyState icon="bell" title="Keine neuen Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/> : <>
+            {production ? <>
+              {notificationsLoading&&notifications.length===0&&<EmptyState icon="bell" title="Benachrichtigungen werden geladen" text="Aktuelle Aktivitäten werden abgerufen."/>}
+              {notificationsError&&<EmptyState icon="bell" title="Benachrichtigungen nicht verfügbar" text={notificationsError} action={<Button variant="secondary" onClick={()=>void loadNotifications()}>Erneut laden</Button>}/>}
+              {!notificationsLoading&&!notificationsError&&notifications.length===0&&<EmptyState icon="bell" title="Keine Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/>}
+              {!notificationsError&&notifications.slice(0,5).map(item=><Link href={item.href||"/benachrichtigungen"} key={item.id} onClick={()=>{void markNotificationRead(item.id);setSheet(null)}}>
+                <span className="activity-icon"><Icon name={notificationIcon(item.kind)}/></span>
+                <div><b>{item.title}</b><p>{item.body}</p><small>{notificationTime(item.created_at)}</small></div>
+                {!item.read_at&&<i className="unread-dot"/>}
+              </Link>)}
+              {unreadNotifications>0&&<button className="notification-mark-all" type="button" onClick={()=>void markAllNotificationsRead()}>Alle als gelesen markieren</button>}
+            </> : <>
               <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
               <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
               <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
