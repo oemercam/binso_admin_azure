@@ -5,6 +5,7 @@ import "./completion-v04.css";
 import "./completion-v06.css";
 import "./mockup-v10.css";
 import "./ux-v1.css";
+import "./pixel-mockup.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { siteConfig } from "@/lib/config";
 
