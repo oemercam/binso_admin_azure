@@ -9,7 +9,7 @@ const fields=`id,name,legal_name,legal_form,uid,vat_number,street,building_numbe
 
 export async function GET(){
  try{
-  const s=await requireSession();authorize(s,"settings:read");
+  const s=await requireSession();authorize(s,"organization:read");
   const item=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select ${fields} from organizations where id=$1`,[s.organizationId])).rows[0]);
   return json({item});
  }catch(error){return apiError(error);}
@@ -17,7 +17,7 @@ export async function GET(){
 
 export async function PATCH(request:NextRequest){
  try{
-  assertSameOrigin(request);const s=await requireSession();authorize(s,"settings:write");
+  assertSameOrigin(request);const s=await requireSession();authorize(s,"organization:write");
   const b=await readJson<CompanyBody>(request,32768);
   const name=cleanText(b.name,160);const vatRate=Number(b.vatRate);const terms=Number(b.paymentTermsDays);
   if(!name)return json({error:"name_required",message:"Firmenname ist erforderlich."},400);
