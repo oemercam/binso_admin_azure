@@ -3,6 +3,7 @@ import "./binso-ui.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import { siteConfig } from "@/lib/config";
+import { I18nProvider } from "@/lib/i18n/provider";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
 
@@ -60,7 +61,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de-CH" suppressHydrationWarning data-scroll-behavior="smooth">
       <body>
-        {children}
+        <I18nProvider>{children}</I18nProvider>
         <PwaRegister />
         <WebVitalsReporter />
       </body>
