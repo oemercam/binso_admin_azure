@@ -145,9 +145,9 @@ export type TenantFeature="core"|"employees"|"expenses"|"time_tracking"|"advance
 
 export async function requireTenantFeature(feature:TenantFeature){
   const tenant=await currentTenant();
-  const rows=await requestDb<Array<{allowed:boolean}>>(
+  const allowed=await requestDb<boolean>(
     "rpc/tenant_has_feature","POST",tenant.token,{target:tenant.tenantId,feature}
   );
-  if(rows as unknown as boolean) return tenant;
+  if(allowed) return tenant;
   throw new ApiError(403,"feature_not_available","Diese Funktion ist in deinem aktuellen Abonnement nicht verfügbar.");
 }
