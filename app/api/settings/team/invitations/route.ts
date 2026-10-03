@@ -10,7 +10,7 @@ export async function GET(){
     const tenant=await currentTenant();
     if(!["owner","admin"].includes(tenant.role)) return json({error:"forbidden",message:"Keine Berechtigung."},403);
     const [members,invitations,accounts]=await Promise.all([
-      tenantList<Record<string,unknown>>("tenant_memberships","user_id,role,created_at,profile:profiles(display_name)","order=created_at.asc"),
+      tenantList<Record<string,unknown>>("tenant_memberships","user_id,role,created_at","order=created_at.asc"),
       tenantList<Record<string,unknown>>("tenant_invitations","id,email,role,status,expires_at,created_at","order=created_at.desc"),
       tenantList<{user_limit:number;plan:string}>("tenant_accounts","user_limit,plan","limit=1"),
     ]);
