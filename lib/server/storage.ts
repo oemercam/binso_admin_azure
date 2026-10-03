@@ -1,51 +1,38 @@
-import { ApiError } from "./http";
-import { getBackendEnv } from "./env";
+import "server-only";
+import {env} from "@/lib/server/env";
 
-function storageHeaders(token:string,contentType?:string){
-  const {supabaseAnonKey}=getBackendEnv();
-  return {
-    apikey:supabaseAnonKey,
-    Authorization:"Bearer "+token,
-    ...(contentType?{"Content-Type":contentType}:{}),
-  };
+function hasSas(){return Boolean(env.azureStorageAccount&&env.azureStorageSas)}
+function hasManagedIdentity(){return Boolean(env.azureStorageAccount&&process.env.IDENTITY_ENDPOINT&&process.env.IDENTITY_HEADER)}
+function configured(){return hasSas()||hasManagedIdentity()}
+function cleanSas(){return (env.azureStorageSas||"").replace(/^\?/,"")}
+let cachedToken:{value:string;expiresAt:number}|null=null;
+async function managedIdentityToken(){
+ if(!hasManagedIdentity())return null;
+ if(cachedToken&&cachedToken.expiresAt>Date.now()+60_000)return cachedToken.value;
+ const endpoint=process.env.IDENTITY_ENDPOINT!;const header=process.env.IDENTITY_HEADER!;
+ const url=new URL(endpoint);url.searchParams.set("resource","https://storage.azure.com/");url.searchParams.set("api-version","2019-08-01");
+ const r=await fetch(url,{headers:{"X-IDENTITY-HEADER":header},cache:"no-store"});if(!r.ok)throw new Error("Managed Identity Token für Storage konnte nicht bezogen werden.");
+ const data=await r.json() as {access_token:string;expires_on?:string};const expires=Number(data.expires_on||0)*1000||Date.now()+45*60_000;cachedToken={value:data.access_token,expiresAt:expires};return data.access_token;
+}
+async function storageAuth():Promise<Record<string,string>>{
+ const token=await managedIdentityToken();
+ return token?{authorization:`Bearer ${token}`,"x-ms-version":"2023-11-03"}:{"x-ms-version":"2023-11-03"};
+}
+function blobUrl(path:string){const safePath=path.split("/").map(encodeURIComponent).join("/");return `https://${env.azureStorageAccount}.blob.core.windows.net/${env.azureStorageContainer}/${safePath}`}
+export async function putBlob(input:{path:string;contentType:string;body:Buffer}){
+ if(!configured())return null;const base=blobUrl(input.path);const url=hasSas()?`${base}?${cleanSas()}`:base;const auth=await storageAuth();
+ const r=await fetch(url,{method:"PUT",headers:{...auth,"x-ms-blob-type":"BlockBlob","content-type":input.contentType,"content-length":String(input.body.length)},body:new Uint8Array(input.body)});if(!r.ok)throw new Error("Datei konnte nicht gespeichert werden.");return base;
+}
+export function dataUrlToBuffer(dataUrl:string){const match=dataUrl.match(/^data:([^;]+);base64,(.+)$/);if(!match)throw new Error("Ungültige Datei.");return {mimeType:match[1],buffer:Buffer.from(match[2],"base64")}}
+export async function getBlobByUrl(url:string){
+ if(!configured())throw new Error("Azure Blob Storage ist nicht konfiguriert.");const expected=`https://${env.azureStorageAccount}.blob.core.windows.net/${env.azureStorageContainer}/`;if(!url.startsWith(expected))throw new Error("Ungültiger Speicherpfad.");const target=hasSas()?`${url}?${cleanSas()}`:url;const auth=await storageAuth();const r=await fetch(target,{headers:auth,cache:"no-store"});if(!r.ok)throw new Error("Datei konnte nicht gelesen werden.");return {contentType:r.headers.get("content-type")||"application/octet-stream",body:await r.arrayBuffer()};
 }
 
-export async function uploadStorageObject(bucket:string,path:string,token:string,bytes:ArrayBuffer,contentType:string){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"POST",
-    headers:{...storageHeaders(token,contentType),"x-upsert":"false"},
-    body:bytes,
-    cache:"no-store",
-  });
-  if(!response.ok){
-    const payload=await response.json().catch(()=>({}));
-    console.error("Storage upload failed",response.status,typeof payload?.statusCode==="string"?payload.statusCode:"unknown");
-    throw new ApiError(400,"storage_upload_failed","Datei konnte nicht gespeichert werden.");
-  }
-}
-
-export async function deleteStorageObject(bucket:string,path:string,token:string){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"DELETE",
-    headers:storageHeaders(token),
-    cache:"no-store",
-  });
-  return response.ok;
-}
-
-export async function signStorageObject(bucket:string,path:string,token:string,expiresIn=300){
-  const {supabaseUrl}=getBackendEnv();
-  const response=await fetch(supabaseUrl+"/storage/v1/object/sign/"+encodeURIComponent(bucket)+"/"+path.split("/").map(encodeURIComponent).join("/"),{
-    method:"POST",
-    headers:{...storageHeaders(token),"Content-Type":"application/json"},
-    body:JSON.stringify({expiresIn}),
-    cache:"no-store",
-  });
-  if(!response.ok) throw new ApiError(400,"storage_sign_failed","Datei konnte nicht geöffnet werden.");
-  const payload=await response.json() as {signedURL?:string;signedUrl?:string};
-  const relative=payload.signedURL??payload.signedUrl;
-  if(!relative) throw new ApiError(500,"storage_sign_failed","Datei konnte nicht geöffnet werden.");
-  return relative.startsWith("http")?relative:supabaseUrl+"/storage/v1"+relative;
+export async function deleteBlobByUrl(url:string){
+ if(!configured())throw new Error("Azure Blob Storage ist nicht konfiguriert.");
+ const expected=`https://${env.azureStorageAccount}.blob.core.windows.net/${env.azureStorageContainer}/`;
+ if(!url.startsWith(expected))throw new Error("Ungültiger Speicherpfad.");
+ const target=hasSas()?`${url}?${cleanSas()}`:url;const auth=await storageAuth();
+ const r=await fetch(target,{method:"DELETE",headers:auth,cache:"no-store"});
+ if(!r.ok&&r.status!==404)throw new Error("Datei konnte nicht gelöscht werden.");
 }
