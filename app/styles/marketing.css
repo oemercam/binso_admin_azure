@@ -640,9 +640,6 @@
 .hero-product-desktop,.hero-product-mobile,.section-product-shot{
   transition:transform var(--motion-slow) var(--motion-ease),box-shadow var(--motion-slow) var(--motion-ease);
 }
-@media (hover:hover) and (pointer:fine){
-  .hero-product-desktop:hover,.section-product-shot:hover{transform:translateY(-4px)}
-}
 .menu-morph{
   position:relative;
   width:22px;
@@ -671,7 +668,4 @@
 @keyframes marketing-menu-enter{
   from{opacity:0;transform:translateY(-8px)}
   to{opacity:1;transform:translateY(0)}
-}
-@media (prefers-reduced-motion:reduce){
-  .hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta,.marketing-mobile-menu{animation:none}
 }
