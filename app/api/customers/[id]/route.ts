@@ -17,9 +17,9 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
   });
   if(!item)return json({error:"Nicht gefunden."},404);
   return json({item});
- }catch(e){return apiError(e,request)}
+ }catch(e){return apiError(e)}
 }
 export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:string}>}){
  try{assertSameOrigin(request);const s=await requireSession();authorize(s,"customers:delete");const {id}=await params;const ok=await deleteCustomer(s.organizationId,s.userId,id);return ok?json({ok:true}):json({error:"Nicht gefunden."},404)}
- catch(e){return apiError(e,request)}
+ catch(e){return apiError(e)}
 }
