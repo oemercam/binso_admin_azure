@@ -2,11 +2,11 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    id: "/dashboard",
+    id: "/?pwa=binso-one",
     name: "Binso One",
     short_name: "Binso One",
     description: "Business-Plattform für Schweizer KMU",
-    start_url: "/dashboard",
+    start_url: "/dashboard?source=pwa",
     scope: "/",
     display: "standalone",
     orientation: "any",
@@ -20,6 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     icons: [
       { src: "/brand/icon-black.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/brand/icon-black.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" },
     ],
   };
 }
