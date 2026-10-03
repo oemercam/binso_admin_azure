@@ -120,10 +120,10 @@ for(const route of routes){
       failures.push(`${route}: stylesheet unexpectedly small (${css.length} bytes) ${assetUrl}`);
       continue;
     }
-    const requiredCssMarkers=["--font-sans",".marketing-header",".button"];
+    const requiredCssMarkers=["--font-sans",".marketing-header",".button",".hero",".app-root","@media"];
     const markerMatches=requiredCssMarkers.filter(marker=>css.includes(marker));
-    if(markerMatches.length===0){
-      failures.push(`${route}: stylesheet does not contain Binso UI markers ${assetUrl}`);
+    if(markerMatches.length<3){
+      failures.push(`${route}: stylesheet is missing Binso UI rules (found ${markerMatches.join(", ")||"none"}) ${assetUrl}`);
     }
   }
 }
