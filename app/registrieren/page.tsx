@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Button, Logo } from "@/components/ui";
-import { clearDemoClientSession } from "@/lib/client/backend";
+import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
 
 export default function Register() {
   const router=useRouter();
@@ -26,7 +26,19 @@ export default function Register() {
         body:JSON.stringify({companyName,email,password}),
       });
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
+      if(!response.ok){
+        if(response.status===503&&payload?.error==="backend_not_configured"){
+          await startDemoClientSession({
+            name:email.split("@")[0]||"Demo",
+            company:companyName,
+            focus:"overview",
+          });
+          router.push("/willkommen");
+          router.refresh();
+          return;
+        }
+        throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
+      }
       clearDemoClientSession();
       if(payload.requiresConfirmation){
         setConfirmation(true);

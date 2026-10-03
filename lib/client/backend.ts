@@ -31,6 +31,35 @@ export function clearDemoClientSession(){
   ].forEach(key=>window.localStorage.removeItem(key));
 }
 
+export async function startDemoClientSession({
+  name="Demo",
+  company="Demo Firma",
+  focus="overview",
+}:{
+  name?:string;
+  company?:string;
+  focus?:string;
+}={}){
+  if(typeof window==="undefined") throw new Error("Demo-Sitzung kann nur im Browser gestartet werden.");
+
+  const now=Date.now();
+  window.localStorage.setItem("binso.demo.session","1");
+  window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
+  window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
+  window.localStorage.setItem("binso.demo.focus",focus);
+  window.localStorage.setItem("binso.demo.startedAt",String(now));
+  window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
+
+  const response=await fetch("/api/demo/session",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+  });
+  if(!response.ok){
+    clearDemoClientSession();
+    throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
+  }
+}
+
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   const payload=await response.json().catch(()=>({}));
   if(!response.ok){
