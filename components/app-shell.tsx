@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Icon, IconButton, Logo } from "./ui";
+import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 const desktopNav = [
@@ -47,24 +47,26 @@ export function AppShell({
   const production=useBackendMode();
   const [query, setQuery] = useState("");
   const [remoteSearch,setRemoteSearch]=useState<typeof searchItems>([]);
-  const [timerRunning, setTimerRunning] = useState(true);
+  const [timerRunning, setTimerRunning] = useState(false);
   const [dark, setDark] = useState(false);
-  const [timerBaseSeconds, setTimerBaseSeconds] = useState(8067);
+  const [timerBaseSeconds, setTimerBaseSeconds] = useState(0);
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
   const [timerNow, setTimerNow] = useState(0);
+  const [timerProjectLabel,setTimerProjectLabel]=useState("");
   const [accountInitials,setAccountInitials]=useState("TM");
 
   useEffect(() => {
     queueMicrotask(() => {
-      const running=window.localStorage.getItem("binso.timer.running") !== "false";
-      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "8067");
+      const running=window.localStorage.getItem("binso.timer.running") === "true";
+      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
       let startedAt=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
       if(running && !startedAt){
         startedAt=Date.now();
         window.localStorage.setItem("binso.timer.startedAt",String(startedAt));
       }
       setTimerRunning(running);
-      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 8067);
+      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 0);
+      setTimerProjectLabel(window.localStorage.getItem("binso.timer.project") ?? "");
       setTimerStartedAt(running ? startedAt : null);
       setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
@@ -73,13 +75,14 @@ export function AppShell({
 
   useEffect(() => {
     const syncTimer=()=>{
-      const running=window.localStorage.getItem("binso.timer.running") !== "false";
+      const running=window.localStorage.getItem("binso.timer.running") === "true";
       const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
       const storedStarted=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
       setTimerRunning(running);
       setTimerBaseSeconds(Number.isFinite(storedBase)?storedBase:0);
       setTimerStartedAt(running&&storedStarted?storedStarted:null);
       setTimerNow(Date.now());
+      setTimerProjectLabel(window.localStorage.getItem("binso.timer.project") ?? "");
     };
     window.addEventListener("binso-timer-change",syncTimer);
     return()=>window.removeEventListener("binso-timer-change",syncTimer);
@@ -204,7 +207,7 @@ export function AppShell({
         <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
         <div className="desktop-appbar-actions">
           <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
-          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/><i className="notification-badge">1</i></button>
+          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{!production&&<i className="notification-badge">1</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </div>
@@ -215,7 +218,7 @@ export function AppShell({
         </div>
         <div className="mobile-header-actions">
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
-          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/><i className="notification-badge">1</i></button>
+          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={() => setSheet("notifications")}><Icon name="bell"/>{!production&&<i className="notification-badge">1</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </header>
@@ -233,7 +236,7 @@ export function AppShell({
       </main>
 
       {timerRunning && <div className="global-timer" role="status">
-        <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>Website Redesign · Acme AG</span></div></div>
+        <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>{timerProjectLabel || "Zeiterfassung"}</span></div></div>
         <b>{formattedTimer}</b>
         <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
@@ -318,9 +321,11 @@ export function AppShell({
           </div>}
 
           {sheet === "notifications" && <div className="notification-list">
-            <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
-            <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
-            <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
+            {production ? <EmptyState icon="bell" title="Keine neuen Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/> : <>
+              <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
+              <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
+              <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
+            </>}
             <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}>Alle Benachrichtigungen <Icon name="arrow" size={15}/></Link>
             <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Einstellungen <Icon name="arrow" size={15}/></Link>
           </div>}
