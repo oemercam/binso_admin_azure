@@ -72,6 +72,20 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
+    const syncTimer=()=>{
+      const running=window.localStorage.getItem("binso.timer.running") !== "false";
+      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
+      const storedStarted=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
+      setTimerRunning(running);
+      setTimerBaseSeconds(Number.isFinite(storedBase)?storedBase:0);
+      setTimerStartedAt(running&&storedStarted?storedStarted:null);
+      setTimerNow(Date.now());
+    };
+    window.addEventListener("binso-timer-change",syncTimer);
+    return()=>window.removeEventListener("binso-timer-change",syncTimer);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
 
