@@ -28,7 +28,10 @@
   --mobile-page-x:clamp(16px,4.55vw,20px);
   --mobile-header-h:48px;
   --mobile-nav-h:64px;
-  --mobile-section-gap:20px;
+  --mobile-page-top:14px;
+  --mobile-page-head-gap:16px;
+  --mobile-toolbar-gap:12px;
+  --mobile-section-gap:18px;
   --touch:44px;
 
   --safe-top:0px;
