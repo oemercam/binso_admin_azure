@@ -25,5 +25,5 @@ export async function POST(request:NextRequest){
     cancelUrl:`${env.appUrl}/checkout?plan=${plan}&billing=${billing}&cancelled=1`
   });
   return json({url:checkout.url});
- }catch(e){return apiError(e,request)}
+ }catch(e){return apiError(e)}
 }
