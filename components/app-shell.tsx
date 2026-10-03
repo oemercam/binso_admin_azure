@@ -85,6 +85,7 @@ export function AppShell({
   const [notifications,setNotifications]=useState<NotificationItem[]>([]);
   const [notificationsLoading,setNotificationsLoading]=useState(false);
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
+  const [navCompact,setNavCompact]=useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -174,6 +175,31 @@ export function AppShell({
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
   }, [pathname]);
+
+  useEffect(() => {
+    if(preview) return;
+    let lastY=window.scrollY;
+    let compact=false;
+    let ticking=false;
+    const update=()=>{
+      const currentY=Math.max(0,window.scrollY);
+      const delta=currentY-lastY;
+      if(currentY<24) compact=false;
+      else if(delta>7) compact=true;
+      else if(delta<-7) compact=false;
+      setNavCompact(value=>value===compact?value:compact);
+      lastY=currentY;
+      ticking=false;
+    };
+    const onScroll=()=>{
+      if(!ticking){
+        ticking=true;
+        window.requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[preview]);
 
 
   useEffect(() => {
@@ -355,7 +381,7 @@ export function AppShell({
         <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
       </div>}
 
-      {!preview && <nav className="bottom-nav" aria-label="Hauptnavigation">
+      {!preview && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
         <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
         <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
