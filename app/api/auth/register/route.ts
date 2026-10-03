@@ -17,7 +17,7 @@ export async function POST(request:NextRequest){
     await enforcePublicRateLimit(request,"auth.register",email);
     if(companyName.length<2) return json({error:"company_required",message:"Bitte Firmennamen eingeben."},400);
     if(!validEmail(email)) return json({error:"email_invalid",message:"Bitte gültige E-Mail-Adresse eingeben."},400);
-    if(password.length<8) return json({error:"password_too_short",message:"Das Passwort muss mindestens 8 Zeichen haben."},400);
+    if(password.length<12) return json({error:"password_too_short",message:"Das Passwort muss mindestens 12 Zeichen haben."},400);
     const result=await signUp(email,password,companyName);
     const response=json({ok:true,requiresConfirmation:!result.access_token,user:result.user ? {id:result.user.id,email:result.user.email}:null});
     if(result.access_token&&result.refresh_token&&result.expires_in&&result.user) setAuthCookies(response,result as TokenResponse);
