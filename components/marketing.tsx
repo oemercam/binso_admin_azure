@@ -29,7 +29,7 @@ export function MarketingHeader() {
           <Link href="/portal/login">Anmelden</Link>
           <Button href="/registrieren">30 Tage kostenlos testen</Button>
           <button className="marketing-menu-button" type="button" aria-label={open ? "Menü schliessen" : "Menü öffnen"} onClick={() => setOpen(!open)}>
-            <Icon name={open ? "close" : "menu"} size={23}/>
+            <span className={`menu-morph ${open ? "is-open" : ""}`} aria-hidden="true"><i/><i/><i/></span>
           </button>
         </div>
       </div>
