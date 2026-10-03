@@ -118,6 +118,12 @@ for(const route of routes){
     const css=await asset.text();
     if(css.length<100){
       failures.push(`${route}: stylesheet unexpectedly small (${css.length} bytes) ${assetUrl}`);
+      continue;
+    }
+    const requiredCssMarkers=["--font-sans",".marketing-header",".button"];
+    const markerMatches=requiredCssMarkers.filter(marker=>css.includes(marker));
+    if(markerMatches.length===0){
+      failures.push(`${route}: stylesheet does not contain Binso UI markers ${assetUrl}`);
     }
   }
 }
