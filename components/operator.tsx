@@ -522,7 +522,7 @@ function RestrictionsView() {
 
 function MonitoringView() {
   const production=useBackendMode();
-  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string}>;incidents?:Array<Record<string,unknown>>}>({});
+  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -550,18 +550,20 @@ function MonitoringView() {
   const operational=services.filter(service=>service.status==="operational").length;
   const configured=services.filter(service=>service.status==="configured").length;
   const missing=services.filter(service=>service.status==="not_connected"||service.status==="not_implemented").length;
-  const emailReady=services.some(service=>service.key==="email"&&service.status==="configured");
-  const label=(status:string)=>status==="operational"?"Operational":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht implementiert":"Nicht verbunden";
+  const emailReady=services.some(service=>service.key==="email"&&(service.status==="configured"||service.status==="operational"));
+  const label=(status:string)=>status==="operational"?"Operational":status==="degraded"?"Beeinträchtigt":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht implementiert":"Nicht verbunden";
+  const vitals=data.webVitals??{};
+  const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
 
   return <>
     <div className="operator-monitor-metrics">
-      <Metric label="Operational" value={String(operational)} hint="laufende Kernservices" icon="chart"/>
-      <Metric label="Konfiguriert" value={String(configured)} hint="externe Integrationen bereit" icon="check"/>
-      <Metric label="Offen" value={String(missing)} hint="nicht verbunden / nicht implementiert" icon="clock"/>
-      <Metric label="Aktive Ereignisse" value={String(incidents.filter(item=>String(item.status)!=="resolved").length)} hint="nicht gelöst" icon="support"/>
+      <Metric label="API" value={data.latencyMs?String(data.latencyMs.api)+" ms":"—"} hint="aktuelle Antwortzeit" icon="clock"/>
+      <Metric label="Datenbank" value={data.latencyMs?String(data.latencyMs.database)+" ms":"—"} hint="aktuelle Abfrage" icon="chart"/>
+      <Metric label="LCP p75" value={formatVital("LCP"," ms")} hint={String(vitals.LCP?.samples??0)+" Messungen / 7 Tage"} icon="chart"/>
+      <Metric label="INP p75" value={formatVital("INP"," ms")} hint={String(vitals.INP?.samples??0)+" Messungen / 7 Tage"} icon="clock"/>
     </div>
     <div className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>Konfiguration statt erfundener SLA-Werte</small></div>
+      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
       <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
     </div>
     <section className="surface incident-history">
