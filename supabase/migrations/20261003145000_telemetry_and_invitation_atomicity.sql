@@ -41,6 +41,8 @@ declare invitation_id uuid; member_count int; pending_count int; allowed_count i
 begin
   if not public.is_tenant_admin(p_tenant_id) or not public.tenant_account_allows_access(p_tenant_id) then raise exception 'not authorized'; end if;
   if p_email is null or length(trim(p_email))<3 then raise exception 'invalid email'; end if;
+  if p_role='owner' then raise exception 'owner role cannot be invited'; end if;
+  if p_role='admin' and not public.tenant_has_feature(p_tenant_id,'advanced_roles') then raise exception 'plan does not allow admin role'; end if;
 
   -- Serialize capacity decisions per tenant so concurrent invites cannot exceed the plan.
   select user_limit into allowed_count from public.tenant_accounts where tenant_id=p_tenant_id for update;
