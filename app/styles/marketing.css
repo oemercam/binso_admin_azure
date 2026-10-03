@@ -181,8 +181,7 @@
   border-top:1px solid var(--color-line);
 }
 .feature-list>div,
-.product-module-list>div,
-.security-points>div{
+.product-module-list>div{
   min-height:58px;
   padding:10px 0;
   display:grid;
@@ -191,6 +190,17 @@
   align-items:center;
   border-bottom:1px solid var(--color-line);
 }
+.security-points>div{
+  min-height:64px;
+  padding:10px 0;
+  display:grid;
+  grid-template-columns:36px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+  border-bottom:1px solid var(--color-line);
+}
+.security-points>div>svg{width:20px;height:20px;justify-self:center}
+.security-points>div>span{min-width:0}
 .feature-list>div>div{min-width:0}
 .feature-list b,
 .workflow-list b,
