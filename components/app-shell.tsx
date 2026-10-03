@@ -301,7 +301,7 @@ export function AppShell({
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
         </div>
       </div>
-      <header className="mobile-header">
+      <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
         <div className="mobile-header-leading">
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
           {backHref && <span className="mobile-header-title">{title}</span>}
