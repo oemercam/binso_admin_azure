@@ -1011,3 +1011,17 @@
 
 .quick-create-menu{display:grid}
 .notification-center-list{display:grid}
+
+.document-source-note{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+  padding:12px 14px;
+  border:1px solid var(--color-line);
+  border-radius:var(--radius-md);
+  font-size:12px;
+}
+.document-source-note span{color:var(--color-muted)}
+.document-source-note b{font-size:12px}
