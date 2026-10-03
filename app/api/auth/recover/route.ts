@@ -1,26 +1,22 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson, validEmail } from "@/lib/server/http";
-import { requestPasswordRecovery } from "@/lib/server/auth";
-import { getBackendEnv, isBackendConfigured } from "@/lib/server/env";
-import { enforcePublicRateLimit } from "@/lib/server/rate-limit";
-
-type Body={email?:unknown};
+import { enforceRateLimit } from "@/lib/server/rate-limit";
+import { query } from "@/lib/server/db";
+import { createAuthToken } from "@/lib/server/auth-tokens";
+import { sendMail, mailLayout } from "@/lib/server/email";
+import { env } from "@/lib/server/env";
 
 export async function POST(request:NextRequest){
-  try{
-    if(!isBackendConfigured()) return json({error:"backend_not_configured",message:"Backend ist noch nicht konfiguriert."},503);
-    assertSameOrigin(request);
-    const body=await readJson<Body>(request,8192);
-    const email=cleanText(body.email,320).toLowerCase();
-    await enforcePublicRateLimit(request,"auth.recover",email);
-    if(!validEmail(email)) return json({error:"email_invalid",message:"Bitte gültige E-Mail-Adresse eingeben."},400);
-    const {appUrl}=getBackendEnv();
-    await requestPasswordRecovery(email,appUrl+"/passwort-zuruecksetzen");
-    // Uniform response avoids revealing whether the account exists.
-    return json({ok:true,message:"Falls ein Konto existiert, wurde ein Link gesendet."});
-  }catch(error){
-    // Recovery endpoint intentionally returns the same public outcome for provider-side account lookup errors.
-    if(error instanceof Error && error.message==="Link konnte nicht gesendet werden.") return json({ok:true,message:"Falls ein Konto existiert, wurde ein Link gesendet."});
-    return apiError(error);
+ try{
+  assertSameOrigin(request);const body=await readJson<{email?:unknown}>(request,8192);const email=cleanText(body.email,320).toLowerCase();
+  await enforceRateLimit(request,"password-recovery",5,60*60_000);
+  if(!validEmail(email))return json({ok:true,message:"Falls ein Konto existiert, wurde ein Link gesendet."});
+  const user=(await query<{id:string}>(`select id from app_users where lower(email)=lower($1) and status='active' limit 1`,[email])).rows[0];
+  if(user){
+   const token=await createAuthToken({type:"password_reset",email,userId:user.id,ttlMinutes:60});
+   const url=`${env.appUrl}/passwort-zuruecksetzen?token=${encodeURIComponent(token)}`;
+   await sendMail({to:email,subject:"Passwort für Binso One zurücksetzen",text:`Passwort zurücksetzen: ${url}`,html:mailLayout("Passwort zurücksetzen","<p>Über den folgenden Link kannst du ein neues Passwort für dein Binso One Konto festlegen.</p>",{label:"Passwort zurücksetzen",url})}).catch(()=>undefined);
   }
+  return json({ok:true,message:"Falls ein Konto existiert, wurde ein Link gesendet."});
+ }catch(error){return apiError(error);}
 }
