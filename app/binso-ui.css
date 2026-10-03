@@ -1,6 +1,6 @@
 /* Binso One centralized UI cascade.
    Keep the order explicit so legacy styles can never override the approved mockup layer. */
-@layer base, completion, completion04, completion06, mockup, ux, pixel;
+@layer base, completion, completion04, completion06, mockup, ux, pixel, portal;
 
 @import "./globals.css" layer(base);
 @import "./completion.css" layer(completion);
@@ -9,3 +9,4 @@
 @import "./mockup-v10.css" layer(mockup);
 @import "./ux-v1.css" layer(ux);
 @import "./pixel-mockup.css" layer(pixel);
+@import "./portal-mockup.css" layer(portal);
