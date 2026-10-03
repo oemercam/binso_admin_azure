@@ -116,17 +116,17 @@ jobs:
 
           curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
           curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"configured":false'
-          curl -fsS -c /tmp/binso-demo.cookies -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
+          echo "Smoke: demo session create"\n          curl -fsS -c /tmp/binso-demo.cookies -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
           curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/demo/session | grep -q '"active":true'
           curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/auth/session | grep -q '"demo":true'
           curl -fsS -b /tmp/binso-demo.cookies -X DELETE -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"active":false'
-          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
+          echo "Smoke: protected APIs"\n          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/notifications)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/files)" = "403"
-          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
+          echo "Smoke: security headers"\n          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
           curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
           curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
           curl -fsS http://127.0.0.1:3000/manifest.webmanifest | grep -q "Binso One"
