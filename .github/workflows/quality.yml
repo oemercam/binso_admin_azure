@@ -23,6 +23,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm css:check
       - run: pnpm typecheck
       - run: pnpm build
       - name: Runtime smoke test

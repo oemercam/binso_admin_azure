@@ -1,14 +1,10 @@
-/* Binso One centralized UI cascade.
-   Keep the order explicit so legacy styles can never override the approved mockup layer. */
-@layer base, completion, completion04, completion06, mockup, ux, pixel, portal, audit, mobile;
+/* Binso One CSS architecture.
+   One source of truth: tokens -> base -> marketing -> app -> operator -> responsive. */
+@layer tokens, base, marketing, app, operator, responsive;
 
-@import "./globals.css" layer(base);
-@import "./completion.css" layer(completion);
-@import "./completion-v04.css" layer(completion04);
-@import "./completion-v06.css" layer(completion06);
-@import "./mockup-v10.css" layer(mockup);
-@import "./ux-v1.css" layer(ux);
-@import "./pixel-mockup.css" layer(pixel);
-@import "./portal-mockup.css" layer(portal);
-@import "./mockup-audit-v4.css" layer(audit);
-@import "./mobile-precision.css" layer(mobile);
+@import "./styles/tokens.css" layer(tokens);
+@import "./styles/base.css" layer(base);
+@import "./styles/marketing.css" layer(marketing);
+@import "./styles/app.css" layer(app);
+@import "./styles/operator.css" layer(operator);
+@import "./styles/responsive.css" layer(responsive);
