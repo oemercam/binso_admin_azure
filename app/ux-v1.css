@@ -639,3 +639,9 @@ html[data-theme="dark"] .settings-list>a:hover{background:#050505}
   .onboarding-footer{display:block}
   .onboarding-footer .button{width:100%;margin-top:10px;justify-content:center}
 }
+
+
+.records-count{margin-left:auto;color:var(--muted);font-size:9px;white-space:nowrap}
+@media(max-width:760px){
+  .records-count{grid-column:1/2;grid-row:auto;margin-left:0;align-self:center}
+}
