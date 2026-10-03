@@ -21,8 +21,8 @@ export async function POST(request:NextRequest){
   if(!org.rows[0])return json({error:"Organisation nicht gefunden."},404);
   const checkout=await createCheckoutSession({
     priceId,customerEmail:s.email,organizationId:s.organizationId,
-    successUrl:`${env.appUrl}/onboarding?billing=success`,
-    cancelUrl:`${env.appUrl}/checkout?plan=${plan}&billing=${billing}&cancelled=1`
+    successUrl:`${env.appUrl}/einstellungen/abonnement?billing=success`,
+    cancelUrl:`${env.appUrl}/einstellungen/abonnement?plan=${plan}&billing=${billing}&cancelled=1`
   });
   return json({url:checkout.url});
  }catch(e){return apiError(e)}
