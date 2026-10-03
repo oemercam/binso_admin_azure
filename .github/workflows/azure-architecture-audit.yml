@@ -46,7 +46,7 @@ jobs:
           DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
           if [ -n "$DATABASE_URL" ]; then
             echo "::add-mask::$DATABASE_URL"
-            PGCONNECT_TIMEOUT=10 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
           else
             echo "DATABASE_URL is not configured."
           fi
