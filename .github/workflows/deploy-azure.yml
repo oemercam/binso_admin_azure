@@ -44,6 +44,24 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
 
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply production database migrations
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL is required so application code and the production database cannot drift."
+            exit 1
+          fi
+          supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
+          supabase db push --db-url "$SUPABASE_DB_URL"
+
       - name: Prepare standalone deploy artifact
         shell: bash
         run: |
