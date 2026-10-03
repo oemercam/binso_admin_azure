@@ -4,7 +4,8 @@ import {createHash,randomBytes} from "node:crypto";
 import {ApiError} from "./http";
 import {query,withPrivileged} from "./db";
 import {hashPassword,verifyPassword} from "./password";
-import {sendEmail} from "./email";\nimport {getBackendEnv} from "./env";
+import {sendEmail} from "./email";
+import {getBackendEnv} from "./env";
 
 const accessCookie="binso_access_token",refreshCookie="binso_refresh_token";
 type AppUser={id:string;email?:string;user_metadata?:Record<string,unknown>};
