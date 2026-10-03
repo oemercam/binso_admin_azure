@@ -1,10 +1,16 @@
-const CACHE = "binso-one-static-v3";
-const PUBLIC_SHELL = ["/", "/login", "/offline", "/manifest.webmanifest", "/brand/logo-black.svg", "/brand/icon-black.svg"];
+const CACHE = "binso-one-shell-v4";
+const OFFLINE_URL = "/offline";
+const SHELL_ASSETS = [
+  OFFLINE_URL,
+  "/manifest.webmanifest",
+  "/brand/logo-black.svg",
+  "/brand/icon-black.svg",
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE)
-      .then(cache => cache.addAll(PUBLIC_SHELL))
+      .then(cache => cache.addAll(SHELL_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
@@ -24,29 +30,21 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navigations should always prefer the network so new deploys are visible immediately.
+  // Never proxy or cache Next.js build assets. They are content-hashed and
+  // must always be resolved by the browser/HTTP cache for the active build.
+  if (url.pathname.startsWith("/_next/")) return;
+
+  // App/document navigations are always network-first; only use the offline
+  // document when the network is genuinely unavailable.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request, { cache: "no-store" })
-        .catch(() => caches.match("/offline"))
+        .catch(() => caches.match(OFFLINE_URL))
     );
     return;
   }
 
-  // During active UX testing, always prefer fresh Next.js assets.
-  if (url.pathname.startsWith("/_next/static/")) {
-    event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
-    return;
-  }
-
+  // Small stable public shell assets may use network-first caching.
   if (url.pathname.startsWith("/brand/") || url.pathname === "/manifest.webmanifest") {
     event.respondWith(
       fetch(request, { cache: "no-store" })
