@@ -1,0 +1,17 @@
+{
+  "id": "/operator?pwa=one-admin",
+  "name": "One Admin",
+  "short_name": "One Admin",
+  "description": "Interne Betriebs- und Verwaltungsoberfläche für Binso One.",
+  "start_url": "/operator?source=pwa",
+  "scope": "/operator",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "de-CH",
+  "icons": [
+    {"src":"/brand/icon-black.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"/brand/icon-black.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+  ]
+}
