@@ -139,7 +139,7 @@ export function AppShell({
     const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.sessionStorage.setItem("binso.launch.seen","1");
     if(reduceMotion) return;
-    setShowLaunch(true);
+    queueMicrotask(()=>setShowLaunch(true));
     const timer=window.setTimeout(()=>setShowLaunch(false),900);
     return()=>window.clearTimeout(timer);
   },[preview]);
