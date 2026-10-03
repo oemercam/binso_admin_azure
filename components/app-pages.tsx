@@ -313,10 +313,10 @@ export function CustomerForm() {
   </AppShell>;
 }
 
-function useDocumentRows(kind:"offer"|"invoice",defaults:string[][]){
+function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=false){
   const [rows,setRows]=useState(defaults);
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
+    if(forceDemo||!isProductionBackendEnabled()) return;
     apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
       .then(payload=>{
         const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
@@ -329,19 +329,19 @@ function useDocumentRows(kind:"offer"|"invoice",defaults:string[][]){
         queueMicrotask(()=>setRows(mapped));
       })
       .catch(()=>undefined);
-  },[kind,defaults]);
+  },[kind,defaults,forceDemo]);
   return rows;
 }
 
-export function OffersPage() {
-  const offerRows=useDocumentRows("offer",offers);
+export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}) {
+  const offerRows=useDocumentRows("offer",offers,forceDemo);
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
     <RecordsView items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
-export function InvoicesPage() {
-  const invoiceRows=useDocumentRows("invoice",invoices);
+export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
+  const invoiceRows=useDocumentRows("invoice",invoices,forceDemo);
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
@@ -691,8 +691,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   </AppShell>;
 }
 
-export function TimePage() {
-  const production=useBackendMode();
+export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
+  const production=useBackendMode()&&!forceDemo;
   const [timeTab,setTimeTab]=useState<"timer"|"entries">("timer");
   const [running,setRunning]=useState(false);
   const [seconds,setSeconds]=useState(0);
