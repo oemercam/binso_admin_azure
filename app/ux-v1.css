@@ -666,3 +666,10 @@ html[data-theme="dark"] .status-warning,
 html[data-theme="dark"] .status-danger,
 html[data-theme="dark"] .status-info,
 html[data-theme="dark"] .status-neutral{color:#fff!important;border-color:#333!important}
+
+
+/* Mobile forms provide their own sticky action bar; avoid duplicate floating actions. */
+@media(max-width:760px){
+  .page-container:has(.mobile-sticky-save) .page-actions,
+  .page-container:has(.mobile-document-bar) .page-actions{display:none}
+}
