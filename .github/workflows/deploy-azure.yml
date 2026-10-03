@@ -1,51 +1,94 @@
 name: Deploy Azure App Service
+
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
 concurrency:
   group: production-deploy
   cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
+
+env:
+  AZURE_WEBAPP_NAME: binso-admin-prod
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
+
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
-          package: .
-      - name: Verify production health
+
+      - name: Resolve Azure App Service hostname
+        id: azure_app
         shell: bash
         run: |
           set -euo pipefail
-          HEALTH_URL="https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/health"
-          for attempt in {1..24}; do
+          HOSTNAME="$(az webapp show --name "$AZURE_WEBAPP_NAME" --query defaultHostName -o tsv)"
+          if [ -z "$HOSTNAME" ]; then
+            echo "Azure App Service hostname konnte nicht ermittelt werden."
+            exit 1
+          fi
+          echo "hostname=$HOSTNAME" >> "$GITHUB_OUTPUT"
+          echo "Azure App Service: $AZURE_WEBAPP_NAME"
+          echo "Hostname: $HOSTNAME"
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: .
+
+      - name: Verify production health
+        shell: bash
+        env:
+          PROD_HOSTNAME: ${{ steps.azure_app.outputs.hostname }}
+        run: |
+          set -euo pipefail
+          HEALTH_URL="https://$PROD_HOSTNAME/api/health"
+
+          for attempt in {1..36}; do
             if curl -fsS "$HEALTH_URL" | grep -q '"status":"ok"'; then
               echo "Binso One production health check passed."
-              exit 0
+              break
             fi
+
+            if [ "$attempt" -eq 36 ]; then
+              echo "Production health check failed: $HEALTH_URL"
+              exit 1
+            fi
+
             sleep 5
           done
-          echo "Production health check failed: $HEALTH_URL"
-          exit 1
+
+          for route in / /portal /demo /dashboard; do
+            echo "Live smoke: https://$PROD_HOSTNAME$route"
+            curl -fsS "https://$PROD_HOSTNAME$route" > /dev/null
+          done
+
+          echo "Production URL: https://$PROD_HOSTNAME"
