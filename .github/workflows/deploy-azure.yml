@@ -200,8 +200,26 @@ jobs:
           done
 
           HEALTH_URL="$PRODUCTION_URL/api/health"
-          curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
-          echo "Binso One production health check passed."
+          HEALTH_READY=0
+          for attempt in {1..30}; do
+            if curl -fsS --max-time 20 -H 'Cache-Control: no-cache' "$HEALTH_URL?probe=$attempt" | grep -q '"status":"ok"'; then
+              HEALTH_READY=$((HEALTH_READY+1))
+              echo "Production health check passed ($HEALTH_READY/3)."
+              if [ "$HEALTH_READY" -ge 3 ]; then
+                break
+              fi
+            else
+              HEALTH_READY=0
+              echo "Waiting for production health readiness ($attempt/30)..."
+            fi
+
+            if [ "$attempt" -eq 30 ]; then
+              echo "::error::Production health endpoint did not become ready."
+              exit 1
+            fi
+
+            sleep 3
+          done
 
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
