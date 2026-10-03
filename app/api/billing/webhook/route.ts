@@ -17,6 +17,7 @@ export async function POST(request:NextRequest){
   const body=await request.text();
   if(body.length>262144)throw new ApiError(413,"request_too_large","Webhook ist zu gross.");
   const signature=request.headers.get("stripe-signature")??"";
+  if(!signature)throw new ApiError(400,"invalid_signature","Ungültige Stripe-Signatur.");
   if(!verifyStripeSignature(body,signature))throw new ApiError(400,"invalid_signature","Ungültige Stripe-Signatur.");
   const event=JSON.parse(body) as {id?:string;type?:string;data?:{object?:unknown}};
   const object=objectValue(event.data?.object);const type=str(event.type);const eventId=str(event.id);
