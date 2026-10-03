@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
 import { LanguageSwitcher } from "./language-switcher";
@@ -105,10 +106,10 @@ export function ProductPreview() {
   const {messages:m}=useI18n();
   return <div className="hero-product-preview" aria-label={m.marketing.productPreview}>
     <div className="hero-product-desktop" aria-hidden="true">
-      <iframe src="/preview/dashboard" title="Binso One Desktop Vorschau" tabIndex={-1}/>
+      <Image src="/screenshots/dashboard-desktop.png" alt="Binso One Dashboard auf Desktop" width={1440} height={900} priority/>
     </div>
     <div className="hero-product-mobile" aria-hidden="true">
-      <iframe src="/preview/dashboard" title="Binso One Mobile Vorschau" tabIndex={-1}/>
+      <Image src="/screenshots/zeit-mobile.png" alt="Binso One auf Mobile" width={390} height={844} priority/>
     </div>
   </div>;
 }
