@@ -1,8 +1,10 @@
-const CACHE = "binso-one-shell-v4";
+const CACHE = "binso-one-shell-v5";
 const OFFLINE_URL = "/offline";
 const SHELL_ASSETS = [
   OFFLINE_URL,
   "/manifest.webmanifest",
+  "/manifest-admin.webmanifest",
+  "/manifest-portal.webmanifest",
   "/brand/logo-black.svg",
   "/brand/icon-black.svg",
 ];
@@ -45,7 +47,7 @@ self.addEventListener("fetch", event => {
   }
 
   // Small stable public shell assets may use network-first caching.
-  if (url.pathname.startsWith("/brand/") || url.pathname === "/manifest.webmanifest") {
+  if (url.pathname.startsWith("/brand/") || ["/manifest.webmanifest", "/manifest-admin.webmanifest", "/manifest-portal.webmanifest"].includes(url.pathname)) {
     event.respondWith(
       fetch(request, { cache: "no-store" })
         .then(response => {
