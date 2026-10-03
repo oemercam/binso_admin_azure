@@ -1,16 +1,1 @@
-import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, json } from "@/lib/server/http";
-import { tenantList } from "@/lib/server/database";
-import { createPortalSession } from "@/lib/server/stripe";
-
-export async function POST(request:NextRequest){
-  try{
-    assertSameOrigin(request);
-    const accounts=await tenantList<{billing_customer_ref?:string|null}>(
-      "tenant_accounts","billing_customer_ref","limit=1"
-    );
-    const customerId=accounts[0]?.billing_customer_ref;
-    if(!customerId) return json({error:"billing_not_connected",message:"Noch kein Stripe-Konto verbunden."},409);
-    return json({url:await createPortalSession(customerId)});
-  }catch(error){return apiError(error);}
-}
+import {NextRequest} from "next/server";import {requireSession} from "@/lib/server/session";import {authorize} from "@/lib/server/rbac";import {query} from "@/lib/server/db";import {createPortalSession} from "@/lib/server/stripe";import {env} from "@/lib/server/env";import {apiError,assertSameOrigin,json} from "@/lib/server/http";export const runtime="nodejs";export async function POST(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();authorize(s,"billing:write");const o=(await query<{stripe_customer_id:string|null}>(`select stripe_customer_id from organizations where id=$1`,[s.organizationId])).rows[0];if(!o?.stripe_customer_id)return json({error:"Für dieses Konto ist noch kein Stripe-Kunde hinterlegt."},400);const p=await createPortalSession({customerId:o.stripe_customer_id,returnUrl:env.stripePortalReturnUrl||`${env.appUrl}/abo`});return json({url:p.url})}catch(e){return apiError(e,request)}}
