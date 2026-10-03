@@ -20,7 +20,7 @@ async function responseMessage(response:Response,fallback:string){
 export function PortalHome(){
   const router=useRouter();
   const {locale}=useI18n();
-  const t={de:["{t[0]}","{t[1]}","{t[2]}","Anmelden","Account erstellen","{t[5]}","{t[6]}","Demo starten","Zur Website","Preise","Sicherheit"],fr:["PORTAIL CLIENT","Bienvenue sur Binso One.","Connectez-vous, créez un compte ou lancez directement une démo.","Connexion","Créer un compte","Découvrir Binso One","Explorez la démo complète sans vérification ni carte de crédit.","Démarrer la démo","Site web","Prix","Sécurité"],it:["PORTALE CLIENTI","Benvenuto in Binso One.","Accedi, crea un account o avvia direttamente una demo.","Accedi","Crea account","Scopri Binso One","Esplora la demo completa senza verifica né carta di credito.","Avvia demo","Sito web","Prezzi","Sicurezza"],en:["CUSTOMER PORTAL","Welcome to Binso One.","Sign in, create an account or start a demo right away.","Sign in","Create account","Explore Binso One","Explore the complete demo without verification or a credit card.","Start demo","Website","Pricing","Security"],tr:["MÜŞTERİ PORTALI","Binso One’a hoş geldiniz.","Giriş yapın, hesap oluşturun veya doğrudan demoyu başlatın.","Giriş yap","Hesap oluştur","Binso One’ı keşfet","Doğrulama veya kredi kartı olmadan tüm demoyu inceleyin.","Demoyu başlat","Web sitesi","Fiyatlar","Güvenlik"]}[locale];
+  const t={de:["KUNDENPORTAL","Willkommen bei Binso One.","Melde dich an, erstelle ein Konto oder starte direkt eine Demo.","Anmelden","Account erstellen","Binso One zuerst ansehen","Ohne Verifikation und ohne Kreditkarte durch die komplette Demo klicken.","Demo starten","Zur Website","Preise","Sicherheit"],fr:["PORTAIL CLIENT","Bienvenue sur Binso One.","Connectez-vous, créez un compte ou lancez directement une démo.","Connexion","Créer un compte","Découvrir Binso One","Explorez la démo complète sans vérification ni carte de crédit.","Démarrer la démo","Site web","Prix","Sécurité"],it:["PORTALE CLIENTI","Benvenuto in Binso One.","Accedi, crea un account o avvia direttamente una demo.","Accedi","Crea account","Scopri Binso One","Esplora la demo completa senza verifica né carta di credito.","Avvia demo","Sito web","Prezzi","Sicurezza"],en:["CUSTOMER PORTAL","Welcome to Binso One.","Sign in, create an account or start a demo right away.","Sign in","Create account","Explore Binso One","Explore the complete demo without verification or a credit card.","Start demo","Website","Pricing","Security"],tr:["MÜŞTERİ PORTALI","Binso One’a hoş geldiniz.","Giriş yapın, hesap oluşturun veya doğrudan demoyu başlatın.","Giriş yap","Hesap oluştur","Binso One’ı keşfet","Doğrulama veya kredi kartı olmadan tüm demoyu inceleyin.","Demoyu başlat","Web sitesi","Fiyatlar","Güvenlik"]}[locale];
   const [checking,setChecking]=useState(true);
 
   useEffect(()=>{
@@ -42,9 +42,9 @@ export function PortalHome(){
   if(checking) return <PortalLoading/>;
 
   return <PortalFrame>
-    <span className="portal-kicker">KUNDENPORTAL</span>
-    <h1>Willkommen bei Binso One.</h1>
-    <p>Melde dich an, erstelle ein Konto oder starte direkt eine Demo.</p>
+    <LanguageSwitcher/><span className="portal-kicker">{t[0]}</span>
+    <h1>{t[1]}</h1>
+    <p>{t[2]}</p>
 
     <div className="portal-primary-actions">
       <Button href="/portal/login">{t[3]}</Button>
@@ -53,7 +53,7 @@ export function PortalHome(){
 
     <div className="portal-demo-card">
       <span className="portal-demo-icon"><Icon name="home" size={18}/></span>
-      <div><b>Binso One zuerst ansehen</b><small>Ohne Verifikation und ohne Kreditkarte durch die komplette Demo klicken.</small></div>
+      <div><b>{t[5]}</b><small>{t[6]}</small></div>
       <Button href="/demo" variant="secondary">{t[7]}</Button>
     </div>
 
