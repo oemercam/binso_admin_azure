@@ -139,3 +139,15 @@ export async function operatorRpc<T>(fn:string,args:Record<string,unknown>={}){
   const {token}=await import("./operator").then(module=>module.requireOperatorSession());
   return requestDb<T>("rpc/"+fn,"POST",token,args);
 }
+
+
+export type TenantFeature="core"|"employees"|"expenses"|"time_tracking"|"advanced_roles";
+
+export async function requireTenantFeature(feature:TenantFeature){
+  const tenant=await currentTenant();
+  const rows=await requestDb<Array<{allowed:boolean}>>(
+    "rpc/tenant_has_feature","POST",tenant.token,{target:tenant.tenantId,feature}
+  );
+  if(rows as unknown as boolean) return tenant;
+  throw new ApiError(403,"feature_not_available","Diese Funktion ist in deinem aktuellen Abonnement nicht verfügbar.");
+}
