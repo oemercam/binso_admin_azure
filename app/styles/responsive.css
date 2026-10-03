@@ -964,3 +964,11 @@
 @media (prefers-reduced-motion:reduce){
   .hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta,.marketing-mobile-menu{animation:none}
 }
+
+@media (hover:hover) and (pointer:fine){
+  .record:hover{transform:translateY(-1px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .app-launch{display:none}
+  .bottom-sheet,.operator-mobile-more{animation:none}
+}
