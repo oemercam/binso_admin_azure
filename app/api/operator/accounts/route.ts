@@ -1,8 +1,10 @@
 import { apiError, json } from "@/lib/server/http";
+import { requireOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { operatorList } from "@/lib/server/database";
 
 export async function GET(){
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"subscriptions:read");
     const items=await operatorList<Record<string,unknown>>(
       "tenant_accounts",
       "tenant_id,plan,subscription_status,account_status,trial_ends_at,current_period_ends_at,user_limit,storage_limit_bytes,billing_customer_ref,billing_subscription_ref,updated_at,tenant:tenants(name,uid,city)",
