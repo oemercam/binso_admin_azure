@@ -33,8 +33,8 @@ async function consume(route:string,key:string){
   }
 }
 
-export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover",identity?:string){
-  const retryAfter=route==="auth.login"?"900":"3600";
+export async function enforcePublicRateLimit(request:NextRequest,route:"auth.login"|"auth.register"|"auth.recover"|"telemetry.web_vitals",identity?:string){
+  const retryAfter=route==="auth.login"?"900":route==="telemetry.web_vitals"?"60":"3600";
   const ipAllowed=await consume(route+":ip","ip|"+clientIp(request));
   if(!ipAllowed) throw new ApiError(429,"rate_limited","Zu viele Versuche. Bitte später erneut versuchen.",{"Retry-After":retryAfter});
 
