@@ -81,8 +81,11 @@ for(const route of routes){
   }
 
   const html=await response.text();
-  const cssHrefs=[...html.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+\.css(?:\?[^"']*)?)["'][^>]*>/gi)]
-    .map(match=>match[1]);
+  const cssHrefs=[...html.matchAll(/<link\b[^>]*>/gi)]
+    .map(match=>match[0])
+    .filter(tag=>/\brel=["'][^"']*stylesheet[^"']*["']/i.test(tag))
+    .map(tag=>tag.match(/\bhref=["']([^"']+\.css(?:\?[^"']*)?)["']/i)?.[1])
+    .filter(Boolean);
 
   if(cssHrefs.length===0){
     failures.push(`${route}: no stylesheet link found`);
