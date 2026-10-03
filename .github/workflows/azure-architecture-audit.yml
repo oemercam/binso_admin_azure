@@ -29,8 +29,10 @@ jobs:
           APP_NAME="binso-admin-prod"
           PG_NAME="binso-platform-db"
 
-          APP_RG="$(az webapp list --query "[?name=='$APP_NAME'].resourceGroup | [0]" -o tsv)"
-          PG_RG="$(az postgres flexible-server list --query "[?name=='$PG_NAME'].resourceGroup | [0]" -o tsv)"
+          APP_RG="$(az resource list --name "$APP_NAME" --resource-type Microsoft.Web/sites --query "[0].resourceGroup" -o tsv)"
+          PG_RG="$(az resource list --name "$PG_NAME" --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[0].resourceGroup" -o tsv)"
+          echo "App resource group: ${APP_RG:-NOT_FOUND}"
+          echo "PostgreSQL resource group: ${PG_RG:-NOT_FOUND}"
           test -n "$APP_RG"
           test -n "$PG_RG"
 
