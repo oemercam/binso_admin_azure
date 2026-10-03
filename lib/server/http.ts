@@ -21,7 +21,7 @@ export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>
 export function assertSameOrigin(request:NextRequest){
   const origin=request.headers.get("origin");
   if(!origin) return;
-  const configured=process.env.NEXT_PUBLIC_APP_URL;
+  const configured=process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL;
   const allowed=configured ? new URL(configured).origin : request.nextUrl.origin;
   if(origin!==allowed) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
 }
