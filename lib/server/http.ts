@@ -21,9 +21,24 @@ export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>
 export function assertSameOrigin(request:NextRequest){
   const origin=request.headers.get("origin");
   if(!origin) return;
+
+  const allowed=new Set<string>();
   const configured=process.env.NEXT_PUBLIC_APP_URL;
-  const allowed=configured ? new URL(configured).origin : request.nextUrl.origin;
-  if(origin!==allowed) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
+  if(configured){
+    try{allowed.add(new URL(configured).origin);}catch{}
+  }
+
+  allowed.add(request.nextUrl.origin);
+
+  const forwardedHost=request.headers.get("x-forwarded-host");
+  const host=forwardedHost||request.headers.get("host");
+  if(host){
+    const forwardedProto=request.headers.get("x-forwarded-proto");
+    const protocol=(forwardedProto?.split(",")[0]?.trim())||request.nextUrl.protocol.replace(":","");
+    allowed.add(`${protocol}://${host.split(",")[0].trim()}`);
+  }
+
+  if(!allowed.has(origin)) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
 }
 
 export class ApiError extends Error {
