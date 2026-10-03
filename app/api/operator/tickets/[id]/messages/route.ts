@@ -1,3 +1,5 @@
+import { requireOperatorSession as requireRbacOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { operatorAudit, operatorInsert, operatorList } from "@/lib/server/database";
@@ -6,7 +8,7 @@ import { requireOperatorSession } from "@/lib/server/operator";
 type Body={body?:unknown;internal?:unknown};
 
 export async function POST(request:NextRequest,{params}:{params:Promise<{id:string}>}){
-  try{
+  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"support:manage");
     assertSameOrigin(request);
     const {id}=await params;
     const payload=await readJson<Body>(request,16384);

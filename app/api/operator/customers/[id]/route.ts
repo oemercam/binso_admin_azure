@@ -1,8 +1,10 @@
 import { apiError, json } from "@/lib/server/http";
+import { requireOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { operatorList, operatorRpc } from "@/lib/server/database";
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"organizations:read");
     const {id}=await params;
     const overview=await operatorRpc<Record<string,unknown>>("operator_customer_overview",{p_tenant_id:id});
     const tickets=await operatorList<Record<string,unknown>>(

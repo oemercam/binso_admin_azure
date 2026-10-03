@@ -1,8 +1,10 @@
+import { requireOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { apiError, json } from "@/lib/server/http";
 import { operatorList, operatorRpc } from "@/lib/server/database";
 
 export async function GET(){
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"platform:read");
     const stats=await operatorRpc<Record<string,unknown>>("operator_dashboard_stats");
     const tickets=await operatorList<Record<string,unknown>>(
       "support_tickets",

@@ -1,3 +1,5 @@
+import { requireOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
@@ -5,7 +7,7 @@ import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/databa
 type Body={status?:unknown;priority?:unknown};
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"support:manage");
     const {id}=await params;
     const tickets=await operatorList<Record<string,unknown>>(
       "support_tickets",
@@ -23,7 +25,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
 }
 
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
-  try{
+  try{const session=await requireOperatorSession();authorizeOperator(session,"support:manage");
     assertSameOrigin(request);
     const {id}=await params;
     const body=await readJson<Body>(request,8192);

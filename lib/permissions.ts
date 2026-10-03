@@ -73,10 +73,10 @@ export function ownRecordOnly(role:string,moduleKey:string){
 }
 
 export type OperatorRole="platform_owner"|"platform_admin"|"platform_support"|"platform_billing"|"platform_auditor";
-export type OperatorPermission="platform:read"|"organizations:read"|"organizations:manage"|"subscriptions:read"|"subscriptions:manage"|"operators:read"|"operators:manage"|"platform_audit:read"|"support:manage"|"feedback:manage"|"feature_flags:manage"|"announcements:manage";
+export type OperatorPermission="platform:read"|"organizations:read"|"organizations:manage"|"subscriptions:read"|"subscriptions:manage"|"operators:read"|"operators:manage"|"platform_audit:read"|"support:manage"|"feedback:manage"|"feature_flags:manage"|"announcements:manage"|"security:manage"|"restrictions:manage"|"integrations:test";
 export const operatorGrants:Record<OperatorRole,ReadonlySet<OperatorPermission>>={
- platform_owner:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","operators:manage","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage"]),
- platform_admin:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","operators:manage","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage"]),
+ platform_owner:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","operators:manage","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage","security:manage","restrictions:manage","integrations:test"]),
+ platform_admin:new Set(["platform:read","organizations:read","organizations:manage","subscriptions:read","subscriptions:manage","operators:read","platform_audit:read","support:manage","feedback:manage","feature_flags:manage","announcements:manage","restrictions:manage","integrations:test"]),
  platform_support:new Set(["platform:read","organizations:read","support:manage","feedback:manage"]),
  platform_billing:new Set(["platform:read","organizations:read","subscriptions:read","subscriptions:manage"]),
  platform_auditor:new Set(["platform:read","organizations:read","operators:read","platform_audit:read"])

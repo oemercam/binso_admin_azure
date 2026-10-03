@@ -1,10 +1,12 @@
+import { requireOperatorSession as requireRbacOperatorSession } from "@/lib/server/operator/session";
+import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, json } from "@/lib/server/http";
 import { requireOperatorSession } from "@/lib/server/operator";
 import { sendMail } from "@/lib/server/email";
 
 export async function POST(request:NextRequest){
-  try{
+  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"integrations:test");
     assertSameOrigin(request);
     const session=await requireOperatorSession();
     const email=session.email;
