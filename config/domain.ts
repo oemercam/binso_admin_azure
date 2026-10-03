@@ -3,7 +3,7 @@ export const domainConfig = {
   defaultLocaleTag: "de-CH",
   defaultPaymentDays: 30,
   defaultReminderDays: 10,
-  trialDays: 14,
+  trialDays: 30,
   demoSessionHours: 24,
   emailVerificationMinutes: 24 * 60,
   passwordResetMinutes: 30,

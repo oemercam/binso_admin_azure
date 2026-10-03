@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import "./binso-ui.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import { siteConfig } from "@/lib/config";
+import { I18nProvider } from "@/lib/i18n/provider";
+import { localeTags, normalizeLocale } from "@/lib/i18n/config";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
 
@@ -23,11 +26,13 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     url: "/",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Binso One – Business-Software für Schweizer KMU" }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
@@ -56,11 +61,13 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get("binso_locale")?.value);
   return (
-    <html lang="de-CH" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang={localeTags[locale]} suppressHydrationWarning data-scroll-behavior="smooth">
       <body>
-        {children}
+        <I18nProvider initialLocale={locale}>{children}</I18nProvider>
         <PwaRegister />
         <WebVitalsReporter />
       </body>

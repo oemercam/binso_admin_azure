@@ -6,6 +6,10 @@ const routes=[
   "/",
   "/produkt",
   "/preise",
+  "/agb",
+  "/datenschutz",
+  "/impressum",
+  "/email-bestaetigen",
   "/login",
   "/registrieren",
   "/portal",
@@ -173,3 +177,28 @@ if(failures.length){
   process.exit(1);
 }
 console.log("Demo flow integrity OK.");
+
+
+async function verifyPublicLaunch(){
+  const home=await fetch(base+"/",{redirect:"manual",headers:{"cache-control":"no-cache"}});
+  if(!home.ok) failures.push(`/: public landing page returned ${home.status}`);
+  else{
+    const html=await home.text();
+    if(!/property=["']og:image["']/i.test(html)) failures.push("/: Open Graph image metadata missing");
+    if(!/name=["']twitter:card["']/i.test(html)) failures.push("/: Twitter card metadata missing");
+    if(!/rel=["']canonical["']/i.test(html)) failures.push("/: canonical metadata missing");
+  }
+  const demo=await fetch(base+"/demo",{redirect:"manual",headers:{"cache-control":"no-cache"}});
+  if(!demo.ok) failures.push(`/demo: anonymous visitor received ${demo.status}`);
+  const social=await fetch(base+"/opengraph-image",{redirect:"manual"});
+  if(!social.ok) failures.push(`/opengraph-image: returned ${social.status}`);
+  else if(!(social.headers.get("content-type")||"").includes("image/")) failures.push("/opengraph-image: invalid content type");
+}
+await verifyPublicLaunch();
+
+if(failures.length){
+  console.error("Public launch integrity check failed:");
+  for(const failure of failures) console.error("- "+failure);
+  process.exit(1);
+}
+console.log("Public landing, social metadata and anonymous demo access OK.");
