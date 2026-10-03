@@ -681,11 +681,34 @@ export function TimePage() {
   const [manualDescription,setManualDescription]=useState("");
   const [toast,setToast]=useState<string|null>(null);
 
+  useEffect(()=>{
+    queueMicrotask(()=>{
+      const storedRunning=window.localStorage.getItem("binso.timer.running")!=="false";
+      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"8067");
+      const started=Number(window.localStorage.getItem("binso.timer.startedAt")??"0");
+      const elapsed=storedRunning&&started?Math.max(0,Math.floor((Date.now()-started)/1000)):0;
+      setRunning(storedRunning);
+      setSeconds((Number.isFinite(base)?base:8067)+elapsed);
+    });
+  },[]);
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
+  const toggleTimer=()=>{
+    const next=!running;
+    setRunning(next);
+    window.localStorage.setItem("binso.timer.running",String(next));
+    window.localStorage.setItem("binso.timer.baseSeconds",String(seconds));
+    if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
+    else window.localStorage.removeItem("binso.timer.startedAt");
+    window.dispatchEvent(new Event("binso-timer-change"));
+  };
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
 
   const stop=async()=>{
     setRunning(false);
+    window.localStorage.setItem("binso.timer.running","false");
+    window.localStorage.setItem("binso.timer.baseSeconds","0");
+    window.localStorage.removeItem("binso.timer.startedAt");
+    window.dispatchEvent(new Event("binso-timer-change"));
     try{
       if(isProductionBackendEnabled()){
         const ended=new Date();
@@ -724,7 +747,7 @@ export function TimePage() {
         {timeTab==="timer"?<>
           <div className="timer-project"><small>Projekt</small><button type="button">Website Redesign · Acme AG <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":"Pausiert"}</small><strong>{formatted}</strong><span>Acme AG · Website Redesign</span></div></div>
-          <div className="timer-actions"><Button onClick={()=>setRunning(!running)} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
+          <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":"Fortsetzen"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()}>Stoppen</Button></div>
         </>:<>
           <SectionTitle title="Heutige Einträge" action={<strong>4:28 h</strong>}/>
           <div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>
