@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -67,6 +67,7 @@ export function AppShell({
   backLabel?: string;
 }) {
   const router=useRouter();
+  const pathname=usePathname();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
   const production=useBackendMode();
   const [query, setQuery] = useState("");
@@ -136,6 +137,11 @@ export function AppShell({
     document.body.style.overflow = sheet ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [sheet]);
+
+  useEffect(() => {
+    window.scrollTo({top:0,left:0,behavior:"auto"});
+  }, [pathname]);
+
 
   useEffect(() => {
     const onKeyDown=(event:KeyboardEvent)=>{
