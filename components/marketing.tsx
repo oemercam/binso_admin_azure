@@ -96,7 +96,9 @@ export function MarketingFooter() {
       <Link href="/demo">Demo</Link>
       <Link href="/portal">Kundenportal</Link>
       <Link href="/portal/login">{m.nav.login}</Link>
-      <Link href="/operator">Admin</Link>
+      <Link href="/agb">AGB</Link>
+      <Link href="/datenschutz">Datenschutz</Link>
+      <Link href="/impressum">Impressum</Link>
     </div>
     <small>© 2026 Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz</small>
   </footer>;
