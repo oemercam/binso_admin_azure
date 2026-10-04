@@ -455,8 +455,10 @@
   border-bottom:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.document-modal>header button{border:0;background:transparent;display:flex;align-items:center;gap:6px;font-size:11px}
-.document-modal>header button:last-child{justify-self:end}
+.document-modal-header-spacer{min-width:1px}
+.document-modal-header-actions{justify-self:end;display:flex;align-items:center;gap:6px}
+.document-modal>header button{width:40px;height:40px;padding:0;border:0;background:transparent;display:grid;place-items:center;border-radius:10px}
+.document-modal>header button:focus-visible{outline:2px solid var(--color-fg);outline-offset:-2px}
 .document-modal-body{max-width:800px;margin:auto;padding:24px}
 .mobile-document-bar{display:none}
 
