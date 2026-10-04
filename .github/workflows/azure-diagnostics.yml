@@ -1,0 +1,53 @@
+name: Azure runtime diagnostics
+on:
+  push:
+    branches: [diagnostics/azure-runtime]
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: azure-runtime-diagnostics
+  cancel-in-progress: true
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Inspect runtime configuration without secrets
+        run: |
+          az webapp config show --resource-group rg-binso-admin-prod --name binso-admin-prod -o json > /tmp/binso-runtime-config.json
+          az webapp config appsettings list --resource-group rg-binso-admin-prod --name binso-admin-prod -o json > /tmp/binso-runtime-settings.json
+          python - <<'PY'
+          import json,urllib.parse
+          config=json.load(open('/tmp/binso-runtime-config.json'))
+          settings={r['name']:r['value'] for r in json.load(open('/tmp/binso-runtime-settings.json'))}
+          url=settings.get('DATABASE_URL','')
+          print('runtime',config.get('linuxFxVersion'),'alwaysOn',config.get('alwaysOn'),'startup_uses_server_js','server.js' in config.get('appCommandLine',''))
+          print('database_url_configured',bool(url),'postgres_scheme',urllib.parse.urlparse(url).scheme in ['postgres','postgresql'])
+          for key in ['DATABASE_SSL','DATABASE_SSL_REJECT_UNAUTHORIZED','DATABASE_POOL_MAX','PORT','WEBSITE_RUN_FROM_PACKAGE']:
+              value=settings.get(key,'unset')
+              print(key,value if value in ['true','false','unset'] or value.isdigit() else 'configured')
+          PY
+      - name: Download and summarize application errors
+        run: |
+          timeout 60 az webapp log download --resource-group rg-binso-admin-prod --name binso-admin-prod --log-file /tmp/binso-app-logs.zip
+          python - <<'PY'
+          import zipfile,re
+          with zipfile.ZipFile('/tmp/binso-app-logs.zip') as archive:
+              for name in archive.namelist():
+                  if not name.endswith(('.log','.txt')):continue
+                  lines=archive.read(name).decode('utf8','replace').splitlines()
+                  errors=[line for line in lines[-5000:] if any(key in line for key in ['Unhandled API error','Cannot find module','ERR_MODULE','ETIMEDOUT','ECONNREFUSED','EACCES','Missing required environment','Error:','ERROR'])]
+                  if not errors:continue
+                  print('log',name,'error_lines',len(errors))
+                  for line in errors[-20:]:
+                      line=re.sub(r'[a-zA-Z]+://[^\s]+','[url redacted]',line)
+                      line=re.sub(r'\S+@\S+','[redacted]',line)
+                      line=re.sub(r"'[^']*'|\"[^\"]*\"","'[redacted]'",line)
+                      print(line[-250:])
+          PY
