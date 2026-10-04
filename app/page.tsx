@@ -25,6 +25,7 @@ const plans=[
 export default function Home() {
   const structuredData={
     "@context":"https://schema.org",
+    "@graph":[{
     "@type":"SoftwareApplication",
     name:"Binso One",
     applicationCategory:"BusinessApplication",
@@ -36,10 +37,13 @@ export default function Home() {
       highPrice:"89",
       offerCount:"3"
     },
-    publisher:{
+    publisher:{"@id":"https://www.binso.ch/#organization"}
+    },{
       "@type":"Organization",
+      "@id":"https://www.binso.ch/#organization",
       name:"Binso GmbH",
       url:"https://www.binso.ch",
+      logo:"https://www.binso.ch/brand/logo-black.svg",
       address:{
         "@type":"PostalAddress",
         streetAddress:"Weissbadstrasse 8b",
@@ -47,7 +51,14 @@ export default function Home() {
         addressLocality:"Appenzell",
         addressCountry:"CH"
       }
-    }
+    },{
+      "@type":"WebSite",
+      "@id":"https://www.binso.ch/#website",
+      url:"https://www.binso.ch",
+      name:"Binso One",
+      publisher:{"@id":"https://www.binso.ch/#organization"},
+      inLanguage:"de-CH"
+    }]
   };
   return <>
     <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
