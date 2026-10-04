@@ -959,7 +959,7 @@
   .operator-main>header>div:first-child{min-width:0}
   .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
   .operator-main>header p{margin-top:8px;line-height:1.45}
-  .operator-app-header{min-height:var(--mobile-header-h);margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px!important;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 10px max(var(--mobile-page-x),var(--safe-left))!important;align-items:center!important;border-bottom:1px solid var(--color-line)!important;background:var(--color-bg)}
+  .operator-app-header{min-height:var(--mobile-header-h);margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 10px max(var(--mobile-page-x),var(--safe-left));align-items:center;border-bottom:1px solid var(--color-line);background:var(--color-bg)}
   .operator-header-brand{gap:10px}.operator-header-brand>.logo{display:block;width:82px;height:28px;flex:0 0 auto}.operator-header-brand>div{display:none}
   .operator-user{gap:4px}.operator-user .icon-button{width:40px;height:40px;min-width:40px}.operator-user .avatar{width:40px;height:40px}
   .monitoring-kpis{grid-template-columns:1fr 1fr;gap:8px}.monitoring-kpis section{padding:12px;border-radius:12px}.monitoring-kpis strong{font-size:21px}
