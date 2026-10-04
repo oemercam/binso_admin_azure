@@ -230,7 +230,7 @@ export function OfferEditor({ existing = false, documentKey }: { existing?: bool
   };
 
   return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : production ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Angebote"} actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
-    {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>{setToast("Angebot für den Versand vorbereitet.");window.setTimeout(()=>setToast(null),2200)}}>Senden</Button><Button href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} variant="secondary">Rechnung erstellen</Button></div>}
+    {existing&&<div className="document-actions offer-document-actions"><Button variant="secondary" icon="mail" onClick={()=>{setToast("Angebot für den Versand vorbereitet.");window.setTimeout(()=>setToast(null),2200)}}>Senden</Button><Button href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} variant="secondary">Rechnung erstellen</Button></div>}
     <DocumentEditor type="Angebot" draft={draft} onChange={setDraft} directory={directory}/>
     <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
     {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft} directory={directory}/></DocumentModal>}
@@ -331,7 +331,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   }
 
   return <div className="invoice-workspace">
-    <section className="invoice-form">
+    <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div className="form-section">
         <h2>Kunde</h2>
         <Field label="Kunde">
