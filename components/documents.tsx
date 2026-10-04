@@ -278,7 +278,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   return <div className="document-detail-view">
     <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2><p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p></section>
     <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsziel"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):draft.due+" Tage"}</b></div><div><small>MwSt.</small><b>{draft.vatRate}%</b></div></section>
-    <section className="document-detail-section"><div className="section-title"><h2>Positionen</h2></div><div className="document-read-lines">{draft.positions.map(item=><div key={item.id}><div><b>{item.description}</b><small>{item.quantity} × CHF {money(numberValue(item.price))}</small></div><strong>CHF {money(numberValue(item.quantity)*numberValue(item.price))}</strong></div>)}</div><div className="invoice-totals"><span>Zwischentotal <b>CHF {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>CHF {money(totals.vat)}</b></span><strong>Total <b>CHF {money(totals.total)}</b></strong></div></section>
+    <section className="document-detail-section document-lines-section"><div className="section-title"><h2>Positionen</h2></div><div className="document-read-lines">{draft.positions.map(item=><div key={item.id}><div><b>{item.description}</b><small>{item.quantity} × CHF {money(numberValue(item.price))}</small></div><strong>CHF {money(numberValue(item.quantity)*numberValue(item.price))}</strong></div>)}</div><div className="invoice-totals"><span>Zwischentotal <b>CHF {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>CHF {money(totals.vat)}</b></span><strong>Total <b>CHF {money(totals.total)}</b></strong></div></section>
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
 }
@@ -389,12 +389,13 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
     <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
     <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
     <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
+    <section className="paper-closing invoice-payment-intro"><b>Zahlungsangaben</b><p>Bitte überweise den Rechnungsbetrag bis {due} mit den nachfolgenden Zahlungsangaben.</p></section>
     <section className="qr-payment">
       <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
       <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
       <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>{money(totals.total)}</b></div>
     </section>
-    <footer>Binso GmbH · CHE-173.401.068 · www.binso.ch · +41 58 510 88 58</footer>
+    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
   </div>;
 }
 
@@ -405,9 +406,10 @@ export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012
   return <div className="paper">
     <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>ANGEBOT</span></div>
     <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebot Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
-    {draft.note&&<div className="paper-intro"><p>{draft.note}</p></div>}
+    <div className="paper-intro"><b>Unser Angebot</b><p>{draft.note || "Vielen Dank für dein Interesse. Gerne bieten wir dir die folgenden Leistungen an."}</p></div>
     <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
     <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
-    <footer>Vielen Dank für dein Vertrauen.</footer>
+    <section className="paper-closing"><b>Konditionen</b><p>Dieses Angebot ist bis {isoToSwiss(draft.due)} gültig. Alle Beträge sind in CHF ausgewiesen. Die MwSt. von {draft.vatRate}% ist im Total enthalten.</p><p>Wir freuen uns auf die Zusammenarbeit und stehen bei Fragen gerne zur Verfügung.</p></section>
+    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
   </div>;
 }
