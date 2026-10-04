@@ -38,7 +38,8 @@ jobs:
           python - <<'PY'
           import json,urllib.request,urllib.error,http.cookiejar,time
           settings={r['name']:r['value'] for r in json.load(open('/tmp/binso-runtime-settings.json'))}
-          base=settings.get('APP_URL','https://binso-admin-prod.azurewebsites.net').rstrip('/')
+          base='https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net'
+          print('app_url_matches_deployment',settings.get('APP_URL','').rstrip('/')==base,flush=True)
           jar=http.cookiejar.CookieJar()
           client=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
           requests=[('/api/health','GET'),('/api/demo/session','POST'),('/api/demo/session','GET')]
@@ -53,4 +54,16 @@ jobs:
                       print(method,path,'status',response.status,'seconds',round(time.monotonic()-start,2),'bytes',len(body),flush=True)
               except Exception as e:
                   print(method,path,'error',type(e).__name__,'status',getattr(e,'code',None),'seconds',round(time.monotonic()-start,2),flush=True)
+          PY
+      - name: Compare curl protocol timing on deployment URL
+        run: |
+          python - <<'PY'
+          import subprocess,time
+          base='https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net'
+          for protocol in [[],['--http1.1']]:
+              for path,method in [('/api/health','GET'),('/api/demo/session','POST'),('/api/demo/data?collection=customers','GET'),('/api/demo/finance','GET')]:
+                  args=['curl','-sS','--max-time','25','-c','/tmp/probe.cookies','-b','/tmp/probe.cookies','-o','/tmp/probe-response','-w','status=%{http_code} seconds=%{time_total} protocol=%{http_version}',*protocol]
+                  if method=='POST':args+=['-X','POST','-H','Content-Type: application/json','-d','{}']
+                  r=subprocess.run(args+[base+path],capture_output=True,text=True,timeout=30)
+                  print(method,path,r.stdout,'exit',r.returncode,flush=True)
           PY
