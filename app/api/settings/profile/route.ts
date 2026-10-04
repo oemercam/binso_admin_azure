@@ -3,7 +3,7 @@ import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/ser
 import { currentProfile, updateProfile } from "@/lib/server/database";
 import { requireUser } from "@/lib/server/auth";
 
-type ProfileBody={firstName?:unknown;lastName?:unknown;phone?:unknown;jobTitle?:unknown;language?:unknown};
+type ProfileBody={firstName?:unknown;lastName?:unknown;phone?:unknown;jobTitle?:unknown;language?:unknown;theme?:unknown};
 
 export async function GET(){
   try{
@@ -22,10 +22,11 @@ export async function PATCH(request:NextRequest){
     const data:Record<string,unknown>={};
     if(body.firstName!==undefined)data.first_name=firstName||null;
     if(body.lastName!==undefined)data.last_name=lastName||null;
-    if(body.firstName!==undefined&&body.lastName!==undefined)data.display_name=[firstName,lastName].filter(Boolean).join(" ")||null;
+    if(body.firstName!==undefined&&body.lastName!==undefined)data.display_name=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
     if(body.phone!==undefined)data.phone=cleanText(body.phone,80)||null;
     if(body.jobTitle!==undefined)data.job_title=cleanText(body.jobTitle,160)||null;
     if(body.language!==undefined)data.language=language;
+    if(body.theme!==undefined)data.theme=cleanText(body.theme,10);
     const rows=await updateProfile(data);
     return json({item:rows[0]});
   }catch(error){return apiError(error);}

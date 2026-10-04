@@ -86,7 +86,7 @@ jobs:
 
           rm -rf deploy/app/node_modules
 
-          pnpm install             --dir deploy/app             --prod             --frozen-lockfile             --config.node-linker=hoisted
+          pnpm install             --ignore-workspace             --dir deploy/app             --prod             --frozen-lockfile             --config.node-linker=hoisted
 
           test -f deploy/app/server.js
 
@@ -116,6 +116,8 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
+          curl -fsS --max-time 20 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
+          test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -202,7 +204,7 @@ jobs:
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
           echo "Binso One production health check passed."
 
-          curl -fsS --max-time 20 -c /tmp/binso-production-demo.cookies -X POST -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
+          curl -fsS --max-time 20 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
           for collection in customers customer_contacts products employees expenses documents payments; do
             curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies "$PRODUCTION_URL/api/demo/data?collection=$collection" > /tmp/binso-production-data.json
             node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-data.json","utf8"));if(!Array.isArray(data.items)||!data.items.length)process.exit(1)'
