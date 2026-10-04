@@ -59,7 +59,7 @@
 .page-head>div{min-width:0}
 .page-head h1{margin:0;font-size:28px;line-height:1.08;letter-spacing:-.035em}
 .page-head p{margin:7px 0 0;color:var(--color-muted);font-size:14px;line-height:1.45}
-.page-actions{display:flex;gap:8px}
+.page-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
 .desktop-back{
   min-height:24px;
   margin-bottom:10px;
@@ -159,7 +159,7 @@
 .quick-grid .button{width:100%;justify-content:flex-start}
 
 /* Lists and filtering */
-.toolbar{min-height:42px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.toolbar{min-height:42px;margin-bottom:16px;display:flex;align-items:center;gap:10px 12px}
 .searchbox{
   height:42px;
   max-width:420px;
@@ -215,7 +215,7 @@
 .filter-button.active{border-color:var(--color-fg)}
 .records-count{margin-left:auto;color:var(--color-muted);font-size:11px;line-height:1.2}
 .toolbar-reset{border:0;background:transparent;color:var(--color-muted);font-size:11px}
-.records{border-top:1px solid var(--color-line)}
+.records{width:100%;min-width:0;border-top:1px solid var(--color-line)}
 .record-wrapper{display:block}
 .record-wrapper:last-child .record{border-bottom:0}
 .record{
@@ -227,10 +227,10 @@
   border-bottom:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.record-main{min-width:0;flex:1}
+.record-main{min-width:0;flex:1;overflow:hidden}
 .record-main b,.record-main small{display:block}
-.record-main b{font-size:13px}
-.record-main small,.record>small{margin-top:3px;color:var(--color-muted);font-size:11px}
+.record-main b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.record-main small,.record>small{margin-top:3px;color:var(--color-muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .record>strong{font-size:12px}
 .record-avatar{
   width:38px;
@@ -248,7 +248,7 @@
 
 /* Master/detail and detail pages */
 .tablet-master-detail{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
-.tablet-detail{display:none;align-self:start}
+.tablet-detail{display:none;min-width:0;align-self:start}
 .tablet-detail-head,
 .entity-hero{
   display:flex;
