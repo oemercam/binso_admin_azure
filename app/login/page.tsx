@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { Button, Logo } from "@/components/ui";
+import { Button, Icon, Logo } from "@/components/ui";
 import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
 
 export default function Login() {
@@ -58,7 +58,7 @@ export default function Login() {
         <label>Passwort
           <div className="password-field">
             <input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/>
-            <button type="button" onClick={()=>setShow(!show)}>{show?"Ausblenden":"Anzeigen"}</button>
+            <button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button>
           </div>
         </label>
         <div className="form-link"><Link href="/passwort-vergessen">Passwort vergessen?</Link></div>

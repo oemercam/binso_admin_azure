@@ -565,8 +565,21 @@
   .settings-form .button{min-height:46px}
   .detail-list{margin-top:8px}
   .detail-list>div:last-child{border-bottom:0}
+  .tabs + .surface,
+  .tabs + .detail-grid>.surface:first-child,
+  .customer-tab-panel,
+  .employee-tab-panel{border-top:0}
+  .customer-tab-panel,
+  .employee-tab-panel{border-bottom:0}
   .customer-tab-panel>.section-title,
   .employee-tab-panel>.section-title{margin-bottom:12px}
+  .customer-tab-panel .compact-list>a:last-child,
+  .customer-tab-panel .contact-list>div:last-child,
+  .customer-tab-panel .timeline>div:last-child,
+  .employee-tab-panel .compact-list>a:last-child,
+  .employee-tab-panel .detail-list>div:last-child,
+  .surface>.compact-list:last-child>a:last-child,
+  .surface>.activity-list:last-child>a:last-child{border-bottom:0}
   .customer-tab-panel .section-title .button,
   .employee-tab-panel .section-title .button{min-height:40px;height:40px;padding-inline:11px;font-size:11px}
   .security-row{align-items:start}
@@ -637,6 +650,15 @@
   .single-action{grid-template-columns:1fr}
   .document-detail-view{display:grid;gap:18px}
   .document-detail-section{padding:0 0 18px;border-bottom:1px solid var(--color-line)}
+  .document-detail-section.document-lines-section{border-bottom:0;padding-bottom:0}
+  .tabs + .detail-grid{margin-top:0}
+  .tabs + .detail-grid>.surface:first-child{border-top:0}
+  .page-add-button{grid-template-columns:1fr;grid-template-rows:1fr}
+  .page-add-button svg{place-self:center}
+  .page-head-actions .responsive-create-action{width:40px;min-width:40px;height:40px;padding:0;border-radius:50%}
+  .responsive-create-action .create-action-label{display:none}
+  .paper-closing{max-width:100%;margin-top:22px}
+  .paper footer{padding-top:20px}
   .document-detail-section h2{margin:5px 0 3px;font-size:17px}
   .document-detail-section p{margin:0;color:var(--color-muted);font-size:11px;line-height:1.5}
   .document-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-bottom:18px;border-bottom:1px solid var(--color-line)}

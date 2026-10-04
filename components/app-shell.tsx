@@ -343,7 +343,7 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <div className={`app-root app-section-${active} ${timerRunning ? "timer-active" : ""} ${preview ? "app-preview" : ""}`}>
+  return <div className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""}`}>
     {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
@@ -374,7 +374,7 @@ export function AppShell({
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
           {backHref && <span className="mobile-header-title">{title}</span>}
         </div>
-        {timerRunning&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
+        {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
         {backHref&&mobileActions&&<div className="mobile-detail-actions">{mobileActions}</div>}
         <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>

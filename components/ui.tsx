@@ -46,6 +46,8 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
     pause: <><path d="M9 5v14M15 5v14"/></>,
     stop: <rect x="6" y="6" width="12" height="12" rx="1"/>,
     edit: <><path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path d="m14 7 3 3"/></>,
+    eye: <><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></>,
+    "eye-off": <><path d="m3 3 18 18"/><path d="M10.6 6.2A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.1 2.7M6.6 6.6C4 8.3 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.4-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
   };
 
   return <svg {...common}>{paths[name] ?? paths.file}</svg>;
@@ -81,7 +83,7 @@ export function Button({
   ariaLabel?: string;
 }) {
   const cls = `button button-${variant} ${className}`.trim();
-  const body = <>{icon && <Icon name={icon} size={17} />}<span>{children}</span></>;
+  const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
   return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
 }
 
