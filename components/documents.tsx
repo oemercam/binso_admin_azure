@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Icon, Toast } from "./ui";
+import { Button, EmptyState, Field, Icon, IconButton, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
@@ -189,121 +189,97 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
 }
 
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
-  const router=useRouter();
-  const searchParams=useSearchParams();
-  const returnTo=!existing&&searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/angebote";
-  const production=useBackendMode();
-  const [preview,setPreview]=useState(false);
-  const [toast,setToast]=useState<string|null>(null);
-  const [draft,setDraft]=useStoredDraft("binso.demo.offer.AN-2026-012",createInitialDraft("Angebot","AN-2026-012"));
-  const directory=useCustomerDirectory();
-  useExistingDocument("Angebot",existing?documentKey:undefined,setDraft);
-
-  useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
-    const names=Object.keys(directory);
-    if(names.length && (!draft.customer || !directory[draft.customer])){
-      queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
-    }
-  },[directory,draft.customer,setDraft]);
-
-  const save=async()=>{
-    if(isProductionBackendEnabled()&&!draft.customer){
-      setToast("Bitte zuerst einen Kunden erfassen.");
-      window.setTimeout(()=>setToast(null),2400);
-      return;
-    }
-    try{
-      if(isProductionBackendEnabled()){
-        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Angebot",draft));
-        else await apiPost("/api/documents",documentPayload("Angebot",draft));
-      }
-      setToast(existing?"Angebot gespeichert.":"Angebot erstellt.");
-      window.setTimeout(()=>{
-        setToast(null);
-        if(!existing) router.push("/angebote/"+encodeURIComponent(draft.number));
-      },900);
-    }catch(error){
-      setToast(error instanceof Error?error.message:"Angebot konnte nicht gespeichert werden.");
-      window.setTimeout(()=>setToast(null),2600);
-    }
-  };
-
-  return <AppShell title={existing ? "Angebot "+draft.number : "Angebot erstellen"} subtitle={existing ? "Angebot bearbeiten" : production ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="angebote" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Angebote"} actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></>}>
-    {existing&&<div className="document-actions offer-document-actions"><Button variant="secondary" icon="mail" onClick={()=>{setToast("Angebot für den Versand vorbereitet.");window.setTimeout(()=>setToast(null),2200)}}>Senden</Button><Button href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} variant="secondary">Rechnung erstellen</Button></div>}
-    <DocumentEditor type="Angebot" draft={draft} onChange={setDraft} directory={directory}/>
-    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Angebot erstellen"}</Button></div>
-    {preview&&<DocumentModal title="Angebotsvorschau" onClose={()=>setPreview(false)}><OfferPreview draft={draft} directory={directory}/></DocumentModal>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
-  </AppShell>;
+  return <DocumentPage kind="Angebot" existing={existing} documentKey={documentKey}/>;
 }
 
 export function InvoiceEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
+  return <DocumentPage kind="Rechnung" existing={existing} documentKey={documentKey}/>;
+}
+
+function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;existing?:boolean;documentKey?:string}){
   const router=useRouter();
   const searchParams=useSearchParams();
-  const returnTo=!existing&&searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/rechnungen";
+  const plural=kind==="Angebot"?"angebote":"rechnungen";
+  const returnTo=!existing&&searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/"+plural;
   const production=useBackendMode();
   const [preview,setPreview]=useState(false);
+  const [editing,setEditing]=useState(!existing);
+  const [moreOpen,setMoreOpen]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const [draft,setDraft]=useStoredDraft("binso.demo.invoice.RE-2026-019",createInitialDraft("Rechnung","RE-2026-019"));
+  const number=kind==="Angebot"?"AN-2026-012":"RE-2026-019";
+  const storageKey=kind==="Angebot"?"binso.demo.offer.AN-2026-012":"binso.demo.invoice.RE-2026-019";
+  const [draft,setDraft]=useStoredDraft(storageKey,createInitialDraft(kind,number));
   const directory=useCustomerDirectory();
-  useExistingDocument("Rechnung",existing?documentKey:undefined,setDraft);
-  const sourceOffer=searchParams.get("sourceOffer");
+  useExistingDocument(kind,existing?documentKey:undefined,setDraft);
+  const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
+
   useEffect(()=>{
-    if(existing||!sourceOffer) return;
+    if(existing||!sourceOffer||kind!=="Rechnung") return;
     if(isProductionBackendEnabled()){
       apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(sourceOffer))
         .then(payload=>queueMicrotask(()=>{
           const source=remoteDraftFromItem(payload.item,"Angebot");
           setDraft(current=>({...source,number:current.number,date:current.date,due:"30"}));
-        }))
-        .catch(()=>undefined);
+        })).catch(()=>undefined);
       return;
     }
     const stored=window.localStorage.getItem("binso.demo.offer.AN-2026-012");
-    if(!stored) return;
+    if(!stored)return;
     try{
       const source=JSON.parse(stored) as DocumentDraft;
       if(source&&Array.isArray(source.positions)) queueMicrotask(()=>setDraft(current=>({...source,number:current.number,date:current.date,due:"30"})));
-    }catch{/* invalid demo source: keep invoice defaults */}
-  },[existing,sourceOffer,setDraft]);
-  const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
+    }catch{/* keep defaults */}
+  },[existing,sourceOffer,kind,setDraft]);
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
     const names=Object.keys(directory);
-    if(names.length && (!draft.customer || !directory[draft.customer])){
-      queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
-    }
+    if(names.length&&(!draft.customer||!directory[draft.customer])) queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
   },[directory,draft.customer,setDraft]);
 
+  const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
-    if(isProductionBackendEnabled()&&!draft.customer){
-      setToast("Bitte zuerst einen Kunden erfassen.");
-      window.setTimeout(()=>setToast(null),2400);
-      return;
-    }
+    if(isProductionBackendEnabled()&&!draft.customer){show("Bitte zuerst einen Kunden erfassen.");return;}
     try{
       if(isProductionBackendEnabled()){
-        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),documentPayload("Rechnung",draft));
-        else await apiPost("/api/documents",documentPayload("Rechnung",draft));
+        const payload=documentPayload(kind,draft);
+        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload);
+        else await apiPost("/api/documents",payload);
       }
-      show(existing?"Rechnung gespeichert.":"Rechnung erstellt.");
-      if(!existing) window.setTimeout(()=>router.push("/rechnungen/"+encodeURIComponent(draft.number)),900);
+      show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
+      if(existing)setEditing(false);
+      else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(draft.number)),900);
     }catch(error){
-      setToast(error instanceof Error?error.message:"Rechnung konnte nicht gespeichert werden.");
-      window.setTimeout(()=>setToast(null),2600);
+      show(error instanceof Error?error.message:`${kind} konnte nicht gespeichert werden.`);
     }
   };
 
-  return <AppShell title={existing ? "Rechnung "+draft.number : "Rechnung erstellen"} subtitle={existing ? "Rechnung bearbeiten" : production ? "Wird beim Erstellen sicher gespeichert" : "Entwurf wird lokal automatisch gespeichert"} active="rechnungen" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Rechnungen"} actions={<><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></>}>
-    {existing&&<div className="document-actions"><Button variant="secondary" icon="mail" onClick={()=>show("Versand wird mit dem E-Mail-Dienst angebunden.")}>Senden</Button><Button href="/zahlungen/neu" variant="secondary" icon="wallet">Zahlung erfassen</Button><Button variant="ghost" onClick={()=>show("Duplizieren wird als eigener Dokument-Workflow angebunden.")}>Duplizieren</Button></div>}
+  const title=existing?`${kind} ${draft.number}`:`${kind} erstellen`;
+  const headerActions=existing&&!editing
+    ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
+    : undefined;
+
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Entwurf wird lokal automatisch gespeichert"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions}>
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
-    <DocumentEditor type="Rechnung" draft={draft} onChange={setDraft} directory={directory}/>
-    <div className="mobile-document-bar"><Button variant="secondary" onClick={()=>setPreview(true)}>Vorschau</Button><Button onClick={()=>void save()}>{existing ? "Speichern" : "Rechnung erstellen"}</Button></div>
-    {preview&&<DocumentModal title="Rechnungsvorschau" onClose={()=>setPreview(false)}><InvoicePreview draft={draft} directory={directory}/></DocumentModal>}
+    {existing&&!editing
+      ? <DocumentReadView type={kind} draft={draft} directory={directory}/>
+      : <DocumentEditor type={kind} draft={draft} onChange={setDraft} directory={directory}/>}
+    {editing&&<div className="mobile-document-bar single-action"><Button onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
+    {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
+    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" onClick={()=>{setMoreOpen(false);show("Angebot für den Versand vorbereitet.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><a href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></a></>:<><button type="button" onClick={()=>{setMoreOpen(false);show("Versand wird mit dem E-Mail-Dienst angebunden.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button><a href="/zahlungen/neu"><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></a></>}</div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
   </AppShell>;
+}
+
+function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
+  const totals=useDocumentTotals(draft);
+  const customer=directory[draft.customer]??customerData[draft.customer]??{sector:"—",city:"—",address:"",zip:""};
+  return <div className="document-detail-view">
+    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2><p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p></section>
+    <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsziel"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):draft.due+" Tage"}</b></div><div><small>MwSt.</small><b>{draft.vatRate}%</b></div></section>
+    <section className="document-detail-section"><div className="section-title"><h2>Positionen</h2></div><div className="document-read-lines">{draft.positions.map(item=><div key={item.id}><div><b>{item.description}</b><small>{item.quantity} × CHF {money(numberValue(item.price))}</small></div><strong>CHF {money(numberValue(item.quantity)*numberValue(item.price))}</strong></div>)}</div><div className="invoice-totals"><span>Zwischentotal <b>CHF {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>CHF {money(totals.vat)}</b></span><strong>Total <b>CHF {money(totals.total)}</b></strong></div></section>
+    {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
+  </div>;
 }
 
 function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory }) {
@@ -343,8 +319,8 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
       </div>
       <div className="form-section">
         <h2>{type}details</h2>
-        <div className="form-grid">
-          <Field label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} onChange={e=>onChange({...draft,number:e.target.value})}/></Field>
+        <div className="form-grid document-meta-grid">
+          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} onChange={e=>onChange({...draft,number:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsziel" : "Gültig bis"}>
             {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
@@ -353,7 +329,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </div>
       </div>
       <div className="form-section">
-        <div className="section-title"><h2>Positionen</h2><button className="text-action" type="button" onClick={addPosition}>+ Position hinzufügen</button></div>
+        <div className="section-title"><h2>Positionen</h2><button className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></button></div>
         <div className="line-items document-line-items">
           <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span><span/></div>
           {draft.positions.map(item=>{
