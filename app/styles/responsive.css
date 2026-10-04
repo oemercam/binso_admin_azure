@@ -721,6 +721,27 @@
   .invoice-totals>strong{font-size:15px}
   .mobile-document-bar{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:10px;padding:10px 0}
   .mobile-document-bar .button{min-height:48px;height:48px;border-radius:12px;font-size:12px}
+  .compact-section-label{display:block;margin:0 0 8px;color:var(--color-muted);font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}
+  .customer-form-section .document-customer-hint b{display:none}
+  .customer-form-section .document-customer-hint{margin-top:6px}
+  .document-meta-grid .document-number-field{grid-column:auto}
+  .document-meta-grid .form-field:last-child{max-width:none}
+  .mobile-position-summary{width:100%;min-height:58px;padding:10px 0;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;gap:10px;align-items:center;border:0;background:transparent;color:inherit;text-align:left}
+  .mobile-position-summary span,.mobile-position-summary b,.mobile-position-summary small{display:block;min-width:0}
+  .mobile-position-summary b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+  .mobile-position-summary small{margin-top:4px;color:var(--color-muted);font-size:10px}
+  .mobile-position-summary strong{font-size:11px;white-space:nowrap}
+  .document-line-item>.mobile-line-field,.document-line-item>.mobile-line-total,.document-line-item>.line-remove{display:none}
+  .document-line-items>.document-line-item{display:block;padding:0}
+  .mobile-position-layer{z-index:120}
+  .mobile-position-sheet{padding-bottom:calc(18px + var(--safe-bottom))}
+  .mobile-position-fields{display:grid;gap:14px}
+  .mobile-position-fields>div:not(.mobile-position-sheet-total){display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mobile-position-sheet-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
+  .mobile-position-sheet-total span{color:var(--color-muted);font-size:11px}
+  .mobile-position-sheet-total b{font-size:14px}
+  .mobile-position-remove{justify-self:start;min-height:40px}
+  .mobile-position-fields>.button{width:100%;min-height:48px}
   .desktop-document-preview,
   .invoice-tablet-preview{display:none}
   .document-modal-body{
