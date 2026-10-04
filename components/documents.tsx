@@ -260,7 +260,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : undefined;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Entwurf wird lokal automatisch gespeichert"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={headerActions}>
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Entwurf wird lokal automatisch gespeichert"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={headerActions} preview={preview}>
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
     {existing&&!editing
       ? <DocumentReadView type={kind} draft={draft} directory={directory}/>
