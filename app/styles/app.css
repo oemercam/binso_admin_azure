@@ -88,7 +88,6 @@
 
 /* Shared app surfaces */
 .surface,
-.metric,
 .invoice-form,
 .timer-card,
 .security-card,
@@ -121,7 +120,7 @@
 /* Dashboard */
 .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .metrics-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.metric{min-height:116px;padding:18px}
+.metric{min-height:116px;padding:18px 0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .metric-top{display:flex;align-items:center;justify-content:space-between;color:var(--color-muted);font-size:12px}
 .metric-top svg{width:18px;height:18px}
 .metric strong{display:block;margin:16px 0 5px;font-size:24px;line-height:1.05;letter-spacing:-.03em}
@@ -1209,3 +1208,18 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .settings-switch>span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .18s ease}
 .settings-switch.is-on{background:#22c55e}.settings-switch.is-on>span{transform:translateX(18px)}
 .settings-switch:disabled{opacity:.45;cursor:not-allowed}
+
+.revenue-bars{height:178px;margin-top:20px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px}
+.revenue-bars button{height:100%;min-width:0;padding:0;display:grid;grid-template-rows:1fr 18px;align-items:end;border:0;background:transparent;color:var(--color-muted);font-size:9px;cursor:pointer}
+.revenue-bars i{width:100%;min-height:12px;display:block;align-self:end;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--color-fg) 18%,transparent);transition:height .22s ease,background .18s ease}
+.revenue-bars button.active i,.revenue-bars button:hover i{background:var(--color-fg)}
+.revenue-bars button:focus-visible{outline:2px solid var(--color-fg);outline-offset:3px;border-radius:4px}
+
+.revenue-bar-detail{min-height:34px;margin-top:18px;display:flex;align-items:baseline;gap:8px;font-size:11px}.revenue-bar-detail>span{color:var(--color-muted)}.revenue-bar-detail b{font-size:12px}
+.revenue-bars{margin-top:6px}
+.revenue-bars button.up i{background:#22c55e}.revenue-bars button.down i{background:#ef4444}.revenue-bars button.neutral i{background:#a3a3a3}
+.revenue-bars button.active i{outline:2px solid currentColor;outline-offset:2px}.revenue-bars button.up{color:#16a34a}.revenue-bars button.down{color:#dc2626}.revenue-bars button.neutral{color:#737373}
+
+/* Visualization standard: no nested cards around charts. */
+.payment-donut-card,.finance-kpis{border:0;border-radius:0;background:transparent;box-shadow:none}
+.donut-center{background:var(--color-bg)}

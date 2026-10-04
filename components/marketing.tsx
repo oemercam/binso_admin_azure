@@ -104,8 +104,14 @@ export function ProductPreview() {
   </div>;
 }
 
-export function ProductScreen({title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
+const productScreens:Record<string,string>={
+  "/preview/dashboard":"/product/binso-one-dashboard-mobile.jpg",
+  "/preview/rechnungen":"/product/binso-one-dashboard-mobile.jpg",
+  "/preview/zeit":"/product/binso-one-dashboard-mobile.jpg",
+};
+
+export function ProductScreen({route="/preview/dashboard",title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
   return <figure className={`product-screen product-screen-${variant}`}>
-    <img src="/product/binso-one-dashboard-mobile.jpg" alt={title} loading="lazy"/>
+    <img src={productScreens[route]??productScreens["/preview/dashboard"]} alt={title} loading="lazy" decoding="async"/>
   </figure>;
 }
