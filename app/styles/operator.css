@@ -345,3 +345,20 @@
 .operator-stat-ring b,.operator-stat-ring span{grid-area:1/1;z-index:1;text-align:center}
 .operator-stat-ring b{font-size:10px;transform:translateY(-5px)}
 .operator-stat-ring span{font-size:8px;color:var(--color-muted);transform:translateY(7px)}
+
+
+/* Monitoring: compact 2x2 technical dashboard without nested chart cards. */
+.monitoring-technical-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 28px;margin-top:26px}
+.monitoring-technical-chart{min-width:0;padding:0;background:transparent;border:0;box-shadow:none}
+.monitoring-chart-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.monitoring-chart-title b{font-size:13px}.monitoring-chart-title strong{font-size:18px;letter-spacing:-.03em;white-space:nowrap}
+.monitoring-technical-chart>small{display:block;margin-top:8px;color:var(--color-muted);font-size:10px;line-height:1.35}
+.monitoring-compact-bars{height:72px;display:flex;align-items:flex-end;gap:5px}
+.monitoring-compact-bars i{flex:1;min-width:3px;border-radius:4px 4px 1px 1px;background:#111}
+.monitoring-compact-bars.database i{background:#60a5fa}
+.monitoring-compact-ring{--health:100%;width:74px;aspect-ratio:1;margin:2px auto 0;display:grid;place-items:center;border-radius:50%;background:conic-gradient(#22c55e 0 var(--health),var(--color-line) var(--health) 100%);position:relative}
+.monitoring-compact-ring.incidents{background:conic-gradient(#f59e0b 0 var(--health),#ef4444 var(--health) 100%)}
+.monitoring-compact-ring:after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--color-bg)}
+.monitoring-compact-ring span{position:relative;z-index:1;font-size:10px;font-weight:750;text-align:center}
+.monitoring-technical-summary{margin-top:26px;padding-top:18px;border-top:1px solid var(--color-line)}
+.monitoring-technical-summary b{font-size:13px}.monitoring-technical-summary p{max-width:760px;margin:6px 0 0;color:var(--color-muted);font-size:11px;line-height:1.55}
