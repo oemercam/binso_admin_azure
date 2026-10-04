@@ -102,9 +102,9 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   return rows;
 }
 
-function RevenueInsight({payments,demo=false}:{payments?:Array<Record<string,unknown>>;demo?:boolean}) {
+function RevenueInsight({invoices,demo=false}:{invoices?:Array<Record<string,unknown>>;demo?:boolean}) {
   const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=[7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400], previous=[3600,5400,6200,9300,7700,8500,11900,10800,9400,13600,12600,16500];
-  if(!demo){current.fill(0);previous.fill(0);const now=new Date();for(const payment of payments??[]){const date=new Date(String(payment.paid_on??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(payment.amount??0);if(date.getFullYear()===now.getFullYear()) current[date.getMonth()]+=amount;else if(date.getFullYear()===now.getFullYear()-1) previous[date.getMonth()]+=amount;}}
+  if(!demo){current.fill(0);previous.fill(0);const now=new Date();for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===now.getFullYear()) current[date.getMonth()]+=amount;else if(date.getFullYear()===now.getFullYear()-1) previous[date.getMonth()]+=amount;}}
   const total=current.reduce((a,b)=>a+b,0), previousTotal=previous.reduce((a,b)=>a+b,0), change=previousTotal?((total-previousTotal)/previousTotal*100):0, max=Math.max(1,...current,...previous);
   const points=(values:number[])=>values.map((value,index)=>`${index/(values.length-1)*100},${94-value/max*78}`).join(" ");
   const paid=demo?103200:total, open=demo?18400:0, overdue=demo?6850:0, volume=Math.max(1,paid+open+overdue), paidPct=Math.round(paid/volume*100), openPct=Math.round(open/volume*100), overduePct=Math.max(0,100-paidPct-openPct);
@@ -112,13 +112,13 @@ function RevenueInsight({payments,demo=false}:{payments?:Array<Record<string,unk
   return <section className="surface revenue-insight">
     <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div><p className="trend-positive">↗ {change.toFixed(1)} % <span>zum Vorjahr</span></p></div><span className="revenue-period">12 Monate</span></div>
     <div className="revenue-chart"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="Umsatzentwicklung über zwölf Monate"><defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563eb" stopOpacity=".22"/><stop offset="100%" stopColor="#2563eb" stopOpacity=".02"/></linearGradient></defs><polygon points={`0,100 ${points(current)} 100,100`} fill="url(#revenueFill)"/><polyline className="revenue-line previous" points={points(previous)}/><polyline className="revenue-line current" points={points(current)}/>{current.map((value,index)=><circle key={months[index]} className="revenue-dot" cx={index/11*100} cy={94-value/max*78} r="1.2"><title>{months[index]}: {moneyChf(value)}</title></circle>)}</svg><div className="revenue-axis">{months.map(m=><span key={m}>{m}</span>)}</div><div className="chart-legend"><span><i className="legend-current"/>Aktuelles Jahr</span><span><i className="legend-previous"/>Vorjahr</span></div></div>
-    <div className="finance-insights"><div className="payment-donut-card"><div className="payment-donut" style={{background:`conic-gradient(#22c55e 0 ${paidPct}%, #cbd5e1 ${paidPct}% ${paidPct+openPct}%, #ef4444 ${paidPct+openPct}% 100%)`}}><div><b>{moneyChf(volume)}</b><span>Volumen</span></div></div><div className="payment-legend"><p><i className="paid"/>Bezahlt <b>{moneyChf(paid)}</b><span>{paidPct} %</span></p><p><i className="open"/>Offen <b>{moneyChf(open)}</b><span>{openPct} %</span></p><p><i className="overdue"/>Überfällig <b>{moneyChf(overdue)}</b><span>{overduePct} %</span></p></div></div><div className="finance-kpis"><div><span>Zahlungen</span><b>{count}</b></div><div><span>Durchschnitt</span><b>{moneyChf(count?paid/count:0)}</b></div><div><span>Stärkster Monat</span><b>{months[strongestIndex]}</b><small>{moneyChf(current[strongestIndex])}</small></div></div></div>
+    <div className="finance-insights"><div className="payment-donut-card"><div className="payment-donut" style={{background:`conic-gradient(#22c55e 0 ${paidPct}%, #cbd5e1 ${paidPct}% ${paidPct+openPct}%, #ef4444 ${paidPct+openPct}% 100%)`}}><div><b>{moneyChf(volume)}</b><span>Volumen</span></div></div><div className="payment-legend"><p><i className="paid"/>Bezahlt <b>{moneyChf(paid)}</b><span>{paidPct} %</span></p><p><i className="open"/>Offen <b>{moneyChf(open)}</b><span>{openPct} %</span></p><p><i className="overdue"/>Überfällig <b>{moneyChf(overdue)}</b><span>{overduePct} %</span></p></div></div><div className="finance-kpis"><div><span>Rechnungen</span><b>{count}</b></div><div><span>Durchschnitt</span><b>{moneyChf(count?paid/count:0)}</b></div><div><span>Stärkster Monat</span><b>{months[strongestIndex]}</b><small>{moneyChf(current[strongestIndex])}</small></div></div></div>
   </section>;
 }
 
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
-  const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>}>({});
+  const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
 
   useEffect(()=>{
     if(!production) return;
@@ -145,7 +145,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
       <Metric label="Kunden" value={String(stats.customers_total??0)} hint="Aktive Kunden" icon="users"/>
       <Metric label="Zeit diese Woche" value={String(hours)+":"+String(mins).padStart(2,"0")+" h"} hint="Erfasste Arbeitszeit" icon="clock"/>
     </div>
-    <RevenueInsight payments={data.analyticsPayments??[]}/>\n    <div className="dashboard-grid">
+    <RevenueInsight invoices={data.analyticsInvoices??[]}/>\n    <div className="dashboard-grid">
       <section className="surface">
         <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
         {invoices.length?<div className="compact-list">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{customer?.name??"Kunde"} · {swissDate(item.issue_date)}</span><Status tone={String(item.status)==="paid"?"success":String(item.status)==="overdue"?"danger":"warning"}>{String(item.status)==="paid"?"Bezahlt":String(item.status)==="overdue"?"Überfällig":String(item.status)==="draft"?"Entwurf":"Offen"}</Status><strong>{moneyChf(item.total)}</strong></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Rechnungen" text="Erstelle die erste Rechnung für einen Kunden." action={<Button href="/rechnungen/neu">Rechnung erstellen</Button>}/>}
