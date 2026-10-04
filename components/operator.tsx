@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
@@ -87,6 +88,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
+  const [accountOpen,setAccountOpen]=useState(false);
+  const router=useRouter();
+  const logout=async()=>{try{await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}});}finally{router.push("/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
@@ -97,8 +101,10 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
     <main className="operator-main">
       <header className="operator-app-header">
         <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
-        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><span className="avatar">OC</span></div>
+        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
+      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
+
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
         <button type="button" className={["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
