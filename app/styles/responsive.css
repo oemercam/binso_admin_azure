@@ -1951,3 +1951,60 @@
 @media (max-width:760px){
   .monitoring-latency-chart,.monitoring-health-chart,.operator-chart-card,.operator-selected-metric,.payment-donut-card,.finance-kpis{border:0;border-radius:0;background:transparent;box-shadow:none}
 }
+
+
+/* Canonical mobile document detail layout: invoice and offer parity. */
+@media (max-width:760px){
+  .mobile-header-detail:has(.document-header-icons){
+    grid-template-columns:44px minmax(0,1fr) 124px;
+  }
+  .mobile-header-detail:has(.document-header-icons) .mobile-header-title{
+    padding:0 6px;
+    text-align:left;
+    font-size:13px;
+    line-height:1.2;
+  }
+  .mobile-header-detail .document-header-icons{
+    width:124px;
+    display:grid;
+    grid-template-columns:repeat(3,40px);
+    gap:2px;
+    justify-content:end;
+  }
+  .mobile-header-detail .document-header-icons .icon-button{
+    width:40px;
+    min-width:40px;
+    height:40px;
+    min-height:40px;
+    padding:0;
+  }
+
+  .document-detail-view{gap:0}
+  .document-detail-section{padding:18px 0}
+  .document-detail-section:first-child{padding-top:10px}
+  .document-detail-section h2{margin:8px 0 4px;font-size:18px;line-height:1.25}
+  .document-detail-section p{font-size:12px;line-height:1.45}
+  .document-facts{
+    gap:12px;
+    padding:16px 0;
+  }
+  .document-facts small{margin-bottom:5px;font-size:10px}
+  .document-facts b{font-size:12px}
+  .document-lines-section>.section-title{margin:0 0 6px}
+  .document-lines-section>.section-title h2{margin:0;font-size:18px}
+  .document-read-lines>div{
+    min-height:64px;
+    padding:12px 0;
+    gap:12px;
+  }
+  .document-read-lines b{font-size:13px;line-height:1.3}
+  .document-read-lines small{margin-top:4px;font-size:11px}
+  .document-read-lines strong{font-size:12px}
+  .document-lines-section .invoice-totals{
+    margin-top:10px;
+    padding-top:8px;
+  }
+  .document-lines-section .invoice-totals>span,
+  .document-lines-section .invoice-totals>strong{min-height:28px}
+  .document-lines-section .invoice-totals>strong{font-size:16px}
+}
