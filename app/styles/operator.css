@@ -267,3 +267,19 @@
 .operator-back-app{min-height:36px;display:inline-flex;align-items:center;gap:7px;color:#777;font-size:10px}
 .operator-demo-filter{color:#777;font-size:10px}
 .operator-mobile-nav{display:none}
+
+.operator-dashboard-cockpit{display:grid;gap:18px}
+.operator-health-strip,.operator-chart-card,.operator-selected-metric{border:1px solid #e4e4e1;border-radius:18px;background:#fff;padding:18px}
+.operator-health-services{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+.operator-health-services button{display:grid;gap:4px;text-align:left;border:1px solid #ececea;border-radius:14px;background:#fff;padding:14px;cursor:pointer}
+.operator-health-services i{width:9px;height:9px;border-radius:50%;background:#12b76a}.operator-health-services i.warn{background:#f79009}
+.operator-health-services span{font-size:12px;color:#12a660}.operator-health-services small{color:#777}
+.operator-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.operator-chart-card{display:grid;gap:5px;text-align:left;cursor:pointer;transition:border-color .18s,transform .18s}.operator-chart-card:hover,.operator-chart-card.active{border-color:#aaa}.operator-chart-card:active{transform:scale(.99)}
+.operator-chart-card>strong{font-size:28px}.operator-chart-card>small{color:#0aaf65}
+.operator-spark{height:76px;display:flex;align-items:end;gap:5px;border-bottom:1px solid #eee;margin-top:8px}.operator-spark i{flex:1;border-radius:4px 4px 0 0;background:#d7f6e6}.operator-spark i:nth-child(2n){height:48%}.operator-spark i:nth-child(3n){height:72%}.operator-spark i:nth-child(4n){height:88%}.operator-spark i:nth-child(5n){height:60%}.operator-spark-1 i{background:#dcecff}.operator-spark-2 i{background:#eadcff}
+.operator-insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.operator-ticket-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.ticket-stat{display:grid;gap:3px;padding:12px;border-radius:12px;background:#fafafa;text-align:center}.ticket-stat strong{font-size:25px}.ticket-stat span{font-size:12px;color:#666}.ticket-stat.t3 strong{color:#e5484d}
+.operator-sla>strong{font-size:31px}.operator-sla>span{margin-left:10px;color:#0aaf65}.sla-bar{display:grid;grid-template-columns:96.3fr 2.5fr 1.2fr;width:100%;height:14px;padding:0;border:0;border-radius:99px;overflow:hidden;margin:18px 0 10px;cursor:pointer}.sla-bar i:nth-child(1){background:#12b76a}.sla-bar i:nth-child(2){background:#f79009}.sla-bar i:nth-child(3){background:#f04438}.operator-sla>div{display:flex;justify-content:space-between;color:#666}
+.operator-category-bars{display:grid;gap:14px;margin-top:12px}.operator-category-bars a{display:grid;grid-template-columns:minmax(130px,1fr) 1.2fr 28px;gap:10px;align-items:center}.operator-category-bars i{height:8px;background:#eee;border-radius:99px;overflow:hidden}.operator-category-bars b{display:block;height:100%;background:#5897f7;border-radius:99px}.operator-category-bars strong{text-align:right}
+.operator-selected-metric{display:flex;align-items:baseline;gap:12px}.operator-selected-metric strong{font-size:24px}.operator-selected-metric small{margin-left:auto;color:#777}
