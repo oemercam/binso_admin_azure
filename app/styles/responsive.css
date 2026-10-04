@@ -541,31 +541,52 @@
   .timer-active .mobile-document-bar{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 66px)}
 
   .invoice-workspace{display:block}
-  .invoice-form{border:0;border-radius:0}
+  .invoice-form{border:0;border-radius:0;overflow:visible}
+  .invoice-form .form-section{padding:18px 0}
+  .invoice-form .form-section:first-child{padding-top:0}
+  .invoice-form .form-section>h2,
+  .invoice-form .section-title h2{font-size:15px;letter-spacing:-.01em}
+  .invoice-form .form-field,
+  .invoice-form .form-grid>label{gap:6px;font-size:12px}
+  .invoice-form :is(input,select,textarea){min-height:46px;border-radius:12px}
+  .invoice-form textarea{min-height:104px;padding-block:12px}
+  .document-customer-hint{margin:8px 0 0;font-size:11px}
+  .document-customer-hint b,.document-customer-hint span{display:block}
+  .document-customer-hint span{margin-top:2px}
   .document-actions{
     width:100%;
-    margin:0 0 16px;
+    margin:0 0 18px;
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px;
     overflow:visible;
   }
-  .document-actions .button{width:100%;min-width:0;padding-inline:10px}
+  .document-actions .button{width:100%;min-width:0;min-height:44px;height:44px;padding-inline:10px;font-size:11px}
   .document-actions .button:last-child{grid-column:1/-1}
-  .line-items,
-  .document-line-items{width:100%;overflow:visible;border-left:0;border-right:0;border-radius:0}
-  .line-items>div,
-  .document-line-items>div{
+  .document-line-items{width:100%;overflow:visible;border:0;border-radius:0}
+  .document-line-items>.line-head{display:none}
+  .document-line-items>.document-line-item{
+    position:relative;
     width:100%;
     min-width:0;
-    grid-template-columns:minmax(0,1fr) 46px 68px 82px 28px;
-    gap:4px;
-    padding-inline:0;
+    padding:14px 40px 14px 0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(82px,.55fr);
+    gap:12px 10px;
+    border-bottom:1px solid var(--color-line);
   }
-  .document-line-items input{min-width:0;width:100%;padding-inline:3px;font-size:14px}
-  .document-line-items b{min-width:0;text-align:right;font-size:11px;white-space:nowrap}
-  .document-line-items .line-head{font-size:9px}
-  .invoice-totals{width:min(100%,310px)}
+  .mobile-line-field{min-width:0;display:grid;gap:5px}
+  .mobile-line-field.description{grid-column:1/-1}
+  .mobile-line-field>span,.mobile-line-total>span{display:block;color:var(--color-muted);font-size:10px;font-weight:650}
+  .document-line-items .mobile-line-field input{width:100%;min-width:0;height:44px;min-height:44px;padding:0 10px;border:1px solid var(--color-line);border-radius:10px;font-size:16px;text-align:left}
+  .mobile-line-total{min-width:0;display:grid;align-content:end;gap:7px;text-align:right}
+  .mobile-line-total b{font-size:12px;white-space:nowrap}
+  .document-line-items .line-remove{position:absolute;right:0;top:42px;width:32px;height:44px}
+  .invoice-totals{width:100%;margin-top:16px}
+  .invoice-totals>span,.invoice-totals>strong{min-height:34px}
+  .invoice-totals>strong{font-size:15px}
+  .mobile-document-bar{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:10px;padding:10px 0}
+  .mobile-document-bar .button{min-height:48px;height:48px;border-radius:12px;font-size:12px}
   .desktop-document-preview,
   .invoice-tablet-preview{display:none}
   .document-modal-body{
