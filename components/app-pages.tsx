@@ -340,14 +340,14 @@ function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=fa
 
 export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const offerRows=useDocumentRows("offer",offers,forceDemo);
-  return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus">Neues Angebot</Button>}>
+  return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Angebot"><span className="create-action-label">Neues Angebot</span></Button>}>
     <RecordsView items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const invoiceRows=useDocumentRows("invoice",invoices,forceDemo);
-  return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
+  return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neue Rechnung"><span className="create-action-label">Neue Rechnung</span></Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
         <RecordsView items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
