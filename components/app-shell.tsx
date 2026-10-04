@@ -462,7 +462,7 @@ export function AppShell({
           </div>}
 
           {sheet === "search" && <div className="global-search">
-            <label className="searchbox large"><Icon name="search"/><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kunden, Rechnungen, Angebote oder Tickets suchen..."/></label>
+            <label className="searchbox large"><Icon name="search"/><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Suchen..."/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>setQuery("")}> <Icon name="close" size={15}/></button>}</label>
             <div className="search-results">
               {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
               {production&&query.trim().length>=2&&filtered.length===0&&<p className="technical-hint">Keine Treffer gefunden.</p>}
