@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantRpc } from "@/lib/server/database";
 
-type Line={description?:unknown;quantity?:unknown;unitPrice?:unknown};
+type Line={unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown};
 type DocumentBody={
-  kind?:unknown;customerName?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
+  kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
 };
 
@@ -26,18 +26,20 @@ export async function POST(request:NextRequest){
     const number=cleanText(body.number,80);
     const issueDate=cleanText(body.issueDate,20);
     const rawItems=Array.isArray(body.items)?body.items as Line[]:[];
-    if(!kind||!customerName||!issueDate||rawItems.length===0) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
+    if(!kind||(!customerName&&!body.customerId)||!issueDate||rawItems.length===0||rawItems.length>100) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
 
-    const customers=await tenantList<{id:string}>("customers","id","name=eq."+encodeURIComponent(customerName)+"&limit=1");
+    const customers=await tenantList<{id:string}>("customers","id",(body.customerId?"id=eq."+encodeURIComponent(cleanText(body.customerId,80)):"name=eq."+encodeURIComponent(customerName))+"&limit=2");
     const customer=customers[0];
-    if(!customer) return json({error:"customer_not_found",message:"Kunde wurde nicht gefunden."},400);
+    if(customers.length!==1) return json({error:"customer_not_found",message:"Kunde wurde nicht gefunden."},400);
 
-    const items=rawItems.slice(0,100).map(item=>({
+    const items=rawItems.map(item=>({
       description:cleanText(item.description,500),
+      unit:cleanText(item.unit,40)||"Stück",
       quantity:Number(item.quantity),
       unit_price:Number(item.unitPrice),
+      vat_rate:item.vatRate===undefined?Number(body.vatRate):Number(item.vatRate),
     }));
-    if(items.some(item=>!item.description||!Number.isFinite(item.quantity)||item.quantity<0||!Number.isFinite(item.unit_price)||item.unit_price<0)){
+    if(items.some(item=>!Number.isFinite(item.vat_rate)||item.vat_rate<0||item.vat_rate>100||!item.description||!Number.isFinite(item.quantity)||item.quantity<0||!Number.isFinite(item.unit_price)||item.unit_price<0)){
       return json({error:"invalid_line_items",message:"Mindestens eine Position ist ungültig."},400);
     }
 

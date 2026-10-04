@@ -1,4 +1,5 @@
 "use client";
+import {startDemoClientSession} from "@/lib/client/backend";
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -214,19 +215,7 @@ export function PortalRegister(){
 }
 
 async function startDemoSession({name,company,focus}:{name:string;company:string;focus:string}){
-  const now=Date.now();
-  window.localStorage.setItem("binso.demo.session","1");
-  window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
-  window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
-  window.localStorage.setItem("binso.demo.focus",focus);
-  window.localStorage.setItem("binso.demo.startedAt",String(now));
-  window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
-
-  const response=await fetch("/api/demo/session",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-  });
-  if(!response.ok) throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
+  await startDemoClientSession({name,company,focus});
 }
 
 function PortalFrame({children,compact=false}:{children:React.ReactNode;compact?:boolean}){

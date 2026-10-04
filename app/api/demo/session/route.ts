@@ -1,3 +1,8 @@
+import {randomUUID} from "node:crypto";
+import {env} from "@/lib/server/env";
+import {provisionOrganization} from "@/lib/server/provisioning";
+import {createSession,destroySession,getSession} from "@/lib/server/session";
+import {enforceRateLimit} from "@/lib/server/rate-limit";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { assertSameOrigin, apiError, json } from "@/lib/server/http";
@@ -13,7 +18,18 @@ export async function GET(){
 export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);
-    const response=json({ok:true,active:true,mode:"demo",expiresIn:demoMaxAge});
+    let databaseBacked=false;
+    if(env.databaseUrl){
+      const current=await getSession();
+      if(!current?.isDemo){
+        await enforceRateLimit(request,'demo-provision',10,60*60*1000);
+        const userId='demo-'+randomUUID(),email=userId+'@example.invalid';
+        const created=await provisionOrganization({userId,email,name:'Demo Benutzer',companyName:'Demo',plan:'business',mode:'demo'});
+        await createSession({userId,organizationId:created.organizationId,email,name:'Demo Benutzer',role:'owner',ttlHours:24,cookieName:'binso_demo_write'});
+      }
+      databaseBacked=true;
+    }
+    const response=json({ok:true,active:true,mode:"demo",databaseBacked,expiresIn:demoMaxAge});
     response.cookies.set(demoCookie,"1",{
       httpOnly:true,
       secure:process.env.NODE_ENV==="production",
@@ -28,6 +44,7 @@ export async function POST(request:NextRequest){
 export async function DELETE(request:NextRequest){
   try{
     assertSameOrigin(request);
+    await destroySession("binso_demo_write");
     const response=json({ok:true,active:false,mode:"demo"});
     response.cookies.set(demoCookie,"",{
       httpOnly:true,

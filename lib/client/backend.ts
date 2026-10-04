@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export function isProductionBackendEnabled(){
   if(typeof window==="undefined") return false;
   if(document.querySelector('[data-operator-demo="true"]'))return false;
-  return window.localStorage.getItem("binso.demo.session")!=="1" && !window.location.pathname.startsWith("/preview/");
+  return (window.localStorage.getItem("binso.demo.session")!=="1" || window.localStorage.getItem("binso.demo.database")==="1") && !window.location.pathname.startsWith("/preview/");
 }
 
 export function useBackendMode(){
@@ -20,6 +20,7 @@ export function clearDemoClientSession(){
   if(typeof window==="undefined") return;
   [
     "binso.demo.session",
+    "binso.demo.database",
     "binso.demo.name",
     "binso.demo.company",
     "binso.demo.focus",
@@ -51,6 +52,9 @@ export async function startDemoClientSession({
     method:"POST",
     headers:{"Content-Type":"application/json"},
   });
+  const payload=await response.json().catch(()=>({}));
+  if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");
+  else window.localStorage.removeItem("binso.demo.database");
   if(!response.ok){
     clearDemoClientSession();
     throw new Error("Demo-Sitzung konnte nicht gestartet werden.");

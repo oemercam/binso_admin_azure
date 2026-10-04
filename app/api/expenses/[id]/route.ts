@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantUpdate, requireTenantFeature } from "@/lib/server/database";
 
-type Body={merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
+type Body={employeeId?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
   try{
@@ -25,7 +25,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
     if(!merchant||!Number.isFinite(amount)||amount<0||!Number.isFinite(vat)||vat<0) return json({error:"invalid_expense",message:"Spesenangaben sind ungültig."},400);
     if(status&&!["draft","submitted","approved","rejected"].includes(status)) return json({error:"status_invalid",message:"Ungültiger Status."},400);
     const rows=await tenantUpdate("expenses",id,{
-      merchant,expense_date:cleanText(body.expenseDate,20)||new Date().toISOString().slice(0,10),category:cleanText(body.category,120)||null,
+      employee_id:cleanText(body.employeeId,80)||null,merchant,expense_date:cleanText(body.expenseDate,20)||new Date().toISOString().slice(0,10),category:cleanText(body.category,120)||null,
       amount,currency:cleanText(body.currency,3)||"CHF",vat_rate:vat,description:cleanText(body.description,2000)||null,status:status||"draft",
     });
     if(!rows[0]) return json({error:"not_found",message:"Spese wurde nicht gefunden."},404);
