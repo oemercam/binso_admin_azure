@@ -1219,3 +1219,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .revenue-bars{margin-top:6px}
 .revenue-bars button.up i{background:#22c55e}.revenue-bars button.down i{background:#ef4444}.revenue-bars button.neutral i{background:#a3a3a3}
 .revenue-bars button.active i{outline:2px solid currentColor;outline-offset:2px}.revenue-bars button.up{color:#16a34a}.revenue-bars button.down{color:#dc2626}.revenue-bars button.neutral{color:#737373}
+
+/* Visualization standard: no nested cards around charts. */
+.payment-donut-card,.finance-kpis{border:0;border-radius:0;background:transparent;box-shadow:none}
+.donut-center{background:var(--color-bg)}
