@@ -530,7 +530,7 @@ function MonitoringCockpit({services,api,database,availability,errorRate,inciden
   const bars=[32,38,35,42,39,48,44,52,46,58,49,55,61,53,47,45,42,40,38,41,36,34,37,32];
   return <div className="monitoring-cockpit">
     <div className="monitoring-kpis monitoring-kpis-visual">
-      <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring availability" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
+      <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
       <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{[42,56,48,68,61,76,58,70].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{[62,48,55,43,51,38,45,41].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(services.length?Math.round(degraded/services.length*100):0)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
