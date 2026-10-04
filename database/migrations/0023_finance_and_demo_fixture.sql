@@ -25,6 +25,10 @@ drop policy if exists operating_costs_tenant on operating_costs;
 create policy operating_costs_tenant on operating_costs
   using (scope='tenant' and organization_id::text=nullif(current_setting('app.organization_id',true),''))
   with check (scope='tenant' and organization_id::text=nullif(current_setting('app.organization_id',true),''));
+drop policy if exists operating_costs_platform on operating_costs;
+create policy operating_costs_platform on operating_costs
+  using (scope='platform' and current_setting('app.platform_operator',true)='true')
+  with check (scope='platform' and current_setting('app.platform_operator',true)='true');
 
 
 -- Isolated deterministic demo workspace. Safe to rerun.
