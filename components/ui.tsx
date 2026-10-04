@@ -71,7 +71,7 @@ export function Button({
   ariaLabel,
 }: {
   href?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: "primary" | "secondary" | "ghost" | "danger";
   icon?: string;
   onClick?: () => void;
