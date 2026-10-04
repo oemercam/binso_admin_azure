@@ -18,9 +18,10 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
  }
  await c.query("select set_config('app.organization_id',$1,true)",[organizationId]);
  await c.query("select set_config('app.user_id',$1,true)",[userId]);
+ const metadata=await c.query("select relname,attname from pg_attribute a join pg_class t on t.oid=a.attrelid join pg_namespace n on n.oid=t.relnamespace where n.nspname='public' and t.relname=any($1::text[]) and a.attnum>0 and not a.attisdropped and a.attgenerated='' order by t.relname,a.attnum",[[...tables]]);
  for(const table of tables){
-  const metadata=await c.query("select attname from pg_attribute where attrelid=$1::regclass and attnum>0 and not attisdropped and attgenerated='' order by attnum",[table]);
-  const columns=metadata.rows.map(row=>'"'+String(row.attname).replaceAll('"','""')+'"').join(',');
+  const columns=metadata.rows.filter(row=>row.relname===table).map(row=>'"'+String(row.attname).replaceAll('"','""')+'"').join(',');
+  const records=[];
   for(const original of source.get(table)??[]){
    const row={...original};
    for(const [key,value] of Object.entries(row)){
@@ -30,8 +31,9 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
    }
    if(table==='support_cases')row.case_number=String(original.case_number)+'-'+organizationId;
    if(table==='employees')row.email=(original===(source.get(table)??[])[0]?userId:String(row.id))+'@example.invalid';
-   await c.query(`insert into ${table}(${columns}) select ${columns} from jsonb_populate_record(null::${table},$1::jsonb) on conflict(id) do nothing`,[JSON.stringify(row)]);
+   records.push(row);
   }
+  if(records.length)await c.query(`insert into ${table}(${columns}) select ${columns} from jsonb_populate_recordset(null::${table},$1::jsonb) on conflict(id) do nothing`,[JSON.stringify(records)]);
  }
  await c.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',1) on conflict do nothing`,[organizationId]);
 }

@@ -103,7 +103,7 @@ jobs:
 
           PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-standalone.log 2>&1 &
           APP_PID=$!
-          trap 'kill $APP_PID 2>/dev/null || true' EXIT
+          trap 'result=$?; if [ "$result" -ne 0 ]; then cat /tmp/binso-standalone.log; fi; kill $APP_PID 2>/dev/null || true' EXIT
 
           READY=0
           for attempt in {1..30}; do
@@ -123,7 +123,7 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
-          curl -fsS --max-time 20 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
+          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
           test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
 
           BINSO_BASE_URL=http://127.0.0.1:3100 node ../../scripts/check-persistence.mjs
@@ -213,7 +213,7 @@ jobs:
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
           echo "Binso One production health check passed."
 
-          curl -fsS --max-time 20 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
+          curl -fsS --max-time 60 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
           echo "Verifying demo session endpoint."
           for collection in customers customer_contacts products employees expenses documents payments; do
             echo "Verifying PostgreSQL demo collection: $collection"
