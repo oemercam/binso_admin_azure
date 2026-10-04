@@ -17,6 +17,7 @@ const desktopNav = [
   ["/zeit","Zeiterfassung","clock"],
   ["/spesen","Spesen","card"],
   ["/finanzen","Finanzen","chart"],
+  ["/finanzen","Finanzen","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
 
