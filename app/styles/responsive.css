@@ -959,6 +959,12 @@
   .operator-main>header>div:first-child{min-width:0}
   .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
   .operator-main>header p{margin-top:8px;line-height:1.45}
+  .operator-app-header{min-height:var(--mobile-header-h);margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px!important;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 10px max(var(--mobile-page-x),var(--safe-left))!important;align-items:center!important;border-bottom:1px solid var(--color-line)!important;background:var(--color-bg)}
+  .operator-header-brand{gap:10px}.operator-header-brand>.logo{display:block;width:82px;height:28px;flex:0 0 auto}.operator-header-brand>div{display:none}
+  .operator-user{gap:4px}.operator-user .icon-button{width:40px;height:40px;min-width:40px}.operator-user .avatar{width:40px;height:40px}
+  .monitoring-kpis{grid-template-columns:1fr 1fr;gap:8px}.monitoring-kpis section{padding:12px;border-radius:12px}.monitoring-kpis strong{font-size:21px}
+  .monitoring-visual-grid{grid-template-columns:1fr;gap:12px}.monitoring-latency-chart,.monitoring-health-chart{padding:14px}.monitoring-bars{height:112px;gap:3px}.monitoring-ring{width:132px}.monitoring-ring:before{width:98px}
+  .monitoring-secondary{display:none}
   .operator-user{flex:0 0 auto}
   .operator-table-card{margin-top:16px}
   .operator-toolbar{align-items:stretch;flex-direction:column;gap:10px;margin-bottom:14px}
