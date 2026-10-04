@@ -98,18 +98,25 @@ for(const route of routes){
     seenAssets.add(assetUrl);
 
     let asset;
-    try{
-      asset=await fetch(assetUrl,{headers:{"cache-control":"no-cache"}});
-    }catch(error){
-      failures.push(`${route}: stylesheet request failed ${assetUrl} (${error instanceof Error?error.message:String(error)})`);
+    let assetError;
+    for(let attempt=1;attempt<=6;attempt++){
+      try{
+        const probe=new URL(assetUrl);
+        probe.searchParams.set("verify",String(attempt));
+        asset=await fetch(probe,{headers:{"cache-control":"no-cache, no-store"}});
+        if(asset.ok) break;
+        assetError=`HTTP ${asset.status}`;
+      }catch(error){
+        assetError=error instanceof Error?error.message:String(error);
+      }
+      if(attempt<6) await new Promise(resolve=>setTimeout(resolve,1500));
+    }
+    if(!asset?.ok){
+      failures.push(`${route}: stylesheet unavailable after retries ${assetUrl} (${assetError||"unknown error"})`);
       continue;
     }
 
     const type=asset.headers.get("content-type")||"";
-    if(!asset.ok){
-      failures.push(`${route}: stylesheet HTTP ${asset.status} ${assetUrl}`);
-      continue;
-    }
     if(!type.includes("text/css")){
       failures.push(`${route}: stylesheet has wrong content-type "${type}" ${assetUrl}`);
       continue;
