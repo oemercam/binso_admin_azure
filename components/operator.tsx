@@ -151,7 +151,7 @@ function OperatorDashboard() {
   const [metric,setMetric]=useState<"availability"|"users"|"api">("availability");
   useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
   const stats=data.stats??{};
-  const recent=production?(data.tickets??[]):tickets.map(([nr,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket);
+  const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket));
   const incidents=data.incidents??[];
   const open=production?Number(stats.tickets_open??0):8, progress=production?Number(stats.tickets_in_progress??0):12;
   const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
