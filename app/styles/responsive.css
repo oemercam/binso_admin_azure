@@ -1567,3 +1567,11 @@
   .bottom-nav span{display:none}
   .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
 }
+
+@media (max-width: 767px){
+  .payment-summary-strip{grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 14px}
+  .payment-summary-strip>div{padding:9px 8px}
+  .payment-summary-strip span{font-size:9px}
+  .payment-summary-strip b{font-size:12px;white-space:nowrap}
+  .payment-summary-strip small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
