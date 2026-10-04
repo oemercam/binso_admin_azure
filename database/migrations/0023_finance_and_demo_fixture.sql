@@ -96,3 +96,20 @@ values
 ('a0000000-0000-4000-8000-000000000003',null,'demo-platform-azure','2026-10-01','infrastructure','Microsoft Azure','Binso One Plattform Infrastruktur',2840,'platform'),
 ('a0000000-0000-4000-8000-000000000004',null,'demo-platform-services','2026-10-01','software','Platform Services','E-Mail, Monitoring und Services',640,'platform')
 on conflict(id) do nothing;
+
+
+insert into time_entries(id,organization_id,external_id,project_id,employee_id,person_name,worker_type,work_date,hours,description,billable,approved,sales_rate,internal_cost_rate)
+values
+('c0000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-time-1','30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','Nina Müller','employee','2026-10-02',7.5,'Konzeption und Umsetzung',true,true,185,58),
+('c0000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-time-2','30000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000002','David Schmid','employee','2026-10-03',6.75,'Cloud Migration',true,true,205,64)
+on conflict(id) do nothing;
+
+insert into tasks(id,organization_id,external_id,title,customer_id,project_id,assignee_employee_id,due_date,priority,status)
+values
+('d0000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-task-1','Client Rollout vorbereiten','10000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','2026-10-12','high','in_progress'),
+('d0000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-task-2','Migration prüfen','10000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000002','2026-10-15','normal','open')
+on conflict(id) do nothing;
+
+insert into platform_tenants(id,organization_id,owner_name,owner_email,platform_status,seats,monthly_revenue_chf,storage_mb,last_active_at)
+values('b0000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','Demo Admin','demo@example.invalid','active',5,490,2048,now())
+on conflict(organization_id) do update set monthly_revenue_chf=excluded.monthly_revenue_chf,seats=excluded.seats,last_active_at=excluded.last_active_at;
