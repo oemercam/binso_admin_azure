@@ -14,6 +14,11 @@ export async function GET(){
       "id,paid_on,amount,status,customer:customers(name),invoice:documents(number)",
       "order=created_at.desc&limit=5"
     );
-    return json({stats,invoices,payments});
+    const analyticsPayments=await tenantList<Record<string,unknown>>(
+      "payments",
+      "id,paid_on,amount,status",
+      "status=eq.booked&order=paid_on.desc&limit=500"
+    );
+    return json({stats,invoices,payments,analyticsPayments});
   }catch(error){return apiError(error);}
 }
