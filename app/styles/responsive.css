@@ -1759,3 +1759,20 @@
     line-height:1.18;
   }
 }
+
+@media (max-width:760px){
+  .revenue-insight{padding:16px;margin-top:12px}
+  .revenue-insight-head h2{font-size:18px}.revenue-total{font-size:28px}.revenue-period{padding:7px 9px}
+  .revenue-chart{margin-top:18px;overflow:hidden}.revenue-chart svg{height:170px}
+  .revenue-axis span:nth-child(even){visibility:hidden}.chart-legend{margin-top:10px}
+  .finance-insights{grid-template-columns:1fr;margin-top:18px}
+  .payment-donut-card{padding:14px;gap:16px}.payment-donut{width:118px}
+  .payment-legend p{font-size:10px}.payment-legend p b{font-size:12px}
+  .finance-kpis{grid-template-columns:repeat(3,1fr)}
+  .finance-kpis>div{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;min-width:0;padding:12px 10px}
+  .finance-kpis>div+div{border-top:0;border-left:1px solid var(--color-border)}
+  .finance-kpis b{font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis}.finance-kpis small{font-size:9px}
+}
+@media (max-width:420px){
+  .payment-donut-card{align-items:flex-start}.payment-donut{width:104px}
+}
