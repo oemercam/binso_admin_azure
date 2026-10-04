@@ -527,18 +527,24 @@ function RestrictionsView() {
 function MonitoringCockpit({services,api,database,availability,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;availability:string;errorRate:string;incidents:Array<Record<string,unknown>>}) {
   const healthy=services.filter(s=>s.status==="operational").length;
   const degraded=services.filter(s=>s.status==="degraded").length;
-  const bars=[32,38,35,42,39,48,44,52,46,58,49,55,61,53,47,45,42,40,38,41,36,34,37,32];
+  const apiBars=[42,56,48,68,61,76,58,70];
+  const dbBars=[62,48,55,43,51,38,45,41];
+  const health=services.length?Math.round(healthy/services.length*100):0;
+  const affected=services.length?Math.round(degraded/services.length*100):0;
   return <div className="monitoring-cockpit">
     <div className="monitoring-kpis monitoring-kpis-visual">
       <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
-      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{[42,56,48,68,61,76,58,70].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{[62,48,55,43,51,38,45,41].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(services.length?Math.round(degraded/services.length*100):0)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
+      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(affected)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
     </div>
-    <div className="monitoring-visual-grid">
-      <section className="surface monitoring-latency-chart"><SectionTitle title="Systemleistung"/><div className="monitoring-chart-head"><div><strong>{api==null?"—":api+" ms"}</strong><span>API Latenz</span></div><small>letzte 24 Stunden</small></div><div className="monitoring-bars" aria-label="Latenzverlauf">{bars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><div className="monitoring-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></section>
-      <section className="surface monitoring-health-chart"><SectionTitle title="Service Health"/><div className="monitoring-ring" style={{"--health":String(services.length?Math.round(healthy/services.length*100):0)+"%"} as React.CSSProperties}><div><strong>{services.length?Math.round(healthy/services.length*100):0}%</strong><span>gesund</span></div></div><div className="monitoring-health-legend"><span><i/>Operational <b>{healthy}</b></span><span><i/>Beeinträchtigt <b>{degraded}</b></span><span><i/>Fehlerrate <b>{errorRate}</b></span></div></section>
+    <div className="monitoring-visual-grid monitoring-technical-grid">
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>API Latenz</b><strong>{api==null?"—":api+" ms"}</strong></div><div className="monitoring-compact-bars">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Aktuelle Antwortzeit und Verlauf</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Datenbank</b><strong>{database==null?"—":database+" ms"}</strong></div><div className="monitoring-compact-bars database">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Abfragezeit der Datenbank</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Service Health</b><strong>{health}%</strong></div><div className="monitoring-compact-ring" style={{"--health":String(health)+"%"} as React.CSSProperties}><span>{healthy}/{services.length}</span></div><small>Operational verfügbare Services</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Fehler und Störungen</b><strong>{incidents.length}</strong></div><div className="monitoring-compact-ring incidents" style={{"--health":String(100-affected)+"%"} as React.CSSProperties}><span>{errorRate}</span></div><small>Fehlerrate und beeinträchtigte Services</small></section>
     </div>
+    <div className="monitoring-technical-summary"><b>Technische Übersicht</b><p>Alle zentralen Plattformwerte auf einen Blick: Verfügbarkeit, API- und Datenbank-Latenz, Service Health, Fehlerrate und aktive Störungen. Darunter bleiben Service-Status und Ereignisse für die technische Detailanalyse sichtbar.</p></div>
   </div>;
 }
 
