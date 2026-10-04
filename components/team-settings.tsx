@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {AppShell} from "./app-shell";
 import {Button,EmptyState,Field,Icon,Status,Toast} from "./ui";
 import {apiGet,apiPatch,apiPost,isProductionBackendEnabled} from "@/lib/client/backend";
@@ -18,8 +18,8 @@ export function TeamSettingsPage(){
  const production=isProductionBackendEnabled();
  const [data,setData]=useState<TeamPayload>({members:production?[]:demoMembers,invitations:[],userLimit:production?1:10,plan:production?"trial":"pro"});
  const [email,setEmail]=useState(""),[role,setRole]=useState("member"),[loading,setLoading]=useState(production),[toast,setToast]=useState<string|null>(null),[inviteOpen,setInviteOpen]=useState(false),[selected,setSelected]=useState<Member|null>(null),[editRole,setEditRole]=useState("member");
- const load=async()=>{if(!production){setLoading(false);return}try{setData(await apiGet<TeamPayload>("/api/settings/team/invitations"))}catch(e){setToast(e instanceof Error?e.message:"Team konnte nicht geladen werden.")}finally{setLoading(false)}};
- useEffect(()=>{queueMicrotask(()=>void load())},[]);
+ const load=useCallback(async()=>{if(!production){setLoading(false);return}try{setData(await apiGet<TeamPayload>("/api/settings/team/invitations"))}catch(e){setToast(e instanceof Error?e.message:"Team konnte nicht geladen werden.")}finally{setLoading(false)}},[production]);
+ useEffect(()=>{queueMicrotask(()=>void load())},[load]);
  const invite=async()=>{if(!email.trim())return;try{if(production)await apiPost("/api/settings/team/invitations",{email,role});setEmail("");setInviteOpen(false);setToast("Einladung wurde gesendet.");await load()}catch(e){setToast(e instanceof Error?e.message:"Einladung konnte nicht gesendet werden.")}window.setTimeout(()=>setToast(null),2600)};
  const openMember=(m:Member)=>{setSelected(m);setEditRole(m.role)};
  const saveRole=async()=>{if(!selected||selected.role==="owner")return;try{if(production)await apiPatch("/api/settings/team/members/"+encodeURIComponent(selected.user_id),{role:editRole});else setData(d=>({...d,members:d.members.map(m=>m.user_id===selected.user_id?{...m,role:editRole}:m)}));setSelected(null);setToast("Rolle gespeichert.")}catch(e){setToast(e instanceof Error?e.message:"Rolle konnte nicht gespeichert werden.")}window.setTimeout(()=>setToast(null),2200)};
