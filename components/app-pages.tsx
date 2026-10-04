@@ -1073,8 +1073,6 @@ export function CompanySettingsPage() {
   const [city,setCity]=useState("Bern");
   const [email,setEmail]=useState("info@musterwerk.ch");
   const [phone,setPhone]=useState("+41 31 123 45 67");
-  const [vatRate,setVatRate]=useState("8.1");
-  const [paymentTerms,setPaymentTerms]=useState("30");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
 
@@ -1109,15 +1107,13 @@ export function CompanySettingsPage() {
         setCity(String(item.city??""));
         setEmail(String(item.email??""));
         setPhone(String(item.phone??""));
-        setVatRate(String(item.vat_rate??"8.1"));
-        setPaymentTerms(String(item.payment_terms_days??"30"));
       });
     }).catch(()=>undefined);
   },[]);
 
   const save=async(message="Firmendaten gespeichert.")=>{
     try{
-      if(isProductionBackendEnabled()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
+      if(isProductionBackendEnabled()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone});
       setToast(message);
       setEditing(false);
     }catch(error){
@@ -1138,11 +1134,9 @@ export function CompanySettingsPage() {
           <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)}/></Field>
           <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
-          <Field label="Standard MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
-          <Field label="Zahlungsziel"><select value={paymentTerms} onChange={e=>setPaymentTerms(e.target.value)}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Standard MwSt.</dt><dd>{vatRate}%</dd></div><div><dt>Zahlungsziel</dt><dd>{paymentTerms} Tage</dd></div></dl></section>}
+      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
