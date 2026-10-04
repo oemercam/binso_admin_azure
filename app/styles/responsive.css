@@ -1671,3 +1671,22 @@
   .mobile-position-remove{min-height:36px}
   .mobile-position-fields>.button{min-height:44px}
 }
+
+
+/* Mobile form standard: 16px prevents iOS focus zoom; compactness comes from 44px controls and tighter labels/spacing. */
+@media (max-width:760px){
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea{font-size:var(--control-font-mobile)}
+  .form-field input:not([type="checkbox"]):not([type="radio"]),
+  .form-field select,
+  .form-grid>label input:not([type="checkbox"]):not([type="radio"]),
+  .form-grid>label select{min-height:var(--control-h-mobile)}
+  .form-field>span,
+  .form-grid>label>span{font-size:var(--control-label-font)}
+  .form-field small,
+  .form-grid>label small{font-size:var(--control-help-font)}
+  .invoice-form input,
+  .invoice-form select{min-height:var(--control-h-mobile)}
+  .invoice-form .form-field>span{font-size:var(--control-label-font)}
+}
