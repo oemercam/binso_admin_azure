@@ -358,11 +358,11 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span><span/></div>
           {draft.positions.map(item=>{
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
-            return <div key={item.id}>
-              <input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/>
-              <input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/>
-              <input aria-label="Preis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/>
-              <b>{money(lineTotal)}</b>
+            return <div className="document-line-item" key={item.id}>
+              <label className="mobile-line-field description"><span>Beschreibung</span><input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
+              <label className="mobile-line-field"><span>Menge</span><input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
+              <label className="mobile-line-field"><span>Preis</span><input aria-label="Preis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
+              <div className="mobile-line-total"><span>Total</span><b>{money(lineTotal)}</b></div>
               <button className="line-remove" type="button" aria-label="Position entfernen" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}><Icon name="close" size={15}/></button>
             </div>;
           })}
