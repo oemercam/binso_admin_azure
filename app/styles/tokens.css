@@ -67,6 +67,15 @@
   --mobile-sheet-row-h:56px;
   --touch:44px;
 
+  --control-h:40px;
+  --control-h-mobile:44px;
+  --control-font:13px;
+  --control-font-mobile:16px;
+  --control-label-font:11px;
+  --control-help-font:10px;
+  --control-x:11px;
+  --control-radius:var(--radius-md);
+
   --safe-top:0px;
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);

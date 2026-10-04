@@ -389,20 +389,25 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
 
-  return <div className="paper invoice-paper">
-    <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div>
-    <div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div>
-    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnung Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Zahlbar bis</small><b>{due}</b></div></div>
-    <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
-    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-    <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
-    <section className="paper-closing invoice-payment-intro"><b>Zahlungsangaben</b><p>Bitte überweise den Rechnungsbetrag bis {due} mit den nachfolgenden Zahlungsangaben.</p></section>
-    <section className="qr-payment">
-      <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
-      <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
-      <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>{money(totals.total)}</b></div>
+  return <div className="document-pages invoice-pages">
+    <section className="paper invoice-paper invoice-page" aria-label="Rechnung Seite 1 von 2">
+      <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div>
+      <div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div>
+      <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnung Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Zahlbar bis</small><b>{due}</b></div></div>
+      <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
+      <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
+      <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
+      <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
     </section>
-    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
+    <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="QR-Rechnung Seite 2 von 2">
+      <div className="qr-page-heading"><img src="/brand/logo-black.svg" alt="Binso"/><span>QR-RECHNUNG</span></div>
+      <div className="qr-page-spacer" aria-hidden="true"/>
+      <section className="qr-payment">
+        <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
+        <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
+        <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>{money(totals.total)}</b></div>
+      </section>
+    </section>
   </div>;
 }
 
