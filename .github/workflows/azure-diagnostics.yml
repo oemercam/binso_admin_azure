@@ -41,7 +41,7 @@ jobs:
           python - <<'PY'
           import re
           lines=open('/tmp/binso-container.log',errors='replace').read().splitlines()
-          for line in lines[-150:]:
+          for line in [line for line in lines if any(term in line for term in ['Error','ERROR','Unhandled','MODULE','EADDR','ENOENT','Next.js','Ready in','Listening','server.js','node:'])][-150:]:
               line=re.sub(r'[a-zA-Z]+://[^\s]+','[url redacted]',line)
               line=re.sub(r'\S+@\S+','[redacted]',line)
               line=re.sub(r"'[^']*'|\"[^\"]*\"","'[redacted]'",line)
@@ -73,3 +73,24 @@ jobs:
           }
           (async()=>{await test('application',app);await test('migration',migration)})().catch(()=>process.exit(1));
           JS
+      - name: Read application stdout and stderr archive through Azure management
+        continue-on-error: true
+        run: |
+          RESOURCE_ID=$(az webapp show --resource-group rg-binso-admin-prod --name binso-admin-prod --query id -o tsv)
+          timeout 60 az rest --method post --url "https://management.azure.com$RESOURCE_ID/containerlogs/zip/download?api-version=2026-03-15" --output-file /tmp/binso-container-logs.zip
+          python - <<'PY'
+          import zipfile,re
+          with zipfile.ZipFile('/tmp/binso-container-logs.zip') as archive:
+              print('log files',len(archive.namelist()))
+              for name in archive.namelist():
+                  if not name.endswith(('.log','.txt')) or 'docker.log' in name and 'default' not in name:continue
+                  lines=archive.read(name).decode('utf8','replace').splitlines()
+                  errors=[line for line in lines[-3000:] if any(term in line for term in ['Error','ERROR','Unhandled','MODULE','EADDR','ENOENT','Next.js','Ready in','Listening','server.js','node:','startup'])]
+                  if not errors:continue
+                  print('log',name)
+                  for line in errors[-30:]:
+                      line=re.sub(r'[a-zA-Z]+://[^\s]+','[url redacted]',line)
+                      line=re.sub(r'\S+@\S+','[redacted]',line)
+                      line=re.sub(r"'[^']*'|\"[^\"]*\"","'[redacted]'",line)
+                      print(line[-250:])
+          PY
