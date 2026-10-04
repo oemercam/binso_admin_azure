@@ -576,6 +576,21 @@
   .timer-active .mobile-sticky-save,
   .timer-active .mobile-document-bar{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 66px)}
 
+  /* Document editor: compact, scan-friendly mobile flow. */
+  .offer-document-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .offer-document-actions .button:last-child{grid-column:auto}
+  .offer-form .form-section{padding:16px 0}
+  .offer-form .form-section+ .form-section{border-top:1px solid var(--color-line)}
+  .offer-form .form-section>h2,
+  .offer-form .section-title h2{margin:0 0 12px}
+  .offer-form .form-grid{gap:12px}
+  .offer-form .document-customer-hint{padding:10px 0 0}
+  .offer-form .section-title{margin-bottom:4px;align-items:center}
+  .offer-form .section-title .text-action{min-height:40px;display:inline-flex;align-items:center;justify-content:flex-end}
+  .offer-form .document-line-items>.document-line-item{padding-top:12px;padding-bottom:12px}
+  .offer-form .invoice-totals{margin-top:10px;padding-top:4px}
+  .offer-form .optional-row{padding-bottom:4px}
+
   .invoice-workspace{display:block}
   .invoice-form{border:0;border-radius:0;overflow:visible}
   .invoice-form .form-section{padding:18px 0}
