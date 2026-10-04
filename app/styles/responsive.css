@@ -510,7 +510,40 @@
 
   .form-page,
   .form-page.narrow,
-  .settings-detail-grid{max-width:none}
+  .settings-detail-grid,
+  .detail-card,
+  .customer-tab-panel,
+  .employee-tab-panel{width:100%;max-width:none}
+  .settings-detail-grid{gap:var(--mobile-section-gap)}
+  .settings-detail-grid>.surface,
+  .subscription-detail-grid>.surface,
+  .security-card,
+  .detail-card,
+  .customer-tab-panel,
+  .employee-tab-panel{margin:0}
+  .settings-detail-grid>.surface:first-child,
+  .subscription-detail-grid>.surface:first-child{padding-top:0}
+  .settings-profile,
+  .company-logo-card{grid-template-columns:48px minmax(0,1fr);gap:12px}
+  .settings-profile h2{font-size:16px}
+  .settings-profile p,
+  .company-logo-card small{font-size:11px;line-height:1.45}
+  .settings-profile>.button,
+  .company-logo-card>.button{grid-column:1/-1;width:100%;margin:2px 0 0}
+  .settings-form{border-bottom:0}
+  .settings-form+.settings-form{border-top:1px solid var(--color-line)}
+  .settings-form .form-grid{gap:14px}
+  .settings-form .button{min-height:46px}
+  .detail-list{margin-top:8px}
+  .detail-list>div:last-child{border-bottom:0}
+  .customer-tab-panel>.section-title,
+  .employee-tab-panel>.section-title{margin-bottom:12px}
+  .customer-tab-panel .section-title .button,
+  .employee-tab-panel .section-title .button{min-height:40px;height:40px;padding-inline:11px;font-size:11px}
+  .security-row{align-items:start}
+  .security-row>.button{width:100%;margin-top:10px}
+  .preference-row{min-height:64px}
+  .danger-zone{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .form-section,
   .form-section.clean,
   .settings-form{padding:18px 0}
