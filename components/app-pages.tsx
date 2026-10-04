@@ -745,6 +745,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   };
 
   const toggleTimer=()=>{
+    if("vibrate" in navigator) navigator.vibrate(8);
     const next=!running;
     setRunning(next);
     window.localStorage.setItem("binso.timer.running",String(next));
@@ -760,6 +761,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const remoteTotal=remoteEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
 
   const stop=async()=>{
+    if("vibrate" in navigator) navigator.vibrate(12);
     if(seconds<=0){
       setToast("Es läuft noch keine Zeitmessung.");
       window.setTimeout(()=>setToast(null),2200);
