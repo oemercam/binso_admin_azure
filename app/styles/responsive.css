@@ -1658,7 +1658,7 @@
   .mobile-position-summary strong{font-size:11px}
   .invoice-totals{margin-top:8px;padding-top:10px;gap:5px}
   .invoice-totals span,.invoice-totals strong{min-height:22px}
-  .document-note-section{padding-top:12px!important}
+  .invoice-form>.document-note-section{padding-top:12px}
   .add-note-action{min-height:40px}
   .mobile-position-sheet{padding:8px max(16px,var(--safe-right)) calc(16px + var(--safe-bottom)) max(16px,var(--safe-left))}
   .mobile-position-sheet .sheet-handle{margin-bottom:8px}
