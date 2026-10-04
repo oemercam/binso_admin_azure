@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 
+
+export const metadata: Metadata = {
+  title: "Produkt – Business-Software für Schweizer KMU",
+  description: "Binso One verbindet Kunden, Angebote, Rechnungen, Zahlungen, Zeiterfassung, Spesen und Mitarbeiter in einer klaren Business-Plattform für Schweizer KMU.",
+  alternates: { canonical: "/produkt" },
+  openGraph: { title: "Binso One Produkt", description: "Eine Plattform für die wichtigsten Abläufe Schweizer KMU.", url: "/produkt", images: ["/opengraph-image"] },
+};
 const modules=[
   ["users","Kunden","Kontakte, Aktivitäten und Belege zentral."],
   ["file","Angebote","Erstellen, prüfen und nachverfolgen."],

@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 
+
+export const metadata: Metadata = {
+  title: "Preise – Binso One",
+  description: "Transparente Preise für Binso One. Business-Software für Schweizer KMU ab CHF 19 pro Monat, mit 30 Tagen kostenloser Testphase.",
+  alternates: { canonical: "/preise" },
+  openGraph: { title: "Binso One Preise", description: "Transparente Pläne für Schweizer KMU – 30 Tage kostenlos testen.", url: "/preise", images: ["/opengraph-image"] },
+};
 const plans=[
   {n:"Start",p:"19",d:"Für Selbstständige und kleine Unternehmen.",f:["1 Benutzer","Kunden und Kontakte","Angebote und Rechnungen","Zahlungen","Produkte"]},
   {n:"Business",p:"49",d:"Für wachsende Schweizer KMU.",f:["Bis 20 Benutzer","Alle Start Funktionen","Mitarbeiter und Spesen","Zeiterfassung","Erweiterte Auswertungen"],hot:true},
