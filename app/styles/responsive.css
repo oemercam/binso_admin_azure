@@ -515,6 +515,9 @@
   .customer-tab-panel,
   .employee-tab-panel{width:100%;max-width:none}
   .settings-detail-grid{gap:var(--mobile-section-gap)}
+  .settings-list{border-top:0}
+  .settings-detail-grid>.settings-form:first-child,
+  .settings-detail-grid>.surface:first-child{border-top:0}
   .settings-detail-grid>.surface,
   .subscription-detail-grid>.surface,
   .security-card,
