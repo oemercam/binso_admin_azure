@@ -397,6 +397,12 @@
   font-size:12px;
 }
 .invoice-totals>strong{font-size:14px;font-weight:800}
+.document-lines-section{border-bottom:0}
+.paper-closing{margin-top:28px;max-width:78%;font-size:10px;line-height:1.55}
+.paper-closing b{display:block;margin-bottom:5px;font-size:10.5px}
+.paper-closing p{margin:0 0 7px;color:#555}
+.invoice-payment-intro{margin-top:26px}
+.paper footer{margin-top:auto;padding-top:28px;border-top:1px solid #e5e5e3;color:#666;font-size:8px;line-height:1.45}
 .desktop-document-preview,
 .invoice-tablet-preview{position:sticky;top:18px;padding:22px;background:#f1f1ef;border-radius:var(--radius-lg)}
 .document-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
