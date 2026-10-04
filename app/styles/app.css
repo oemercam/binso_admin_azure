@@ -1208,3 +1208,9 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .settings-switch>span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .18s ease}
 .settings-switch.is-on{background:#22c55e}.settings-switch.is-on>span{transform:translateX(18px)}
 .settings-switch:disabled{opacity:.45;cursor:not-allowed}
+
+.revenue-bars{height:178px;margin-top:20px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px}
+.revenue-bars button{height:100%;min-width:0;padding:0;display:grid;grid-template-rows:1fr 18px;align-items:end;border:0;background:transparent;color:var(--color-muted);font-size:9px;cursor:pointer}
+.revenue-bars i{width:100%;min-height:12px;display:block;align-self:end;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--color-fg) 18%,transparent);transition:height .22s ease,background .18s ease}
+.revenue-bars button.active i,.revenue-bars button:hover i{background:var(--color-fg)}
+.revenue-bars button:focus-visible{outline:2px solid var(--color-fg);outline-offset:3px;border-radius:4px}
