@@ -164,28 +164,14 @@ export function AppShell({
 
   useEffect(() => {
     if (!sheet) return;
-    const scrollY=window.scrollY;
     const body=document.body;
     const root=document.documentElement;
-    const previous={
-      bodyPosition:body.style.position,
-      bodyTop:body.style.top,
-      bodyWidth:body.style.width,
-      bodyOverflow:body.style.overflow,
-      rootOverflow:root.style.overflow,
-    };
-    body.style.position="fixed";
-    body.style.top=`-${scrollY}px`;
-    body.style.width="100%";
+    const previous={bodyOverflow:body.style.overflow,rootOverflow:root.style.overflow};
     body.style.overflow="hidden";
     root.style.overflow="hidden";
     return () => {
-      body.style.position=previous.bodyPosition;
-      body.style.top=previous.bodyTop;
-      body.style.width=previous.bodyWidth;
       body.style.overflow=previous.bodyOverflow;
       root.style.overflow=previous.rootOverflow;
-      window.scrollTo({top:scrollY,left:0,behavior:"auto"});
     };
   }, [sheet]);
 
