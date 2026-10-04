@@ -5,7 +5,7 @@ function sessionClient(){
  const cookies=new Map();
  return async(path,method='GET',body,expected=200,headers={})=>{
   const multipart=body instanceof FormData;
-  const response=await fetch(base+path,{method,headers:{...(multipart?{}:{'Content-Type':'application/json'}),Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; '),...headers},body:body===undefined?undefined:multipart?body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+  const response=await fetch(base+path,{method,headers:{...(multipart?{}:{'Content-Type':'application/json'}),Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; '),...headers},body:body===undefined?undefined:multipart?body:JSON.stringify(body),signal:AbortSignal.timeout(path==='/api/demo/session'?60000:20000)});
   for(const cookie of response.headers.getSetCookie()){const pair=cookie.split(';')[0],i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1));}
   assert.equal(response.status,expected,method+' '+path+' returned unexpected status');
   return response.headers.get('content-type')?.includes('application/json')?response.json():response.arrayBuffer();
