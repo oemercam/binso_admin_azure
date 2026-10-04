@@ -2,6 +2,7 @@
 
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
+import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -273,14 +274,13 @@ export function AppShell({
     return searchItems.filter(item => `${item.type} ${item.title} ${item.meta}`.toLowerCase().includes(q));
   }, [production,query,remoteSearch]);
 
-  function toggleTheme() {
-    const next = !dark;
-    const mode = next ? "dark" : "light";
-    setDark(next);
-    document.documentElement.dataset.theme = mode;
-    window.localStorage.setItem("binso.theme", mode);
-    window.localStorage.setItem("binso.theme.mode", mode);
-  }
+  useEffect(()=>{
+    const listener=(event:Event)=>setDark((event as CustomEvent<{resolved:string}>).detail.resolved==="dark");
+    window.addEventListener("binso-theme",listener);
+    void loadTheme().catch(()=>{});
+    return()=>window.removeEventListener("binso-theme",listener);
+  },[]);
+  async function toggleTheme(){try{await saveTheme(dark?"light":"dark");}catch{setTimerNotice("Darstellung konnte nicht gespeichert werden.");}}
 
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
 

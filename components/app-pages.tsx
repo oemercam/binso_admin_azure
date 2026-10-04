@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import {loadTheme,saveTheme} from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
@@ -1365,18 +1366,15 @@ export function AppearanceSettingsPage() {
     queueMicrotask(()=>setTheme(next));
   },[]);
 
-  const choose=(next:"light"|"dark"|"system")=>{
-    setTheme(next);
-    const resolved=next==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):next;
-    document.documentElement.dataset.theme=resolved;
-    window.localStorage.setItem("binso.theme.mode",next);
-    window.localStorage.setItem("binso.theme",resolved);
-  };
+  const [error,setError]=useState("");
+  useEffect(()=>{void loadTheme().then(mode=>{if(mode)setTheme(mode)}).catch(()=>setError("Darstellung konnte nicht geladen werden."));},[]);
+  const choose=async(next:"light"|"dark"|"system")=>{try{await saveTheme(next);setTheme(next);setError("");}catch{setError("Darstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    {error&&<p role="alert">{error}</p>}
     <div className="appearance-grid">
-      <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
-      <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>
-      <button className={`appearance-card ${theme==="system"?"selected":""}`} onClick={()=>choose("system")}><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button>
+      <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>void choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
+      <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>void choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>
+      <button className={`appearance-card ${theme==="system"?"selected":""}`} onClick={()=>void choose("system")}><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button>
     </div>
   </AppShell>;
 }
