@@ -565,14 +565,21 @@
   .settings-form .button{min-height:46px}
   .detail-list{margin-top:8px}
   .detail-list>div:last-child{border-bottom:0}
+  .tabs + .surface,
+  .tabs + .detail-grid>.surface:first-child,
   .customer-tab-panel,
-  .employee-tab-panel{border-top:0;border-bottom:0}
+  .employee-tab-panel{border-top:0}
+  .customer-tab-panel,
+  .employee-tab-panel{border-bottom:0}
   .customer-tab-panel>.section-title,
   .employee-tab-panel>.section-title{margin-bottom:12px}
   .customer-tab-panel .compact-list>a:last-child,
   .customer-tab-panel .contact-list>div:last-child,
   .customer-tab-panel .timeline>div:last-child,
-  .employee-tab-panel .compact-list>a:last-child{border-bottom:0}
+  .employee-tab-panel .compact-list>a:last-child,
+  .employee-tab-panel .detail-list>div:last-child,
+  .surface>.compact-list:last-child>a:last-child,
+  .surface>.activity-list:last-child>a:last-child{border-bottom:0}
   .customer-tab-panel .section-title .button,
   .employee-tab-panel .section-title .button{min-height:40px;height:40px;padding-inline:11px;font-size:11px}
   .security-row{align-items:start}
