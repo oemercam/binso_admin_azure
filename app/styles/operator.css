@@ -327,3 +327,6 @@
 .operator-pulse-grid{
   align-items:stretch;
 }
+
+/* Analytics visuals: charts stand on the page without nested card chrome. */
+.operator-payment-insight,.monitoring-kpis section{border:0;border-radius:0;background:transparent;box-shadow:none}
