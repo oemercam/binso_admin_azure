@@ -655,7 +655,7 @@
   .tabs + .detail-grid>.surface:first-child{border-top:0}
   .page-add-button{grid-template-columns:1fr;grid-template-rows:1fr}
   .page-add-button svg{place-self:center}
-  .responsive-create-action{width:40px!important;min-width:40px!important;height:40px!important;padding:0!important;border-radius:50%!important}
+  .page-head-actions .responsive-create-action{width:40px;min-width:40px;height:40px;padding:0;border-radius:50%}
   .responsive-create-action .create-action-label{display:none}
   .paper-closing{max-width:100%;margin-top:22px}
   .paper footer{padding-top:20px}
