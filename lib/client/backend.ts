@@ -2,17 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-const configured=Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export function isProductionBackendEnabled(){
-  if(!configured || typeof window==="undefined") return false;
-  return window.localStorage.getItem("binso.demo.session")!=="1";
+  if(typeof window==="undefined") return false;
+  if(document.querySelector('[data-operator-demo="true"]'))return false;
+  return window.localStorage.getItem("binso.demo.session")!=="1" && !window.location.pathname.startsWith("/preview/");
 }
 
 export function useBackendMode(){
-  const [enabled,setEnabled]=useState(false);
+  const [enabled,setEnabled]=useState(true);
   useEffect(()=>{
     queueMicrotask(()=>setEnabled(isProductionBackendEnabled()));
   },[]);

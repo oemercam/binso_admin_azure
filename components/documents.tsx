@@ -35,10 +35,9 @@ const customerData: Record<string,{ sector:string; city:string; address:string; 
 type CustomerDirectory = typeof customerData;
 
 function useCustomerDirectory() {
-  const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>(customerData);
+  const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>({});
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>("/api/customers")
+    apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")
       .then(payload=>{
         const next:Record<string,{sector:string;city:string;address:string;zip:string}>={};
         for(const item of payload.items){
@@ -52,6 +51,7 @@ function useCustomerDirectory() {
 }
 
 function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
+  if(!number)return {customer:"",number:"",date:"",due:kind==="Rechnung"?"30":"",vatRate:"8.1",note:"",positions:[{id:"line-1",description:"",quantity:"1",price:"0.00"}]};
   return {
     customer:"Acme AG",
     number,
@@ -182,9 +182,10 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
 
 function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setDraft:(draft:DocumentDraft)=>void){
   useEffect(()=>{
-    if(!isProductionBackendEnabled()||!documentKey) return;
-    apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey))
-      .then(payload=>queueMicrotask(()=>setDraft(remoteDraftFromItem(payload.item,kind))))
+    if(!documentKey) return;
+    const url=isProductionBackendEnabled()?"/api/documents/"+encodeURIComponent(documentKey):"/api/demo/data?collection=documents&number="+encodeURIComponent(documentKey);
+    apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)
+      .then(payload=>{const item=payload.item??payload.items?.[0];if(item)queueMicrotask(()=>setDraft(remoteDraftFromItem(item,kind)))})
       .catch(()=>undefined);
   },[documentKey,kind,setDraft]);
 }
@@ -207,11 +208,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const number=kind==="Angebot"?"AN-2026-012":"RE-2026-019";
   const storageKey=kind==="Angebot"?"binso.demo.offer.AN-2026-012":"binso.demo.invoice.RE-2026-019";
-  const [draft,setDraft]=useStoredDraft(storageKey,createInitialDraft(kind,number));
+  const [draft,setDraft]=useStoredDraft(storageKey,createInitialDraft(kind,""));
   const directory=useCustomerDirectory();
   useExistingDocument(kind,existing?documentKey:undefined,setDraft);
+  useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
 
   useEffect(()=>{

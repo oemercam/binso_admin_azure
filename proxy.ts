@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const protectedPrefixes=[
   "/dashboard","/kunden","/angebote","/rechnungen","/zahlungen","/produkte",
   "/mitarbeiter","/spesen","/zeit","/support","/einstellungen","/belege",
-  "/benachrichtigungen","/willkommen"
+  "/benachrichtigungen","/willkommen","/finanzen"
 ];
 
 export function proxy(request:NextRequest){
@@ -25,6 +25,6 @@ export const config={
     "/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
-    "/benachrichtigungen/:path*","/willkommen/:path*"
+    "/benachrichtigungen/:path*","/willkommen/:path*","/finanzen/:path*"
   ]
 };

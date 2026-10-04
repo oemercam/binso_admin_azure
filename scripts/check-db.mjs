@@ -3,8 +3,11 @@ if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"}});
 
 const required={
+ operating_costs:["id","organization_id","external_id","cost_date","amount","scope","is_demo"],
+ platform_billing_payments:["id","organization_id","provider","external_id","payment_date","amount","currency"],
+ active_time_trackers:["organization_id","user_id","state","active_since","accumulated_seconds","project_label"],
  organizations:["id","name","slug","status","currency","locale","is_demo"],
- app_users:["id","email","display_name","status","password_hash","language","email_verified_at","mfa_enabled"],
+ app_users:["id","email","display_name","status","password_hash","language","email_verified_at","mfa_enabled","first_name","last_name","phone","job_title"],
  organization_memberships:["organization_id","user_id","email","role","status"],
  organization_subscriptions:["organization_id","plan","status","trial_until"],
  organization_entitlements:["organization_id","features","max_users","max_storage_mb"],
@@ -43,8 +46,8 @@ const required={
  rate_limit_buckets:["bucket_key","count","reset_at","updated_at"],
  schema_migrations:["version","checksum","applied_at"]
 };
-const tenantTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","support_cases","in_app_notifications","file_objects"];
-const forceTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents"];
+const tenantTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
+const forceTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
  const migrations=await pool.query("select version from schema_migrations order by version");

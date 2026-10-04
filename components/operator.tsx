@@ -11,6 +11,7 @@ const operatorNav = [
   ["tickets","Tickets","support"],
   ["kunden","Kunden","users"],
   ["zahlungen","Zahlungen","wallet"],
+  ["finanzen","Finanzen","chart"],
   ["abonnemente","Abonnemente","card"],
   ["sperrungen","Sperrungen","lock"],
   ["monitoring","Monitoring","chart"],
@@ -107,12 +108,12 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
-        <button type="button" className={["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
+        <button type="button" className={["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
       </nav>
       {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
         <section className="operator-mobile-more" role="dialog" aria-modal="true" aria-label="Weitere Admin-Bereiche">
           <header><div><h2>Mehr</h2><p>Weitere Bereiche von One Admin.</p></div><button type="button" className="icon-button" aria-label="Schliessen" onClick={()=>setMobileMore(false)}><Icon name="close"/></button></header>
-          <nav>{operatorNav.filter(([slug])=>["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
+          <nav>{operatorNav.filter(([slug])=>["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
         </section>
       </div>}
 
@@ -121,6 +122,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
         key === "zahlungen" ? <PaymentsView/> :
+        key === "finanzen" ? <OperatorFinanceView demo={demo}/> :
         key === "abonnemente" ? <SubscriptionsView/> :
         key === "sperrungen" ? <RestrictionsView/> :
         key === "monitoring" ? <MonitoringView/> :
@@ -140,6 +142,7 @@ function operatorSubtitle(key: string, detail: string) {
     tickets: "Kundenanfragen verwalten und beantworten.",
     kunden: "Kundenkonten, Status und Supportkontext.",
     zahlungen: "Zahlungen und fehlgeschlagene Transaktionen.",
+    finanzen: "Plattformumsatz, Kosten und wirtschaftliche Entwicklung.",
     abonnemente: "Pläne, Nutzung und Abrechnungsstatus.",
     sperrungen: "Einschränkungen kontrolliert verwalten.",
     monitoring: "Status der Plattform und abhängiger Services.",
@@ -162,6 +165,11 @@ function OperatorDashboard() {
   const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
   const metricInfo={availability:["Systemverfügbarkeit","99.99 %","+0.01 %","0,6,12,18,24"],users:["Aktive Nutzer",production?String(stats.users_active??0):"128","aktuell online","0,6,12,18,24"],api:["Antwortzeit API","182 ms","−12 %","0,6,12,18,24"]} as const;
   const current=metricInfo[metric];
+  if(production)return <div className="operator-dashboard-cockpit">
+    <div className="operator-ticket-stats">{[["Offene Tickets",open],["In Bearbeitung",progress],["Gelöst",resolved],["Aktive Nutzer",Number(stats.users_active??0)]].map(([label,value])=><Link href="/operator/tickets" key={label}><strong>{value}</strong><span>{label}</span></Link>)}</div>
+    <section className="surface"><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length} aktive Störungen erfasst</p></section>
+    <section className="surface"><SectionTitle title="Letzte Supportfälle"/><div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div></section>
+  </div>;
   return <div className="operator-dashboard-cockpit">
     <section className="operator-health-strip">
       <SectionTitle title="Systemstatus" action={<Link className="text-action" href="/operator/monitoring">Alle anzeigen</Link>}/>
@@ -378,6 +386,29 @@ function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:s
   </section>;
 }
 
+function OperatorFinanceView({demo=false}:{demo?:boolean}){
+  const production=useBackendMode();
+  const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;subscriptions?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
+  const [error,setError]=useState<string|null>(null);
+  const [range,setRange]=useState("month");
+  useEffect(()=>{apiGet<typeof data>(demo?"/api/demo/platform-finance":"/api/operator/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production,demo]);
+  const now=new Date(), ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
+  let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}
+  const source=(data.payments??[]);
+  const inRange=(value:unknown)=>{const d=new Date(String(value??""));return d>=start&&d<end};
+  const volume=source.filter(x=>inRange(x.payment_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const platformRevenue=((data.subscriptions??[])).filter(x=>inRange(x.created_at)).reduce((s,x)=>s+Number(x.monthly_revenue_chf??0),0);
+  const costs=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(end.getFullYear(),end.getMonth()-1-i,1);const value=source.filter(x=>{const p=new Date(String(x.payment_date??""));return p.getFullYear()===d.getFullYear()&&p.getMonth()===d.getMonth()}).reduce((s,x)=>s+Number(x.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse(),max=Math.max(1,...monthly.map(x=>x.value));
+  return <div>
+    {error&&<p role="alert">{error}</p>}
+    <div className="finance-range">{Object.entries(ranges).map(([key,x])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{x.label}</button>)}</div>
+    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="donut" ratio={platformRevenue+costs?Math.round(platformRevenue/(platformRevenue+costs)*100):0}/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="status" ratio={platformRevenue+costs?Math.round(costs/(platformRevenue+costs)*100):0}/></div>
+    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/><div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div></section>
+    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+(platformRevenue-costs).toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden aus Azure PostgreSQL geladen und nach dem gewählten Zeitraum ausgewertet.</p></section></div>
+  </div>
+}
+
 function PaymentsView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
@@ -527,18 +558,24 @@ function RestrictionsView() {
 function MonitoringCockpit({services,api,database,availability,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;availability:string;errorRate:string;incidents:Array<Record<string,unknown>>}) {
   const healthy=services.filter(s=>s.status==="operational").length;
   const degraded=services.filter(s=>s.status==="degraded").length;
-  const bars=[32,38,35,42,39,48,44,52,46,58,49,55,61,53,47,45,42,40,38,41,36,34,37,32];
+  const apiBars=api==null?[]:[Math.min(100,Math.max(1,api/10))];
+  const dbBars=database==null?[]:[Math.min(100,Math.max(1,database/10))];
+  const health=services.length?Math.round(healthy/services.length*100):0;
+  const affected=services.length?Math.round(degraded/services.length*100):0;
   return <div className="monitoring-cockpit">
     <div className="monitoring-kpis monitoring-kpis-visual">
       <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
-      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{[42,56,48,68,61,76,58,70].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{[62,48,55,43,51,38,45,41].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(services.length?Math.round(degraded/services.length*100):0)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
+      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(affected)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
     </div>
-    <div className="monitoring-visual-grid">
-      <section className="surface monitoring-latency-chart"><SectionTitle title="Systemleistung"/><div className="monitoring-chart-head"><div><strong>{api==null?"—":api+" ms"}</strong><span>API Latenz</span></div><small>letzte 24 Stunden</small></div><div className="monitoring-bars" aria-label="Latenzverlauf">{bars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><div className="monitoring-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></section>
-      <section className="surface monitoring-health-chart"><SectionTitle title="Service Health"/><div className="monitoring-ring" style={{"--health":String(services.length?Math.round(healthy/services.length*100):0)+"%"} as React.CSSProperties}><div><strong>{services.length?Math.round(healthy/services.length*100):0}%</strong><span>gesund</span></div></div><div className="monitoring-health-legend"><span><i/>Operational <b>{healthy}</b></span><span><i/>Beeinträchtigt <b>{degraded}</b></span><span><i/>Fehlerrate <b>{errorRate}</b></span></div></section>
+    <div className="monitoring-visual-grid monitoring-technical-grid">
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>API Latenz</b><strong>{api==null?"—":api+" ms"}</strong></div><div className="monitoring-compact-bars">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Aktuelle Messung · keine historischen Daten</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Datenbank</b><strong>{database==null?"—":database+" ms"}</strong></div><div className="monitoring-compact-bars database">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Aktuelle Abfrage · keine historischen Daten</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Service Health</b><strong>{health}%</strong></div><div className="monitoring-compact-ring" style={{"--health":String(health)+"%"} as React.CSSProperties}><span>{healthy}/{services.length}</span></div><small>Operational verfügbare Services</small></section>
+      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Aktive Störungen</b><strong>{incidents.length}</strong></div><div className="monitoring-compact-ring incidents" style={{"--health":String(affected)+"%"} as React.CSSProperties}><span>{degraded}</span></div><small>Anteil beeinträchtigter Services</small></section>
     </div>
+    <div className="monitoring-technical-summary"><b>Technische Übersicht</b><p>Alle zentralen Plattformwerte auf einen Blick: Verfügbarkeit, API- und Datenbank-Latenz, Service Health und aktive Störungen. INP-Stichproben: {errorRate}. Darunter bleiben Service-Status und Ereignisse für die technische Detailanalyse sichtbar.</p></div>
   </div>;
 }
 

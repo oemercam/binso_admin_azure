@@ -1,0 +1,12 @@
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const source=await fs.readFile('lib/permissions.ts','utf8');
+const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const {tenantCan,operatorCan,routePermission}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+for(const role of ['owner','admin','finance'])assert.equal(tenantCan(role,'accounting:read'),true);
+for(const role of ['member','reader','hr','project_manager'])assert.equal(tenantCan(role,'accounting:read'),false);
+assert.equal(routePermission('/finanzen'),'accounting:read');
+assert.equal(operatorCan('platform_support','subscriptions:read'),false);
+assert.equal(operatorCan('platform_billing','subscriptions:read'),true);
+console.log('Finance and operator permission matrix passed.');

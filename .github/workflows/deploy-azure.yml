@@ -54,7 +54,6 @@ jobs:
             echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
-          pnpm db:check
           pnpm db:migrate
           pnpm db:check
 
@@ -202,6 +201,16 @@ jobs:
           HEALTH_URL="$PRODUCTION_URL/api/health"
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
           echo "Binso One production health check passed."
+
+          curl -fsS --max-time 20 -c /tmp/binso-production-demo.cookies -X POST -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
+          for collection in customers customer_contacts products employees expenses documents payments; do
+            curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies "$PRODUCTION_URL/api/demo/data?collection=$collection" > /tmp/binso-production-data.json
+            node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-data.json","utf8"));if(!Array.isArray(data.items)||!data.items.length)process.exit(1)'
+          done
+          curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies "$PRODUCTION_URL/api/demo/finance" > /tmp/binso-production-finance.json
+          node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-finance.json","utf8"));if(!data.payments?.length||!data.payroll?.length||!data.operatingCosts?.length)process.exit(1)'
+          curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null
+          echo "PostgreSQL-backed demo and finance production checks passed."
 
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 

@@ -3,9 +3,13 @@ import { requireSession } from "@/lib/server/session";
 import { authorize } from "@/lib/server/rbac";
 import { deleteCustomer, updateCustomer } from "@/lib/server/repositories/customers";
 import { apiError, assertSameOrigin, json, readJson } from "@/lib/server/http";
+import { tenantList } from "@/lib/server/database";
 import { asObject, stringField } from "@/lib/server/validation";
 
 export const runtime="nodejs";
+export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
+ try{const s=await requireSession();authorize(s,"customers:read");const {id}=await params;const rows=await tenantList("customers","*","id=eq."+encodeURIComponent(id));return rows[0]?json({item:rows[0]}):json({error:"not_found",message:"Kunde wurde nicht gefunden."},404)}catch(e){return apiError(e)}
+}
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
  try{
   assertSameOrigin(request);const s=await requireSession();authorize(s,"customers:write");const {id}=await params;const body=asObject(await readJson(request));

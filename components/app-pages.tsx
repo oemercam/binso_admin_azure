@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
-import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
-import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
+import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
+import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
@@ -19,7 +20,7 @@ function moneyChf(value:unknown){
 
 function swissDate(value:unknown){
   if(typeof value!=="string") return "";
-  const parts=value.split("-");
+  const parts=value.slice(0,10).split("-");
   return parts.length===3?`${parts[2]}.${parts[1]}.${parts[0]}`:value;
 }
 
@@ -71,20 +72,20 @@ function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[])
 }
 
 function useDemoRows(collection:DemoCollection, defaults:string[][]) {
-  const [rows,setRows]=useState(defaults);
+  const [rows,setRows]=useState<string[][]>([]);
 
   useEffect(()=>{
     if(isProductionBackendEnabled()){
       const controller=new AbortController();
       apiGet<{items:Record<string,unknown>[]}>(`/api/${collection==="payments"?"payments":collection}`)
         .then(payload=>queueMicrotask(()=>setRows(mapRemoteRows(collection,payload.items))))
-        .catch(()=>queueMicrotask(()=>setRows(defaults)));
+        .catch(()=>queueMicrotask(()=>setRows([])));
       return()=>controller.abort();
     }
 
     const sync=()=>{
-      const stored=readDemoRows(collection);
-      queueMicrotask(()=>setRows([...stored,...defaults]));
+      apiGet<{items:Record<string,unknown>[]}>(`/api/demo/data?collection=${collection}`)
+        .then(payload=>setRows(mapRemoteRows(collection,payload.items))).catch(()=>setRows([]));
     };
     sync();
     const listener=(event:Event)=>{
@@ -102,17 +103,17 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   return rows;
 }
 
-function RevenueInsight({invoices,demo=false}:{invoices?:Array<Record<string,unknown>>;demo?:boolean}) {
-  const [activeMonth,setActiveMonth]=useState<number|null>(null);
+function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Record<string,unknown>>;demo?:boolean;onMonthChange?:(month:number)=>void}) {
+  const [activeMonth,setActiveMonth]=useState(()=>new Date().getMonth());
   const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=[7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400], previous=[3600,5400,6200,9300,7700,8500,11900,10800,9400,13600,12600,16500];
   if(!demo){current.fill(0);previous.fill(0);const now=new Date();for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===now.getFullYear()) current[date.getMonth()]+=amount;else if(date.getFullYear()===now.getFullYear()-1) previous[date.getMonth()]+=amount;}}
   const total=current.reduce((a,b)=>a+b,0), previousTotal=previous.reduce((a,b)=>a+b,0), change=previousTotal?((total-previousTotal)/previousTotal*100):0, max=Math.max(1,...current,...previous);
-  const activeChange=activeMonth!==null&&previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
+  const activeChange=previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
   return <section className="surface revenue-insight">
     <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div><p className="trend-positive">↗ {change.toFixed(1)} % <span>zum Vorjahr</span></p></div><span className="revenue-period">12 Monate</span></div>
-    <div className="revenue-bar-detail" aria-live="polite">{activeMonth===null?<span>Monat antippen für Details</span>:<><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></>}</div>
+    <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
     <div className="revenue-bars" aria-label="Umsatz der letzten zwölf Monate">
-      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>setActiveMonth(index)} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${Math.max(18,value/max*100)}%`}}/><span>{months[index]}</span></button>})}
+      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${value>0?Math.max(18,value/max*100):0}%`}}/><span>{months[index]}</span></button>})}
     </div>
   </section>;
 }
@@ -120,33 +121,39 @@ function RevenueInsight({invoices,demo=false}:{invoices?:Array<Record<string,unk
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
   const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
+  const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
 
   useEffect(()=>{
-    if(!production) return;
-    apiGet<typeof data>("/api/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
-  },[production]);
+    if(forceDemo) return;
+    apiGet<typeof data>(isProductionBackendEnabled()?"/api/dashboard":"/api/demo/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+  },[production,forceDemo]);
 
-  if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
-    <div className="metrics-grid"><Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/><Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/><Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/></div>
-    <RevenueInsight demo/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
+  if(forceDemo) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
+    <div className="metrics-grid"><Metric label="Umsatz im Monat" value={moneyChf([7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400][dashboardMonth])} hint="Rechnungsvolumen" icon="chart"/><Metric label="Rechnungen" value={String([4,5,5,7,6,8,9,8,8,10,10,12][dashboardMonth])} hint="In diesem Monat" icon="receipt"/><Metric label="Zahlungseingänge" value={moneyChf([6900,9800,9400,13100,11800,14900,16500,15100,15400,18100,18900,21600][dashboardMonth])} hint="Verbucht im Monat" icon="wallet"/><Metric label="Neue Kunden" value={String([1,2,1,3,2,2,3,1,2,3,2,4][dashboardMonth])} hint="In diesem Monat" icon="users"/></div>
+    <RevenueInsight demo onMonthChange={setDashboardMonth}/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 
-  const stats=data.stats??{};
-  const minutes=Number(stats.time_week_minutes??0);
-  const hours=Math.floor(minutes/60);
-  const mins=minutes%60;
   const invoices=data.invoices??[];
   const paymentsData=data.payments??[];
+  const analyticsInvoices=data.analyticsInvoices??[];
+  const analyticsPayments=data.analyticsPayments??[];
+  const selectedYear=new Date().getFullYear();
+  const monthInvoices=analyticsInvoices.filter(item=>{const d=new Date(String(item.issue_date??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
+  const monthPayments=analyticsPayments.filter(item=>{const d=new Date(String(item.paid_on??item.created_at??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
+  const monthRevenue=monthInvoices.reduce((sum,item)=>sum+Number(item.total??0),0);
+  const monthPaid=monthPayments.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const monthCustomers=monthInvoices.reduce((sum,item)=>sum+Number(item.customer_count??0),0);
+  const monthInvoiceCount=monthInvoices.reduce((sum,item)=>sum+Number(item.invoice_count??1),0);
 
   return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
     <div className="metrics-grid">
-      <Metric label="Eingegangen im Monat" value={moneyChf(stats.payments_month_total)} hint="Verbuchte Kundenzahlungen" icon="chart"/>
-      <Metric label="Offene Rechnungen" value={moneyChf(stats.invoice_open_total)} hint={String(stats.invoice_open_count??0)+" Rechnungen"} icon="receipt"/>
-      <Metric label="Kunden" value={String(stats.customers_total??0)} hint="Aktive Kunden" icon="users"/>
-      <Metric label="Zeit diese Woche" value={String(hours)+":"+String(mins).padStart(2,"0")+" h"} hint="Erfasste Arbeitszeit" icon="clock"/>
+      <Metric label="Umsatz im Monat" value={moneyChf(monthRevenue)} hint="Rechnungsvolumen" icon="chart"/>
+      <Metric label="Rechnungen" value={String(monthInvoiceCount)} hint="In diesem Monat" icon="receipt"/>
+      <Metric label="Zahlungseingänge" value={moneyChf(monthPaid)} hint="Verbucht im Monat" icon="wallet"/>
+      <Metric label="Kunden" value={String(monthCustomers)} hint="Mit Rechnungen im Monat" icon="users"/>
     </div>
-    <RevenueInsight invoices={data.analyticsInvoices??[]}/>
+    <RevenueInsight invoices={analyticsInvoices} onMonthChange={setDashboardMonth}/>
     <div className="dashboard-grid">
       <section className="surface">
         <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
@@ -158,6 +165,34 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
       </section>
     </div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+  </AppShell>;
+}
+
+export function FinancePage() {
+  const production=useBackendMode();
+  const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;expenses?:Array<Record<string,unknown>>;payroll?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
+  const [error,setError]=useState<string|null>(null);
+  const [range,setRange]=useState("month");
+  useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production]);
+  const now=new Date();
+  const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
+  const bounds=(()=>{let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
+  const payments=(data.payments??[]);
+  const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
+  const income=selected.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const inRange=(value:unknown)=>{const d=new Date(String(value??""));return d>=bounds.start&&d<bounds.end};
+  const expense=((data.expenses??[])).filter(x=>inRange(x.expense_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
+  const costs=expense+operating+staff,result=income-costs;
+  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(bounds.end.getFullYear(),bounds.end.getMonth()-1-i,1);const value=payments.filter(item=>{const x=new Date(String(item.payment_date??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((s,item)=>s+Number(item.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse();
+  const max=Math.max(1,...monthly.map(x=>x.value));
+  return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
+    {error&&<p role="alert">{error}</p>}
+    <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{item.label}</button>)}</div>
+    <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
+    <section className="finance-analysis"><div className="section-title"><div><span className="eyebrow">ENTWICKLUNG</span><h2>Einnahmen im Zeitraum</h2></div></div><div className="finance-month-bars">{monthly.map(item=><div key={item.label}><i style={{height:`${item.value>0?Math.max(8,item.value/max*100):0}%`}}/><b>{item.label}</b><small>{moneyChf(item.value)}</small></div>)}</div></section>
+    <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{moneyChf(operating)}</strong></div><div><span>Personalkosten</span><strong>{moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{moneyChf(expense)}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Spesen, Betriebskosten und freigegebene Lohnläufe werden für denselben Zeitraum aus der Datenbank ausgewertet.</p></section></div>
   </AppShell>;
 }
 
@@ -335,10 +370,10 @@ export function CustomerForm() {
 }
 
 function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=false){
-  const [rows,setRows]=useState(defaults);
+  const [rows,setRows]=useState<string[][]>([]);
   useEffect(()=>{
-    if(forceDemo||!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
+    if(forceDemo){queueMicrotask(()=>setRows(defaults));return;}
+    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(isProductionBackendEnabled()?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`)
       .then(payload=>{
         const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
         const mapped=payload.items.map(item=>{
@@ -368,11 +403,7 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
       <div>
         <RecordsView items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
-      <aside className="tablet-detail invoice-tablet-preview">
-        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
-        <div className="tablet-document-actions"><Button href="/rechnungen/RE-2026-019" variant="secondary">Öffnen</Button><Button href="/zahlungen/neu">Zahlung</Button></div>
-        <InvoicePreview/>
-      </aside>
+      {forceDemo&&<aside className="tablet-detail invoice-tablet-preview"><InvoicePreview/></aside>}
     </div>
   </AppShell>;
 }
@@ -380,25 +411,26 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 export function PaymentsPage() {
   const paymentRows=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
-    <div className="payment-summary-strip" aria-label="Zahlungsübersicht">
-      <div><span>Eingegangen</span><b>CHF 49’820</b><small>diesen Monat</small></div>
-      <div><span>Offen</span><b>CHF 12’800</b><small>8 Rechnungen</small></div>
-      <div><span>Überfällig</span><b>CHF 3’700</b><small>1 Rechnung</small></div>
-    </div>
     <RecordsView items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function PaymentForm() {
   const router=useRouter();
-  const [date,setDate]=useState("2026-10-02");
-  const [amount,setAmount]=useState("4346.40");
+  const [toast,setToast]=useState<string|null>(null);
+  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
+  const [amount,setAmount]=useState("");
   const [method,setMethod]=useState("Banküberweisung");
   const [idempotencyKey,setIdempotencyKey]=useState("");
-  const [toast,setToast]=useState<string|null>(null);
+  const [invoiceId,setInvoiceId]=useState("");
+  const [note,setNote]=useState("");
+  const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;customer?:{name?:string}}>>([]);
+  useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
+  const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
+
   const save=async()=>{
     const value=Number(amount.replace(",","."));
-    if(!Number.isFinite(value)||value<=0){
+    if(!selectedInvoice||!Number.isFinite(value)||value<=0){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
@@ -407,12 +439,12 @@ export function PaymentForm() {
       if(isProductionBackendEnabled()){
         const key=idempotencyKey||window.crypto.randomUUID();
         if(!idempotencyKey) setIdempotencyKey(key);
-        await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""},{idempotencyKey:key});
+        await apiPost("/api/payments",{invoiceId,paidOn:date,amount:value,method,note},{idempotencyKey:key});
       }
       else{
         const id=String(Date.now());
         const displayDate=date.split("-").reverse().join(".");
-        appendDemoRow("payments",[id,displayDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
+        appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
       setToast("Zahlung gespeichert.");
       window.setTimeout(()=>router.push("/zahlungen"),700);
@@ -423,12 +455,12 @@ export function PaymentForm() {
   };
   return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
-      <section className="payment-context"><span className="activity-icon"><Icon name="receipt"/></span><div><small>Rechnung</small><b>RE-2026-019 · Acme AG</b><span>Offener Betrag CHF 4’346.40</span></div></section>
+      <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(Number(item.total)-Number(item.paid_amount)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {moneyChf(Number(item.total)-Number(item.paid_amount))}</option>)}</select></Field>
       <div className="form-grid two">
         <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
         <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field>
         <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
-        <Field label="Notiz"><input placeholder="Optional"/></Field>
+        <Field label="Notiz"><input placeholder="Optional" value={note} onChange={e=>setNote(e.target.value)}/></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={save}>Zahlung speichern</Button></div>
     </div>
@@ -632,8 +664,8 @@ export function ExpensesPage() {
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
   const production=useBackendMode();
-  const [person,setPerson]=useState("Thomas Müller");
-  const [date,setDate]=useState("2026-10-02");
+  const [person,setPerson]=useState("");
+  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState(existing?"280.00":"");
   const [currency,setCurrency]=useState("CHF");
@@ -756,45 +788,29 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>>([]);
 
   useEffect(()=>{
-    queueMicrotask(()=>{
-      const storedRunning=window.localStorage.getItem("binso.timer.running")==="true";
-      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"0");
-      const started=Number(window.localStorage.getItem("binso.timer.startedAt")??"0");
-      const elapsed=storedRunning&&started?Math.max(0,Math.floor((Date.now()-started)/1000)):0;
-      const storedProject=window.localStorage.getItem("binso.timer.project");
-      setRunning(storedRunning);
-      setSeconds((Number.isFinite(base)?base:0)+elapsed);
-      setTimerProject(storedProject||"Interne Planung");
-      setManualDate(new Date().toLocaleDateString("en-CA"));
-    });
+    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project)}).catch(()=>undefined)};
+    sync();
+    queueMicrotask(()=>setManualDate(new Date().toLocaleDateString("en-CA")));
+    window.addEventListener("binso-timer-change",sync);
+    return()=>window.removeEventListener("binso-timer-change",sync);
   },[]);
 
   useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>("/api/time-entries")
+    if(forceDemo) return;
+    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries":"/api/demo/data?collection=time_entries")
       .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
       .catch(()=>undefined);
-  },[production]);
+  },[production,forceDemo]);
 
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
-  const setProject=(project:string)=>{
-    setTimerProject(project);
-    window.localStorage.setItem("binso.timer.project",project);
-    window.dispatchEvent(new Event("binso-timer-change"));
-    setProjectOpen(false);
+  const setProject=async(project:string)=>{
+    try{const state=await changeTimer("project",project);setTimerProject(state.project);setProjectOpen(false)}
+    catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
-
-  const toggleTimer=()=>{
-    if("vibrate" in navigator) navigator.vibrate(8);
-    const next=!running;
-    setRunning(next);
-    window.localStorage.setItem("binso.timer.running",String(next));
-    window.localStorage.setItem("binso.timer.baseSeconds",String(seconds));
-    window.localStorage.setItem("binso.timer.project",timerProject);
-    if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
-    else window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:next?(seconds>0?"Zeitmessung fortgesetzt.":"Zeitmessung gestartet."):"Zeitmessung pausiert."}));
+  const toggleTimer=async()=>{
+    try{const state=await changeTimer(running?"pause":"start",timerProject);setRunning(state.running);setSeconds(state.seconds)}
+    catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
   };
 
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
@@ -802,31 +818,11 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const remoteTotal=remoteEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
 
   const stop=async()=>{
-    if("vibrate" in navigator) navigator.vibrate(12);
-    if(seconds<=0){
-      setToast("Es läuft noch keine Zeitmessung.");
-      window.setTimeout(()=>setToast(null),2200);
-      return;
-    }
-    setRunning(false);
-    window.localStorage.setItem("binso.timer.running","false");
-    window.localStorage.setItem("binso.timer.baseSeconds","0");
-    window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:"Zeitmessung gestoppt."}));
     try{
-      if(isProductionBackendEnabled()){
-        const ended=new Date();
-        const started=new Date(ended.getTime()-seconds*1000);
-        const [projectName,customerName=""]=timerProject.split(" · ");
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName,projectName,description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
-        setRemoteEntries(current=>[payload.item,...current]);
-      }
-      setSeconds(0);
-      setToast("Zeiteintrag gespeichert.");
-    }catch(error){
-      setSeconds(0);
-      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
-    }
+      await changeTimer("finish",timerProject);
+      setRunning(false);setSeconds(0);setToast("Zeiteintrag gespeichert.");
+      if(production){const payload=await apiGet<{items:typeof remoteEntries}>("/api/time-entries");setRemoteEntries(payload.items)}
+    }catch(error){setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.")}
     window.setTimeout(()=>setToast(null),2400);
   };
 
@@ -840,7 +836,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     }
     try{
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -863,14 +859,14 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
-          <SectionTitle title={production?"Einträge":"Heutige Einträge"} action={<strong>{production?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
-          {production?productionEntries:demoEntries}
+          <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
+          {!forceDemo?productionEntries:demoEntries}
           <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
         </>}
       </section>
       <section className="surface">
-        <SectionTitle title={production?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{production?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
-        {production?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
+        <SectionTitle title={!forceDemo?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
+        {!forceDemo?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>
     </div>
@@ -881,10 +877,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 }
 
 function useSupportRows(){
-  const [rows,setRows]=useState(supportTickets);
+  const [rows,setRows]=useState<string[][]>([]);
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>("/api/support/tickets")
+    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?"/api/support/tickets":"/api/demo/data?collection=support_tickets")
       .then(payload=>{
         const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
         queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject,new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status])));
@@ -897,15 +892,10 @@ function useSupportRows(){
 export function SupportPage() {
   const ticketRows=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
-    <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
+    <div className="support-summary"><Metric label="Offen" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="support"/><Metric label="Gelöst" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
       <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
-      <aside className="tablet-detail support-tablet-preview surface">
-        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
-        <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
-        <div className="support-preview-message support"><small>Binso Support · 10:37</small><p>Gerne. Um welche Rechnung geht es genau?</p></div>
-        <Button href="/support/5832" variant="secondary">Konversation öffnen</Button>
-      </aside>
+
     </div>
   </AppShell>;
 }
@@ -1032,7 +1022,7 @@ export function SettingsPage() {
     ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
     ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
     ["/einstellungen/team","users","Team","Benutzer, Rollen und Einladungen"],
-    ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
+    ["/einstellungen/abonnement","card","Abonnement","Plan, Nutzung und Zahlungsabwicklung"],
     ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
     ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
     ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
@@ -1047,11 +1037,11 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
-  const [firstName,setFirstName]=useState("Thomas");
-  const [lastName,setLastName]=useState("Müller");
-  const [email,setEmail]=useState("thomas@musterwerk.ch");
-  const [phone,setPhone]=useState("+41 79 123 45 67");
-  const [jobTitle,setJobTitle]=useState("Geschäftsführer");
+  const [firstName,setFirstName]=useState("");
+  const [lastName,setLastName]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
+  const [jobTitle,setJobTitle]=useState("");
   const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
@@ -1107,13 +1097,13 @@ export function AccountSettingsPage() {
 }
 
 export function CompanySettingsPage() {
-  const [name,setName]=useState("Musterwerk AG");
-  const [uid,setUid]=useState("CHE-123.456.789");
-  const [street,setStreet]=useState("Bahnhofstrasse 12");
-  const [postalCode,setPostalCode]=useState("3000");
-  const [city,setCity]=useState("Bern");
-  const [email,setEmail]=useState("info@musterwerk.ch");
-  const [phone,setPhone]=useState("+41 31 123 45 67");
+  const [name,setName]=useState("");
+  const [uid,setUid]=useState("");
+  const [street,setStreet]=useState("");
+  const [postalCode,setPostalCode]=useState("");
+  const [city,setCity]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
 
@@ -1301,17 +1291,24 @@ export function NotificationSettingsPage() {
   const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
     Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
   });
-  const toggle = (title:string, channel:"email"|"push") => setPrefs(current=>({...current,[title]:{...current[title],[channel]:!current[title][channel]}}));
+  const [error,setError]=useState("");
+  useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
+  const toggle = async (title:string, channel:"email"|"push") => {const enabled=!prefs[title][channel];try{if(isProductionBackendEnabled())await apiPatch("/api/settings/notifications",{kind:title,channel,enabled});setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));setError("");}catch{setError("Einstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
+    {error&&<p role="alert">{error}</p>}
+    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>void toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>void toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
   </AppShell>;
 }
 
 export function LanguageSettingsPage() {
   const [language,setLanguage] = useState("de");
+  const [error,setError]=useState("");
+  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>setLanguage(data.item?.language??"de")).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
+  const choose=async(code:string)=>{try{if(isProductionBackendEnabled())await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
   const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>setLanguage(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    {error&&<p role="alert">{error}</p>}
     <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
   </AppShell>;
 }
@@ -1385,34 +1382,14 @@ export function AppearanceSettingsPage() {
 }
 
 export function DocumentsHubPage() {
-  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neue Rechnung"><span className="create-action-label">Neue Rechnung</span></Button>}>
-    <div className="documents-summary" aria-label="Belegübersicht"><div><Icon name="file" size={16}/><span>Offene Angebote</span><b>2</b><small>CHF 10’464.32</small></div><div><Icon name="receipt" size={16}/><span>Offene Rechnungen</span><b>8</b><small>CHF 12’800</small></div><div><Icon name="wallet" size={16}/><span>Zahlungen im Monat</span><b>CHF 49’820</b><small>184 Eingänge</small></div></div>
+  const offerRows=useDocumentRows("offer",offers);
+  const invoiceRows=useDocumentRows("invoice",invoices);
+  const paymentRows=useDemoRows("payments",payments);
+  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen im Überblick." active="belege">
     <div className="documents-hub-grid">
-      <section className="surface">
-        <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/angebote/AN-2026-012"><b>AN-2026-012 · Acme AG</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link>
-          <Link href="/angebote/AN-2026-011"><b>AN-2026-011 · Müller GmbH</b><span>CHF 3’200.00</span><Status tone="neutral">Entwurf</Status></Link>
-        </div>
-        <Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button>
-      </section>
-      <section className="surface">
-        <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/rechnungen/RE-2026-019"><b>RE-2026-019 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link>
-          <Link href="/rechnungen/RE-2026-018"><b>RE-2026-018 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></Link>
-          <Link href="/rechnungen/RE-2026-017"><b>RE-2026-017 · Berger Bau AG</b><span>CHF 3’700.00</span><Status tone="danger">Überfällig</Status></Link>
-        </div>
-        <Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button>
-      </section>
-      <section className="surface">
-        <SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/zahlungen/1"><b>02.10.2026 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Verbucht</Status></Link>
-          <Link href="/zahlungen/2"><b>30.09.2026 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="success">Verbucht</Status></Link>
-        </div>
-        <Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button>
-      </section>
+      <section className="surface"><SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/><div className="compact-list">{offerRows.slice(0,5).map(([nr,name,amount,status])=><Link key={nr} href={`/angebote/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button></section>
+      <section className="surface"><SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="compact-list">{invoiceRows.slice(0,5).map(([nr,name,,amount,status])=><Link key={nr} href={`/rechnungen/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button></section>
+      <section className="surface"><SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/><div className="compact-list">{paymentRows.slice(0,5).map(([id,date,name,,amount,status])=><Link key={id} href={`/zahlungen/${id}`}><b>{date} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button></section>
     </div>
   </AppShell>;
 }

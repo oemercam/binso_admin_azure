@@ -48,6 +48,7 @@ export class ApiError extends Error {
 }
 
 export function apiError(error:unknown){
+  if(error instanceof Response) return json({error:error.status===403?"forbidden":"request_failed",message:error.status===403?"Keine Berechtigung.":"Die Anfrage konnte nicht verarbeitet werden."},error.status);
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   console.error("Unhandled API error",error instanceof Error ? error.message : "unknown");
   return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden."},500);

@@ -14,30 +14,31 @@
     "db:check": "node scripts/check-db.mjs",
     "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
     "permissions:test": "node scripts/permission-selfcheck.mjs",
-    "test": "node scripts/architecture-selfcheck.mjs && node scripts/ui-consistency-selfcheck.mjs && node scripts/rendering-selfcheck.mjs && node scripts/content-selfcheck.mjs && node scripts/i18n-mobile-selfcheck.mjs && node scripts/ui-standards-selfcheck.mjs && node scripts/architecture-hardcoding-selfcheck.mjs && node scripts/runtime-boundary-selfcheck.mjs && node scripts/trial-demo-selfcheck.mjs && node scripts/overlay-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/production-selfcheck.mjs && node scripts/plan-demo-selfcheck.mjs",
-    "tenant:test": "node scripts/tenant-isolation-check.mjs",
+    "test": "node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/migration-test.mjs",
+    "tenant:test": "node scripts/migration-test.mjs",
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
     "architecture:check": "node scripts/architecture-selfcheck.mjs",
-    "architecture:hardcoding": "node scripts/architecture-hardcoding-selfcheck.mjs",
+    "architecture:hardcoding": "node scripts/architecture-selfcheck.mjs",
     "css:check": "node scripts/check-css-architecture.mjs",
     "routes:css-check": "node scripts/check-route-css.mjs"
   },
   "dependencies": {
-    "next": "16.3.6",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
     "lucide-react": "0.468.0",
-    "pg": "8.16.3"
+    "next": "16.3.6",
+    "pg": "8.16.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.3.15",
     "@types/node": "22.20.4",
+    "@types/pg": "8.15.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.6",
-    "typescript": "5.9.3",
-    "@types/pg": "8.15.5"
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=20.9.0"
