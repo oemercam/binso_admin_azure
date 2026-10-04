@@ -403,11 +403,7 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
       <div>
         <RecordsView items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
-      <aside className="tablet-detail invoice-tablet-preview">
-        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="receipt"/></span><div><h2>RE-2026-019</h2><p>Acme AG · 12.09.2026</p></div><Status tone="success">Bezahlt</Status></div>
-        <div className="tablet-document-actions"><Button href="/rechnungen/RE-2026-019" variant="secondary">Öffnen</Button><Button href="/zahlungen/neu">Zahlung</Button></div>
-        <InvoicePreview/>
-      </aside>
+      {forceDemo&&<aside className="tablet-detail invoice-tablet-preview"><InvoicePreview/></aside>}
     </div>
   </AppShell>;
 }
@@ -415,25 +411,26 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 export function PaymentsPage() {
   const paymentRows=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
-    <div className="payment-summary-strip" aria-label="Zahlungsübersicht">
-      <div><span>Eingegangen</span><b>CHF 49’820</b><small>diesen Monat</small></div>
-      <div><span>Offen</span><b>CHF 12’800</b><small>8 Rechnungen</small></div>
-      <div><span>Überfällig</span><b>CHF 3’700</b><small>1 Rechnung</small></div>
-    </div>
     <RecordsView items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
 export function PaymentForm() {
   const router=useRouter();
-  const [date,setDate]=useState("2026-10-02");
-  const [amount,setAmount]=useState("4346.40");
+  const [toast,setToast]=useState<string|null>(null);
+  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
+  const [amount,setAmount]=useState("");
   const [method,setMethod]=useState("Banküberweisung");
   const [idempotencyKey,setIdempotencyKey]=useState("");
-  const [toast,setToast]=useState<string|null>(null);
+  const [invoiceId,setInvoiceId]=useState("");
+  const [note,setNote]=useState("");
+  const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;customer?:{name?:string}}>>([]);
+  useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
+  const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
+
   const save=async()=>{
     const value=Number(amount.replace(",","."));
-    if(!Number.isFinite(value)||value<=0){
+    if(!selectedInvoice||!Number.isFinite(value)||value<=0){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
@@ -442,12 +439,12 @@ export function PaymentForm() {
       if(isProductionBackendEnabled()){
         const key=idempotencyKey||window.crypto.randomUUID();
         if(!idempotencyKey) setIdempotencyKey(key);
-        await apiPost("/api/payments",{invoiceNumber:"RE-2026-019",customerName:"Acme AG",paidOn:date,amount:value,method,note:""},{idempotencyKey:key});
+        await apiPost("/api/payments",{invoiceId,paidOn:date,amount:value,method,note},{idempotencyKey:key});
       }
       else{
         const id=String(Date.now());
         const displayDate=date.split("-").reverse().join(".");
-        appendDemoRow("payments",[id,displayDate,"Acme AG",`RE-2026-019 · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
+        appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
       setToast("Zahlung gespeichert.");
       window.setTimeout(()=>router.push("/zahlungen"),700);
@@ -458,12 +455,12 @@ export function PaymentForm() {
   };
   return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
     <div className="form-page narrow">
-      <section className="payment-context"><span className="activity-icon"><Icon name="receipt"/></span><div><small>Rechnung</small><b>RE-2026-019 · Acme AG</b><span>Offener Betrag CHF 4’346.40</span></div></section>
+      <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(Number(item.total)-Number(item.paid_amount)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {moneyChf(Number(item.total)-Number(item.paid_amount))}</option>)}</select></Field>
       <div className="form-grid two">
         <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
         <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field>
         <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
-        <Field label="Notiz"><input placeholder="Optional"/></Field>
+        <Field label="Notiz"><input placeholder="Optional" value={note} onChange={e=>setNote(e.target.value)}/></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={save}>Zahlung speichern</Button></div>
     </div>
@@ -667,8 +664,8 @@ export function ExpensesPage() {
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
   const production=useBackendMode();
-  const [person,setPerson]=useState("Thomas Müller");
-  const [date,setDate]=useState("2026-10-02");
+  const [person,setPerson]=useState("");
+  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState(existing?"280.00":"");
   const [currency,setCurrency]=useState("CHF");
@@ -898,12 +895,7 @@ export function SupportPage() {
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
       <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
-      <aside className="tablet-detail support-tablet-preview surface">
-        <div className="tablet-detail-head"><span className="activity-icon"><Icon name="support"/></span><div><h2>Ticket #5832</h2><p>Frage zur Rechnung</p></div><Status tone="warning">Offen</Status></div>
-        <div className="support-preview-message"><small>Thomas · 10:24</small><p>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</p></div>
-        <div className="support-preview-message support"><small>Binso Support · 10:37</small><p>Gerne. Um welche Rechnung geht es genau?</p></div>
-        <Button href="/support/5832" variant="secondary">Konversation öffnen</Button>
-      </aside>
+
     </div>
   </AppShell>;
 }
@@ -1030,7 +1022,7 @@ export function SettingsPage() {
     ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
     ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
     ["/einstellungen/team","users","Team","Benutzer, Rollen und Einladungen"],
-    ["/einstellungen/abonnement","card","Abonnement","Business · CHF 49 / Monat"],
+    ["/einstellungen/abonnement","card","Abonnement","Plan, Nutzung und Zahlungsabwicklung"],
     ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
     ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
     ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
@@ -1045,11 +1037,11 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
-  const [firstName,setFirstName]=useState("Thomas");
-  const [lastName,setLastName]=useState("Müller");
-  const [email,setEmail]=useState("thomas@musterwerk.ch");
-  const [phone,setPhone]=useState("+41 79 123 45 67");
-  const [jobTitle,setJobTitle]=useState("Geschäftsführer");
+  const [firstName,setFirstName]=useState("");
+  const [lastName,setLastName]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
+  const [jobTitle,setJobTitle]=useState("");
   const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
@@ -1105,13 +1097,13 @@ export function AccountSettingsPage() {
 }
 
 export function CompanySettingsPage() {
-  const [name,setName]=useState("Musterwerk AG");
-  const [uid,setUid]=useState("CHE-123.456.789");
-  const [street,setStreet]=useState("Bahnhofstrasse 12");
-  const [postalCode,setPostalCode]=useState("3000");
-  const [city,setCity]=useState("Bern");
-  const [email,setEmail]=useState("info@musterwerk.ch");
-  const [phone,setPhone]=useState("+41 31 123 45 67");
+  const [name,setName]=useState("");
+  const [uid,setUid]=useState("");
+  const [street,setStreet]=useState("");
+  const [postalCode,setPostalCode]=useState("");
+  const [city,setCity]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
 
@@ -1299,17 +1291,24 @@ export function NotificationSettingsPage() {
   const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
     Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
   });
-  const toggle = (title:string, channel:"email"|"push") => setPrefs(current=>({...current,[title]:{...current[title],[channel]:!current[title][channel]}}));
+  const [error,setError]=useState("");
+  useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
+  const toggle = async (title:string, channel:"email"|"push") => {const enabled=!prefs[title][channel];try{if(isProductionBackendEnabled())await apiPatch("/api/settings/notifications",{kind:title,channel,enabled});setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));setError("");}catch{setError("Einstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
+    {error&&<p role="alert">{error}</p>}
+    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>void toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>void toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
   </AppShell>;
 }
 
 export function LanguageSettingsPage() {
   const [language,setLanguage] = useState("de");
+  const [error,setError]=useState("");
+  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>setLanguage(data.item?.language??"de")).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
+  const choose=async(code:string)=>{try{if(isProductionBackendEnabled())await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
   const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>setLanguage(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+    {error&&<p role="alert">{error}</p>}
     <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
   </AppShell>;
 }
@@ -1383,34 +1382,14 @@ export function AppearanceSettingsPage() {
 }
 
 export function DocumentsHubPage() {
-  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neue Rechnung"><span className="create-action-label">Neue Rechnung</span></Button>}>
-    <div className="documents-summary" aria-label="Belegübersicht"><div><Icon name="file" size={16}/><span>Offene Angebote</span><b>2</b><small>CHF 10’464.32</small></div><div><Icon name="receipt" size={16}/><span>Offene Rechnungen</span><b>8</b><small>CHF 12’800</small></div><div><Icon name="wallet" size={16}/><span>Zahlungen im Monat</span><b>CHF 49’820</b><small>184 Eingänge</small></div></div>
+  const offerRows=useDocumentRows("offer",offers);
+  const invoiceRows=useDocumentRows("invoice",invoices);
+  const paymentRows=useDemoRows("payments",payments);
+  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen im Überblick." active="belege">
     <div className="documents-hub-grid">
-      <section className="surface">
-        <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/angebote/AN-2026-012"><b>AN-2026-012 · Acme AG</b><span>CHF 7’264.32</span><Status tone="warning">Gesendet</Status></Link>
-          <Link href="/angebote/AN-2026-011"><b>AN-2026-011 · Müller GmbH</b><span>CHF 3’200.00</span><Status tone="neutral">Entwurf</Status></Link>
-        </div>
-        <Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button>
-      </section>
-      <section className="surface">
-        <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/rechnungen/RE-2026-019"><b>RE-2026-019 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link>
-          <Link href="/rechnungen/RE-2026-018"><b>RE-2026-018 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="warning">Offen</Status></Link>
-          <Link href="/rechnungen/RE-2026-017"><b>RE-2026-017 · Berger Bau AG</b><span>CHF 3’700.00</span><Status tone="danger">Überfällig</Status></Link>
-        </div>
-        <Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button>
-      </section>
-      <section className="surface">
-        <SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
-        <div className="compact-list">
-          <Link href="/zahlungen/1"><b>02.10.2026 · Acme AG</b><span>CHF 4’346.40</span><Status tone="success">Verbucht</Status></Link>
-          <Link href="/zahlungen/2"><b>30.09.2026 · Müller GmbH</b><span>CHF 1’200.00</span><Status tone="success">Verbucht</Status></Link>
-        </div>
-        <Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button>
-      </section>
+      <section className="surface"><SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/><div className="compact-list">{offerRows.slice(0,5).map(([nr,name,amount,status])=><Link key={nr} href={`/angebote/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button></section>
+      <section className="surface"><SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="compact-list">{invoiceRows.slice(0,5).map(([nr,name,,amount,status])=><Link key={nr} href={`/rechnungen/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button></section>
+      <section className="surface"><SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/><div className="compact-list">{paymentRows.slice(0,5).map(([id,date,name,,amount,status])=><Link key={id} href={`/zahlungen/${id}`}><b>{date} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button></section>
     </div>
   </AppShell>;
 }

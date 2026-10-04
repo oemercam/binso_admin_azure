@@ -19,14 +19,14 @@ export async function PATCH(request:NextRequest){
     const firstName=cleanText(body.firstName,120);
     const lastName=cleanText(body.lastName,120);
     const language=cleanText(body.language,20)||"de-CH";
-    const rows=await updateProfile({
-      first_name:firstName||null,
-      last_name:lastName||null,
-      display_name:[firstName,lastName].filter(Boolean).join(" ")||null,
-      phone:cleanText(body.phone,80)||null,
-      job_title:cleanText(body.jobTitle,160)||null,
-      language,
-    });
+    const data:Record<string,unknown>={};
+    if(body.firstName!==undefined)data.first_name=firstName||null;
+    if(body.lastName!==undefined)data.last_name=lastName||null;
+    if(body.firstName!==undefined&&body.lastName!==undefined)data.display_name=[firstName,lastName].filter(Boolean).join(" ")||null;
+    if(body.phone!==undefined)data.phone=cleanText(body.phone,80)||null;
+    if(body.jobTitle!==undefined)data.job_title=cleanText(body.jobTitle,160)||null;
+    if(body.language!==undefined)data.language=language;
+    const rows=await updateProfile(data);
     return json({item:rows[0]});
   }catch(error){return apiError(error);}
 }

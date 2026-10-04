@@ -45,7 +45,7 @@ export async function updateProfile(data:Row){
  const s=await requireSession();const map:Row={};
  for(const key of ['display_name','first_name','last_name','phone','job_title'])if(data[key]!==undefined)map[key]=data[key];
  if(data.language!==undefined){const language=String(data.language).split('-')[0];if(!['de','fr','it','en','tr'].includes(language))throw new ApiError(400,'language_invalid','Ungültige Sprache.');map.language=language;}
- const keys=Object.keys(map);
+ const keys=Object.keys(map);if(!keys.length)throw new ApiError(400,"empty_update","Keine Änderungen angegeben.");
  return withTenant(s.organizationId,s.userId,async c=>(await c.query(`update app_users set ${keys.map((k,i)=>k+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning id,email,display_name,first_name,last_name,phone,job_title,language,theme`,[...keys.map(k=>map[k]),s.userId])).rows);
 }
 export async function operatorList<T extends Row>(table:string,_select="*",extra=""){const s=await requireOperatorSession();return withPlatform(async c=>await listOperatorBusiness(c,s,table,extra) as T[])}

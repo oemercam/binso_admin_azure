@@ -29,7 +29,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(kind&&kind!==k)continue;
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
-   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,d.issue_date,${k==='invoice'?'d.due_date':'null::date'} due_date,${k==='offer'?'d.valid_until':'null::date'} valid_until,d.note,d.currency,d.created_at,
+   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,d.issue_date,${k==='invoice'?'d.due_date':'null::date'} due_date,${k==='offer'?'d.valid_until':'null::date'} valid_until,d.note,d.currency,d.created_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
      coalesce((select sum(l.quantity*l.unit_price) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) subtotal,
      coalesce((select sum(l.quantity*l.unit_price*l.vat_rate/100) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_amount,
      ${k==='invoice'?'d.total_amount':`coalesce((select sum(l.quantity*l.unit_price*(1+l.vat_rate/100)) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
