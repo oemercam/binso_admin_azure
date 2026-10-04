@@ -118,6 +118,11 @@ img,svg{max-width:100%}
   line-height:22px;
   white-space:nowrap;
 }
+.status-neutral{background:var(--status-neutral-bg);color:var(--status-neutral-fg);border-color:var(--status-neutral-line)}
+.status-success{background:var(--status-success-bg);color:var(--status-success-fg);border-color:var(--status-success-line)}
+.status-warning{background:var(--status-warning-bg);color:var(--status-warning-fg);border-color:var(--status-warning-line)}
+.status-danger{background:var(--status-danger-bg);color:var(--status-danger-fg);border-color:var(--status-danger-line)}
+.status-info{background:var(--status-info-bg);color:var(--status-info-fg);border-color:var(--status-info-line)}
 
 input,
 select,

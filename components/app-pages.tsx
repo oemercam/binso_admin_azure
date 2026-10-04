@@ -172,7 +172,7 @@ export function WelcomePage() {
 
 export function CustomersPage() {
   const customerRows=useDemoRows("customers",customers);
-  return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus">Neuer Kunde</Button>}>
+  return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button" ariaLabel="Neuer Kunde"></Button>}>
     <div className="tablet-master-detail">
       <div>
         <RecordsView items={customerRows} placeholder="Kunden suchen...">{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
@@ -853,7 +853,7 @@ function useSupportRows(){
 
 export function SupportPage() {
   const ticketRows=useSupportRows();
-  return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus">Neue Anfrage</Button>}>
+  return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button" ariaLabel="Neues Ticket"></Button>}>
     <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
       <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
@@ -1000,10 +1000,6 @@ export function SettingsPage() {
     <div className="settings-list">
       {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
     </div>
-    <section className="subscription-panel">
-      <div><small>Aktueller Plan</small><h2>Business</h2><p>CHF 49 / Monat · nächste Rechnung am 01.11.2026</p></div>
-      <Button href="/einstellungen/abonnement" variant="secondary">Plan verwalten</Button>
-    </section>
   </AppShell>;
 }
 
@@ -1015,6 +1011,7 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("Geschäftsführer");
   const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
+  const [editing,setEditing]=useState(false);
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
@@ -1036,6 +1033,7 @@ export function AccountSettingsPage() {
     try{
       if(isProductionBackendEnabled()) await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
       setToast(message);
+      setEditing(false);
     }catch(error){
       setToast(error instanceof Error?error.message:"Persönliche Daten konnten nicht gespeichert werden.");
     }
@@ -1044,12 +1042,12 @@ export function AccountSettingsPage() {
 
   const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
     <div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <div className="profile-avatar">{initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div><Button variant="secondary" onClick={()=>void save("Profilbild wird mit Storage angebunden.")}>Bild ändern</Button>
+        <div className="profile-avatar">{initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<Button variant="secondary" onClick={()=>void save("Profilbild wird mit Storage angebunden.")}>Bild ändern</Button>}
       </section>
-      <section className="settings-form">
+      {editing?<section className="settings-form">
         <div className="form-grid two">
           <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
           <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -1059,7 +1057,7 @@ export function AccountSettingsPage() {
           <Field label="Sprache"><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="de-CH">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-      </section>
+      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div><div><dt>Sprache</dt><dd>{{"de-CH":"Deutsch (Schweiz)",fr:"Français",it:"Italiano",en:"English",tr:"Türkçe"}[language]??language}</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
@@ -1076,6 +1074,7 @@ export function CompanySettingsPage() {
   const [vatRate,setVatRate]=useState("8.1");
   const [paymentTerms,setPaymentTerms]=useState("30");
   const [toast,setToast]=useState<string|null>(null);
+  const [editing,setEditing]=useState(false);
 
   const uploadLogo=async(file:File|undefined)=>{
     if(!file) return;
@@ -1118,16 +1117,17 @@ export function CompanySettingsPage() {
     try{
       if(isProductionBackendEnabled()) await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,vatRate:Number(vatRate),paymentTermsDays:Number(paymentTerms)});
       setToast(message);
+      setEditing(false);
     }catch(error){
       setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
     }
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
     <div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>Firmenlogo</b><small>Für Angebote, Rechnungen und Dokumente</small></div><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></section>
-      <section className="settings-form">
+      <section className="surface company-logo-card"><img src="/brand/logo-black.svg" alt="Firmenlogo"/><div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
+      {editing?<section className="settings-form">
         <div className="form-grid two">
           <Field label="Firmenname"><input value={name} onChange={e=>setName(e.target.value)}/></Field>
           <Field label="UID"><input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
@@ -1140,7 +1140,7 @@ export function CompanySettingsPage() {
           <Field label="Zahlungsziel"><select value={paymentTerms} onChange={e=>setPaymentTerms(e.target.value)}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select></Field>
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-      </section>
+      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Standard MwSt.</dt><dd>{vatRate}%</dd></div><div><dt>Zahlungsziel</dt><dd>{paymentTerms} Tage</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
