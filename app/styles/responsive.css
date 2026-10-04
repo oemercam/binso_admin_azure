@@ -955,11 +955,11 @@
   .operator-table-row{min-width:720px}
   .operator-message{max-width:88%}
   .operator-demo-banner{margin:0 0 20px}
-  .operator-main>header{align-items:flex-start;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--color-line)}
+  .operator-main>header{align-items:flex-start;gap:12px;padding-bottom:18px;border-bottom:0}
   .operator-main>header>div:first-child{min-width:0}
   .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
   .operator-main>header p{margin-top:8px;line-height:1.45}
-  .operator-app-header{height:calc(var(--mobile-header-h) + var(--safe-top));min-height:calc(var(--mobile-header-h) + var(--safe-top));margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 0 max(var(--mobile-page-x),var(--safe-left));align-items:center;border-bottom:1px solid var(--color-line);background:var(--color-bg)}
+  .operator-main>header.operator-app-header{height:calc(var(--mobile-header-h) + var(--safe-top));min-height:calc(var(--mobile-header-h) + var(--safe-top));margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 0 max(var(--mobile-page-x),var(--safe-left));align-items:center;border-bottom:1px solid var(--color-line);background:var(--color-bg)}
   .operator-header-brand{gap:10px}.operator-header-brand>.logo{display:block;width:82px;height:28px;flex:0 0 auto}.operator-header-brand>div{display:none}
   .operator-user{gap:4px}.operator-user .icon-button,.operator-user .avatar-button{width:44px;height:44px;min-width:44px;min-height:44px}.operator-user .avatar{width:44px;height:44px}
   .monitoring-kpis{grid-template-columns:1fr 1fr;gap:8px}.monitoring-kpis section{padding:12px;border-radius:12px}.monitoring-kpis strong{font-size:21px}
@@ -1060,6 +1060,12 @@
   .operator-mobile-more nav{display:grid}
   .operator-mobile-more nav a{min-height:54px;display:grid;grid-template-columns:30px 1fr 16px;align-items:center;gap:10px;border-bottom:1px solid var(--color-line);font-size:12px}
 
+
+  /* Operator separators: one boundary owns one line. */
+  .operator-table-card .operator-table{border-top:0}
+  .operator-table-row:last-child{border-bottom:0}
+  .operator-detail-list>div:last-child,.audit-list span:last-child,.mini-stat:last-child,.monitoring-list>div:last-child,.incident-history>div:last-child{border-bottom:0}
+  .surface>.context-block:first-of-type,.surface>.notice:first-of-type{border-top:0}
   .ticket-meta-bar{grid-template-columns:1fr}
 }
 
