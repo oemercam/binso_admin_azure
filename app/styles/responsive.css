@@ -46,7 +46,7 @@
   .marketing-header{
     height:calc(54px + var(--safe-top));
     padding-top:var(--safe-top);
-    background:#fff;
+    background:var(--color-bg);
     backdrop-filter:none;
   }
   .marketing-nav{
@@ -71,7 +71,7 @@
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
     padding:22px max(var(--mobile-page-x),var(--safe-right)) calc(24px + var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));
-    background:#fff;
+    background:var(--color-bg);
   }
   .marketing-mobile-menu nav{display:grid;border-top:0}
   .marketing-mobile-menu nav a{
