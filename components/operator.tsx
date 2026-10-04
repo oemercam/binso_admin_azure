@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
@@ -87,6 +88,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
+  const [accountOpen,setAccountOpen]=useState(false);
+  const router=useRouter();
+  const logout=async()=>{try{await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}});}finally{router.push("/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
@@ -95,11 +99,12 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
     </aside>
 
     <main className="operator-main">
-      {demo&&<div className="operator-demo-banner">Demo-Modus · Beispieldaten · keine produktiven Admin-Aktionen</div>}
       <header className="operator-app-header">
         <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
-        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><span className="avatar">OC</span></div>
+        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
+      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
+
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
         <button type="button" className={["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
@@ -366,6 +371,13 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   </>;
 }
 
+function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:string;kind:"trend"|"donut"|"status";bars?:number[];ratio?:number}) {
+  return <section className={"operator-payment-insight "+kind}>
+    <div><span>{label}</span><strong>{value}</strong></div>
+    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>)}</div>:<div className={"payment-ring "+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
+  </section>;
+}
+
 function PaymentsView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
@@ -378,7 +390,7 @@ function PaymentsView() {
   },[production]);
 
   if(!production) return <>
-    <div className="metrics-grid three"><Metric label="Kundenzahlungen" value="CHF 49’820" hint="Demo" icon="chart"/><Metric label="Verbucht" value="184" hint="Demo" icon="wallet"/><Metric label="Storniert / offen" value="2" hint="Demo" icon="clock"/></div>
+    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
     <section className="surface operator-table-card"><div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></div>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><div className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</div>)}</div></section>
   </>;
 
@@ -387,10 +399,10 @@ function PaymentsView() {
   const pending=items.filter(item=>item.status==="pending").length;
   const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
-    <div className="metrics-grid three">
-      <Metric label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="chart"/>
-      <Metric label="Verbucht" value={String(booked.length)} hint="In dieser Liste" icon="wallet"/>
-      <Metric label="Ausstehend / storniert" value={String(pending+reversed)} hint={String(pending)+" ausstehend · "+String(reversed)+" storniert"} icon="clock"/>
+    <div className="operator-payment-insights">
+      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={[32,46,41,58,52,67,61,78]}/>
+      <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
+      <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
     </div>
     <section className="surface operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
