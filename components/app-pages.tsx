@@ -364,7 +364,11 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 export function PaymentsPage() {
   const paymentRows=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
-    <div className="metrics-grid three"><Metric label="Eingegangen" value="CHF 49’820" hint="diesen Monat" icon="wallet"/><Metric label="Offen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Überfällig" value="CHF 3’700" hint="1 Rechnung" icon="clock"/></div>
+    <div className="payment-summary-strip" aria-label="Zahlungsübersicht">
+      <div><span>Eingegangen</span><b>CHF 49’820</b><small>diesen Monat</small></div>
+      <div><span>Offen</span><b>CHF 12’800</b><small>8 Rechnungen</small></div>
+      <div><span>Überfällig</span><b>CHF 3’700</b><small>1 Rechnung</small></div>
+    </div>
     <RecordsView items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }

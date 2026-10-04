@@ -455,8 +455,10 @@
   border-bottom:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.document-modal>header button{border:0;background:transparent;display:flex;align-items:center;gap:6px;font-size:11px}
-.document-modal>header button:last-child{justify-self:end}
+.document-modal-header-spacer{min-width:1px}
+.document-modal-header-actions{justify-self:end;display:flex;align-items:center;gap:6px}
+.document-modal>header button{width:40px;height:40px;padding:0;border:0;background:transparent;display:grid;place-items:center;border-radius:10px}
+.document-modal>header button:focus-visible{outline:2px solid var(--color-fg);outline-offset:-2px}
 .document-modal-body{max-width:800px;margin:auto;padding:24px}
 .mobile-document-bar{display:none}
 
@@ -1122,3 +1124,12 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form{border-top:0}
 .settings-profile,.company-logo-card{align-items:center}
 .receipt-upload.is-scanning{opacity:.72}
+
+.payment-summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px;border-block:1px solid var(--color-line)}
+.payment-summary-strip>div{min-width:0;padding:12px 16px;border-right:1px solid var(--color-line)}
+.payment-summary-strip>div:last-child{border-right:0}
+.payment-summary-strip span,.payment-summary-strip b,.payment-summary-strip small{display:block}
+.payment-summary-strip span,.payment-summary-strip small{color:var(--color-muted)}
+.payment-summary-strip span{font-size:10px;font-weight:650}
+.payment-summary-strip b{margin:3px 0;font-size:17px;letter-spacing:-.02em}
+.payment-summary-strip small{font-size:9px}
