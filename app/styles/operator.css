@@ -335,3 +335,13 @@
 .monitoring-latency-chart,.monitoring-health-chart,.operator-chart-card,.operator-selected-metric{border:0;border-radius:0;background:transparent;box-shadow:none}
 .ticket-stat{border:0;background:transparent}
 .payment-ring:after,.monitoring-kpi-ring:after,.monitoring-ring:before,.sla-ring:before{background:var(--color-bg)}
+
+
+/* Dashboard statistic visuals use the same compact ring language as monitoring. */
+.operator-stat-ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#16b364 0 86%,#ececea 86% 100%)}
+.operator-stat-ring.users{background:conic-gradient(#3b82f6 0 72%,#ececea 72% 100%)}
+.operator-stat-ring.api{background:conic-gradient(#8b5cf6 0 64%,#ececea 64% 100%)}
+.operator-stat-ring:after{content:"";grid-area:1/1;width:46px;height:46px;border-radius:50%;background:var(--color-bg)}
+.operator-stat-ring b,.operator-stat-ring span{grid-area:1/1;z-index:1;text-align:center}
+.operator-stat-ring b{font-size:10px;transform:translateY(-5px)}
+.operator-stat-ring span{font-size:8px;color:var(--color-muted);transform:translateY(7px)}
