@@ -753,7 +753,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     window.localStorage.setItem("binso.timer.project",timerProject);
     if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
     else window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new Event("binso-timer-change"));
+    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:next?(seconds>0?"Zeitmessung fortgesetzt.":"Zeitmessung gestartet."):"Zeitmessung pausiert."}));
   };
 
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
@@ -771,7 +771,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     window.localStorage.setItem("binso.timer.running","false");
     window.localStorage.setItem("binso.timer.baseSeconds","0");
     window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new Event("binso-timer-change"));
+    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:"Zeitmessung gestoppt."}));
     try{
       if(isProductionBackendEnabled()){
         const ended=new Date();
@@ -1351,11 +1351,7 @@ export function AppearanceSettingsPage() {
 
 export function DocumentsHubPage() {
   return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen auf einen Blick." active="belege" actions={<Button href="/rechnungen/neu" icon="plus">Neue Rechnung</Button>}>
-    <div className="metrics-grid three">
-      <Metric label="Offene Angebote" value="2" hint="CHF 10’464.32" icon="file"/>
-      <Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/>
-      <Metric label="Zahlungen im Monat" value="CHF 49’820" hint="184 Eingänge" icon="wallet"/>
-    </div>
+    <div className="documents-summary" aria-label="Belegübersicht"><div><Icon name="file" size={16}/><span>Offene Angebote</span><b>2</b><small>CHF 10’464.32</small></div><div><Icon name="receipt" size={16}/><span>Offene Rechnungen</span><b>8</b><small>CHF 12’800</small></div><div><Icon name="wallet" size={16}/><span>Zahlungen im Monat</span><b>CHF 49’820</b><small>184 Eingänge</small></div></div>
     <div className="documents-hub-grid">
       <section className="surface">
         <SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/>
