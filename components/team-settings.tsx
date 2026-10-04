@@ -1,55 +1,35 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { AppShell } from "./app-shell";
-import { Button, EmptyState, Field, Status, Toast } from "./ui";
-import { apiGet, apiPost, isProductionBackendEnabled } from "@/lib/client/backend";
-
-type Member={user_id:string;role:string;created_at:string};
+import {useEffect,useState} from "react";
+import {AppShell} from "./app-shell";
+import {Button,EmptyState,Field,Icon,Status,Toast} from "./ui";
+import {apiGet,apiPatch,apiPost,isProductionBackendEnabled} from "@/lib/client/backend";
+type Member={user_id:string;role:string;created_at:string;name?:string;email?:string};
 type Invitation={id:string;email:string;role:string;status:string;expires_at:string;created_at:string};
 type TeamPayload={members:Member[];invitations:Invitation[];userLimit:number;plan:string};
-
+const demoMembers:Member[]=[
+ {user_id:"demo-owner",name:"Thomas Müller",email:"thomas@musterwerk.ch",role:"owner",created_at:"2026-01-10"},
+ {user_id:"demo-admin",name:"Sarah Meier",email:"sarah@musterwerk.ch",role:"admin",created_at:"2026-02-03"},
+ {user_id:"demo-project",name:"Lukas Weber",email:"lukas@musterwerk.ch",role:"project_manager",created_at:"2026-03-14"},
+ {user_id:"demo-finance",name:"Nina Schmid",email:"nina@musterwerk.ch",role:"finance",created_at:"2026-04-08"},
+ {user_id:"demo-member",name:"Marco Keller",email:"marco@musterwerk.ch",role:"member",created_at:"2026-05-21"},
+];
+const roleLabel=(role:string)=>({owner:"Inhaber",admin:"Administrator",finance:"Finanzen",hr:"Personal",project_manager:"Projektleitung",manager:"Management",member:"Mitarbeitende",reader:"Lesen",employee:"Mitarbeitende"}[role]??role);
 export function TeamSettingsPage(){
-  const [data,setData]=useState<TeamPayload>({members:[],invitations:[],userLimit:1,plan:"trial"});
-  const [email,setEmail]=useState("");
-  const [role,setRole]=useState<"member"|"admin">("member");
-  const [loading,setLoading]=useState(true);
-  const [toast,setToast]=useState<string|null>(null);
-
-  const load=async()=>{
-    if(!isProductionBackendEnabled()){setLoading(false);return;}
-    try{setData(await apiGet<TeamPayload>("/api/settings/team/invitations"));}
-    catch(error){setToast(error instanceof Error?error.message:"Team konnte nicht geladen werden.");}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{queueMicrotask(()=>void load());},[]);
-
-  const invite=async()=>{
-    if(!email.trim()) return;
-    try{
-      await apiPost("/api/settings/team/invitations",{email,role});
-      setEmail("");
-      setToast("Einladung wurde gesendet.");
-      await load();
-    }catch(error){setToast(error instanceof Error?error.message:"Einladung konnte nicht gesendet werden.");}
-    window.setTimeout(()=>setToast(null),2600);
-  };
-
-  const occupied=data.members.length+data.invitations.filter(item=>item.status==="pending"&&new Date(item.expires_at)>new Date()).length;
-  return <AppShell title="Team" subtitle="Benutzer und Einladungen deiner Firma." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="surface settings-form">
-      <div className="form-grid two">
-        <Field label="E-Mail"><input type="email" value={email} onChange={event=>setEmail(event.target.value)} placeholder="name@firma.ch"/></Field>
-        <Field label="Rolle"><select value={role} onChange={event=>setRole(event.target.value==="admin"?"admin":"member")}><option value="member">Benutzer</option>{data.plan==="pro"&&<option value="admin">Administrator</option>}</select></Field>
-      </div>
-      <p>{occupied} von {data.userLimit} Plätzen belegt · Plan {data.plan}</p>
-      <Button onClick={()=>void invite()} disabled={occupied>=data.userLimit}>Einladung senden</Button>
-    </section>
-    <section className="surface">
-      <h2>Benutzer</h2>
-      {loading?<p>Wird geladen…</p>:data.members.length?<div className="compact-list">{data.members.map(item=><div key={item.user_id}><b>{item.user_id}</b><span>{item.role==="owner"?"Inhaber":item.role==="admin"?"Administrator":"Benutzer"}</span><Status tone="success">Aktiv</Status></div>)}</div>:<EmptyState icon="users" title="Keine Benutzer" text="Es sind noch keine Benutzer vorhanden."/>}
-    </section>
-    {data.invitations.length>0&&<section className="surface"><h2>Einladungen</h2><div className="compact-list">{data.invitations.map(item=><div key={item.id}><b>{item.email}</b><span>{item.role==="admin"?"Administrator":"Benutzer"}</span><Status tone={item.status==="pending"?"warning":"neutral"}>{item.status==="pending"?"Ausstehend":item.status}</Status></div>)}</div></section>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
-  </AppShell>;
+ const production=isProductionBackendEnabled();
+ const [data,setData]=useState<TeamPayload>({members:production?[]:demoMembers,invitations:[],userLimit:production?1:10,plan:production?"trial":"pro"});
+ const [email,setEmail]=useState(""),[role,setRole]=useState("member"),[loading,setLoading]=useState(production),[toast,setToast]=useState<string|null>(null),[inviteOpen,setInviteOpen]=useState(false),[selected,setSelected]=useState<Member|null>(null),[editRole,setEditRole]=useState("member");
+ const load=async()=>{if(!production){setLoading(false);return}try{setData(await apiGet<TeamPayload>("/api/settings/team/invitations"))}catch(e){setToast(e instanceof Error?e.message:"Team konnte nicht geladen werden.")}finally{setLoading(false)}};
+ useEffect(()=>{queueMicrotask(()=>void load())},[]);
+ const invite=async()=>{if(!email.trim())return;try{if(production)await apiPost("/api/settings/team/invitations",{email,role});setEmail("");setInviteOpen(false);setToast("Einladung wurde gesendet.");await load()}catch(e){setToast(e instanceof Error?e.message:"Einladung konnte nicht gesendet werden.")}window.setTimeout(()=>setToast(null),2600)};
+ const openMember=(m:Member)=>{setSelected(m);setEditRole(m.role)};
+ const saveRole=async()=>{if(!selected||selected.role==="owner")return;try{if(production)await apiPatch("/api/settings/team/members/"+encodeURIComponent(selected.user_id),{role:editRole});else setData(d=>({...d,members:d.members.map(m=>m.user_id===selected.user_id?{...m,role:editRole}:m)}));setSelected(null);setToast("Rolle gespeichert.")}catch(e){setToast(e instanceof Error?e.message:"Rolle konnte nicht gespeichert werden.")}window.setTimeout(()=>setToast(null),2200)};
+ const occupied=data.members.length+data.invitations.filter(i=>i.status==="pending"&&new Date(i.expires_at)>new Date()).length;
+ return <AppShell title="Team" subtitle="Mitarbeitende, Rollen und Einladungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={<Button icon="plus" onClick={()=>setInviteOpen(true)} ariaLabel="Mitarbeiter einladen"/>}>
+  <div className="settings-choice-list team-list">{loading?<p>Wird geladen…</p>:data.members.length?data.members.map(m=><button type="button" key={m.user_id} onClick={()=>openMember(m)}><span className="team-avatar">{(m.name||m.email||m.user_id).split(/\s|@/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}</span><div><b>{m.name||m.email||"Mitarbeiter"}</b><small>{m.email?m.email+" · ":""}{roleLabel(m.role)}</small></div><Status tone="success">Aktiv</Status><Icon name="arrow" size={17}/></button>):<EmptyState icon="users" title="Keine Mitarbeitenden" text="Lade die erste Person in dein Team ein."/>}</div>
+  {data.invitations.length>0&&<section className="settings-section"><h2>Offene Einladungen</h2><div className="settings-choice-list">{data.invitations.filter(i=>i.status==="pending").map(i=><div className="settings-static-row" key={i.id}><div><b>{i.email}</b><small>{roleLabel(i.role)}</small></div><Status tone="warning">Ausstehend</Status></div>)}</div></section>}
+  <p className="settings-note">{occupied} von {data.userLimit} Plätzen belegt · Plan {data.plan}</p>
+  {inviteOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setInviteOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Mitarbeiter einladen</h2><p>Zugang und Rolle können später geändert werden.</p></div><button className="icon-button" onClick={()=>setInviteOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid"><Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field><Field label="Rolle"><select value={role} onChange={e=>setRole(e.target.value)}><option value="member">Mitarbeitende</option><option value="reader">Lesen</option><option value="project_manager">Projektleitung</option><option value="finance">Finanzen</option><option value="hr">Personal</option><option value="admin">Administrator</option></select></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setInviteOpen(false)}>Abbrechen</Button><Button onClick={()=>void invite()} disabled={occupied>=data.userLimit}>Einladen</Button></div></section></div>}
+  {selected&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="bottom-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>{selected.name||selected.email||"Mitarbeiter"}</h2><p>{selected.email||selected.user_id}</p></div><button className="icon-button" onClick={()=>setSelected(null)} aria-label="Schliessen"><Icon name="close"/></button></header><Field label="Rolle"><select value={editRole} disabled={selected.role==="owner"} onChange={e=>setEditRole(e.target.value)}><option value="member">Mitarbeitende</option><option value="reader">Lesen</option><option value="project_manager">Projektleitung</option><option value="finance">Finanzen</option><option value="hr">Personal</option><option value="admin">Administrator</option>{selected.role==="owner"&&<option value="owner">Inhaber</option>}</select></Field><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button>{selected.role!=="owner"&&<Button onClick={()=>void saveRole()}>Rolle speichern</Button>}</div></section></div>}
+  {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
+ </AppShell>
 }
