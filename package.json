@@ -42,7 +42,10 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "braces": "3.0.4"
+    }
   },
   "browserslist": {
     "production": [
