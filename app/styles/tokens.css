@@ -8,6 +8,21 @@
   --color-inverse-bg:#0a0a0a;
   --color-inverse-fg:#fff;
   --color-danger:#a61b1b;
+  --status-success-bg:#eaf7ee;
+  --status-success-fg:#176b35;
+  --status-success-line:#bfe5ca;
+  --status-warning-bg:#fff6df;
+  --status-warning-fg:#8a5a00;
+  --status-warning-line:#f1d38a;
+  --status-danger-bg:#fdecec;
+  --status-danger-fg:#a61b1b;
+  --status-danger-line:#efbcbc;
+  --status-info-bg:#eaf3ff;
+  --status-info-fg:#1d5fa7;
+  --status-info-line:#bfd7f4;
+  --status-neutral-bg:#f3f3f1;
+  --status-neutral-fg:#555;
+  --status-neutral-line:#dededb;
 
   --font-sans:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
 
@@ -82,6 +97,21 @@ html[data-theme="dark"]{
   --color-inverse-fg:#000;
   --glass-bg:rgba(0,0,0,.72);
   --glass-line:rgba(255,255,255,.16);
+  --status-success-bg:#0d2a18;
+  --status-success-fg:#78d99a;
+  --status-success-line:#245f39;
+  --status-warning-bg:#302306;
+  --status-warning-fg:#f1c75b;
+  --status-warning-line:#665018;
+  --status-danger-bg:#321010;
+  --status-danger-fg:#ff8e8e;
+  --status-danger-line:#6f2929;
+  --status-info-bg:#0d2239;
+  --status-info-fg:#82baff;
+  --status-info-line:#28517d;
+  --status-neutral-bg:#171717;
+  --status-neutral-fg:#c5c5c5;
+  --status-neutral-line:#343434;
 
   --bg:var(--color-bg);
   --ink:var(--color-fg);
