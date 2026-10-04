@@ -974,3 +974,126 @@
   .app-launch{display:none}
   .bottom-sheet,.operator-mobile-more{animation:none}
 }
+
+
+/* Mobile/PWA canonical layout hardening
+   Keep sheets, keyboard states and shared rows inside the visual viewport. */
+@media (max-width:760px){
+  .sheet-layer{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+    padding:0;
+  }
+  .bottom-sheet{
+    box-sizing:border-box;
+    max-width:100%;
+    max-height:min(82dvh,720px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+  .bottom-sheet>.global-search,
+  .bottom-sheet>.sheet-menu,
+  .bottom-sheet>.notification-list,
+  .bottom-sheet>.account-sheet{
+    min-width:0;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+  .search-sheet{
+    height:min(82dvh,720px);
+    max-height:min(82dvh,720px);
+  }
+  .search-sheet .sheet-header{flex:0 0 auto}
+  .search-sheet .global-search{
+    min-height:0;
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .search-sheet .searchbox{
+    flex:0 0 auto;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    margin:0;
+  }
+  .search-sheet .searchbox input{
+    width:100%;
+    min-width:0;
+    font-size:16px;
+  }
+  .search-sheet .search-results{
+    min-height:0;
+    flex:1 1 auto;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:calc(12px + var(--safe-bottom));
+  }
+  .search-results>a{
+    width:100%;
+    min-width:0;
+  }
+  .search-results>a>div{min-width:0}
+  .search-results>a :is(b,span,small){
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .sheet-layer-navigation .bottom-sheet{
+    width:100%;
+    max-width:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+  .sheet-layer-navigation .sheet-header{
+    margin-left:calc(-1 * max(var(--mobile-page-x),var(--safe-left)));
+    margin-right:calc(-1 * max(var(--mobile-page-x),var(--safe-right)));
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+
+  .sheet-menu>a{
+    width:100%;
+    min-width:0;
+  }
+  .sheet-menu>a>div{min-width:0}
+  .sheet-menu :is(b,small){overflow-wrap:anywhere}
+
+  .demo-onboarding{
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+  .demo-step{
+    width:100%;
+    max-width:100%;
+  }
+  .demo-step h1{font-size:clamp(26px,7.2vw,30px)}
+  .demo-form,
+  .demo-form label,
+  .demo-form input{width:100%;max-width:100%;min-width:0}
+  .demo-form input{scroll-margin-block:96px 260px}
+
+  .mobile-header,
+  .page-container{
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+}
+
+@supports (height:100svh){
+  @media (max-width:760px){
+    .search-sheet{
+      max-height:min(82dvh,720px);
+    }
+  }
+}
