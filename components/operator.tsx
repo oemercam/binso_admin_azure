@@ -11,6 +11,7 @@ const operatorNav = [
   ["tickets","Tickets","support"],
   ["kunden","Kunden","users"],
   ["zahlungen","Zahlungen","wallet"],
+  ["finanzen","Finanzen","chart"],
   ["abonnemente","Abonnemente","card"],
   ["sperrungen","Sperrungen","lock"],
   ["monitoring","Monitoring","chart"],
@@ -107,12 +108,12 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
-        <button type="button" className={["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
+        <button type="button" className={["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
       </nav>
       {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
         <section className="operator-mobile-more" role="dialog" aria-modal="true" aria-label="Weitere Admin-Bereiche">
           <header><div><h2>Mehr</h2><p>Weitere Bereiche von One Admin.</p></div><button type="button" className="icon-button" aria-label="Schliessen" onClick={()=>setMobileMore(false)}><Icon name="close"/></button></header>
-          <nav>{operatorNav.filter(([slug])=>["zahlungen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
+          <nav>{operatorNav.filter(([slug])=>["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
         </section>
       </div>}
 
@@ -121,6 +122,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
         key === "zahlungen" ? <PaymentsView/> :
+        key === "finanzen" ? <OperatorFinanceView/> :
         key === "abonnemente" ? <SubscriptionsView/> :
         key === "sperrungen" ? <RestrictionsView/> :
         key === "monitoring" ? <MonitoringView/> :
@@ -140,6 +142,7 @@ function operatorSubtitle(key: string, detail: string) {
     tickets: "Kundenanfragen verwalten und beantworten.",
     kunden: "Kundenkonten, Status und Supportkontext.",
     zahlungen: "Zahlungen und fehlgeschlagene Transaktionen.",
+    finanzen: "Plattformumsatz, Kosten und wirtschaftliche Entwicklung.",
     abonnemente: "Pläne, Nutzung und Abrechnungsstatus.",
     sperrungen: "Einschränkungen kontrolliert verwalten.",
     monitoring: "Status der Plattform und abhängiger Services.",
@@ -376,6 +379,24 @@ function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:s
     <div><span>{label}</span><strong>{value}</strong></div>
     {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>)}</div>:<div className={"payment-ring "+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
   </section>;
+}
+
+function OperatorFinanceView(){
+  const production=useBackendMode();
+  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  const [range,setRange]=useState("month");
+  useEffect(()=>{if(!production)return;apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/payments").then(payload=>queueMicrotask(()=>setItems(payload.items))).catch(()=>undefined)},[production]);
+  const now=new Date(), ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
+  let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}
+  const source=production?items:[{paid_on:"2026-10-02",amount:1240,status:"booked"},{paid_on:"2026-10-04",amount:4900,status:"booked"},{paid_on:"2026-09-12",amount:3800,status:"booked"}];
+  const selected=source.filter(item=>{const d=new Date(String(item.paid_on??""));return d>=start&&d<end&&item.status==="booked"}), volume=selected.reduce((s,x)=>s+Number(x.amount??0),0);
+  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(end.getFullYear(),end.getMonth()-1-i,1);const value=source.filter(x=>{const p=new Date(String(x.paid_on??""));return p.getFullYear()===d.getFullYear()&&p.getMonth()===d.getMonth()&&x.status==="booked"}).reduce((s,x)=>s+Number(x.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse(),max=Math.max(1,...monthly.map(x=>x.value));
+  return <div className="operator-finance">
+    <div className="finance-range">{Object.entries(ranges).map(([key,x])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{x.label}</button>)}</div>
+    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={[35,48,44,61,55,70,66,82]}/><PaymentInsight label="Plattformumsatz" value={production?"—":"CHF 18’640"} kind="donut" ratio={72}/><PaymentInsight label="Betriebskosten" value={production?"—":"CHF 6’240"} kind="status" ratio={34}/></div>
+    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/><div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${Math.max(8,x.value/max*100)}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div></section>
+    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Azure und Infrastruktur</span><strong>{production?"Noch nicht angebunden":"CHF 2’840"}</strong></div><div><span>E-Mail und Services</span><strong>{production?"Noch nicht angebunden":"CHF 640"}</strong></div><div><span>Personal / Betrieb</span><strong>{production?"Noch nicht angebunden":"CHF 2’760"}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen sind bereits aus dem System verfügbar. SaaS-Abonnementumsatz, Azure-/Providerkosten und interne Personalkosten werden erst als Ergebnis ausgewiesen, sobald die jeweiligen produktiven Datenquellen angebunden sind.</p></section></div>
+  </div>
 }
 
 function PaymentsView() {
