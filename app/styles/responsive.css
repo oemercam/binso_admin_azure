@@ -1690,3 +1690,72 @@
   .invoice-form select{min-height:var(--control-h-mobile)}
   .invoice-form .form-field>span{font-size:var(--control-label-font)}
 }
+
+
+/* Mobile document preview viewport and typography rhythm. */
+@media (max-width:760px){
+  .document-modal{
+    height:100dvh;
+    min-height:100dvh;
+    overflow:hidden;
+  }
+  .document-modal-body{
+    position:absolute;
+    inset:58px 0 0;
+    box-sizing:border-box;
+    height:auto;
+    min-height:0;
+    margin:0;
+    padding:12px max(10px,var(--safe-right)) max(12px,var(--safe-bottom)) max(10px,var(--safe-left));
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    background:var(--color-subtle);
+  }
+  .document-modal .document-pages{
+    width:100%;
+    min-height:0;
+    padding:0;
+    margin:0;
+    align-content:start;
+  }
+  .document-modal .document-pages::after{content:none}
+  .document-modal .paper{
+    flex:none;
+    margin:0 auto;
+  }
+  .document-modal .document-pages>.paper:last-child{margin-bottom:0}
+
+  .document-modal .paper-meta{
+    margin:9% 0 6%;
+    gap:6%;
+    line-height:1.22;
+  }
+  .document-modal .paper-meta>div{
+    align-content:start;
+    gap:1px;
+    line-height:1.22;
+  }
+  .document-modal .paper-meta>div>small:not(:first-child){margin-top:5px}
+  .document-modal .sender-line{
+    margin-top:3px;
+    line-height:1.2;
+  }
+  .document-modal .paper-intro{
+    line-height:1.3;
+  }
+  .document-modal .paper-intro p{
+    margin:3px 0 0;
+    line-height:1.3;
+  }
+  .document-modal .qr-info{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    line-height:1.18;
+  }
+  .document-modal .qr-info small:not(:first-child){margin-top:5px}
+  .document-modal .qr-info span{line-height:1.18}
+  .document-modal .qr-amount{
+    line-height:1.18;
+  }
+}
