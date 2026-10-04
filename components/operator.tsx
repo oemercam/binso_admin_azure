@@ -82,19 +82,20 @@ function useOperatorCustomers(){
 }
 
 
-export function OperatorPage({ section = "" }: { section?: string }) {
+export function OperatorPage({ section = "", demo = false }: { section?: string; demo?: boolean }) {
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
 
-  return <div className="operator-root">
+  return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
       <Link href="/operator"><Logo dark/></Link>
       <nav>{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span>{label==="Tickets"&&<em>12</em>}</Link>)}</nav>
     </aside>
 
     <main className="operator-main">
+      {demo&&<div className="operator-demo-banner">Demo-Modus · Beispieldaten · keine produktiven Admin-Aktionen</div>}
       <header>
         <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
         <div className="operator-user"><Link className="operator-back-app" href="/dashboard"><Icon name="back" size={15}/><span>Zur App</span></Link><span className="avatar">OC</span></div>
