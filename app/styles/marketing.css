@@ -459,6 +459,9 @@
 .form-link a,
 .portal-bottom a{font-weight:700}
 .auth-error{margin:0;color:#a61b1b;font-size:11px}
+.operator-login-card>.eyebrow{margin:0 0 12px}
+.operator-login-card>.logo{margin-bottom:42px}
+.operator-login-note{margin:0 0 22px!important;font-size:10px!important;line-height:1.5!important}
 
 /* Customer portal entry */
 .portal-page{
