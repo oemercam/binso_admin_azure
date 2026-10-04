@@ -162,18 +162,17 @@ function OperatorDashboard() {
       <SectionTitle title="Systemstatus" action={<Link className="text-action" href="/operator/monitoring">Alle anzeigen</Link>}/>
       <div className="operator-health-services">{["Web App","Datenbank","API","Dateispeicher","E-Mail Service"].map((name,i)=><button type="button" key={name} onClick={()=>setMetric(i===1?"availability":i===2?"api":"users")}><i className={i===4?"warn":""}/><b>{name}</b><span>{i===4?"Degradiert":"Online"}</span><small>{i===0?"99.99 %":i===1?"12 ms":i===2?"24 ms":i===3?"34 ms":"Antwortzeit erhöht"}</small></button>)}</div>
     </section>
-    <div className="operator-chart-grid">
-      {(["availability","users","api"] as const).map((key,i)=><button type="button" className={"operator-chart-card "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small><div className={"operator-spark operator-spark-"+i}><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></button>)}
+    <div className="operator-pulse-grid">
+      {(["availability","users","api"] as const).map((key,i)=><button type="button" className={"operator-pulse "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><div><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small></div><div className={"operator-mini-trend trend-"+i}><i/><i/><i/><i/><i/><i/></div></button>)}
     </div>
     <div className="operator-insight-grid">
       <section className="surface"><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span>{label}</span></Link>)}</div></section>
-      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><strong>96.3 %</strong><span>+2.1 %</span><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-bar"><i/><i/><i/></button><div><small>Innerhalb SLA 96.3 %</small><small>Knapp 2.5 %</small><small>Überfällig 1.2 %</small></div></section>
+      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-compact"><span className="sla-ring"><b>96.3%</b></span><span className="sla-copy"><strong>Innerhalb SLA</strong><small><i/> 96.3 % erfüllt</small><small><i/> 2.5 % knapp</small><small><i/> 1.2 % überfällig</small></span></button></section>
     </div>
     <div className="operator-insight-grid">
       <section className="surface"><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span>{label}</span><i><b style={{width:String(Number(value)*6)+"%"}}/></i><strong>{value}</strong></Link>)}</div></section>
       <section className="surface"><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b>{x.title}</b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</section>
     </div>
-    <section className="surface operator-selected-metric"><span>{current[0]}</span><strong>{current[1]}</strong><small>{current[2]} · Antippen wechselt die Detailansicht</small></section>
   </div>;
 }
 
