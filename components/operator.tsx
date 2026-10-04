@@ -96,9 +96,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
 
     <main className="operator-main">
       {demo&&<div className="operator-demo-banner">Demo-Modus · Beispieldaten · keine produktiven Admin-Aktionen</div>}
-      <header>
-        <div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div>
-        <div className="operator-user"><Link className="operator-back-app" href="/dashboard"><Icon name="back" size={15}/><span>Zur App</span></Link><span className="avatar">OC</span></div>
+      <header className="operator-app-header">
+        <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
+        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><span className="avatar">OC</span></div>
       </header>
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
@@ -162,18 +162,17 @@ function OperatorDashboard() {
       <SectionTitle title="Systemstatus" action={<Link className="text-action" href="/operator/monitoring">Alle anzeigen</Link>}/>
       <div className="operator-health-services">{["Web App","Datenbank","API","Dateispeicher","E-Mail Service"].map((name,i)=><button type="button" key={name} onClick={()=>setMetric(i===1?"availability":i===2?"api":"users")}><i className={i===4?"warn":""}/><b>{name}</b><span>{i===4?"Degradiert":"Online"}</span><small>{i===0?"99.99 %":i===1?"12 ms":i===2?"24 ms":i===3?"34 ms":"Antwortzeit erhöht"}</small></button>)}</div>
     </section>
-    <div className="operator-chart-grid">
-      {(["availability","users","api"] as const).map((key,i)=><button type="button" className={"operator-chart-card "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small><div className={"operator-spark operator-spark-"+i}><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></button>)}
+    <div className="operator-pulse-grid">
+      {(["availability","users","api"] as const).map((key,i)=><button type="button" className={"operator-pulse "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><div><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small></div><div className={"operator-mini-trend trend-"+i}><i/><i/><i/><i/><i/><i/></div></button>)}
     </div>
     <div className="operator-insight-grid">
       <section className="surface"><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span>{label}</span></Link>)}</div></section>
-      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><strong>96.3 %</strong><span>+2.1 %</span><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-bar"><i/><i/><i/></button><div><small>Innerhalb SLA 96.3 %</small><small>Knapp 2.5 %</small><small>Überfällig 1.2 %</small></div></section>
+      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-compact"><span className="sla-ring"><b>96.3%</b></span><span className="sla-copy"><strong>Innerhalb SLA</strong><small><i/> 96.3 % erfüllt</small><small><i/> 2.5 % knapp</small><small><i/> 1.2 % überfällig</small></span></button></section>
     </div>
     <div className="operator-insight-grid">
       <section className="surface"><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span>{label}</span><i><b style={{width:String(Number(value)*6)+"%"}}/></i><strong>{value}</strong></Link>)}</div></section>
       <section className="surface"><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b>{x.title}</b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</section>
     </div>
-    <section className="surface operator-selected-metric"><span>{current[0]}</span><strong>{current[1]}</strong><small>{current[2]} · Antippen wechselt die Detailansicht</small></section>
   </div>;
 }
 
@@ -512,6 +511,25 @@ function RestrictionsView() {
   </>;
 }
 
+
+function MonitoringCockpit({services,api,database,availability,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;availability:string;errorRate:string;incidents:Array<Record<string,unknown>>}) {
+  const healthy=services.filter(s=>s.status==="operational").length;
+  const degraded=services.filter(s=>s.status==="degraded").length;
+  const bars=[32,38,35,42,39,48,44,52,46,58,49,55,61,53,47,45,42,40,38,41,36,34,37,32];
+  return <div className="monitoring-cockpit">
+    <div className="monitoring-kpis">
+      <section><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></section>
+      <section><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></section>
+      <section><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></section>
+      <section><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></section>
+    </div>
+    <div className="monitoring-visual-grid">
+      <section className="surface monitoring-latency-chart"><SectionTitle title="Systemleistung"/><div className="monitoring-chart-head"><div><strong>{api==null?"—":api+" ms"}</strong><span>API Latenz</span></div><small>letzte 24 Stunden</small></div><div className="monitoring-bars" aria-label="Latenzverlauf">{bars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><div className="monitoring-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></section>
+      <section className="surface monitoring-health-chart"><SectionTitle title="Service Health"/><div className="monitoring-ring" style={{"--health":String(services.length?Math.round(healthy/services.length*100):0)+"%"} as React.CSSProperties}><div><strong>{services.length?Math.round(healthy/services.length*100):0}%</strong><span>gesund</span></div></div><div className="monitoring-health-legend"><span><i/>Operational <b>{healthy}</b></span><span><i/>Beeinträchtigt <b>{degraded}</b></span><span><i/>Fehlerrate <b>{errorRate}</b></span></div></section>
+    </div>
+  </div>;
+}
+
 function MonitoringView() {
   const production=useBackendMode();
   const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
@@ -532,10 +550,7 @@ function MonitoringView() {
     window.setTimeout(()=>setToast(null),2600);
   };
 
-  if(!production) return <>
-    <div className="operator-monitor-metrics"><Metric label="Verfügbarkeit" value="99.99%" hint="Demo" icon="chart"/><Metric label="API Antwortzeit" value="182 ms" hint="Demo" icon="clock"/><Metric label="Fehlerrate" value="0.08%" hint="Demo" icon="support"/><Metric label="Aktive Nutzer" value="1’284" hint="Demo" icon="users"/></div>
-    <div className="monitoring-panel"><div className="monitoring-head"><div><span className="monitoring-dot"/><b>Demo-Monitoring</b></div><small>Keine Live-Telemetrie verbunden</small></div><div className="monitoring-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><div><i/><span><b>{s}</b><small>{i<3?"Binso One":"Nicht verbunden"}</small></span></div><strong>{i<3?"Operational":"—"}</strong><div className="spark"/></div>)}</div></div>
-  </>;
+  if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} availability="99.99 %" errorRate="0.08 %" incidents={[]}/>;
 
   const services=data.services??[];
   const incidents=data.incidents??[];
@@ -548,7 +563,8 @@ function MonitoringView() {
   const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
 
   return <>
-    <div className="operator-monitor-metrics">
+    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} availability={operational&&services.length?((operational/services.length)*100).toFixed(2)+" %":"—"} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
+    <div className="operator-monitor-metrics monitoring-secondary">
       <Metric label="API" value={data.latencyMs?String(data.latencyMs.api)+" ms":"—"} hint="aktuelle Antwortzeit" icon="clock"/>
       <Metric label="Datenbank" value={data.latencyMs?String(data.latencyMs.database)+" ms":"—"} hint="aktuelle Abfrage" icon="chart"/>
       <Metric label="LCP p75" value={formatVital("LCP"," ms")} hint={String(vitals.LCP?.samples??0)+" Messungen / 7 Tage"} icon="chart"/>

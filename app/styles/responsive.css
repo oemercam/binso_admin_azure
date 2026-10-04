@@ -959,32 +959,43 @@
   .operator-main>header>div:first-child{min-width:0}
   .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
   .operator-main>header p{margin-top:8px;line-height:1.45}
+  .operator-app-header{min-height:var(--mobile-header-h);margin:calc(-1 * 16px) calc(-1 * max(var(--mobile-page-x),var(--safe-right))) 16px;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) 10px max(var(--mobile-page-x),var(--safe-left));align-items:center;border-bottom:1px solid var(--color-line);background:var(--color-bg)}
+  .operator-header-brand{gap:10px}.operator-header-brand>.logo{display:block;width:82px;height:28px;flex:0 0 auto}.operator-header-brand>div{display:none}
+  .operator-user{gap:4px}.operator-user .icon-button{width:40px;height:40px;min-width:40px}.operator-user .avatar{width:40px;height:40px}
+  .monitoring-kpis{grid-template-columns:1fr 1fr;gap:8px}.monitoring-kpis section{padding:12px;border-radius:12px}.monitoring-kpis strong{font-size:21px}
+  .monitoring-visual-grid{grid-template-columns:1fr;gap:12px}.monitoring-latency-chart,.monitoring-health-chart{padding:14px}.monitoring-bars{height:112px;gap:3px}.monitoring-ring{width:132px}.monitoring-ring:before{width:98px}
+  .monitoring-secondary{display:none}
   .operator-user{flex:0 0 auto}
   .operator-table-card{margin-top:16px}
   .operator-toolbar{align-items:stretch;flex-direction:column;gap:10px;margin-bottom:14px}
   .operator-toolbar .searchbox{width:100%;max-width:none}
-  .operator-grid{gap:18px}
-  .operator-grid>.surface{padding:0;border:0;border-radius:0;box-shadow:none}
-  .operator-grid>.surface+.surface{padding-top:18px;border-top:1px solid var(--color-line)}
+  .operator-grid{gap:14px}
   .operator-grid .button{min-height:44px}
-  .operator-health-services{display:flex;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:4px}
-  .operator-health-services button{min-width:150px;scroll-snap-align:start}
+  .operator-main .searchbox{width:100%;max-width:none;min-width:0;height:44px;flex:0 0 44px;padding:0 12px;border:1px solid var(--color-line);border-radius:12px;background:var(--color-bg)}
+  .operator-main .searchbox input{width:100%;min-width:0;font-size:16px;line-height:1.2}
+  .operator-health-strip,.operator-chart-card,.operator-selected-metric{padding:14px;border-radius:14px}
+  .operator-health-services{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:visible;padding-bottom:0}
+  .operator-health-services button{min-width:0;min-height:94px;padding:12px;border-radius:12px}
+  .operator-health-services button:last-child{grid-column:1/-1}
   .operator-chart-grid{grid-template-columns:1fr;gap:10px}
+  .operator-pulse-grid{grid-template-columns:1fr;gap:8px}
+  .operator-pulse{grid-template-columns:minmax(0,1fr) 74px;padding:11px 12px;border-radius:12px}
+  .operator-pulse strong{font-size:19px}.operator-mini-trend{height:34px}
+  .sla-compact{grid-template-columns:88px minmax(0,1fr);gap:14px}
+  .sla-ring{width:86px}.sla-ring:before{width:62px}.sla-ring b{font-size:15px}
   .operator-chart-card{padding:14px}
-  .operator-spark{height:54px}
+  .operator-chart-card>strong{font-size:24px}
+  .operator-spark{height:46px}
   .operator-insight-grid{grid-template-columns:1fr;gap:12px}
-  .operator-ticket-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-  .ticket-stat{padding:10px 4px}.ticket-stat strong{font-size:21px}.ticket-stat span{font-size:10px}
-  .operator-sla>div{gap:8px;flex-wrap:wrap}
-  .operator-category-bars a{grid-template-columns:minmax(115px,1fr) 1fr 24px;font-size:12px}
+  .operator-insight-grid>.surface{padding:14px;border:1px solid var(--color-line);border-radius:14px;box-shadow:none}
+  .operator-ticket-stats{grid-template-columns:1fr 1fr;gap:8px}
+  .ticket-stat{padding:11px 8px;min-width:0}.ticket-stat strong{font-size:22px}.ticket-stat span{font-size:11px}
+  .operator-sla>div{display:grid;grid-template-columns:1fr;gap:4px}
+  .operator-category-bars a{grid-template-columns:minmax(110px,1fr) minmax(70px,1fr) 24px;font-size:12px}
   .operator-selected-metric{display:grid;grid-template-columns:1fr auto;gap:4px 10px}
   .operator-selected-metric small{grid-column:1/-1;margin-left:0}
-  .monitoring-panel{
-    margin-left:calc(-1 * var(--mobile-page-x));
-    margin-right:calc(-1 * var(--mobile-page-x));
-    padding:18px var(--mobile-page-x);
-    border-radius:0;
-  }
+  .monitoring-panel{margin-inline:0;padding:16px;border-radius:14px}
+
   .monitoring-list>div{grid-template-columns:1fr 70px}
   .monitoring-list .spark{display:none}
   .operator-modal-layer{align-items:end;padding:0}
