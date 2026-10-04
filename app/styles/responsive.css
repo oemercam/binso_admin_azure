@@ -1776,3 +1776,14 @@
 @media (max-width:420px){
   .payment-donut-card{align-items:flex-start}.payment-donut{width:104px}
 }
+
+/* Compact finance cockpit: same mobile content rail as the rest of the app. */
+@media (max-width:760px){
+  .revenue-insight{width:100%;max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:14px;overflow:hidden}
+  .revenue-insight-head{gap:10px}.revenue-insight-head h2{margin:2px 0 5px;font-size:17px}.revenue-total{font-size:25px}.trend-positive,.trend-negative{margin-top:3px;font-size:12px}.revenue-period{padding:5px 7px;font-size:10px}
+  .revenue-chart{margin-top:10px}.revenue-chart svg{height:142px;margin-top:28px}.revenue-tooltip{top:0;min-height:26px;padding:4px 8px;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+  .revenue-axis{margin-top:3px}.chart-legend{margin-top:6px;gap:12px;font-size:10px}
+  .finance-insights{margin-top:12px;gap:8px}.payment-donut-card{padding:10px 8px;gap:12px}.payment-donut-wrap{width:92px}.payment-donut{width:92px}.donut-center b{font-size:11px}.donut-center span{font-size:8px}
+  .payment-legend{gap:5px}.payment-legend p{font-size:9px;gap:5px}.payment-legend p b{font-size:11px}
+  .finance-kpis>div{padding:8px}.finance-kpis span{font-size:9px}.finance-kpis b{font-size:12px}.finance-kpis small{font-size:8px}
+}
