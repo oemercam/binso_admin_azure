@@ -98,18 +98,14 @@ export function MarketingFooter() {
 }
 
 export function ProductPreview() {
-  return <div className="hero-product-preview" aria-label="Aktuelle Binso One Oberfläche">
-    <div className="hero-product-desktop">
-      <iframe src="/preview/dashboard" title="Aktuelle Binso One Dashboard-Ansicht" tabIndex={-1}/>
-    </div>
-    <div className="hero-product-mobile">
-      <iframe src="/preview/dashboard" title="Aktuelle Binso One Mobile-Ansicht" tabIndex={-1}/>
-    </div>
+  return <div className="hero-product-preview" aria-label="Echte Binso One Produktansicht">
+    <div className="hero-product-desktop"><img src="/product/binso-one-dashboard-mobile.jpg" alt="Binso One Dashboard in der aktuellen mobilen Oberfläche"/></div>
+    <div className="hero-product-mobile"><img src="/product/binso-one-dashboard-mobile.jpg" alt="" aria-hidden="true"/></div>
   </div>;
 }
 
-export function ProductScreen({route,title,variant="desktop"}:{route:string;title:string;variant?:"desktop"|"mobile"}) {
-  return <div className={`product-screen product-screen-${variant}`}>
-    <iframe src={route} title={title} tabIndex={-1}/>
-  </div>;
+export function ProductScreen({title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
+  return <figure className={`product-screen product-screen-${variant}`}>
+    <img src="/product/binso-one-dashboard-mobile.jpg" alt={title} loading="lazy"/>
+  </figure>;
 }

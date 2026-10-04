@@ -131,7 +131,7 @@
     border-width:6px;
     border-radius:28px;
   }
-  .hero-product-mobile iframe{transform:scale(.43)}
+  .hero-product-mobile img{width:100%;height:100%;object-fit:cover;object-position:top center}
 
   .marketing-section{padding-top:54px;padding-bottom:54px}
   .subpage{padding-top:38px;padding-bottom:54px}
@@ -954,6 +954,31 @@
   .operator-table-head,
   .operator-table-row{min-width:720px}
   .operator-message{max-width:88%}
+  .operator-demo-banner{margin:0 0 20px}
+  .operator-main>header{align-items:flex-start;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--color-line)}
+  .operator-main>header>div:first-child{min-width:0}
+  .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
+  .operator-main>header p{margin-top:8px;line-height:1.45}
+  .operator-user{flex:0 0 auto}
+  .operator-table-card{margin-top:16px}
+  .operator-toolbar{align-items:stretch;flex-direction:column;gap:10px;margin-bottom:14px}
+  .operator-toolbar .searchbox{width:100%;max-width:none}
+  .operator-grid{gap:18px}
+  .operator-grid>.surface{padding:0;border:0;border-radius:0;box-shadow:none}
+  .operator-grid>.surface+.surface{padding-top:18px;border-top:1px solid var(--color-line)}
+  .operator-grid .button{min-height:44px}
+  .operator-health-services{display:flex;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:4px}
+  .operator-health-services button{min-width:150px;scroll-snap-align:start}
+  .operator-chart-grid{grid-template-columns:1fr;gap:10px}
+  .operator-chart-card{padding:14px}
+  .operator-spark{height:54px}
+  .operator-insight-grid{grid-template-columns:1fr;gap:12px}
+  .operator-ticket-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .ticket-stat{padding:10px 4px}.ticket-stat strong{font-size:21px}.ticket-stat span{font-size:10px}
+  .operator-sla>div{gap:8px;flex-wrap:wrap}
+  .operator-category-bars a{grid-template-columns:minmax(115px,1fr) 1fr 24px;font-size:12px}
+  .operator-selected-metric{display:grid;grid-template-columns:1fr auto;gap:4px 10px}
+  .operator-selected-metric small{grid-column:1/-1;margin-left:0}
   .monitoring-panel{
     margin-left:calc(-1 * var(--mobile-page-x));
     margin-right:calc(-1 * var(--mobile-page-x));
@@ -980,10 +1005,8 @@
     overflow:visible;
     border:1px solid var(--glass-line);
     border-radius:var(--mobile-nav-radius);
-    background:var(--glass-bg);
-    box-shadow:0 10px 34px rgba(0,0,0,.12);
-    -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
-    backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+    background:color-mix(in srgb,var(--color-bg) 96%,transparent);
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
   }
   .operator-mobile-nav a,
   .operator-mobile-nav button{
@@ -1858,9 +1881,18 @@
 @media (max-width:760px){
   .hero-product-preview{min-height:0;display:block}
   .hero-product-mobile{width:100%;height:min(68dvh,560px);border:1px solid var(--color-line);border-radius:18px;box-shadow:0 18px 42px rgba(0,0,0,.10)}
-  .hero-product-mobile iframe{width:440px;height:956px;transform:scale(calc((100vw - (2 * var(--mobile-page-x)) - 2px)/440));transform-origin:top left}
+  .hero-product-mobile img{width:100%;height:100%;object-fit:cover;object-position:top center}
   .product-screen-desktop{height:280px}
-  .product-screen-desktop iframe{width:1440px;height:900px;transform:scale(.31);transform-origin:top left}
+  .product-screen-desktop img{width:100%;height:100%;object-fit:cover;object-position:top center}
   .product-screen-mobile{width:100%;height:min(68dvh,560px);border:1px solid var(--color-line);border-radius:18px;box-shadow:0 18px 42px rgba(0,0,0,.10)}
-  .product-screen-mobile iframe{width:440px;height:956px;transform:scale(calc((100vw - (2 * var(--mobile-page-x)) - 2px)/440));transform-origin:top left}
+  .product-screen-mobile img{width:100%;height:100%;object-fit:cover;object-position:top center}
+}
+
+@media (max-width: 767px){
+  .payment-donut-card{display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center}
+  .payment-donut-wrap{width:92px;height:92px}
+  .payment-donut-wrap .payment-donut{width:92px;height:92px}
+  .payment-donut-wrap .donut-center{position:absolute;inset:18px;width:auto;height:auto;aspect-ratio:auto}
+  .finance-kpis>div:last-child b,.finance-kpis>div:last-child small{white-space:nowrap}
+  .finance-kpis>div:last-child{min-width:0}
 }

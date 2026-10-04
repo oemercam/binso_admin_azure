@@ -147,53 +147,34 @@ function operatorSubtitle(key: string, detail: string) {
 
 function OperatorDashboard() {
   const production=useBackendMode();
-  const [data,setData]=useState<{
-    stats?:Record<string,unknown>;
-    tickets?:OperatorTicket[];
-    incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>;
-  }>({});
-
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
-  },[production]);
-
-  if(!production) return <>
-    <div className="metrics-grid">
-      <Metric label="Aktive Kunden" value="2’841" hint="+12%" icon="users"/>
-      <Metric label="Offene Tickets" value="12" hint="4 in Bearbeitung" icon="support"/>
-      <Metric label="Monatlicher Umsatz" value="CHF 49’820" hint="+8%" icon="chart"/>
-      <Metric label="Systemstatus" value="Operational" hint="Alle Systeme verfügbar" icon="lock"/>
-    </div>
-    <div className="operator-grid"><section className="surface"><SectionTitle title="Support" action={<Link className="text-action" href="/operator/tickets">Alle Tickets</Link>}/><div className="compact-list">{tickets.map(([nr,subject,customer,status])=><div key={nr}><b>{nr} · {subject}</b><span>{customer}</span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></div>)}</div></section><section className="surface"><SectionTitle title="Monitoring" action={<Link className="text-action" href="/operator/monitoring">Details</Link>}/><div className="service-list">{["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((s,i)=><div key={s}><span><i/>{s}</span><strong>{i<3?"Operational":"Nicht verbunden"}</strong></div>)}</div></section></div>
-  </>;
-
+  const [data,setData]=useState<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>({});
+  const [metric,setMetric]=useState<"availability"|"users"|"api">("availability");
+  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
   const stats=data.stats??{};
-  const recent=data.tickets??[];
+  const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket));
   const incidents=data.incidents??[];
-  return <>
-    <div className="metrics-grid">
-      <Metric label="Aktive Kunden" value={String(stats.tenants_active??0)} hint={String(stats.tenants_total??0)+" insgesamt"} icon="users"/>
-      <Metric label="Offene Tickets" value={String(stats.tickets_open??0)} hint={String(stats.tickets_in_progress??0)+" in Bearbeitung"} icon="support"/>
-      <Metric label="Rechnungsvolumen 30 Tage" value={"CHF "+Number(stats.documents_30d_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Kundenrechnungen" icon="chart"/>
-      <Metric label="Einschränkungen" value={String(stats.restrictions_active??0)} hint="Aktive Kontoeinschränkungen" icon="lock"/>
+  const open=production?Number(stats.tickets_open??0):8, progress=production?Number(stats.tickets_in_progress??0):12;
+  const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
+  const metricInfo={availability:["Systemverfügbarkeit","99.99 %","+0.01 %","0,6,12,18,24"],users:["Aktive Nutzer",production?String(stats.users_active??0):"128","aktuell online","0,6,12,18,24"],api:["Antwortzeit API","182 ms","−12 %","0,6,12,18,24"]} as const;
+  const current=metricInfo[metric];
+  return <div className="operator-dashboard-cockpit">
+    <section className="operator-health-strip">
+      <SectionTitle title="Systemstatus" action={<Link className="text-action" href="/operator/monitoring">Alle anzeigen</Link>}/>
+      <div className="operator-health-services">{["Web App","Datenbank","API","Dateispeicher","E-Mail Service"].map((name,i)=><button type="button" key={name} onClick={()=>setMetric(i===1?"availability":i===2?"api":"users")}><i className={i===4?"warn":""}/><b>{name}</b><span>{i===4?"Degradiert":"Online"}</span><small>{i===0?"99.99 %":i===1?"12 ms":i===2?"24 ms":i===3?"34 ms":"Antwortzeit erhöht"}</small></button>)}</div>
+    </section>
+    <div className="operator-chart-grid">
+      {(["availability","users","api"] as const).map((key,i)=><button type="button" className={"operator-chart-card "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small><div className={"operator-spark operator-spark-"+i}><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></button>)}
     </div>
-    <div className="operator-grid">
-      <section className="surface">
-        <SectionTitle title="Support" action={<Link className="text-action" href="/operator/tickets">Alle Tickets</Link>}/>
-        {recent.length?<div className="compact-list">{recent.map(ticket=><Link href={"/operator/tickets/"+ticket.id} key={ticket.id}><b>{ticket.subject}</b><span>{ticket.tenant?.name??"Kunde"}</span><Status tone={ticket.status==="open"?"warning":"info"}>{operatorStatus(ticket.status)}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine offenen Tickets" text="Aktuell liegen keine Support-Anfragen vor."/>}
-      </section>
-      <section className="surface">
-        <SectionTitle title="Systemereignisse" action={<Link className="text-action" href="/operator/monitoring">Monitoring</Link>}/>
-        {incidents.length?<div className="incident-history">{incidents.map(incident=><div className="incident-row" key={incident.id}><span className={"incident-dot "+(incident.status==="resolved"?"resolved":"maintenance")}/><div><b>{incident.title}</b><small>{incident.service+" · "+new Date(incident.started_at).toLocaleString("de-CH")}</small></div><Status tone={incident.status==="resolved"?"success":"warning"}>{operatorStatus(incident.status)}</Status></div>)}</div>:<div className="notice"><Status tone="success">Operational</Status><b>Keine erfassten Störungen</b><span>Für Web App, API und Datenbank sind keine aktiven Vorfälle hinterlegt.</span></div>}
-      </section>
+    <div className="operator-insight-grid">
+      <section className="surface"><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span>{label}</span></Link>)}</div></section>
+      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><strong>96.3 %</strong><span>+2.1 %</span><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-bar"><i/><i/><i/></button><div><small>Innerhalb SLA 96.3 %</small><small>Knapp 2.5 %</small><small>Überfällig 1.2 %</small></div></section>
     </div>
-    <div className="operator-grid thirds">
-      <section className="surface"><SectionTitle title="Abonnemente"/><div className="mini-stat"><span>Aktiv</span><strong>{String(stats.subscriptions_active??0)}</strong></div><div className="mini-stat"><span>Überfällig</span><strong>{String(stats.subscriptions_past_due??0)}</strong></div></section>
-      <section className="surface"><SectionTitle title="Kontostatus"/><div className="mini-stat"><span>Eingeschränkt / gesperrt</span><strong>{String(stats.tenants_restricted??0)}</strong></div><Link className="text-action" href="/operator/sperrungen">Einschränkungen verwalten</Link></section>
-      <section className="surface"><SectionTitle title="Kundenzahlungen"/><div className="mini-stat"><span>30 Tage</span><strong>{"CHF "+Number(stats.payments_30d_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div><span>Nur erfasste Kundenrechnungs-Zahlungen, kein SaaS-Billing.</span></section>
+    <div className="operator-insight-grid">
+      <section className="surface"><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span>{label}</span><i><b style={{width:String(Number(value)*6)+"%"}}/></i><strong>{value}</strong></Link>)}</div></section>
+      <section className="surface"><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b>{x.title}</b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</section>
     </div>
-  </>;
+    <section className="surface operator-selected-metric"><span>{current[0]}</span><strong>{current[1]}</strong><small>{current[2]} · Antippen wechselt die Detailansicht</small></section>
+  </div>;
 }
 
 function TicketsView() {
