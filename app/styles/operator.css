@@ -53,14 +53,14 @@
 .operator-main>header{
   margin-bottom:26px;
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
   gap:20px;
 }
 .operator-main h1{margin:0;font-size:26px;letter-spacing:-.03em}
 .operator-main header p{margin:6px 0 0;color:#6c6c6c;font-size:13px}
 .operator-user{display:flex;align-items:center;gap:8px}
-.operator-user button{width:36px;height:36px;border:1px solid #ddd;border-radius:9px;background:#fff}
+.operator-user .icon-button{width:40px;height:40px;min-width:40px;min-height:40px;border:0;border-radius:var(--radius-md);background:transparent}.operator-user .avatar-button{width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border:0;border-radius:50%;background:var(--color-subtle)}
 
 .operator-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
 .operator-grid.thirds{grid-template-columns:repeat(3,1fr)}
@@ -286,7 +286,7 @@
 .operator-category-bars{display:grid;gap:14px;margin-top:12px}.operator-category-bars a{display:grid;grid-template-columns:minmax(130px,1fr) 1.2fr 28px;gap:10px;align-items:center}.operator-category-bars i{height:8px;background:#eee;border-radius:99px;overflow:hidden}.operator-category-bars b{display:block;height:100%;background:#5897f7;border-radius:99px}.operator-category-bars strong{text-align:right}
 .operator-selected-metric{display:flex;align-items:baseline;gap:12px}.operator-selected-metric strong{font-size:24px}.operator-selected-metric small{margin-left:auto;color:#777}
 
-.operator-app-header{min-height:58px}
+.operator-app-header{height:64px;min-height:64px;margin-bottom:28px;padding:0 clamp(32px,3vw,48px);border-bottom:1px solid var(--color-line);background:var(--color-bg)}
 .operator-header-brand{display:flex;align-items:center;gap:16px;min-width:0}.operator-header-brand>.logo{display:none}
 .operator-home-link{display:inline-flex}
 .monitoring-cockpit{display:grid;gap:14px;margin-bottom:16px}.monitoring-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.monitoring-kpis section{display:grid;gap:5px;padding:16px;border:1px solid var(--color-line);border-radius:16px;background:var(--color-bg)}.monitoring-kpis span,.monitoring-kpis small{color:var(--color-muted);font-size:11px}.monitoring-kpis strong{font-size:25px}
