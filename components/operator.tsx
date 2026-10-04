@@ -101,7 +101,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
     <main className="operator-main">
       <header className="operator-app-header">
         <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
-        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
+        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
       {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
 
@@ -529,11 +529,11 @@ function MonitoringCockpit({services,api,database,availability,errorRate,inciden
   const degraded=services.filter(s=>s.status==="degraded").length;
   const bars=[32,38,35,42,39,48,44,52,46,58,49,55,61,53,47,45,42,40,38,41,36,34,37,32];
   return <div className="monitoring-cockpit">
-    <div className="monitoring-kpis">
-      <section><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></section>
-      <section><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></section>
-      <section><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></section>
-      <section><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></section>
+    <div className="monitoring-kpis monitoring-kpis-visual">
+      <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
+      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{[42,56,48,68,61,76,58,70].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{[62,48,55,43,51,38,45,41].map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
+      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(services.length?Math.round(degraded/services.length*100):0)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
     </div>
     <div className="monitoring-visual-grid">
       <section className="surface monitoring-latency-chart"><SectionTitle title="Systemleistung"/><div className="monitoring-chart-head"><div><strong>{api==null?"—":api+" ms"}</strong><span>API Latenz</span></div><small>letzte 24 Stunden</small></div><div className="monitoring-bars" aria-label="Latenzverlauf">{bars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><div className="monitoring-axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></section>
