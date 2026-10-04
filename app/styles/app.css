@@ -1196,7 +1196,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .revenue-guide{stroke:#2563eb;stroke-width:.7;stroke-dasharray:2 2;vector-effect:non-scaling-stroke;opacity:.55}
 .revenue-dot.active{r:2;stroke-width:1}
 .payment-donut-wrap{width:150px;flex:0 0 auto}
-.payment-donut{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:none!important;display:grid;place-items:center}
+.payment-donut-wrap .payment-donut{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:none;display:grid;place-items:center}
 .donut-ring{position:absolute;inset:0;border-radius:50%}
 .donut-center{position:relative;z-index:2;width:68%;aspect-ratio:1;border-radius:50%;background:var(--color-bg);display:grid;place-content:center;text-align:center;pointer-events:none}
 .donut-center b{font-size:15px}.donut-center span{font-size:10px;color:var(--color-muted)}
