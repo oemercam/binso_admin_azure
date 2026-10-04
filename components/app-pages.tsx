@@ -169,25 +169,27 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
 export function FinancePage() {
   const production=useBackendMode();
-  const [data,setData]=useState<{analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
+  const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;expenses?:Array<Record<string,unknown>>;payroll?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
   const [range,setRange]=useState("month");
-  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
+  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/finance").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
   const now=new Date();
   const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
   const bounds=(()=>{let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
-  const payments=production?(data.analyticsPayments??[]):[
-    {paid_on:"2026-10-02",amount:4346.4},{paid_on:"2026-10-05",amount:12800},{paid_on:"2026-09-14",amount:9200},{paid_on:"2026-08-20",amount:11100}
-  ];
-  const selected=payments.filter(item=>{const d=new Date(String(item.paid_on??""));return d>=bounds.start&&d<bounds.end});
+  const payments=production?(data.payments??[]):[{payment_date:"2026-10-02",amount:13512.5},{payment_date:"2026-09-12",amount:8215.6}];
+  const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
   const income=selected.reduce((sum,item)=>sum+Number(item.amount??0),0);
-  const expense=0,staff=0,result=income-expense-staff;
-  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(bounds.end.getFullYear(),bounds.end.getMonth()-1-i,1);const value=payments.filter(item=>{const x=new Date(String(item.paid_on??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((s,item)=>s+Number(item.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse();
+  const inRange=(value:unknown)=>{const d=new Date(String(value??""));return d>=bounds.start&&d<bounds.end};
+  const expense=(production?(data.expenses??[]):[{expense_date:"2026-10-02",amount:86},{expense_date:"2026-10-03",amount:148}]).filter(x=>inRange(x.expense_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const operating=(production?(data.operatingCosts??[]):[{cost_date:"2026-10-01",amount:1280},{cost_date:"2026-10-01",amount:620}]).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const staff=(production?(data.payroll??[]):[{period:"2026-10",gross_amount:7200},{period:"2026-10",gross_amount:6240}]).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
+  const costs=expense+operating+staff,result=income-costs;
+  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(bounds.end.getFullYear(),bounds.end.getMonth()-1-i,1);const value=payments.filter(item=>{const x=new Date(String(item.payment_date??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((s,item)=>s+Number(item.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse();
   const max=Math.max(1,...monthly.map(x=>x.value));
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
     <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{item.label}</button>)}</div>
-    <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={production?"—":moneyChf(expense)} hint={production?"Noch keine Kostendaten":"Erfasste Kosten"} icon="card"/><Metric label="Personalkosten" value={production?"—":moneyChf(staff)} hint={production?"Lohndaten noch nicht angebunden":"Im Zeitraum"} icon="users"/><Metric label="Ergebnis" value={production&&(!expense&&!staff)?"—":moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
+    <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
     <section className="finance-analysis"><div className="section-title"><div><span className="eyebrow">ENTWICKLUNG</span><h2>Einnahmen im Zeitraum</h2></div></div><div className="finance-month-bars">{monthly.map(item=><div key={item.label}><i style={{height:`${Math.max(8,item.value/max*100)}%`}}/><b>{item.label}</b><small>{moneyChf(item.value)}</small></div>)}</div></section>
-    <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{production?"Noch nicht angebunden":moneyChf(expense)}</strong></div><div><span>Personalkosten</span><strong>{production?"Noch nicht angebunden":moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{production?"Noch nicht angebunden":"CHF 0.00"}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Ausgaben, Spesen und Personalkosten werden erst in das Ergebnis eingerechnet, sobald diese Datenquellen produktiv angebunden sind.</p></section></div>
+    <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{moneyChf(operating)}</strong></div><div><span>Personalkosten</span><strong>{moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{moneyChf(expense)}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Spesen, Betriebskosten und freigegebene Lohnläufe werden für denselben Zeitraum aus der Datenbank ausgewertet.</p></section></div>
   </AppShell>;
 }
 
