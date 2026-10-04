@@ -273,7 +273,7 @@
 .operator-dashboard-cockpit{display:grid;gap:18px}
 .operator-health-strip,.operator-chart-card,.operator-selected-metric{border:1px solid #e4e4e1;border-radius:18px;background:#fff;padding:18px}
 .operator-health-services{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
-.operator-health-services button{display:grid;gap:4px;text-align:left;border:1px solid #ececea;border-radius:14px;background:#fff;padding:14px;cursor:pointer}
+.operator-health-services button{display:grid;gap:4px;text-align:left;border:0;border-radius:0;background:transparent;padding:14px;cursor:pointer}
 .operator-health-services i{width:9px;height:9px;border-radius:50%;background:#12b76a}.operator-health-services i.warn{background:#f79009}
 .operator-health-services span{font-size:12px;color:#12a660}.operator-health-services small{color:#777}
 .operator-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
