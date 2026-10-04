@@ -42,7 +42,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  }
  if(!source)throw new ApiError(400,'invalid_table','Ungültige Datenquelle.');
  const where:string[]=[];
- for(const key of ['id','name','number','customer_id','status']){
+ for(const key of ['id','name','number','customer_id','status',...(table==='employees'?['first_name','last_name']:[])]){
   const value=filters.get(key);if(!value)continue;
   if(!value.startsWith('eq.'))throw new ApiError(400,'invalid_filter','Ungültiger Filter.');
   values.push(value.slice(3));where.push(`q.${key}::text=$${values.length}`);

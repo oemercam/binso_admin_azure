@@ -53,7 +53,7 @@ export async function operatorInsert<T extends Row>(table:string,data:T){const s
 export async function operatorUpdate<T extends Row>(table:string,filter:string,data:T){const s=await requireOperatorSession();return withPlatform(c=>updateOperatorBusiness(c,s,table,filter,data))}
 export async function operatorAudit(action:string,targetType?:string,targetId?:string,metadata:Row={}){const s=await requireOperatorSession();await platformAudit({userId:s.userId,userEmail:s.email,action,entityType:targetType??"platform",entityId:targetId,metadata})}
 export async function requireTenantFeature(_feature:string){return currentTenant()}
-export async function tenantRpc<T>(operation:string,args:Row):Promise<T>{const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>await mutateApiBusiness(c,s,operation,args) as T)}
+export async function tenantRpc<T>(operation:string,args:Row):Promise<T>{const s=await requireSession();if(s.organizationStatus==="read_only")throw new ApiError(403,"read_only","Der Mandant ist schreibgeschützt.");return withTenant(s.organizationId,s.userId,async c=>await mutateApiBusiness(c,s,operation,args) as T)}
 export async function userRpc<T>(_fn:string,_args:Row={}):Promise<T>{throw new ApiError(501,"legacy_rpc_removed","Diese Funktion wird auf Azure PostgreSQL umgestellt.")}
 export async function operatorRpc<T>(operation:string,args:Row={}):Promise<T>{
  const s=await requireOperatorSession();if(operation!=="operator_customer_overview")throw new ApiError(400,"invalid_operation","Ungültige Aktion.");
