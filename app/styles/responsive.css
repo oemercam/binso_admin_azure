@@ -954,6 +954,19 @@
   .operator-table-head,
   .operator-table-row{min-width:720px}
   .operator-message{max-width:88%}
+  .operator-demo-banner{margin:0 0 20px}
+  .operator-main>header{align-items:flex-start;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--color-line)}
+  .operator-main>header>div:first-child{min-width:0}
+  .operator-main>header h1{font-size:24px;line-height:1.05;overflow-wrap:anywhere}
+  .operator-main>header p{margin-top:8px;line-height:1.45}
+  .operator-user{flex:0 0 auto}
+  .operator-table-card{margin-top:16px}
+  .operator-toolbar{align-items:stretch;flex-direction:column;gap:10px;margin-bottom:14px}
+  .operator-toolbar .searchbox{width:100%;max-width:none}
+  .operator-grid{gap:18px}
+  .operator-grid>.surface{padding:0;border:0;border-radius:0;box-shadow:none}
+  .operator-grid>.surface+.surface{padding-top:18px;border-top:1px solid var(--color-line)}
+  .operator-grid .button{min-height:44px}
   .monitoring-panel{
     margin-left:calc(-1 * var(--mobile-page-x));
     margin-right:calc(-1 * var(--mobile-page-x));
@@ -980,10 +993,8 @@
     overflow:visible;
     border:1px solid var(--glass-line);
     border-radius:var(--mobile-nav-radius);
-    background:var(--glass-bg);
-    box-shadow:0 10px 34px rgba(0,0,0,.12);
-    -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
-    backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+    background:color-mix(in srgb,var(--color-bg) 96%,transparent);
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
   }
   .operator-mobile-nav a,
   .operator-mobile-nav button{
