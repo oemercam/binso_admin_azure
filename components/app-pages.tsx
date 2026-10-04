@@ -283,6 +283,22 @@ export function CustomerForm() {
   const [city,setCity]=useState("");
   const [sector,setSector]=useState("Dienstleistung");
   const [toast,setToast]=useState<string|null>(null);
+  const scanReceipt=async(file:File|null)=>{
+    setReceiptFile(file);if(!file)return;setScanState("scanning");
+    try{
+      if(production){
+        const form=new FormData();form.append("file",file);
+        const result=await apiUpload<{merchant?:string;date?:string;total?:number;currency?:string;confidence?:number;filename?:string}>("/api/expenses/scan-receipt",form);
+        if(result.merchant)setMerchant(result.merchant);if(result.date)setDate(result.date);if(typeof result.total==="number")setAmount(result.total.toFixed(2));if(result.currency)setCurrency(result.currency);setScanConfidence(result.confidence??null);
+        if(result.filename)setReceiptFile(new File([file],result.filename,{type:file.type,lastModified:file.lastModified}));
+      }else{
+        setMerchant("SBB CFF FFS");setDate(new Date().toLocaleDateString("en-CA"));setAmount("89.00");setCurrency("CHF");setVatRate("8.1");setScanConfidence(.96);
+        const ext=(file.name.split(".").pop()||"jpg").toLowerCase();setReceiptFile(new File([file],`${new Date().toLocaleDateString("en-CA")}_SBB-CFF-FFS_89.00-CHF.${ext}`,{type:file.type,lastModified:file.lastModified}));
+      }
+      setScanState("done");
+    }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}
+  };
+
   const save=async()=>{
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
@@ -618,7 +634,10 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [amount,setAmount]=useState(existing?"280.00":"");
   const [currency,setCurrency]=useState("CHF");
   const [vatRate,setVatRate]=useState("8.1");
+  const [merchant,setMerchant]=useState(existing?"Hotel Schweizerhof":"");
   const [description,setDescription]=useState(existing?"Übernachtung Kundentermin Zürich":"");
+  const [scanState,setScanState]=useState<"idle"|"scanning"|"done"|"error">("idle");
+  const [scanConfidence,setScanConfidence]=useState<number|null>(null);
   const [status,setStatus]=useState(existing?"Eingereicht":"Eingereicht");
   const [receiptFile,setReceiptFile]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
@@ -635,7 +654,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         setAmount(String(item.amount??"0.00"));
         setCurrency(String(item.currency??"CHF"));
         setVatRate(String(item.vat_rate??"8.1"));
-        setDescription(String(item.description??item.merchant??""));
+        setMerchant(String(item.merchant??""));
+        setDescription(String(item.description??""));
         const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
       });
@@ -647,7 +667,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
     const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
     try{
-      const payload={employeeName:person,merchant:description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
+      const payload={employeeName:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
       let targetExpenseId=expenseId??"";
       if(production){
         if(existing&&expenseId){
@@ -665,7 +685,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           await apiUpload("/api/files",form);
         }
       }else if(!existing){
-        appendDemoRow("expenses",[description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
+        appendDemoRow("expenses",[merchant.trim()||description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
       setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");
       window.setTimeout(()=>router.push("/spesen"),700);
@@ -675,11 +695,12 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
+  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
     <div className="expense-layout">
-      <label className="receipt-upload" htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{receiptFile?receiptFile.name:"Beleg hinzufügen"}</b><small>{receiptFile?"Wird beim Speichern hochgeladen":"Kamera oder Datei verwenden"}</small></label><input id="expense-receipt-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>setReceiptFile(e.target.files?.[0]??null)}/>
+      <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
       <div className="form-page">
         <div className="form-grid two">
+          <Field label="Händler / Firma"><input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option>Thomas Müller</option><option>Sarah Meier</option></select></Field>
           <Field label="Datum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
           <Field label="Kategorie"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
