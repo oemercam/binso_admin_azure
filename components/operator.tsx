@@ -95,7 +95,6 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
     </aside>
 
     <main className="operator-main">
-      {demo&&<div className="operator-demo-banner">Demo-Modus · Beispieldaten · keine produktiven Admin-Aktionen</div>}
       <header className="operator-app-header">
         <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
         <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><Link className="icon-button" href="/operator/monitoring" aria-label="Monitoring"><Icon name="chart" size={18}/></Link><span className="avatar">OC</span></div>
