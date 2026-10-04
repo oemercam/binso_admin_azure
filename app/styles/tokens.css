@@ -50,7 +50,7 @@
   --page-x:38px;
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
-  --mobile-header-h:48px;
+  --mobile-header-h:52px;
   --mobile-nav-h:68px;
   --mobile-nav-compact-h:52px;
   --mobile-nav-edge:clamp(8px,2.8vw,14px);
