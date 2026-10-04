@@ -1929,3 +1929,15 @@
   .monitoring-kpis-visual span,.monitoring-kpis-visual small{font-size:8px}.monitoring-kpis-visual strong{font-size:16px}
   .monitoring-kpi-bars{width:100%;height:32px;gap:2px}.monitoring-kpi-ring{width:38px;height:38px}.monitoring-kpi-ring:after{width:27px;height:27px}.monitoring-kpi-ring b{font-size:7px}
 }
+
+
+@media (max-width:760px){
+  .operator-payment-insight,
+  .monitoring-kpis-visual section,
+  .operator-pulse{
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+}
