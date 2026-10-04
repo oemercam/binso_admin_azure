@@ -1945,3 +1945,5 @@
 @media (max-width:760px){.metric,.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}}
 
 @media (max-width:760px){.revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px;font-size:8px}.revenue-bars i{border-radius:3px 3px 1px 1px}}
+
+@media (max-width:760px){.revenue-bar-detail{min-height:30px;margin-top:12px;gap:6px;font-size:9px}.revenue-bar-detail b{font-size:10px}.revenue-bars{margin-top:4px;gap:4px}.revenue-bars button{font-size:7px}}
