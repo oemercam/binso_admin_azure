@@ -309,6 +309,18 @@
   .mobile-header:not(.mobile-header-detail){position:sticky}
   .mobile-header:not(.mobile-header-detail) .header-timer{position:absolute;left:50%;transform:translateX(-50%);z-index:1}
   .mobile-header:not(.mobile-header-detail) .mobile-header-leading,.mobile-header:not(.mobile-header-detail) .mobile-header-actions{position:relative;z-index:2}
+  .mobile-header-detail{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+  }
+  .mobile-header-detail>.header-timer{
+    position:static;
+    transform:none;
+    flex:none;
+    min-width:82px;
+    justify-content:center;
+  }
   .mobile-header .logo{width:82px;height:28px}
   .mobile-header-title{
     max-width:min(46vw,176px);
@@ -317,12 +329,13 @@
     white-space:nowrap;
     font-size:12px;
   }
-  .mobile-header-detail .mobile-header-leading{width:100%;gap:0}
+  .mobile-header-detail .mobile-header-leading{width:100%;min-width:0;gap:0}
   .mobile-header-detail .mobile-header-actions{display:none}
   .mobile-header-detail .mobile-header-title{
     max-width:none;
+    min-width:0;
     flex:1;
-    padding-right:40px;
+    padding-right:8px;
     font-size:15px;
     font-weight:700;
     text-align:center;
@@ -1420,7 +1433,8 @@
 }
 
 @media (max-width:389px){
-  .mobile-header-detail{grid-template-columns:40px minmax(0,1fr) auto}
+  .mobile-header-detail{grid-template-columns:minmax(0,1fr) auto auto}
+  .mobile-header-detail>.header-timer{min-width:74px;padding-inline:6px;font-size:9px}
   .mobile-header-detail .mobile-detail-actions .icon-button{width:36px;height:40px;min-width:36px}
   .mobile-header-title{font-size:13px}
   .record{grid-template-columns:34px minmax(0,1fr) auto 16px}
@@ -1440,8 +1454,57 @@
 }
 
 @media (min-width:1101px){
-  .page-container{padding-left:clamp(32px,3vw,48px);padding-right:clamp(32px,3vw,48px)}
+  .desktop-appbar{
+    position:sticky;
+    top:0;
+    z-index:18;
+    height:64px;
+    padding:0 clamp(32px,3vw,48px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    border-bottom:1px solid var(--color-line);
+    background:color-mix(in srgb,var(--color-bg) 94%,transparent);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .desktop-search-trigger{
+    width:min(100%,440px);
+    height:38px;
+    padding:0 11px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid var(--color-line);
+    border-radius:10px;
+    background:var(--color-bg);
+    color:var(--color-muted);
+    font-size:12px;
+    text-align:left;
+  }
+  .desktop-search-trigger span{flex:1}
+  .desktop-search-trigger kbd{
+    padding:3px 6px;
+    border:1px solid var(--color-line);
+    border-radius:6px;
+    background:var(--color-subtle);
+    color:var(--color-muted);
+    font:inherit;
+    font-size:10px;
+  }
+  .desktop-appbar-actions{display:flex;align-items:center;gap:6px}
+  .page-container{padding-top:28px;padding-left:clamp(32px,3vw,48px);padding-right:clamp(32px,3vw,48px)}
   .page-head{margin-bottom:28px}
+  .toolbar{flex-wrap:wrap;row-gap:8px}
+  .toolbar .searchbox{flex:1 1 320px}
+  .toolbar .chips{flex:0 1 auto}
+  .records{border-bottom:1px solid var(--color-line)}
+  .record{padding-left:10px;padding-right:10px;border-radius:8px;transition:background-color var(--motion-fast) var(--motion-ease-standard)}
+  .record-wrapper:hover .record{background:var(--color-subtle)}
+  .tablet-master-detail{grid-template-columns:minmax(420px,.95fr) minmax(360px,1.05fr);gap:22px;align-items:start}
+  .tablet-detail{display:block;position:sticky;top:82px;max-height:calc(100dvh - 104px);overflow:auto}
+  .empty-state{min-height:240px}
 }
 
 @media (max-width:760px){
@@ -1451,7 +1514,7 @@
   .mobile-back{
     width:44px;height:44px;min-width:44px;min-height:44px;
   }
-  .mobile-header-detail{grid-template-columns:44px minmax(0,1fr) auto}
+  .mobile-header-detail{grid-template-columns:minmax(0,1fr) auto auto}
   .mobile-detail-actions .icon-button{width:44px;height:44px;min-width:44px}
   .mobile-header-detail .mobile-back{margin-left:-10px}
 }
