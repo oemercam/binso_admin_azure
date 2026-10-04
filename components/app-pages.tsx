@@ -283,22 +283,6 @@ export function CustomerForm() {
   const [city,setCity]=useState("");
   const [sector,setSector]=useState("Dienstleistung");
   const [toast,setToast]=useState<string|null>(null);
-  const scanReceipt=async(file:File|null)=>{
-    setReceiptFile(file);if(!file)return;setScanState("scanning");
-    try{
-      if(production){
-        const form=new FormData();form.append("file",file);
-        const result=await apiUpload<{merchant?:string;date?:string;total?:number;currency?:string;confidence?:number;filename?:string}>("/api/expenses/scan-receipt",form);
-        if(result.merchant)setMerchant(result.merchant);if(result.date)setDate(result.date);if(typeof result.total==="number")setAmount(result.total.toFixed(2));if(result.currency)setCurrency(result.currency);setScanConfidence(result.confidence??null);
-        if(result.filename)setReceiptFile(new File([file],result.filename,{type:file.type,lastModified:file.lastModified}));
-      }else{
-        setMerchant("SBB CFF FFS");setDate(new Date().toLocaleDateString("en-CA"));setAmount("89.00");setCurrency("CHF");setVatRate("8.1");setScanConfidence(.96);
-        const ext=(file.name.split(".").pop()||"jpg").toLowerCase();setReceiptFile(new File([file],`${new Date().toLocaleDateString("en-CA")}_SBB-CFF-FFS_89.00-CHF.${ext}`,{type:file.type,lastModified:file.lastModified}));
-      }
-      setScanState("done");
-    }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}
-  };
-
   const save=async()=>{
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
@@ -661,6 +645,22 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       });
     }).catch(()=>undefined);
   },[production,existing,expenseId]);
+
+  const scanReceipt=async(file:File|null)=>{
+    setReceiptFile(file);if(!file)return;setScanState("scanning");
+    try{
+      if(production){
+        const form=new FormData();form.append("file",file);
+        const result=await apiUpload<{merchant?:string;date?:string;total?:number;currency?:string;confidence?:number;filename?:string}>("/api/expenses/scan-receipt",form);
+        if(result.merchant)setMerchant(result.merchant);if(result.date)setDate(result.date);if(typeof result.total==="number")setAmount(result.total.toFixed(2));if(result.currency)setCurrency(result.currency);setScanConfidence(result.confidence??null);
+        if(result.filename)setReceiptFile(new File([file],result.filename,{type:file.type,lastModified:file.lastModified}));
+      }else{
+        setMerchant("SBB CFF FFS");setDate(new Date().toLocaleDateString("en-CA"));setAmount("89.00");setCurrency("CHF");setVatRate("8.1");setScanConfidence(.96);
+        const ext=(file.name.split(".").pop()||"jpg").toLowerCase();setReceiptFile(new File([file],`${new Date().toLocaleDateString("en-CA")}_SBB-CFF-FFS_89.00-CHF.${ext}`,{type:file.type,lastModified:file.lastModified}));
+      }
+      setScanState("done");
+    }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}
+  };
 
   const save=async()=>{
     const value=Number(amount.replace(",","."));
