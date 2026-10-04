@@ -1575,3 +1575,56 @@
   .payment-summary-strip b{font-size:12px;white-space:nowrap}
   .payment-summary-strip small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
+
+
+/* Document preview: preserve real A4 page proportions on mobile/PWA. */
+@media (max-width:760px){
+  .document-modal{overflow:hidden}
+  .document-modal>header{height:58px}
+  .document-modal-body{
+    height:calc(100dvh - 58px);
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:12px max(10px,var(--safe-right)) calc(18px + var(--safe-bottom)) max(10px,var(--safe-left));
+    overflow-y:auto;
+    overflow-x:hidden;
+    background:var(--color-subtle);
+    scroll-snap-type:y proximity;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .document-modal .document-pages{gap:12px}
+  .document-modal .paper,
+  .document-modal .invoice-paper{
+    width:100%;
+    min-width:0;
+    min-height:0;
+    aspect-ratio:210/297;
+    padding:6.5% 5.5% 4.5%;
+    box-shadow:0 1px 8px rgba(0,0,0,.08);
+    font-size:clamp(7px,2.15vw,9px);
+    scroll-snap-align:start;
+  }
+  .document-modal .invoice-page{height:auto}
+  .document-modal .paper-brand img,
+  .document-modal .qr-page-heading img{width:21%}
+  .document-modal .paper-brand span{font-size:clamp(13px,4.4vw,18px)}
+  .document-modal .paper-meta{margin:12% 0 8%;gap:7%}
+  .document-modal .paper-meta>div:last-child{flex:0 0 31%}
+  .document-modal .paper th,
+  .document-modal .paper td{padding:2.5% 1%;font-size:inherit}
+  .document-modal .paper-total{width:58%;margin-top:5%}
+  .document-modal .qr-invoice-page{padding-bottom:0}
+  .document-modal .qr-page-heading span{font-size:clamp(11px,3.6vw,16px)}
+  .document-modal .qr-invoice-page .qr-payment{
+    min-height:35.35%;
+    margin:0 -5.82%;
+    padding:4% 5.5% 5%;
+    grid-template-columns:22% minmax(0,1fr);
+    gap:4%;
+  }
+  .document-modal .qr-code{width:100%;height:auto;aspect-ratio:1}
+  .document-modal .qr-info{font-size:clamp(6px,1.9vw,8px)}
+  .document-modal .qr-amount{grid-column:2;font-size:clamp(7px,2.2vw,9px)}
+}
