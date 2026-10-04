@@ -287,6 +287,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   const production=useBackendMode();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
+  const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
   const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
@@ -309,9 +310,8 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
 
   return <div className="invoice-workspace">
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
-      <div className="form-section">
-        <h2>Kunde</h2>
-        <Field label="Kunde">
+      <div className="form-section customer-form-section">
+        <Field label="Kunde auswählen">
           <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value})}>
             {names.map(name=><option key={name}>{name}</option>)}
           </select>
@@ -346,7 +346,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </div>
         <div className="invoice-totals"><span>Zwischentotal <b>CHF {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>CHF {money(totals.vat)}</b></span><strong>Total <b>CHF {money(totals.total)}</b></strong></div>
       </div>
-      <div className="form-section optional-row"><Field label="Notiz"><textarea value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optionaler Text für den Kunden"/></Field></div>
+      <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
     <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft} directory={directory}/> : <OfferPreview draft={draft} directory={directory}/>}</aside>
   </div>;
