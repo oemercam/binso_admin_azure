@@ -540,7 +540,7 @@
   .settings-detail-grid>.surface:first-child,
   .subscription-detail-grid>.surface:first-child{padding-top:0}
   .settings-profile,
-  .company-logo-card{grid-template-columns:48px minmax(0,1fr);gap:12px}
+  .company-logo-card{grid-template-columns:48px minmax(0,1fr);gap:16px}
   .settings-profile h2{font-size:16px}
   .settings-profile p,
   .company-logo-card small{font-size:11px;line-height:1.45}
@@ -1263,3 +1263,5 @@
     }
   }
 }
+
+@media(max-width:767px){.settings-detail-grid{gap:0}.settings-detail-grid>.surface{border-bottom:0}.settings-detail-grid>.settings-readonly,.settings-detail-grid>.settings-form{border-top:1px solid var(--color-line)}.settings-profile,.company-logo-card{padding-bottom:18px}.team-list{margin-top:2px}.settings-choice-list>button{min-height:66px}.settings-choice-list .status{font-size:9px}}
