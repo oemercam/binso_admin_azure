@@ -288,6 +288,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
+  const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
   const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
@@ -311,12 +312,13 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   return <div className="invoice-workspace">
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div className="form-section customer-form-section">
+        <span className="compact-section-label">Kunde</span>
         <Field label="Kunde auswählen">
           <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value})}>
             {names.map(name=><option key={name}>{name}</option>)}
           </select>
         </Field>
-        <div className="document-customer-hint"><b>{draft.customer}</b><span>{customer.sector} · {customer.city}</span></div>
+        <div className="document-customer-hint"><span>{customer.sector} · {customer.city}</span></div>
       </div>
       <div className="form-section">
         <h2>{type}details</h2>
@@ -336,6 +338,10 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           {draft.positions.map(item=>{
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
+              <button className="mobile-position-summary" type="button" onClick={()=>setMobilePositionId(item.id)}>
+                <span><b>{item.description}</b><small>{item.quantity} × CHF {money(numberValue(item.price))}</small></span>
+                <strong>CHF {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
+              </button>
               <label className="mobile-line-field description"><span>Beschreibung</span><input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
               <label className="mobile-line-field"><span>Menge</span><input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
               <label className="mobile-line-field"><span>Preis</span><input aria-label="Preis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
@@ -346,6 +352,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </div>
         <div className="invoice-totals"><span>Zwischentotal <b>CHF {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>CHF {money(totals.vat)}</b></span><strong>Total <b>CHF {money(totals.total)}</b></strong></div>
       </div>
+      {mobilePositionId&&(()=>{const item=draft.positions.find(entry=>entry.id===mobilePositionId);if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)setMobilePositionId(null)}}><section className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMobilePositionId(null)}/></header><div className="mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></Field><Field label="Preis"><input inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>CHF {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);setMobilePositionId(null)}}>Position entfernen</button><Button onClick={()=>setMobilePositionId(null)}>Übernehmen</Button></div></section></div>})()}
       <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
     <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft} directory={directory}/> : <OfferPreview draft={draft} directory={directory}/>}</aside>
