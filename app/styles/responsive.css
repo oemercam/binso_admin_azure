@@ -1800,3 +1800,32 @@
   .mobile-position-summary>span{padding-left:0}
   .mobile-position-summary>svg{justify-self:end}
 }
+
+/* Canonical mobile detail header: back, centred title, balanced action slot. */
+@media (max-width:760px){
+  .mobile-header-detail{
+    position:relative;
+    display:grid;
+    grid-template-columns:44px minmax(0,1fr) 44px;
+    align-items:center;
+    gap:0;
+    padding-left:max(var(--mobile-page-x),var(--safe-left));
+    padding-right:max(var(--mobile-page-x),var(--safe-right));
+  }
+  .mobile-header-detail .mobile-header-leading{display:contents}
+  .mobile-header-detail .mobile-back{grid-column:1;margin:0;justify-self:start}
+  .mobile-header-detail .mobile-header-title{
+    grid-column:2;
+    min-width:0;
+    padding:0 8px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-align:center;
+    font-size:14px;
+    font-weight:700;
+    line-height:1.2;
+  }
+  .mobile-header-detail .mobile-detail-actions{grid-column:3;min-width:44px;margin:0;justify-self:end}
+  .mobile-header-detail:not(:has(.mobile-detail-actions))::after{content:"";grid-column:3;width:44px;height:44px}
+}
