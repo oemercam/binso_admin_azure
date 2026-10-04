@@ -60,6 +60,11 @@ jobs:
           pnpm db:check
 
       - name: Prepare standalone deploy artifact
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: "true"
+          DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
+          APP_MODE: production
         shell: bash
         run: |
           set -euo pipefail
@@ -120,6 +125,8 @@ jobs:
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
           curl -fsS --max-time 20 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
           test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
+
+          BINSO_BASE_URL=http://127.0.0.1:3100 node ../../scripts/check-persistence.mjs
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -219,6 +226,7 @@ jobs:
           curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null
           echo "PostgreSQL-backed demo and finance production checks passed."
 
+          BINSO_BASE_URL="$PRODUCTION_URL" node scripts/check-persistence.mjs
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"

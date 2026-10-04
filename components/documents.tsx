@@ -14,10 +14,14 @@ type LineItem = {
   description: string;
   quantity: string;
   price: string;
+  vatRate?: string;
+  unit?: string;
 };
 
 type DocumentDraft = {
   customer: string;
+  customerId?: string;
+  currency?: string;
   number: string;
   date: string;
   due: string;
@@ -101,52 +105,26 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
   return {
     kind:kind==="Rechnung"?"invoice":"offer",
     customerName:draft.customer,
+    customerId:draft.customerId,
     number:draft.number,
     issueDate:draft.date,
     dueDate:kind==="Rechnung"?invoiceDueIso(draft.date,draft.due):null,
     validUntil:kind==="Angebot"?draft.due:null,
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
-    currency:"CHF",
-    items:draft.positions.map(item=>({description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price)})),
+    currency:draft.currency??"CHF",
+    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate)})),
   };
 }
 
-function useStoredDraft(key:string, initial:DocumentDraft) {
-  const [draft,setDraft]=useState(initial);
-  const [ready,setReady]=useState(false);
-
-  useEffect(()=>{
-    if(isProductionBackendEnabled()){
-      queueMicrotask(()=>setReady(true));
-      return;
-    }
-    const stored=window.localStorage.getItem(key);
-    queueMicrotask(()=>{
-      if(stored){
-        try {
-          const parsed=JSON.parse(stored) as DocumentDraft;
-          if(parsed && Array.isArray(parsed.positions)) setDraft(parsed);
-        } catch {
-          // Invalid demo draft: keep safe defaults.
-        }
-      }
-      setReady(true);
-    });
-  },[key]);
-
-  useEffect(()=>{
-    if(!ready || isProductionBackendEnabled()) return;
-    window.localStorage.setItem(key,JSON.stringify(draft));
-  },[draft,key,ready]);
-
-  return [draft,setDraft] as const;
+function useDocumentDraft(initial:DocumentDraft) {
+  return useState(initial);
 }
 
 function useDocumentTotals(draft:DocumentDraft) {
   return useMemo(()=>{
     const subtotal=draft.positions.reduce((sum,item)=>sum+(numberValue(item.quantity)*numberValue(item.price)),0);
-    const vat=subtotal*(numberValue(draft.vatRate)/100);
+    const vat=draft.positions.reduce((sum,item)=>sum+numberValue(item.quantity)*numberValue(item.price)*numberValue(item.vatRate??draft.vatRate)/100,0);
     return { subtotal, vat, total:subtotal+vat };
   },[draft]);
 }
@@ -162,10 +140,12 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     const start=new Date(issueDate+"T12:00:00");
     const end=new Date(dueDate+"T12:00:00");
     const days=Math.round((end.getTime()-start.getTime())/86400000);
-    due=["10","30","45"].includes(String(days))?String(days):"30";
+    due=String(days);
   }
   return {
     customer:String(customer?.name??""),
+    customerId:String(item.customer_id??""),
+    currency:String(item.currency??"CHF"),
     number:String(item.number??""),
     date:issueDate,
     due,
@@ -176,6 +156,8 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
       description:String(line.description??""),
       quantity:String(line.quantity??"1"),
       price:String(line.unit_price??"0.00"),
+      unit:String(line.unit??"Stück"),
+      vatRate:String(line.vat_rate??item.vat_rate??"0"),
     })),
   };
 }
@@ -208,8 +190,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const storageKey=kind==="Angebot"?"binso.demo.offer.AN-2026-012":"binso.demo.invoice.RE-2026-019";
-  const [draft,setDraft]=useStoredDraft(storageKey,createInitialDraft(kind,""));
+  const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const directory=useCustomerDirectory();
   useExistingDocument(kind,existing?documentKey:undefined,setDraft);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
@@ -225,12 +206,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         })).catch(()=>undefined);
       return;
     }
-    const stored=window.localStorage.getItem("binso.demo.offer.AN-2026-012");
-    if(!stored)return;
-    try{
-      const source=JSON.parse(stored) as DocumentDraft;
-      if(source&&Array.isArray(source.positions)) queueMicrotask(()=>setDraft(current=>({...source,number:current.number,date:current.date,due:"30"})));
-    }catch{/* keep defaults */}
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],"Angebot");setDraft(current=>({...source,number:current.number,date:current.date,due:"30"}));}}).catch(()=>undefined);
   },[existing,sourceOffer,kind,setDraft]);
 
   useEffect(()=>{
@@ -242,15 +218,18 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
     if(isProductionBackendEnabled()&&!draft.customer){show("Bitte zuerst einen Kunden erfassen.");return;}
+    let savedNumber=draft.number;
     try{
+      if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
         const payload=documentPayload(kind,draft);
-        if(existing) await apiPatch("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload);
-        else await apiPost("/api/documents",payload);
+        const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload);
+        savedNumber=String(response.item.number);
+        setDraft(remoteDraftFromItem(response.item,kind));
       }
       show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
       if(existing)setEditing(false);
-      else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(draft.number)),900);
+      else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
     }catch(error){
       show(error instanceof Error?error.message:`${kind} konnte nicht gespeichert werden.`);
     }
@@ -261,7 +240,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : undefined;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Entwurf wird lokal automatisch gespeichert"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={headerActions} preview={preview}>
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={headerActions} preview={preview}>
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
     {existing&&!editing
       ? <DocumentReadView type={kind} draft={draft} directory={directory}/>
@@ -275,7 +254,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
 function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
   const totals=useDocumentTotals(draft);
-  const customer=directory[draft.customer]??customerData[draft.customer]??{sector:"—",city:"—",address:"",zip:""};
+  const customer=directory[draft.customer]??{sector:"—",city:"—",address:"",zip:""};
   return <div className="document-detail-view">
     <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2><p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p></section>
     <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsziel"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):draft.due+" Tage"}</b></div><div><small>MwSt.</small><b>{draft.vatRate}%</b></div></section>
@@ -290,7 +269,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   const names=Object.keys(directory);
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
-  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
+  const customer=directory[draft.customer] ?? {sector:"—",city:"—",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
     onChange({...draft,positions:draft.positions.map(item=>item.id===id?{...item,...patch}:item)});
@@ -315,7 +294,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
       <div className="form-section customer-form-section">
         <span className="compact-section-label">Kunde</span>
         <Field label="Kunde auswählen">
-          <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value})}>
+          <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value,customerId:undefined})}>
             {names.map(name=><option key={name}>{name}</option>)}
           </select>
         </Field>
@@ -327,9 +306,9 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} readOnly aria-readonly="true"/></Field>
           <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsziel" : "Gültig bis"}>
-            {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
+            {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field>
-          <Field label="MwSt."><select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value})}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="MwSt."><select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         </div>
       </div>
       <div className="form-section">
@@ -385,44 +364,48 @@ function DocumentModal({ title, onClose, children }: { title:string; onClose:()=
   </div>;
 }
 
+function useDocumentCompany(){
+ const [company,setCompany]=useState<Record<string,unknown>>({});
+ useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{item:Record<string,unknown>}>('/api/settings/company').then(data=>setCompany(data.item)).catch(()=>undefined);},[]);
+ return {name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.name,company.uid,company.phone,company.website].filter(Boolean).join(' · ')};
+}
+
 export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-019"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
   const totals=useDocumentTotals(draft);
-  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
+  const company=useDocumentCompany();
+  const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
 
   return <div className="document-pages invoice-pages">
     <section className="paper invoice-paper invoice-page" aria-label="Rechnung Seite 1 von 2">
-      <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div>
-      <div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div>
+      <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>RECHNUNG</span></div>
+      <div className="sender-line">{[company.name,company.street,company.city].filter(Boolean).join(" · ")}</div>
       <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnung Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Zahlbar bis</small><b>{due}</b></div></div>
       <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
       <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
       <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
-      <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
+      <footer>{company.footer}</footer>
     </section>
-    <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="QR-Rechnung Seite 2 von 2">
-      <div className="qr-page-heading"><img src="/brand/logo-black.svg" alt="Binso"/><span>QR-RECHNUNG</span></div>
+    {company.iban&&<section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="Zahlungsinformationen">
+      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div>
       <div className="qr-page-spacer" aria-hidden="true"/>
-      <section className="qr-payment">
-        <div className="qr-code" aria-label="QR-Code Vorschau"><i/><i/><i/></div>
-        <div className="qr-info"><small>Konto / Zahlbar an</small><b>CH93 0076 2011 6238 5295 7</b><span>Binso GmbH<br/>Weissbadstrasse 8b<br/>9050 Appenzell</span><small>Referenz</small><b>21 00000 00003 13947 14300 09017</b></div>
-        <div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>{money(totals.total)}</b></div>
-      </section>
-    </section>
+      <section className="qr-payment"><div className="qr-info"><small>Konto / Zahlbar an</small><b>{company.iban}</b><span>{company.name}<br/>{company.street}<br/>{company.city}</span><small>Zahlungsmitteilung</small><b>{draft.number}</b></div><div className="qr-amount"><small>Währung</small><b>CHF</b><small>Betrag</small><b>{money(totals.total)}</b></div></section>
+    </section>}
   </div>;
 }
 
 export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
   const totals=useDocumentTotals(draft);
-  const customer=directory[draft.customer] ?? customerData[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
+  const company=useDocumentCompany();
+  const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
 
   return <div className="paper">
-    <div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>ANGEBOT</span></div>
+    <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>ANGEBOT</span></div>
     <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebot Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
     <div className="paper-intro"><b>Unser Angebot</b><p>{draft.note || "Vielen Dank für dein Interesse. Gerne bieten wir dir die folgenden Leistungen an."}</p></div>
     <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
     <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total CHF <b>{money(totals.total)}</b></strong></div>
     <section className="paper-closing"><b>Konditionen</b><p>Dieses Angebot ist bis {isoToSwiss(draft.due)} gültig. Alle Beträge sind in CHF ausgewiesen. Die MwSt. von {draft.vatRate}% ist im Total enthalten.</p><p>Wir freuen uns auf die Zusammenarbeit und stehen bei Fragen gerne zur Verfügung.</p></section>
-    <footer>Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · CHE-173.401.068 · +41 58 510 88 58 · www.binso.ch</footer>
+    <footer>{company.footer}</footer>
   </div>;
 }

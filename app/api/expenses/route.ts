@@ -4,9 +4,9 @@ import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/dat
 
 type ExpenseBody={employeeId?:unknown;employeeName?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
 
-export async function GET(){
+export async function GET(request:NextRequest){
   try{
-    await requireTenantFeature("expenses");return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)","order=expense_date.desc")});}
+    await requireTenantFeature("expenses");return json({items:await tenantList("expenses","id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)","order=expense_date.desc"+(request.nextUrl.searchParams.get("employeeId")?"&employee_id=eq."+encodeURIComponent(request.nextUrl.searchParams.get("employeeId")!):""))});}
   catch(error){return apiError(error);}
 }
 

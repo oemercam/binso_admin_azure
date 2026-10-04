@@ -1,5 +1,6 @@
 import "server-only";
 import {randomUUID} from "node:crypto";
+import {seedDatabaseDemo} from "./repositories/demo-fixture";
 import type {PoolClient} from "pg";
 import {withTransaction} from "@/lib/server/db";
 import {domainConfig,addDays,addHours,type PlanId} from "@/config/domain";
@@ -36,48 +37,6 @@ async function uniqueSlug(client:PoolClient,name:string){
    if(!exists.rowCount)return candidate;
  }
  return `${base}-${randomUUID().slice(0,8)}`;
-}
-
-async function seedDemo(client:PoolClient,organizationId:string,userId:string){
- const customer1=randomUUID(),customer2=randomUUID();
- const projectId=randomUUID(),quoteId=randomUUID(),orderId=randomUUID(),invoiceId=randomUUID();
- await client.query(
-  `insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,city,country,payment_days,status,created_at,updated_at)
-   values
-   ($1,$3,'demo-customer-1','K-DEMO-001','Alpina Architektur AG','Alpina Architektur AG','Anna Muster','kontakt@alpina-demo.ch','Zürich','Schweiz',30,'active',now(),now()),
-   ($2,$3,'demo-customer-2','K-DEMO-002','Bergwerk Digital AG','Bergwerk Digital AG','Luca Beispiel','kontakt@bergwerk-demo.ch','Bern','Schweiz',30,'active',now(),now())`,
-  [customer1,customer2,organizationId]
- );
- await client.query(
-  `insert into projects(id,organization_id,external_id,customer_id,name,budget,hours_budget,progress,start_date,status,notes,created_by_user_id)
-   values($1,$2,'demo-project-1',$3,'Website Relaunch',32000,180,65,current_date,'in_progress','Isoliertes Demo-Projekt',$4)`,
-  [projectId,organizationId,customer2,userId]
- );
- await client.query(
-  `insert into quotes(id,organization_id,external_id,quote_no,customer_id,title,issue_date,valid_until,status,version,created_at,updated_at)
-   values($1,$2,'demo-quote-1','OF-DEMO-1042',$3,'Digital Workplace Erweiterung',current_date,current_date+30,'sent',1,now(),now())`,
-  [quoteId,organizationId,customer1]
- );
- await client.query(
-  `insert into quote_lines(id,organization_id,external_id,quote_id,sort_order,description,quantity,unit,unit_price,vat_rate)
-   values(gen_random_uuid(),$1,'demo-quote-line-1',$2,0,'Beratung und Umsetzung',64,'h',180,$3)`,
-  [organizationId,quoteId,domainConfig.defaultVatRate]
- );
- await client.query(
-  `insert into orders(id,organization_id,external_id,customer_id,project_id,name,budget_hours,sales_rate,cost_rate,billing_model,status,amount,created_by_user_id,created_at,updated_at)
-   values($1,$2,'demo-order-1',$3,$4,'Digital Workplace Umsetzung',180,180,110,'time','active',28900,$5,now(),now())`,
-  [orderId,organizationId,customer2,projectId,userId]
- );
- await client.query(
-  `insert into invoices(id,organization_id,external_id,invoice_no,customer_id,order_id,period,issue_date,due_date,status,subtotal,vat_amount,total_amount,paid_amount,created_at,updated_at)
-   values($1,$2,'demo-invoice-1','RE-DEMO-0318',$3,$4,to_char(current_date,'YYYY-MM'),current_date,current_date+30,'sent',7234.04,585.96,7820,0,now(),now())`,
-  [invoiceId,organizationId,customer2,orderId]
- );
- await client.query(
-  `insert into invoice_lines(id,organization_id,external_id,invoice_id,sort_order,description,quantity,unit,unit_price,vat_rate,source_time_external_ids,source_expense_external_ids)
-   values(gen_random_uuid(),$1,'demo-invoice-line-1',$2,0,'Projektleistungen',40.1891,'h',180,$3,'{}','{}')`,
-  [organizationId,invoiceId,domainConfig.defaultVatRate]
- );
 }
 
 export async function provisionOrganization(input:{
@@ -135,13 +94,13 @@ export async function provisionOrganization(input:{
    );
    await client.query(
      `insert into audit_events(organization_id,actor_user_id,actor_name,action,entity_type,entity_id,detail)
-      values($1,$2,$3,$4,'organization',$1,$5)`,
+      values($1::uuid,$2,$3,$4,'organization',$1::text,$5)`,
      [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId})]
    );
    if(input.mode==="demo"){
      await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
      await client.query("select set_config('app.user_id',$1,true)",[input.userId]);
-     await seedDemo(client,organizationId,input.userId);
+     await seedDatabaseDemo(client,organizationId,input.userId);
      await client.query(`insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','demo') on conflict do nothing`,[organizationId]);
    }
    return {organizationId,expiresAt,plan:planId};
