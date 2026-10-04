@@ -323,7 +323,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
       <div className="form-section">
         <h2>{type}details</h2>
         <div className="form-grid document-meta-grid">
-          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} onChange={e=>onChange({...draft,number:e.target.value})}/></Field>
+          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} readOnly aria-readonly="true"/></Field>
           <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsziel" : "Gültig bis"}>
             {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}><option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}

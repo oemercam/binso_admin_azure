@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
+import { MarketingFooter, MarketingHeader, ProductPreview, ProductScreen } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 
 const benefits=[
