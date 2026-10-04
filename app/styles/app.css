@@ -1095,3 +1095,17 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 }
 
 .documents-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.documents-summary>div{padding:12px 14px;border:1px solid var(--color-line);border-radius:var(--radius-md);display:grid;grid-template-columns:auto 1fr;gap:3px 8px;align-items:center}.documents-summary svg{grid-row:1/3}.documents-summary span,.documents-summary small{color:var(--color-muted);font-size:10px}.documents-summary b{font-size:14px}
+
+/* Shared settings architecture: one separator, one row rhythm, no card-by-card drift. */
+.settings-choice-list{border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
+.settings-choice-list>button,.settings-static-row{width:100%;min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
+.settings-choice-list>button:last-child,.settings-static-row:last-child{border-bottom:0}
+.settings-choice-list b,.settings-choice-list small,.settings-static-row b,.settings-static-row small{display:block}
+.settings-choice-list small,.settings-static-row small{margin-top:2px;color:var(--color-muted);font-size:11px}
+.team-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--color-soft);font-size:11px;font-weight:800}
+.team-list .status{justify-self:end}
+.settings-section{margin-top:24px}
+.settings-section>h2{margin:0 0 10px;font-size:13px}
+.settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form{border-top:0}
+.settings-profile,.company-logo-card{align-items:center}
+.receipt-upload.is-scanning{opacity:.72}
