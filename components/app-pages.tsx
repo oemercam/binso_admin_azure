@@ -102,17 +102,17 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
   return rows;
 }
 
-function RevenueInsight({invoices,demo=false}:{invoices?:Array<Record<string,unknown>>;demo?:boolean}) {
-  const [activeMonth,setActiveMonth]=useState<number|null>(null);
+function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Record<string,unknown>>;demo?:boolean;onMonthChange?:(month:number)=>void}) {
+  const [activeMonth,setActiveMonth]=useState(()=>new Date().getMonth());
   const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=[7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400], previous=[3600,5400,6200,9300,7700,8500,11900,10800,9400,13600,12600,16500];
   if(!demo){current.fill(0);previous.fill(0);const now=new Date();for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===now.getFullYear()) current[date.getMonth()]+=amount;else if(date.getFullYear()===now.getFullYear()-1) previous[date.getMonth()]+=amount;}}
   const total=current.reduce((a,b)=>a+b,0), previousTotal=previous.reduce((a,b)=>a+b,0), change=previousTotal?((total-previousTotal)/previousTotal*100):0, max=Math.max(1,...current,...previous);
-  const activeChange=activeMonth!==null&&previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
+  const activeChange=previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
   return <section className="surface revenue-insight">
     <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div><p className="trend-positive">↗ {change.toFixed(1)} % <span>zum Vorjahr</span></p></div><span className="revenue-period">12 Monate</span></div>
-    <div className="revenue-bar-detail" aria-live="polite">{activeMonth===null?<span>Monat antippen für Details</span>:<><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></>}</div>
+    <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
     <div className="revenue-bars" aria-label="Umsatz der letzten zwölf Monate">
-      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>setActiveMonth(index)} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${Math.max(18,value/max*100)}%`}}/><span>{months[index]}</span></button>})}
+      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${Math.max(18,value/max*100)}%`}}/><span>{months[index]}</span></button>})}
     </div>
   </section>;
 }
@@ -120,6 +120,7 @@ function RevenueInsight({invoices,demo=false}:{invoices?:Array<Record<string,unk
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
   const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
+  const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
 
   useEffect(()=>{
     if(!production) return;
@@ -127,26 +128,31 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   },[production]);
 
   if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
-    <div className="metrics-grid"><Metric label="Umsatz im Monat" value="CHF 24’500" hint="+12% zum Vormonat" icon="chart"/><Metric label="Offene Rechnungen" value="CHF 12’800" hint="8 Rechnungen" icon="receipt"/><Metric label="Kunden" value="42" hint="+3 diesen Monat" icon="users"/><Metric label="Zeit diese Woche" value="28:15 h" hint="4 aktive Projekte" icon="clock"/></div>
-    <RevenueInsight demo/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
+    <div className="metrics-grid"><Metric label="Umsatz im Monat" value={moneyChf([7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400][dashboardMonth])} hint="Rechnungsvolumen" icon="chart"/><Metric label="Rechnungen" value={String([4,5,5,7,6,8,9,8,8,10,10,12][dashboardMonth])} hint="In diesem Monat" icon="receipt"/><Metric label="Zahlungseingänge" value={moneyChf([6900,9800,9400,13100,11800,14900,16500,15100,15400,18100,18900,21600][dashboardMonth])} hint="Verbucht im Monat" icon="wallet"/><Metric label="Neue Kunden" value={String([1,2,1,3,2,2,3,1,2,3,2,4][dashboardMonth])} hint="In diesem Monat" icon="users"/></div>
+    <RevenueInsight demo onMonthChange={setDashboardMonth}/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 
   const stats=data.stats??{};
-  const minutes=Number(stats.time_week_minutes??0);
-  const hours=Math.floor(minutes/60);
-  const mins=minutes%60;
   const invoices=data.invoices??[];
   const paymentsData=data.payments??[];
+  const analyticsInvoices=data.analyticsInvoices??[];
+  const analyticsPayments=data.analyticsPayments??[];
+  const selectedYear=new Date().getFullYear();
+  const monthInvoices=analyticsInvoices.filter(item=>{const d=new Date(String(item.issue_date??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
+  const monthPayments=analyticsPayments.filter(item=>{const d=new Date(String(item.paid_on??item.created_at??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
+  const monthRevenue=monthInvoices.reduce((sum,item)=>sum+Number(item.total??0),0);
+  const monthPaid=monthPayments.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const monthCustomers=new Set(monthInvoices.map(item=>String(item.customer_id??"")).filter(Boolean)).size;
 
   return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
     <div className="metrics-grid">
-      <Metric label="Eingegangen im Monat" value={moneyChf(stats.payments_month_total)} hint="Verbuchte Kundenzahlungen" icon="chart"/>
-      <Metric label="Offene Rechnungen" value={moneyChf(stats.invoice_open_total)} hint={String(stats.invoice_open_count??0)+" Rechnungen"} icon="receipt"/>
-      <Metric label="Kunden" value={String(stats.customers_total??0)} hint="Aktive Kunden" icon="users"/>
-      <Metric label="Zeit diese Woche" value={String(hours)+":"+String(mins).padStart(2,"0")+" h"} hint="Erfasste Arbeitszeit" icon="clock"/>
+      <Metric label="Umsatz im Monat" value={moneyChf(monthRevenue)} hint="Rechnungsvolumen" icon="chart"/>
+      <Metric label="Rechnungen" value={String(monthInvoices.length)} hint="In diesem Monat" icon="receipt"/>
+      <Metric label="Zahlungseingänge" value={moneyChf(monthPaid)} hint="Verbucht im Monat" icon="wallet"/>
+      <Metric label="Kunden" value={String(monthCustomers)} hint="Mit Rechnungen im Monat" icon="users"/>
     </div>
-    <RevenueInsight invoices={data.analyticsInvoices??[]}/>
+    <RevenueInsight invoices={analyticsInvoices} onMonthChange={setDashboardMonth}/>
     <div className="dashboard-grid">
       <section className="surface">
         <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
