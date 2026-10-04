@@ -1124,3 +1124,12 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form{border-top:0}
 .settings-profile,.company-logo-card{align-items:center}
 .receipt-upload.is-scanning{opacity:.72}
+
+.payment-summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px;border-block:1px solid var(--color-line)}
+.payment-summary-strip>div{min-width:0;padding:12px 16px;border-right:1px solid var(--color-line)}
+.payment-summary-strip>div:last-child{border-right:0}
+.payment-summary-strip span,.payment-summary-strip b,.payment-summary-strip small{display:block}
+.payment-summary-strip span,.payment-summary-strip small{color:var(--color-muted)}
+.payment-summary-strip span{font-size:10px;font-weight:650}
+.payment-summary-strip b{margin:3px 0;font-size:17px;letter-spacing:-.02em}
+.payment-summary-strip small{font-size:9px}
