@@ -1864,3 +1864,12 @@
   .product-screen-mobile{width:100%;height:min(68dvh,560px);border:1px solid var(--color-line);border-radius:18px;box-shadow:0 18px 42px rgba(0,0,0,.10)}
   .product-screen-mobile iframe{width:440px;height:956px;transform:scale(calc((100vw - (2 * var(--mobile-page-x)) - 2px)/440));transform-origin:top left}
 }
+
+@media (max-width: 767px){
+  .payment-donut-card{display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center}
+  .payment-donut-wrap{width:92px;height:92px}
+  .payment-donut-wrap .payment-donut{width:92px;height:92px}
+  .payment-donut-wrap .donut-center{position:absolute;inset:18px;width:auto;height:auto;aspect-ratio:auto}
+  .finance-kpis>div:last-child b,.finance-kpis>div:last-child small{white-space:nowrap}
+  .finance-kpis>div:last-child{min-width:0}
+}
