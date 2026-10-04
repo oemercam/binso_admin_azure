@@ -325,6 +325,13 @@
     text-align:center;
   }
   .mobile-back{width:40px;height:40px;display:grid;place-items:center;margin-left:-8px}
+  .mobile-detail-actions{display:flex;align-items:center;gap:2px;margin-left:auto}
+  .mobile-detail-actions .document-header-icons{display:flex;gap:2px}
+  .mobile-detail-actions .icon-button{width:40px;height:40px;min-width:40px}
+  .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-leading{width:auto;flex:1}
+  .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-title{padding-right:4px;text-align:left}
+  .header-timer{min-height:36px;padding:0 8px;display:flex;align-items:center;gap:5px;border:1px solid var(--color-line);border-radius:999px;font-size:10px;font-variant-numeric:tabular-nums}
+  .header-timer i{width:6px;height:6px;border-radius:50%;background:var(--status-success-fg)}
   .mobile-header .icon-button,
   .mobile-header .mobile-notification-button,
   .mobile-header .avatar-button{width:40px;height:40px;min-width:40px;min-height:40px}
@@ -431,6 +438,7 @@
   .detail-grid{grid-template-columns:1fr;gap:var(--mobile-section-gap);margin-top:var(--mobile-section-gap)}
   .surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .quick-section{margin-top:var(--mobile-section-gap)}
+  .quick-section>.section-title{margin-bottom:12px}
   .quick-grid{grid-template-columns:1fr 1fr;gap:10px}
   .quick-grid .button{min-height:44px;height:44px;padding-inline:12px}
 
@@ -448,6 +456,8 @@
     height:var(--mobile-search-h);
     min-height:var(--mobile-search-h);
     max-width:none;
+    border-radius:10px;
+    box-shadow:none;
   }
   .toolbar .chips{
     grid-column:1;
@@ -591,6 +601,27 @@
   .offer-form .invoice-totals{margin-top:10px;padding-top:4px}
   .offer-form .optional-row{padding-bottom:4px}
 
+  .document-header-icons{display:flex;align-items:center;gap:4px}
+  .document-meta-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .document-meta-grid .document-number-field{grid-column:1/-1}
+  .document-meta-grid .form-field:last-child{max-width:110px}
+  .icon-action{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:var(--color-fg)}
+  .single-action{grid-template-columns:1fr}
+  .document-detail-view{display:grid;gap:18px}
+  .document-detail-section{padding:0 0 18px;border-bottom:1px solid var(--color-line)}
+  .document-detail-section h2{margin:5px 0 3px;font-size:17px}
+  .document-detail-section p{margin:0;color:var(--color-muted);font-size:11px;line-height:1.5}
+  .document-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-bottom:18px;border-bottom:1px solid var(--color-line)}
+  .document-facts div{min-width:0}
+  .document-facts small,.document-facts b{display:block}
+  .document-facts small{margin-bottom:4px;color:var(--color-muted);font-size:9px}
+  .document-facts b{font-size:11px;white-space:nowrap}
+  .document-read-lines>div{min-height:58px;padding:10px 0;display:flex;justify-content:space-between;gap:14px;align-items:center;border-bottom:1px solid var(--color-line)}
+  .document-read-lines b,.document-read-lines small{display:block}
+  .document-read-lines b{font-size:12px}
+  .document-read-lines small{margin-top:3px;color:var(--color-muted);font-size:10px}
+  .document-read-lines strong{font-size:11px;white-space:nowrap}
+  .document-more-sheet .sheet-menu>button,.document-more-sheet .sheet-menu>a{width:100%;min-height:var(--mobile-sheet-row-h);padding:8px 0;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;gap:10px;align-items:center;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
   .invoice-workspace{display:block}
   .invoice-form{border:0;border-radius:0;overflow:visible}
   .invoice-form .form-section{padding:18px 0}
@@ -678,8 +709,12 @@
 
   .time-layout{display:block}
   .timer-card{border-left:0;border-right:0;border-radius:0}
-  .timer-ring{width:220px;height:220px}
-  .timer-ring strong{font-size:34px}
+  .timer-card{padding-top:12px}
+  .timer-project{max-width:none;margin:12px auto 0}
+  .timer-ring{width:164px;height:164px;margin:18px auto;border-width:8px}
+  .timer-ring strong{font-size:27px}
+  .timer-ring span{max-width:118px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .timer-actions .button{min-height:44px;height:44px}
   .global-timer{
     left:max(var(--mobile-page-x),var(--safe-left));
     right:max(var(--mobile-page-x),var(--safe-right));
