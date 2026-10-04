@@ -88,7 +88,6 @@
 
 /* Shared app surfaces */
 .surface,
-.metric,
 .invoice-form,
 .timer-card,
 .security-card,
@@ -121,7 +120,7 @@
 /* Dashboard */
 .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .metrics-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.metric{min-height:116px;padding:18px}
+.metric{min-height:116px;padding:18px 0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .metric-top{display:flex;align-items:center;justify-content:space-between;color:var(--color-muted);font-size:12px}
 .metric-top svg{width:18px;height:18px}
 .metric strong{display:block;margin:16px 0 5px;font-size:24px;line-height:1.05;letter-spacing:-.03em}
