@@ -7,8 +7,9 @@ export function GET() {
     {
       status: "ok",
       service: "binso-one",
-      version: process.env.npm_package_version ?? "0.10.0",
-      release: process.env.GITHUB_SHA?.slice(0, 7) ?? process.env.WEBSITE_INSTANCE_ID?.slice(0, 7) ?? "development",
+      version: process.env.npm_package_version ?? "0.11.0",
+      release: process.env.BINSO_BUILD_SHA?.slice(0, 7) ?? "development",
+      sha: process.env.BINSO_BUILD_SHA ?? "development",
       uptimeSeconds: Math.round(process.uptime()),
     },
     {

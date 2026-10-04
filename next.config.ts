@@ -63,6 +63,7 @@ const sensitiveRoutes = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  env: { BINSO_BUILD_SHA: process.env.BINSO_BUILD_SHA ?? process.env.GITHUB_SHA ?? "development" },
   output: "standalone",
   poweredByHeader: false,
   compress: true,
