@@ -576,12 +576,6 @@ function MonitoringView() {
 
   return <>
     <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} availability={operational&&services.length?((operational/services.length)*100).toFixed(2)+" %":"—"} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
-    <div className="operator-monitor-metrics monitoring-secondary">
-      <Metric label="API" value={data.latencyMs?String(data.latencyMs.api)+" ms":"—"} hint="aktuelle Antwortzeit" icon="clock"/>
-      <Metric label="Datenbank" value={data.latencyMs?String(data.latencyMs.database)+" ms":"—"} hint="aktuelle Abfrage" icon="chart"/>
-      <Metric label="LCP p75" value={formatVital("LCP"," ms")} hint={String(vitals.LCP?.samples??0)+" Messungen / 7 Tage"} icon="chart"/>
-      <Metric label="INP p75" value={formatVital("INP"," ms")} hint={String(vitals.INP?.samples??0)+" Messungen / 7 Tage"} icon="clock"/>
-    </div>
     <div className="monitoring-panel">
       <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
       <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
