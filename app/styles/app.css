@@ -460,6 +460,26 @@
 .document-modal>header button{width:40px;height:40px;padding:0;border:0;background:transparent;display:grid;place-items:center;border-radius:10px}
 .document-modal>header button:focus-visible{outline:2px solid var(--color-fg);outline-offset:-2px}
 .document-modal-body{max-width:800px;margin:auto;padding:24px}
+.document-pages{display:grid;gap:24px}
+.document-modal-body{width:min(100%,800px)}
+.document-modal .document-pages{width:100%}
+.document-modal .paper{aspect-ratio:210/297;min-height:0}
+.invoice-pages .invoice-page{width:100%;aspect-ratio:210/297}
+.qr-invoice-page{padding:42px 36px 0}
+.qr-page-heading{display:flex;align-items:center;justify-content:space-between}
+.qr-page-heading img{width:76px}
+.qr-page-heading span{font-size:16px;font-weight:800;letter-spacing:.06em}
+.qr-page-spacer{flex:1}
+.qr-invoice-page .qr-payment{
+  min-height:35.35%;
+  margin:0 -36px;
+  padding:16px 36px 22px;
+  display:grid;
+  grid-template-columns:84px minmax(0,1fr) auto;
+  gap:18px;
+  align-items:start;
+  border-top:1px dashed #777;
+}
 .mobile-document-bar{display:none}
 
 /* Time */
