@@ -671,20 +671,27 @@
     padding:6px var(--mobile-page-x) calc(14px + var(--safe-bottom));
   }
   .sheet-layer-navigation{
-    align-items:stretch;
-    background:var(--color-bg);
+    align-items:end;
+    padding:0;
+    background:rgba(0,0,0,.34);
+    -webkit-backdrop-filter:blur(2px);
+    backdrop-filter:blur(2px);
   }
   .sheet-layer-navigation .bottom-sheet{
-    height:100dvh;
-    min-height:100dvh;
-    max-height:100dvh;
-    padding-top:calc(6px + var(--safe-top));
-    border:0;
-    border-radius:0;
-    box-shadow:none;
+    width:100%;
+    height:auto;
+    min-height:0;
+    max-height:min(88dvh,760px);
+    padding-top:6px;
+    border:1px solid var(--color-line);
+    border-bottom:0;
+    border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;
+    background:var(--color-bg);
+    box-shadow:var(--shadow-modal);
+    overflow:hidden;
   }
-  .sheet-layer-navigation .sheet-handle{display:none}
-  .sheet-layer-navigation .sheet-header{top:calc(-6px - var(--safe-top))}
+  .sheet-layer-navigation .sheet-handle{display:block}
+  .sheet-layer-navigation .sheet-header{top:0}
   .sheet-handle{margin-bottom:4px}
   .sheet-header{
     min-height:58px;
@@ -1050,10 +1057,12 @@
   .sheet-layer-navigation .bottom-sheet{
     width:100%;
     max-width:100%;
+    max-height:min(88dvh,760px);
     overflow-y:auto;
     overflow-x:hidden;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
+    padding-bottom:calc(14px + var(--safe-bottom));
   }
   .sheet-layer-navigation .sheet-header{
     margin-left:calc(-1 * max(var(--mobile-page-x),var(--safe-left)));
