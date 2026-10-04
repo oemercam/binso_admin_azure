@@ -38,6 +38,10 @@
   --mobile-header-h:48px;
   --mobile-nav-h:68px;
   --mobile-nav-compact-h:52px;
+  --mobile-nav-edge:clamp(8px,2.8vw,14px);
+  --mobile-nav-bottom:clamp(8px,2.2vw,12px);
+  --mobile-nav-radius:30px;
+  --mobile-nav-compact-radius:26px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
   --mobile-toolbar-gap:10px;
@@ -50,7 +54,7 @@
 
   --safe-top:0px;
   --safe-right:env(safe-area-inset-right,0px);
-  --safe-bottom:0px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
 
   --bg:var(--color-bg);
