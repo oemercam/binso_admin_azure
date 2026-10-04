@@ -33,64 +33,24 @@ jobs:
               value=settings.get(key,'unset')
               print(key,value if value in ['true','false','unset'] or value.isdigit() else 'configured')
           PY
-      - name: Read recent container logs through Azure management
-        continue-on-error: true
+      - name: Time production API requests without printing business data
         run: |
-          RESOURCE_ID=$(az webapp show --resource-group rg-binso-admin-prod --name binso-admin-prod --query id -o tsv)
-          timeout 60 az rest --method post --url "https://management.azure.com$RESOURCE_ID/containerlogs?api-version=2026-03-15" --output-file /tmp/binso-container.log
           python - <<'PY'
-          import re
-          lines=open('/tmp/binso-container.log',errors='replace').read().splitlines()
-          for line in [line for line in lines if any(term in line for term in ['Error','ERROR','Unhandled','MODULE','EADDR','ENOENT','Next.js','Ready in','Listening','server.js','node:'])][-150:]:
-              line=re.sub(r'[a-zA-Z]+://[^\s]+','[url redacted]',line)
-              line=re.sub(r'\S+@\S+','[redacted]',line)
-              line=re.sub(r"'[^']*'|\"[^\"]*\"","'[redacted]'",line)
-              print(line[-250:])
-          PY
-      - name: Compare and verify database targets without exposing credentials
-        env:
-          MIGRATION_DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          npm install --prefix /tmp/binso-pg-probe --no-package-lock --ignore-scripts pg@8.16.3 > /tmp/binso-pg-install.log
-          node <<'JS'
-          const fs=require('fs');
-          const {Client}=require('/tmp/binso-pg-probe/node_modules/pg');
-          const settings=Object.fromEntries(JSON.parse(fs.readFileSync('/tmp/binso-runtime-settings.json','utf8')).map(r=>[r.name,r.value]));
-          const app=settings.DATABASE_URL,migration=process.env.MIGRATION_DATABASE_URL;
-          console.log('application_matches_migration_url',app===migration);
-          async function test(label,url){
-              if(!url){console.log(label,{configured:false});return}
-              console.log(label,{azurePostgresHost:new URL(url).hostname.endsWith('.postgres.database.azure.com')});
-              const client=new Client({connectionString:url,ssl:{rejectUnauthorized:true},connectionTimeoutMillis:8000,query_timeout:8000,statement_timeout:8000});
-              try{
-                  await client.connect();
-                  await client.query("select set_config('app.organization_id','00000000-0000-4000-8000-000000000099',false)");
-                  const demo=await client.query("select count(*)::int n from organizations where is_demo=true and id='00000000-0000-4000-8000-000000000099'");
-                  const history=await client.query("select count(*)::int n from schema_migrations");
-                  console.log(label,{connected:true,demoExists:demo.rows[0].n===1,migrations:history.rows[0].n});
-              }catch(error){console.log(label,{connected:false,errorCode:error.code??error.name});}
-              finally{await client.end().catch(()=>{});}
-          }
-          (async()=>{await test('application',app);await test('migration',migration)})().catch(()=>process.exit(1));
-          JS
-      - name: Read application stdout and stderr archive through Azure management
-        continue-on-error: true
-        run: |
-          RESOURCE_ID=$(az webapp show --resource-group rg-binso-admin-prod --name binso-admin-prod --query id -o tsv)
-          timeout 60 az rest --method post --url "https://management.azure.com$RESOURCE_ID/containerlogs/zip/download?api-version=2026-03-15" --output-file /tmp/binso-container-logs.zip
-          python - <<'PY'
-          import zipfile,re
-          with zipfile.ZipFile('/tmp/binso-container-logs.zip') as archive:
-              print('log files',len(archive.namelist()))
-              for name in archive.namelist():
-                  if not name.endswith(('.log','.txt')) or 'docker.log' in name and 'default' not in name:continue
-                  lines=archive.read(name).decode('utf8','replace').splitlines()
-                  errors=[line for line in lines[-3000:] if any(term in line for term in ['Error','ERROR','Unhandled','MODULE','EADDR','ENOENT','Next.js','Ready in','Listening','server.js','node:','startup'])]
-                  if not errors:continue
-                  print('log',name)
-                  for line in errors[-30:]:
-                      line=re.sub(r'[a-zA-Z]+://[^\s]+','[url redacted]',line)
-                      line=re.sub(r'\S+@\S+','[redacted]',line)
-                      line=re.sub(r"'[^']*'|\"[^\"]*\"","'[redacted]'",line)
-                      print(line[-250:])
+          import json,urllib.request,urllib.error,http.cookiejar,time
+          settings={r['name']:r['value'] for r in json.load(open('/tmp/binso-runtime-settings.json'))}
+          base=settings.get('APP_URL','https://binso-admin-prod.azurewebsites.net').rstrip('/')
+          jar=http.cookiejar.CookieJar()
+          client=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+          requests=[('/api/health','GET'),('/api/demo/session','POST'),('/api/demo/session','GET')]
+          requests += [('/api/demo/data?collection='+c,'GET') for c in ['customers','customer_contacts','products','employees','expenses','documents','payments']]
+          requests += [('/api/demo/finance','GET'),('/api/finance','GET')]
+          for path,method in requests:
+              start=time.monotonic()
+              req=urllib.request.Request(base+path,data=b'{}' if method=='POST' else None,method=method,headers={'Content-Type':'application/json'})
+              try:
+                  with client.open(req,timeout=25) as response:
+                      body=response.read()
+                      print(method,path,'status',response.status,'seconds',round(time.monotonic()-start,2),'bytes',len(body),flush=True)
+              except Exception as e:
+                  print(method,path,'error',type(e).__name__,'status',getattr(e,'code',None),'seconds',round(time.monotonic()-start,2),flush=True)
           PY
