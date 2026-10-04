@@ -365,6 +365,13 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   </>;
 }
 
+function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:string;kind:"trend"|"donut"|"status";bars?:number[];ratio?:number}) {
+  return <section className={"operator-payment-insight "+kind}>
+    <div><span>{label}</span><strong>{value}</strong></div>
+    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>)}</div>:<div className={"payment-ring "+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
+  </section>;
+}
+
 function PaymentsView() {
   const production=useBackendMode();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
@@ -377,7 +384,7 @@ function PaymentsView() {
   },[production]);
 
   if(!production) return <>
-    <div className="metrics-grid three"><Metric label="Kundenzahlungen" value="CHF 49’820" hint="Demo" icon="chart"/><Metric label="Verbucht" value="184" hint="Demo" icon="wallet"/><Metric label="Storniert / offen" value="2" hint="Demo" icon="clock"/></div>
+    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
     <section className="surface operator-table-card"><div className="operator-table"><div className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></div>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><div className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</div>)}</div></section>
   </>;
 
@@ -386,10 +393,10 @@ function PaymentsView() {
   const pending=items.filter(item=>item.status==="pending").length;
   const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
-    <div className="metrics-grid three">
-      <Metric label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="chart"/>
-      <Metric label="Verbucht" value={String(booked.length)} hint="In dieser Liste" icon="wallet"/>
-      <Metric label="Ausstehend / storniert" value={String(pending+reversed)} hint={String(pending)+" ausstehend · "+String(reversed)+" storniert"} icon="clock"/>
+    <div className="operator-payment-insights">
+      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={[32,46,41,58,52,67,61,78]}/>
+      <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
+      <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
     </div>
     <section className="surface operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
