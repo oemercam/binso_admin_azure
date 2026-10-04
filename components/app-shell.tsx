@@ -56,6 +56,7 @@ export function AppShell({
   active,
   children,
   actions,
+  mobileActions,
   backHref,
   backLabel = "Zurück",
   preview = false,
@@ -65,6 +66,7 @@ export function AppShell({
   active: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  mobileActions?: React.ReactNode;
   backHref?: string;
   backLabel?: string;
   preview?: boolean;
@@ -369,7 +371,8 @@ export function AppShell({
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
           {backHref && <span className="mobile-header-title">{title}</span>}
         </div>
-        <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
+        {backHref&&mobileActions&&<div className="mobile-detail-actions">{mobileActions}</div>}
+        <div className="mobile-header-actions">{timerRunning&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
@@ -461,7 +464,7 @@ export function AppShell({
           </div>}
 
           {sheet === "search" && <div className="global-search">
-            <label className="searchbox large"><Icon name="search"/><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Suchen..."/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>setQuery("")}> <Icon name="close" size={15}/></button>}</label>
+            <div className="searchbox large" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Suchen..."/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>setQuery("")}><Icon name="close" size={15}/></button>}</div>
             <div className="search-results">
               {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
               {production&&query.trim().length>=2&&filtered.length===0&&<p className="technical-hint">Keine Treffer gefunden.</p>}
@@ -490,7 +493,6 @@ export function AppShell({
               <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
             </>}
             <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}>Alle Benachrichtigungen <Icon name="arrow" size={15}/></Link>
-            <Link className="notification-settings-link" href="/einstellungen/benachrichtigungen" onClick={() => setSheet(null)}>Einstellungen <Icon name="arrow" size={15}/></Link>
           </div>}
         </section>
       </div>}
