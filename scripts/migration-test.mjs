@@ -50,5 +50,10 @@ try{
  assert.equal((await db.query('select status from invoices where id=$1',[document.id])).rows[0].status,'paid');
  await assert.rejects(mutateApiBusiness(client,session,'create_payment_idempotent',{...paymentArgs,p_amount:2}),e=>e.status===409);
  await assert.rejects(db.query("insert into tasks(organization_id,external_id,title,project_id) values('00000000-0000-4000-8000-000000000001','cross-tenant','Blocked','30000000-0000-4000-8000-000000000001')"),e=>e.code==='23503');
+ const {dashboardAnalytics}=await import(dataModule((await fs.readFile('lib/server/repositories/dashboard.ts','utf8')).replace("import 'server-only';",'')));
+ const analytics=await dashboardAnalytics(client,demo);
+ const october=analytics.analyticsInvoices.find(row=>new Date(row.issue_date).toISOString().startsWith('2026-10'));
+ assert.ok(october&&Number(october.invoice_count)>=1&&Number(october.customer_count)>=1);
+ assert.ok(analytics.analyticsPayments.length>12);
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}

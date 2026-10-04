@@ -134,7 +134,6 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
 
-  const stats=data.stats??{};
   const invoices=data.invoices??[];
   const paymentsData=data.payments??[];
   const analyticsInvoices=data.analyticsInvoices??[];
@@ -144,12 +143,13 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const monthPayments=analyticsPayments.filter(item=>{const d=new Date(String(item.paid_on??item.created_at??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
   const monthRevenue=monthInvoices.reduce((sum,item)=>sum+Number(item.total??0),0);
   const monthPaid=monthPayments.reduce((sum,item)=>sum+Number(item.amount??0),0);
-  const monthCustomers=new Set(monthInvoices.map(item=>String(item.customer_id??"")).filter(Boolean)).size;
+  const monthCustomers=monthInvoices.reduce((sum,item)=>sum+Number(item.customer_count??0),0);
+  const monthInvoiceCount=monthInvoices.reduce((sum,item)=>sum+Number(item.invoice_count??1),0);
 
   return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
     <div className="metrics-grid">
       <Metric label="Umsatz im Monat" value={moneyChf(monthRevenue)} hint="Rechnungsvolumen" icon="chart"/>
-      <Metric label="Rechnungen" value={String(monthInvoices.length)} hint="In diesem Monat" icon="receipt"/>
+      <Metric label="Rechnungen" value={String(monthInvoiceCount)} hint="In diesem Monat" icon="receipt"/>
       <Metric label="Zahlungseingänge" value={moneyChf(monthPaid)} hint="Verbucht im Monat" icon="wallet"/>
       <Metric label="Kunden" value={String(monthCustomers)} hint="Mit Rechnungen im Monat" icon="users"/>
     </div>
@@ -892,7 +892,7 @@ function useSupportRows(){
 export function SupportPage() {
   const ticketRows=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
-    <div className="support-summary"><Metric label="Offen" value="2" hint="aktuelle Tickets" icon="support"/><Metric label="Gelöst" value="14" hint="letzte 90 Tage" icon="check"/></div>
+    <div className="support-summary"><Metric label="Offen" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="support"/><Metric label="Gelöst" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
       <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={`#${id} · ${subject}`} meta={updated} status={status}/>}</RecordsView>
 
