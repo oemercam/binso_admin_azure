@@ -2008,3 +2008,21 @@
   .document-lines-section .invoice-totals>strong{min-height:28px}
   .document-lines-section .invoice-totals>strong{font-size:16px}
 }
+
+
+@media (max-width:760px){
+  .monitoring-technical-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:24px 18px;
+    margin-top:24px;
+  }
+  .monitoring-technical-chart{min-width:0}
+  .monitoring-chart-title{display:grid;gap:3px;margin-bottom:10px}
+  .monitoring-chart-title b{font-size:11px}
+  .monitoring-chart-title strong{font-size:16px}
+  .monitoring-compact-bars{height:62px;gap:3px}
+  .monitoring-compact-ring{width:68px}
+  .monitoring-technical-chart>small{font-size:9px}
+  .monitoring-technical-summary{margin-top:24px;padding-top:16px}
+}
