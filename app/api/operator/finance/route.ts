@@ -5,12 +5,12 @@ import { withPlatform } from "@/lib/server/db";
 
 export async function GET(){
   try{
-    const s=await requireOperatorSession();authorizeOperator(s,"platform:read");
+    const s=await requireOperatorSession();authorizeOperator(s,"subscriptions:read");
     const data=await withPlatform(async c=>{
       const [payments,subscriptions,costs]=await Promise.all([
-        c.query("select p.payment_date,p.amount from payments p order by p.payment_date desc limit 2000"),
-        c.query("select monthly_revenue_chf,platform_status,created_at from platform_tenants order by created_at desc limit 1000"),
-        c.query("select cost_date,category,provider,description,amount from operating_costs where scope='platform' order by cost_date desc limit 1000")
+        c.query("select p.payment_date,sum(p.amount) amount from platform_billing_payments p join organizations o on o.id=p.organization_id where not o.is_demo and p.provider<>'demo' and p.currency='CHF' group by p.payment_date order by p.payment_date desc"),
+        c.query("select p.payment_date created_at,sum(p.amount) monthly_revenue_chf from platform_billing_payments p join organizations o on o.id=p.organization_id where not o.is_demo and p.provider<>'demo' and p.currency='CHF' group by p.payment_date order by p.payment_date desc"),
+        c.query("select cost_date,category,provider,description,amount from operating_costs where scope='platform' and not is_demo and currency='CHF' order by cost_date desc")
       ]);
       return {payments:payments.rows,subscriptions:subscriptions.rows,operatingCosts:costs.rows};
     });

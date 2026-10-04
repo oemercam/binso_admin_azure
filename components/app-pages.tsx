@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
-import { customers, employees, expenses, invoices, offers, payments, products, supportTickets } from "@/lib/demo-data";
-import { appendDemoRow, type DemoCollection, readDemoRows } from "@/lib/demo-storage";
+import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
+import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
@@ -19,7 +20,7 @@ function moneyChf(value:unknown){
 
 function swissDate(value:unknown){
   if(typeof value!=="string") return "";
-  const parts=value.split("-");
+  const parts=value.slice(0,10).split("-");
   return parts.length===3?`${parts[2]}.${parts[1]}.${parts[0]}`:value;
 }
 
@@ -71,20 +72,20 @@ function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[])
 }
 
 function useDemoRows(collection:DemoCollection, defaults:string[][]) {
-  const [rows,setRows]=useState(defaults);
+  const [rows,setRows]=useState<string[][]>([]);
 
   useEffect(()=>{
     if(isProductionBackendEnabled()){
       const controller=new AbortController();
       apiGet<{items:Record<string,unknown>[]}>(`/api/${collection==="payments"?"payments":collection}`)
         .then(payload=>queueMicrotask(()=>setRows(mapRemoteRows(collection,payload.items))))
-        .catch(()=>queueMicrotask(()=>setRows(defaults)));
+        .catch(()=>queueMicrotask(()=>setRows([])));
       return()=>controller.abort();
     }
 
     const sync=()=>{
-      const stored=readDemoRows(collection);
-      queueMicrotask(()=>setRows([...stored,...defaults]));
+      apiGet<{items:Record<string,unknown>[]}>(`/api/demo/data?collection=${collection}`)
+        .then(payload=>setRows(mapRemoteRows(collection,payload.items))).catch(()=>setRows([]));
     };
     sync();
     const listener=(event:Event)=>{
@@ -112,7 +113,7 @@ function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Rec
     <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div><p className="trend-positive">↗ {change.toFixed(1)} % <span>zum Vorjahr</span></p></div><span className="revenue-period">12 Monate</span></div>
     <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
     <div className="revenue-bars" aria-label="Umsatz der letzten zwölf Monate">
-      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${Math.max(18,value/max*100)}%`}}/><span>{months[index]}</span></button>})}
+      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${value>0?Math.max(18,value/max*100):0}%`}}/><span>{months[index]}</span></button>})}
     </div>
   </section>;
 }
@@ -123,11 +124,11 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
 
   useEffect(()=>{
-    if(!production) return;
-    apiGet<typeof data>("/api/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
-  },[production]);
+    if(forceDemo) return;
+    apiGet<typeof data>(isProductionBackendEnabled()?"/api/dashboard":"/api/demo/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+  },[production,forceDemo]);
 
-  if(!production) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
+  if(forceDemo) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
     <div className="metrics-grid"><Metric label="Umsatz im Monat" value={moneyChf([7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400][dashboardMonth])} hint="Rechnungsvolumen" icon="chart"/><Metric label="Rechnungen" value={String([4,5,5,7,6,8,9,8,8,10,10,12][dashboardMonth])} hint="In diesem Monat" icon="receipt"/><Metric label="Zahlungseingänge" value={moneyChf([6900,9800,9400,13100,11800,14900,16500,15100,15400,18100,18900,21600][dashboardMonth])} hint="Verbucht im Monat" icon="wallet"/><Metric label="Neue Kunden" value={String([1,2,1,3,2,2,3,1,2,3,2,4][dashboardMonth])} hint="In diesem Monat" icon="users"/></div>
     <RevenueInsight demo onMonthChange={setDashboardMonth}/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
@@ -170,25 +171,27 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 export function FinancePage() {
   const production=useBackendMode();
   const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;expenses?:Array<Record<string,unknown>>;payroll?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
+  const [error,setError]=useState<string|null>(null);
   const [range,setRange]=useState("month");
-  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/finance").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
+  useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production]);
   const now=new Date();
   const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
   const bounds=(()=>{let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
-  const payments=production?(data.payments??[]):[{payment_date:"2026-10-02",amount:13512.5},{payment_date:"2026-09-12",amount:8215.6}];
+  const payments=(data.payments??[]);
   const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
   const income=selected.reduce((sum,item)=>sum+Number(item.amount??0),0);
   const inRange=(value:unknown)=>{const d=new Date(String(value??""));return d>=bounds.start&&d<bounds.end};
-  const expense=(production?(data.expenses??[]):[{expense_date:"2026-10-02",amount:86},{expense_date:"2026-10-03",amount:148}]).filter(x=>inRange(x.expense_date)).reduce((s,x)=>s+Number(x.amount??0),0);
-  const operating=(production?(data.operatingCosts??[]):[{cost_date:"2026-10-01",amount:1280},{cost_date:"2026-10-01",amount:620}]).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
-  const staff=(production?(data.payroll??[]):[{period:"2026-10",gross_amount:7200},{period:"2026-10",gross_amount:6240}]).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
+  const expense=((data.expenses??[])).filter(x=>inRange(x.expense_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
+  const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
   const costs=expense+operating+staff,result=income-costs;
   const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(bounds.end.getFullYear(),bounds.end.getMonth()-1-i,1);const value=payments.filter(item=>{const x=new Date(String(item.payment_date??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((s,item)=>s+Number(item.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse();
   const max=Math.max(1,...monthly.map(x=>x.value));
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
+    {error&&<p role="alert">{error}</p>}
     <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{item.label}</button>)}</div>
     <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
-    <section className="finance-analysis"><div className="section-title"><div><span className="eyebrow">ENTWICKLUNG</span><h2>Einnahmen im Zeitraum</h2></div></div><div className="finance-month-bars">{monthly.map(item=><div key={item.label}><i style={{height:`${Math.max(8,item.value/max*100)}%`}}/><b>{item.label}</b><small>{moneyChf(item.value)}</small></div>)}</div></section>
+    <section className="finance-analysis"><div className="section-title"><div><span className="eyebrow">ENTWICKLUNG</span><h2>Einnahmen im Zeitraum</h2></div></div><div className="finance-month-bars">{monthly.map(item=><div key={item.label}><i style={{height:`${item.value>0?Math.max(8,item.value/max*100):0}%`}}/><b>{item.label}</b><small>{moneyChf(item.value)}</small></div>)}</div></section>
     <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{moneyChf(operating)}</strong></div><div><span>Personalkosten</span><strong>{moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{moneyChf(expense)}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Spesen, Betriebskosten und freigegebene Lohnläufe werden für denselben Zeitraum aus der Datenbank ausgewertet.</p></section></div>
   </AppShell>;
 }
@@ -367,10 +370,10 @@ export function CustomerForm() {
 }
 
 function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=false){
-  const [rows,setRows]=useState(defaults);
+  const [rows,setRows]=useState<string[][]>([]);
   useEffect(()=>{
-    if(forceDemo||!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(`/api/documents?kind=${kind}`)
+    if(forceDemo){queueMicrotask(()=>setRows(defaults));return;}
+    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(isProductionBackendEnabled()?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`)
       .then(payload=>{
         const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
         const mapped=payload.items.map(item=>{
@@ -788,45 +791,29 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>>([]);
 
   useEffect(()=>{
-    queueMicrotask(()=>{
-      const storedRunning=window.localStorage.getItem("binso.timer.running")==="true";
-      const base=Number(window.localStorage.getItem("binso.timer.baseSeconds")??"0");
-      const started=Number(window.localStorage.getItem("binso.timer.startedAt")??"0");
-      const elapsed=storedRunning&&started?Math.max(0,Math.floor((Date.now()-started)/1000)):0;
-      const storedProject=window.localStorage.getItem("binso.timer.project");
-      setRunning(storedRunning);
-      setSeconds((Number.isFinite(base)?base:0)+elapsed);
-      setTimerProject(storedProject||"Interne Planung");
-      setManualDate(new Date().toLocaleDateString("en-CA"));
-    });
+    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project)}).catch(()=>undefined)};
+    sync();
+    queueMicrotask(()=>setManualDate(new Date().toLocaleDateString("en-CA")));
+    window.addEventListener("binso-timer-change",sync);
+    return()=>window.removeEventListener("binso-timer-change",sync);
   },[]);
 
   useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>("/api/time-entries")
+    if(forceDemo) return;
+    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries":"/api/demo/data?collection=time_entries")
       .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
       .catch(()=>undefined);
-  },[production]);
+  },[production,forceDemo]);
 
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
-  const setProject=(project:string)=>{
-    setTimerProject(project);
-    window.localStorage.setItem("binso.timer.project",project);
-    window.dispatchEvent(new Event("binso-timer-change"));
-    setProjectOpen(false);
+  const setProject=async(project:string)=>{
+    try{const state=await changeTimer("project",project);setTimerProject(state.project);setProjectOpen(false)}
+    catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
-
-  const toggleTimer=()=>{
-    if("vibrate" in navigator) navigator.vibrate(8);
-    const next=!running;
-    setRunning(next);
-    window.localStorage.setItem("binso.timer.running",String(next));
-    window.localStorage.setItem("binso.timer.baseSeconds",String(seconds));
-    window.localStorage.setItem("binso.timer.project",timerProject);
-    if(next) window.localStorage.setItem("binso.timer.startedAt",String(Date.now()));
-    else window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:next?(seconds>0?"Zeitmessung fortgesetzt.":"Zeitmessung gestartet."):"Zeitmessung pausiert."}));
+  const toggleTimer=async()=>{
+    try{const state=await changeTimer(running?"pause":"start",timerProject);setRunning(state.running);setSeconds(state.seconds)}
+    catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
   };
 
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
@@ -834,31 +821,11 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const remoteTotal=remoteEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
 
   const stop=async()=>{
-    if("vibrate" in navigator) navigator.vibrate(12);
-    if(seconds<=0){
-      setToast("Es läuft noch keine Zeitmessung.");
-      window.setTimeout(()=>setToast(null),2200);
-      return;
-    }
-    setRunning(false);
-    window.localStorage.setItem("binso.timer.running","false");
-    window.localStorage.setItem("binso.timer.baseSeconds","0");
-    window.localStorage.removeItem("binso.timer.startedAt");
-    window.dispatchEvent(new CustomEvent("binso-timer-change",{detail:"Zeitmessung gestoppt."}));
     try{
-      if(isProductionBackendEnabled()){
-        const ended=new Date();
-        const started=new Date(ended.getTime()-seconds*1000);
-        const [projectName,customerName=""]=timerProject.split(" · ");
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName,projectName,description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(seconds/60))});
-        setRemoteEntries(current=>[payload.item,...current]);
-      }
-      setSeconds(0);
-      setToast("Zeiteintrag gespeichert.");
-    }catch(error){
-      setSeconds(0);
-      setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
-    }
+      await changeTimer("finish",timerProject);
+      setRunning(false);setSeconds(0);setToast("Zeiteintrag gespeichert.");
+      if(production){const payload=await apiGet<{items:typeof remoteEntries}>("/api/time-entries");setRemoteEntries(payload.items)}
+    }catch(error){setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.")}
     window.setTimeout(()=>setToast(null),2400);
   };
 
@@ -872,7 +839,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     }
     try{
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,durationMinutes});
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -895,14 +862,14 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
-          <SectionTitle title={production?"Einträge":"Heutige Einträge"} action={<strong>{production?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
-          {production?productionEntries:demoEntries}
+          <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
+          {!forceDemo?productionEntries:demoEntries}
           <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
         </>}
       </section>
       <section className="surface">
-        <SectionTitle title={production?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{production?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
-        {production?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
+        <SectionTitle title={!forceDemo?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
+        {!forceDemo?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>
     </div>
@@ -913,10 +880,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 }
 
 function useSupportRows(){
-  const [rows,setRows]=useState(supportTickets);
+  const [rows,setRows]=useState<string[][]>([]);
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>("/api/support/tickets")
+    apiGet<{items:Array<{id:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?"/api/support/tickets":"/api/demo/data?collection=support_tickets")
       .then(payload=>{
         const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
         queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject,new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status])));

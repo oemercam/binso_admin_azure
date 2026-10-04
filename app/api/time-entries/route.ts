@@ -1,31 +1,38 @@
 import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
-import { requireUser } from "@/lib/server/auth";
-
-type TimeBody={customerId?:unknown;customerName?:unknown;projectName?:unknown;description?:unknown;startedAt?:unknown;endedAt?:unknown;durationMinutes?:unknown};
+import { randomUUID } from "node:crypto";
+import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
+import { requireSession } from "@/lib/server/session";
+import { authorize } from "@/lib/server/rbac";
+import { ownRecordOnly } from "@/lib/permissions";
+import { withTenant } from "@/lib/server/db";
 
 export async function GET(){
   try{
-    await requireTenantFeature("time_tracking");return json({items:await tenantList("time_entries","id,user_id,customer_id,project_name,description,started_at,ended_at,duration_minutes,created_at","order=created_at.desc")});}
-  catch(error){return apiError(error);}
+    const s=await requireSession();authorize(s,"time:read");
+    const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select t.id,coalesce(p.name,t.description) project_name,t.description,
+      t.work_date started_at,round(t.hours*60) duration_minutes,t.created_at
+      from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id
+      where t.organization_id=$1 and t.archived_at is null and ($3::boolean=false or t.created_by_user_id=$2)
+      order by t.work_date desc,t.created_at desc limit 1000`,[s.organizationId,s.userId,ownRecordOnly(s.role,"zeiterfassung")])).rows);
+    return json({items});
+  }catch(e){return apiError(e)}
 }
-
 export async function POST(request:NextRequest){
   try{
-    await requireTenantFeature("time_tracking");
-    assertSameOrigin(request);
-    const body=await readJson<TimeBody>(request,16384);
-    const {user}=await requireUser();
+    assertSameOrigin(request);const s=await requireSession();authorize(s,"time:write");
+    const body=await readJson<{durationMinutes?:unknown;projectName?:unknown;description?:unknown;startedAt?:unknown}>(request,16384);
     const duration=Number(body.durationMinutes);
-    if(!Number.isFinite(duration)||duration<0) return json({error:"duration_invalid",message:"Ungültige Dauer."},400);
-    let customerId=cleanText(body.customerId,80)||null;
-    const customerName=cleanText(body.customerName,200);
-    if(!customerId&&customerName){
-      const customers=await tenantList<{id:string}>("customers","id","name=eq."+encodeURIComponent(customerName)+"&limit=1");
-      customerId=customers[0]?.id??null;
-    }
-    const rows=await tenantInsert("time_entries",{user_id:user.id,customer_id:customerId,project_name:cleanText(body.projectName,200)||null,description:cleanText(body.description,2000)||null,started_at:cleanText(body.startedAt,40)||null,ended_at:cleanText(body.endedAt,40)||null,duration_minutes:Math.round(duration)});
-    return json({item:rows[0]},201);
-  }catch(error){return apiError(error);}
+    if(!Number.isFinite(duration)||duration<=0||duration>1440)throw new ApiError(400,"duration_invalid","Ungültige Dauer.");
+    const rawDate=cleanText(body.startedAt,40);const workDate=rawDate?new Date(rawDate):new Date();
+    if(!Number.isFinite(workDate.getTime()))throw new ApiError(400,"date_invalid","Ungültiges Datum.");
+    const item=await withTenant(s.organizationId,s.userId,async c=>{
+      const project=cleanText(body.projectName,200);
+      const found=await c.query("select id from projects where organization_id=$1 and name=$2 and archived_at is null",[s.organizationId,project]);
+      const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id)
+        values($1,$2,$3,$4,'employee',$5,$6,$7,true,false,$8)
+        returning id,description as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,created_at`,
+        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId]);
+      return result.rows[0];
+    });return json({item},201);
+  }catch(e){return apiError(e)}
 }

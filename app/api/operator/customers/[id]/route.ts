@@ -1,3 +1,4 @@
+import { operatorCan } from "@/lib/permissions";
 import { apiError, json } from "@/lib/server/http";
 import { requireOperatorSession } from "@/lib/server/operator/session";
 import { authorizeOperator } from "@/lib/server/operator/rbac";
@@ -7,16 +8,16 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
   try{const session=await requireOperatorSession();authorizeOperator(session,"organizations:read");
     const {id}=await params;
     const overview=await operatorRpc<Record<string,unknown>>("operator_customer_overview",{p_tenant_id:id});
-    const tickets=await operatorList<Record<string,unknown>>(
+    const tickets=operatorCan(session.role,"support:manage")?await operatorList<Record<string,unknown>>(
       "support_tickets",
       "id,subject,priority,status,created_at,updated_at",
       "tenant_id=eq."+encodeURIComponent(id)+"&order=updated_at.desc&limit=8"
-    );
-    const audit=await operatorList<Record<string,unknown>>(
+    ):[];
+    const audit=operatorCan(session.role,"platform_audit:read")?await operatorList<Record<string,unknown>>(
       "audit_log",
       "id,user_id,action,entity_type,entity_id,metadata,created_at",
       "tenant_id=eq."+encodeURIComponent(id)+"&order=created_at.desc&limit=12"
-    );
+    ):[];
     return json({overview,tickets,audit});
   }catch(error){return apiError(error);}
 }

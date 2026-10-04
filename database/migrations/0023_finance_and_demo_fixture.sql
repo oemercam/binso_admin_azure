@@ -32,6 +32,9 @@ create policy operating_costs_platform on operating_costs
 
 
 -- Isolated deterministic demo workspace. Safe to rerun.
+-- Migration transaction context is also required with a non-superuser table owner.
+select set_config('app.organization_id','00000000-0000-4000-8000-000000000099',true);
+select set_config('app.platform_operator','true',true);
 insert into organizations(id,name,slug,status,country,currency,locale,is_demo)
 values('00000000-0000-4000-8000-000000000099','Binso One Demo','binso-one-demo','active','Schweiz','CHF','de-CH',true)
 on conflict(id) do update set is_demo=true;

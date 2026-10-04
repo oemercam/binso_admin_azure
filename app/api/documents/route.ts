@@ -26,7 +26,7 @@ export async function POST(request:NextRequest){
     const number=cleanText(body.number,80);
     const issueDate=cleanText(body.issueDate,20);
     const rawItems=Array.isArray(body.items)?body.items as Line[]:[];
-    if(!kind||!customerName||!number||!issueDate||rawItems.length===0) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
+    if(!kind||!customerName||!issueDate||rawItems.length===0) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
 
     const customers=await tenantList<{id:string}>("customers","id","name=eq."+encodeURIComponent(customerName)+"&limit=1");
     const customer=customers[0];

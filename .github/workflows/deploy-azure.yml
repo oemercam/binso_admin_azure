@@ -54,7 +54,6 @@ jobs:
             echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
-          pnpm db:check
           pnpm db:migrate
           pnpm db:check
 

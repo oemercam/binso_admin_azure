@@ -1,9 +1,9 @@
 import { apiError, json } from "@/lib/server/http";
-import { tenantList, tenantRpc } from "@/lib/server/database";
+import { tenantList } from "@/lib/server/database";
 
 export async function GET(){
   try{
-    const stats=await tenantRpc<Record<string,unknown>>("tenant_dashboard_stats",{});
+    const stats={};
     const invoices=await tenantList<Record<string,unknown>>(
       "documents",
       "id,kind,number,status,issue_date,total,customer:customers(name)",
@@ -24,6 +24,6 @@ export async function GET(){
       "id,issue_date,total,status",
       "kind=eq.invoice&order=issue_date.desc&limit=500"
     );
-    return json({stats,invoices,payments,analyticsPayments,analyticsInvoices});
+    return json({stats,invoices,payments,analyticsPayments,analyticsInvoices:analyticsInvoices.filter(x=>!["draft","cancelled"].includes(String(x.status)))});
   }catch(error){return apiError(error);}
 }

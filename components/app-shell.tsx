@@ -1,5 +1,6 @@
 "use client";
 
+import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -16,7 +17,6 @@ const desktopNav = [
   ["/produkte","Produkte","box"],
   ["/zeit","Zeiterfassung","clock"],
   ["/spesen","Spesen","card"],
-  ["/finanzen","Finanzen","chart"],
   ["/finanzen","Finanzen","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
@@ -96,18 +96,6 @@ export function AppShell({
 
   useEffect(() => {
     queueMicrotask(() => {
-      const running=window.localStorage.getItem("binso.timer.running") === "true";
-      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
-      let startedAt=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
-      if(running && !startedAt){
-        startedAt=Date.now();
-        window.localStorage.setItem("binso.timer.startedAt",String(startedAt));
-      }
-      setTimerRunning(running);
-      setTimerBaseSeconds(Number.isFinite(storedBase) ? storedBase : 0);
-      setTimerProjectLabel(window.localStorage.getItem("binso.timer.project") ?? "");
-      setTimerStartedAt(running ? startedAt : null);
-      setTimerNow(Date.now());
       setDark(window.localStorage.getItem("binso.theme") === "dark");
       const demo=window.localStorage.getItem("binso.demo.session")==="1";
       const expiresAt=Number(window.localStorage.getItem("binso.demo.expiresAt")??"0");
@@ -121,21 +109,12 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
-    const syncTimer=(event:Event)=>{
-      const running=window.localStorage.getItem("binso.timer.running") === "true";
-      const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
-      const storedStarted=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
-      setTimerRunning(running);
-      setTimerBaseSeconds(Number.isFinite(storedBase)?storedBase:0);
-      setTimerStartedAt(running&&storedStarted?storedStarted:null);
-      setTimerNow(Date.now());
-      setTimerProjectLabel(window.localStorage.getItem("binso.timer.project") ?? "");
-      const message=(event as CustomEvent<string>).detail;
-      if(message){setTimerNotice(message);window.setTimeout(()=>setTimerNotice(null),1800);}
-    };
+    if(preview)return;
+    const syncTimer=()=>{readTimer().then(state=>{setTimerRunning(state.running);setTimerBaseSeconds(state.seconds);setTimerStartedAt(state.running?Date.now():null);setTimerNow(Date.now());setTimerProjectLabel(state.project)}).catch(()=>undefined)};
+    syncTimer();
     window.addEventListener("binso-timer-change",syncTimer);
     return()=>window.removeEventListener("binso-timer-change",syncTimer);
-  }, []);
+  }, [preview]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
@@ -306,21 +285,8 @@ export function AppShell({
   const timerSeconds = timerBaseSeconds + (timerRunning && timerStartedAt ? Math.max(0, Math.floor((timerNow - timerStartedAt) / 1000)) : 0);
 
   async function stopTimer() {
-    setTimerRunning(false);
-    setTimerBaseSeconds(timerSeconds);
-    setTimerStartedAt(null);
-    window.localStorage.setItem("binso.timer.running", "false");
-    window.localStorage.setItem("binso.timer.baseSeconds", String(timerSeconds));
-    window.localStorage.removeItem("binso.timer.startedAt");
-    if(isProductionBackendEnabled()){
-      try{
-        const ended=new Date();
-        const started=new Date(ended.getTime()-timerSeconds*1000);
-        await apiPost("/api/time-entries",{customerName:"Acme AG",projectName:"Website Redesign",description:"Timer",startedAt:started.toISOString(),endedAt:ended.toISOString(),durationMinutes:Math.max(1,Math.round(timerSeconds/60))});
-      }catch{
-        // The timer remains stopped locally; failed persistence can be surfaced by the time page.
-      }
-    }
+    try{await changeTimer("finish",timerProjectLabel);setTimerRunning(false);setTimerBaseSeconds(0);setTimerStartedAt(null);setTimerNotice("Zeiteintrag gespeichert.")}
+    catch(error){setTimerNotice(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.")}
   }
 
   async function logout(){

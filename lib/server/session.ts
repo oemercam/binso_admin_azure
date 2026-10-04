@@ -5,6 +5,7 @@ import {query} from "@/lib/server/db";
 import {env} from "@/lib/server/env";
 
 export type SessionUser={
+ organizationStatus?:string;
  sessionId:string;
  userId:string;
  organizationId:string;
@@ -46,7 +47,7 @@ export async function getSession():Promise<SessionUser|null>{
  const token=jar.get(env.sessionCookieName)?.value;
  if(!token)return null;
  const result=await query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'

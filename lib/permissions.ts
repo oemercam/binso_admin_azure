@@ -50,6 +50,7 @@ export function localRoleToTenant(role:LocalUserRole|string):TenantRole{
 }
 
 export const modulePermissionMap:Record<string,{read:TenantPermission;write:TenantPermission}>={
+ finanzen:{read:"accounting:read",write:"accounting:write"},
  kunden:{read:"customers:read",write:"customers:write"},
  offerten:{read:"sales:read",write:"sales:write"},auftraege:{read:"sales:read",write:"sales:write"},
  rechnungen:{read:"invoices:read",write:"invoices:write"},zahlungen:{read:"payments:read",write:"payments:write"},
