@@ -372,7 +372,7 @@ function DocumentModal({ title, onClose, children }: { title:string; onClose:()=
     try{await navigator.clipboard.writeText(url);}catch{/* clipboard unavailable */}
   };
   return <div className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
-    <header><button type="button" onClick={onClose}><Icon name="back"/>Schliessen</button><strong>{title}</strong><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button></header>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
     <div className="document-modal-body">{children}</div>
   </div>;
 }
