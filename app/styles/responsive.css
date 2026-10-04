@@ -967,6 +967,18 @@
   .operator-grid>.surface{padding:0;border:0;border-radius:0;box-shadow:none}
   .operator-grid>.surface+.surface{padding-top:18px;border-top:1px solid var(--color-line)}
   .operator-grid .button{min-height:44px}
+  .operator-health-services{display:flex;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:4px}
+  .operator-health-services button{min-width:150px;scroll-snap-align:start}
+  .operator-chart-grid{grid-template-columns:1fr;gap:10px}
+  .operator-chart-card{padding:14px}
+  .operator-spark{height:54px}
+  .operator-insight-grid{grid-template-columns:1fr;gap:12px}
+  .operator-ticket-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .ticket-stat{padding:10px 4px}.ticket-stat strong{font-size:21px}.ticket-stat span{font-size:10px}
+  .operator-sla>div{gap:8px;flex-wrap:wrap}
+  .operator-category-bars a{grid-template-columns:minmax(115px,1fr) 1fr 24px;font-size:12px}
+  .operator-selected-metric{display:grid;grid-template-columns:1fr auto;gap:4px 10px}
+  .operator-selected-metric small{grid-column:1/-1;margin-left:0}
   .monitoring-panel{
     margin-left:calc(-1 * var(--mobile-page-x));
     margin-right:calc(-1 * var(--mobile-page-x));
