@@ -90,6 +90,7 @@ export function AppShell({
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
   const [navCompact,setNavCompact]=useState(false);
   const [showLaunch,setShowLaunch]=useState(false);
+  const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -118,7 +119,7 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
-    const syncTimer=()=>{
+    const syncTimer=(event:Event)=>{
       const running=window.localStorage.getItem("binso.timer.running") === "true";
       const storedBase=Number(window.localStorage.getItem("binso.timer.baseSeconds") ?? "0");
       const storedStarted=Number(window.localStorage.getItem("binso.timer.startedAt") ?? "0");
@@ -127,6 +128,8 @@ export function AppShell({
       setTimerStartedAt(running&&storedStarted?storedStarted:null);
       setTimerNow(Date.now());
       setTimerProjectLabel(window.localStorage.getItem("binso.timer.project") ?? "");
+      const message=(event as CustomEvent<string>).detail;
+      if(message){setTimerNotice(message);window.setTimeout(()=>setTimerNotice(null),1800);}
     };
     window.addEventListener("binso-timer-change",syncTimer);
     return()=>window.removeEventListener("binso-timer-change",syncTimer);
@@ -391,11 +394,7 @@ export function AppShell({
         {children}
       </main>
 
-      {timerRunning && <div className="global-timer" role="status">
-        <div className="global-timer-main"><i/><div><small>Zeitmessung läuft</small><span>{timerProjectLabel || "Zeiterfassung"}</span></div></div>
-        <b>{formattedTimer}</b>
-        <button type="button" onClick={()=>void stopTimer()} aria-label="Zeitmessung stoppen"><Icon name="stop" size={16}/><span>Stoppen</span></button>
-      </div>}
+      {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
       {!preview && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
