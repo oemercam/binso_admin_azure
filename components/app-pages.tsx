@@ -1000,10 +1000,6 @@ export function SettingsPage() {
     <div className="settings-list">
       {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
     </div>
-    <section className="subscription-panel">
-      <div><small>Aktueller Plan</small><h2>Business</h2><p>CHF 49 / Monat · nächste Rechnung am 01.11.2026</p></div>
-      <Button href="/einstellungen/abonnement" variant="secondary">Plan verwalten</Button>
-    </section>
   </AppShell>;
 }
 
