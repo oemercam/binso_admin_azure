@@ -2026,3 +2026,5 @@
   .monitoring-technical-chart>small{font-size:9px}
   .monitoring-technical-summary{margin-top:24px;padding-top:16px}
 }
+
+@media(max-width:760px){.finance-range{margin-right:calc(var(--page-pad) * -1);padding-right:var(--page-pad)}.finance-month-bars{height:150px;gap:5px}.finance-month-bars small{display:none}.finance-breakdown{grid-template-columns:1fr;gap:24px;padding:22px 0}.finance-metrics{margin-bottom:10px}}
