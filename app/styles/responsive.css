@@ -1443,3 +1443,21 @@
   .page-container{padding-left:clamp(32px,3vw,48px);padding-right:clamp(32px,3vw,48px)}
   .page-head{margin-bottom:28px}
 }
+
+@media (max-width:760px){
+  .mobile-header .icon-button,
+  .mobile-header .mobile-notification-button,
+  .mobile-header .avatar-button,
+  .mobile-back{
+    width:44px;height:44px;min-width:44px;min-height:44px;
+  }
+  .mobile-header-detail{grid-template-columns:44px minmax(0,1fr) auto}
+  .mobile-detail-actions .icon-button{width:44px;height:44px;min-width:44px}
+  .mobile-header-detail .mobile-back{margin-left:-10px}
+}
+@media (max-height:520px) and (orientation:landscape) and (max-width:900px){
+  :root{--mobile-nav-h:54px;--mobile-nav-bottom:6px}
+  .bottom-nav{height:54px;min-height:54px}
+  .bottom-nav span{display:none}
+  .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
+}
