@@ -16,6 +16,7 @@ const desktopNav = [
   ["/produkte","Produkte","box"],
   ["/zeit","Zeiterfassung","clock"],
   ["/spesen","Spesen","card"],
+  ["/finanzen","Finanzen","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
 
@@ -388,7 +389,7 @@ export function AppShell({
         <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
         <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
         <Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>
-        <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
+        <button type="button" className={["produkte","spesen","finanzen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
       </nav>}
 
       {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
