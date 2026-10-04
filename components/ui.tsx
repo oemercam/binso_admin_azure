@@ -81,7 +81,7 @@ export function Button({
   ariaLabel?: string;
 }) {
   const cls = `button button-${variant} ${className}`.trim();
-  const body = <>{icon && <Icon name={icon} size={17} />}<span>{children}</span></>;
+  const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
   return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
 }
 
