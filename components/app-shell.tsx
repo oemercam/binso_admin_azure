@@ -374,8 +374,9 @@ export function AppShell({
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
           {backHref && <span className="mobile-header-title">{title}</span>}
         </div>
+        {timerRunning&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
         {backHref&&mobileActions&&<div className="mobile-detail-actions">{mobileActions}</div>}
-        <div className="mobile-header-actions">{timerRunning&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
+        <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
           <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
