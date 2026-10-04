@@ -1374,8 +1374,8 @@ export function AppearanceSettingsPage() {
   const [theme,setTheme] = useState<"light"|"dark"|"system">("light");
 
   useEffect(()=>{
-    const storedMode=window.localStorage.getItem("binso.theme.mode");
-    const storedResolved=window.localStorage.getItem("binso.theme");
+    const storedMode=document.documentElement.dataset.themeMode;
+    const storedResolved=document.documentElement.dataset.theme;
     const next=storedMode==="system"||storedMode==="dark"||storedMode==="light"
       ? storedMode
       : storedResolved==="dark" ? "dark" : "light";

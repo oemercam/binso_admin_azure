@@ -423,7 +423,7 @@ textarea{
 .invoice-payment-intro{margin-top:26px}
 .paper footer{margin-top:auto;padding-top:28px;border-top:1px solid #e5e5e3;color:#666;font-size:8px;line-height:1.45}
 .desktop-document-preview,
-.invoice-tablet-preview{position:sticky;top:18px;padding:22px;background:#f1f1ef;border-radius:var(--radius-lg)}
+.invoice-tablet-preview{position:sticky;top:18px;padding:22px;background:var(--color-bg);border-radius:var(--radius-lg)}
 .document-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .document-preview-heading h2{margin:0;font-size:14px}
 .paper,

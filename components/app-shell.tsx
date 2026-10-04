@@ -97,7 +97,7 @@ export function AppShell({
 
   useEffect(() => {
     queueMicrotask(() => {
-      setDark(window.localStorage.getItem("binso.theme") === "dark");
+      setDark(document.documentElement.dataset.theme === "dark");
       const demo=window.localStorage.getItem("binso.demo.session")==="1";
       const expiresAt=Number(window.localStorage.getItem("binso.demo.expiresAt")??"0");
       const validDemo=demo&&(!expiresAt||expiresAt>Date.now());

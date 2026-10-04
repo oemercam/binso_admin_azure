@@ -180,3 +180,5 @@ if(failures.length){
   process.exit(1);
 }
 console.log("Demo flow integrity OK.");
+
+await import("./check-theme.mjs");

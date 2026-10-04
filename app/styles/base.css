@@ -39,6 +39,8 @@ img,svg{max-width:100%}
   object-position:left center;
 }
 .logo-compact{width:30px}
+html[data-theme="dark"] .logo[src*="-black"],
+html[data-theme="light"] .logo[src*="-white"]{filter:invert(1)}
 
 .button{
   min-height:42px;

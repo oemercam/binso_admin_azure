@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./binso-ui.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
+import {initializeTheme} from "@/lib/theme";
+import {ThemeRuntime} from "@/components/theme-runtime";
 import { siteConfig } from "@/lib/config";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
@@ -56,16 +58,15 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="de-CH" suppressHydrationWarning data-scroll-behavior="smooth">
+      <head><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
       <body>
+        <ThemeRuntime />
         {children}
         <PwaRegister />
         <WebVitalsReporter />
