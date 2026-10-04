@@ -56,3 +56,43 @@ values
 ('40000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-service-consulting','IT Consulting','service','Stunde',185,8.1,'active'),
 ('40000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-service-engineering','Engineering','service','Stunde',205,8.1,'active')
 on conflict(id) do nothing;
+
+
+insert into quotes(id,organization_id,external_id,quote_no,customer_id,title,issue_date,valid_until,status,version)
+values
+('50000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-quote-1','AN-2026-012','10000000-0000-4000-8000-000000000001','Modern Workplace Erweiterung','2026-10-01','2026-10-31','sent',1),
+('50000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-quote-2','AN-2026-013','10000000-0000-4000-8000-000000000003','Security Review','2026-10-03','2026-11-02','draft',1)
+on conflict(id) do nothing;
+
+insert into invoices(id,organization_id,external_id,invoice_no,customer_id,project_id,issue_date,due_date,status,subtotal,vat_amount,total_amount,paid_amount)
+values
+('60000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-invoice-1','RE-2026-019','10000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','2026-10-01','2026-10-31','paid',12500,1012.50,13512.50,13512.50),
+('60000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-invoice-2','RE-2026-020','10000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002','2026-10-03','2026-11-02','sent',8900,720.90,9620.90,0),
+('60000000-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000099','demo-invoice-3','RE-2026-018','10000000-0000-4000-8000-000000000003',null,'2026-09-05','2026-10-05','paid',7600,615.60,8215.60,8215.60)
+on conflict(id) do nothing;
+
+insert into payments(id,organization_id,external_id,invoice_id,payment_date,amount,method,reference,allocation_status)
+values
+('70000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-payment-1','60000000-0000-4000-8000-000000000001','2026-10-02',13512.50,'bank','RF-DEMO-001','matched'),
+('70000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-payment-2','60000000-0000-4000-8000-000000000003','2026-09-12',8215.60,'bank','RF-DEMO-002','matched')
+on conflict(id) do nothing;
+
+insert into expenses(id,organization_id,external_id,customer_id,project_id,employee_id,expense_date,description,category,quantity,unit_price,billable,status)
+values
+('80000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-expense-1','10000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','2026-10-02','Bahnreise','travel',1,86,true,'approved'),
+('80000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-expense-2',null,null,'20000000-0000-4000-8000-000000000002','2026-10-03','Arbeitsmaterial','material',1,148,false,'approved')
+on conflict(id) do nothing;
+
+insert into payroll_runs(id,organization_id,external_id,employee_id,period,gross_amount,deduction_amount,net_amount,status)
+values
+('90000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-payroll-2026-10-1','20000000-0000-4000-8000-000000000001','2026-10',7200,1120,6080,'approved'),
+('90000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-payroll-2026-10-2','20000000-0000-4000-8000-000000000002','2026-10',6240,970,5270,'approved')
+on conflict(id) do nothing;
+
+insert into operating_costs(id,organization_id,external_id,cost_date,category,provider,description,amount,scope)
+values
+('a0000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000099','demo-cost-azure','2026-10-01','infrastructure','Microsoft Azure','Cloud Infrastruktur',1280,'tenant'),
+('a0000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000099','demo-cost-software','2026-10-01','software','Software Services','Lizenzen und Dienste',620,'tenant'),
+('a0000000-0000-4000-8000-000000000003',null,'demo-platform-azure','2026-10-01','infrastructure','Microsoft Azure','Binso One Plattform Infrastruktur',2840,'platform'),
+('a0000000-0000-4000-8000-000000000004',null,'demo-platform-services','2026-10-01','software','Platform Services','E-Mail, Monitoring und Services',640,'platform')
+on conflict(id) do nothing;
