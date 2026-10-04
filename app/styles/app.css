@@ -1202,3 +1202,10 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .donut-center b{font-size:15px}.donut-center span{font-size:10px;color:var(--color-muted)}
 .donut-hit{position:absolute;z-index:3;border:0;background:transparent;padding:0;cursor:pointer}
 .paid-hit{inset:0 42% 0 0}.open-hit{inset:0 0 50% 42%}.overdue-hit{inset:50% 0 0 42%}
+
+.security-setting-row{min-height:64px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.security-setting-row b{display:block;font-size:13px}.security-setting-row p{margin:4px 0 0;color:var(--color-muted);font-size:11px}
+.settings-switch{position:relative;width:44px;height:26px;flex:0 0 auto;padding:0;border:0;border-radius:999px;background:var(--color-line);cursor:pointer;transition:background .18s ease}
+.settings-switch>span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .18s ease}
+.settings-switch.is-on{background:#22c55e}.settings-switch.is-on>span{transform:translateX(18px)}
+.settings-switch:disabled{opacity:.45;cursor:not-allowed}
