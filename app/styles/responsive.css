@@ -1829,3 +1829,28 @@
   .mobile-header-detail .mobile-detail-actions{grid-column:3;min-width:44px;margin:0;justify-self:end}
   .mobile-header-detail:not(:has(.mobile-detail-actions))::after{content:"";grid-column:3;width:44px;height:44px}
 }
+
+/* Canonical mobile list-page create action alignment. */
+@media (max-width:760px){
+  .page-head:not(.page-head-detail){position:relative;min-height:64px;padding-right:56px}
+  .page-head:not(.page-head-detail) .page-actions{
+    position:absolute;
+    top:50%;
+    right:0;
+    margin:0;
+    transform:translateY(-50%);
+    align-self:auto;
+  }
+  .page-head:not(.page-head-detail) .page-actions .responsive-create-action,
+  .page-head:not(.page-head-detail) .page-actions .page-add-button{
+    width:44px;
+    min-width:44px;
+    height:44px;
+    min-height:44px;
+    padding:0;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+  }
+  .page-head:not(.page-head-detail) .page-actions .page-add-button svg{margin:0;place-self:center}
+}
