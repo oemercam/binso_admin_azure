@@ -1,13 +1,10 @@
-name: Azure runtime diagnostics
+name: Azure persistence diagnostics
 on:
   push:
     branches: [diagnostics/azure-runtime]
 permissions:
   contents: read
   id-token: write
-concurrency:
-  group: azure-runtime-diagnostics
-  cancel-in-progress: true
 jobs:
   diagnostics:
     runs-on: ubuntu-latest
@@ -18,52 +15,19 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Inspect runtime configuration without secrets
+      - name: Inspect persistence metadata without business data or credentials
         run: |
-          az webapp config show --resource-group rg-binso-admin-prod --name binso-admin-prod -o json > /tmp/binso-runtime-config.json
-          az webapp config appsettings list --resource-group rg-binso-admin-prod --name binso-admin-prod -o json > /tmp/binso-runtime-settings.json
-          python - <<'PY'
-          import json,urllib.parse
-          config=json.load(open('/tmp/binso-runtime-config.json'))
-          settings={r['name']:r['value'] for r in json.load(open('/tmp/binso-runtime-settings.json'))}
-          url=settings.get('DATABASE_URL','')
-          print('runtime',config.get('linuxFxVersion'),'alwaysOn',config.get('alwaysOn'),'startup_uses_server_js','server.js' in config.get('appCommandLine',''))
-          print('database_url_configured',bool(url),'postgres_scheme',urllib.parse.urlparse(url).scheme in ['postgres','postgresql'])
-          for key in ['DATABASE_SSL','DATABASE_SSL_REJECT_UNAUTHORIZED','DATABASE_POOL_MAX','PORT','WEBSITE_RUN_FROM_PACKAGE']:
-              value=settings.get(key,'unset')
-              print(key,value if value in ['true','false','unset'] or value.isdigit() else 'configured')
-          PY
-      - name: Time production API requests without printing business data
-        run: |
-          python - <<'PY'
-          import json,urllib.request,urllib.error,http.cookiejar,time
-          settings={r['name']:r['value'] for r in json.load(open('/tmp/binso-runtime-settings.json'))}
-          base='https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net'
-          print('app_url_matches_deployment',settings.get('APP_URL','').rstrip('/')==base,flush=True)
-          jar=http.cookiejar.CookieJar()
-          client=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-          requests=[('/api/health','GET'),('/api/demo/session','POST'),('/api/demo/session','GET')]
-          requests += [('/api/demo/data?collection='+c,'GET') for c in ['customers','customer_contacts','products','employees','expenses','documents','payments']]
-          requests += [('/api/demo/finance','GET'),('/api/finance','GET')]
-          for path,method in requests:
-              start=time.monotonic()
-              req=urllib.request.Request(base+path,data=b'{}' if method=='POST' else None,method=method,headers={'Content-Type':'application/json'})
-              try:
-                  with client.open(req,timeout=25) as response:
-                      body=response.read()
-                      print(method,path,'status',response.status,'seconds',round(time.monotonic()-start,2),'bytes',len(body),flush=True)
-              except Exception as e:
-                  print(method,path,'error',type(e).__name__,'status',getattr(e,'code',None),'seconds',round(time.monotonic()-start,2),flush=True)
-          PY
-      - name: Compare curl protocol timing on deployment URL
-        run: |
-          python - <<'PY'
-          import subprocess,time
-          base='https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net'
-          for protocol in [[],['--http1.1']]:
-              for path,method in [('/api/health','GET'),('/api/demo/session','POST'),('/api/demo/data?collection=customers','GET'),('/api/demo/finance','GET')]:
-                  args=['curl','-sS','--max-time','25','-c','/tmp/probe.cookies','-b','/tmp/probe.cookies','-o','/tmp/probe-response','-w','status=%{http_code} seconds=%{time_total} protocol=%{http_version}',*protocol]
-                  if method=='POST':args+=['-X','POST','-H','Content-Type: application/json','-d','{}']
-                  r=subprocess.run(args+[base+path],capture_output=True,text=True,timeout=30)
-                  print(method,path,r.stdout,'exit',r.returncode,flush=True)
-          PY
+          az webapp config appsettings list --resource-group rg-binso-admin-prod --name binso-admin-prod -o json > /tmp/binso-settings.json
+          az webapp identity show --resource-group rg-binso-admin-prod --name binso-admin-prod --query type -o tsv
+          npm install --prefix /tmp/binso-probe --no-package-lock --ignore-scripts pg@8.16.3 > /tmp/binso-install.log
+          node <<'JS'
+          const fs=require('fs'),{Client}=require('/tmp/binso-probe/node_modules/pg');
+          const settings=Object.fromEntries(JSON.parse(fs.readFileSync('/tmp/binso-settings.json')).map(r=>[r.name,r.value]));
+          console.log('Blob account configured',Boolean(settings.AZURE_STORAGE_ACCOUNT),'SAS configured',Boolean(settings.AZURE_STORAGE_SAS),'app mode',settings.APP_MODE==='production'?'production':'other');
+          const c=new Client({connectionString:settings.DATABASE_URL,ssl:{rejectUnauthorized:true},connectionTimeoutMillis:8000,query_timeout:8000});
+          (async()=>{await c.connect();
+            const snapshot=await c.query("select count(*)::int n from tenant_business_state s join organizations o on o.id=s.organization_id where not o.is_demo and s.state<>'{}'::jsonb");console.log('Nonempty productive legacy snapshots',snapshot.rows[0].n);
+            const constraints=await c.query("select conrelid::regclass::text as table_name,conname from pg_constraint where contype='f' and not convalidated");console.log('Unvalidated foreign keys',constraints.rows);
+            await c.end();
+          })().catch(e=>{console.error('Probe failed',e.code??e.name);process.exit(1)});
+          JS
