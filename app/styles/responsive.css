@@ -1941,3 +1941,5 @@
     box-shadow:none;
   }
 }
+
+@media (max-width:760px){.metric,.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}}
