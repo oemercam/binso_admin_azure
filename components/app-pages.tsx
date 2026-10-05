@@ -194,13 +194,32 @@ export function FinancePage() {
   const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
   const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
   const costs=expense+operating+staff,result=income-costs;
-  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(rangeBounds.end.getFullYear(),rangeBounds.end.getMonth()-1-i,1);const value=payments.filter(item=>{const x=new Date(String(item.payment_date??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((s,item)=>s+Number(item.amount??0),0);return{key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`,label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse();
-  const max=Math.max(1,...monthly.map(x=>x.value));
+  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{
+    const d=new Date(rangeBounds.end.getFullYear(),rangeBounds.end.getMonth()-1-i,1);
+    const sameMonth=(value:unknown)=>{const x=new Date(String(value??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()};
+    const monthIncome=payments.filter(item=>sameMonth(item.payment_date)).reduce((s,item)=>s+Number(item.amount??0),0);
+    const monthExpense=(data.expenses??[]).filter(item=>sameMonth(item.expense_date)).reduce((s,item)=>s+Number(item.amount??0),0);
+    const monthOperating=(data.operatingCosts??[]).filter(item=>sameMonth(item.cost_date)).reduce((s,item)=>s+Number(item.amount??0),0);
+    const monthStaff=(data.payroll??[]).filter(item=>sameMonth(String(item.period??"")+"-01")).reduce((s,item)=>s+Number(item.gross_amount??0),0);
+    const monthCosts=monthExpense+monthOperating+monthStaff;
+    return{key:String(d.getFullYear())+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("de-CH",{month:"short"}),income:monthIncome,costs:monthCosts,result:monthIncome-monthCosts};
+  }).reverse();
+  const singlePeriod=ranges[range].months===1||focusMonth!==null;
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
     {error&&<p role="alert">{error}</p>}
     <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}</div>
     <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
-    <section className="finance-analysis"><div className="section-title"><div><span className="eyebrow">ENTWICKLUNG</span><h2>{focusMonth?"Ausgewählter Monat":"Einnahmen im Zeitraum"}</h2></div>{focusMonth&&<button type="button" className="text-action" onClick={()=>setFocusMonth(null)}>Zeitraum anzeigen</button>}</div><div className="finance-month-bars">{monthly.map(item=><button type="button" className={focusMonth===item.key?"active":""} key={item.key} onClick={()=>setFocusMonth(item.key)} aria-label={`${item.label} auswählen`}><i style={{height:`${item.value>0?Math.max(8,item.value/max*100):0}%`}}/><b>{item.label}</b><small>{moneyChf(item.value)}</small></button>)}</div></section>
+    <section className="finance-analysis">
+      <div className="section-title"><div><span className="eyebrow">{singlePeriod?"FINANZFLUSS":"MONATSVERGLEICH"}</span><h2>{singlePeriod?"So entsteht dein Ergebnis":"Einnahmen, Kosten und Ergebnis"}</h2></div>{focusMonth&&<button type="button" className="text-action" onClick={()=>setFocusMonth(null)}>Zeitraum anzeigen</button>}</div>
+      {singlePeriod?<div className="finance-flow" aria-label="Finanzfluss">
+        <div className="finance-flow-primary"><span>Einnahmen</span><strong>{moneyChf(income)}</strong></div>
+        <div className="finance-flow-costs"><div><span>Betrieb</span><strong>− {moneyChf(operating)}</strong></div><div><span>Spesen</span><strong>− {moneyChf(expense)}</strong></div><div><span>Personal</span><strong>− {moneyChf(staff)}</strong></div></div>
+        <div className="finance-flow-result"><span>Ergebnis</span><strong>{moneyChf(result)}</strong><small>{income>0?((result/income)*100).toLocaleString("de-CH",{maximumFractionDigits:1})+" % Marge":"Keine Marge berechenbar"}</small></div>
+      </div>:<div className="finance-period-table" role="table" aria-label="Finanzvergleich nach Monat">
+        <div className="finance-period-head" role="row"><span>Monat</span><span>Einnahmen</span><span>Kosten</span><span>Ergebnis</span></div>
+        {monthly.map(item=><button type="button" role="row" key={item.key} onClick={()=>setFocusMonth(item.key)}><b>{item.label}</b><span>{moneyChf(item.income)}</span><span>{moneyChf(item.costs)}</span><strong>{moneyChf(item.result)}</strong></button>)}
+      </div>}
+    </section>
     <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{moneyChf(operating)}</strong></div><div><span>Personalkosten</span><strong>{moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{moneyChf(expense)}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Spesen, Betriebskosten und freigegebene Lohnläufe werden für denselben Zeitraum aus der Datenbank ausgewertet.</p></section></div>
   </AppShell>;
 }
@@ -962,6 +981,16 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [sent,setSent]=useState<string[]>([]);
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
+  const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
+  const ticketReference=(()=>{
+    const raw=String(ticket?.case_number??ticketId);
+    if(/^T-[0-9a-f-]{20,}$/i.test(raw))return "T-"+String(ticket?.id??ticketId).replace(/-/g,"").slice(0,8).toUpperCase();
+    if(/^[0-9a-f-]{20,}$/i.test(raw))return "T-"+raw.replace(/-/g,"").slice(0,8).toUpperCase();
+    return raw.startsWith("#")?raw:"#"+raw;
+  })();
+  const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
+  const ticketStatus=String(ticket?.status??"open");
+  const ticketStatusLabel:Record<string,string>={open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",resolved:"Gelöst",closed:"Geschlossen"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file)return;
@@ -985,9 +1014,13 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()) return;
-    apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages")
-      .then(payload=>queueMicrotask(()=>setRemote(payload.items)))
-      .catch(()=>undefined);
+    Promise.all([
+      apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets"),
+      apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages"),
+    ]).then(([tickets,messages])=>queueMicrotask(()=>{
+      setTicket(tickets.items.find(item=>item.id===ticketId)??null);
+      setRemote(messages.items);
+    })).catch(()=>undefined);
   },[ticketId]);
 
   const send=async()=>{
@@ -1009,7 +1042,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   };
 
   const production=useBackendMode();
-  return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support">
+  return <AppShell title={ticketSubject} subtitle={ticketReference+" · "+(ticketStatusLabel[ticketStatus]??ticketStatus)} active="support" backHref="/support" backLabel="Support">
     <div className="desktop-detail-workspace support-detail-workspace">
       <div className="desktop-detail-main"><div className="support-thread">
       <div className="thread-day">Heute</div>
@@ -1023,7 +1056,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
       <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
     </div></div>
-      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{"#"+ticketId}</strong><small>Support-Konversation</small><div className="desktop-summary-facts"><span>Status <b>Offen</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="desktop-summary-facts"><span>Status <b>{ticketStatusLabel[ticketStatus]??ticketStatus}</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
     {toast&&<Toast title={toast} tone="danger"/>}
   </AppShell>;
