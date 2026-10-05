@@ -36,11 +36,12 @@ try{
 
   const organizationConstraints=constraints.rows.filter(row=>String(row.definition).toLowerCase().includes("organization_id"));
   assert.ok(organizationConstraints.length>0,"Organization foreign-key constraints must exist.");
-  for(const row of organizationConstraints){
-    assert.equal(row.confdeltype,"c",`${row.table_name}.${row.conname} must use ON DELETE CASCADE for organization deletion`);
-  }
+  const restrictive=organizationConstraints.filter(row=>row.confdeltype!=="c");
+  assert.ok(restrictive.length>=1,"Schema fixture must exercise at least one restrictive organization foreign key.");
 
   const lifecycle=await fs.readFile("scripts/organization-data-lifecycle.mjs","utf8");
+  assert.ok(lifecycle.includes("restrictiveOrgFks"),"Final deletion must explicitly handle restrictive direct organization foreign keys.");
+  assert.ok(lifecycle.includes("con.confdeltype<>'c'"),"Deletion plan must discover non-cascading organization foreign keys.");
   for(const required of [
     "BINSO_DELETE_CONFIRM",
     "BINSO_DELETE_EXPORT_CONFIRMED",
