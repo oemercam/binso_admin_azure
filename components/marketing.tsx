@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
+import {PrivacySettingsButton} from "./privacy-consent";
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
@@ -93,6 +94,7 @@ export function MarketingFooter() {
       <Link href="/agb">AGB</Link>
       <Link href="/auftragsbearbeitung">DPA</Link>
       <Link href="/unterauftragsbearbeiter">Unterauftragsbearbeiter</Link>
+      <PrivacySettingsButton/>
     </div>
     <small>© 2026 Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz · CHE-173.401.068</small>
   </footer>;
