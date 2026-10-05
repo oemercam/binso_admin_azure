@@ -698,8 +698,8 @@
 .legal-processor-list dl>div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px}
 .legal-processor-list dt{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .legal-processor-list dd{margin:0}
-.billing-legal-consent{margin-top:16px;display:grid!important;grid-template-columns:18px minmax(0,1fr);gap:10px!important;align-items:start;font-size:10px!important;font-weight:400!important;line-height:1.5}
-.billing-legal-consent input{width:18px!important;height:18px!important;min-height:0!important;margin:1px 0 0;padding:0}
+.billing-legal-consent{margin-top:16px;display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-items:start;font-size:10px;font-weight:400;line-height:1.5}
+.billing-legal-consent input{width:18px;height:18px;min-height:0;margin:1px 0 0;padding:0}
 .billing-legal-consent a{text-decoration:underline;text-underline-offset:2px}
 
 @media (max-width:760px){
