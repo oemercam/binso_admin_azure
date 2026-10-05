@@ -53,7 +53,7 @@ export BINSO_EXPORT_DIR='/secure/binso-exports'
 pnpm data:delete
 ```
 
-Die Löschung läuft in einer Datenbanktransaktion. Wenn Fremdschlüssel oder verbleibende mandantenbezogene Zeilen eine vollständige Löschung verhindern, wird die Transaktion zurückgerollt. Damit entsteht kein teilweise gelöschter Mandant.
+Die Löschung läuft in einer Datenbanktransaktion. Direkte organisationsbezogene Tabellen mit restriktiven Fremdschlüsseln werden innerhalb derselben Transaktion kontrolliert vorgelöscht; Cascades übernehmen die übrigen Abhängigkeiten. Anschliessend wird geprüft, dass keine mandantenbezogenen Zeilen verbleiben. Bei jedem Fehler wird die gesamte Transaktion zurückgerollt, damit kein teilweise gelöschter Mandant entsteht.
 
 ## Dateien / Blob Storage
 Aktuell in PostgreSQL gespeicherte Datei-Inhalte werden durch die Tenant-Cascade mit entfernt. Falls ein Datensatz auf externen Azure Blob Storage verweist, blockiert das Löschtool die Datenbanklöschung, bis die externe Blob-Bereinigung explizit mit `BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED=true` bestätigt wurde. Blob-URLs werden nicht in CI-/Konsolenlogs ausgegeben.
