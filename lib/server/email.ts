@@ -59,32 +59,13 @@ async function sendViaGraph(mail:Mail){
  return {delivered:true,provider:"microsoft-graph" as const};
 }
 
-async function sendViaResend(mail:Mail){
- if(!env.resendApiKey)throw new Error("Resend ist nicht konfiguriert.");
- const response=await fetch("https://api.resend.com/emails",{
-  method:"POST",
-  headers:{authorization:`Bearer ${env.resendApiKey}`,"content-type":"application/json"},
-  body:JSON.stringify({from:env.emailFrom,to:[mail.to],subject:mail.subject,html:mail.html,text:mail.text}),
-  cache:"no-store",
- });
- if(!response.ok){
-  const detail=(await response.text()).slice(0,300);
-  log("error","resend_mail_error",{status:response.status,detail,toDomain:mail.to.split("@")[1]});
-  throw new Error("E-Mail konnte nicht über Resend versendet werden.");
- }
- return {delivered:true,provider:"resend" as const};
-}
-
 export async function sendMail(mail:Mail){
- const mode=env.emailDeliveryMode.toLowerCase();
- if(mode==="graph"||mode==="microsoft"||mode==="microsoft_graph")return sendViaGraph(mail);
- if(mode==="resend")return sendViaResend(mail);
- if(graphConfigured())return sendViaGraph(mail);
- if(env.resendApiKey)return sendViaResend(mail);
-
- log("error","email_provider_not_configured",{toDomain:mail.to.split("@")[1],subject:mail.subject,appMode:env.appMode});
- if(env.appMode==="production")throw new Error("Produktiver E-Mail-Versand ist nicht konfiguriert.");
- return {delivered:false,provider:"none" as const};
+ if(!graphConfigured()){
+  log("error","graph_mail_not_configured",{toDomain:mail.to.split("@")[1],subject:mail.subject,appMode:env.appMode});
+  if(env.appMode==="production")throw new Error("Microsoft Graph Mail ist produktiv nicht vollständig konfiguriert.");
+  return {delivered:false,provider:"none" as const};
+ }
+ return sendViaGraph(mail);
 }
 
 export function mailLayout(title:string,body:string,cta?:{label:string;url:string}){
