@@ -18,5 +18,3 @@ export async function inviteUser(email:string,data:Record<string,string>){
  await sendMail({to:email,subject:"Einladung zu Binso One",text:`Einladung annehmen: ${url}`,html:mailLayout("Einladung zu Binso One","<p>Du wurdest zu einem Binso One Firmenkonto eingeladen.</p>",{label:"Einladung annehmen",url})});
  return {id:userId,email};
 }
-export async function privilegedSupabase<T>():Promise<T>{throw new ApiError(410,"legacy_backend_removed","Die frühere Backend-Schnittstelle wurde entfernt.")}
-export const inviteSupabaseUser=inviteUser;

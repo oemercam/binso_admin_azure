@@ -5,8 +5,8 @@ on:
     paths:
       - .github/workflows/stripe-configuration-audit.yml
       - scripts/stripe-configuration-audit.mjs
-      - scripts/stripe-price-migration.mjs
-      - scripts/lib/stripe-price-configuration.mjs
+      - lib/server/stripe.ts
+      - lib/server/env.ts
   workflow_dispatch:
 permissions:
   contents: read
@@ -26,18 +26,16 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Map verified existing Stripe prices and audit configuration without payments
+      - name: Audit current Stripe production configuration without payments
         shell: bash
         run: |
           set -euo pipefail
           SETTINGS_FILE="$(mktemp)"
-          MAPPING_FILE="$(mktemp)"
-          chmod 600 "$SETTINGS_FILE" "$MAPPING_FILE"
-          trap 'rm -f "$SETTINGS_FILE" "$MAPPING_FILE"' EXIT
-          az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_') || name == 'APP_URL'].{name:name,value:value}" -o json > "$SETTINGS_FILE"
-          node scripts/stripe-price-migration.mjs "$SETTINGS_FILE" "$MAPPING_FILE"
-          if node -e 'process.exit(Object.keys(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))).length?0:1)' "$MAPPING_FILE"; then
-            az webapp config appsettings set -g rg-binso-admin-prod -n binso-admin-prod --settings "@$MAPPING_FILE" -o none
-            az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_') || name == 'APP_URL'].{name:name,value:value}" -o json > "$SETTINGS_FILE"
-          fi
+          chmod 600 "$SETTINGS_FILE"
+          trap 'rm -f "$SETTINGS_FILE"' EXIT
+          az webapp config appsettings list \
+            -g rg-binso-admin-prod \
+            -n binso-admin-prod \
+            --query "[?starts_with(name, 'STRIPE_') || name == 'APP_URL'].{name:name,value:value}" \
+            -o json > "$SETTINGS_FILE"
           node scripts/stripe-configuration-audit.mjs "$SETTINGS_FILE"

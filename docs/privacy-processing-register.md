@@ -39,7 +39,7 @@ Dieses Dokument ist die betriebliche Grundlage für die Datenschutzdokumentation
 - Betroffene: Kundenbenutzer und in Supportinhalten erwähnte Personen
 - Daten: Nachricht, Anhänge, Diagnosekontext, Route/Build, Kontaktdaten
 - Zweck: Support, Fehlerbehebung, Produktverbesserung
-- Empfänger: Microsoft Azure; E-Mail-Provider soweit Kommunikation per E-Mail erfolgt
+- Empfänger: Microsoft Azure; Microsoft Graph / Microsoft 365 soweit Kommunikation per E-Mail erfolgt
 
 ## 6. Interne Binso-Administration
 - Betroffene: Binso-Mitarbeitende
