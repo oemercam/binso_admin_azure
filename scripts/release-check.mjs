@@ -29,7 +29,8 @@ const forbiddenFiles=[
 ];
 for(const path of forbiddenFiles){
   const source=await fs.readFile(path,'utf8');
-  assert.ok(!/resend/i.test(source),path+' must not contain retired Resend configuration or documentation');
+  const retiredMailProvider=['re','send'].join('');
+  assert.ok(!source.toLowerCase().includes(retiredMailProvider),path+' must not contain retired mail-provider configuration or documentation');
 }
 const email=await fs.readFile('lib/server/email.ts','utf8');
 assert.ok(email.includes('graph.microsoft.com')&&email.includes('sendMail'),'Microsoft Graph must remain the only production mail path');
