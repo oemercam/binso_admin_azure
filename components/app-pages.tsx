@@ -620,6 +620,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
   return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={(!existing||employeeTab==="overview")?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    <div className={existing?"desktop-detail-workspace":"desktop-detail-single"}>
+      <div className="desktop-detail-main">
     {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
       <button role="tab" aria-selected={employeeTab==="time"} className={employeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}>Arbeitszeit</button>
@@ -642,6 +644,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href="/zeit" variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
     {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledger.files.length&&<EmptyState icon="file" title="Keine Dokumente" text="Für diesen Mitarbeiter sind keine Dokumente geladen."/>}</section>}
+      </div>
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+    </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -741,7 +746,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   };
 
   return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
-    <div className="expense-layout">
+    <div className={existing?"expense-layout expense-detail-workspace":"expense-layout"}>
       <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
       <div className="form-page">
         <div className="form-grid two">
@@ -998,8 +1003,9 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   };
 
   const production=useBackendMode();
-  return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support" actions={<Status tone="warning">Offen</Status>}>
-    <div className="support-thread">
+  return <AppShell title={"Ticket #"+ticketId} subtitle="Support-Konversation" active="support" backHref="/support" backLabel="Support">
+    <div className="desktop-detail-workspace support-detail-workspace">
+      <div className="desktop-detail-main"><div className="support-thread">
       <div className="thread-day">Heute</div>
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
         <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
@@ -1010,6 +1016,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       </>}
       {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
       <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
+    </div></div>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{"#"+ticketId}</strong><small>Support-Konversation</small><div className="desktop-summary-facts"><span>Status <b>Offen</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
     {toast&&<Toast title={toast} tone="danger"/>}
   </AppShell>;
