@@ -97,3 +97,11 @@ assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow window
 assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
 assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
+
+const appShellSource=await fs.readFile('components/app-shell.tsx','utf8');
+assert.ok(appShellSource.includes('className={"desktop-search "+(desktopSearchOpen?"is-open":"")}'),'Desktop search must be an inline header search');
+assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search keyboard shortcut must focus the inline field');
+assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
+assert.ok(appCss.includes('.desktop-search-results{'),'Desktop search results must render as an anchored dropdown');
+assert.ok(!responsiveCss.includes('.desktop-search-trigger'),'Responsive CSS must not retain obsolete popup-search trigger rules');
+console.log('Desktop global search stays inline with anchored results and no modal trigger.');
