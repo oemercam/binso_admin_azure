@@ -117,10 +117,6 @@ export function AppShell({
     return()=>window.removeEventListener("binso-timer-change",syncTimer);
   }, [preview]);
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = dark ? "dark" : "light";
-  }, [dark]);
-
   useEffect(()=>{
     if(preview||window.sessionStorage.getItem("binso.launch.seen")==="1") return;
     const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -248,15 +244,6 @@ export function AppShell({
     setNotifications(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
     try{
       await apiPatch("/api/notifications/"+encodeURIComponent(id),{});
-    }catch{
-      void loadNotifications();
-    }
-  }
-
-  async function markAllNotificationsRead(){
-    setNotifications(current=>current.map(item=>({...item,read_at:item.read_at??new Date().toISOString()})));
-    try{
-      await apiPatch("/api/notifications",{action:"read_all"});
     }catch{
       void loadNotifications();
     }
@@ -440,13 +427,12 @@ export function AppShell({
                 <div><b>{item.title}</b><p>{item.body}</p><small>{notificationTime(item.created_at)}</small></div>
                 {!item.read_at&&<i className="unread-dot"/>}
               </Link>)}
-              {unreadNotifications>0&&<button className="notification-mark-all" type="button" onClick={()=>void markAllNotificationsRead()}>Alle als gelesen markieren</button>}
             </> : <>
               <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
               <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
               <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
             </>}
-            <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}>Alle Benachrichtigungen <Icon name="arrow" size={15}/></Link>
+            <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}><span>Alle Benachrichtigungen</span><Icon name="arrow" size={15}/></Link>
           </div>}
         </section>
       </div>}

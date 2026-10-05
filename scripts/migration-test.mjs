@@ -125,6 +125,29 @@ try{
  const provisioned=await provisionOrganization({userId:'demo-provision-test',email:'demo-provision-test@example.invalid',name:'Demo Test',companyName:'Demo',plan:'business',mode:'demo'});
  assert.equal((await db.query('select is_demo from organizations where id=$1',[provisioned.organizationId])).rows[0].is_demo,true);
  assert.ok((await db.query('select count(*)::int n from invoices where organization_id=$1',[provisioned.organizationId])).rows[0].n>20);
+ // Exercise real provisioning for 50 independent production-style trial tenants.
+ const trialTenants=[];
+ for(let i=0;i<50;i++){
+  const trial=await provisionOrganization({userId:`trial-probe-${i}`,email:`trial-probe-${i}@example.invalid`,name:`Synthetic ${i}`,companyName:`Synthetic Company ${i}`,plan:'business',mode:'trial'});
+  trialTenants.push(trial.organizationId);
+  await db.query("select set_config('app.organization_id',$1,false)",[trial.organizationId]);
+  await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'same-external-id','K-001',$2)",[trial.organizationId,`Customer ${i}`]);
+ }
+ assert.equal(new Set(trialTenants).size,50);
+ await db.exec('set role tenant_probe');
+ for(const [i,organizationId] of trialTenants.entries()){
+  await db.query("select set_config('app.organization_id',$1,false)",[organizationId]);
+  const visible=await db.query('select organization_id,name from customers');
+  assert.equal(visible.rows.length,1);assert.equal(visible.rows[0].organization_id,organizationId);assert.equal(visible.rows[0].name,`Customer ${i}`);
+  const foreignTenant=trialTenants[(i+1)%trialTenants.length];
+  await assert.rejects(db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'forbidden','K-002','Cross tenant')",[foreignTenant]),e=>e.code==='42501');
+  assert.equal((await db.query("update customers set name='forbidden' where organization_id=$1 returning id",[foreignTenant])).rows.length,0);
+  assert.equal((await db.query('delete from customers where organization_id=$1 returning id',[foreignTenant])).rows.length,0);
+ }
+ await db.query("select set_config('app.organization_id','',false)");
+ assert.equal((await db.query('select * from customers')).rows.length,0);
+ await db.exec('reset role');
+ console.log('50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).');
  delete globalThis.__provisionTest;
  delete globalThis.__customerPersistenceTest;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
