@@ -1,6 +1,6 @@
 import {spawnSync} from "node:child_process";
 
-const allowed=new Set(["GHSA-vfj7-8cjw-p6xm"]);
+const allowed=new Set(["GHSA-VFJ7-8CJW-P6XM"]);
 const result=spawnSync("pnpm",["audit","--audit-level","high","--json"],{
   encoding:"utf8",
   shell:process.platform==="win32"
