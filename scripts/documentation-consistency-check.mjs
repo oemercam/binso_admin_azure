@@ -15,6 +15,15 @@ const [
   envExample,
   securityRoute,
   appPages,
+  productPage,
+  marketing,
+  verifyEmailRoute,
+  portalLoginRoute,
+  portalRegisterRoute,
+  rootLayout,
+  privacyConsent,
+  webVitals,
+  privacyPage,
 ]=await Promise.all([
   read("README.md"),
   read("docs/auth-security-flow.md"),
@@ -27,6 +36,15 @@ const [
   read(".env.example"),
   read("app/einstellungen/sicherheit/page.tsx"),
   read("components/app-pages.tsx"),
+  read("app/produkt/page.tsx"),
+  read("components/marketing.tsx"),
+  read("app/api/auth/verify-email/route.ts"),
+  read("app/portal/login/page.tsx"),
+  read("app/portal/registrieren/page.tsx"),
+  read("app/layout.tsx"),
+  read("components/privacy-consent.tsx"),
+  read("components/web-vitals-reporter.tsx"),
+  read("app/datenschutz/page.tsx"),
 ]);
 
 const stripeVersion=stripeSource.match(/stripeApiVersion=['"]([^'"]+)['"]/)?.[1];
@@ -69,3 +87,16 @@ for(const required of [
 }
 
 console.log("Documentation consistency passed: runtime, authentication, billing and operational docs are aligned.");
+
+assert.ok(productPage.includes("domainConfig.trialDays"),"Product page must use the canonical trial duration");
+assert.ok(!productPage.includes("30 Tage kostenlos"),"Product page must not contain the retired 30-day trial");
+assert.ok(!marketing.includes('href="/portal/login"'),"Public login links must use the canonical customer login");
+assert.ok(marketing.includes('href="/login"'),"Public marketing must link to the canonical customer login");
+assert.ok(portalLoginRoute.includes('redirect("/login")'),"Legacy portal login route must redirect to canonical login");
+assert.ok(portalRegisterRoute.includes('redirect("/registrieren")'),"Legacy portal registration route must redirect to canonical registration");
+assert.ok(!verifyEmailRoute.includes("consumeAuthToken"),"Email verification must use the six-digit code flow only");
+assert.ok(!verifyEmailRoute.includes("invalid_or_expired_token"),"Retired verification-link compatibility must not return");
+assert.ok(rootLayout.includes("<PrivacyConsent"),"Privacy consent controls must be mounted globally");
+assert.ok(privacyConsent.includes("Nur notwendige")&&privacyConsent.includes("Alle erlauben"),"Privacy controls must offer explicit choices");
+assert.ok(webVitals.includes("readPerformanceConsent"),"Optional performance telemetry must respect the user's privacy preference");
+assert.ok(privacyPage.includes("Optionale Performance-Messungen")&&privacyPage.includes("keine Werbe- oder Cross-Site-Tracking-Cookies"),"Privacy policy must describe the current consent and tracking behavior");
