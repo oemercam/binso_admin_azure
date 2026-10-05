@@ -67,3 +67,8 @@ const appCss=await fs.readFile('app/styles/app.css','utf8');
 assert.ok(appCss.includes('.responsive-create-action{'),'Responsive create actions need a shared structural rule');
 assert.ok(appCss.includes('display:inline-flex'),'Responsive create actions must keep icon and label on one line outside mobile mode');
 console.log('Medium desktop uses the full content width and keeps create actions on one line.');
+
+assert.ok(appCss.includes('.support-master-detail{'),'Support list must use the shared full-width workspace');
+assert.ok(appCss.includes('grid-template-columns:minmax(0,1fr);'),'Support list must not reserve an empty preview column');
+assert.ok(appCss.includes('.support-summary .metric+.metric{border-left:1px solid var(--color-line)}'),'Support summary must use the shared compact metric strip');
+console.log('Support list uses the canonical full-width list and compact summary layout.');
