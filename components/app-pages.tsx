@@ -1163,11 +1163,15 @@ export function CompanySettingsPage() {
 export function SubscriptionSettingsPage() {
   const production=useBackendMode();
   const searchParams=useSearchParams();
-  const [dialog,setDialog]=useState<"plan"|"payment"|"cancel"|null>(null);
+  const requestedPlan=searchParams.get("plan");
+  const requestedBilling=searchParams.get("billing");
+  const initialPlan=requestedPlan==="start"||requestedPlan==="business"||requestedPlan==="pro"?requestedPlan:"business";
+  const initialBilling=requestedBilling==="yearly"?"yearly":"monthly";
+  const [dialog,setDialog]=useState<"plan"|"payment"|"cancel"|null>(searchParams.get("activate")==="1"?"plan":null);
   const [plan,setPlan]=useState("Business");
-  const [selectedPlan,setSelectedPlan]=useState<"start"|"business"|"pro">("business");
+  const [selectedPlan,setSelectedPlan]=useState<"start"|"business"|"pro">(initialPlan);
   const [subscription,setSubscription]=useState<Record<string,unknown>|null>(null);
-  const [billingCycle,setBillingCycle]=useState<"monthly"|"yearly">("monthly");
+  const [billingCycle,setBillingCycle]=useState<"monthly"|"yearly">(initialBilling);
   const [catalog,setCatalog]=useState<Array<{plan:string;billing:string;available:boolean;amount?:number}>>([]);
   const [stripeLive,setStripeLive]=useState(false);
   const [billingError,setBillingError]=useState("");
@@ -1176,15 +1180,6 @@ export function SubscriptionSettingsPage() {
   const [billingLoading,setBillingLoading]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
-
-  useEffect(()=>{
-    if(!production)return;
-    const requestedPlan=searchParams.get("plan");
-    const requestedBilling=searchParams.get("billing");
-    if(requestedPlan==="start"||requestedPlan==="business"||requestedPlan==="pro")setSelectedPlan(requestedPlan);
-    if(requestedBilling==="monthly"||requestedBilling==="yearly")setBillingCycle(requestedBilling);
-    if(searchParams.get("activate")==="1")setDialog("plan");
-  },[production,searchParams]);
 
   const prices:Record<string,string>=Object.fromEntries(subscriptionPlans.flatMap(p=>[[p.name,String(p.monthly)],[p.id,String(p.monthly)]]));
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
