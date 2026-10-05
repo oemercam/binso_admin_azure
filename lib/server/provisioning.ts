@@ -3,7 +3,7 @@ import {randomUUID} from "node:crypto";
 import {seedDatabaseDemo} from "./repositories/demo-fixture";
 import type {PoolClient} from "pg";
 import {withTransaction} from "@/lib/server/db";
-import {domainConfig,addDays,addHours,type BillingCycle,type PlanId} from "@/config/domain";
+import {domainConfig,addHours,type BillingCycle,type PlanId} from "@/config/domain";
 import {subscriptionEntitlements} from '@/lib/subscription-plans';
 import {plans} from "@/lib/plans";
 
@@ -46,7 +46,7 @@ export async function provisionOrganization(input:{
    const billingCycle:BillingCycle=input.mode==="demo"?"monthly":input.billingCycle??"monthly";
    const selectedAmount=billingCycle==="yearly"?definition.yearly:definition.monthly;
    const limits=subscriptionEntitlements(planId);
-   const expiresAt=input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):input.mode==="trial"?addDays(new Date(),domainConfig.trialDays):null;
+   const expiresAt=input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):null;
 
    const existing=await client.query<{id:string}>("select id from app_users where lower(email)=lower($1) limit 1",[email]);
    if(existing.rowCount&&existing.rows[0].id!==input.userId)throw new Error("Für diese E-Mail besteht bereits ein Konto.");
