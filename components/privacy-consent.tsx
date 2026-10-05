@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import {useEffect,useState} from "react";
-import {Button} from "@/components/ui";
+import {Button,SectionTitle,Status} from "@/components/ui";
+import {AppShell} from "@/components/app-shell";
 
 export const privacyPreferenceKey="binso.privacy.preferences.v1";
 export const privacyPreferenceEvent="binso:privacy-preferences";
@@ -47,7 +48,7 @@ export function PrivacyConsent(){
 
   if(!ready||!open)return null;
 
-  return <div className="privacy-consent-layer" role="dialog" aria-modal="true" aria-labelledby="privacy-consent-title">
+  return <div className="privacy-consent-layer" role="dialog" aria-labelledby="privacy-consent-title">
     <section className="privacy-consent-card">
       <div className="privacy-consent-copy">
         <span className="eyebrow">DATENSCHUTZ</span>
@@ -70,4 +71,42 @@ export function PrivacyConsent(){
 
 export function PrivacySettingsButton(){
   return <button type="button" className="footer-privacy-button" onClick={()=>window.dispatchEvent(new Event("binso:open-privacy-settings"))}>Cookie-/Datenschutz-Einstellungen</button>;
+}
+
+
+export function PrivacySettingsPage(){
+  const [performance,setPerformance]=useState(false);
+  const [saved,setSaved]=useState(false);
+
+  useEffect(()=>{
+    setPerformance(loadPreferences()?.performance??false);
+  },[]);
+
+  const save=(value:boolean)=>{
+    storePreferences(value);
+    setPerformance(value);
+    setSaved(true);
+    window.setTimeout(()=>setSaved(false),2200);
+  };
+
+  return <AppShell title="Datenschutz & Cookies" subtitle="Technisch notwendige Funktionen und optionale Performance-Messung." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <section className="surface security-card">
+      <SectionTitle title="Technisch notwendig"/>
+      <div className="context-block"><Status tone="success">Immer aktiv</Status><b>Anmeldung, Sicherheit und Einstellungen</b><span>Diese Speichermechanismen sind für Sessions, Kontoschutz, Demo-Funktionen und Benutzereinstellungen erforderlich und können nicht deaktiviert werden.</span></div>
+    </section>
+    <section className="surface security-card">
+      <SectionTitle title="Performance-Messung"/>
+      <div className="context-block"><Status tone={performance?"success":"neutral"}>{performance?"Erlaubt":"Aus"}</Status><b>Web-Vitals</b><span>Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking.</span></div>
+      <div className="privacy-settings-actions">
+        <Button variant={performance?"secondary":"primary"} onClick={()=>save(false)}>Deaktivieren</Button>
+        <Button variant={performance?"primary":"secondary"} onClick={()=>save(true)}>Erlauben</Button>
+      </div>
+      {saved&&<p className="settings-note" role="status">Datenschutz-Einstellung gespeichert.</p>}
+    </section>
+    <section className="surface security-card">
+      <SectionTitle title="Weitere Informationen"/>
+      <p className="settings-note">Details zur Datenbearbeitung und zu eingesetzten Dienstleistern findest du in der Datenschutzerklärung und der Unterauftragsbearbeiter-Liste.</p>
+      <div className="privacy-settings-actions"><Button href="/datenschutz" variant="secondary">Datenschutzerklärung</Button><Button href="/unterauftragsbearbeiter" variant="secondary">Unterauftragsbearbeiter</Button></div>
+    </section>
+  </AppShell>;
 }
