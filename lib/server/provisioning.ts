@@ -38,7 +38,7 @@ export async function provisionOrganization(input:{
  return withTransaction(async client=>{
    const email=input.email.trim().toLowerCase();
    const displayName=input.name.trim();
-   const companyName=input.mode==="demo"?"Binso Demo AG":input.companyName.trim();
+   const companyName=input.mode==="demo"?"Alpenblick Digital AG":input.companyName.trim();
    const slug=await uniqueSlug(client,companyName);
    const canonicalPlan=toCanonicalPlan(input.mode==="demo"?"business":input.plan);
    const planId:PlanId=input.mode==="demo"?"business":input.plan;

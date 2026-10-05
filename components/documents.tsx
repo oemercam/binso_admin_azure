@@ -24,6 +24,7 @@ type LineItem = {
 type DocumentDraft = {
   id?: string;
   reference?: string;
+  title?: string;
   customer: string;
   customerId?: string;
   status?: string;
@@ -162,6 +163,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
   return {
     id:String(item.id??""),
     reference:String(item.qr_reference??""),
+    title:String(item.title??""),
     customer:String(customer?.name??""),
     customerId:String(item.customer_id??""),
     currency:String(item.currency??"CHF"),
@@ -448,7 +450,7 @@ function useDocumentCompany(){
      .finally(()=>{if(active)setLoading(false);});
    return()=>{active=false;};
  },[]);
- return {loading,error,raw:company,name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.name,company.uid,company.phone,company.website].filter(Boolean).join(' · ')};
+ return {loading,error,raw:company,name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.legal_name||company.name,company.vat_number||company.uid,company.email,company.phone,company.website].filter(Boolean).join(' · ')};
 }
 
 export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-019"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
@@ -464,17 +466,16 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   return <div className="document-pages invoice-pages">
     <section className="paper invoice-paper invoice-page" aria-label="Rechnung Seite 1 von 2">
       <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>RECHNUNG</span></div>
-      {company.raw.is_demo===true&&<p className="demo-payment-label">Demo-Rechnung · Nicht bezahlen</p>}
       <div className="sender-line">{[company.name,company.street,company.city].filter(Boolean).join(" · ")}</div>
-      <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnung Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Zahlbar bis</small><b>{due}</b></div></div>
-      <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
-      <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-      <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
+    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnungsnummer</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b>{Boolean(company.raw.vat_number||company.raw.uid)&&<><small>MWST / UID</small><b>{String(company.raw.vat_number||company.raw.uid)}</b></>}<small>Zahlbar bis</small><b>{due}</b></div></div>
+      <div className="paper-intro">{draft.title&&<h2>{draft.title}</h2>}<p>{draft.note || String(company.raw.invoice_intro_text||"Für die erbrachten Leistungen stellen wir Ihnen folgende Rechnung.")}</p></div>
+      <table><thead><tr><th>Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Betrag</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{numberValue(item.quantity).toLocaleString("de-CH",{maximumFractionDigits:3})}{item.unit&&<small className="paper-unit">{item.unit}</small>}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
+      <DocumentTotals draft={draft} totals={totals}/>
+      <section className="paper-closing invoice-payment-intro"><p>{draft.status==="paid"?"Der Rechnungsbetrag wurde vollständig beglichen. Vielen Dank für Ihre Zahlung.":`Bitte überweisen Sie den Rechnungsbetrag${due?" bis zum "+due:""} mit dem QR-Zahlteil auf der folgenden Seite.`}</p><DocumentText text={String(company.raw.invoice_footer_text||"Vielen Dank für Ihr Vertrauen. Bei Fragen zu dieser Rechnung stehen wir Ihnen gerne zur Verfügung.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
       <footer>{company.footer}</footer>
     </section>
     <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="Rechnung Seite 2 von 2: Zahlungsinformationen">
-      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div>
-      {company.raw.is_demo===true&&<p className="demo-payment-label">Demo-Zahlteil mit Beispielkonto · Nicht bezahlen</p>}
+      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div><div className="qr-page-reference"><span>Rechnung {draft.number}</span><b>{draft.currency??"CHF"} {money(totals.total)}</b></div>
       <div className="qr-page-spacer" aria-hidden="true"/>
       {payment.svg?<div className="qr-payment-slip" dangerouslySetInnerHTML={{__html:payment.svg}}/>:<div className="payment-setup-notice"><b>QR-Zahlteil noch nicht verfügbar</b><p>{payment.issue}</p></div>}
     </section>
@@ -486,13 +487,33 @@ export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012
   const company=useDocumentCompany();
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
 
-  return <div className="paper">
+  if(company.loading)return <p role="status">Angebotsvorschau wird geladen …</p>;
+  if(company.error)return <p role="alert">{company.error}</p>;
+  return <div className="document-pages"><section className="paper">
     <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>ANGEBOT</span></div>
-    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebot Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
-    <div className="paper-intro"><b>Unser Angebot</b><p>{draft.note || "Vielen Dank für dein Interesse. Gerne bieten wir dir die folgenden Leistungen an."}</p></div>
-    <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-    <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
-    <section className="paper-closing"><b>Konditionen</b><p>Dieses Angebot ist bis {isoToSwiss(draft.due)} gültig. Alle Beträge sind in CHF ausgewiesen. Die MwSt. von {Number(draft.vatRate).toFixed(2)} % ist im Total enthalten.</p><p>Wir freuen uns auf die Zusammenarbeit und stehen bei Fragen gerne zur Verfügung.</p></section>
+    <div className="sender-line">{[company.name,company.street,company.city].filter(Boolean).join(" · ")}</div>
+    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebotsnummer</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b>{Boolean(company.raw.vat_number||company.raw.uid)&&<><small>MWST / UID</small><b>{String(company.raw.vat_number||company.raw.uid)}</b></>}<small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
+    <div className="paper-intro"><h2>{draft.title||"Ihr Angebot"}</h2><p>{draft.note || String(company.raw.quote_intro_text||"Vielen Dank für Ihre Anfrage. Gerne offerieren wir Ihnen die folgenden Leistungen.")}</p></div>
+    <table><thead><tr><th>Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Betrag</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{numberValue(item.quantity).toLocaleString("de-CH",{maximumFractionDigits:3})}{item.unit&&<small className="paper-unit">{item.unit}</small>}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
+    <DocumentTotals draft={draft} totals={totals}/>
+    <section className="paper-closing"><b>Konditionen</b><p>{draft.due?`Dieses Angebot ist bis zum ${isoToSwiss(draft.due)} gültig. `:""}Alle Beträge sind in {draft.currency??"CHF"} ausgewiesen; die MWST ist im Gesamtbetrag enthalten.</p><DocumentText text={String(company.raw.quote_footer_text||"Die Umsetzung erfolgt nach Ihrer schriftlichen Auftragsbestätigung. Zusätzliche Leistungen stimmen wir vorab mit Ihnen ab. Wir freuen uns auf die Zusammenarbeit.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
     <footer>{company.footer}</footer>
-  </div>;
+  </section></div>;
+}
+
+function DocumentText({text}:{text:string}){
+  return <>{text.split(/\n\s*\n/).filter(Boolean).map((paragraph,index)=><p className="paper-text" key={index}>{paragraph}</p>)}</>;
+}
+function DocumentTotals({draft,totals}:{draft:DocumentDraft;totals:{subtotal:number;vat:number;total:number}}){
+  const taxes=new Map<number,number>();
+  for(const item of draft.positions){
+    const rate=numberValue(item.vatRate??draft.vatRate);
+    taxes.set(rate,(taxes.get(rate)??0)+numberValue(item.quantity)*numberValue(item.price)*rate/100);
+  }
+  const groups=[...taxes].sort(([a],[b])=>b-a);
+  const displayed=groups.map(([rate,amount],index)=>{
+    const rounded=index===groups.length-1?Math.round(totals.vat*100)/100-groups.slice(0,index).reduce((sum,[,value])=>sum+Math.round(value*100)/100,0):Math.round(amount*100)/100;
+    return [rate,rounded];
+  });
+  return <div className="paper-total"><span>Nettobetrag <b>{money(totals.subtotal)}</b></span>{displayed.map(([rate,amount])=><span key={rate}>MWST {rate.toFixed(2)} % <b>{money(amount)}</b></span>)}<strong>Gesamtbetrag {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>;
 }
