@@ -26,6 +26,7 @@ export async function POST(request:NextRequest){
   const plan=enumField(body,"plan",planIds);
   const billingCycle=enumField(body,"billingCycle",billingCycles);
   const locale=(typeof body.locale==="string"&&["de","en","fr","it","tr"].includes(body.locale)?body.locale:"de") as MailLocale;
+  const profileLanguage=locale==="de"?"de-CH":locale;
   if(body.acceptedTerms!==true)throw new Error("AGB und Datenschutz müssen akzeptiert werden.");
   const termsVersion=stringField(body,"termsVersion",{max:40});
   const privacyVersion=stringField(body,"privacyVersion",{max:40});
@@ -33,7 +34,7 @@ export async function POST(request:NextRequest){
   const exists=await query("select 1 from app_users where lower(email)=lower($1) limit 1",[email]);
   if(exists.rowCount)throw new Error("Für diese E-Mail besteht bereits ein Konto.");
   const userId=randomUUID();
-  const provisioned=await provisionOrganization({userId,email,name,companyName:company,plan,billingCycle,mode:"trial",passwordHash:await hashPassword(password),language:locale,termsVersion,privacyVersion});
+  const provisioned=await provisionOrganization({userId,email,name,companyName:company,plan,billingCycle,mode:"trial",passwordHash:await hashPassword(password),language:profileLanguage,termsVersion,privacyVersion});
   const code=await issueEmailCode({email,purpose:"verify_email",userId,organizationId:provisioned.organizationId});
   let emailSent=true;
   try{
