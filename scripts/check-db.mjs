@@ -3,6 +3,7 @@ if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"}});
 
 const required={
+ billing_checkout_sessions:["organization_id","request_key","stripe_session_id","plan","billing_interval","expires_at"],
  file_contents:["file_id","organization_id","body"],
  operating_costs:["id","organization_id","external_id","cost_date","amount","scope","is_demo"],
  platform_billing_payments:["id","organization_id","provider","external_id","payment_date","amount","currency"],
@@ -47,8 +48,8 @@ const required={
  rate_limit_buckets:["bucket_key","count","reset_at","updated_at"],
  schema_migrations:["version","checksum","applied_at"]
 };
-const tenantTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
-const forceTables=["customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
+const tenantTables=["billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
+const forceTables=["billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
  const migrations=await pool.query("select version from schema_migrations order by version");

@@ -26,14 +26,13 @@ export async function POST(request:NextRequest){
   const plan=enumField(body,"plan",planIds);
   enumField(body,"billingCycle",billingCycles);
   const locale=(typeof body.locale==="string"&&["de","en","fr","it","tr"].includes(body.locale)?body.locale:"de") as MailLocale;
-  const trial=body.trial===true;
   if(body.acceptedTerms!==true)throw new Error("AGB und Datenschutz müssen akzeptiert werden.");
   const termsVersion=stringField(body,"termsVersion",{max:40});
   const privacyVersion=stringField(body,"privacyVersion",{max:40});
   const exists=await query(`select 1 from app_users where lower(email)=lower($1) limit 1`,[email]);
   if(exists.rowCount)throw new Error("Für diese E-Mail besteht bereits ein Konto.");
   const userId=randomUUID();
-  const provisioned=await provisionOrganization({userId,email,name,companyName:company,plan,mode:trial?"trial":"subscription",passwordHash:await hashPassword(password),language:locale,termsVersion,privacyVersion});
+  const provisioned=await provisionOrganization({userId,email,name,companyName:company,plan,mode:"trial",passwordHash:await hashPassword(password),language:locale,termsVersion,privacyVersion});
   const token=await createAuthToken({type:"verify_email",email,userId,organizationId:provisioned.organizationId,ttlMinutes:domainConfig.emailVerificationMinutes});
   const url=`${env.appUrl}/email-bestaetigen?token=${encodeURIComponent(token)}`;
   let emailSent=true;

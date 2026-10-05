@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
@@ -12,6 +12,7 @@ export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import {plans as subscriptionPlans} from '@/lib/plans';
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
 
 function moneyChf(value:unknown){
@@ -1165,11 +1166,16 @@ export function SubscriptionSettingsPage() {
   const [plan,setPlan]=useState("Business");
   const [selectedPlan,setSelectedPlan]=useState<"start"|"business"|"pro">("business");
   const [subscription,setSubscription]=useState<Record<string,unknown>|null>(null);
+  const [billingCycle,setBillingCycle]=useState<"monthly"|"yearly">("monthly");
+  const [catalog,setCatalog]=useState<Array<{plan:string;billing:string;available:boolean;amount?:number}>>([]);
+  const [stripeLive,setStripeLive]=useState(false);
+  const [billingError,setBillingError]=useState("");
+  const checkoutRequest=useRef<{plan:string;billing:string;key:string}|null>(null);
   const [integrations,setIntegrations]=useState<Array<Record<string,unknown>>>([]);
   const [billingLoading,setBillingLoading]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
-  const prices:Record<string,string>={Start:"19",Business:"49",Pro:"89",start:"19",business:"49",pro:"89"};
+  const prices:Record<string,string>=Object.fromEntries(subscriptionPlans.flatMap(p=>[[p.name,String(p.monthly)],[p.id,String(p.monthly)]]));
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
   useEffect(()=>{
@@ -1177,25 +1183,38 @@ export function SubscriptionSettingsPage() {
     Promise.all([
       apiGet<{item:Record<string,unknown>}>("/api/settings/subscription"),
       apiGet<{items:Array<Record<string,unknown>>}>("/api/integrations/status"),
-    ]).then(([subscriptionPayload,integrationPayload])=>queueMicrotask(()=>{
+      apiGet<{live:boolean;items:Array<{plan:string;billing:string;available:boolean;amount?:number}>}>("/api/billing/catalog"),
+    ]).then(([subscriptionPayload,integrationPayload,catalogPayload])=>queueMicrotask(()=>{
       setSubscription(subscriptionPayload.item);
       setIntegrations(integrationPayload.items);
-    })).catch(()=>undefined);
+      setCatalog(catalogPayload.items);
+      setStripeLive(catalogPayload.live);
+    })).catch(()=>setBillingError("Abonnement konnte nicht geladen werden. Bitte die Seite erneut laden."));
 
+    let attempts=0;
+    let stopped=false;
+    let refreshTimer:ReturnType<typeof setTimeout>|undefined;
+    const refreshSubscription=async()=>{
+      try{const payload=await apiGet<{item:Record<string,unknown>}>("/api/settings/subscription");if(stopped)return;setSubscription(payload.item);if(payload.item.billing_subscription_ref&&payload.item.subscription_status==="active")return;}catch{if(stopped)return;}
+      if(++attempts<10)refreshTimer=setTimeout(()=>void refreshSubscription(),3000);
+    };
     const result=new URLSearchParams(window.location.search).get("checkout");
     if(result==="success"){
+      refreshTimer=setTimeout(()=>void refreshSubscription(),3000);
       queueMicrotask(()=>setToast("Stripe Checkout abgeschlossen. Der Abostatus wird über den signierten Webhook aktualisiert."));
       window.setTimeout(()=>setToast(null),4200);
     }else if(result==="cancelled"){
       queueMicrotask(()=>setToast("Planwechsel abgebrochen."));
       window.setTimeout(()=>setToast(null),2200);
     }
+    return ()=>{stopped=true;if(refreshTimer)clearTimeout(refreshTimer);};
   },[production]);
 
   const startCheckout=async()=>{
     setBillingLoading(true);
     try{
-      const payload=await apiPost<{url:string}>("/api/billing/checkout",{plan:selectedPlan});
+      if(!checkoutRequest.current||checkoutRequest.current.plan!==selectedPlan||checkoutRequest.current.billing!==billingCycle)checkoutRequest.current={plan:selectedPlan,billing:billingCycle,key:crypto.randomUUID()};
+      const payload=await apiPost<{url:string}>("/api/billing/checkout",{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key});
       window.open(payload.url,"_self");
     }catch(error){
       setToast(error instanceof Error?error.message:"Stripe Checkout konnte nicht geöffnet werden.");
@@ -1231,18 +1250,18 @@ export function SubscriptionSettingsPage() {
     </AppShell>;
   }
 
-  if(!subscription) return <AppShell title="Abonnement" subtitle="Daten werden geladen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><EmptyState icon="card" title="Abonnement wird geladen" text="Die Kontodaten werden abgerufen."/></AppShell>;
+  if(!subscription) return <AppShell title="Abonnement" subtitle="Daten werden geladen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><EmptyState icon="card" title={billingError?"Abonnement nicht verfügbar":"Abonnement wird geladen"} text={billingError||"Die Kontodaten werden abgerufen."}/></AppShell>;
 
   const planKey=String(subscription.plan??"trial");
   const planLabel:Record<string,string>={trial:"Testphase",start:"Start",business:"Business",pro:"Pro"};
-  const planPrice:Record<string,string>={trial:"0",start:"19",business:"49",pro:"89"};
-  const statusLabel:Record<string,string>={trial:"Testphase",active:"Aktiv",past_due:"Überfällig",suspended:"Pausiert",cancelled:"Gekündigt"};
-  const accountLabel:Record<string,string>={active:"Aktiv",restricted:"Eingeschränkt",suspended:"Gesperrt",cancelled:"Gekündigt"};
+  const contractAmount=subscription.unit_amount_chf==null?null:Number(subscription.unit_amount_chf);
+  const statusLabel:Record<string,string>={trial:"Testphase",active:"Aktiv",past_due:"Überfällig",expired:"Abgelaufen",read_only:"Nur Lesen",suspended:"Pausiert",cancelled:"Gekündigt"};
+  const accountLabel:Record<string,string>={trial:"Testphase",read_only:"Nur Lesen",grace_period:"Nachfrist",active:"Aktiv",restricted:"Eingeschränkt",suspended:"Gesperrt",cancelled:"Gekündigt"};
   const subscriptionStatus=String(subscription.subscription_status??"trial");
   const accountStatus=String(subscription.account_status??"active");
-  const billingConnected=Boolean(subscription.billing_customer_ref&&subscription.billing_subscription_ref);
+  const billingConnected=Boolean(subscription.billing_customer_ref&&subscription.billing_subscription_ref)&&!["cancelled","expired"].includes(subscriptionStatus);
   const billingIntegration=integrations.find(item=>item.key==="billing");
-  const billingConfigured=billingIntegration?.configured===true;
+  const billingConfigured=billingIntegration?.configured===true&&catalog.some(item=>item.available);
   const storageLimit=Number(subscription.storage_limit_bytes??0);
   const storageLabel=storageLimit>0?(storageLimit/1024/1024/1024).toLocaleString("de-CH",{maximumFractionDigits:1})+" GB":"—";
   const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString("de-CH"):"—";
@@ -1251,9 +1270,11 @@ export function SubscriptionSettingsPage() {
   return <AppShell title="Abonnement" subtitle="Plan, Nutzung und Kontostatus." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
       <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{planLabel[planKey]??planKey}</h2><p>{subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</p></div>
-      <div className="plan-price"><strong>{"CHF "+(planPrice[planKey]??"—")}</strong><span>/ Monat</span></div>
+      <div className="plan-price"><strong>{contractAmount==null?"—":moneyChf(contractAmount)}</strong><span>{subscription.billing_interval==="yearly"?"/ Jahr":"/ Monat"}</span></div>
       {billingConfigured?(billingConnected?<Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing verwalten</Button>:<Button onClick={()=>setDialog("plan")}>Plan aktivieren</Button>):<Status tone="warning">Stripe nicht konfiguriert</Status>}
     </section>
+    {!stripeLive&&billingConfigured&&<p className="technical-hint">Stripe-Testmodus · keine echten Zahlungen.</p>}
+    {subscription.cancel_at_period_end===true&&<p className="technical-hint">Abonnement endet am {periodEnd}.</p>}
     <div className="subscription-detail-grid">
       <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzerlimit</span><b>{String(subscription.user_limit??"—")}</b></div><div className="usage-row"><span>Dateispeicher</span><b>{storageLabel}</b></div><div className="usage-row"><span>Kontostatus</span><b>{accountLabel[accountStatus]??accountStatus}</b></div><div className="usage-row"><span>{subscriptionStatus==="trial"?"Testphase bis":"Aktuelle Periode bis"}</span><b>{subscriptionStatus==="trial"?trialEnd:periodEnd}</b></div></section>
       <section className="surface"><SectionTitle title="Zahlungsabwicklung"/>{billingConnected?<div className="context-block"><Status tone="success">Verbunden</Status><b>Stripe Billing verbunden</b><span>Zahlungsmittel und SaaS-Rechnungen bleiben bei Stripe und werden über das sichere Kundenportal verwaltet.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal öffnen</Button></div>:billingConfigured?<div className="context-block"><Status tone="info">Bereit</Status><b>Stripe ist konfiguriert</b><span>Wähle einen Plan, um das produktive Abonnement über Stripe Checkout zu starten.</span><Button onClick={()=>setDialog("plan")}>Plan auswählen</Button></div>:<div className="context-block"><Status tone="warning">Noch nicht verbunden</Status><b>Keine produktive Zahlungsabwicklung</b><span>Stripe-Schlüssel, Webhook und Preis-IDs müssen in der Produktionsumgebung konfiguriert werden.</span></div>}</section>
@@ -1261,7 +1282,7 @@ export function SubscriptionSettingsPage() {
     <section className="surface invoices-panel"><SectionTitle title="SaaS-Abrechnungen"/>{billingConnected?<div className="context-block"><b>Rechnungen und Zahlungsmittel in Stripe</b><span>Binso One speichert keine vollständigen Kartendaten. Öffne das Billing-Portal für Rechnungsdownloads und Zahlungsmittel.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal</Button></div>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/>}</section>
     <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Planwechsel, Zahlungsmittel und Kündigung werden über Stripe Billing ausgeführt.":"Ohne verbundenes Billing gibt es hier keine produktive Kündigungsaktion."}</p></div><Button variant="secondary" disabled={!billingConnected||billingLoading} onClick={()=>void openPortal()}>Abonnement verwalten</Button></div>
 
-    {dialog==="plan"&&billingConfigured&&!billingConnected&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Plan auswählen</h2><p>Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=><button type="button" className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{"CHF "+prices[name]+" / Monat"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading}>{billingLoading?"Checkout wird geöffnet…":"Weiter zu Stripe"}</Button></div></section></div>}
+    {dialog==="plan"&&billingConfigured&&!billingConnected&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Plan auswählen</h2><p>Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="sheet-body"><Field label="Zahlungszeitraum"><select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly">Monatlich</option><option value="yearly">Jährlich</option></select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{price?.available?moneyChf(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}>{billingLoading?"Checkout wird geöffnet…":"Weiter zu Stripe"}</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("nicht")?"danger":"success"}/>}
   </AppShell>;
 }
