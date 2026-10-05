@@ -72,3 +72,9 @@ assert.ok(appCss.includes('.support-master-detail{'),'Support list must use the 
 assert.ok(appCss.includes('grid-template-columns:minmax(0,1fr);'),'Support list must not reserve an empty preview column');
 assert.ok(appCss.includes('.support-summary .metric+.metric{border-left:1px solid var(--color-line)}'),'Support summary must use the shared compact metric strip');
 console.log('Support list uses the canonical full-width list and compact summary layout.');
+
+assert.ok(responsiveCss.includes('.plan-hero{'),'Subscription plan summary must use the shared flat desktop section');
+assert.ok(responsiveCss.includes('border-top:1px solid var(--color-line);\n    border-bottom:1px solid var(--color-line);'),'Subscription sections must use separators instead of card borders');
+assert.ok(responsiveCss.includes('.subscription-detail-grid>.surface{'),'Subscription detail areas must flatten shared surfaces on desktop');
+assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing history must use the flat section pattern');
+console.log('Subscription settings use flat separators instead of legacy cards.');
