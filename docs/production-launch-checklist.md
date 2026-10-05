@@ -91,9 +91,21 @@ Stand: 5. Oktober 2026
 ## Repository Security
 - [x] Security Policy im Repository dokumentiert (`SECURITY.md`)
 - [x] Dependabot-Konfiguration für npm und GitHub Actions vorhanden
+- [x] Production-Deploy blockiert veraltete Main-SHAs, ist nicht abbrechbar und verlangt bei manuellem Start eine explizite Bestätigung
+- [x] Production-Deploy erzeugt/rotiert keine Encryption Keys und verändert keine App-Settings automatisch
+- [x] Build/Artefaktprüfung erfolgt vor Datenbankmigration; Produktionsartefakt wird mit SHA-256 erhalten
+- [x] automatische Produktionsmigration blockiert destruktive/breaking SQL-Muster und serialisiert Migrationen per Advisory Lock
+- [x] produktiver DB-Reset ist technisch blockiert
+- [x] Retention ist vom Deploy getrennt, transaktional, DB-gebunden und mengenbegrenzt
+- [x] Produktions-Smoke-Tests im Deploy schreiben keine synthetischen Geschäftsdaten
+- [ ] Main-Branch Ruleset gemäss `docs/github-production-protection.md` aktivieren
+- [ ] Production Environment auf Deployment von `main` beschränken
 - [ ] GitHub Private Vulnerability Reporting aktiviert
 - [ ] GitHub Dependabot Alerts aktiviert
 - [ ] offene Code-Scanning-Warnungen triagiert oder behoben
+- [ ] Azure OIDC/RBAC und Production-Secrets manuell nach Least Privilege geprüft
+- [ ] getrennte PostgreSQL Runtime-/Migration-Rollen geprüft und falls sinnvoll umgesetzt
+- [ ] Azure Deployment Slots für Blue/Green/Swap auf aktuellem App-Service-Plan geprüft
 
 ## Datenschutz / Betrieb
 - [x] Bearbeitungsverzeichnis angelegt
