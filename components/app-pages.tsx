@@ -117,17 +117,28 @@ function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Rec
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
   const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState<string|null>(null);
   const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
 
   useEffect(()=>{
     if(forceDemo) return;
-    apiGet<typeof data>(isProductionBackendEnabled()?"/api/dashboard":"/api/demo/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+    let active=true;
+    apiGet<typeof data>(isProductionBackendEnabled()?"/api/dashboard":"/api/demo/dashboard")
+      .then(payload=>{if(active){setData(payload);setError(null);}})
+      .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"Übersicht konnte nicht geladen werden.");})
+      .finally(()=>{if(active)setLoading(false);});
+    return()=>{active=false;};
   },[production,forceDemo]);
 
   if(forceDemo) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
     <div className="metrics-grid"><Metric label="Umsatz im Monat" value={moneyChf([7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400][dashboardMonth])} hint="Rechnungsvolumen" icon="chart"/><Metric label="Rechnungen" value={String([4,5,5,7,6,8,9,8,8,10,10,12][dashboardMonth])} hint="In diesem Monat" icon="receipt"/><Metric label="Zahlungseingänge" value={moneyChf([6900,9800,9400,13100,11800,14900,16500,15100,15400,18100,18900,21600][dashboardMonth])} hint="Verbucht im Monat" icon="wallet"/><Metric label="Neue Kunden" value={String([1,2,1,3,2,2,3,1,2,3,2,4][dashboardMonth])} hint="In diesem Monat" icon="users"/></div>
     <RevenueInsight demo onMonthChange={setDashboardMonth}/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+  </AppShell>;
+
+  if(loading||error)return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
+    {loading?<p role="status">Übersicht wird geladen …</p>:<div role="alert"><p>{error}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}
   </AppShell>;
 
   const invoices=data.invoices??[];
@@ -153,11 +164,11 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
     <div className="dashboard-grid">
       <section className="surface">
         <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
-        {invoices.length?<div className="recent-invoices">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+encodeURIComponent(String(item.number))} key={String(item.id)}><b>{customer?.name??"Kunde"}</b><span>{String(item.number)}</span></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Rechnungen" text="Erstelle die erste Rechnung für einen Kunden." action={<Button href="/rechnungen/neu">Rechnung erstellen</Button>}/>}
+        {invoices.length?<div className="recent-invoices">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+encodeURIComponent(String(item.number))} key={String(item.id)}><b>{customer?.name??"Kunde"}</b><span>{String(item.number)}</span></Link>})}</div>:<p>Keine Rechnungen erfasst.</p>}
       </section>
       <section className="surface">
         <SectionTitle title="Letzte Zahlungen" action={<Link href="/zahlungen">Alle Zahlungen</Link>}/>
-        {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<EmptyState icon="wallet" title="Noch keine Zahlungen" text="Erfasste Zahlungen erscheinen hier."/>}
+        {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<p>Keine Zahlungen erfasst.</p>}
       </section>
     </div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
