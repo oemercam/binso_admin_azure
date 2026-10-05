@@ -13,7 +13,9 @@ try{
       await db.exec("commit");
     }catch(error){
       await db.exec("rollback",
-    "begin isolation level repeatable read read only");
+    "begin isolation level repeatable read read only",
+    "not exists(select 1 from organization_memberships m where m.user_id=u.id)",
+    "not exists(select 1 from platform_operator_assignments p where p.user_id=u.id)");
       throw new Error(file+": "+error.message);
     }
   }
