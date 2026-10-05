@@ -21,7 +21,6 @@
   .desktop-document-preview{position:relative;top:auto}
   .time-layout{grid-template-columns:1fr}
   .expense-layout{grid-template-columns:220px minmax(0,1fr)}
-  .support-master-detail{grid-template-columns:minmax(0,1fr) 320px}
   .thread-composer{
     left:calc(var(--sidebar-w) + 28px);
     right:28px;
@@ -1576,6 +1575,7 @@
     grid-template-columns:minmax(0,1fr);
   }
   .invoice-master-detail>div,
+  .support-master-detail,
   .customer-records-layout,
   .records,
   .toolbar{width:100%;min-width:0}
@@ -2369,7 +2369,8 @@
   .settings-detail-grid,
   .settings-readonly,
   .notification-center,
-  .support-summary{max-width:none}
+  .support-summary,
+  .support-master-detail{width:100%;max-width:none}
 
   .documents-hub-grid{gap:18px}
   .documents-hub-grid>.surface{min-width:0}
