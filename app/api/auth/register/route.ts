@@ -1,7 +1,7 @@
 import {NextRequest} from "next/server";
 import {randomUUID} from "node:crypto";
 import {hashPassword} from "@/lib/server/password";
-import {createSession} from "@/lib/server/session";
+import {createSession,endDemoSession} from "@/lib/server/session";
 import {apiError,assertSameOrigin,json,readJson} from "@/lib/server/http";
 import {emailField,enumField,stringField,asObject} from "@/lib/server/validation";
 import {enforceRateLimit} from "@/lib/server/rate-limit";
@@ -37,6 +37,7 @@ export async function POST(request:NextRequest){
   const url=`${env.appUrl}/email-bestaetigen?token=${encodeURIComponent(token)}`;
   let emailSent=true;
   try{await sendMail({to:email,subject:mailText("E-Mail für Binso One bestätigen",locale),text:`${mailText("Bitte bestätige deine E-Mail-Adresse:",locale)} ${url}`,html:mailLayout(mailText("E-Mail-Adresse bestätigen",locale),`<p>${mailText("Bestätige deine geschäftliche E-Mail-Adresse, damit dein Binso-One-Konto vollständig aktiviert ist.",locale)}</p>`,{label:mailText("E-Mail bestätigen",locale),url})})}catch{emailSent=false}
+  await endDemoSession();
   await createSession({userId,organizationId:provisioned.organizationId,email,name,role:"owner"});
   return json({ok:true,organizationId:provisioned.organizationId,onboardingComplete:false,requiresEmailVerification:true,emailSent},201);
  }catch(error){return apiError(error)}
