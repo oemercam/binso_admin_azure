@@ -25,7 +25,8 @@
     "retention:cleanup": "node scripts/retention-cleanup.mjs",
     "data:export": "node scripts/organization-data-lifecycle.mjs export",
     "data:delete": "node scripts/organization-data-lifecycle.mjs delete",
-    "security:scan:all": "node scripts/full-security-audit.mjs"
+    "security:scan:all": "node scripts/full-security-audit.mjs",
+    "repository:clean": "node scripts/repository-cleanliness-check.mjs"
   },
   "dependencies": {
     "lucide-react": "0.468.0",
