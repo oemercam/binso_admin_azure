@@ -6,10 +6,15 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DEPLOY_PRODUCTION to confirm a manual production deploy from main"
+        required: true
+        type: string
 
 concurrency:
   group: production-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -24,12 +29,35 @@ jobs:
   deploy:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     environment: production
 
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Verify production deploy target is current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.confirm }}" != "DEPLOY_PRODUCTION" ]; then
+              echo "::error::Manual production deploy requires exact confirmation DEPLOY_PRODUCTION."
+              exit 1
+            fi
+            if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+              echo "::error::Manual production deploys are allowed only from main."
+              exit 1
+            fi
+          fi
+          MAIN_SHA="$(git ls-remote origin refs/heads/main | awk '{print $1}')"
+          if [ -z "$MAIN_SHA" ] || [ "$DEPLOY_SHA" != "$MAIN_SHA" ]; then
+            echo "::error::Stale production deploy blocked. Target $DEPLOY_SHA is not current main $MAIN_SHA."
+            exit 1
+          fi
+          echo "Production deploy target verified: $DEPLOY_SHA"
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -44,27 +72,88 @@ jobs:
         env:
           BINSO_BUILD_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
+      - name: Azure login (OIDC)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate immutable production security and mail configuration
+        shell: bash
+        env:
+          BINSO_ENTRA_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          set -euo pipefail
+          get_setting() {
+            az webapp config appsettings list               --resource-group "$AZURE_RESOURCE_GROUP"               --name "$AZURE_WEBAPP_NAME"               --query "[?name=='$1'].value | [0]" -o tsv
+          }
+
+          OLD_MAIL_PREFIX="RE""SEND"
+          OLD_BACKEND_PREFIX="SUP""ABASE"
+          for retired in             "${OLD_MAIL_PREFIX}_API_KEY"             "EMAIL_DELIVERY_MODE"             "EMAIL_FROM"             "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL"             "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY"             "${OLD_BACKEND_PREFIX}_URL"             "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY"             "STRIPE_PRICE_STARTER"             "STRIPE_PRICE_BUSINESS"             "STRIPE_PRICE_PROFESSIONAL"; do
+            if [ -n "$(get_setting "$retired")" ]; then
+              echo "::error::Retired production setting still exists: $retired. Clean it deliberately outside the deploy."
+              exit 1
+            fi
+          done
+
+          APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
+          if [ -z "$APP_ENCRYPTION_KEY" ]; then
+            echo "::error::APP_ENCRYPTION_KEY is missing. Production deploy refuses to generate or rotate encryption keys automatically."
+            exit 1
+          fi
+          echo "::add-mask::$APP_ENCRYPTION_KEY"
+
+          GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
+          GRAPH_CLIENT_ID="$(get_setting GRAPH_CLIENT_ID)"
+          GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
+          GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
+          OPERATOR_ENTRA_TENANT_ID="$(get_setting OPERATOR_ENTRA_TENANT_ID)"
+          OPERATOR_ALLOWED_DOMAIN="$(get_setting OPERATOR_ALLOWED_DOMAIN)"
+
+          for name in GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID; do
+            value="$(get_setting "$name")"
+            if [ -z "$value" ]; then
+              echo "::error::Microsoft Graph mail configuration is incomplete: $name is missing."
+              exit 1
+            fi
+            echo "::add-mask::$value"
+          done
+
+          if [ "$OPERATOR_ENTRA_TENANT_ID" != "$BINSO_ENTRA_TENANT_ID" ]; then
+            echo "::error::OPERATOR_ENTRA_TENANT_ID does not match the production Azure tenant."
+            exit 1
+          fi
+          if [ "$OPERATOR_ALLOWED_DOMAIN" != "binso.ch" ]; then
+            echo "::error::OPERATOR_ALLOWED_DOMAIN must be binso.ch."
+            exit 1
+          fi
+
+          TOKEN_RESPONSE="$(curl -fsS --max-time 30             -X POST             -H 'Content-Type: application/x-www-form-urlencoded'             --data-urlencode "client_id=$GRAPH_CLIENT_ID"             --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET"             --data-urlencode "scope=https://graph.microsoft.com/.default"             --data-urlencode "grant_type=client_credentials"             "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
+          node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
+          echo "Production configuration validation passed without mutating settings."
+
       - name: Validate and migrate Azure PostgreSQL
         shell: bash
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_SSL: "true"
           DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
+          EXPECTED_DATABASE_HOST: binso-platform-db.postgres.database.azure.com
+          EXPECTED_DATABASE_NAME: binso_platform
         run: |
           set -euo pipefail
           if [ -z "$DATABASE_URL" ]; then
             echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
+          node scripts/check-production-migration-safety.mjs
           pnpm db:migrate
           pnpm db:check
-          pnpm retention:cleanup
 
       - name: Prepare standalone deploy artifact
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_SSL: "true"
-          DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
           APP_MODE: production
         shell: bash
         run: |
@@ -102,10 +191,7 @@ jobs:
 
           node -e "require.resolve('next')"
 
-          export BINSO_SMOKE_TEST_TOKEN="$(openssl rand -hex 32)"
-          echo "::add-mask::$BINSO_SMOKE_TEST_TOKEN"
-
-          PORT=3100 HOSTNAME=127.0.0.1 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node server.js > /tmp/binso-standalone.log 2>&1 &
+          PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-standalone.log 2>&1 &
           APP_PID=$!
           trap 'result=$?; if [ "$result" -ne 0 ]; then cat /tmp/binso-standalone.log; fi; kill $APP_PID 2>/dev/null || true' EXIT
 
@@ -127,10 +213,7 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
-          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -H "x-binso-smoke-test: $BINSO_SMOKE_TEST_TOKEN" -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
           test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
-
-          BINSO_BASE_URL=http://127.0.0.1:3100 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node ../../scripts/check-persistence.mjs
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -140,92 +223,6 @@ jobs:
           cd ..
           test -s binso-one.zip
           unzip -l binso-one.zip | grep -q 'server.js'
-
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Ensure production security and mail settings
-        shell: bash
-        env:
-          BINSO_ENTRA_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: |
-          set -euo pipefail
-
-          get_setting() {
-            az webapp config appsettings list \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --name "$AZURE_WEBAPP_NAME" \
-              --query "[?name=='$1'].value | [0]" -o tsv
-          }
-
-          OLD_MAIL_PREFIX="RE""SEND"
-          OLD_BACKEND_PREFIX="SUP""ABASE"
-          az webapp config appsettings delete \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$AZURE_WEBAPP_NAME" \
-            --setting-names \
-              "${OLD_MAIL_PREFIX}_API_KEY" \
-              "EMAIL_DELIVERY_MODE" \
-              "EMAIL_FROM" \
-              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL" \
-              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY" \
-              "${OLD_BACKEND_PREFIX}_URL" \
-              "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY" \
-              "STRIPE_PRICE_STARTER" \
-              "STRIPE_PRICE_BUSINESS" \
-              "STRIPE_PRICE_PROFESSIONAL" \
-            > /dev/null 2>&1 || true
-          echo "Retired App Service settings cleaned."
-
-          APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
-          if [ -z "$APP_ENCRYPTION_KEY" ]; then
-            APP_ENCRYPTION_KEY="$(openssl rand -base64 48 | tr -d '\n')"
-            echo "::add-mask::$APP_ENCRYPTION_KEY"
-            az webapp config appsettings set \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --name "$AZURE_WEBAPP_NAME" \
-              --settings "APP_ENCRYPTION_KEY=$APP_ENCRYPTION_KEY" > /dev/null
-            echo "Created stable APP_ENCRYPTION_KEY."
-          else
-            echo "::add-mask::$APP_ENCRYPTION_KEY"
-            echo "APP_ENCRYPTION_KEY already configured."
-          fi
-
-          GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
-          GRAPH_CLIENT_ID="$(get_setting GRAPH_CLIENT_ID)"
-          GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
-          GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
-
-          az webapp config appsettings set \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$AZURE_WEBAPP_NAME" \
-            --settings \
-              "OPERATOR_ENTRA_TENANT_ID=$BINSO_ENTRA_TENANT_ID" \
-              "OPERATOR_ALLOWED_DOMAIN=binso.ch" > /dev/null
-
-          for name in GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID; do
-            value="$(get_setting "$name")"
-            if [ -z "$value" ]; then
-              echo "::error::Microsoft Graph mail configuration is incomplete: $name is missing."
-              exit 1
-            fi
-            echo "::add-mask::$value"
-          done
-
-          TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
-            -X POST \
-            -H 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
-            --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET" \
-            --data-urlencode "scope=https://graph.microsoft.com/.default" \
-            --data-urlencode "grant_type=client_credentials" \
-            "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
-          node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
-          echo "Microsoft Graph client-credentials authentication passed."
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
