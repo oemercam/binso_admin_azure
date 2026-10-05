@@ -149,6 +149,23 @@ try{
  assert.equal((await db.query('select * from customers')).rows.length,0);
  await db.exec('reset role');
  console.log('50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).');
+
+ // Expired unpaid trials must become read-only while paid/Stripe-linked trials stay untouched.
+ const lifecycleDb=dataModule('export async function query(text,params=[]){return globalThis.__lifecycleQuery(text,params)}');
+ globalThis.__lifecycleQuery=(text,params)=>db.query(text,params);
+ const lifecycleSource=(await fs.readFile('lib/server/subscription-lifecycle.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(lifecycleDb));
+ const {expireUnpaidTrials}=await import(dataModule(lifecycleSource));
+ const expiredTrial=await provisionOrganization({userId:'expired-trial-user',email:'expired-trial@example.invalid',name:'Expired Trial',companyName:'Expired Trial AG',plan:'start',mode:'trial'});
+ await db.query("update organization_subscriptions set trial_until=now()-interval '1 day' where organization_id=$1",[expiredTrial.organizationId]);
+ await expireUnpaidTrials();
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[expiredTrial.organizationId])).rows[0].status,'expired');
+ assert.equal((await db.query('select status from organizations where id=$1',[expiredTrial.organizationId])).rows[0].status,'read_only');
+ assert.equal((await db.query('select platform_status from platform_tenants where organization_id=$1',[expiredTrial.organizationId])).rows[0].platform_status,'read_only');
+ const linkedTrial=await provisionOrganization({userId:'linked-trial-user',email:'linked-trial@example.invalid',name:'Linked Trial',companyName:'Linked Trial AG',plan:'start',mode:'trial'});
+ await db.query("update organization_subscriptions set trial_until=now()-interval '1 day',billing_subscription_id='sub_pending' where organization_id=$1",[linkedTrial.organizationId]);
+ await expireUnpaidTrials();
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[linkedTrial.organizationId])).rows[0].status,'trial');
+ delete globalThis.__lifecycleQuery;
  // Use the actual Stripe transport/signature code with an isolated HTTP fixture.
  globalThis.__billingEnv={stripeSecretKey:'sk_test_fixture',stripeWebhookSecret:'whsec_fixture',appUrl:'https://example.invalid',stripePrices:{start:{monthly:'price_start_m'},business:{yearly:'price_business_y'},pro:{}}};
  const billingEnv=dataModule('export const env=globalThis.__billingEnv');
