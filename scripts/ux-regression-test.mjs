@@ -108,3 +108,29 @@ const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(ma
 assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
 assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
 console.log('Desktop global search stays inline with anchored results and no modal trigger.');
+
+assert.ok(appCss.includes('.desktop-appbar-actions svg{'),'Desktop header icons must use explicit integer geometry');
+assert.ok(appCss.includes('width:20px;'),'Desktop header icons must use a fixed integer size');
+assert.ok(!appCss.includes('backface-visibility:hidden'),'Desktop header icons must not be forced onto rasterized compositor layers');
+const mediumDesktopBlock=responsiveCss.match(/@media \(min-width:761px\) and \(max-width:1100px\)\{([\s\S]*?)\n\}/)?.[1]??'';
+const wideDesktopBlock=responsiveCss.match(/@media \(min-width:1101px\)\{([\s\S]*?)\n\}/)?.[1]??'';
+assert.ok(mediumDesktopBlock.includes('backdrop-filter:none'),'Medium desktop appbar must avoid blur rasterization');
+assert.ok(wideDesktopBlock.includes('backdrop-filter:none'),'Wide desktop appbar must avoid blur rasterization');
+console.log('Desktop header icons render on a non-rasterized, pixel-stable appbar.');
+
+const marketingCss=await fs.readFile('app/styles/marketing.css','utf8');
+assert.ok(marketingCss.includes('.marketing-header{'),'Marketing header must exist');
+assert.ok(marketingCss.includes('-webkit-backdrop-filter:none'),'PWA entry headers must disable WebKit backdrop blur');
+assert.ok(marketingCss.includes('.portal-header{'),'Portal header must use the opaque header standard');
+assert.ok(marketingCss.includes('.demo-onboarding-header{'),'Demo onboarding header must use the opaque header standard');
+assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA headers must not render dimming pseudo overlays');
+assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
+console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
+
+const manifestSource=await fs.readFile('app/manifest.ts','utf8');
+const layoutSource=await fs.readFile('app/layout.tsx','utf8');
+assert.ok(manifestSource.includes('/brand/pwa-icon-192.png'),'PWA manifest must expose the Binso One 192px icon');
+assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must expose the Binso One 512px icon');
+assert.ok(manifestSource.includes('/brand/pwa-icon-maskable-512.png'),'PWA manifest must expose a maskable Binso One icon');
+assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen metadata must use the Binso One artwork');
+console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');

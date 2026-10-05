@@ -397,6 +397,85 @@ textarea{
 .select-card small{margin-top:3px;color:var(--color-muted);font-size:11px}
 
 /* Document editor and preview */
+.document-detail-view{
+  width:100%;
+  min-width:0;
+}
+.document-detail-section{
+  min-width:0;
+}
+.document-detail-section h2{
+  margin:8px 0 4px;
+  font-size:22px;
+  line-height:1.2;
+}
+.document-detail-section p{
+  margin:4px 0 0;
+  color:var(--color-muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.document-facts{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.document-facts>div{
+  min-width:0;
+  padding-right:24px;
+}
+.document-facts small,
+.document-facts b{display:block}
+.document-facts small{
+  margin-bottom:6px;
+  color:var(--color-muted);
+  font-size:10px;
+}
+.document-facts b{
+  font-size:13px;
+  line-height:1.35;
+}
+.document-read-table{
+  width:100%;
+  min-width:0;
+  border-top:1px solid var(--color-line);
+}
+.document-read-head,
+.document-read-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 90px 130px 140px;
+  gap:18px;
+  align-items:center;
+}
+.document-read-head{
+  min-height:38px;
+  color:var(--color-muted);
+  font-size:10px;
+}
+.document-read-head span:not(:first-child),
+.document-read-row>span,
+.document-read-row>strong{text-align:right}
+.document-read-row{
+  min-height:58px;
+  padding:12px 0;
+  border-top:1px solid var(--color-line);
+}
+.document-read-row:first-of-type{border-top:0}
+.document-read-row b{
+  min-width:0;
+  overflow-wrap:anywhere;
+  font-size:13px;
+  line-height:1.35;
+}
+.document-read-row span{
+  color:var(--color-muted);
+  font-size:11px;
+  white-space:nowrap;
+}
+.document-read-row strong{
+  font-size:12px;
+  white-space:nowrap;
+}
 .invoice-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.78fr);gap:18px;align-items:start}
 .invoice-form{overflow:hidden}
 .document-actions{margin-bottom:14px;display:flex;align-items:center;gap:8px}
@@ -1112,9 +1191,29 @@ textarea{
 .desktop-appbar-actions{display:flex;align-items:center;gap:8px}
 .desktop-appbar-actions :is(svg,.avatar-button,.desktop-notification-button){
   transform:none;
-  backface-visibility:hidden;
 }
-.desktop-notification-button svg{width:18px;height:18px}
+.desktop-appbar-actions svg{
+  width:20px;
+  height:20px;
+  min-width:20px;
+  min-height:20px;
+  display:block;
+  flex:none;
+  overflow:visible;
+}
+.desktop-header-timer svg{
+  width:18px;
+  height:18px;
+}
+.desktop-notification-button{
+  display:grid;
+  place-items:center;
+  line-height:1;
+}
+.desktop-notification-button svg{
+  width:20px;
+  height:20px;
+}
 .desktop-search{
   position:relative;
   width:min(100%,520px);

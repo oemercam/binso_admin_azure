@@ -310,7 +310,19 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   return <div className="document-detail-view">
     <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</section>
     <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{draft.vatRate}%</b></div></section>
-    <section className="document-detail-section document-lines-section"><div className="section-title"><h2>Positionen</h2></div><div className="document-read-lines">{draft.positions.map(item=><div key={item.id}><div><b>{item.description}</b><small>{item.quantity} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></div><strong>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</strong></div>)}</div><div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div></section>
+    <section className="document-detail-section document-lines-section">
+      <div className="section-title"><h2>Positionen</h2></div>
+      <div className="document-read-table">
+        <div className="document-read-head" aria-hidden="true"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span></div>
+        {draft.positions.map(item=><div className="document-read-row" key={item.id}>
+          <b>{item.description}</b>
+          <span>{item.quantity}</span>
+          <span>{draft.currency??"CHF"} {money(numberValue(item.price))}</span>
+          <strong>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
+        </div>)}
+      </div>
+      <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+    </section>
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
 }
