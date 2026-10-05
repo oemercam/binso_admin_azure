@@ -73,3 +73,7 @@ await fs.access('app/api/auth/sessions/route.ts');
 await fs.access('app/api/auth/sessions/[id]/route.ts');
 const sessionSecurityUi=await fs.readFile('components/security-settings-page.tsx','utf8');
 assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.includes('Alle anderen abmelden'),'Security settings must expose real session management');
+
+const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
+assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
+await fs.access('docs/dependency-security-review.md');
