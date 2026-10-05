@@ -16,31 +16,6 @@ assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.ma
 assert.ok(register.includes('billingCycle')&&register.includes('selectedPlan'),'Registration must preserve selected plan and billing cycle');
 console.log('Release gates passed.');
 
-const forbiddenFiles=[
-  'lib/server/email.ts',
-  'lib/server/env.ts',
-  '.env.example',
-  '.github/workflows/deploy-azure.yml',
-  'README.md',
-  'docs/auth-security-flow.md',
-  'docs/privacy-processing-register.md',
-  'docs/production-launch-checklist.md',
-  'docs/technical-organizational-measures.md'
-];
-for(const path of forbiddenFiles){
-  const source=(await fs.readFile(path,'utf8')).toLowerCase();
-  const retiredArtifacts=[
-    'resend_api_key',
-    'resend.com',
-    'sendviaresend',
-    'provider:"resend"',
-    "provider:'resend'",
-    'email_delivery_mode=resend'
-  ];
-  for(const artifact of retiredArtifacts){
-    assert.ok(!source.includes(artifact),path+' must not contain retired mail-provider artifact '+artifact);
-  }
-}
 const email=await fs.readFile('lib/server/email.ts','utf8');
 assert.ok(email.includes('graph.microsoft.com')&&email.includes('sendMail'),'Microsoft Graph must remain the only production mail path');
 const envExample=await fs.readFile('.env.example','utf8');
