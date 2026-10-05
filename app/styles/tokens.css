@@ -49,6 +49,13 @@
   --marketing-max:1240px;
   --page-x:clamp(28px,2.4vw,46px);
 
+  /* Canonical desktop workspace rhythm. */
+  --desktop-section-y:24px;
+  --desktop-surface-x:24px;
+  --desktop-section-gap:20px;
+  --desktop-action-h:40px;
+  --desktop-action-gap:8px;
+
   --mobile-page-x:clamp(16px,4.55vw,20px);
   --mobile-header-h:52px;
   --mobile-nav-h:68px;
