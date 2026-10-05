@@ -4,21 +4,35 @@ on:
   schedule:
     - cron: "17 2 * * *"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/retention-maintenance.yml
-      - scripts/retention-cleanup.mjs
+    inputs:
+      confirm:
+        description: "Type RUN_RETENTION to confirm manual production cleanup"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
+concurrency:
+  group: production-retention
+  cancel-in-progress: false
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: production
     steps:
       - uses: actions/checkout@v4
+      - name: Validate manual trigger
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: bash
+        run: |
+          if [ "${{ inputs.confirm }}" != "RUN_RETENTION" ]; then
+            echo "::error::Manual retention cleanup requires exact confirmation RUN_RETENTION."
+            exit 1
+          fi
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -32,4 +46,7 @@ jobs:
           DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
           AUTH_ARTIFACT_RETENTION_DAYS: "7"
           EXPIRED_SESSION_RETENTION_DAYS: "30"
+          RETENTION_MAX_DELETE_ROWS: "10000"
+          EXPECTED_DATABASE_HOST: binso-platform-db.postgres.database.azure.com
+          EXPECTED_DATABASE_NAME: binso_platform
         run: pnpm retention:cleanup
