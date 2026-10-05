@@ -15,6 +15,8 @@ Stand: 5. Oktober 2026
 ## Automatisierte Produktionskontrollen
 - [x] High/Critical-Audit der Produktionsabhängigkeiten als hartes Quality-Gate; Dev-Tooling-Advisories separat dokumentiert
 - [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
+- [x] Repository-Cleanliness-Gate verhindert ausgemusterte Backend-/Provider-Artefakte und obsolete Kompatibilitätsdateien
+- [x] aktive Dokumentation auf Azure PostgreSQL, Microsoft Entra, Microsoft Graph und Stripe konsolidiert
 - [x] Microsoft Graph als einziger produktiver Mailpfad
 - [x] Graph-Konfigurationsprüfung im Deploy
 - [x] echter Microsoft-Graph-sendMail-Selbsttest als eigener Production-Workflow
