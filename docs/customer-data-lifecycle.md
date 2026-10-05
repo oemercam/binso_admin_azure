@@ -21,6 +21,7 @@ pnpm data:export
 ```
 
 Der Export:
+- läuft in einer PostgreSQL-`REPEATABLE READ`-Transaktion und verwendet dadurch einen konsistenten Snapshot,
 - ermittelt alle Tabellen mit `organization_id`,
 - exportiert die Datensätze mandantenbezogen,
 - ergänzt die zugehörigen `app_users`,
@@ -38,6 +39,7 @@ Vor der endgültigen Löschung müssen alle folgenden Bedingungen erfüllt sein:
 3. Es besteht kein aktives, laufendes oder im Trial befindliches Abonnement.
 4. Die Organisation-ID wurde nochmals unabhängig geprüft.
 5. Gesetzliche Aufbewahrungspflichten wurden beurteilt.
+6. Falls externe Azure-Blob-Objekte vorhanden sind, wurden diese anhand des gesicherten Exports kontrolliert gelöscht.
 
 Ausführung:
 
@@ -46,13 +48,15 @@ export DATABASE_URL='...'
 export BINSO_ORGANIZATION_ID='<uuid>'
 export BINSO_DELETE_CONFIRM='<dieselbe uuid>'
 export BINSO_DELETE_EXPORT_CONFIRMED='true'
+export BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED='true' # nur setzen, wenn externe Blobs tatsächlich gelöscht wurden
+export BINSO_EXPORT_DIR='/secure/binso-exports'
 pnpm data:delete
 ```
 
 Die Löschung läuft in einer Datenbanktransaktion. Wenn Fremdschlüssel oder verbleibende mandantenbezogene Zeilen eine vollständige Löschung verhindern, wird die Transaktion zurückgerollt. Damit entsteht kein teilweise gelöschter Mandant.
 
 ## Dateien / Blob Storage
-Aktuell in PostgreSQL gespeicherte Datei-Inhalte werden durch die Tenant-Cascade mit entfernt. Falls ein Datensatz auf externen Azure Blob Storage verweist, müssen diese Blob-Objekte zusätzlich kontrolliert entfernt und im Löschprotokoll dokumentiert werden.
+Aktuell in PostgreSQL gespeicherte Datei-Inhalte werden durch die Tenant-Cascade mit entfernt. Falls ein Datensatz auf externen Azure Blob Storage verweist, blockiert das Löschtool die Datenbanklöschung, bis die externe Blob-Bereinigung explizit mit `BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED=true` bestätigt wurde. Blob-URLs werden nicht in CI-/Konsolenlogs ausgegeben.
 
 ## E2E-Abnahmetest vor Go-live
 Mit einer eigens dafür angelegten Testorganisation durchführen:
