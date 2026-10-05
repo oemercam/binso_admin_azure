@@ -78,3 +78,7 @@ assert.ok(responsiveCss.includes('border-top:1px solid var(--color-line);\n    b
 assert.ok(responsiveCss.includes('.subscription-detail-grid>.surface{'),'Subscription detail areas must flatten shared surfaces on desktop');
 assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing history must use the flat section pattern');
 console.log('Subscription settings use flat separators instead of legacy cards.');
+
+assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
+assert.ok(responsiveCss.includes('.desktop-search-trigger kbd{display:none}'),'Medium desktop header must compact the search trigger instead of removing the account controls');
+console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
