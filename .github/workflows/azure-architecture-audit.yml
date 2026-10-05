@@ -42,6 +42,9 @@ jobs:
           echo "=== App setting names only ==="
           az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
 
+          echo "=== App Service Authentication / Microsoft Entra ==="
+          az webapp auth show -g "$APP_RG" -n "$APP_NAME" --query "{enabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,defaultProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,issuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: App Service Authentication configuration unavailable."
+
           echo "=== PostgreSQL connection from configured App Service setting ==="
           DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
           if [ -n "$DATABASE_URL" ]; then
