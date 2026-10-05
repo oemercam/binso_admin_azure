@@ -4,7 +4,7 @@ Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
 
 ## Current release: v0.10 security hardening
 
-The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe is a production integration. Transactional email is handled exclusively through Microsoft Graph / Microsoft 365 and requires complete Graph configuration in production.
+The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe is a production integration. Transactional email is handled exclusively through Microsoft Graph / Microsoft 365 and requires complete Graph configuration in production. No fallback email provider is configured.
 
 ### Production foundations
 
