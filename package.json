@@ -22,7 +22,9 @@
     "architecture:hardcoding": "node scripts/architecture-selfcheck.mjs",
     "css:check": "node scripts/check-css-architecture.mjs",
     "routes:css-check": "node scripts/check-route-css.mjs",
-    "retention:cleanup": "node scripts/retention-cleanup.mjs"
+    "retention:cleanup": "node scripts/retention-cleanup.mjs",
+    "data:export": "BINSO_DATA_LIFECYCLE_OPERATION=export node scripts/organization-data-lifecycle.mjs",
+    "data:delete": "BINSO_DATA_LIFECYCLE_OPERATION=delete node scripts/organization-data-lifecycle.mjs"
   },
   "dependencies": {
     "lucide-react": "0.468.0",
