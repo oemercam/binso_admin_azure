@@ -4,7 +4,7 @@ import pg from "pg";
 
 const {Pool}=pg;
 const databaseUrl=process.env.DATABASE_URL?.trim();
-const operation=(process.env.BINSO_DATA_LIFECYCLE_OPERATION??"export").trim().toLowerCase();
+const operation=(process.argv[2]??process.env.BINSO_DATA_LIFECYCLE_OPERATION??"export").trim().toLowerCase();
 const organizationId=(process.env.BINSO_ORGANIZATION_ID??"").trim();
 const exportDir=(process.env.BINSO_EXPORT_DIR??"").trim();
 const confirm=(process.env.BINSO_DELETE_CONFIRM??"").trim();
