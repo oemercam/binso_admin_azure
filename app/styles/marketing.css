@@ -702,11 +702,3 @@
 .billing-legal-consent input{width:18px;height:18px;min-height:0;margin:1px 0 0;padding:0}
 .billing-legal-consent a{text-decoration:underline;text-underline-offset:2px}
 
-@media (max-width:760px){
- .legal-page{padding:38px max(var(--mobile-page-x),var(--safe-left)) calc(56px + var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-right))}
- .legal-hero{margin-bottom:30px}
- .legal-hero h1{font-size:34px}
- .legal-content section{padding:22px 0}
- .legal-processor-list dl>div{grid-template-columns:1fr;gap:3px}
- .legal-related{display:grid;grid-template-columns:1fr 1fr}
-}
