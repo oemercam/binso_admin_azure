@@ -82,4 +82,4 @@ assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-lev
 assert.equal(packageJson.scripts['security:scan:all'],'node scripts/full-security-audit.mjs','Full dependency audit must use the exact advisory gate');
 await fs.access('scripts/full-security-audit.mjs');
 const fullAuditGate=await fs.readFile('scripts/full-security-audit.mjs','utf8');
-assert.ok(fullAuditGate.includes('GHSA-vfj7-8cjw-p6xm'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
+assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
