@@ -37,6 +37,7 @@ export async function POST(request:NextRequest){
   const user=result.rows[0];
   if(!user?.password_hash||!(await verifyPassword(password,user.password_hash)))return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist falsch."},401);
 
+  let verifiedEmailNow=false;
   if(!user.email_verified_at){
     if(!emailCode){
       const code=await issueEmailCode({email:user.email,purpose:"verify_email",userId:user.id,organizationId:user.organization_id});
@@ -46,6 +47,7 @@ export async function POST(request:NextRequest){
     if(!await consumeEmailCode({email:user.email,purpose:"verify_email",code:emailCode}))return json({error:"invalid_code",message:"Der Bestätigungscode ist ungültig oder abgelaufen.",requiresEmailVerification:true},401);
     await query("update app_users set email_verified_at=now(),updated_at=now() where id=$1",[user.id]);
     await query(`update organization_subscriptions set trial_until=now()+($2||' days')::interval,updated_at=now() where organization_id=$1 and status='trial'`,[user.organization_id,String(domainConfig.trialDays)]);
+    verifiedEmailNow=true;
   }
 
   if(user.mfa_enabled){
@@ -58,7 +60,7 @@ export async function POST(request:NextRequest){
    }
    if(!ok)return json({error:"invalid_mfa",message:"Der MFA-Code ist ungültig.",mfaRequired:true,mfaMethod:"totp"},401);
   }else{
-    if(!emailCode){
+    if(verifiedEmailNow||!emailCode){
       const code=await issueEmailCode({email:user.email,purpose:"login",userId:user.id,organizationId:user.organization_id});
       await sendMail({to:user.email,subject:"Binso One Anmeldecode",text:`Dein Anmeldecode lautet: ${code}.`,html:mailLayout("Anmeldung bestätigen",`<p>Verwende diesen Code, um deine Anmeldung bei Binso One abzuschliessen:</p><div style="font-size:32px;font-weight:800;letter-spacing:.18em;margin:24px 0">${code}</div><p>Der Code ist ${domainConfig.emailCodeMinutes} Minuten gültig. Wenn du dich nicht angemeldet hast, kannst du diese E-Mail ignorieren.</p>`)});
       return json({mfaRequired:true,mfaMethod:"email",codeSent:true},202);

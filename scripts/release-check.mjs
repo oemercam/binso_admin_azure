@@ -6,6 +6,11 @@ assert.ok(deploy.includes('Verify current production build and routes'));
 const home=await fs.readFile('app/page.tsx','utf8');
 const pricing=await fs.readFile('app/preise/page.tsx','utf8');
 const register=await fs.readFile('app/registrieren/page.tsx','utf8');
+const loginRoute=await fs.readFile('app/api/auth/login/route.ts','utf8');
+const recoverRoute=await fs.readFile('app/api/auth/recover/route.ts','utf8');
+const registerRouteSource=await fs.readFile('app/api/auth/register/route.ts','utf8');
+const provisioningSource=await fs.readFile('lib/server/provisioning.ts','utf8');
+const operatorSource=await fs.readFile('components/operator.tsx','utf8');
 for(const [name,source] of [['landing',home],['pricing',pricing],['register',register]]){
   assert.ok(!source.includes('30 Tage kostenlos'),name+' must not advertise the old 30-day trial');
 }
@@ -14,6 +19,15 @@ for(const legacy of ['CHF 19','CHF 49','CHF 89']){
 }
 assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.map'),'Pricing page must use canonical trial and plan configuration');
 assert.ok(register.includes('billingCycle')&&register.includes('selectedPlan'),'Registration must preserve selected plan and billing cycle');
+assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue a fresh login code after first email verification');
+assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
+assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');
+assert.ok(provisioningSource.includes('input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):null'),'Trial expiry must not start before first email verification');
+const appPagesSource=await fs.readFile('components/app-pages.tsx','utf8');
+assert.ok(appPagesSource.includes('value==="de"?"de-CH":value'),'Language settings must present persisted de as de-CH');
+for(const legacyMrr of ['CHF 19','CHF 49','CHF 89'])assert.ok(!operatorSource.includes('mrr:"'+legacyMrr+'"'),'Operator demo must not hardcode retired MRR '+legacyMrr);
+assert.ok(operatorSource.includes('demoPlan("start")')&&operatorSource.includes('demoPlan("business")')&&operatorSource.includes('demoPlan("pro")'),'Operator demo MRR must derive from canonical plans');
+
 console.log('Release gates passed.');
 
 const email=await fs.readFile('lib/server/email.ts','utf8');
@@ -26,6 +40,8 @@ for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GR
 const deployWorkflow=await fs.readFile('.github/workflows/deploy-azure.yml','utf8');
 assert.ok(deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must enforce retention cleanup');
 assert.ok(deployWorkflow.includes('/api/health/ready'),'Production deploy must verify readiness health');
+assert.ok(deployWorkflow.includes('retry_curl()'),'Production verification must retry transient HTTP failures');
+assert.ok(deployWorkflow.includes('trap cleanup_demo_session EXIT'),'Production demo verification must always clean up its session');
 await fs.access('.github/workflows/retention-maintenance.yml');
 await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');
@@ -50,6 +66,7 @@ const sessionSecurityUi=await fs.readFile('components/security-settings-page.tsx
 assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.includes('Alle anderen abmelden'),'Security settings must expose real session management');
 
 const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
+assert.equal(packageJson.engines?.node,'>=24 <25','Runtime contract must stay pinned to Node 24');
 assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
 await fs.access('docs/dependency-security-review.md');
 

@@ -1355,7 +1355,7 @@ export function NotificationSettingsPage() {
 export function LanguageSettingsPage() {
   const [language,setLanguage] = useState("de-CH");
   const [error,setError]=useState("");
-  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>setLanguage(data.item?.language??"de-CH")).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
+  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>{const value=data.item?.language??"de-CH";setLanguage(value==="de"?"de-CH":value)}).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
   const choose=async(code:string)=>{try{if(!isProductionBackendEnabled())throw new Error("Schreibgeschützte Vorschau");await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
   const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
