@@ -20,6 +20,10 @@ const operatorNav = [
   ["audit","Audit","file"],
 ] as const;
 
+function moneyChf(value:number){
+  return "CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
 const tickets = [
   ["#8421","Rechnungsstellung unklar","Acme AG","Offen"],
   ["#8419","Zahlung fehlgeschlagen","Müller GmbH","In Bearbeitung"],
@@ -177,7 +181,7 @@ function OperatorDashboard() {
       <section className="surface"><SectionTitle title="Support"/><div className="operator-ticket-stats">{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><strong>{String(value)}</strong><span>{String(label)}</span></Link>)}</div></section>
     </div>
     <section className="surface"><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></section>
-    <section className="surface"><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/ >}</section>
+    <section className="surface"><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</section>
   </div>;
   return <div className="operator-dashboard-cockpit">
     <section className="operator-health-strip">
