@@ -4,7 +4,7 @@ import type {BillingCycle,PlanId} from '@/config/domain';
 import {subscriptionEntitlements} from '@/lib/subscription-plans';
 import {ApiError} from '../http';
 import {env} from '../env';
-import {createCheckoutSession,expireCheckoutSession,createStripeCustomer,retrievePrice,retrieveSubscription,retrieveInvoice,validatePrice,priceSelection,objectValue,stripeId,stripeLiveMode,type StripeObject} from '../stripe';
+import {createCheckoutSession,retrieveCheckoutSession,expireCheckoutSession,createStripeCustomer,retrievePrice,retrieveSubscription,retrieveInvoice,validatePrice,priceSelection,objectValue,stripeId,stripeLiveMode,type StripeObject} from '../stripe';
 import type {SessionUser} from '../session';
 const str=(value:unknown)=>typeof value==='string'?value:'';
 const iso=(value:unknown)=>{const n=Number(value);return Number.isFinite(n)&&n>0?new Date(n*1000).toISOString():null;};
@@ -16,8 +16,14 @@ export async function startBillingCheckout(c:PoolClient,s:SessionUser,plan:PlanI
  const cached=(await c.query('select * from billing_checkout_sessions where organization_id=$1 and request_key=$2',[s.organizationId,requestKey])).rows[0];
  if(cached&&(cached.plan!==plan||cached.billing_interval!==billing||new Date(cached.expires_at).getTime()<=Date.now()))throw new ApiError(409,'checkout_request_reused','Bitte einen neuen Checkout starten.');
  const open=cached??(await c.query('select * from billing_checkout_sessions where organization_id=$1 and expires_at>now() order by created_at desc limit 1',[s.organizationId])).rows[0];
- if(open&&open.plan===plan&&open.billing_interval===billing)return {url:open.checkout_url};
- if(open){const expired=await expireCheckoutSession(open.stripe_session_id);if(expired.status!=='expired')throw new ApiError(409,'checkout_pending','Der vorherige Checkout muss zuerst abgeschlossen werden.');await c.query('update billing_checkout_sessions set expires_at=now() where id=$1',[open.id]);}
+ if(open&&open.plan===plan&&open.billing_interval===billing){
+  const current=await retrieveCheckoutSession(open.stripe_session_id);
+  if(current.status==='open')return {url:open.checkout_url};
+  if(current.status!=='expired')throw new ApiError(409,'checkout_pending','Stripe verarbeitet den Checkout. Bitte den Abostatus erneut laden.');
+  if(cached)throw new ApiError(409,'checkout_request_expired','Der Checkout ist abgelaufen. Bitte die Seite erneut laden.');
+  await c.query('update billing_checkout_sessions set expires_at=now() where id=$1',[open.id]);
+ }
+ if(open&&(open.plan!==plan||open.billing_interval!==billing)){const expired=await expireCheckoutSession(open.stripe_session_id);if(expired.status!=='expired')throw new ApiError(409,'checkout_pending','Der vorherige Checkout muss zuerst abgeschlossen werden.');await c.query('update billing_checkout_sessions set expires_at=now() where id=$1',[open.id]);}
  const priceId=env.stripePrices[plan][billing];if(!priceId)throw new ApiError(503,'stripe_price_missing','Dieser Zahlungszeitraum ist noch nicht eingerichtet.');
  const price=await retrievePrice(priceId);validatePrice(price,billing);
  let customerId=str(row.billing_customer_id);

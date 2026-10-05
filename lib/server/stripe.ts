@@ -41,6 +41,7 @@ export async function createCheckoutSession(input:{priceId:string;customerId:str
  if(env.stripeAutomaticTax)body.set('automatic_tax[enabled]','true');
  return stripeRequest<{id:string;url:string;expires_at:number}>('/checkout/sessions',body,`binso-checkout-${input.organizationId}-${input.requestKey}`);
 }
+export const retrieveCheckoutSession=(id:string)=>stripeRequest<StripeObject>('/checkout/sessions/'+encodeURIComponent(id));
 export const expireCheckoutSession=(id:string)=>stripeRequest<StripeObject>('/checkout/sessions/'+encodeURIComponent(id)+'/expire',new URLSearchParams());
 export async function createPortalSession(input:{customerId:string;returnUrl:string}){return stripeRequest<{url:string}>('/billing_portal/sessions',new URLSearchParams({customer:input.customerId,return_url:input.returnUrl}));}
 export function verifyStripeSignature(payload:string,header:string){

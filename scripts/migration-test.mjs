@@ -170,7 +170,7 @@ try{
  const billingSession={organizationId:billingTenant.organizationId,userId:'billing-probe',email:'billing-probe@example.invalid',role:'owner'};
  const prices={price_start_m:{id:'price_start_m',active:true,currency:'chf',unit_amount:2900,recurring:{interval:'month',interval_count:1}},price_business_y:{id:'price_business_y',active:true,currency:'chf',unit_amount:69000,recurring:{interval:'year',interval_count:1}}};
  let authoritative={id:'sub_fixture',customer:'cus_fixture',metadata:{organization_id:billingTenant.organizationId},status:'active',cancel_at_period_end:true,items:{data:[{quantity:1,price:prices.price_business_y,current_period_end:timestamp+86400}]}};
- let failInvoice=false,checkoutCalls=0,expireCalls=0;
+ let failInvoice=false,checkoutCalls=0,expireCalls=0,checkoutState="open";
  const originalFetch=globalThis.fetch;
  globalThis.fetch=async(url,options)=>{
   assert.equal(options.headers['Stripe-Version'],stripeApiVersion);
@@ -178,6 +178,7 @@ try{
   if(path.startsWith('/v1/prices/'))return Response.json(prices[path.split('/').pop()]);
   if(path==='/v1/customers'){assert.ok(options.headers['Idempotency-Key']);return Response.json({id:'cus_fixture'});}
   if(path==='/v1/checkout/sessions'){checkoutCalls++;const form=options.body;assert.ok(options.headers['Idempotency-Key']);assert.equal(form.get('success_url'),'https://example.invalid/einstellungen/abonnement?checkout=success');assert.equal(form.get('customer'),'cus_fixture');return Response.json({id:'cs_fixture_'+checkoutCalls,url:'https://checkout.stripe.com/c/pay_fixture',expires_at:timestamp+86400});}
+  if(path.startsWith('/v1/checkout/sessions/')&&options.method==='GET')return Response.json({status:checkoutState});
   if(path.startsWith('/v1/checkout/sessions/')&&path.endsWith('/expire')){expireCalls++;return Response.json({status:'expired'});}
   if(path==='/v1/subscriptions/sub_fixture')return Response.json(authoritative);
   if(path==='/v1/invoices/in_fixture'){if(failInvoice)throw new Error('Simulated failure');return Response.json({id:'in_fixture',customer:'cus_fixture',status:'paid',amount_paid:69000,currency:'chf',status_transitions:{paid_at:timestamp}});}
@@ -189,6 +190,11 @@ try{
  assert.ok(checkout.url.startsWith('https://checkout.stripe.com/'));
  const sameCheckout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly','00000000-0000-4000-8000-000000000035'));
  assert.equal(checkout.url,sameCheckout.url);assert.equal(checkoutCalls,1);
+ checkoutState='complete';
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='checkout_pending');
+ checkoutState='expired';
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='checkout_request_expired');
+ assert.equal(checkoutCalls,1);checkoutState='open';
  await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly',requestKey)),e=>e.code==='checkout_request_reused');
  await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,{...billingSession,organizationId:provisioned.organizationId},'start','monthly',requestKey)),e=>e.status===403);
  await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly','00000000-0000-4000-8000-000000000036'));
