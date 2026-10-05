@@ -58,6 +58,7 @@ jobs:
           fi
           pnpm db:migrate
           pnpm db:check
+          pnpm retention:cleanup
 
       - name: Prepare standalone deploy artifact
         env:
@@ -280,7 +281,8 @@ jobs:
 
           HEALTH_URL="$PRODUCTION_URL/api/health"
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
-          echo "Binso One production health check passed."
+          curl -fsS --max-time 20 "$PRODUCTION_URL/api/health/ready" | grep -q '"status":"ready"'
+          echo "Binso One production health and readiness checks passed."
 
           curl -fsS --max-time 60 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
           echo "Verifying demo session endpoint."
