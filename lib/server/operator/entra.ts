@@ -16,13 +16,17 @@ const roleMap:Record<string,OperatorRole>={
 
 function claimValues(principal:EasyAuthPrincipal,types:string[]){
   const wanted=new Set(types.map(x=>x.toLowerCase()));
-  return (principal.claims??[]).filter(c=>wanted.has(String(c.typ??"").toLowerCase())).map(c=>String(c.val??"")).filter(Boolean);
+  return (principal.claims??[])
+    .filter(claim=>wanted.has(String(claim.typ??"").toLowerCase()))
+    .map(claim=>String(claim.val??""))
+    .filter(Boolean);
 }
 function firstClaim(principal:EasyAuthPrincipal,types:string[]){
   return claimValues(principal,types)[0]||"";
 }
 function decodePrincipal(raw:string){
-  try{return JSON.parse(Buffer.from(raw,"base64").toString("utf8")) as EasyAuthPrincipal}catch{return null}
+  try{return JSON.parse(Buffer.from(raw,"base64").toString("utf8")) as EasyAuthPrincipal}
+  catch{return null}
 }
 
 export type EntraOperatorIdentity={
@@ -38,19 +42,29 @@ export async function getEntraOperatorIdentity():Promise<EntraOperatorIdentity|n
   const h=await headers();
   const raw=h.get("x-ms-client-principal");
   if(!raw)return null;
+
   const principal=decodePrincipal(raw);
   if(!principal||String(principal.auth_typ??"").toLowerCase()!=="aad")return null;
 
-  const objectId=firstClaim(principal,["http://schemas.microsoft.com/identity/claims/objectidentifier","oid"]);
+  const objectId=
+    firstClaim(principal,["http://schemas.microsoft.com/identity/claims/objectidentifier","oid"])||
+    h.get("x-ms-client-principal-id")||
+    "";
   const tenantId=firstClaim(principal,["http://schemas.microsoft.com/identity/claims/tenantid","tid"]);
-  const email=firstClaim(principal,[
-    "preferred_username",
-    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
-    "email","upn"
-  ]).toLowerCase();
+  const email=(
+    firstClaim(principal,[
+      "preferred_username",
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+      "email",
+      "upn",
+    ])||
+    h.get("x-ms-client-principal-name")||
+    ""
+  ).toLowerCase();
   const name=firstClaim(principal,["name","http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"])||email;
+
   const roles=new Set(claimValues(principal,["roles","http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]));
-  const appRole=Object.keys(roleMap).find(r=>roles.has(r))||"";
+  const appRole=Object.keys(roleMap).find(role=>roles.has(role))||"";
   if(!objectId||!tenantId||!email||!appRole)return null;
 
   if(env.operatorEntraTenantId&&tenantId.toLowerCase()!==env.operatorEntraTenantId.toLowerCase())return null;
