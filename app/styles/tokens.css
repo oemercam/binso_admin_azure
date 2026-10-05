@@ -45,9 +45,9 @@
   --glass-blur:18px;
 
   --sidebar-w:228px;
-  --content-max:1480px;
+  --content-max:1760px;
   --marketing-max:1240px;
-  --page-x:38px;
+  --page-x:clamp(28px,2.4vw,46px);
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
   --mobile-header-h:52px;

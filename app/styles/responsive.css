@@ -2109,3 +2109,217 @@
 }
 @keyframes desktop-dialog-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media (min-width:761px) and (prefers-reduced-motion:reduce){.bottom-sheet{animation:none}}
+
+
+/* Canonical desktop workspace: full-width content, quiet headers and consistent action rails. */
+@media (max-width:1100px){
+  .desktop-page-actions{display:none}
+  .document-desktop-rail{display:none}
+}
+
+@media (min-width:1101px){
+  .mobile-page-actions{display:none}
+
+  .page-container{
+    width:100%;
+    max-width:var(--content-max);
+    padding-top:30px;
+    padding-left:var(--page-x);
+    padding-right:var(--page-x);
+  }
+  .page-head{
+    min-height:auto;
+    margin:0 0 22px;
+    padding:0 0 22px;
+    align-items:flex-start;
+    border-bottom:1px solid var(--color-line);
+  }
+  .page-head h1{font-size:30px;line-height:1.05}
+  .page-head p{max-width:780px;margin-top:8px}
+  .page-head-detail .desktop-back{margin-bottom:12px}
+
+  .desktop-page-actions{
+    min-height:44px;
+    margin:-8px 0 24px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .desktop-page-actions:empty{display:none}
+  .desktop-page-actions .button{min-height:40px}
+
+  .desktop-appbar{padding-left:var(--page-x);padding-right:var(--page-x)}
+  .desktop-appbar-actions{gap:10px}
+  .desktop-search-trigger{width:min(42vw,520px)}
+
+  .toolbar{
+    min-height:48px;
+    margin-bottom:12px;
+    padding-bottom:12px;
+    flex-wrap:nowrap;
+    border-bottom:1px solid var(--color-line);
+  }
+  .toolbar .searchbox{max-width:520px;flex:1 1 360px}
+  .toolbar .chips{flex:0 1 auto;min-width:0}
+  .records-count{white-space:nowrap}
+  .records{
+    border-top:0;
+    border-bottom:1px solid var(--color-line);
+  }
+  .record{
+    min-height:64px;
+    padding:10px 8px;
+    border-radius:0;
+  }
+  .record-wrapper:hover .record{background:color-mix(in srgb,var(--color-fg) 3%,var(--color-bg))}
+  .record-main b{font-size:13px}
+  .record-main small{font-size:11px;line-height:1.45}
+
+  .surface{
+    padding:22px 24px;
+    border-radius:12px;
+  }
+  .section-title{
+    min-height:34px;
+    margin-bottom:4px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--color-line);
+  }
+  .section-title h2{font-size:15px}
+  .compact-list>div,
+  .compact-list>a,
+  .activity-list>div,
+  .activity-list>a{min-height:58px}
+
+  .metrics-grid{
+    gap:0;
+    border-top:1px solid var(--color-line);
+    border-bottom:1px solid var(--color-line);
+  }
+  .metric{
+    min-height:118px;
+    padding:20px 22px;
+  }
+  .metric+.metric{border-left:1px solid var(--color-line)}
+  .metric strong{font-size:26px}
+  .dashboard-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+    margin-top:20px;
+  }
+  .quick-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--color-line)}
+  .quick-grid{gap:12px}
+
+  .revenue-insight,
+  .finance-analysis{
+    width:100%;
+    margin-top:22px;
+    padding:24px 0;
+    border-left:0;
+    border-right:0;
+    border-radius:0;
+  }
+  .revenue-chart svg{height:260px}
+  .finance-month-bars{width:100%;min-height:250px}
+  .finance-breakdown{gap:32px}
+  .finance-insights{grid-template-columns:minmax(0,1.7fr) minmax(300px,.7fr)}
+
+  .detail-grid{grid-template-columns:minmax(0,1fr) minmax(320px,.42fr);gap:22px}
+  .detail-grid>.surface:only-child{grid-column:1/-1}
+  .customer-tab-panel{max-width:none}
+  .settings-detail-grid,
+  .settings-readonly,
+  .notification-center,
+  .support-summary{max-width:none}
+
+  .documents-hub-grid{gap:18px}
+  .documents-hub-grid>.surface{min-width:0}
+
+  .invoice-workspace{
+    grid-template-columns:minmax(0,1.25fr) minmax(430px,.75fr);
+    gap:24px;
+  }
+  .desktop-document-preview{top:88px}
+
+  .document-desktop-workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(430px,36%);
+    gap:28px;
+    align-items:start;
+  }
+  .document-desktop-detail{
+    min-width:0;
+    padding-right:8px;
+  }
+  .document-desktop-rail{
+    min-width:0;
+    position:sticky;
+    top:86px;
+    max-height:calc(100dvh - 108px);
+    display:grid;
+    gap:18px;
+    overflow:auto;
+    scrollbar-width:thin;
+  }
+  .document-toolbox{
+    display:grid;
+    border-top:1px solid var(--color-line);
+  }
+  .document-toolbox>.compact-section-label{
+    padding:0 0 10px;
+    border-bottom:1px solid var(--color-line);
+  }
+  .document-toolbox>button,
+  .document-toolbox>a{
+    width:100%;
+    min-height:58px;
+    padding:10px 2px;
+    display:grid;
+    grid-template-columns:24px minmax(0,1fr) 18px;
+    gap:10px;
+    align-items:center;
+    border:0;
+    border-bottom:1px solid var(--color-line);
+    background:transparent;
+    color:inherit;
+    text-align:left;
+  }
+  .document-toolbox>button:hover,
+  .document-toolbox>a:hover{background:color-mix(in srgb,var(--color-fg) 3%,var(--color-bg))}
+  .document-toolbox>button>span,
+  .document-toolbox>a>span{min-width:0;display:grid;gap:3px}
+  .document-toolbox b{font-size:12px}
+  .document-toolbox small{color:var(--color-muted);font-size:10px;line-height:1.35}
+  .document-inline-preview{
+    min-width:0;
+    padding:18px;
+    border:1px solid var(--color-line);
+    border-radius:12px;
+    background:var(--color-bg);
+  }
+  .document-inline-preview .document-preview-heading{
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--color-line);
+  }
+  .document-inline-preview .document-pages{width:100%}
+  .document-inline-preview .paper{width:100%;min-height:560px}
+
+  .document-detail-view{border-top:1px solid var(--color-line)}
+  .document-detail-section{padding:24px 0;border-bottom:1px solid var(--color-line)}
+  .document-facts{
+    margin:0;
+    padding:20px 0;
+    border-bottom:1px solid var(--color-line);
+  }
+  .document-read-lines>div{min-height:58px;padding:12px 0}
+}
+
+@media (min-width:1500px){
+  .document-desktop-workspace{grid-template-columns:minmax(0,1fr) minmax(500px,34%)}
+  .invoice-workspace{grid-template-columns:minmax(0,1.35fr) minmax(500px,.65fr)}
+  .revenue-chart svg{height:300px}
+  .finance-month-bars{min-height:290px}
+}

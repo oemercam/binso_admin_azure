@@ -271,13 +271,31 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const headerActions=existing&&!editing
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>;
+  const desktopActions=existing&&!editing?undefined:headerActions;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview}>
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview}>
     {editing&&companyPending&&<p role="status">Firmendaten werden geladen …</p>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
     {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
-      ? <DocumentReadView type={kind} draft={draft} directory={directory}/>
+      ? <div className="document-desktop-workspace">
+          <div className="document-desktop-detail"><DocumentReadView type={kind} draft={draft} directory={directory}/></div>
+          <aside className="document-desktop-rail">
+            <section className="document-toolbox" aria-label="Dokumentaktionen">
+              <span className="compact-section-label">Aktionen</span>
+              <button type="button" onClick={()=>setEditing(true)}><Icon name="edit" size={17}/><span><b>Bearbeiten</b><small>Dokumentdaten ändern</small></span><Icon name="arrow" size={15}/></button>
+              <button type="button" onClick={()=>setPreview(true)}><Icon name="file" size={17}/><span><b>Vorschau öffnen</b><small>Dokument gross anzeigen</small></span><Icon name="arrow" size={15}/></button>
+              <button type="button" onClick={()=>show(kind==="Angebot"?"Angebot für den Versand vorbereitet.":"Versand wird mit dem E-Mail-Dienst angebunden.")}><Icon name="mail" size={17}/><span><b>Senden</b><small>{kind==="Angebot"?"Angebot versenden":"Rechnung versenden"}</small></span><Icon name="arrow" size={15}/></button>
+              {kind==="Angebot"
+                ? <Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>Rechnung erstellen</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
+                : <Link href="/zahlungen/neu"><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
+            </section>
+            <section className="document-inline-preview">
+              <div className="document-preview-heading"><h2>Vorschau</h2><button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button></div>
+              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
+            </section>
+          </aside>
+        </div>
       : <DocumentEditor type={kind} draft={draft} onChange={next=>setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})} directory={directory}/>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
