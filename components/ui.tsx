@@ -7,9 +7,11 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.8,
+    strokeWidth: 2,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
+    vectorEffect: "non-scaling-stroke" as const,
+    shapeRendering: "geometricPrecision" as const,
     "aria-hidden": true,
   };
 

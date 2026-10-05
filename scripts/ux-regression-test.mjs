@@ -42,3 +42,69 @@ for(const source of searchSources){
 }
 assert.equal(searchItem(searchSources[5],{id:'employee-id',first_name:'Anna',last_name:'Muster'}).title,'Anna Muster');
 console.log('Search results use visible labels, canonical record IDs and existing detail routes.');
+
+
+const [tokensCss,baseCss,responsiveCss]=await Promise.all([
+  fs.readFile('app/styles/tokens.css','utf8'),
+  fs.readFile('app/styles/base.css','utf8'),
+  fs.readFile('app/styles/responsive.css','utf8'),
+]);
+for(const token of ['--desktop-section-y:24px','--desktop-surface-x:24px','--desktop-action-h:40px']){
+  assert.ok(tokensCss.includes(token),'Missing canonical desktop layout token: '+token);
+}
+assert.ok(baseCss.includes('.icon-action'),'Section icon actions must use the shared icon control contract');
+assert.ok(responsiveCss.includes('.form-section>.section-title'),'Form section headings must use the canonical desktop section rhythm');
+assert.ok(responsiveCss.includes('.invoice-form>.form-section'),'Document editors must use the shared inset form-section layout');
+assert.ok(responsiveCss.includes('var(--desktop-action-h)'),'Desktop actions must derive from the shared action height token');
+console.log('Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.');
+
+
+assert.ok(responsiveCss.includes('.tablet-master-detail:not(:has(>.tablet-detail))'),'Medium desktop must not reserve an empty detail column');
+assert.ok(responsiveCss.includes('grid-template-columns:minmax(220px,1fr) auto auto'),'Medium desktop toolbar must use the canonical responsive grid');
+assert.ok(responsiveCss.includes('grid-template-columns:minmax(0,1fr);\n    gap:var(--desktop-section-gap);'),'Medium desktop time tracking must collapse to one full-width column');
+assert.ok(responsiveCss.includes('grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr)'),'Wide desktop time tracking must use the canonical two-column workspace');
+const appCss=await fs.readFile('app/styles/app.css','utf8');
+assert.ok(appCss.includes('.responsive-create-action{'),'Responsive create actions need a shared structural rule');
+assert.ok(appCss.includes('display:inline-flex'),'Responsive create actions must keep icon and label on one line outside mobile mode');
+console.log('Medium desktop uses the full content width and keeps create actions on one line.');
+
+assert.ok(appCss.includes('.support-master-detail{'),'Support list must use the shared full-width workspace');
+assert.ok(appCss.includes('grid-template-columns:minmax(0,1fr);'),'Support list must not reserve an empty preview column');
+assert.ok(appCss.includes('.support-summary .metric+.metric{border-left:1px solid var(--color-line)}'),'Support summary must use the shared compact metric strip');
+console.log('Support list uses the canonical full-width list and compact summary layout.');
+
+assert.ok(responsiveCss.includes('.plan-hero{'),'Subscription plan summary must use the shared flat desktop section');
+assert.ok(responsiveCss.includes('border-top:1px solid var(--color-line);\n    border-bottom:1px solid var(--color-line);'),'Subscription sections must use separators instead of card borders');
+assert.ok(responsiveCss.includes('.subscription-detail-grid>.surface{'),'Subscription detail areas must flatten shared surfaces on desktop');
+assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing history must use the flat section pattern');
+console.log('Subscription settings use flat separators instead of legacy cards.');
+
+assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
+assert.ok(responsiveCss.includes('.desktop-search-field kbd{display:none}'),'Medium desktop header must compact the inline search instead of removing account controls');
+console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
+
+const uiSource=await fs.readFile('components/ui.tsx','utf8');
+const baseCssSource=await fs.readFile('app/styles/base.css','utf8');
+assert.ok(uiSource.includes('strokeWidth: 2'),'Shared icons must use pixel-stable strokes');
+assert.ok(uiSource.includes('vectorEffect: "non-scaling-stroke"'),'Shared icons must keep stroke width stable while scaling');
+assert.ok(baseCssSource.includes('.desktop-notification-button>svg'),'Header icons must use a fixed integer SVG size');
+console.log('Small SVG icons use crisp pixel-stable rendering.');
+
+assert.ok(!responsiveCss.includes('max-width:767px'),'Responsive system must not introduce a second mobile breakpoint at 767px');
+assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables must not force desktop-width horizontal scrolling');
+assert.ok(responsiveCss.includes('Primary layout states:'),'Viewport contract must stay explicit and centralized');
+assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
+assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
+assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
+console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
+
+const appShellSource=await fs.readFile('components/app-shell.tsx','utf8');
+assert.ok(appShellSource.includes('className={"desktop-search "+(desktopSearchOpen?"is-open":"")}'),'Desktop search must be an inline header search');
+assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search keyboard shortcut must focus the inline field');
+assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
+assert.ok(appCss.includes('.desktop-search-results{'),'Desktop search results must render as an anchored dropdown');
+assert.ok(!responsiveCss.includes('.desktop-search-trigger'),'Responsive CSS must not retain obsolete popup-search trigger rules');
+const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(match=>match[1].replace(/\s+/g,' ').replace(/\(\s*/g,'(').replace(/\s*\)/g,')').replace(/\s*:\s*/g,':').trim());
+assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
+assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
+console.log('Desktop global search stays inline with anchored results and no modal trigger.');
