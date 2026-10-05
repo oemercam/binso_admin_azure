@@ -134,7 +134,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
       {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
         <section className="operator-mobile-more" role="dialog" aria-modal="true" aria-label="Weitere Admin-Bereiche">
           <header><div><h2>Mehr</h2><p>Weitere Bereiche von One Admin.</p></div><button type="button" className="icon-button" aria-label="Schliessen" onClick={()=>setMobileMore(false)}><Icon name="close"/></button></header>
-          <nav>{operatorNav.filter(([slug])=>["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(slug)).map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</nav>
+          <nav className="operator-mobile-more-groups">{operatorNavGroups.map(group=>{const items=group.slugs.map(slug=>operatorNav.find(([candidate])=>candidate===slug)).filter((item):item is NonNullable<typeof item>=>Boolean(item&&["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(item[0])));if(!items.length)return null;return <div className="operator-mobile-more-group" key={group.label}><span>{group.label}</span>{items.map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</div>})}</nav>
         </section>
       </div>}
 
