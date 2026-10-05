@@ -3,7 +3,7 @@ import {randomUUID} from "node:crypto";
 import {seedDatabaseDemo} from "./repositories/demo-fixture";
 import type {PoolClient} from "pg";
 import {withTransaction} from "@/lib/server/db";
-import {domainConfig,addDays,addHours,type PlanId} from "@/config/domain";
+import {domainConfig,addDays,addHours,type BillingCycle,type PlanId} from "@/config/domain";
 import {subscriptionEntitlements} from '@/lib/subscription-plans';
 import {plans} from "@/lib/plans";
 
@@ -32,7 +32,7 @@ async function uniqueSlug(client:PoolClient,name:string){
 }
 
 export async function provisionOrganization(input:{
- userId:string;email:string;name:string;companyName:string;plan:PlanId;mode:"trial"|"demo"|"subscription";
+ userId:string;email:string;name:string;companyName:string;plan:PlanId;billingCycle?:BillingCycle;mode:"trial"|"demo"|"subscription";
  passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;
 }){
  return withTransaction(async client=>{
@@ -43,6 +43,8 @@ export async function provisionOrganization(input:{
    const canonicalPlan=toCanonicalPlan(input.mode==="demo"?"business":input.plan);
    const planId:PlanId=input.mode==="demo"?"business":input.plan;
    const definition=planDefinition(planId);
+   const billingCycle:BillingCycle=input.mode==="demo"?"monthly":input.billingCycle??"monthly";
+   const selectedAmount=billingCycle==="yearly"?definition.yearly:definition.monthly;
    const limits=subscriptionEntitlements(planId);
    const expiresAt=input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):input.mode==="trial"?addDays(new Date(),domainConfig.trialDays):null;
 
@@ -67,8 +69,8 @@ export async function provisionOrganization(input:{
    );
    await client.query(
      `insert into organization_subscriptions(organization_id,plan,status,seats,trial_until,billing_provider,billing_interval,unit_amount_chf)
-      values($1,$2,$3,$4,$5,'manual','monthly',$6)`,
-     [organizationId,canonicalPlan,input.mode==="subscription"?"active":"trial",limits.users,expiresAt,input.mode==="demo"?0:definition.monthly]
+      values($1,$2,$3,$4,$5,'manual',$6,$7)`,
+     [organizationId,canonicalPlan,input.mode==="subscription"?"active":"trial",limits.users,expiresAt,billingCycle,input.mode==="demo"?0:selectedAmount]
    );
    await client.query(
      `insert into organization_entitlements(organization_id,features,max_users,max_storage_mb,max_monthly_documents,max_api_requests_per_month)
@@ -78,7 +80,7 @@ export async function provisionOrganization(input:{
    await client.query(
      `insert into platform_tenants(organization_id,owner_name,owner_email,platform_status,seats,monthly_revenue_chf,storage_mb,last_active_at)
       values($1,$2,$3,$4,$5,$6,0,now())`,
-     [organizationId,displayName,email,input.mode==="subscription"?"active":"trial",limits.users,input.mode==="demo"?0:definition.monthly]
+     [organizationId,displayName,email,input.mode==="subscription"?"active":"trial",limits.users,input.mode==="subscription"?definition.monthly:0]
    );
    await client.query(
      `insert into company_profile(organization_id,name,address,zip,city,country,email,phone,uid,iban,bank_name,website)
