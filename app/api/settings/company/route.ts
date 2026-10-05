@@ -5,7 +5,7 @@ import { authorize } from "@/lib/server/rbac";
 import { withTenant } from "@/lib/server/db";
 
 type CompanyBody=Record<string,unknown>;
-const fields=`id,name,legal_name,legal_form,uid,vat_number,street,building_number,postal_code,city,country_code,email,phone,website,logo_url,vat_rate,payment_terms_days,iban,qr_iban,invoice_intro_text,invoice_footer_text,quote_intro_text,quote_footer_text,mail_sender_name,mail_reply_to,mail_signature`;
+const fields=`id,is_demo,name,legal_name,legal_form,uid,vat_number,street,building_number,postal_code,city,country_code,email,phone,website,logo_url,vat_rate,payment_terms_days,iban,qr_iban,invoice_intro_text,invoice_footer_text,quote_intro_text,quote_footer_text,mail_sender_name,mail_reply_to,mail_signature`;
 
 export async function GET(){
  try{

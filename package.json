@@ -28,7 +28,8 @@
     "next": "16.3.6",
     "pg": "8.16.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "swissqrbill": "4.4.2"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.15",

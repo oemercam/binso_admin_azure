@@ -3,6 +3,8 @@ import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
+import { SwissQRBill } from 'swissqrbill/svg';
+import { isQRReferenceValid } from 'swissqrbill/utils';
 const db=new PGlite({extensions:{pgcrypto}});
 const demo='00000000-0000-4000-8000-000000000099';
 try{
@@ -32,7 +34,9 @@ try{
  const permissions=dataModule(await fs.readFile('lib/permissions.ts','utf8'));
  const audit=dataModule((await fs.readFile('lib/server/audit.ts','utf8')).replace('import "server-only";',''));
  const http=dataModule('export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}');
- const businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','').replace('"../http"',JSON.stringify(http)).replace('"../audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions));
+ const qrSource=(await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/shared/utils.js',import.meta.url).href));
+ const qrModule=dataModule(qrSource);
+ const businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','').replace('"../http"',JSON.stringify(http)).replace('"../audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule));
  const {listApiBusiness,mutateApiBusiness}=await import(dataModule(businessSource));
  const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length}}};
  const session={organizationId:demo,userId:'demo-readonly',role:'owner'};
@@ -40,7 +44,22 @@ try{
  for(const table of ['customers','customer_contacts','products','employees','expenses','documents','payments'])assert.ok((await listApiBusiness(client,session,table,'')).length>0,table+' must have readable canonical fixture data');
  assert.equal((await listApiBusiness(client,session,'documents','number=eq.RE-2026-019')).length,1);
  const documentArgs={p_kind:'invoice',p_customer_id:'10000000-0000-4000-8000-000000000001',p_number:'TEST-001',p_issue_date:'2026-10-04',p_due_date:'2026-11-04',p_vat_rate:8.1,p_currency:'CHF',p_note:'Test',p_items:[{description:'Consulting',quantity:2,unit_price:100}]};
+ const company=(await db.query('select * from organizations where id=$1',[demo])).rows[0];
+ await db.query('update organizations set iban=null,qr_iban=null where id=$1',[demo]);
+ await assert.rejects(()=>mutateApiBusiness(client,session,'create_document_atomic',documentArgs),e=>e.code==='invoice_payment_setup_required');
+ await db.query('update organizations set iban=$2 where id=$1',[demo,company.iban]);
  const document=await mutateApiBusiness(client,session,'create_document_atomic',documentArgs);
+ assert.equal(document.issue_date,'2026-10-04');assert.equal(document.due_date,'2026-11-04');assert.equal(document.status,'draft');
+ const {createQrBillData,validSwissIban}=await import(qrModule);
+ assert.equal(validSwissIban('CH9300762011623852958'),false);
+ const qrData=createQrBillData(company,{reference:document.qr_reference,number:document.number,total:Number(document.total),currency:document.currency});
+ assert.equal(qrData.amount,216.2);assert.equal(qrData.creditor.account,company.iban);assert.equal(qrData.reference,undefined);
+ const qrReference=createQrBillData({...company,qr_iban:'CH4431999123000889012'},{reference:document.qr_reference,number:document.number,total:Number(document.total)});
+ assert.equal(isQRReferenceValid(qrReference.reference),true);assert.equal(qrReference.reference,document.qr_reference);
+ assert.equal((await db.query('select qr_reference from invoices where id=$1',[document.id])).rows[0].qr_reference,qrReference.reference);
+ const unsafeName={...qrData,creditor:{...qrData.creditor,name:'Test <img src=x onerror=alert(1)>'}};
+ const svg=new SwissQRBill(unsafeName,{language:'DE'}).toString();assert.ok(svg.includes('&lt;img'));assert.ok(!svg.includes('<img'));
+
  assert.equal(Number(document.total),216.2);
  await db.query("update invoices set status='sent' where id=$1",[document.id]);
  const paymentArgs={p_invoice_id:document.id,p_paid_on:'2026-10-04',p_amount:216.2,p_method:'bank',p_note:'Test',p_idempotency_key:'test-payment-0001'};

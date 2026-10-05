@@ -2028,3 +2028,21 @@
 }
 
 @media(max-width:760px){.finance-range{margin-right:calc(var(--page-x) * -1);padding-right:var(--page-x)}.finance-month-bars{height:150px;gap:5px}.finance-month-bars small{display:none}.finance-breakdown{grid-template-columns:1fr;gap:24px;padding:22px 0}.finance-metrics{margin-bottom:10px}}
+
+@media (max-width:760px){
+  /* Hide the complete label box, including Button's wrapper, so the icon has one grid cell. */
+  .responsive-create-action>span{display:none}
+  .responsive-create-action>svg{display:block;grid-area:1 / 1;align-self:center;justify-self:center}
+  .mobile-header-detail .mobile-back{margin-inline-start:calc(var(--control-h-mobile) / -2)}
+  .mobile-header-detail .mobile-detail-actions{margin-inline-end:calc(var(--control-h-mobile) / -2)}
+  .document-facts b{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+  .time-layout>.surface{border-top:0}
+  .time-layout>.timer-card>.tabs{border-top:0}
+  .time-layout>.surface+.surface{margin-top:20px}
+  .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
+  .bottom-sheet>.filter-sheet-actions{position:static;bottom:auto;margin-top:0;padding-bottom:0}
+  .bottom-sheet .form-grid{grid-template-columns:minmax(0,1fr)}
+  .bottom-sheet .form-field>input::-webkit-date-and-time-value{min-width:0;text-align:left}
+}
+
+@media (max-width:760px){.document-modal .paper.qr-invoice-page{padding-inline:0}.document-modal .qr-page-heading{padding-inline:5.5%}.document-modal .qr-payment-slip{flex:none}}
