@@ -66,3 +66,5 @@ const lifecycle=await fs.readFile('scripts/organization-data-lifecycle.mjs','utf
 for(const guard of ['BINSO_DELETE_CONFIRM','BINSO_DELETE_EXPORT_CONFIRMED','Organization must be archived before final deletion','Active/trial billing state blocks final deletion']){
   assert.ok(lifecycle.includes(guard),'Customer deletion safeguard missing: '+guard);
 }
+
+await fs.access('docs/graph-mail-least-privilege.md');
