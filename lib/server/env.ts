@@ -24,6 +24,8 @@ export const env={
   operatorEntraTenantId:optional("OPERATOR_ENTRA_TENANT_ID"),
   operatorAllowedDomain:optional("OPERATOR_ALLOWED_DOMAIN")||"binso.ch",
   sessionTtlHours:int("SESSION_TTL_HOURS",168),
+  authArtifactRetentionDays:int("AUTH_ARTIFACT_RETENTION_DAYS",7),
+  expiredSessionRetentionDays:int("EXPIRED_SESSION_RETENTION_DAYS",30),
   databaseUrl:optional("DATABASE_URL"),
   databaseSsl:bool("DATABASE_SSL",true),
   databaseSslRejectUnauthorized:bool("DATABASE_SSL_REJECT_UNAUTHORIZED",true),
