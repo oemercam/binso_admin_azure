@@ -26,7 +26,7 @@ export default function Prices(){
       <div className="pricing-trust">
         <span><Icon name="check" size={16}/>{domainConfig.trialDays} Tage kostenlos</span>
         <span><Icon name="check" size={16}/>Keine Einrichtungsgebühr</span>
-        <span><Icon name="check" size={16}/>CHF-Abrechnung</span>
+        <span><Icon name="check" size={16}/>CHF-Abrechnung über Stripe</span>
       </div>
     </div>
     <div className="pricing-grid">
@@ -40,6 +40,6 @@ export default function Prices(){
         <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={15}/>{feature}</li>)}</ul>
       </article>)}
     </div>
-    <section className="pricing-foot"><div><h2>Alle Pläne starten einfach.</h2><p>Registrieren, Firmennamen erfassen und direkt mit dem gewählten Plan in die Testphase starten.</p></div><Button href="/demo" variant="secondary">Demo starten</Button></section>
+    <section className="pricing-foot"><div><h2>Alle Pläne starten mit 14 Tagen Testphase.</h2><p>Keine Kreditkarte nötig. Ohne aktiviertes Abo wechselt das Konto nach der Testphase in den Nur-Lesen-Modus; deine Daten bleiben erhalten.</p><small>Alle Preise in CHF. Allfällige Steuern werden im Stripe Checkout transparent ausgewiesen.</small></div><Button href="/demo" variant="secondary">Demo ohne Registrierung</Button></section>
   </main><MarketingFooter/></>;
 }
