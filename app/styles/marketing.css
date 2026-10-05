@@ -713,8 +713,7 @@
   align-items:end;
   justify-items:center;
   padding:20px;
-  background:rgba(0,0,0,.28);
-  backdrop-filter:blur(6px);
+  pointer-events:none;
 }
 .privacy-consent-card{
   width:min(760px,100%);
@@ -725,6 +724,7 @@
   border-radius:16px;
   background:var(--color-bg);
   box-shadow:0 24px 70px rgba(0,0,0,.18);
+  pointer-events:auto;
 }
 .privacy-consent-copy h2{margin:0 0 8px;font-size:22px;letter-spacing:-.025em}
 .privacy-consent-copy p{margin:0 0 8px;color:var(--color-muted);font-size:12px;line-height:1.6}
@@ -760,3 +760,5 @@
   .privacy-consent-actions{display:grid;grid-template-columns:1fr}
   .privacy-consent-actions .button{width:100%}
 }
+
+.privacy-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
