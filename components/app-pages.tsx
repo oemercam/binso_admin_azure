@@ -457,8 +457,11 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   },[production,paymentId]);
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
-    <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section>
+    <div className="desktop-detail-workspace">
+      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
+      <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section></div>
+      <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span><Link href="/rechnungen/RE-2026-019"><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>RE-2026-019</small></span><Icon name="arrow" size={15}/></Link><Link href="/kunden/acme"><Icon name="users"/><span><b>Kunde öffnen</b><small>Acme AG</small></span><Icon name="arrow" size={15}/></Link></section></aside>
+    </div>
   </AppShell>;
 
   if(!payment) return <AppShell title="Zahlung" subtitle="Daten werden geladen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><EmptyState icon="wallet" title="Zahlung wird geladen" text="Die Zahlungsdaten werden abgerufen."/></AppShell>;
@@ -468,8 +471,11 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const status=String(payment.status??"booked");
   const statusLabel:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
-    <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{String(payment.method??"—")}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section>
+    <div className="desktop-detail-workspace">
+      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
+      <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{String(payment.method??"—")}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
+      <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href="/kunden"><Icon name="users"/><span><b>Kundenübersicht</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
+    </div>
   </AppShell>;
 }
 
@@ -530,8 +536,9 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
-    <div className="form-page">
-      <div className="form-grid two">
+    <div className={existing?"entity-edit-workspace":"form-page"}>
+      <div className={existing?"entity-edit-main form-page":"form-grid two"}>
+        {existing&&<div className="form-grid two">}
         <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
         <Field label="Typ"><select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></select></Field>
         <Field label="Artikelnummer"><input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
@@ -540,7 +547,9 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
         <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
         <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
+        {existing&&</div>}
       </div>
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Produktübersicht</span><strong>{price?moneyChf(Number(price.replace(",","."))):"CHF 0.00"}</strong><small>{type} · {unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>MwSt. <b>{vatRate}%</b></span>{sku&&<span>Artikelnummer <b>{sku}</b></span>}</div></section><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
