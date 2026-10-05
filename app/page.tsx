@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { MarketingFooter, MarketingHeader, ProductPreview, ProductScreen } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
+import { domainConfig } from "@/config/domain";
+import { plans as subscriptionPlans } from "@/lib/plans";
 
 const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
@@ -16,12 +18,6 @@ const workflow=[
   ["04","Rechnung","Aus Leistungen und Zeit eine Rechnung erstellen."],
 ] as const;
 
-const plans=[
-  {name:"Start",price:"19",description:"Für Selbstständige und kleine Unternehmen.",features:["1 Benutzer","Kunden und Kontakte","Angebote und Rechnungen","Zahlungen","Produkte"],featured:false},
-  {name:"Business",price:"49",description:"Für wachsende Schweizer KMU.",features:["Bis 20 Benutzer","Alle Start Funktionen","Mitarbeiter und Spesen","Zeiterfassung","Erweiterte Auswertungen"],featured:true},
-  {name:"Pro",price:"89",description:"Für Unternehmen mit erweiterten Anforderungen.",features:["Mehr Benutzer","Alle Business Funktionen","Erweiterte Rollen","Prioritäts-Support","Zukünftige Integrationen"],featured:false},
-] as const;
-
 export default function Home() {
   const structuredData={
     "@context":"https://schema.org",
@@ -33,8 +29,8 @@ export default function Home() {
     offers:{
       "@type":"AggregateOffer",
       priceCurrency:"CHF",
-      lowPrice:"19",
-      highPrice:"89",
+      lowPrice:String(Math.min(...subscriptionPlans.map(plan=>plan.monthly))),
+      highPrice:String(Math.max(...subscriptionPlans.map(plan=>plan.monthly))),
       offerCount:"3"
     },
     publisher:{"@id":"https://www.binso.ch/#organization"}
@@ -70,7 +66,7 @@ export default function Home() {
           <h1>Mehr Zeit für das Wesentliche.</h1>
           <p className="hero-lead">Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.</p>
           <div className="hero-actions">
-            <Button href="/registrieren">30 Tage kostenlos testen</Button>
+            <Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button>
             <Button href="/demo" variant="secondary">Demo starten</Button>
           </div>
           <div className="trust-row">
@@ -150,12 +146,12 @@ export default function Home() {
           <p>Alle Pläne bleiben bewusst übersichtlich. Keine versteckten Pflichtmodule.</p>
         </div>
         <div className="pricing-grid marketing-pricing-grid">
-          {plans.map(plan=><article className={plan.featured?"price-card featured":"price-card"} key={plan.name}>
-            {plan.featured&&<span className="popular">BELIEBT</span>}
+          {subscriptionPlans.map(plan=><article className={plan.popular?"price-card featured":"price-card"} key={plan.id}>
+            {plan.popular&&<span className="popular">BELIEBT</span>}
             <h3>{plan.name}</h3>
             <p>{plan.description}</p>
-            <div className="price"><strong>CHF {plan.price}</strong><span>/ Monat</span></div>
-            <Button href="/registrieren" variant={plan.featured?"primary":"secondary"}>30 Tage kostenlos testen</Button>
+            <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div><p><small>oder CHF {plan.yearly} / Jahr</small></p>
+            <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button>
             <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
           </article>)}
         </div>
@@ -189,7 +185,7 @@ export default function Home() {
 
       <section className="marketing-cta">
         <div><span className="eyebrow">BINSO ONE</span><h2>Einfach selbst ansehen.</h2><p>Starte direkt mit der Demo oder richte dein eigenes Konto ein.</p></div>
-        <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
+        <div><Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
       </section>
     </main>
     <MarketingFooter/>
