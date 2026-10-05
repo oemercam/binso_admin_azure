@@ -12,7 +12,7 @@ export function useDialogFocus(open: boolean, onClose: () => void) {
     if(open)return;
     const rememberTrigger = () => {
       const active = document.activeElement;
-      if(active instanceof HTMLElement && !dialogRef.current?.contains(active)) triggerRef.current = active;
+      if(active instanceof HTMLElement && !active.closest('[role="dialog"][aria-modal="true"]') && !dialogRef.current?.contains(active)) triggerRef.current = active;
     };
     rememberTrigger();
     document.addEventListener("focusin", rememberTrigger);
