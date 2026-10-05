@@ -31,3 +31,14 @@ assert.match(calls[2].sql,/order by q\.expense_date desc,q\.id desc/);
 await listApiBusiness(client,session,'customer_contacts','order=is_primary.desc,created_at.asc');
 assert.match(calls[3].sql,/order by q\.is_primary desc,q\.created_at asc,q\.id desc/);
 console.log('Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.');
+
+const searchSource=await fs.readFile('lib/search.ts','utf8');
+const {searchSources,searchItem}=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+for(const source of searchSources){
+ const result=searchItem(source,{id:'canonical-uuid',name:'Acme AG',number:source.table==='documents'?'AN-2026-000001':undefined,total:135.67,customer:{name:'Acme AG'}});
+ assert.ok(result.title&&result.type&&result.icon,'Search links need an accessible text label');
+ assert.ok(await fs.stat('app'+source.href+'/[id]/page.tsx'),'Search may only link to existing detail routes');
+ assert.equal(result.href,source.href+'/'+(source.table==='documents'?'AN-2026-000001':'canonical-uuid'));
+}
+assert.equal(searchItem(searchSources[5],{id:'employee-id',first_name:'Anna',last_name:'Muster'}).title,'Anna Muster');
+console.log('Search results use visible labels, canonical record IDs and existing detail routes.');
