@@ -3,8 +3,6 @@ import { MarketingFooter, MarketingHeader, ProductPreview, ProductScreen } from 
 import { Button, Icon } from "@/components/ui";
 import { domainConfig } from "@/config/domain";
 import { plans as subscriptionPlans } from "@/lib/plans";
-import { domainConfig } from "@/config/domain";
-import { plans as subscriptionPlans } from "@/lib/plans";
 
 const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
@@ -153,7 +151,7 @@ export default function Home() {
             <h3>{plan.name}</h3>
             <p>{plan.description}</p>
             <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div><p><small>oder CHF {plan.yearly} / Jahr</small></p>
-            <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button>
+            <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button><Link className="marketing-text-link" href={`/registrieren?plan=${plan.id}&billing=yearly`}>Jährlich starten</Link>
             <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
           </article>)}
         </div>
