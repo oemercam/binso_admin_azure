@@ -2064,3 +2064,10 @@
   .detail-list dd{min-width:0;overflow-wrap:anywhere;line-height:1.5}
   .time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
 }
+
+@media (max-width:640px){
+  .privacy-consent-layer{padding:10px}
+  .privacy-consent-card{padding:18px;border-radius:14px}
+  .privacy-consent-actions{display:grid;grid-template-columns:1fr}
+  .privacy-consent-actions .button{width:100%}
+}

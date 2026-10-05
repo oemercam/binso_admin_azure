@@ -11,6 +11,7 @@ import {billingCycles,domainConfig,planIds} from "@/config/domain";
 import {mailText,type MailLocale} from "@/lib/server/mail-i18n";
 import {provisionOrganization} from "@/lib/server/provisioning";
 import {query} from "@/lib/server/db";
+import {legalConfig} from "@/config/legal";
 
 export const runtime="nodejs";
 export async function POST(request:NextRequest){
@@ -28,6 +29,7 @@ export async function POST(request:NextRequest){
   if(body.acceptedTerms!==true)throw new Error("AGB und Datenschutz müssen akzeptiert werden.");
   const termsVersion=stringField(body,"termsVersion",{max:40});
   const privacyVersion=stringField(body,"privacyVersion",{max:40});
+  if(termsVersion!==legalConfig.termsVersion||privacyVersion!==legalConfig.privacyVersion)throw new Error("Bitte lade die Registrierungsseite neu und bestätige die aktuelle Fassung der Bedingungen.");
   const exists=await query("select 1 from app_users where lower(email)=lower($1) limit 1",[email]);
   if(exists.rowCount)throw new Error("Für diese E-Mail besteht bereits ein Konto.");
   const userId=randomUUID();

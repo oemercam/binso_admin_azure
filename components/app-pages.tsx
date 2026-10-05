@@ -1009,6 +1009,7 @@ export function SettingsPage() {
     ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
     ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
     ["/einstellungen/darstellung","moon","Darstellung","Hell oder Dunkel"],
+    ["/einstellungen/datenschutz","lock","Datenschutz & Cookies","Notwendige Funktionen und Performance-Messung"],
     ["/support","support","Hilfe und Support","Tickets und Kontakt"],
   ];
   return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">

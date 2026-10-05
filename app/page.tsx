@@ -103,7 +103,7 @@ export default function Home() {
           </div>
           <Link className="marketing-text-link" href="/produkt">Alle Funktionen ansehen <Icon name="arrow" size={15}/></Link>
         </div>
-        <ProductScreen route="/preview/rechnungen" title="Binso One Rechnungen" variant="desktop"/>
+        <ProductScreen route="/preview/dashboard" title="Aktuelle Binso One Produktoberfläche" variant="desktop"/>
       </section>
 
       <section className="workflow-section">
@@ -120,7 +120,7 @@ export default function Home() {
             </article>)}
           </div>
         </div>
-        <ProductScreen route="/preview/zeit" title="Binso One Zeiterfassung" variant="mobile"/>
+        <ProductScreen route="/preview/dashboard" title="Aktuelle mobile Binso One Oberfläche" variant="mobile"/>
       </section>
 
       <section className="product-callout">
@@ -179,7 +179,7 @@ export default function Home() {
           <details><summary>Kann ich Binso One zuerst ausprobieren?</summary><p>Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen.</p></details>
           <details><summary>Brauche ich eine Kreditkarte für den Test?</summary><p>Nein. Die 14-tägige Testphase startet ohne Kreditkarte. Erst wenn du einen Plan aktivierst, wirst du zu Stripe Checkout weitergeleitet.</p></details><details><summary>Was passiert nach den 14 Tagen?</summary><p>Ohne aktiviertes Abo bleibt dein Konto erhalten, wechselt aber in den Nur-Lesen-Modus. Du kannst danach jederzeit einen Plan aktivieren und weiterarbeiten.</p></details>
           <details><summary>Funktioniert Binso One auf dem Smartphone?</summary><p>Ja. Mobile und PWA sind als eigene App-Oberfläche gestaltet und nicht als verkleinerte Desktop-Version.</p></details>
-          <details><summary>Kann ich später den Plan wechseln?</summary><p>Ja. Der Plan kann später an die Grösse und Anforderungen deines Unternehmens angepasst werden.</p></details>
+          <details><summary>Kann ich mein Abo kündigen?</summary><p>Ja. Ein aktives Abonnement kann über das bereitgestellte Stripe Customer Portal auf das Ende der laufenden Abrechnungsperiode gekündigt werden. Der bezahlte Zugriff bleibt bis dahin bestehen.</p></details>
         </div>
       </section>
 

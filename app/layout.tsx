@@ -5,6 +5,7 @@ import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import {initializeTheme} from "@/lib/theme";
 import {ThemeRuntime} from "@/components/theme-runtime";
 import { siteConfig } from "@/lib/config";
+import { PrivacyConsent } from "@/components/privacy-consent";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <ThemeRuntime />
         {children}
+        <PrivacyConsent />
         <PwaRegister />
         <WebVitalsReporter />
       </body>

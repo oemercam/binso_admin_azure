@@ -17,6 +17,10 @@ Stand: 5. Oktober 2026
 - [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
 - [x] Repository-Cleanliness-Gate verhindert ausgemusterte Backend-/Provider-Artefakte und obsolete Kompatibilitätsdateien
 - [x] aktive Dokumentation auf Azure PostgreSQL, Microsoft Entra, Microsoft Graph und Stripe konsolidiert
+- [x] öffentlicher Login und Registrierung auf einen einzigen kanonischen Auth-Flow konsolidiert
+- [x] Cookie-/Datenschutz-Einstellungen mit technisch notwendigen Funktionen und optionaler Performance-Messung implementiert
+- [x] optionale Web-Vitals werden nur nach entsprechender Auswahl übertragen
+- [x] Landingpage-, Produkt-, Auth- und Rechtstexte gegen den aktuellen Funktionsstand abgeglichen
 - [x] Microsoft Graph als einziger produktiver Mailpfad
 - [x] Graph-Konfigurationsprüfung im Deploy
 - [x] echter Microsoft-Graph-sendMail-Selbsttest als eigener Production-Workflow
