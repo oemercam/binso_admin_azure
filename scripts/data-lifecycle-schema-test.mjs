@@ -12,7 +12,8 @@ try{
       await db.exec(await fs.readFile("database/migrations/"+file,"utf8"));
       await db.exec("commit");
     }catch(error){
-      await db.exec("rollback");
+      await db.exec("rollback",
+    "begin isolation level repeatable read read only");
       throw new Error(file+": "+error.message);
     }
   }
@@ -43,6 +44,7 @@ try{
   for(const required of [
     "BINSO_DELETE_CONFIRM",
     "BINSO_DELETE_EXPORT_CONFIRMED",
+    "BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED",
     'organization.status!=="archived"',
     "Active/trial billing state blocks final deletion",
     "Tenant rows remain after organization deletion",
