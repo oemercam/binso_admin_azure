@@ -117,3 +117,12 @@ const wideDesktopBlock=responsiveCss.match(/@media \(min-width:1101px\)\{([\s\S]
 assert.ok(mediumDesktopBlock.includes('backdrop-filter:none'),'Medium desktop appbar must avoid blur rasterization');
 assert.ok(wideDesktopBlock.includes('backdrop-filter:none'),'Wide desktop appbar must avoid blur rasterization');
 console.log('Desktop header icons render on a non-rasterized, pixel-stable appbar.');
+
+const marketingCss=await fs.readFile('app/styles/marketing.css','utf8');
+assert.ok(marketingCss.includes('.marketing-header{'),'Marketing header must exist');
+assert.ok(marketingCss.includes('-webkit-backdrop-filter:none'),'PWA entry headers must disable WebKit backdrop blur');
+assert.ok(marketingCss.includes('.portal-header{'),'Portal header must use the opaque header standard');
+assert.ok(marketingCss.includes('.demo-onboarding-header{'),'Demo onboarding header must use the opaque header standard');
+assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA headers must not render dimming pseudo overlays');
+assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
+console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
