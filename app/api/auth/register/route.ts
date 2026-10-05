@@ -1,13 +1,12 @@
 import {NextRequest} from "next/server";
 import {randomUUID} from "node:crypto";
 import {hashPassword} from "@/lib/server/password";
-import {createSession,endDemoSession} from "@/lib/server/session";
+import {endDemoSession} from "@/lib/server/session";
 import {apiError,assertSameOrigin,json,readJson} from "@/lib/server/http";
 import {emailField,enumField,stringField,asObject} from "@/lib/server/validation";
 import {enforceRateLimit} from "@/lib/server/rate-limit";
-import {createAuthToken} from "@/lib/server/auth-tokens";
+import {issueEmailCode} from "@/lib/server/email-otp";
 import {mailLayout,sendMail} from "@/lib/server/email";
-import {env} from "@/lib/server/env";
 import {billingCycles,domainConfig,planIds} from "@/config/domain";
 import {mailText,type MailLocale} from "@/lib/server/mail-i18n";
 import {provisionOrganization} from "@/lib/server/provisioning";
@@ -29,16 +28,21 @@ export async function POST(request:NextRequest){
   if(body.acceptedTerms!==true)throw new Error("AGB und Datenschutz müssen akzeptiert werden.");
   const termsVersion=stringField(body,"termsVersion",{max:40});
   const privacyVersion=stringField(body,"privacyVersion",{max:40});
-  const exists=await query(`select 1 from app_users where lower(email)=lower($1) limit 1`,[email]);
+  const exists=await query("select 1 from app_users where lower(email)=lower($1) limit 1",[email]);
   if(exists.rowCount)throw new Error("Für diese E-Mail besteht bereits ein Konto.");
   const userId=randomUUID();
   const provisioned=await provisionOrganization({userId,email,name,companyName:company,plan,billingCycle,mode:"trial",passwordHash:await hashPassword(password),language:locale,termsVersion,privacyVersion});
-  const token=await createAuthToken({type:"verify_email",email,userId,organizationId:provisioned.organizationId,ttlMinutes:domainConfig.emailVerificationMinutes});
-  const url=`${env.appUrl}/email-bestaetigen?token=${encodeURIComponent(token)}`;
+  const code=await issueEmailCode({email,purpose:"verify_email",userId,organizationId:provisioned.organizationId});
   let emailSent=true;
-  try{await sendMail({to:email,subject:mailText("E-Mail für Binso One bestätigen",locale),text:`${mailText("Bitte bestätige deine E-Mail-Adresse:",locale)} ${url}`,html:mailLayout(mailText("E-Mail-Adresse bestätigen",locale),`<p>${mailText("Bestätige deine geschäftliche E-Mail-Adresse, damit dein Binso-One-Konto vollständig aktiviert ist.",locale)}</p>`,{label:mailText("E-Mail bestätigen",locale),url})})}catch{emailSent=false}
+  try{
+    await sendMail({
+      to:email,
+      subject:mailText("E-Mail für Binso One bestätigen",locale),
+      text:`Dein Binso One Bestätigungscode lautet: ${code}. Er ist ${domainConfig.emailCodeMinutes} Minuten gültig.`,
+      html:mailLayout(mailText("E-Mail-Adresse bestätigen",locale),`<p>${mailText("Bestätige deine geschäftliche E-Mail-Adresse, damit dein Binso-One-Konto vollständig aktiviert ist.",locale)}</p><div style="font-size:32px;font-weight:800;letter-spacing:.18em;margin:24px 0">${code}</div><p>Der Code ist ${domainConfig.emailCodeMinutes} Minuten gültig.</p>`)
+    });
+  }catch{emailSent=false}
   await endDemoSession();
-  await createSession({userId,organizationId:provisioned.organizationId,email,name,role:"owner"});
-  return json({ok:true,organizationId:provisioned.organizationId,onboardingComplete:false,requiresEmailVerification:true,emailSent},201);
+  return json({ok:true,organizationId:provisioned.organizationId,onboardingComplete:false,requiresEmailVerification:true,emailSent,verificationMethod:"code"},201);
  }catch(error){return apiError(error)}
 }
