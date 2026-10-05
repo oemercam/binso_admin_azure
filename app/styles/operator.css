@@ -365,7 +365,7 @@
 
 
 /* Canonical operator desktop workspace */
-.operator-sidebar-groups{display:grid!important;gap:18px!important}
+.operator-sidebar-groups{display:grid;gap:18px}
 .operator-sidebar-group{display:grid;gap:3px}
 .operator-nav-label{
   padding:0 11px 6px;
