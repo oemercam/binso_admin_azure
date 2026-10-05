@@ -3,6 +3,7 @@ import {createHash,randomBytes} from "node:crypto";
 import {cookies,headers} from "next/headers";
 import {query} from "@/lib/server/db";
 import {env} from "@/lib/server/env";
+import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
 
 export type SessionUser={
  isDemo?:boolean;
