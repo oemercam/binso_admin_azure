@@ -38,13 +38,10 @@ export const env={
     pro:{monthly:optional("STRIPE_PRICE_PRO_MONTHLY"),yearly:optional("STRIPE_PRICE_PRO_YEARLY")}
   },
   appEncryptionKey:optional("APP_ENCRYPTION_KEY"),
-  emailDeliveryMode:optional("EMAIL_DELIVERY_MODE")||"auto",
   graphTenantId:optional("GRAPH_TENANT_ID"),
   graphClientId:optional("GRAPH_CLIENT_ID"),
   graphClientSecret:optional("GRAPH_CLIENT_SECRET"),
   graphSenderUserId:optional("GRAPH_SENDER_USER_ID"),
-  resendApiKey:optional("RESEND_API_KEY"),
-  emailFrom:optional("EMAIL_FROM")||"Binso One <noreply@binso.ch>",
   supportEmail:optional("SUPPORT_EMAIL")||"support@binso.ch",
   azureStorageAccount:optional("AZURE_STORAGE_ACCOUNT"),
   azureStorageContainer:optional("AZURE_STORAGE_CONTAINER")||"documents",
