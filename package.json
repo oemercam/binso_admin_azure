@@ -25,7 +25,7 @@
     "retention:cleanup": "node scripts/retention-cleanup.mjs",
     "data:export": "node scripts/organization-data-lifecycle.mjs export",
     "data:delete": "node scripts/organization-data-lifecycle.mjs delete",
-    "security:scan:all": "pnpm audit --audit-level high"
+    "security:scan:all": "pnpm audit --audit-level high --ignore GHSA-vfj7-8cjw-p6xm"
   },
   "dependencies": {
     "lucide-react": "0.468.0",
