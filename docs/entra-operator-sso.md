@@ -1,32 +1,34 @@
-# Binso One internal Microsoft Entra access
+# Binso One – Interner Zugriff mit Microsoft Entra ID
 
-Internal Binso employees authenticate to One Admin with Microsoft Entra ID. Customer authentication remains separate.
+Stand: 5. Oktober 2026
 
-## App roles
-Configure these App Roles on the Entra application used by Azure App Service Authentication:
+Interne Binso-Mitarbeitende authentifizieren sich für One Admin über Microsoft Entra ID. Die Kunden-Authentifizierung bleibt davon vollständig getrennt.
 
-- `Binso.Platform.Owner` -> full platform ownership
-- `Binso.Platform.Admin` -> platform administration
-- `Binso.Platform.Support` -> support/customer visibility
-- `Binso.Platform.Billing` -> subscriptions and billing
-- `Binso.Platform.Auditor` -> read/audit access
+## App-Rollen
+Auf der für Azure App Service Authentication verwendeten Entra-Anwendung sind diese App-Rollen zu konfigurieren:
 
-Assign users or Entra groups to those application roles. Binso One maps the signed/validated Easy Auth role claims to its existing `platform_*` permission model.
+- `Binso.Platform.Owner` → vollständige Plattformverantwortung
+- `Binso.Platform.Admin` → Plattformadministration
+- `Binso.Platform.Support` → Support und Kundensicht
+- `Binso.Platform.Billing` → Abonnemente und Billing
+- `Binso.Platform.Auditor` → Lese- und Audit-Zugriff
+
+Benutzer oder Entra-Gruppen werden diesen App-Rollen zugewiesen. Binso One ordnet die von Easy Auth validierten Rollen-Claims dem internen `platform_*`-Berechtigungsmodell zu.
 
 ## MFA
-Microsoft Entra controls MFA. Microsoft Authenticator can be required using Conditional Access / Authentication Strength policies. Binso One does not store a second internal password for employees.
+Microsoft Entra steuert MFA. Microsoft Authenticator kann über Conditional Access bzw. Authentication Strength verpflichtend gemacht werden. Binso One speichert für interne Mitarbeitende kein zweites lokales Produktivpasswort.
 
-## Trust boundary
-Production operator API access requires both:
-1. a valid Binso operator session, and
-2. a current Azure App Service Easy Auth principal whose tenant/object identity and App Role still match the session.
+## Vertrauensgrenze
+Produktiver Operator-API-Zugriff benötigt gleichzeitig:
+1. eine gültige Binso-Operator-Session und
+2. einen aktuellen Azure-App-Service-Easy-Auth-Principal, dessen Tenant-/Object-Identität und App-Rolle weiterhin zur Session passen.
 
-The default allowed email domain is `binso.ch`. `OPERATOR_ENTRA_TENANT_ID` can additionally pin the accepted tenant ID.
+Die standardmässig erlaubte E-Mail-Domain ist `binso.ch`. `OPERATOR_ENTRA_TENANT_ID` bindet den Zugriff zusätzlich an den erwarteten Entra-Tenant.
 
 ## Azure App Service
-The application intentionally keeps customer/public routes anonymous. Internal login is initiated explicitly through:
+Öffentliche und Kunden-Routen bleiben bewusst von App Service Authentication ausgenommen. Der interne Login wird explizit über folgenden Pfad gestartet:
 `/.auth/login/aad`
 
-After Microsoft authentication, Azure injects the validated `X-MS-CLIENT-PRINCIPAL` header. The application never trusts a browser-supplied email or role.
+Nach erfolgreicher Microsoft-Authentifizierung setzt Azure den validierten Header `X-MS-CLIENT-PRINCIPAL`. Die Anwendung vertraut weder einer vom Browser gelieferten E-Mail-Adresse noch einer vom Browser gelieferten Rolle.
 
-The architecture audit prints only non-secret Easy Auth settings so the production configuration can be verified without exposing credentials.
+Der Architecture-Audit gibt nur nicht geheime Easy-Auth-Einstellungen aus, damit die Produktionskonfiguration ohne Offenlegung von Zugangsdaten geprüft werden kann.

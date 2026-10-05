@@ -227,6 +227,7 @@ corepack enable
 corepack prepare pnpm@10.0.0 --activate
 pnpm install --frozen-lockfile
 pnpm repository:clean
+pnpm docs:check
 pnpm release:check
 pnpm test
 pnpm lint
@@ -244,6 +245,8 @@ Der verbindliche aktuelle Stand steht in:
 `docs/production-launch-checklist.md`
 
 Dokumentierte Betriebsverfahren:
+- `docs/auth-security-flow.md`
+- `docs/entra-operator-sso.md`
 - `docs/production-rollback.md`
 - `docs/azure-postgresql-backup-restore.md`
 - `docs/customer-data-lifecycle.md`
