@@ -12,10 +12,7 @@ try{
       await db.exec(await fs.readFile("database/migrations/"+file,"utf8"));
       await db.exec("commit");
     }catch(error){
-      await db.exec("rollback",
-    "begin isolation level repeatable read read only",
-    "not exists(select 1 from organization_memberships m where m.user_id=u.id)",
-    "not exists(select 1 from platform_operator_assignments p where p.user_id=u.id)");
+      await db.exec("rollback");
       throw new Error(file+": "+error.message);
     }
   }
