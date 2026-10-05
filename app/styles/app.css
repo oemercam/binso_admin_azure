@@ -1191,9 +1191,29 @@ textarea{
 .desktop-appbar-actions{display:flex;align-items:center;gap:8px}
 .desktop-appbar-actions :is(svg,.avatar-button,.desktop-notification-button){
   transform:none;
-  backface-visibility:hidden;
 }
-.desktop-notification-button svg{width:18px;height:18px}
+.desktop-appbar-actions svg{
+  width:20px;
+  height:20px;
+  min-width:20px;
+  min-height:20px;
+  display:block;
+  flex:none;
+  overflow:visible;
+}
+.desktop-header-timer svg{
+  width:18px;
+  height:18px;
+}
+.desktop-notification-button{
+  display:grid;
+  place-items:center;
+  line-height:1;
+}
+.desktop-notification-button svg{
+  width:20px;
+  height:20px;
+}
 .desktop-search{
   position:relative;
   width:min(100%,520px);
