@@ -50,6 +50,12 @@ Prioritäten: P1 = blockiert einen Hauptablauf oder zeigt fachlich falsche Ergeb
 | UX-14 | Supportliste | 1363 × 936 | Vollständige technische UUID als Ticketnummer vor dem Betreff | Lesbare Fallnummer statt UUID | P2 | Vorhandene case_number verwenden; ohne Nummer Betreff anzeigen, UUID nur als Routing-ID |
 | UX-15 | Demo / Einstellungen Abonnement | 1363 × 936 | „noch 1 Tage“, Testphasenstatus in Demo | Korrekte Einzahl und eindeutiger Demo-Status | P3 | Einzahl korrigiert, Demo-spezifischer Hinweis |
 
+| UX-16 | Kundenportal / Erstellen, Suche, Konto; Admin / Konto | 1363 × 936 | Dialog am Bildschirmboden mit mobilem Ziehgriff (Erstellen: y=433,6 bis 936 px) | Desktop: zentrierter Dialog ohne Ziehgriff; mobile Darstellung eigenständig | P2 | Gemeinsame Desktop-Dialogregeln ab 761 px; Tastaturfokus, Escape und Fokusrückgabe für Shell-/Admin-Kontodialog |
+| UX-17 | Admin-Navigation | 1363 × 936 | Feste Ticketzahl 12 trotz nur vier Demo-Tickets; aktive Seite kaum unterscheidbar | Keine erfundene Kennzahl, klarer aktiver Navigationspunkt | P2 | Feste Zahl entfernt; aria-current und sichtbare Hervorhebung |
+| UX-18 | Admin / Dashboard und Detailkopf | 1363 × 936 / Codeprüfung | Demo nicht sichtbar gekennzeichnet; Kundendetailkopf fest Acme AG, Ticketkopf zeigt Routing-ID | Demo sichtbar, neutraler Detailkopf bis echte Daten vorliegen | P2 | Demo-Badge, Kundendetails/Ticketdetails statt falschem Namen/UUID |
+| UX-19 | Admin-Tabellen und Konversationen | 1363 × 936 | Tabellen-/Beschreibungstext überwiegend 10–11 px; feste Spalten können lange Inhalte verdrängen | Gut lesbare Desktoptexte und begrenzte flexible Spalten | P2 | Zeilen 13 px, Unterzeilen 12 px, minmax-Spalten, Umbruch, Toolbar-Wrapping |
+| UX-20 | Kundenportal / Header | 1363 × 936 / Codeprüfung | Laufender Timer nur im mobilen Header sichtbar | Desktop: Status und direkter Zugang zur Zeiterfassung | P2 | Kompakter Timer-Link im Desktop-Header |
+
 Zusätzliche Codehärtung: Kein automatischer Wechsel von fehlgeschlagener produktiver Anmeldung zu Demo; Login-Rücksprung akzeptiert keine protokollrelativen externen URLs.
 
 ## Muss manuell auf echtem Gerät bestätigt werden
@@ -69,3 +75,7 @@ Registrierung mit kontrollierter empfangsfähiger Testmailbox, ausdrückliche An
 ## Technische Validierung
 
 Alle zehn angeforderten pnpm-Befehle werden auf dem finalen Änderungsstand ausgeführt. Lokale Ergebnisprotokolle und GitHub Quality/Deploy müssen separat erfolgreich sein. Ein grüner Build ersetzt keine vollständige UX-Abnahme. Ein erfolgreicher Deploy allein bestätigt weder echte E-Mail-Zustellung noch Safari/PWA-Verhalten.
+
+## Erweiterte Desktop-Abnahme für Kunden- und Adminportal
+
+Desktop wird als Arbeitsoberfläche mit persistenter Navigation, direkter Suche, sichtbaren Hauptaktionen und Inline-Positionseditor geprüft. Mobile Navigation und Bottom Sheets werden nicht als verpflichtendes Desktop-Bedienmuster übernommen. Admin-Demo ist eine tatsächlich produktiv gerenderte, isolierte Beispielansicht; sie bestätigt nicht die Daten und Berechtigungen einer echten Microsoft-Operator-Sitzung. Admin-Demo-Einstieg wechselt nach Sitzungsanlage vollständig zur Anwendung und verändert keine Kunden-Demo-Markierung im Local Storage.

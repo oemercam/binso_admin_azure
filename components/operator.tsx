@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDialogFocus } from "./use-dialog-focus";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
@@ -94,24 +95,25 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
+  const accountDialogRef=useDialogFocus(accountOpen,()=>setAccountOpen(false));
   const router=useRouter();
   const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
       <Link href="/operator"><Logo dark/></Link>
-      <nav>{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span>{label==="Tickets"&&<em>12</em>}</Link>)}</nav>
+      <nav>{operatorNav.map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span></Link>)}</nav>
     </aside>
 
     <main className="operator-main">
       <header className="operator-app-header">
-        <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
-        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
+        <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
+        <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
-      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
+      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section ref={accountDialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
-        {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
+        {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
         <button type="button" className={["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
       </nav>
       {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>

@@ -2075,3 +2075,37 @@
 @media(max-width:767px){
   .single-action.mobile-document-bar{grid-template-columns:1fr}
 }
+
+
+/* Desktop workspaces use dialogs, persistent navigation and inline editing. */
+@media (min-width:761px){
+  .sheet-layer{align-items:center;padding:24px}
+  .bottom-sheet{
+    max-height:calc(100dvh - 48px);
+    padding:18px 24px 24px;
+    border:1px solid var(--color-line);
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-modal);
+    animation:desktop-dialog-enter var(--motion-base) var(--motion-ease) both;
+  }
+  .sheet-handle{display:none}
+  .bottom-sheet>.sheet-header{top:-18px;padding-top:0}
+  .bottom-sheet .sheet-menu b{font-size:14px}
+  .bottom-sheet .sheet-menu small{font-size:12px}
+  .desktop-header-timer{display:flex;align-items:center;gap:6px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .operator-sidebar a{font-size:13px}
+  .operator-sidebar a[aria-current="page"]{font-weight:750;text-decoration:underline;text-underline-offset:6px}
+  .operator-table-head,.operator-table-row{grid-template-columns:100px minmax(0,1.5fr) minmax(0,1fr) 150px 120px}
+  .operator-table-row{font-size:13px}
+  .operator-table-row>span{min-width:0;overflow-wrap:anywhere}
+  .operator-table-row small{font-size:12px;line-height:1.5}
+  .operator-table-head{font-size:12px}
+  .operator-table-head.customer,.operator-table-row.customer{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr))}
+  .operator-table-head.payment,.operator-table-row.payment{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .operator-table-head.security,.operator-table-row.security{grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr))}
+  .operator-table-head.audit,.operator-table-row.audit{grid-template-columns:minmax(0,.6fr) minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1.6fr)}
+  .operator-toolbar{flex-wrap:wrap}
+  .operator-message p,.operator-detail-list>div{font-size:13px;line-height:1.5}
+}
+@keyframes desktop-dialog-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media (min-width:761px) and (prefers-reduced-motion:reduce){.bottom-sheet{animation:none}}

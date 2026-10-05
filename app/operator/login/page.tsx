@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import {useSearchParams,useRouter} from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import {useState} from "react";
 import {Button,Logo} from "@/components/ui";
 
 export default function OperatorLogin(){
-  const router=useRouter();
   const search=useSearchParams();
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
@@ -25,8 +24,7 @@ export default function OperatorLogin(){
     try{
       const response=await fetch("/api/operator/demo-session",{method:"POST",headers:{"Content-Type":"application/json"}});
       if(!response.ok)throw new Error();
-      window.localStorage.setItem("binso.demo.session","1");
-      router.push("/operator");router.refresh();
+      window.location.replace("/operator");
     }catch{
       setError("One Admin Demo konnte nicht gestartet werden.");setLoading(false);
     }
