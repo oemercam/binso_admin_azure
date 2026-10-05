@@ -362,10 +362,10 @@ export function AppShell({
           {sheet === "more" && <>
             <div className="sheet-menu">
               <SheetLink href="/produkte" icon="box" title="Produkte" text="Produkte und Dienstleistungen" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/mitarbeiter" icon="users" title="Mitarbeiter" text="Team und Rollen" onSelect={() => setSheet(null)}/>
+              <SheetLink href="/mitarbeiter" icon="users" title="Mitarbeiter" text="Stammdaten und Arbeitsverhältnis" onSelect={() => setSheet(null)}/>
               <SheetLink href="/spesen" icon="card" title="Spesen" text="Belege und Freigaben" onSelect={() => setSheet(null)}/>
+              <SheetLink href="/finanzen" icon="chart" title="Finanzen" text="Einnahmen, Kosten und Auswertungen" onSelect={() => setSheet(null)}/>
               <SheetLink href="/support" icon="support" title="Support" text="Tickets und Hilfe" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/einstellungen/konto" icon="user" title="Persönliche Daten" text="Profil und Sprache" onSelect={() => setSheet(null)}/>
               <SheetLink href="/einstellungen" icon="settings" title="Einstellungen" text="Alle Einstellungen" onSelect={() => setSheet(null)}/>
             </div>
             <div className="sheet-secondary">
