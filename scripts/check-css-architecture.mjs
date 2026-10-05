@@ -104,4 +104,35 @@ const variables=new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(match=>match[1]
 const unresolved=[...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map(match=>match[1]))].filter(name=>!variables.has(name));
 if(unresolved.length)throw new Error(`Undefined central CSS variables: ${unresolved.join(", ")}`);
 
-console.log(`CSS architecture OK: ${used.size} used classes covered by ${runtimeCss.length} runtime stylesheets.`);
+const responsive=fs.readFileSync(path.join(styleDir,"responsive.css"),"utf8");
+const normalizeMedia=value=>value.replace(/\s+/g," ").replace(/\(\s*/g,"(").replace(/\s*\)/g,")").replace(/\s*:\s*/g,":").trim();
+const mediaConditions=[...responsive.matchAll(/@media\s*([^\{]+)\{/g)].map(match=>normalizeMedia(match[1]));
+const mediaCounts=new Map();
+for(const condition of mediaConditions)mediaCounts.set(condition,(mediaCounts.get(condition)??0)+1);
+const duplicateMedia=[...mediaCounts].filter(([,count])=>count>1);
+if(duplicateMedia.length){
+  throw new Error("Responsive CSS must have one block per media condition: "+duplicateMedia.map(([condition,count])=>condition+" x"+count).join(", "));
+}
+const allowedMedia=new Set([
+  "(max-width:1100px)",
+  "(min-width:761px)",
+  "(min-width:761px) and (max-width:1100px)",
+  "(min-width:1101px)",
+  "(min-width:1500px)",
+  "(max-width:760px)",
+  "(max-width:640px)",
+  "(max-width:420px)",
+  "(max-width:389px)",
+  "(max-height:520px) and (orientation:landscape)",
+  "(max-height:520px) and (orientation:landscape) and (max-width:900px)",
+  "(hover:hover) and (pointer:fine)",
+  "(prefers-reduced-motion:reduce)",
+  "(min-width:761px) and (prefers-reduced-motion:reduce)",
+]);
+const unexpectedMedia=mediaConditions.filter(condition=>!allowedMedia.has(condition));
+if(unexpectedMedia.length)throw new Error("Unexpected responsive breakpoint/query: "+[...new Set(unexpectedMedia)].join(", "));
+if(mediaConditions.length>allowedMedia.size)throw new Error("Responsive CSS contains too many media blocks: "+mediaConditions.length);
+if(/max-width\s*:\s*767px/.test(responsive))throw new Error("Legacy 767px breakpoint is not allowed");
+if(/min-width\s*:\s*720px/.test(responsive))throw new Error("Fixed 720px minimum width is not allowed");
+
+console.log(`CSS architecture OK: ${used.size} used classes covered by ${runtimeCss.length} runtime stylesheets; ${mediaConditions.length} canonical media blocks.`);
