@@ -754,11 +754,5 @@
   cursor:pointer;
 }
 .footer-privacy-button:hover{text-decoration:underline}
-@media (max-width:640px){
-  .privacy-consent-layer{padding:10px}
-  .privacy-consent-card{padding:18px;border-radius:14px}
-  .privacy-consent-actions{display:grid;grid-template-columns:1fr}
-  .privacy-consent-actions .button{width:100%}
-}
 
 .privacy-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
