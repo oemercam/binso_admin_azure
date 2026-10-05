@@ -2139,16 +2139,19 @@
   .page-head-detail .desktop-back{margin-bottom:12px}
 
   .desktop-page-actions{
-    min-height:44px;
-    margin:-8px 0 24px;
+    min-height:var(--desktop-action-h);
+    margin:0 0 var(--desktop-section-gap);
     display:flex;
     align-items:center;
     justify-content:flex-start;
     flex-wrap:wrap;
-    gap:8px;
+    gap:var(--desktop-action-gap);
   }
   .desktop-page-actions:empty{display:none}
-  .desktop-page-actions .button{min-height:40px}
+  .desktop-page-actions .button{
+    min-height:var(--desktop-action-h);
+    height:var(--desktop-action-h);
+  }
 
   .desktop-appbar{padding-left:var(--page-x);padding-right:var(--page-x)}
   .desktop-appbar-actions{gap:10px}
@@ -2178,16 +2181,33 @@
   .record-main small{font-size:11px;line-height:1.45}
 
   .surface{
-    padding:22px 24px;
+    padding:var(--desktop-section-y) var(--desktop-surface-x);
     border-radius:12px;
   }
   .section-title{
-    min-height:34px;
-    margin-bottom:4px;
+    min-height:var(--desktop-action-h);
+    margin-bottom:12px;
     padding-bottom:12px;
     border-bottom:1px solid var(--color-line);
   }
   .section-title h2{font-size:15px}
+  .section-title>.icon-action,
+  .section-title>.icon-button{
+    width:var(--desktop-action-h);
+    min-width:var(--desktop-action-h);
+    height:var(--desktop-action-h);
+    min-height:var(--desktop-action-h);
+    border:1px solid var(--color-line);
+    border-radius:var(--control-radius);
+    background:var(--color-bg);
+  }
+  .form-section>.section-title,
+  .settings-form>.section-title{
+    min-height:var(--desktop-action-h);
+    margin-bottom:16px;
+    padding-bottom:0;
+    border-bottom:0;
+  }
   .compact-list>div,
   .compact-list>a,
   .activity-list>div,
@@ -2239,8 +2259,20 @@
 
   .invoice-workspace{
     grid-template-columns:minmax(0,1.25fr) minmax(430px,.75fr);
-    gap:24px;
+    gap:var(--desktop-section-y);
   }
+  .invoice-form{
+    overflow:visible;
+  }
+  .invoice-form>.form-section{
+    padding:var(--desktop-section-y) var(--desktop-surface-x);
+    border-bottom:1px solid var(--color-line);
+  }
+  .invoice-form>.form-section:first-child{padding-top:var(--desktop-section-y)}
+  .invoice-form>.form-section:last-child{border-bottom:0}
+  .invoice-form .document-customer-hint{margin:10px 0 0}
+  .invoice-form .document-line-items{margin-top:2px}
+  .invoice-form .invoice-totals{margin-top:20px}
   .desktop-document-preview{top:88px}
 
   .document-desktop-workspace{
