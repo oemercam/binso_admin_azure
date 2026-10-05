@@ -4,6 +4,7 @@ import Link from "next/link";
 import {useRouter,useSearchParams} from "next/navigation";
 import {FormEvent,useMemo,useState} from "react";
 import {Eye,EyeOff} from "lucide-react";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {Button,Logo} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {billingCycles,domainConfig,planIds,type BillingCycle,type PlanId} from "@/config/domain";
@@ -18,6 +19,7 @@ export default function Register(){
   const plan=plans.find(item=>item.id===selectedPlan)??plans[0];
   const subscriptionHref=`/einstellungen/abonnement?plan=${selectedPlan}&billing=${billingCycle}&activate=1`;
 
+  const [confirmCancel,setConfirmCancel]=useState(false);
   const [companyName,setCompanyName]=useState("");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -48,7 +50,7 @@ export default function Register(){
       const payload=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
       const next=payload.mfaSetupRequired?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(subscriptionHref)}`:subscriptionHref;
-      router.push(next);router.refresh();
+      window.location.replace(next);
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");setLoading(false);}
   };
 
@@ -75,7 +77,7 @@ export default function Register(){
   </section></main>;
 
   return <main className="auth-page"><section className="auth-card">
-    <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/preise">Abbrechen</Link></div>
+    <div className="auth-topbar"><Logo/><button type="button" className="auth-inline-action" onClick={()=>{if(companyName||email||password)setConfirmCancel(true);else router.push("/preise");}}>Abbrechen</button></div>
     <h1>Konto erstellen</h1><p>{domainConfig.trialDays} Tage kostenlos testen. Keine Kreditkarte erforderlich.</p>
     <div className="auth-plan-summary"><b>{plan.name}</b><span>{billingCycle==="yearly"?`CHF ${plan.yearly} / Jahr`:`CHF ${plan.monthly} / Monat`} nach Aktivierung</span><small>Ohne Abo nach der Testphase: Nur-Lesen, Daten bleiben erhalten.</small></div>
     <form onSubmit={submit}>
@@ -87,5 +89,6 @@ export default function Register(){
       <Button type="submit" disabled={loading||!acceptedTerms}>{loading?"Account wird erstellt…":"Account erstellen"}</Button>
     </form>
     <div className="auth-after-submit"><p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> und die <Link href="/auftragsbearbeitung">Auftragsbearbeitung</Link> zur Kenntnis genommen zu haben.</p><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>
+    <ConfirmDialog open={confirmCancel} title="Registrierung abbrechen?" message="Deine Eingaben gehen verloren." confirmLabel="Registrierung abbrechen" cancelLabel="Weiter bearbeiten" onCancel={()=>setConfirmCancel(false)} onConfirm={()=>router.push("/preise")}/>
   </section></main>;
 }

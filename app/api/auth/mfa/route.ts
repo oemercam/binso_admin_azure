@@ -10,7 +10,7 @@ export async function GET(){
     if(!session)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
     const user=await query<{mfa_enabled:boolean}>("select mfa_enabled from app_users where id=$1 limit 1",[session.userId]);
     const enabled=user.rows[0]?.mfa_enabled===true;
-    return json({enabled,required:["owner","admin","finance"].includes(session.role),role:session.role});
+    return json({enabled,required:session.isDemo!==true&&["owner","admin","finance"].includes(session.role),role:session.role,demo:session.isDemo===true});
   }catch(error){return apiError(error);}
 }
 export async function DELETE(_request:NextRequest){

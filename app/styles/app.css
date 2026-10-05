@@ -1259,3 +1259,11 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .entity-hero>div{min-width:0}.entity-hero h2,.entity-hero p{overflow-wrap:anywhere}
 
 .customer-records-layout{width:100%;min-width:0}
+
+/* Inline editor is the desktop default; mobile summary rules live in responsive.css. */
+.mobile-position-summary{display:none}
+.document-line-item>.mobile-line-field{min-width:0}
+.document-line-item>.mobile-line-field>span,
+.document-line-item>.mobile-line-total>span{display:none}
+.document-line-item>.mobile-line-field input{width:100%;min-width:0}
+.document-line-items>div{grid-template-columns:minmax(0,1fr) 56px 78px 82px 32px}

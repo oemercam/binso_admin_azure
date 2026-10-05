@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
 import {PrivacySettingsButton} from "./privacy-consent";
 
@@ -81,7 +81,6 @@ export function MarketingFooter() {
     <div className="footer-links">
       <Link href="/produkt">Produkt</Link>
       <Link href="/preise">Preise</Link>
-      <Link href="/#sicherheit">Sicherheit</Link>
       <Link href="/demo">Demo</Link>
       <Link href="/login">Anmelden</Link>
       <Link href="/impressum">Impressum</Link>
@@ -89,25 +88,42 @@ export function MarketingFooter() {
       <Link href="/agb">AGB</Link>
       <Link href="/auftragsbearbeitung">DPA</Link>
       <Link href="/unterauftragsbearbeiter">Unterauftragsbearbeiter</Link>
+      <a href="https://ch.linkedin.com/company/binsogmbh" target="_blank" rel="noreferrer" aria-label="Binso auf LinkedIn">LinkedIn</a>
       <PrivacySettingsButton/>
     </div>
-    <small>© 2026 Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · Schweiz · CHE-173.401.068</small>
+    <small>© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a> · Weissbadstrasse 8b · 9050 Appenzell · Schweiz · CHE-173.401.068</small>
   </footer>;
 }
 
 export function ProductPreview() {
   return <div className="hero-product-preview" aria-label="Echte Binso One Produktansicht">
-    <div className="hero-product-desktop"><img src="/product/binso-one-dashboard-mobile.jpg" alt="Binso One Dashboard in der aktuellen mobilen Oberfläche"/></div>
-    <div className="hero-product-mobile"><img src="/product/binso-one-dashboard-mobile.jpg" alt="" aria-hidden="true"/></div>
+    <div className="hero-product-desktop"><img src="/product/binso-one-dashboard-desktop.jpg" alt="Binso One Dashboard aus der produktiven Demo" width={1363} height={936}/></div>
+
   </div>;
 }
 
 const productScreens:Record<string,string>={
-  "/preview/dashboard":"/product/binso-one-dashboard-mobile.jpg",
+  "/preview/dashboard":"/product/binso-one-dashboard-desktop.jpg",
 };
 
 export function ProductScreen({route="/preview/dashboard",title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
   return <figure className={`product-screen product-screen-${variant}`}>
-    <img src={productScreens[route]??productScreens["/preview/dashboard"]} alt={title} loading="lazy" decoding="async"/>
+    <img src={productScreens[route]??productScreens["/preview/dashboard"]} alt={title} width={1363} height={936} loading="lazy" decoding="async"/>
   </figure>;
+}
+
+export function MarketingFaq({children}:{children:React.ReactNode}) {
+  const ref=useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    const root=ref.current;
+    if(!root)return;
+    const closeOthers=(event:Event)=>{
+      const opened=event.target;
+      if(!(opened instanceof HTMLDetailsElement)||!opened.open)return;
+      for(const detail of root.querySelectorAll("details")){if(detail!==opened)detail.open=false;}
+    };
+    root.addEventListener("toggle",closeOthers,true);
+    return()=>root.removeEventListener("toggle",closeOthers,true);
+  },[]);
+  return <div className="faq-list" ref={ref}>{children}</div>;
 }
