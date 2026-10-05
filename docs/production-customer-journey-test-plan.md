@@ -1,38 +1,40 @@
-# Binso One – Production Customer Journey Test Plan
+# Binso One – Produktiver Customer-Journey-Testplan
 
-## Scope
-This plan verifies the public demo, real 14-day trial, Stripe subscription activation, webhook processing, account entitlements, Customer Portal, cancellation, and trial expiry behavior without conflating demo and production sessions.
+Stand: 5. Oktober 2026
 
-## 1. Public demo
-1. Open the landing page in a clean browser session.
-2. Select **Demo starten**.
-3. Complete demo onboarding and verify example data is visible.
-4. Open **Einstellungen → Abonnement**.
-5. Expected: the page clearly states that payments are disabled in demo. No live Stripe Checkout can be started.
-6. Leave demo and register a real account in the same browser.
-7. Expected: the demo cookie/session is removed and the new real account is used immediately.
+## Umfang
+Dieser Testplan prüft öffentliche Demo, echte 14-Tage-Testphase, Stripe-Aktivierung, Webhook-Verarbeitung, Berechtigungen, Customer Portal, Kündigung und Trial-Ablauf. Demo- und Produktionssitzungen dürfen dabei nicht vermischt werden.
 
-## 2. Real registration and 14-day trial
-1. Choose each plan from the pricing page: Start, Business, Pro.
-2. Test both monthly and yearly selection.
-3. Register with a unique business email.
-4. Expected: the selected plan and billing interval are preserved.
-5. Expected: no card is required for trial creation.
-6. Expected: the account shows a 14-day trial and CHF 0 during the trial.
-7. Verify the confirmation email arrives and the verification link succeeds.
-8. Verify **Bestätigungs-E-Mail erneut senden** is rate-limited and works.
+## 1. Öffentliche Demo
+1. Landingpage in einer neuen Browser-Sitzung öffnen.
+2. **Demo starten** wählen.
+3. Demo-Onboarding abschliessen und prüfen, dass Beispieldaten sichtbar sind.
+4. **Einstellungen → Abonnement** öffnen.
+5. Erwartet: Zahlungen sind in der Demo klar deaktiviert; ein Live-Stripe-Checkout kann nicht gestartet werden.
+6. Demo verlassen und im selben Browser ein echtes Konto registrieren.
+7. Erwartet: Demo-Session/Cookie wird entfernt und unmittelbar die echte Kontositzung verwendet.
+
+## 2. Echte Registrierung und 14-Tage-Testphase
+1. Auf der Preisseite nacheinander Start, Business und Pro auswählen.
+2. Monats- und Jahresabrechnung testen.
+3. Mit einer eindeutigen geschäftlichen E-Mail-Adresse registrieren.
+4. Erwartet: gewählter Tarif und Abrechnungsintervall bleiben erhalten.
+5. Erwartet: Für die Testphase ist keine Kreditkarte erforderlich.
+6. Erwartet: Das Konto zeigt 14 Tage Testphase und CHF 0 während dieser Testphase.
+7. Prüfen, dass die Bestätigungs-E-Mail über Microsoft Graph eintrifft und der darin enthaltene sechsstellige Bestätigungscode erfolgreich akzeptiert wird.
+8. **Code erneut senden** prüfen; die erneute Zustellung muss funktionieren und rate-limitiert sein.
 
 ## 3. Stripe Checkout
-1. From a real trial account, open **Einstellungen → Abonnement**.
-2. Expected: Stripe is reported as ready; all six live prices are available.
-3. Select the plan/billing interval and continue to Stripe.
-4. Verify company/billing address and tax ID collection.
-5. Complete one controlled live payment only with explicit business approval.
-6. Expected: returning from Stripe alone does not activate access until the signed webhook is processed.
-7. Expected after webhook: subscription becomes active, Stripe customer/subscription IDs are stored, plan limits update, and the paid period is shown.
+1. Mit einem echten Testkonto **Einstellungen → Abonnement** öffnen.
+2. Erwartet: Stripe wird als bereit angezeigt und alle sechs Live-Preise sind verfügbar.
+3. Tarif und Intervall auswählen und zu Stripe wechseln.
+4. Firmen-/Rechnungsadresse und Steuer-ID-Erfassung prüfen.
+5. Genau eine kontrollierte Live-Zahlung nur mit ausdrücklicher geschäftlicher Freigabe durchführen.
+6. Erwartet: Die Rückkehr von Stripe allein aktiviert das Abo nicht; massgebend ist erst der signierte Webhook.
+7. Erwartet nach dem Webhook: Abo aktiv, Stripe-Kunden-/Subscription-IDs gespeichert, Tarifgrenzen aktualisiert und bezahlte Periode korrekt angezeigt.
 
-## 4. Webhook and idempotency
-Verify processing for:
+## 4. Webhook und Idempotenz
+Verarbeitung prüfen für:
 - checkout.session.completed
 - checkout.session.async_payment_succeeded
 - checkout.session.async_payment_failed
@@ -41,49 +43,49 @@ Verify processing for:
 - invoice.payment_failed
 - invoice.payment_action_required
 
-Replay the same event ID and confirm no duplicate billing ledger entry or entitlement update is created.
+Dieselbe Event-ID erneut zustellen und prüfen, dass weder ein doppelter Billing-Eintrag noch eine doppelte Berechtigungsänderung entsteht.
 
 ## 5. Customer Portal
-1. Open Billing Portal from a paid account.
-2. Verify invoice history is visible.
-3. Verify payment method update is available.
-4. Verify subscription cancellation is available.
-5. Verify plan switching is not exposed unless Binso One explicitly supports it.
-6. Cancel at period end and confirm Binso One reflects cancel_at_period_end without immediately removing paid access.
+1. Customer Portal aus einem bezahlten Konto öffnen.
+2. Rechnungsverlauf prüfen.
+3. Aktualisierung des Zahlungsmittels prüfen.
+4. Kündigungsmöglichkeit prüfen.
+5. Prüfen, dass Tarifwechsel nicht angeboten werden, solange Binso One diese Funktion nicht ausdrücklich freigibt.
+6. Kündigung auf Periodenende durchführen und prüfen, dass `cancel_at_period_end` übernommen wird, ohne den bezahlten Zugriff sofort zu entziehen.
 
-## 6. Trial expiry
-1. Create a trial tenant with trial_until in the past and no Stripe subscription ID.
-2. Trigger authenticated access.
-3. Expected: subscription status becomes expired and organization becomes read_only.
-4. Verify reads continue to work.
-5. Verify normal writes are blocked.
-6. Verify billing actions remain allowed so a customer can activate a plan later.
-7. Verify data is not deleted.
+## 6. Ablauf der Testphase
+1. Testorganisation mit abgelaufenem `trial_until` und ohne Stripe-Subscription-ID erzeugen.
+2. Authentifizierten Zugriff auslösen.
+3. Erwartet: Subscription-Status wird `expired`, Organisation wird `read_only`.
+4. Prüfen, dass Lesezugriffe weiterhin funktionieren.
+5. Prüfen, dass normale Schreibzugriffe blockiert werden.
+6. Prüfen, dass Billing-Aktionen weiterhin möglich sind, damit später ein Abo aktiviert werden kann.
+7. Prüfen, dass keine Kundendaten gelöscht werden.
 
-## 7. Payment failure
-1. Simulate invoice.payment_failed in a non-live environment.
-2. Verify status transitions according to the billing lifecycle.
-3. Ensure customer data remains readable and destructive actions are not performed.
-4. Verify successful later payment restores the correct active subscription state.
+## 7. Fehlgeschlagene Zahlung
+1. `invoice.payment_failed` in einer Nicht-Live-Umgebung simulieren.
+2. Statusübergänge gemäss Billing-Lifecycle prüfen.
+3. Sicherstellen, dass Kundendaten lesbar bleiben und keine destruktiven Aktionen erfolgen.
+4. Prüfen, dass eine spätere erfolgreiche Zahlung den korrekten aktiven Abozustand wiederherstellt.
 
 ## 8. Mobile / PWA
-Test on current Safari/iOS, Chrome/Android, Edge/Windows and installed PWA:
-- safe-area spacing
-- sticky mobile header
-- compacting bottom navigation
-- plan selection sheet
-- Stripe redirect and return
-- keyboard/form behavior
-- no horizontal overflow
-- demo-to-real-session switch
+Auf aktuellem Safari/iOS, Chrome/Android, Edge/Windows und als installierte PWA prüfen:
+- Safe-Area-Abstände
+- Sticky Mobile Header
+- kompakt werdende Bottom-Navigation
+- Tarifauswahl-Sheet
+- Stripe-Weiterleitung und Rückkehr
+- Tastatur- und Formularverhalten
+- kein horizontaler Overflow
+- Wechsel von Demo- zu Echt-Sitzung
 
-## 9. Final production gates
-Before launch require:
-- Quality green on main
-- Azure deploy green
-- production route verification green
-- Stripe Billing Configuration green with billingProductionReady=true
-- six live CHF recurring prices valid
-- live webhook enabled on 2026-08-26.dahlia
-- default live Customer Portal enabled
-- no legacy CHF 19/49/89 pricing or 30-day trial copy on public pages
+## 9. Finale Produktions-Gates
+Vor dem Go-live erforderlich:
+- Quality auf `main` grün
+- Azure-Deploy grün
+- produktive Routenprüfung grün
+- Stripe Billing Configuration grün mit `billingProductionReady=true`
+- sechs gültige wiederkehrende CHF-Live-Preise
+- Live-Webhook aktiv und API-Version `2026-08-26.dahlia`, entsprechend `lib/server/stripe.ts`
+- standardmässiges Live-Customer-Portal aktiviert
+- keine alten Preisangaben CHF 19/49/89 und keine alte 30-Tage-Testphase auf öffentlichen Seiten
