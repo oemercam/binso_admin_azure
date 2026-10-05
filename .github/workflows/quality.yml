@@ -24,6 +24,9 @@ jobs:
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm security:scan
+      - name: Full dependency audit including development tooling
+        continue-on-error: true
+        run: pnpm security:scan:all
       - run: pnpm css:check
       - run: pnpm typecheck
       - run: pnpm build
