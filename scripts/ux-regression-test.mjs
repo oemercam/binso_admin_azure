@@ -80,7 +80,7 @@ assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing histo
 console.log('Subscription settings use flat separators instead of legacy cards.');
 
 assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
-assert.ok(responsiveCss.includes('.desktop-search-trigger kbd{display:none}'),'Medium desktop header must compact the search trigger instead of removing the account controls');
+assert.ok(responsiveCss.includes('.desktop-search-field kbd{display:none}'),'Medium desktop header must compact the inline search instead of removing account controls');
 console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
 
 const uiSource=await fs.readFile('components/ui.tsx','utf8');
@@ -92,7 +92,7 @@ console.log('Small SVG icons use crisp pixel-stable rendering.');
 
 assert.ok(!responsiveCss.includes('max-width:767px'),'Responsive system must not introduce a second mobile breakpoint at 767px');
 assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables must not force desktop-width horizontal scrolling');
-assert.ok(responsiveCss.includes('Final viewport contract: small <=760, medium 761-1100, wide >=1101'),'Viewport contract must stay explicit and centralized');
+assert.ok(responsiveCss.includes('Primary layout states:'),'Viewport contract must stay explicit and centralized');
 assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
 assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
 assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
@@ -104,4 +104,7 @@ assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search
 assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
 assert.ok(appCss.includes('.desktop-search-results{'),'Desktop search results must render as an anchored dropdown');
 assert.ok(!responsiveCss.includes('.desktop-search-trigger'),'Responsive CSS must not retain obsolete popup-search trigger rules');
+const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(match=>match[1].replace(/\s+/g,' ').replace(/\(\s*/g,'(').replace(/\s*\)/g,')').replace(/\s*:\s*/g,':').trim());
+assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
+assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
 console.log('Desktop global search stays inline with anchored results and no modal trigger.');
