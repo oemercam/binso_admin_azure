@@ -56,3 +56,13 @@ await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');
 await fs.access('docs/production-rollback.md');
 await fs.access('docs/azure-postgresql-backup-restore.md');
+
+await fs.access('scripts/organization-data-lifecycle.mjs');
+await fs.access('scripts/data-lifecycle-schema-test.mjs');
+await fs.access('docs/customer-data-lifecycle.md');
+await fs.access('.github/workflows/production-monitoring-readiness.yml');
+await fs.access('.github/workflows/postgresql-backup-readiness.yml');
+const lifecycle=await fs.readFile('scripts/organization-data-lifecycle.mjs','utf8');
+for(const guard of ['BINSO_DELETE_CONFIRM','BINSO_DELETE_EXPORT_CONFIRMED','Organization must be archived before final deletion','Active/trial billing state blocks final deletion']){
+  assert.ok(lifecycle.includes(guard),'Customer deletion safeguard missing: '+guard);
+}
