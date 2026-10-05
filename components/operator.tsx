@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
+import { plans } from "@/lib/plans";
 
 const operatorNav = [
   ["","Dashboard","home"],
@@ -32,11 +33,16 @@ function moneyChf(value:number){
   return "CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
+const demoPlan=(id:"start"|"business"|"pro")=>{
+  const plan=plans.find(item=>item.id===id);
+  if(!plan)throw new Error("Demo plan configuration is missing: "+id);
+  return {plan:plan.name,mrr:"CHF "+plan.monthly.toLocaleString("de-CH")};
+};
 const demoCustomers = [
-  {id:"acme",name:"Acme AG",plan:"Business",mrr:"CHF 49",status:"Aktiv"},
-  {id:"mueller",name:"Müller GmbH",plan:"Start",mrr:"CHF 19",status:"Aktiv"},
-  {id:"berger",name:"Berger Bau AG",plan:"Pro",mrr:"CHF 89",status:"Aktiv"},
-  {id:"meier",name:"Meier Handel AG",plan:"Business",mrr:"CHF 49",status:"Eingeschränkt"},
+  {id:"acme",name:"Acme AG",...demoPlan("business"),status:"Aktiv"},
+  {id:"mueller",name:"Müller GmbH",...demoPlan("start"),status:"Aktiv"},
+  {id:"berger",name:"Berger Bau AG",...demoPlan("pro"),status:"Aktiv"},
+  {id:"meier",name:"Meier Handel AG",...demoPlan("business"),status:"Eingeschränkt"},
 ];
 
 const tickets = [
