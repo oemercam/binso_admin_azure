@@ -246,6 +246,7 @@ Der verbindliche aktuelle Stand steht in:
 
 Zentrale Betriebsübersicht:
 - `docs/production-operations-runbook.md`
+- `docs/production-evidence-log.md`
 
 Dokumentierte Betriebsverfahren:
 - `docs/auth-security-flow.md`
