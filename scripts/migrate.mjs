@@ -6,13 +6,16 @@ import pg from "pg";
 const url=process.env.DATABASE_URL;
 if(!url)throw new Error("DATABASE_URL is required");
 const ssl=process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"};
-const pool=new pg.Pool({connectionString:url,ssl});
+const pool=new pg.Pool({connectionString:url,ssl,max:1,connectionTimeoutMillis:15_000});
 const divergent=new Set([
  "001_initial.sql","002_permissions_operator.sql","003_pilot_support_legal.sql","004_support_diagnostics.sql",
  "005_production_readiness.sql","006_organization_settings.sql","007_support_attachments.sql","008_locale_turkish.sql","009_platform_foundation.sql"
 ]);
 
+let migrationLockHeld=false;
 try{
+ await pool.query("select pg_advisory_lock(hashtext($1))",["binso-one-schema-migrations"]);
+ migrationLockHeld=true;
  await pool.query(`create table if not exists schema_migrations(
    version text primary key,
    checksum text not null,
@@ -23,7 +26,7 @@ try{
  const canonicalLineage=applied.has("0001_baseline.sql")||applied.has("0016_self_service_signup.sql");
  const divergentLineage=[...divergent].some(v=>applied.has(v));
  if(divergentLineage&&!canonicalLineage){
-   throw new Error("Database uses the retired divergent migration lineage. Use the guarded reset workflow before applying canonical migrations.");
+   throw new Error("Database uses the retired divergent migration lineage. Production must be recovered with an explicitly reviewed forward migration; automatic reset is forbidden.");
  }
  if(applied.size>0&&!canonicalLineage){
    throw new Error("Unknown database lineage detected. Refusing automatic migration.");
@@ -47,6 +50,8 @@ try{
    const client=await pool.connect();
    try{
      await client.query("begin");
+     await client.query("set local lock_timeout = '15s'");
+     await client.query("set local statement_timeout = '5min'");
      await client.query(sql);
      await client.query("insert into schema_migrations(version,checksum) values($1,$2)",[file,checksum]);
      await client.query("commit");
@@ -56,4 +61,9 @@ try{
    }finally{client.release()}
  }
  console.log("Canonical migrations complete");
-}finally{await pool.end()}
+}finally{
+ if(migrationLockHeld){
+   try{await pool.query("select pg_advisory_unlock(hashtext($1))",["binso-one-schema-migrations"]);}catch{}
+ }
+ await pool.end();
+}
