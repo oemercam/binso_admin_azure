@@ -44,6 +44,14 @@ export async function destroySession(cookieName=env.sessionCookieName){
  jar.delete(cookieName);
 }
 
+export async function endDemoSession(){
+ const jar=await cookies();
+ const token=jar.get("binso_demo_write")?.value;
+ if(token)await query("delete from auth_sessions where token_hash=$1",[tokenHash(token)]);
+ jar.delete("binso_demo_write");
+ jar.delete("binso_demo");
+}
+
 export async function getSession():Promise<SessionUser|null>{
  const jar=await cookies();
  const demo=jar.get('binso_demo')?.value==='1';
