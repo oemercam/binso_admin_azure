@@ -126,3 +126,11 @@ assert.ok(marketingCss.includes('.demo-onboarding-header{'),'Demo onboarding hea
 assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA headers must not render dimming pseudo overlays');
 assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
 console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
+
+const manifestSource=await fs.readFile('app/manifest.ts','utf8');
+const layoutSource=await fs.readFile('app/layout.tsx','utf8');
+assert.ok(manifestSource.includes('/brand/pwa-icon-192.png'),'PWA manifest must expose the Binso One 192px icon');
+assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must expose the Binso One 512px icon');
+assert.ok(manifestSource.includes('/brand/pwa-icon-maskable-512.png'),'PWA manifest must expose a maskable Binso One icon');
+assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen metadata must use the Binso One artwork');
+console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');
