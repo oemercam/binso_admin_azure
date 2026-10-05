@@ -65,6 +65,8 @@ Prioritäten: P1 = blockiert einen Hauptablauf oder zeigt fachlich falsche Ergeb
 
 | UX-26 | Rechnung erstellen / Vorschau | 1363 × 936 | Vor Laden der Firmendaten wird fälschlich eine fehlende IBAN gemeldet; API-Fehler werden verschluckt | Erst Firmendaten laden, danach echte Zahlungsvalidierung; Requestfehler sichtbar | P2 | Firmenlade-/Fehlerstatus, Speicheraktion während Laden gesperrt, Vorschau zeigt Lade-/Fehlerzustand |
 
+| UX-27 | Globale Suche | 1363 × 936 | API liefert label/sub, UI erwartet title/type/meta/icon: Treffer ohne Namen; alte Modulpfade/IDs führen zu falschen Details; Lade-/Fehlerstatus fehlt | Benannte, lesbare und zugängliche Treffer mit richtigen Detailrouten und eindeutigen Requestzuständen | P1 | Gemeinsamer SearchItem-Vertrag, kanonische Datenquellen/IDs und vorhandene Detailrouten, Requestzustand und Schutz vor überholten Ergebnissen |
+
 Zusätzliche Codehärtung: Kein automatischer Wechsel von fehlgeschlagener produktiver Anmeldung zu Demo; Login-Rücksprung akzeptiert keine protokollrelativen externen URLs.
 
 ## Muss manuell auf echtem Gerät bestätigt werden

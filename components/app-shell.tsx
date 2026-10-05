@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import type { SearchItem } from "@/lib/search";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -23,7 +24,7 @@ const desktopNav = [
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
 
-const searchItems = [
+const searchItems:SearchItem[] = [
   { type: "Kunde", title: "Acme AG", meta: "Zürich · Aktiv", href: "/kunden/acme", icon: "users" },
   { type: "Rechnung", title: "RE-2026-019", meta: "Acme AG · CHF 4’346.40", href: "/rechnungen/RE-2026-019", icon: "receipt" },
   { type: "Angebot", title: "AN-2026-012", meta: "Acme AG · CHF 7’264.32", href: "/angebote/AN-2026-012", icon: "file" },
@@ -80,7 +81,7 @@ export function AppShell({
   const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
   const production=useBackendMode();
   const [query, setQuery] = useState("");
-  const [remoteSearch,setRemoteSearch]=useState<typeof searchItems>([]);
+  const [remoteSearch,setRemoteSearch]=useState<{query:string;items:SearchItem[];loading:boolean;error:string|null}>({query:"",items:[],loading:false,error:null});
   const [timerRunning, setTimerRunning] = useState(false);
   const [dark, setDark] = useState(false);
   const [timerBaseSeconds, setTimerBaseSeconds] = useState(0);
@@ -191,17 +192,20 @@ export function AppShell({
   }, [timerRunning]);
 
   useEffect(()=>{
-    if(!production||query.trim().length<2){
-      queueMicrotask(()=>setRemoteSearch([]));
-      return;
-    }
+    let active=true;
+    const term=query.trim();
+    if(!production||term.length<2)return;
+    queueMicrotask(()=>{if(active)setRemoteSearch({query:term,items:[],loading:true,error:null})});
     const timer=window.setTimeout(()=>{
-      apiGet<{items:typeof searchItems}>("/api/search?q="+encodeURIComponent(query.trim()))
-        .then(payload=>setRemoteSearch(payload.items))
-        .catch(()=>setRemoteSearch([]));
+      apiGet<{items:SearchItem[]}>("/api/search?q="+encodeURIComponent(term))
+        .then(payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})})
+        .catch(error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:"Suche konnte nicht geladen werden."})});
     },180);
-    return()=>window.clearTimeout(timer);
+    return()=>{active=false;window.clearTimeout(timer)};
   },[production,query]);
+
+  const searchLoading=production&&query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
+  const searchError=remoteSearch.query===query.trim()?remoteSearch.error:null;
 
   async function loadNotifications(){
     if(!production) return;
@@ -243,7 +247,7 @@ export function AppShell({
   const filtered = useMemo(() => {
     if(production){
       if(!query.trim()) return [];
-      return remoteSearch;
+      return remoteSearch.query===query.trim()?remoteSearch.items:[];
     }
     if (!query.trim()) return searchItems;
     const q = query.toLowerCase();
@@ -397,7 +401,9 @@ export function AppShell({
             <div className="searchbox large" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Suchen..."/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>setQuery("")}><Icon name="close" size={15}/></button>}</div>
             <div className="search-results">
               {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
-              {production&&query.trim().length>=2&&filtered.length===0&&<p className="technical-hint">Keine Treffer gefunden.</p>}
+              {searchLoading&&<p className="technical-hint" role="status">Suche läuft …</p>}
+              {production&&query.trim().length>=2&&!searchLoading&&searchError&&<p className="technical-hint" role="alert">{searchError}</p>}
+              {production&&query.trim().length>=2&&!searchLoading&&!searchError&&filtered.length===0&&<p className="technical-hint" role="status">Keine Treffer gefunden.</p>}
               {filtered.map(item => <Link key={item.href} href={item.href} onClick={() => setSheet(null)}>
                 <span className="activity-icon"><Icon name={item.icon}/></span>
                 <div><small>{item.type}</small><b>{item.title}</b><span>{item.meta}</span></div>
