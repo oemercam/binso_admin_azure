@@ -101,7 +101,10 @@ jobs:
 
           node -e "require.resolve('next')"
 
-          PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-standalone.log 2>&1 &
+          export BINSO_SMOKE_TEST_TOKEN="$(openssl rand -hex 32)"
+          echo "::add-mask::$BINSO_SMOKE_TEST_TOKEN"
+
+          PORT=3100 HOSTNAME=127.0.0.1 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node server.js > /tmp/binso-standalone.log 2>&1 &
           APP_PID=$!
           trap 'result=$?; if [ "$result" -ne 0 ]; then cat /tmp/binso-standalone.log; fi; kill $APP_PID 2>/dev/null || true' EXIT
 
@@ -123,10 +126,10 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
-          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
+          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -H "x-binso-smoke-test: $BINSO_SMOKE_TEST_TOKEN" -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
           test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
 
-          BINSO_BASE_URL=http://127.0.0.1:3100 node ../../scripts/check-persistence.mjs
+          BINSO_BASE_URL=http://127.0.0.1:3100 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node ../../scripts/check-persistence.mjs
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -285,7 +288,6 @@ jobs:
           curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null
           echo "PostgreSQL-backed demo and finance production checks passed."
 
-          BINSO_BASE_URL="$PRODUCTION_URL" node scripts/check-persistence.mjs
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"
