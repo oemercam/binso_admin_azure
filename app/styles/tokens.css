@@ -1,4 +1,6 @@
 :root{
+  --sheet-available-height:100dvh;
+  --sheet-keyboard-offset:0px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -78,7 +80,7 @@
   --control-h-mobile:44px;
   --control-font:13px;
   --control-font-mobile:16px;
-  --control-label-font:11px;
+  --control-label-font:14px;
   --control-help-font:10px;
   --control-x:11px;
   --control-radius:var(--radius-md);

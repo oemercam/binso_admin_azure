@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import ts from 'typescript';
+import {SwissQRBill} from 'swissqrbill/svg';
+
+const require=createRequire(import.meta.url);
+const source=(await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/utils')).href));
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const {responsiveQrSvg}=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
+const original=new SwissQRBill({creditor:{account:'CH9300762011623852957',name:'Preview test',address:'Teststrasse',zip:'8000',city:'Zürich',country:'CH'},currency:'CHF',amount:100}).toString();
+const scaled=responsiveQrSvg(original);
+const box=scaled.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
+assert.deepEqual(box.slice(0,2),[0,0]);
+assert.equal(box[2],210*96/25.4);
+assert.equal(box[3],105*96/25.4);
+assert.equal(box[2]/box[3],2,'Full payment slip must retain its 2:1 aspect ratio');
+assert.equal(scaled.slice(scaled.indexOf('>')+1),original.slice(original.indexOf('>')+1),'Scaling must not change QR data or payment content');
+assert.equal(responsiveQrSvg(scaled),scaled,'Already scalable SVG must remain unchanged');
+console.log('Generated Swiss QR payment slip scales as a complete 210 × 105 mm viewport without altering its content.');

@@ -5,8 +5,9 @@ import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
 import { useDialogFocus } from "./use-dialog-focus";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ConfirmDialog from "./confirm-dialog";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import type { SearchItem } from "@/lib/search";
@@ -65,6 +66,8 @@ export function AppShell({
   backHref,
   backLabel = "Zurück",
   preview = false,
+  editing = false,
+  unsavedChanges,
 }: {
   title: string;
   subtitle?: string;
@@ -75,8 +78,42 @@ export function AppShell({
   backHref?: string;
   backLabel?: string;
   preview?: boolean;
+  editing?: boolean;
+  unsavedChanges?: boolean;
 }) {
   const pathname=usePathname();
+  const router=useRouter();
+  const formActive=editing||pathname.endsWith("/neu");
+  const [formDirty,setFormDirty]=useState(false);
+  const shellRef=useRef<HTMLDivElement>(null);
+  const dirty=unsavedChanges??formDirty;
+  const allowLeave=useRef(false);
+  useEffect(()=>{
+    if(!formActive)return;
+    const root=shellRef.current;
+    const changed=(event:Event)=>{
+      if(event.target instanceof Element&&event.target.closest('.form-field,.mobile-line-field'))setFormDirty(true);
+    };
+    root?.addEventListener('input',changed);
+    root?.addEventListener('change',changed);
+    return()=>{root?.removeEventListener('input',changed);root?.removeEventListener('change',changed);};
+  },[formActive]);
+  const [leaveHref,setLeaveHref]=useState<string|null>(null);
+  useEffect(()=>{
+    if(!dirty)return;
+    const beforeUnload=(event:BeforeUnloadEvent)=>{if(allowLeave.current)return;event.preventDefault();event.returnValue="";};
+    const navigate=(event:MouseEvent)=>{
+      if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+      const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>("a[href]"):null;
+      if(!link||link.target==="_blank"||link.hasAttribute("download"))return;
+      const url=new URL(link.href,window.location.href);
+      if(url.href===window.location.href||url.hash&&url.pathname===pathname)return;
+      event.preventDefault();event.stopPropagation();setLeaveHref(url.href);
+    };
+    window.addEventListener("beforeunload",beforeUnload);
+    document.addEventListener("click",navigate,true);
+    return()=>{window.removeEventListener("beforeunload",beforeUnload);document.removeEventListener("click",navigate,true);};
+  },[dirty,pathname]);
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
   const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
   const production=useBackendMode();
@@ -298,7 +335,8 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <div className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""}`}>
+  return <div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowLeave.current=true;const url=new URL(href);if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
@@ -370,7 +408,7 @@ export function AppShell({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
+      {!preview && !formActive && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
         <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
         <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>

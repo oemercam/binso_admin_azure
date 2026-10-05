@@ -1303,7 +1303,7 @@
     border:1px solid var(--glass-line);
     border-radius:var(--mobile-nav-radius);
     background:var(--glass-bg);
-    box-shadow:0 10px 34px rgba(0,0,0,.12);
+    box-shadow:0 4px 16px rgba(0,0,0,.07);
     transform:translateZ(0);
     transition:height var(--motion-base) var(--motion-ease),border-radius var(--motion-base) var(--motion-ease),background-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease);
   }
@@ -1311,7 +1311,7 @@
     height:var(--mobile-nav-compact-h);
     min-height:var(--mobile-nav-compact-h);
     border-radius:var(--mobile-nav-compact-radius);
-    box-shadow:0 8px 26px rgba(0,0,0,.10);
+    box-shadow:0 3px 12px rgba(0,0,0,.06);
   }
   .bottom-nav>a,
   .bottom-nav>button{
@@ -1745,6 +1745,7 @@
   .danger-zone .button{width:100%;margin-top:12px}
 
   .sheet-layer{
+    bottom:var(--sheet-keyboard-offset);
     overscroll-behavior:contain;
     touch-action:none;
   }
@@ -2061,8 +2062,8 @@
   .bottom-sheet{
     box-sizing:border-box;
     max-width:100%;
-    max-height:min(82dvh,720px);
-    overflow:hidden;
+    max-height:min(82dvh,var(--sheet-available-height,82dvh),720px);
+    overflow:auto;
     display:flex;
     flex-direction:column;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
@@ -2374,9 +2375,9 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .payment-summary-strip small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .document-modal{overflow:hidden}
-  .document-modal>header{height:58px}
+  .document-modal>header{height:calc(58px + var(--safe-top));padding-top:var(--safe-top)}
   .document-modal-body{
-    height:calc(100dvh - 58px);
+    height:calc(100dvh - 58px - var(--safe-top));
     width:100%;
     max-width:none;
     margin:0;
@@ -2767,9 +2768,13 @@ input:not([type="checkbox"]):not([type="radio"]),
   .time-layout>.timer-card>.tabs{border-top:0}
   .time-layout>.surface+.surface{margin-top:20px}
   .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
+  .bottom-sheet>.form-grid{min-height:0;overflow-y:auto}
+  .app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}
+  .document-modal-body:has(.is-zoomed){overflow-x:auto;scroll-snap-type:none}
+  .document-modal .document-preview-content.is-zoomed{width:760px}
   .bottom-sheet>.filter-sheet-actions{position:static;bottom:auto;margin-top:0;padding-bottom:0}
   .bottom-sheet .form-grid{grid-template-columns:minmax(0,1fr)}
-  .bottom-sheet .form-field>input::-webkit-date-and-time-value{min-width:0;text-align:left}
+  .form-field>input::-webkit-date-and-time-value{min-width:0;text-align:left}
 
 .document-modal .paper.qr-invoice-page{padding-inline:0}.document-modal .qr-page-heading{padding-inline:5.5%}.document-modal .qr-payment-slip{flex:none}
 
