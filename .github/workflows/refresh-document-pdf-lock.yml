@@ -1,0 +1,39 @@
+name: Refresh document PDF lockfile
+
+on:
+  push:
+    branches:
+      - prod/document-delivery-2026-10-05
+    paths:
+      - package.json
+      - .github/workflows/refresh-document-pdf-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod/document-delivery-2026-10-05
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile --lockfile-only
+      - name: Commit lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "Lockfile already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "Update lockfile for document PDF support"
+          git push origin HEAD:prod/document-delivery-2026-10-05
