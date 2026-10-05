@@ -1,7 +1,7 @@
 export const legalConfig={
   versionDate:"5. Oktober 2026",
   termsVersion:"2026-10-05",
-  privacyVersion:"2026-10-05",
+  privacyVersion:"2026-10-05.2",
   dpaVersion:"2026-10-05",
   company:{
     name:"Binso GmbH",
