@@ -89,3 +89,11 @@ assert.ok(uiSource.includes('strokeWidth: 2'),'Shared icons must use pixel-stabl
 assert.ok(uiSource.includes('vectorEffect: "non-scaling-stroke"'),'Shared icons must keep stroke width stable while scaling');
 assert.ok(baseCssSource.includes('.desktop-notification-button>svg'),'Header icons must use a fixed integer SVG size');
 console.log('Small SVG icons use crisp pixel-stable rendering.');
+
+assert.ok(!responsiveCss.includes('max-width:767px'),'Responsive system must not introduce a second mobile breakpoint at 767px');
+assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables must not force desktop-width horizontal scrolling');
+assert.ok(responsiveCss.includes('Final viewport contract: small <=760, medium 761-1100, wide >=1101'),'Viewport contract must stay explicit and centralized');
+assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
+assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
+assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
+console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
