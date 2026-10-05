@@ -18,8 +18,8 @@ Die sechs Prices müssen aktiv sein, CHF verwenden und jeweils monatlich oder j�
 
 ## Stripe Dashboard / Workbench
 
-Webhook-URL: `https://<APP_URL>/api/billing/webhook`.
-API-Version: `2026-08-26.dahlia`, passend zur produktiven Webhook-Konfiguration und zur im Code festgelegten Version.
+Webhook-URL: `<APP_URL>/api/billing/webhook`, wobei `APP_URL` bereits die vollständige HTTPS-Basisadresse enthält.
+API-Version: `2026-08-26.dahlia`. Die technische Quelle der Wahrheit ist `stripeApiVersion` in `lib/server/stripe.ts`; Audit und Dokumentation müssen dazu passen.
 Ereignisse:
 
 - `checkout.session.completed`
@@ -34,12 +34,12 @@ Customer Portal im selben Konto und Modus aktivieren. Rechnungsdownload, Zahlung
 
 Kartenangaben werden nur bei Stripe erfasst. Azure PostgreSQL speichert Checkout-Referenzen, Kunden-/Vertragszuordnung, Status, Leistungsgrenzen, tatsächliche Plattform-Zahlungseingänge und verarbeitete Ereignis-IDs. Mandanten werden über die vorher gespeicherte Customer-Zuordnung identifiziert, niemals allein über Webhook-Metadaten. Signierte Webhooks und aktuelle Stripe-Verträge sind massgebend; eine Checkout-Rückleitungs-URL aktiviert kein Konto. Wiederholungen werden dedupliziert und Änderungen transaktional verbucht. Administrative Sperren bleiben erhalten.
 
-Selbstregistrierung erzeugt eine Testphase, keine bereits bezahlte Subscription. Der bestehende öffentliche Registrierungsbereich verweist auf noch fehlende AGB-/Datenschutzseiten; rechtlich freigegebene Texte und Versionskennungen müssen vor kommerziellem Rollout bereitgestellt werden. `registration-v1` kennzeichnet nur die aktuelle Einwilligungsmaske und ist keine Behauptung einer freigegebenen Vertragsversion.
+Selbstregistrierung erzeugt eine Testphase, keine bereits bezahlte Subscription. AGB, Datenschutzerklärung, Vereinbarung zur Auftragsbearbeitung und Unterauftragsbearbeiter-Liste sind in Binso One veröffentlicht und werden bei der Registrierung bzw. vor kostenpflichtigem Checkout versioniert bestätigt. Die finale juristische Freigabe bleibt ein organisatorischer Go-live-Punkt.
 
 ## Verifikation
 
 `pnpm test` prüft Signaturen, NaN-/Zeitstempel-Angriffe, Checkout-Wiederholungen, Mandantenmapping, Rollback, doppelte/veraltete Ereignisse, Leistungsgrenzen und Plattform-Zahlungsverbuchung gegen PostgreSQL-Migrationen mit HTTP-Testfixtures.
 
-Der GitHub-Workflow **Stripe Billing Configuration** übernimmt ausschliesslich fehlende Zuordnungen bestehender aktiver CHF-Prices aus den bisherigen Variablen `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_BUSINESS` und `STRIPE_PRICE_PROFESSIONAL`. Jahrespreise werden nur bei einer eindeutigen Zuordnung zum selben Produkt übernommen. Bestehende Einstellungen werden nicht überschrieben; Tarife und Zahlungen werden nicht erstellt. Danach liest er die Account-/Price-Konfiguration. Ein erfolgreicher Audit-Job bedeutet nicht, dass Zahlungen betriebsbereit sind; das Feld `billingConfigurationReady` und Warnungen sind massgebend. Er erzeugt keine Zahlung.
+Der GitHub-Workflow **Stripe Billing Configuration** liest die produktive App-Service-Konfiguration, prüft das Stripe-Konto, die sechs expliziten Monats-/Jahres-Price-IDs, den Live-Webhook und das Live-Customer-Portal. Ein erfolgreicher Audit-Job erzeugt keine Zahlung. Die sechs `STRIPE_PRICE_*_MONTHLY`/`YEARLY`-Variablen sind die produktive Quelle der Wahrheit.
 
 Vor Änderungen an der produktiven Konfiguration werden Checkout, 3-D-Secure, Webhook-Zustellung, Wiederholung, fehlgeschlagene Zahlung, Kündigung und Customer Portal zuerst in Stripe Sandbox/Test geprüft. Der produktive Betrieb selbst verwendet ausschliesslich Live-Key, Live-Prices, Live-Webhook und Live-Customer-Portal. Der CI-Readiness-Check schlägt fehl, wenn ein Test-Key, nicht freigeschaltetes Konto, Test-Price, fehlender/fehlerhafter Webhook oder unvollständiges Portal erkannt wird. Rückerstattungen/Disputes sind nicht Teil des aktuellen Umsatzbuchungsmodells; deren kaufmännische Verbuchung benötigt eine eigene Erweiterung.
