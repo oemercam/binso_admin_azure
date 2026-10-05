@@ -11,5 +11,5 @@ export async function sendMail(mail:Mail){
 }
 export function mailLayout(title:string,body:string,cta?:{label:string;url:string}){
  const button=cta?`<p style="margin:28px 0"><a href="${cta.url}" style="background:#111;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none">${cta.label}</a></p>`:"";
- return `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#111;line-height:1.55"><div style="max-width:620px;margin:auto;padding:32px"><h1 style="font-size:24px">${title}</h1>${body}${button}<hr style="border:0;border-top:1px solid #ddd;margin:32px 0"><small>Binso One · Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</small></div></body></html>`;
+ return `<!doctype html><html lang="de"><body style="margin:0;background:#fff;font-family:Arial,sans-serif;color:#111;line-height:1.55"><div style="max-width:620px;margin:auto;padding:40px 28px"><div style="font-size:13px;font-weight:800;letter-spacing:.12em;margin-bottom:30px">BINSO ONE</div><h1 style="margin:0 0 16px;font-size:24px;line-height:1.15">${title}</h1>${body}${button}<hr style="border:0;border-top:1px solid #ddd;margin:34px 0 20px"><small style="color:#666">Binso One · Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · support@binso.ch</small></div></body></html>`;
 }
