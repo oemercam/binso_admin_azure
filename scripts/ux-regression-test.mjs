@@ -57,3 +57,11 @@ assert.ok(responsiveCss.includes('.form-section>.section-title'),'Form section h
 assert.ok(responsiveCss.includes('.invoice-form>.form-section'),'Document editors must use the shared inset form-section layout');
 assert.ok(responsiveCss.includes('var(--desktop-action-h)'),'Desktop actions must derive from the shared action height token');
 console.log('Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.');
+
+
+assert.ok(responsiveCss.includes('.tablet-master-detail:not(:has(>.tablet-detail))'),'Medium desktop must not reserve an empty detail column');
+assert.ok(responsiveCss.includes('grid-template-columns:minmax(220px,1fr) auto auto'),'Medium desktop toolbar must use the canonical responsive grid');
+const appCss=await fs.readFile('app/styles/app.css','utf8');
+assert.ok(appCss.includes('.responsive-create-action{'),'Responsive create actions need a shared structural rule');
+assert.ok(appCss.includes('display:inline-flex'),'Responsive create actions must keep icon and label on one line outside mobile mode');
+console.log('Medium desktop uses the full content width and keeps create actions on one line.');
