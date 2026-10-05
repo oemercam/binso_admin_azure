@@ -70,9 +70,6 @@ export function MarketingHeader() {
         <span className="marketing-social-placeholder" aria-label="Instagram Profil folgt">◎</span>
         <span className="marketing-social-placeholder marketing-social-xing" aria-label="XING Profil folgt">X</span>
       </div>
-      <div className="marketing-mobile-secondary">
-        <Link href="/operator" onClick={() => setOpen(false)}>Admin</Link>
-      </div>
       <small className="marketing-mobile-copyright">© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer">Binso GmbH</a></small>
     </div>}
   </>;
@@ -86,9 +83,7 @@ export function MarketingFooter() {
       <Link href="/preise">Preise</Link>
       <Link href="/#sicherheit">Sicherheit</Link>
       <Link href="/demo">Demo</Link>
-      <Link href="/login">Kundenportal</Link>
       <Link href="/login">Anmelden</Link>
-      <Link href="/operator">Admin</Link>
       <Link href="/impressum">Impressum</Link>
       <Link href="/datenschutz">Datenschutz</Link>
       <Link href="/agb">AGB</Link>
@@ -109,8 +104,6 @@ export function ProductPreview() {
 
 const productScreens:Record<string,string>={
   "/preview/dashboard":"/product/binso-one-dashboard-mobile.jpg",
-  "/preview/rechnungen":"/product/binso-one-dashboard-mobile.jpg",
-  "/preview/zeit":"/product/binso-one-dashboard-mobile.jpg",
 };
 
 export function ProductScreen({route="/preview/dashboard",title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
