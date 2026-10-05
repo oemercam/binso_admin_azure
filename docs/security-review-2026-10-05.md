@@ -18,12 +18,24 @@ Primärquellen: https://owasp.org/projects/asvs, https://www.nist.gov/cyberframe
 
 Analysierte Bereiche: 70 API-Routendateien als Inventar; gemeinsame Session-, Datenbank-, RBAC-, Provisionierungs-, Repository-, Datei-, Finance-, Theme- und Monitoringpfade; 33 PostgreSQL-Migrationen; Quality-, Deployment- und Azure-Audit-Workflows; PWA-Cache und Sicherheitsheader. Nicht jede Zeile und nicht jede Kombination aller Rollen und Geschäftsvorgänge wurde dynamisch geprüft. Produktive Konfigurationswerte und Azure-Steuerungsebene werden separat im Architecture-Audit gelesen; nicht zugängliche Werte bleiben unbestätigt.
 
+## Produktivbefunde aus Azure am Prüftag
+
+Architecture-Audit `37278638323`, Job `111661248170`, Main `2710edefe1ea6cb1d944ebf130bc54471f8cffb8`:
+
+- **Kritisch:** Der konfigurierte produktive DB-Benutzer `binsoadmin` hat `rolsuper=false`, aber **`rolbypassrls=true`**, `rolcreatedb=true` und `rolcreaterole=true`. Die Anwendung verwendet damit eine privilegierte Administrationsrolle. Die RLS-Policies werden für diese Verbindung umgangen; die expliziten Tenant- und Sessionprüfungen im Anwendungscode bleiben wirksam, aber die unabhängige Datenbankschutzschicht ist produktiv nicht gegeben. Den Test mit einer eingeschränkten Rolle darf man deshalb nicht als Nachweis für die aktuelle Laufzeitverbindung interpretieren. Vor breitem Kundenbetrieb Laufzeit- und Migrationsidentität sauber trennen und die komplette Anwendung mit der eingeschränkten Rolle prüfen. Keine blinde Änderung bestehender Zugangsdaten durchgeführt.
+- App Service läuft in Switzerland North, `httpsOnly=true`, `clientAffinityEnabled=false`. Die gelesene App-Service-Konfiguration meldet keine Managed Identity.
+- Die Kern-Geschäftstabellen haben RLS/FORCE RLS; das Inventar umfasst 71 Tabellen mit `organization_id`. Nicht alle administrativen, Auth-/Plattform- oder älteren Tabellen haben RLS/FORCE RLS. Jede Ausnahme benötigt eine dokumentierte Zugriffsklassifikation; das Inventar allein ist keine Vollständigkeitsfreigabe.
+- Der Deployment-Identität ist kein PostgreSQL Flexible Server in ihrer Ressourcenliste sichtbar. Daraus folgt **nicht**, dass kein Server oder Backup existiert. Backup/HA/Netzwerk bleiben unbestätigt.
+- Leserechte auf Storage, Insights-Ressourcen, Metric Alerts, Scheduled Query Rules und Action Groups fehlen (`AuthorizationFailed`). Der Audit-Job ist erfolgreich, weil er diese Grenzen ausdrücklich als `UNVERIFIED` protokolliert. Ein grüner Audit-Job bedeutet deshalb keine bestandene Sicherheitszertifizierung und keine bestätigte Alarmierung.
+
+Diese Befunde ändern das Gesamturteil: **Mandantenarchitektur und Rollen implementiert, aber vor einer uneingeschränkten Sicherheitsfreigabe bestehen kritische Betriebsarbeiten.**
+
 ## Kontrollbewertung
 
 | Bereich / Rahmen | Nachweis | Bewertung und Grenze |
 |---|---|---|
 | Mandanten / ASVS Autorisierung | `provisioning.ts`, `session.ts`, `db.ts`, Migrationen 0017/0025/0031, 50-Firmen-Test | Implementiert und in beschriebenen Szenarien getestet. Gemeinsame DB; kein physischer Tenant-Silo. |
-| Datenbankzugriff / ASVS Konfiguration | `withTenant` setzt Organisation/Benutzer mit `set_config(...,true)` innerhalb BEGIN/COMMIT | Pool-Kontext transaktionslokal. FORCE RLS schützt auch Tabellenbesitzer, aber nicht Superuser/BYPASSRLS. Produktive Rolle muss separat geprüft werden. |
+| Datenbankzugriff / ASVS Konfiguration | `withTenant` setzt Organisation/Benutzer mit `set_config(...,true)` innerhalb BEGIN/COMMIT | Pool-Kontext transaktionslokal. FORCE RLS schützt auch Tabellenbesitzer, aber nicht Superuser/BYPASSRLS. Produktive Rolle im Azure-Audit geprüft: `BYPASSRLS=true`, kritisch offen. |
 | Beziehungen / ASVS Datenintegrität | Composite Tenant-FKs; Migrationstest weist fremden Projektbezug ab und prüft validierte FKs | Schutz im Schema vorhanden. Nicht jeder FK-Pfad einzeln getestet. |
 | Rollen / ASVS Autorisierung | `lib/permissions.ts`, `rbac.ts`, Operator-RBAC, API-Prüfungen | Owner, Admin, Finance, HR, Projektleitung, Mitarbeiter, Reader und fünf Operator-Rollen. Ungültige Rollen neu ohne Rechte. Vollständige positive/negative Endpunktmatrix noch offen. |
 | Eigenbezug / ASVS Autorisierung | Zeit-/Spesen-APIs, Datei-Zweckprüfung, `ownRecordOnly` | Such-API hat Eigenbezug bisher nicht weitergereicht; in diesem PR behoben und Handler getestet. |
@@ -53,7 +65,9 @@ Analysierte Bereiche: 70 API-Routendateien als Inventar; gemeinsame Session-, Da
 
 ## Prioritäten vor einer umfassenden Betriebsfreigabe
 
-**Hoch:** Laufzeit-DB-Rolle ohne Superuser/BYPASSRLS bestätigen, privilegierten Migrationszugang trennen; vollständigen Operator-Login mit verbindlicher MFA und Audit umsetzen; Malware-Scan/Quarantäne an Dateiflows anschliessen; Cloud-TLS/Private-Network/Backups/HA und Restore belegen; echte Alarmierung mit Testzustellung einrichten; Main-Branchschutz mit verpflichtendem Quality-Check aktivieren.
+**Kritisch:** Produktive `binsoadmin`-Verbindung mit BYPASSRLS durch eine geprüfte Least-Privilege-Laufzeitrolle ersetzen, privilegierten Migrationszugang trennen.
+
+**Hoch:** vollständigen Operator-Login mit verbindlicher MFA und Audit umsetzen; Malware-Scan/Quarantäne an Dateiflows anschliessen; Cloud-TLS/Private-Network/Backups/HA und Restore belegen; echte Alarmierung mit Testzustellung einrichten; Main-Branchschutz mit verpflichtendem Quality-Check aktivieren.
 
 **Abhängigkeitsbefund:** Der vollständige `pnpm security:scan` meldet einen High-Befund in `braces <=3.0.3` über ESLint → Next-ESLint-Plugin → fast-glob → micromatch (GHSA-vfj7-8cjw-p6xm / CVE-2026-93687). Am Prüftag ist keine korrigierte Version angegeben. Der Befund wird nicht unterdrückt; der vollständige Security-Scan ist deshalb nicht grün. Die Abhängigkeit liegt im Entwicklungswerkzeugpfad; `pnpm audit --prod --audit-level high` hat am Prüftag keine bekannten Schwachstellen gefunden. Build-/Lint-Prozesse dürfen keine fremden Glob-Muster verarbeiten. Quelle: https://github.com/advisories/GHSA-vfj7-8cjw-p6xm.
 
