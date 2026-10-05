@@ -362,3 +362,96 @@
 .monitoring-compact-ring span{position:relative;z-index:1;font-size:10px;font-weight:750;text-align:center}
 .monitoring-technical-summary{margin-top:26px;padding-top:18px;border-top:1px solid var(--color-line)}
 .monitoring-technical-summary b{font-size:13px}.monitoring-technical-summary p{max-width:760px;margin:6px 0 0;color:var(--color-muted);font-size:11px;line-height:1.55}
+
+
+/* Canonical operator desktop workspace */
+.operator-sidebar-groups{display:grid;gap:18px}
+.operator-sidebar-group{display:grid;gap:3px}
+.operator-nav-label{
+  padding:0 11px 6px;
+  color:var(--color-muted);
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.operator-sidebar a.active{
+  background:var(--color-subtle);
+  font-weight:700;
+}
+.operator-main{
+  min-width:0;
+  padding:0 var(--page-x) 72px;
+}
+.operator-app-header{
+  position:sticky;
+  top:0;
+  z-index:18;
+  margin:0 calc(-1 * var(--page-x));
+  padding:0 var(--page-x);
+  height:64px;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--color-line);
+  background:color-mix(in srgb,var(--color-bg) 94%,transparent);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.operator-header-brand{display:flex;align-items:center;gap:10px}
+.operator-header-brand>.logo{display:block;width:86px}
+.operator-header-brand>span{
+  padding-left:10px;
+  border-left:1px solid var(--color-line);
+  color:var(--color-muted);
+  font-size:11px;
+  font-weight:700;
+}
+.operator-page-head{
+  width:100%;
+  max-width:1760px;
+  margin:0 auto 24px;
+  padding:30px 0 22px;
+  border-bottom:1px solid var(--color-line);
+}
+.operator-page-head h1{
+  margin:0;
+  font-size:30px;
+  line-height:1.05;
+  letter-spacing:-.035em;
+}
+.operator-page-head p{
+  max-width:820px;
+  margin:8px 0 0;
+  color:var(--color-muted);
+  font-size:13px;
+  line-height:1.45;
+}
+.operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.operator-mobile-nav):not(.operator-mobile-more-layer){
+  width:100%;
+  max-width:1760px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.operator-table-card,
+.operator-root .surface{border-radius:12px}
+.operator-toolbar{
+  min-height:48px;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--color-line);
+}
+.operator-table-head{
+  min-height:42px;
+  padding-inline:10px;
+}
+.operator-table-row{
+  min-height:62px;
+  padding-inline:10px;
+}
+.operator-table-row:hover{background:color-mix(in srgb,var(--color-fg) 3%,var(--color-bg))}
+.operator-grid{gap:20px}
+.operator-insight-grid{gap:20px}
+.operator-customer-grid{gap:20px}
+.operator-ticket-layout{gap:24px}
