@@ -60,7 +60,7 @@ export function PrivacyConsent(){
       </div>
       <div className="privacy-consent-options">
         <div><span><b>Technisch notwendig</b><small>Für Anmeldung, Sicherheit, Sitzungen und Einstellungen.</small></span><strong>Immer aktiv</strong></div>
-        <label><span><b>Performance</b><small>Anonyme Web-Vitals wie Ladezeit und Darstellungsstabilität. Keine Werbung.</small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
+        <label><span><b>Performance</b><small>Technische Web-Vitals wie Ladezeit und Darstellungsstabilität. Keine Werbung und kein Cross-Site-Tracking.</small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
       </div>
       <div className="privacy-consent-actions">
         <Button variant="secondary" onClick={()=>{storePreferences(false);setPerformance(false);setOpen(false);}}>Nur notwendige</Button>
