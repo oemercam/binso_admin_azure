@@ -2323,3 +2323,103 @@
   .revenue-chart svg{height:300px}
   .finance-month-bars{min-height:290px}
 }
+
+
+/* Shared desktop detail workspace for entity, payment, employee and support views. */
+@media (max-width:1100px){
+  .desktop-context-rail{display:none}
+  .entity-edit-workspace{display:block}
+}
+
+@media (min-width:1101px){
+  .desktop-detail-workspace,
+  .entity-edit-workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,360px);
+    gap:28px;
+    align-items:start;
+  }
+  .desktop-detail-main,
+  .entity-edit-main{min-width:0}
+  .form-main-new{display:block}
+  .desktop-context-rail{
+    min-width:0;
+    position:sticky;
+    top:86px;
+    display:grid;
+    gap:18px;
+    align-self:start;
+  }
+  .desktop-toolbox,
+  .desktop-summary-card{
+    min-width:0;
+    display:grid;
+    border-top:1px solid var(--color-line);
+  }
+  .desktop-toolbox>.compact-section-label,
+  .desktop-summary-card>.compact-section-label{
+    padding:0 0 10px;
+    border-bottom:1px solid var(--color-line);
+  }
+  .desktop-toolbox>button,
+  .desktop-toolbox>a{
+    width:100%;
+    min-height:58px;
+    padding:10px 2px;
+    display:grid;
+    grid-template-columns:24px minmax(0,1fr) 18px;
+    gap:10px;
+    align-items:center;
+    border:0;
+    border-bottom:1px solid var(--color-line);
+    background:transparent;
+    color:inherit;
+    text-align:left;
+  }
+  .desktop-toolbox>button:hover,
+  .desktop-toolbox>a:hover{background:color-mix(in srgb,var(--color-fg) 3%,var(--color-bg))}
+  .desktop-toolbox>button>span,
+  .desktop-toolbox>a>span{min-width:0;display:grid;gap:3px}
+  .desktop-toolbox b{font-size:12px}
+  .desktop-toolbox small{color:var(--color-muted);font-size:10px;line-height:1.35}
+
+  .desktop-summary-card{
+    padding:0 0 16px;
+    border-bottom:1px solid var(--color-line);
+  }
+  .desktop-summary-card>strong{
+    margin-top:16px;
+    font-size:28px;
+    line-height:1.05;
+    letter-spacing:-.035em;
+  }
+  .desktop-summary-card>small{
+    margin-top:6px;
+    color:var(--color-muted);
+    font-size:11px;
+  }
+  .desktop-summary-facts{
+    margin-top:16px;
+    display:grid;
+    gap:0;
+    border-top:1px solid var(--color-line);
+  }
+  .desktop-summary-facts>span{
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:1px solid var(--color-line);
+    color:var(--color-muted);
+    font-size:11px;
+  }
+  .desktop-summary-facts b{color:var(--color-fg);font-size:11px;text-align:right}
+  .desktop-detail-main>.surface,
+  .entity-edit-main>.surface{max-width:none}
+}
+
+@media (min-width:1500px){
+  .desktop-detail-workspace,
+  .entity-edit-workspace{grid-template-columns:minmax(0,1fr) minmax(340px,390px)}
+}
