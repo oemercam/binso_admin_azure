@@ -42,3 +42,18 @@ for(const source of searchSources){
 }
 assert.equal(searchItem(searchSources[5],{id:'employee-id',first_name:'Anna',last_name:'Muster'}).title,'Anna Muster');
 console.log('Search results use visible labels, canonical record IDs and existing detail routes.');
+
+
+const [tokensCss,baseCss,responsiveCss]=await Promise.all([
+  fs.readFile('app/styles/tokens.css','utf8'),
+  fs.readFile('app/styles/base.css','utf8'),
+  fs.readFile('app/styles/responsive.css','utf8'),
+]);
+for(const token of ['--desktop-section-y:24px','--desktop-surface-x:24px','--desktop-action-h:40px']){
+  assert.ok(tokensCss.includes(token),'Missing canonical desktop layout token: '+token);
+}
+assert.ok(baseCss.includes('.icon-action'),'Section icon actions must use the shared icon control contract');
+assert.ok(responsiveCss.includes('.form-section>.section-title'),'Form section headings must use the canonical desktop section rhythm');
+assert.ok(responsiveCss.includes('.invoice-form>.form-section'),'Document editors must use the shared inset form-section layout');
+assert.ok(responsiveCss.includes('var(--desktop-action-h)'),'Desktop actions must derive from the shared action height token');
+console.log('Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.');
