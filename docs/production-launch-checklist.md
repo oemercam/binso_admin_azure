@@ -26,7 +26,7 @@ Stand: 5. Oktober 2026
 - [x] Retention Cleanup zusätzlich bei jedem produktiven Deploy
 - [x] Readiness-Endpoint prüft DB, App-Verschlüsselung, Graph-Mail und Stripe-Konfigurationsvollständigkeit
 - [x] kontrolliertes Tooling für mandantenbezogenen Datenexport und endgültige Löschung vorhanden
-- [x] CI prüft die Lösch-Schutzbedingungen und ON-DELETE-CASCADE-Regeln
+- [x] CI prüft Lösch-Schutzbedingungen, Tenant-Fremdschlüssel sowie Cascade-/Restrict-Behandlung
 - [x] Azure Monitoring Readiness Workflow prüft Application Insights, Action Group und Alert-Regeln
 - [x] PostgreSQL Backup Readiness Workflow prüft Serverzustand und konfigurierte Backup-Retention
 
