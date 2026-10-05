@@ -4,6 +4,7 @@ import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
+import { useDialogFocus } from "./use-dialog-focus";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
@@ -76,6 +77,7 @@ export function AppShell({
 }) {
   const pathname=usePathname();
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
+  const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
   const production=useBackendMode();
   const [query, setQuery] = useState("");
   const [remoteSearch,setRemoteSearch]=useState<typeof searchItems>([]);
@@ -139,18 +141,6 @@ export function AppShell({
       .catch(()=>undefined);
   },[]);
 
-  useEffect(() => {
-    if (!sheet) return;
-    const body=document.body;
-    const root=document.documentElement;
-    const previous={bodyOverflow:body.style.overflow,rootOverflow:root.style.overflow};
-    body.style.overflow="hidden";
-    root.style.overflow="hidden";
-    return () => {
-      body.style.overflow=previous.bodyOverflow;
-      root.style.overflow=previous.rootOverflow;
-    };
-  }, [sheet]);
 
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
@@ -303,7 +293,7 @@ export function AppShell({
     <div className="app-main">
       <div className="desktop-appbar">
         <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
-        <div className="desktop-appbar-actions">{demoSession&&<span className="app-demo-badge">Demo</span>}
+        <div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}{demoSession&&<span className="app-demo-badge">Demo</span>}
           <Button icon="plus" onClick={() => setSheet("quick")}>Erstellen</Button>
           <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
@@ -346,7 +336,7 @@ export function AppShell({
       </nav>}
 
       {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
-        <section className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
+        <section ref={dialogRef} tabIndex={-1} className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">
             <div>

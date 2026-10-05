@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDialogFocus } from "./use-dialog-focus";
 import { Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
 
@@ -23,6 +24,13 @@ const operatorNav = [
 function moneyChf(value:number){
   return "CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
+
+const demoCustomers = [
+  {id:"acme",name:"Acme AG",plan:"Business",mrr:"CHF 49",status:"Aktiv"},
+  {id:"mueller",name:"Müller GmbH",plan:"Start",mrr:"CHF 19",status:"Aktiv"},
+  {id:"berger",name:"Berger Bau AG",plan:"Pro",mrr:"CHF 89",status:"Aktiv"},
+  {id:"meier",name:"Meier Handel AG",plan:"Business",mrr:"CHF 49",status:"Eingeschränkt"},
+];
 
 const tickets = [
   ["#8421","Rechnungsstellung unklar","Acme AG","Offen"],
@@ -94,24 +102,25 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
+  const accountDialogRef=useDialogFocus(accountOpen,()=>setAccountOpen(false));
   const router=useRouter();
   const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
       <Link href="/operator"><Logo dark/></Link>
-      <nav>{operatorNav.map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span>{label==="Tickets"&&<em>12</em>}</Link>)}</nav>
+      <nav>{operatorNav.map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span></Link>)}</nav>
     </aside>
 
     <main className="operator-main">
       <header className="operator-app-header">
-        <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? `Ticket #${detail}` : key === "kunden" ? "Acme AG" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
-        <div className="operator-user"><Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
+        <div className="operator-header-brand"><Logo/><div><h1>{detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title}</h1><p>{operatorSubtitle(key, detail)}</p></div></div>
+        <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
-      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
+      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section ref={accountDialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/operator/sicherheit" onClick={()=>setAccountOpen(false)}><Icon name="lock"/><span><b>Sicherheit</b><small>Zugriff und Sicherheit</small></span><Icon name="arrow" size={15}/></Link><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
-        {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
+        {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
         <button type="button" className={["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
       </nav>
       {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
@@ -214,7 +223,7 @@ function TicketsView() {
 
   if(!production) return <section className="surface operator-table-card">
     <div className="operator-toolbar"><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {tickets.length}</button><button className={filter==="Offen"?"active":""} onClick={()=>setFilter("Offen")}>Offen</button><button className={filter==="In Bearbeitung"?"active":""} onClick={()=>setFilter("In Bearbeitung")}>In Bearbeitung</button><button className={filter==="Wartet auf Kunde"?"active":""} onClick={()=>setFilter("Wartet auf Kunde")}>Wartet auf Kunde</button></div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tickets suchen..."/></label></div>
-    <div className="operator-table"><div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>{demoTicketVisible.map(([nr,subject,customer,status],i)=><Link href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+    {demoTicketVisible.length===0&&<p role="status">Keine Tickets gefunden.</p>}<div className="operator-table"><div className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></div>{demoTicketVisible.map(([nr,subject,customer,status],i)=><Link href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></Link>)}</div>
   </section>;
 
   const visible=items.filter(item=>{
@@ -319,8 +328,7 @@ function CustomersView() {
   const {production,items}=useOperatorCustomers();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
-  const demoCustomers=[["Acme AG","Business","CHF 49","Aktiv"],["Müller GmbH","Start","CHF 19","Aktiv"],["Berger Bau AG","Pro","CHF 89","Aktiv"],["Meier Handel AG","Business","CHF 49","Eingeschränkt"]];
-  const demoCustomerVisible=demoCustomers.filter(([name,,,status])=>{
+  const demoCustomerVisible=demoCustomers.filter(({name,status})=>{
     const matchQuery=!query.trim()||name.toLowerCase().includes(query.trim().toLowerCase());
     const matchFilter=filter==="all"||status===filter;
     return matchQuery&&matchFilter;
@@ -328,7 +336,7 @@ function CustomersView() {
 
   if(!production) return <section className="surface">
     <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden suchen..."/></label><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="Aktiv"?"active":""} onClick={()=>setFilter("Aktiv")}>Aktiv</button><button className={filter==="Eingeschränkt"?"active":""} onClick={()=>setFilter("Eingeschränkt")}>Eingeschränkt</button></div></div>
-    <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{demoCustomerVisible.map(([name,plan,mrr,status],i)=><Link href={i===0?"/operator/kunden/acme":"#"} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></Link>)}</div>
+    {demoCustomerVisible.length===0&&<p role="status">Keine Kunden gefunden.</p>}<div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></div>{demoCustomerVisible.map(({id,name,plan,mrr,status})=><Link href={"/operator/kunden/"+id} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></Link>)}</div>
   </section>;
 
   const visible=items.filter(item=>{
@@ -357,9 +365,11 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
 
   const notify=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
-  if(!production) return <>
-    <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Demo-Kunde · Zürich</p></div></div><div className="operator-customer-actions"><Status tone="success">Aktiv</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff ist im Demo-Modus nur simuliert.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div></div>
-    <div className="operator-customer-metrics"><Metric label="Plan" value="Business" hint="Demo" icon="card"/><Metric label="Benutzer" value="8 / 10" hint="Demo" icon="users"/><Metric label="Offene Tickets" value="1" hint="Demo" icon="support"/><Metric label="Zahlungsstatus" value="Bezahlt" hint="Demo" icon="wallet"/></div>
+  const demoCustomer=demoCustomers.find(item=>item.id===tenantId);
+  if(!production&&!demoCustomer)return <p role="status">Kunde nicht gefunden.</p>;
+  if(!production&&demoCustomer) return <>
+    <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">{demoCustomer.name[0]}</span><div><h2>{demoCustomer.name}</h2><p>Demo-Kunde</p></div></div><div className="operator-customer-actions"><Status tone={demoCustomer.status==="Aktiv"?"success":"warning"}>{demoCustomer.status}</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff ist im Demo-Modus nur simuliert.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div></div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value={demoCustomer.plan} hint="Demo" icon="card"/><Metric label="Benutzer" value="—" hint="Demo" icon="users"/><Metric label="Offene Tickets" value={String(tickets.filter(item=>item[2]===demoCustomer.name&&item[3]!=="Gelöst").length)} hint="Demo" icon="support"/><Metric label="Zahlungsstatus" value="—" hint="Demo" icon="wallet"/></div>
     {toast&&<Toast title={toast}/>}
   </>;
 
@@ -568,7 +578,7 @@ function RestrictionsView() {
 }
 
 
-function MonitoringCockpit({services,api,database,availability,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;availability:string;errorRate:string;incidents:Array<Record<string,unknown>>}) {
+function MonitoringCockpit({services,api,database,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;errorRate:string;incidents:Array<Record<string,unknown>>}) {
   const healthy=services.filter(s=>s.status==="operational").length;
   const degraded=services.filter(s=>s.status==="degraded").length;
   const apiBars=api==null?[]:[Math.min(100,Math.max(1,api/10))];
@@ -577,7 +587,7 @@ function MonitoringCockpit({services,api,database,availability,errorRate,inciden
   const affected=services.length?Math.round(degraded/services.length*100):0;
   return <div className="monitoring-cockpit">
     <div className="monitoring-kpis monitoring-kpis-visual">
-      <section><div><span>Service Health</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational · Momentaufnahme</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
+      <section><div><span>Service Health</span><strong>{services.length?health+" %":"—"}</strong><small>{healthy}/{services.length} Services operational · Momentaufnahme</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":health+"%"} as React.CSSProperties}><b>{services.length?health+" %":"—"}</b></div></section>
       <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(affected)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
@@ -612,7 +622,7 @@ function MonitoringView() {
     window.setTimeout(()=>setToast(null),2600);
   };
 
-  if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} availability="99.99 %" errorRate="0.08 %" incidents={[]}/>;
+  if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} errorRate="—" incidents={[]}/>;
 
   const services=data.services??[];
   const incidents=data.incidents??[];
@@ -625,7 +635,7 @@ function MonitoringView() {
   const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
 
   return <>
-    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} availability={operational&&services.length?((operational/services.length)*100).toFixed(2)+" %":"—"} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
+    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
     <div className="monitoring-panel">
       <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
       <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
