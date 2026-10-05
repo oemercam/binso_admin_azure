@@ -4,6 +4,7 @@ import {seedDatabaseDemo} from "./repositories/demo-fixture";
 import type {PoolClient} from "pg";
 import {withTransaction} from "@/lib/server/db";
 import {domainConfig,addDays,addHours,type PlanId} from "@/config/domain";
+import {subscriptionEntitlements} from '@/lib/subscription-plans';
 import {plans} from "@/lib/plans";
 
 export type CanonicalPlan="starter"|"business"|"professional";
@@ -19,15 +20,6 @@ function planDefinition(plan:PlanId){
  return definition;
 }
 
-function planFeatures(plan:PlanId){
- const common=["crm","quotes","orders","time","invoices","expenses"];
- if(plan==="start")return common;
- const business=[...common,"finance","employees","accounting","projects","suppliers","documents"];
- if(plan==="business")return business;
- return [...business,"contracts","payroll","audit","exports","api","automations"];
-}
-function planMaxUsers(plan:PlanId){return plan==="start"?3:plan==="business"?15:10000}
-function planMaxStorage(plan:PlanId){return plan==="start"?1024:plan==="business"?5120:20480}
 
 async function uniqueSlug(client:PoolClient,name:string){
  const base=(name||"organisation").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"organisation";
@@ -51,6 +43,7 @@ export async function provisionOrganization(input:{
    const canonicalPlan=toCanonicalPlan(input.mode==="demo"?"business":input.plan);
    const planId:PlanId=input.mode==="demo"?"business":input.plan;
    const definition=planDefinition(planId);
+   const limits=subscriptionEntitlements(planId);
    const expiresAt=input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):input.mode==="trial"?addDays(new Date(),domainConfig.trialDays):null;
 
    const existing=await client.query<{id:string}>("select id from app_users where lower(email)=lower($1) limit 1",[email]);
@@ -75,17 +68,17 @@ export async function provisionOrganization(input:{
    await client.query(
      `insert into organization_subscriptions(organization_id,plan,status,seats,trial_until,billing_provider,billing_interval,unit_amount_chf)
       values($1,$2,$3,$4,$5,'manual','monthly',$6)`,
-     [organizationId,canonicalPlan,input.mode==="subscription"?"active":"trial",planMaxUsers(planId),expiresAt,input.mode==="demo"?0:definition.monthly]
+     [organizationId,canonicalPlan,input.mode==="subscription"?"active":"trial",limits.users,expiresAt,input.mode==="demo"?0:definition.monthly]
    );
    await client.query(
      `insert into organization_entitlements(organization_id,features,max_users,max_storage_mb,max_monthly_documents,max_api_requests_per_month)
       values($1,$2,$3,$4,$5,$6)`,
-     [organizationId,planFeatures(planId),planMaxUsers(planId),planMaxStorage(planId),planId==="start"?100:planId==="business"?1000:10000,planId==="start"?10000:planId==="business"?100000:1000000]
+     [organizationId,limits.features,limits.users,limits.storageMb,limits.monthlyDocuments,limits.monthlyApiRequests]
    );
    await client.query(
      `insert into platform_tenants(organization_id,owner_name,owner_email,platform_status,seats,monthly_revenue_chf,storage_mb,last_active_at)
       values($1,$2,$3,$4,$5,$6,0,now())`,
-     [organizationId,displayName,email,input.mode==="subscription"?"active":"trial",planMaxUsers(planId),input.mode==="demo"?0:definition.monthly]
+     [organizationId,displayName,email,input.mode==="subscription"?"active":"trial",limits.users,input.mode==="demo"?0:definition.monthly]
    );
    await client.query(
      `insert into company_profile(organization_id,name,address,zip,city,country,email,phone,uid,iban,bank_name,website)

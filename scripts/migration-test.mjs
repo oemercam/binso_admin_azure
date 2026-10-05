@@ -121,7 +121,8 @@ try{
  const transactions=dataModule('export async function withTransaction(fn){return globalThis.__provisionTest(fn)}');
  globalThis.__provisionTest=async(fn)=>{await db.exec('begin');try{const result=await fn(client);await db.exec('commit');return result}catch(e){await db.exec('rollback');throw e}};
  const provisionSource=(await fs.readFile('lib/server/provisioning.ts','utf8')).replace('import "server-only";','').replace('"./repositories/demo-fixture"',JSON.stringify(fixture)).replace('"@/lib/server/db"',JSON.stringify(transactions)).replace('"@/config/domain"',JSON.stringify(domain)).replace('"@/lib/plans"',JSON.stringify(plans));
- const {provisionOrganization}=await import(dataModule(provisionSource));
+ const entitlementModule=dataModule((await fs.readFile('lib/subscription-plans.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)));
+ const {provisionOrganization}=await import(dataModule(provisionSource.replace("'@/lib/subscription-plans'",JSON.stringify(entitlementModule))));
  const provisioned=await provisionOrganization({userId:'demo-provision-test',email:'demo-provision-test@example.invalid',name:'Demo Test',companyName:'Demo',plan:'business',mode:'demo'});
  assert.equal((await db.query('select is_demo from organizations where id=$1',[provisioned.organizationId])).rows[0].is_demo,true);
  assert.ok((await db.query('select count(*)::int n from invoices where organization_id=$1',[provisioned.organizationId])).rows[0].n>20);
@@ -148,6 +149,79 @@ try{
  assert.equal((await db.query('select * from customers')).rows.length,0);
  await db.exec('reset role');
  console.log('50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).');
+ // Use the actual Stripe transport/signature code with an isolated HTTP fixture.
+ globalThis.__billingEnv={stripeSecretKey:'sk_test_fixture',stripeWebhookSecret:'whsec_fixture',appUrl:'https://example.invalid',stripePrices:{start:{monthly:'price_start_m'},business:{yearly:'price_business_y'},pro:{}}};
+ const billingEnv=dataModule('export const env=globalThis.__billingEnv');
+ const billingLimits=dataModule(await fs.readFile('config/limits.ts','utf8'));
+ let stripeSource=(await fs.readFile('lib/server/stripe.ts','utf8')).replace("import 'server-only';",'').replace("'@/lib/server/env'",JSON.stringify(billingEnv)).replace("'@/lib/server/http'",JSON.stringify(http)).replace("'@/config/limits'",JSON.stringify(billingLimits));
+ const stripeModule=dataModule(stripeSource);
+ let billingSource=(await fs.readFile('lib/server/repositories/stripe-billing.ts','utf8')).replace("import 'server-only';",'').replace("'../http'",JSON.stringify(http)).replace("'../env'",JSON.stringify(billingEnv)).replace("'../stripe'",JSON.stringify(stripeModule)).replace("'@/lib/subscription-plans'",JSON.stringify(entitlementModule));
+ const {startBillingCheckout,processStripeEvent}=await import(dataModule(billingSource));
+ const {verifyStripeSignature,stripeApiVersion}=await import(stripeModule);
+ const {createHmac}=await import('node:crypto');
+ const payload='{"id":"evt_test"}',timestamp=Math.floor(Date.now()/1000);
+ const digest=createHmac('sha256','whsec_fixture').update(timestamp+'.'+payload).digest('hex');
+ assert.equal(verifyStripeSignature(payload,`t=${timestamp},v1=${digest}`),true);
+ assert.equal(verifyStripeSignature(payload,`t=NaN,v1=${digest}`),false);
+ assert.equal(verifyStripeSignature(payload,`t=${timestamp},v1=xyz`),false);
+ assert.equal(verifyStripeSignature(payload+'x',`t=${timestamp},v1=${digest}`),false);
+ assert.equal(verifyStripeSignature(payload,`t=${timestamp-600},v1=${digest}`),false);
+ const billingTenant=await provisionOrganization({userId:'billing-probe',email:'billing-probe@example.invalid',name:'Billing Probe',companyName:'Billing Probe',plan:'start',mode:'trial'});
+ const billingSession={organizationId:billingTenant.organizationId,userId:'billing-probe',email:'billing-probe@example.invalid',role:'owner'};
+ const prices={price_start_m:{id:'price_start_m',active:true,currency:'chf',unit_amount:2900,recurring:{interval:'month',interval_count:1}},price_business_y:{id:'price_business_y',active:true,currency:'chf',unit_amount:69000,recurring:{interval:'year',interval_count:1}}};
+ let authoritative={id:'sub_fixture',customer:'cus_fixture',metadata:{organization_id:billingTenant.organizationId},status:'active',cancel_at_period_end:true,items:{data:[{quantity:1,price:prices.price_business_y,current_period_end:timestamp+86400}]}};
+ let failInvoice=false,checkoutCalls=0,expireCalls=0;
+ const originalFetch=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{
+  assert.equal(options.headers['Stripe-Version'],stripeApiVersion);
+  const path=new URL(url).pathname;
+  if(path.startsWith('/v1/prices/'))return Response.json(prices[path.split('/').pop()]);
+  if(path==='/v1/customers'){assert.ok(options.headers['Idempotency-Key']);return Response.json({id:'cus_fixture'});}
+  if(path==='/v1/checkout/sessions'){checkoutCalls++;const form=options.body;assert.ok(options.headers['Idempotency-Key']);assert.equal(form.get('success_url'),'https://example.invalid/einstellungen/abonnement?checkout=success');assert.equal(form.get('customer'),'cus_fixture');return Response.json({id:'cs_fixture_'+checkoutCalls,url:'https://checkout.stripe.com/c/pay_fixture',expires_at:timestamp+86400});}
+  if(path.startsWith('/v1/checkout/sessions/')&&path.endsWith('/expire')){expireCalls++;return Response.json({status:'expired'});}
+  if(path==='/v1/subscriptions/sub_fixture')return Response.json(authoritative);
+  if(path==='/v1/invoices/in_fixture'){if(failInvoice)throw new Error('Simulated failure');return Response.json({id:'in_fixture',customer:'cus_fixture',status:'paid',amount_paid:69000,currency:'chf',status_transitions:{paid_at:timestamp}});}
+  throw new Error('Unexpected Stripe request: '+path);
+ };
+ await db.query("select set_config('app.organization_id',$1,false)",[billingTenant.organizationId]);
+ const requestKey='00000000-0000-4000-8000-000000000034';
+ const checkout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey));
+ assert.ok(checkout.url.startsWith('https://checkout.stripe.com/'));
+ const sameCheckout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly','00000000-0000-4000-8000-000000000035'));
+ assert.equal(checkout.url,sameCheckout.url);assert.equal(checkoutCalls,1);
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly',requestKey)),e=>e.code==='checkout_request_reused');
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,{...billingSession,organizationId:provisioned.organizationId},'start','monthly',requestKey)),e=>e.status===403);
+ await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly','00000000-0000-4000-8000-000000000036'));
+ assert.equal(expireCalls,1);assert.equal(checkoutCalls,2);
+ assert.equal((await db.query('select count(*)::int total from billing_checkout_sessions where organization_id=$1 and expires_at>now()',[billingTenant.organizationId])).rows[0].total,1);
+ const invoiceEvent={id:'evt_fixture',livemode:false,type:'invoice.paid',data:{object:{id:'in_fixture',customer:'cus_fixture',parent:{subscription_details:{subscription:'sub_fixture'}}}}};
+ failInvoice=true;
+ await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent)),e=>e.code==='stripe_unavailable');
+ assert.equal((await db.query("select * from billing_webhook_events where external_event_id='evt_fixture'")).rows.length,0);
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'trial');
+ failInvoice=false;
+ assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).processed,true);
+ assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).duplicate,true);
+ const billed=(await db.query('select * from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0];
+ assert.equal(billed.plan,'business');assert.equal(billed.status,'active');assert.equal(billed.billing_interval,'yearly');assert.equal(Number(billed.unit_amount_chf),690);assert.equal(billed.cancel_at_period_end,true);
+ assert.equal((await db.query('select max_users from organization_entitlements where organization_id=$1',[billingTenant.organizationId])).rows[0].max_users,15);
+ const ledger=(await db.query("select * from platform_billing_payments where external_id='in_fixture'")).rows;
+ assert.equal(ledger.length,1);assert.equal(Number(ledger[0].amount),690);
+ // A stale cancellation event must use current provider state (still active).
+ await globalThis.__provisionTest(c=>processStripeEvent(c,{id:'evt_stale',livemode:false,type:'customer.subscription.deleted',data:{object:{id:'sub_fixture',customer:'cus_fixture',status:'canceled'}}}));
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'active');
+ await db.query("update organizations set status='suspended' where id=$1",[billingTenant.organizationId]);
+ await globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_suspended'}));
+ assert.equal((await db.query('select status from organizations where id=$1',[billingTenant.organizationId])).rows[0].status,'suspended');
+ await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_mode',livemode:true})),e=>e.code==='stripe_mode_mismatch');
+ authoritative={...authoritative,metadata:{organization_id:demo}};
+ await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_tenant'})),e=>e.code==='subscription_mapping_invalid');
+ await db.exec('set role tenant_probe');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ assert.equal((await db.query('select * from billing_checkout_sessions')).rows.length,0);
+ await db.exec('reset role');
+ globalThis.fetch=originalFetch;delete globalThis.__billingEnv;
+ console.log('Stripe signature, persisted checkout retries, duplicate/stale events, rollback, billing ledger, entitlements and tenant mapping passed (HTTP fixtures).');
+
  delete globalThis.__provisionTest;
  delete globalThis.__customerPersistenceTest;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button, Logo } from "@/components/ui";
-import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
+import { clearDemoClientSession } from "@/lib/client/backend";
 
 export default function Register() {
   const router=useRouter();
@@ -16,6 +16,7 @@ export default function Register() {
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [confirmation,setConfirmation]=useState(false);
+  const [acceptedTerms,setAcceptedTerms]=useState(false);
 
   const submit=async(event:FormEvent)=>{
     event.preventDefault();
@@ -24,24 +25,14 @@ export default function Register() {
       const response=await fetch("/api/auth/register",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({companyName,email,password}),
+        body:JSON.stringify({name:companyName,company:companyName,email,password,plan:"start",billingCycle:"monthly",acceptedTerms,termsVersion:"registration-v1",privacyVersion:"registration-v1",locale:"de",trial:true}),
       });
       const payload=await response.json().catch(()=>({}));
       if(!response.ok){
-        if(response.status===503&&payload?.error==="backend_not_configured"){
-          await startDemoClientSession({
-            name:email.split("@")[0]||"Demo",
-            company:companyName,
-            focus:"overview",
-          });
-          router.push("/dashboard");
-          router.refresh();
-          return;
-        }
         throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
       }
       clearDemoClientSession();
-      if(payload.requiresConfirmation){
+      if(payload.requiresEmailVerification&&payload.emailSent){
         setConfirmation(true);
         setLoading(false);
         return;
@@ -54,7 +45,7 @@ export default function Register() {
     }
   };
 
-  if(confirmation) return <main className="auth-page"><section className="auth-card"><Logo/><h1>E-Mail bestätigen</h1><p>Wir haben dir einen Bestätigungslink gesendet. Öffne den Link und melde dich danach an.</p><Button href="/login">Zur Anmeldung</Button></section></main>;
+  if(confirmation) return <main className="auth-page"><section className="auth-card"><Logo/><h1>E-Mail bestätigen</h1><p>Wir haben dir einen Bestätigungslink gesendet. Öffne den Link, um deine E-Mail-Adresse zu bestätigen. Du kannst dein Testkonto bereits öffnen.</p><Button href="/dashboard">Testkonto öffnen</Button></section></main>;
 
   return <main className="auth-page">
     <section className="auth-card">
@@ -62,17 +53,18 @@ export default function Register() {
       <h1>Konto erstellen</h1>
       <p>Nur das Nötigste. Weitere Angaben kannst du später ergänzen.</p>
       <form onSubmit={submit}>
-        <label>Firmenname<input required autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
+        <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
         <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
         <label>Passwort
           <div className="password-field">
-            <input required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 8 Zeichen"/>
+            <input required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 12 Zeichen"/>
             <button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button>
           </div>
-          <small className="password-hint">Mindestens 8 Zeichen.</small>
+          <small className="password-hint">Mindestens 12 Zeichen.</small>
         </label>
+        <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/>Ich akzeptiere die AGB und habe die Datenschutzerklärung zur Kenntnis genommen.</label>
         {error&&<p className="auth-error" role="alert">{error}</p>}
-        <Button type="submit">{loading?"Account wird erstellt…":"Account erstellen"}</Button>
+        <Button type="submit" disabled={loading||!acceptedTerms}>{loading?"Account wird erstellt…":"Account erstellen"}</Button>
       </form>
       <div className="auth-after-submit">
         <p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> zur Kenntnis genommen zu haben.</p>

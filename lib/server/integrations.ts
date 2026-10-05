@@ -1,3 +1,4 @@
+import {env} from './env';
 export type IntegrationStatus = {
   key:"database"|"storage"|"billing"|"email"|"banking"|"swiss_qr";
   label:string;
@@ -9,7 +10,7 @@ export type IntegrationStatus = {
 export function getIntegrationStatus():IntegrationStatus[] {
   const database=Boolean(process.env.DATABASE_URL);
   const storage=Boolean(process.env.AZURE_STORAGE_ACCOUNT&&(process.env.AZURE_STORAGE_SAS||(process.env.IDENTITY_ENDPOINT&&process.env.IDENTITY_HEADER)));
-  const stripe=Boolean(process.env.STRIPE_SECRET_KEY&&process.env.STRIPE_WEBHOOK_SECRET&&process.env.STRIPE_PRICE_START_MONTHLY&&process.env.STRIPE_PRICE_BUSINESS_MONTHLY&&process.env.STRIPE_PRICE_PRO_MONTHLY);
+  const stripe=Boolean(env.stripeSecretKey&&env.stripeWebhookSecret&&Object.values(env.stripePrices).some(cycles=>cycles.monthly||cycles.yearly));
   const email=Boolean(process.env.RESEND_API_KEY&&process.env.EMAIL_FROM);
   return [
     {key:"database",label:"Datenbank",configured:database,status:database?"configured":"not_connected",detail:database?"Azure PostgreSQL konfiguriert":"Azure PostgreSQL nicht konfiguriert"},

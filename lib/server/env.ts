@@ -28,6 +28,7 @@ export const env={
   databasePoolMax:int("DATABASE_POOL_MAX",10),
   stripeSecretKey:optional("STRIPE_SECRET_KEY"),
   stripeWebhookSecret:optional("STRIPE_WEBHOOK_SECRET"),
+  stripeAutomaticTax:bool("STRIPE_AUTOMATIC_TAX",false),
   stripePortalReturnUrl:optional("STRIPE_PORTAL_RETURN_URL"),
   stripePrices:{
     start:{monthly:optional("STRIPE_PRICE_START_MONTHLY"),yearly:optional("STRIPE_PRICE_START_YEARLY")},
