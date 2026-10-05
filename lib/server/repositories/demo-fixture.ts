@@ -9,7 +9,7 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
  const target=await c.query('select is_demo from organizations where id=$1',[organizationId]);
  if(target.rows[0]?.is_demo!==true||organizationId===demoTemplateId)throw new ApiError(403,'demo_target_invalid','Ungültiger Demo-Mandant.');
  await c.query("select set_config('app.organization_id',$1,true)",[demoTemplateId]);
- const template=await c.query('select is_demo from organizations where id=$1',[demoTemplateId]);
+ const template=await c.query('select is_demo,street,building_number,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[demoTemplateId]);
  if(template.rows[0]?.is_demo!==true)throw new ApiError(503,'demo_unavailable','Demo-Vorlage ist nicht verfügbar.');
  const source=new Map<string,Record<string,unknown>[]>(),ids=new Map<string,string>();
  for(const table of tables){
@@ -18,6 +18,8 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
  }
  await c.query("select set_config('app.organization_id',$1,true)",[organizationId]);
  await c.query("select set_config('app.user_id',$1,true)",[userId]);
+ const company=template.rows[0];
+ await c.query("update organizations set street=$2,building_number=$3,postal_code=$4,city=$5,country_code=$6,iban=$7,qr_iban=$8 where id=$1 and is_demo=true and coalesce(street,'')='' and coalesce(iban,'')=''",[organizationId,company.street,company.building_number,company.postal_code,company.city,company.country_code,company.iban,company.qr_iban]);
  const metadata=await c.query("select relname,attname from pg_attribute a join pg_class t on t.oid=a.attrelid join pg_namespace n on n.oid=t.relnamespace where n.nspname='public' and t.relname=any($1::text[]) and a.attnum>0 and not a.attisdropped and a.attgenerated='' order by t.relname,a.attnum",[[...tables]]);
  for(const table of tables){
   const columns=metadata.rows.filter(row=>row.relname===table).map(row=>'"'+String(row.attname).replaceAll('"','""')+'"').join(',');

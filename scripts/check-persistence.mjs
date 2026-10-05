@@ -30,9 +30,16 @@ try{
  await a('/api/expenses/'+expense.id,'PATCH',{employeeId:employee.id,merchant:'Test Hotel',expenseDate:today,category:'Verpflegung',amount:124,currency:'CHF',vatRate:2.6,description:'Updated expense',status:'approved'});
  expenseRead=(await a('/api/expenses/'+expense.id)).item;assert.equal(expenseRead.category,'Verpflegung');assert.equal(expenseRead.employee_id,employee.id);assert.equal(expenseRead.status,'approved');
  const docInput={kind:'invoice',customerId:customer.id,customerName:customerInput.name,issueDate:today,dueDate:today,vatRate:8.1,currency:'CHF',note:'Persisted note',items:[{description:'Service',quantity:2,unitPrice:100,vatRate:8.1},{description:'Material',quantity:1,unitPrice:50,vatRate:2.6}]};
+ const company=(await a('/api/settings/company')).item;
+ const paymentSettings=(await a('/api/settings/documents')).item;
+ await a('/api/settings/documents','PATCH',{vatRate:8.1,paymentTermsDays:30,iban:'',qrIban:''});
+ const blocked=await a('/api/documents','POST',docInput,409);assert.equal(blocked.error,'invoice_payment_setup_required');
+ await a('/api/settings/documents','PATCH',{vatRate:8.1,paymentTermsDays:30,iban:'CH9300762011623852958',qrIban:''},400);
+ await a('/api/settings/documents','PATCH',{vatRate:8.1,paymentTermsDays:30,iban:paymentSettings.iban||'CH9300762011623852957',qrIban:paymentSettings.qr_iban||''});
+ assert.ok(company.street&&company.city&&company.postal_code,'Demo creditor address must be database-backed');
  const invoice=(await a('/api/documents','POST',docInput,201)).item;
  const docRead=(await a('/api/documents/'+invoice.number)).item;
- assert.equal(docRead.customer_id,customer.id);assert.equal(docRead.note,docInput.note);assert.equal(docRead.items.length,2);assert.equal(Number(docRead.items[1].vat_rate),2.6);
+ assert.match(docRead.issue_date,/^\d{4}-\d{2}-\d{2}$/);assert.match(docRead.due_date,/^\d{4}-\d{2}-\d{2}$/);assert.equal(docRead.status,'draft');assert.match(docRead.qr_reference,/^\d{27}$/);assert.equal(docRead.customer_id,customer.id);assert.equal(docRead.note,docInput.note);assert.equal(docRead.items.length,2);assert.equal(Number(docRead.items[1].vat_rate),2.6);
  await b('/api/documents/'+invoice.number,'GET',undefined,404);
  const quote=(await a('/api/documents','POST',{...docInput,kind:'offer',validUntil:today},201)).item;assert.equal((await a('/api/documents/'+quote.number)).item.kind,'offer');
  const time=(await a('/api/time-entries','POST',{durationMinutes:37,projectName:'Persisted project label',customerName:customerInput.name,description:'Persisted activity',startedAt:today+'T12:00:00'},201)).item;

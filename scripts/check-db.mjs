@@ -23,7 +23,7 @@ const required={
  products_services:["id","organization_id","external_id","name","status"],
  time_entries:["id","organization_id","external_id","project_id","customer_id","project_label","hours"],
  expenses:["id","organization_id","external_id","expense_date","status","category_label"],
- invoices:["id","organization_id","external_id","invoice_no","customer_id","status"],
+ invoices:["id","organization_id","external_id","invoice_no","customer_id","status","qr_reference"],
  invoice_lines:["id","organization_id","external_id","invoice_id"],
  payments:["id","organization_id","external_id","amount","allocation_status"],
  suppliers:["id","organization_id","external_id","name","status"],

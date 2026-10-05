@@ -4,6 +4,7 @@ import type { PoolClient } from "pg";
 import { audit } from "../audit";
 import { ApiError } from "../http";
 import { ownRecordOnly, tenantCan } from "@/lib/permissions";
+import { invoicePaymentIssue } from "@/lib/qr-bill";
 import type { SessionUser } from "../session";
 
 type Row=Record<string,unknown>;
@@ -29,7 +30,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(kind&&kind!==k)continue;
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
-   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,d.issue_date,${k==='invoice'?'d.due_date':'null::date'} due_date,${k==='offer'?'d.valid_until':'null::date'} valid_until,d.note,d.currency,d.created_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
+   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.currency,d.created_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
      coalesce((select sum(l.quantity*l.unit_price) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) subtotal,
      coalesce((select sum(l.quantity*l.unit_price*l.vat_rate/100) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_amount,
      ${k==='invoice'?'d.total_amount':`coalesce((select sum(l.quantity*l.unit_price*(1+l.vat_rate/100)) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
@@ -91,6 +92,10 @@ export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:str
  }
  if(!['create_document_atomic','update_document_atomic'].includes(operation))throw new ApiError(400,'invalid_operation','Ungültige Aktion.');
  const invoice=args.p_kind==='invoice';if(!tenantCan(s.role,invoice?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
+ if(invoice){
+  const company=(await c.query('select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[s.organizationId])).rows[0];
+  const issue=invoicePaymentIssue(company??{});if(issue)throw new ApiError(409,'invoice_payment_setup_required',issue);
+ }
  if(!args.p_number&&operation==='create_document_atomic'){
   const year=String(new Date().getFullYear());
   const sequence=await c.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[s.organizationId,invoice?'invoice':'quote',year]);
