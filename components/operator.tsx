@@ -95,7 +95,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const [mobileMore,setMobileMore]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const router=useRouter();
-  const logout=async()=>{try{await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}});}finally{router.push("/login");router.refresh();}};
+  const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
@@ -709,18 +709,24 @@ function SecurityView() {
   if(!production) return <>
     <section className="surface">
       <SectionTitle title="Interne Benutzer"/>
-      <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Hinweis</span></div>{[["Oemer Cam","Administrator","Aktiv","Demo"],["Maria Bianchi","Support","Aktiv","Demo"],["Luca Schneider","Support","Aktiv","Demo"],["Anna Pross","Finanzen","Aktiv","Demo"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
+      <div className="operator-table"><div className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Quelle</span></div>{[["Oemer Cam","Administrator","Aktiv","Microsoft Entra"],["Maria Bianchi","Support","Aktiv","Microsoft Entra"],["Luca Schneider","Support","Aktiv","Microsoft Entra"],["Anna Pross","Finanzen","Aktiv","Microsoft Entra"]].map(r=><div className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></div>)}</div>
     </section>
   </>;
 
-  const roleLabel:Record<string,string>={administrator:"Administrator",support:"Support",finance:"Finanzen",readonly:"Nur Lesen"};
+  const roleLabel:Record<string,string>={
+    platform_owner:"Plattform Owner",
+    platform_admin:"Administrator",
+    platform_support:"Support",
+    platform_billing:"Finanzen",
+    platform_auditor:"Audit"
+  };
   return <>
     <section className="surface">
-      <SectionTitle title="Operator-Zugriffe"/>
-      <p className="technical-hint">Es werden nur tatsächlich autorisierte Operator-Konten angezeigt. Namen und E-Mail-Adressen werden nicht aus dem Auth-System erfunden.</p>
-      {items.length?<div className="operator-table"><div className="operator-table-head security"><span>Benutzer-ID</span><span>Rolle</span><span>Status</span><span>Erstellt</span></div>{items.map(item=><div className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.user_id).slice(0,12)}…</b></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{new Date(String(item.created_at)).toLocaleDateString("de-CH")}</span></div>)}</div>:<EmptyState icon="lock" title="Keine Operator-Zugriffe" text="Es sind keine autorisierten internen Benutzer hinterlegt."/>}
+      <SectionTitle title="Microsoft Entra Zugriffe"/>
+      <p className="technical-hint">Interne Identitäten, MFA und Rollen werden in Microsoft Entra ID verwaltet. Binso One zeigt hier nur die zuletzt synchronisierte Berechtigung.</p>
+      {items.length?<div className="operator-table"><div className="operator-table-head security"><span>Benutzer</span><span>Rolle</span><span>Status</span><span>Synchronisiert</span></div>{items.map(item=><div className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.display_name??item.email??"")}</b><small>{String(item.email??"")}</small></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{item.last_entra_sync_at?new Date(String(item.last_entra_sync_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"—"}</span></div>)}</div>:<EmptyState icon="lock" title="Noch keine Entra-Anmeldung" text="Sobald ein berechtigter Binso-Mitarbeiter sich über Microsoft anmeldet, erscheint die Identität hier."/>}
     </section>
-    <section className="surface security-card"><div className="security-row"><div><b>Operator-Benutzer hinzufügen</b><p>Neue Operator-Konten müssen bewusst über den sicheren Auth- und Berechtigungsprozess provisioniert werden.</p></div><Status tone="neutral">Manuell provisionieren</Status><Button variant="secondary" disabled>Einladen</Button></div></section>
+    <section className="surface security-card"><div className="security-row"><div><b>Berechtigungen in Azure verwalten</b><p>Zuweisungen erfolgen ausschliesslich über die Binso-One-App-Rollen in Microsoft Entra ID. Lokale Operator-Passwörter und lokale Rollenzuweisungen sind für Produktion deaktiviert.</p></div><Status tone="success">Entra verwaltet</Status><Button variant="secondary" disabled>Azure / Entra</Button></div></section>
   </>;
 }
 

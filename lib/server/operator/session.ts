@@ -4,8 +4,9 @@ import {cookies,headers} from "next/headers";
 import {query} from "@/lib/server/db";
 import {env} from "@/lib/server/env";
 import type {OperatorRole} from "@/lib/permissions";
+import {getEntraOperatorIdentity} from "@/lib/server/operator/entra";
 
-export type OperatorSession={sessionId:string;userId:string;email:string;name:string;role:OperatorRole};
+export type OperatorSession={sessionId:string;userId:string;email:string;name:string;role:OperatorRole;entraObjectId:string|null;entraTenantId:string|null;authSource:string};
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
 const ipHash=(value:string)=>createHash("sha256").update(value).digest("hex");
 
@@ -22,10 +23,22 @@ export async function createOperatorSession(input:{userId:string;email:string;na
 }
 export async function getOperatorSession():Promise<OperatorSession|null>{
  const jar=await cookies();const token=jar.get(env.operatorSessionCookieName)?.value;if(!token)return null;
- const result=await query<OperatorSession>(`select s.id as "sessionId",u.user_id as "userId",u.email,coalesce(u.display_name,u.email) as name,u.role from platform_auth_sessions s join platform_operator_assignments u on u.user_id=s.user_id where s.token_hash=$1 and s.expires_at>now() and u.status='active'`,[tokenHash(token)]);
+ const result=await query<OperatorSession>(`select s.id as "sessionId",u.user_id as "userId",u.email,coalesce(u.display_name,u.email) as name,u.role,u.entra_object_id as "entraObjectId",u.entra_tenant_id as "entraTenantId",u.auth_source as "authSource" from platform_auth_sessions s join platform_operator_assignments u on u.user_id=s.user_id where s.token_hash=$1 and s.expires_at>now() and u.status='active'`,[tokenHash(token)]);
  const session=result.rows[0]||null;
  if(session)void query(`update platform_auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }
-export async function requireOperatorSession(){const session=await getOperatorSession();if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}return session}
+export async function requireOperatorSession(){
+ const session=await getOperatorSession();
+ if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
+ if(env.appMode==="production"){
+  const identity=await getEntraOperatorIdentity();
+  if(!identity||session.authSource!=="entra"||identity.tenantId!==session.entraTenantId||identity.objectId!==session.entraObjectId||identity.role!==session.role){
+   await destroyOperatorSession();
+   const {ApiError}=await import("@/lib/server/http");
+   throw new ApiError(401,"entra_reauthentication_required","Microsoft Entra Anmeldung oder Berechtigung ist nicht mehr gültig.");
+  }
+ }
+ return session;
+}
 export async function destroyOperatorSession(){const jar=await cookies();const token=jar.get(env.operatorSessionCookieName)?.value;if(token)await query("delete from platform_auth_sessions where token_hash=$1",[tokenHash(token)]);jar.delete(env.operatorSessionCookieName)}
