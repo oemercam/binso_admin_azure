@@ -4,7 +4,7 @@ Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
 
 ## Current release: v0.10 security hardening
 
-The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe and Resend remain opt-in production integrations and are only shown as connected when their server configuration is present.
+The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe is a production integration. Transactional email is handled exclusively through Microsoft Graph / Microsoft 365 and requires complete Graph configuration in production.
 
 ### Production foundations
 
@@ -27,7 +27,7 @@ The standalone demo still works without external services. With Supabase configu
 - dashboard aggregates and global tenant search
 - Operator dashboard, customers, tickets, account lifecycle, restrictions, announcements, monitoring and audit
 - Stripe Checkout, Billing Portal and signed/idempotent webhook foundation
-- Resend server integration and authorized Operator test email
+- Microsoft Graph / Microsoft 365 transactional-email integration and authorized Operator test email
 
 ### v0.10 security hardening
 
@@ -55,7 +55,7 @@ The standalone demo still works without external services. With Supabase configu
 The following still require real provider configuration or final domain implementation:
 
 - live Stripe account, products/prices, Portal settings and webhook secret
-- verified Resend domain and production sender
+- Microsoft Graph application permissions and production sender mailbox verified
 - final offer/invoice PDF generation and email attachment delivery
 - standards-compliant Swiss QR bill generation
 - bank synchronization
@@ -75,7 +75,7 @@ Binso One does not invent payment cards, SaaS invoices, SLA values, device sessi
 - Supabase private Storage
 - PostgreSQL RLS for tenant isolation
 - Stripe Checkout / Billing Portal / signed webhook foundation
-- Resend transactional-email foundation
+- Microsoft Graph / Microsoft 365 transactional-email foundation
 - PWA manifest and conservative service-worker caching
 - Azure App Service deployment through GitHub Actions
 
@@ -104,11 +104,13 @@ STRIPE_PRICE_START=<price-id>
 STRIPE_PRICE_BUSINESS=<price-id>
 STRIPE_PRICE_PRO=<price-id>
 
-RESEND_API_KEY=<resend-api-key>
-BINSO_EMAIL_FROM=Binso One <no-reply@binso.ch>
+GRAPH_TENANT_ID=<microsoft-entra-tenant-id>
+GRAPH_CLIENT_ID=<app-registration-client-id>
+GRAPH_CLIENT_SECRET=<app-registration-client-secret>
+GRAPH_SENDER_USER_ID=<sender-mailbox-user-id-or-address>
 ```
 
-Do not expose `RATE_LIMIT_SECRET`, the Supabase service-role key, Stripe secrets or Resend API key through `NEXT_PUBLIC_*`.
+Do not expose `RATE_LIMIT_SECRET`, the Supabase service-role key, Stripe secrets or Microsoft Graph credentials through `NEXT_PUBLIC_*`.
 
 For Stripe, configure monthly recurring Prices for Start, Business and Pro, enable the Customer Portal, and register:
 
@@ -124,7 +126,7 @@ Current billing webhook events:
 - `invoice.paid`
 - `invoice.payment_failed`
 
-For Resend, verify the sending domain and use Operator → Monitoring to test the configured sender path.
+For Microsoft Graph, grant the application the required mail-sending permission, configure the sender mailbox, and use Operator → Monitoring to test the production sender path.
 
 ## Local QA
 
