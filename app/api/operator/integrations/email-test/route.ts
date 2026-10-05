@@ -14,8 +14,8 @@ export async function POST(request:NextRequest){
     const result=await sendMail({
       to:email,
       subject:"Binso One – E-Mail Integrationstest",
-      html:"<p>Der produktive E-Mail-Versand von Binso One ist erfolgreich mit Resend verbunden.</p><p>Diese Nachricht wurde bewusst durch einen autorisierten Operator ausgelöst.</p>",
-      text:"Der produktive E-Mail-Versand von Binso One ist erfolgreich mit Resend verbunden.",
+      html:"<p>Der produktive E-Mail-Versand von Binso One ist erfolgreich verbunden.</p><p>Diese Nachricht wurde bewusst durch einen autorisierten Operator ausgelöst.</p>",
+      text:"Der produktive E-Mail-Versand von Binso One ist erfolgreich verbunden.",
     });
     return json({ok:true,delivered:result.delivered,provider:result.provider});
   }catch(error){return apiError(error);}
