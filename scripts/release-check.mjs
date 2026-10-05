@@ -68,3 +68,8 @@ for(const guard of ['BINSO_DELETE_CONFIRM','BINSO_DELETE_EXPORT_CONFIRMED','Orga
 }
 
 await fs.access('docs/graph-mail-least-privilege.md');
+
+await fs.access('app/api/auth/sessions/route.ts');
+await fs.access('app/api/auth/sessions/[id]/route.ts');
+const sessionSecurityUi=await fs.readFile('components/security-settings-page.tsx','utf8');
+assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.includes('Alle anderen abmelden'),'Security settings must expose real session management');
