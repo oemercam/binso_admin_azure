@@ -2516,7 +2516,7 @@
     line-height:1.45;
   }
 
-  .operator-mobile-more-groups{display:grid!important;gap:18px!important}
+  .operator-mobile-more-groups{display:grid;gap:18px}
   .operator-mobile-more-group{display:grid}
   .operator-mobile-more-group>span{
     padding:0 0 7px;
