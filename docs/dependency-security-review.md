@@ -14,7 +14,13 @@ High- und Critical-Advisories in **Produktionsabhängigkeiten** blockieren den R
 
 ## Bekannter Dev-Tooling-Befund
 
-Der vollständige Audit (`pnpm security:scan:all`) meldet derzeit:
+Der vollständige Audit wird mit einer **einzigen expliziten GHSA-Ausnahme** ausgeführt:
+
+```bash
+pnpm audit --audit-level high --ignore GHSA-vfj7-8cjw-p6xm
+```
+
+Dadurch blockiert Quality weiterhin bei jedem anderen High-/Critical-Finding. Die einzige tolerierte Advisory ist derzeit:
 
 - Advisory: `GHSA-vfj7-8cjw-p6xm`
 - Paket: `braces@3.0.3`
@@ -29,6 +35,7 @@ Dieser Befund wird deshalb nicht durch einen erzwungenen Package-Override umgang
 ## Behandlung
 
 - Produktionsabhängigkeiten bleiben ein hartes Release-Gate.
+- Jede weitere High-/Critical-Advisory – auch in Development-Abhängigkeiten – blockiert Quality.
 - Der vollständige Dev-Dependency-Audit wird bei Dependency-/Next-/ESLint-Upgrades erneut geprüft.
 - Sobald eine upstream-kompatible Behebung verfügbar ist, werden Lockfile und Toolchain aktualisiert.
 - Neue High-/Critical-Advisories in Produktionsabhängigkeiten dürfen nicht als Ausnahme aufgenommen werden.
