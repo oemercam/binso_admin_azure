@@ -77,3 +77,8 @@ assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.in
 const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
 assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
 await fs.access('docs/dependency-security-review.md');
+
+await fs.access('docs/dependency-security-audit.md');
+const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
+assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-level high','Blocking security audit must cover production dependencies at high severity');
+assert.ok(packageJson.scripts['security:scan:all'],'A full dependency audit command must remain available');
