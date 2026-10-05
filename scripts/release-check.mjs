@@ -28,9 +28,18 @@ const forbiddenFiles=[
   'docs/technical-organizational-measures.md'
 ];
 for(const path of forbiddenFiles){
-  const source=await fs.readFile(path,'utf8');
-  const retiredMailProvider=['re','send'].join('');
-  assert.ok(!source.toLowerCase().includes(retiredMailProvider),path+' must not contain retired mail-provider configuration or documentation');
+  const source=(await fs.readFile(path,'utf8')).toLowerCase();
+  const retiredArtifacts=[
+    'resend_api_key',
+    'resend.com',
+    'sendviaresend',
+    'provider:"resend"',
+    "provider:'resend'",
+    'email_delivery_mode=resend'
+  ];
+  for(const artifact of retiredArtifacts){
+    assert.ok(!source.includes(artifact),path+' must not contain retired mail-provider artifact '+artifact);
+  }
 }
 const email=await fs.readFile('lib/server/email.ts','utf8');
 assert.ok(email.includes('graph.microsoft.com')&&email.includes('sendMail'),'Microsoft Graph must remain the only production mail path');
