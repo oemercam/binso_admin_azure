@@ -58,7 +58,7 @@ export const plans: PricingPlan[] = [
       "Verträge und Dokumente",
       "Erweiterte Rollen und Audit",
       "Priorisierter Support",
-      "unbegrenzte Benutzer"
+      "Erweiterte Benutzer- und Leistungsgrenzen"
     ]
   }
 ];
