@@ -10,6 +10,7 @@ const loginRoute=await fs.readFile('app/api/auth/login/route.ts','utf8');
 const recoverRoute=await fs.readFile('app/api/auth/recover/route.ts','utf8');
 const registerRouteSource=await fs.readFile('app/api/auth/register/route.ts','utf8');
 const provisioningSource=await fs.readFile('lib/server/provisioning.ts','utf8');
+const operatorSource=await fs.readFile('components/operator.tsx','utf8');
 for(const [name,source] of [['landing',home],['pricing',pricing],['register',register]]){
   assert.ok(!source.includes('30 Tage kostenlos'),name+' must not advertise the old 30-day trial');
 }
@@ -22,6 +23,9 @@ assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue 
 assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
 assert.ok(registerRouteSource.includes('profileLanguage=locale==="de"?"de-CH":locale'),'Registration must store Swiss German using canonical de-CH locale');
 assert.ok(provisioningSource.includes('input.language??"de-CH"'),'Provisioning default locale must remain de-CH');
+assert.ok(provisioningSource.includes('input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):null'),'Trial expiry must not start before first email verification');
+for(const legacyMrr of ['CHF 19','CHF 49','CHF 89'])assert.ok(!operatorSource.includes('mrr:"'+legacyMrr+'"'),'Operator demo must not hardcode retired MRR '+legacyMrr);
+assert.ok(operatorSource.includes('demoPlan("start")')&&operatorSource.includes('demoPlan("business")')&&operatorSource.includes('demoPlan("pro")'),'Operator demo MRR must derive from canonical plans');
 
 console.log('Release gates passed.');
 
