@@ -1008,16 +1008,16 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
 export function SettingsPage() {
   const rows = [
-    ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail und Sprache"],
-    ["/einstellungen/firma","users","Firma","Unternehmensdaten und Rechnungseinstellungen"],
-    ["/einstellungen/team","users","Team","Benutzer, Rollen und Einladungen"],
+    ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail, Telefon und Funktion"],
+    ["/einstellungen/firma","users","Firma","Unternehmensdaten, Adresse und Firmenlogo"],
+    ["/einstellungen/dokumente","receipt","Rechnungen & Dokumente","MwSt., Zahlungsfrist, IBAN und Standardtexte"],
+    ["/einstellungen/team","users","Benutzer & Rollen","Zugänge, Rollen und Einladungen"],
     ["/einstellungen/abonnement","card","Abonnement","Plan, Nutzung und Zahlungsabwicklung"],
-    ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail und Push"],
-    ["/einstellungen/sprache","settings","Sprache","Deutsch (Schweiz), FR, IT, EN, TR"],
-    ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, Sitzungen und Geräte"],
-    ["/einstellungen/darstellung","moon","Darstellung","Hell oder Dunkel"],
+    ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail- und Push-Einstellungen"],
+    ["/einstellungen/sprache","settings","Sprache","Oberflächen- und Kommunikationssprache"],
+    ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, MFA, Sitzungen und Geräte"],
+    ["/einstellungen/darstellung","moon","Darstellung","Hell, Dunkel oder Systemeinstellung"],
     ["/einstellungen/datenschutz","lock","Datenschutz & Cookies","Notwendige Funktionen und Performance-Messung"],
-    ["/support","support","Hilfe und Support","Tickets und Kontakt"],
   ];
   return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">
     <div className="settings-list">
@@ -1032,7 +1032,6 @@ export function AccountSettingsPage() {
   const [email,setEmail]=useState("");
   const [phone,setPhone]=useState("");
   const [jobTitle,setJobTitle]=useState("");
-  const [language,setLanguage]=useState("de-CH");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
   const [avatarUrl,setAvatarUrl]=useState("");
@@ -1050,7 +1049,6 @@ export function AccountSettingsPage() {
           setPhone(String(item.phone??""));
           setAvatarUrl(String(item.avatar_url??""));
           setJobTitle(String(item.job_title??""));
-          setLanguage(String(item.language??"de-CH"));
         });
       }).catch(()=>undefined);
   },[]);
@@ -1058,7 +1056,7 @@ export function AccountSettingsPage() {
   const save=async(message="Persönliche Daten gespeichert.")=>{
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
-      await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle,language});
+      await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle});
       setToast(message);
       setEditing(false);
     }catch(error){
@@ -1081,10 +1079,9 @@ export function AccountSettingsPage() {
           <Field label="E-Mail"><input type="email" value={email} readOnly/></Field>
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
           <Field label="Funktion"><input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
-          <Field label="Sprache"><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="de-CH">Deutsch (Schweiz)</option><option value="fr">Français</option><option value="it">Italiano</option><option value="en">English</option><option value="tr">Türkçe</option></select></Field>
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
-      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div><div><dt>Sprache</dt><dd>{{"de-CH":"Deutsch (Schweiz)",fr:"Français",it:"Italiano",en:"English",tr:"Türkçe"}[language]??language}</dd></div></dl></section>}
+      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
   </AppShell>;
@@ -1333,11 +1330,11 @@ export function NotificationSettingsPage() {
 }
 
 export function LanguageSettingsPage() {
-  const [language,setLanguage] = useState("de");
+  const [language,setLanguage] = useState("de-CH");
   const [error,setError]=useState("");
-  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>setLanguage(data.item?.language??"de")).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
+  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>setLanguage(data.item?.language??"de-CH")).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
   const choose=async(code:string)=>{try{if(!isProductionBackendEnabled())throw new Error("Schreibgeschützte Vorschau");await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
-  const languages=[["Deutsch (Schweiz)","de"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
+  const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
     {error&&<p role="alert">{error}</p>}
