@@ -101,7 +101,7 @@ async function deleteOrganization(client){
     const activeSubscription=await client.query(
       `select 1 from organization_subscriptions
         where organization_id=$1
-          and status in ('active','trial','past_due','grace_period')
+          and (status not in ('canceled','expired') or billing_subscription_id is not null)
         limit 1`,
       [organizationId]
     );
