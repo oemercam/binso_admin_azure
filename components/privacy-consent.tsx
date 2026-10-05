@@ -38,9 +38,11 @@ export function PrivacyConsent(){
 
   useEffect(()=>{
     const existing=loadPreferences();
-    if(existing)setPerformance(existing.performance);
-    setOpen(!existing);
-    setReady(true);
+    queueMicrotask(()=>{
+      if(existing)setPerformance(existing.performance);
+      setOpen(!existing);
+      setReady(true);
+    });
     const reopen=()=>{const current=loadPreferences();setPerformance(current?.performance??false);setOpen(true);};
     window.addEventListener("binso:open-privacy-settings",reopen);
     return()=>window.removeEventListener("binso:open-privacy-settings",reopen);
@@ -79,7 +81,7 @@ export function PrivacySettingsPage(){
   const [saved,setSaved]=useState(false);
 
   useEffect(()=>{
-    setPerformance(loadPreferences()?.performance??false);
+    queueMicrotask(()=>setPerformance(loadPreferences()?.performance??false));
   },[]);
 
   const save=(value:boolean)=>{
