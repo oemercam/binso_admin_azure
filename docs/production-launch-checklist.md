@@ -14,7 +14,7 @@ Stand: 5. Oktober 2026
 
 ## Automatisierte Produktionskontrollen
 - [x] Dependency Audit mit pnpm audit --audit-level high in Quality
-- [x] Resend-Regressionsschutz im Release Gate
+- [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
 - [x] Microsoft Graph als einziger produktiver Mailpfad
 - [x] Graph-Konfigurationsprüfung im Deploy
 - [x] echter Microsoft-Graph-sendMail-Selbsttest als eigener Production-Workflow
