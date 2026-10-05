@@ -5,6 +5,7 @@ import { query } from "@/lib/server/db";
 import { createAuthToken } from "@/lib/server/auth-tokens";
 import { sendMail, mailLayout } from "@/lib/server/email";
 import { env } from "@/lib/server/env";
+import { domainConfig } from "@/config/domain";
 
 export async function POST(request:NextRequest){
  try{
@@ -13,7 +14,7 @@ export async function POST(request:NextRequest){
   if(!validEmail(email))return json({ok:true,message:"Falls ein Konto existiert, wurde ein Link gesendet."});
   const user=(await query<{id:string}>(`select id from app_users where lower(email)=lower($1) and status='active' limit 1`,[email])).rows[0];
   if(user){
-   const token=await createAuthToken({type:"password_reset",email,userId:user.id,ttlMinutes:60});
+   const token=await createAuthToken({type:"password_reset",email,userId:user.id,ttlMinutes:domainConfig.passwordResetMinutes});
    const url=`${env.appUrl}/passwort-zuruecksetzen?token=${encodeURIComponent(token)}`;
    await sendMail({to:email,subject:"Passwort für Binso One zurücksetzen",text:`Passwort zurücksetzen: ${url}`,html:mailLayout("Passwort zurücksetzen","<p>Über den folgenden Link kannst du ein neues Passwort für dein Binso One Konto festlegen.</p>",{label:"Passwort zurücksetzen",url})}).catch(()=>undefined);
   }
