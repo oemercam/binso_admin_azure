@@ -60,6 +60,9 @@ Prioritäten: P1 = blockiert einen Hauptablauf oder zeigt fachlich falsche Ergeb
 
 | UX-22 | Admin / Monitoring | 1363 × 936 | Service Health gleichzeitig 99,99 % und 67 % bei 4/6 verfügbaren Services | Gleiche Momentaufnahme aus tatsächlicher Serviceanzahl | P2 | Beide Anzeigen berechnen denselben Health-Anteil; erfundene INP-Prozentangabe aus Demo entfernt |
 
+| UX-23 | Kundenportal / Dashboard | 1363 × 936 | Während Laden stehen Kennzahlen auf 0 und „Noch keine Rechnungen“ erscheint trotz vorhandener Belege; Requestfehler werden verschluckt | Lade-/Fehlerzustand vor Zahlen und Leerzuständen | P2 | Eigener Requeststatus, Fehler mit Wiederholen, kompakte tatsächliche Leerzeilen |
+| UX-24 | Angebot/Rechnung / Nummer | 1363 × 936 | Leeres nicht editierbares Nummernfeld ohne Erklärung | Automatische Vergabe vor Speicherung klar anzeigen | P3 | Placeholder „Wird beim Erstellen vergeben“ |
+
 Zusätzliche Codehärtung: Kein automatischer Wechsel von fehlgeschlagener produktiver Anmeldung zu Demo; Login-Rücksprung akzeptiert keine protokollrelativen externen URLs.
 
 ## Muss manuell auf echtem Gerät bestätigt werden
