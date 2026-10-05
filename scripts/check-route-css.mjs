@@ -63,6 +63,7 @@ const routes=[
 ];
 
 const seenAssets=new Set();
+const assetCss=new Map();
 const failures=[];
 
 for(const route of routes){
@@ -123,15 +124,15 @@ for(const route of routes){
     }
 
     const css=await asset.text();
-    if(css.length<100){
-      failures.push(`${route}: stylesheet unexpectedly small (${css.length} bytes) ${assetUrl}`);
-      continue;
-    }
-    const requiredCssMarkers=["--font-sans",".marketing-header",".button",".hero",".app-root","@media"];
-    const markerMatches=requiredCssMarkers.filter(marker=>css.includes(marker));
-    if(markerMatches.length<3){
-      failures.push(`${route}: stylesheet is missing Binso UI rules (found ${markerMatches.join(", ")||"none"}) ${assetUrl}`);
-    }
+    assetCss.set(assetUrl,css);
+  }
+  // Next.js can split and deduplicate CSS into an empty auxiliary chunk. The
+  // complete set linked by each route must still contain every shared UI marker.
+  const combinedCss=cssHrefs.map(href=>assetCss.get(new URL(href,url).toString())??'').join('\n');
+  const requiredCssMarkers=["--font-sans",".marketing-header",".button",".hero",".app-root","@media"];
+  const missing=requiredCssMarkers.filter(marker=>!combinedCss.includes(marker));
+  if(combinedCss.length<1000||missing.length){
+    failures.push(`${route}: linked stylesheets are incomplete (${combinedCss.length} bytes; missing ${missing.join(", ")||"none"})`);
   }
 }
 
