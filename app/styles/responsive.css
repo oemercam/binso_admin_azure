@@ -2423,3 +2423,51 @@
   .desktop-detail-workspace,
   .entity-edit-workspace{grid-template-columns:minmax(0,1fr) minmax(340px,390px)}
 }
+
+
+@media (min-width:1101px){
+  .desktop-detail-main .success-panel,
+  .desktop-detail-main .detail-card{max-width:none}
+
+  .expense-detail-workspace{
+    grid-template-columns:minmax(0,1fr) 320px;
+    align-items:start;
+  }
+  .expense-detail-workspace>.form-page{grid-column:1;grid-row:1}
+  .expense-detail-workspace>.receipt-upload{
+    grid-column:2;
+    grid-row:1;
+    min-height:360px;
+    position:sticky;
+    top:86px;
+  }
+
+  .support-detail-workspace .support-thread{
+    max-width:none;
+    min-height:calc(100dvh - 210px);
+    margin:0;
+  }
+  .support-detail-workspace .thread-composer{
+    position:sticky;
+    left:auto;
+    right:auto;
+    bottom:18px;
+    width:100%;
+    margin-top:auto;
+  }
+
+  .settings-list{
+    width:100%;
+    max-width:none;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:32px;
+    border-top:0;
+  }
+  .settings-list>a{border-top:1px solid var(--color-line)}
+  .settings-list>a:nth-last-child(-n+2){border-bottom:1px solid var(--color-line)}
+}
+
+@media (min-width:1500px){
+  .expense-detail-workspace{grid-template-columns:minmax(0,1fr) 360px}
+}
