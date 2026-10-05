@@ -168,7 +168,7 @@ try{
  assert.equal(verifyStripeSignature(payload,`t=${timestamp-600},v1=${digest}`),false);
  const billingTenant=await provisionOrganization({userId:'billing-probe',email:'billing-probe@example.invalid',name:'Billing Probe',companyName:'Billing Probe',plan:'start',mode:'trial'});
  const billingSession={organizationId:billingTenant.organizationId,userId:'billing-probe',email:'billing-probe@example.invalid',role:'owner'};
- const prices={price_start_m:{id:'price_start_m',active:true,currency:'chf',unit_amount:2900,recurring:{interval:'month',interval_count:1}},price_business_y:{id:'price_business_y',active:true,currency:'chf',unit_amount:69000,recurring:{interval:'year',interval_count:1}}};
+ const prices={price_start_m:{id:'price_start_m',active:true,livemode:false,currency:'chf',unit_amount:2900,recurring:{interval:'month',interval_count:1}},price_business_y:{id:'price_business_y',active:true,livemode:false,currency:'chf',unit_amount:69000,recurring:{interval:'year',interval_count:1}}};
  let authoritative={id:'sub_fixture',customer:'cus_fixture',metadata:{organization_id:billingTenant.organizationId},status:'active',cancel_at_period_end:true,items:{data:[{quantity:1,price:prices.price_business_y,current_period_end:timestamp+86400}]}};
  let failInvoice=false,checkoutCalls=0,expireCalls=0,checkoutState="open";
  const originalFetch=globalThis.fetch;
