@@ -23,9 +23,15 @@ Stand: 5. Oktober 2026
 - Backups: nach dokumentierter Rotation; keine dauerhafte Schattenaufbewahrung.
 - Support-/Auditdaten: nach Support-, Sicherheits- und Beweiszweck; periodische Review.
 
-## Vor Go-live verbindlich festzulegen
-- konkrete Azure Backup-Retention und Restore Point Objective,
-- Log-Retention je Logquelle,
-- Frist für automatische Bereinigung abgelaufener Auth-Codes/Sessions,
-- Kundenexport- und endgültiger Löschprozess nach Vertragsende,
-- Verantwortliche Person für Incident-Koordination.
+## Technisch verbindliche Auth-/Session-Retention
+- Verbrauchte oder abgelaufene E-Mail-Codes: automatische Löschung nach 7 Tagen.
+- Abgelaufene Kunden- und Operator-Sessions: automatische Löschung nach 30 Tagen.
+- Abgelaufene, noch nicht abgeschlossene MFA-Enrollment-Secrets: werden entfernt, sobald die hinterlegte Ablaufzeit überschritten ist.
+- Die Bereinigung läuft täglich über den GitHub-Workflow `Retention Maintenance` und zusätzlich bei produktiven Deployments.
+- Standardwerte: `AUTH_ARTIFACT_RETENTION_DAYS=7` und `EXPIRED_SESSION_RETENTION_DAYS=30`. Änderungen sind bewusst zu dokumentieren und dürfen die definierten Maximalwerte nicht überschreiten.
+
+## Vor Go-live weiterhin operativ zu bestätigen
+- konkrete Azure PostgreSQL Backup-Retention und Restore Point Objective,
+- Log-Retention je Azure-/Application-Insights-Quelle,
+- Kundenexport- und endgültiger Löschprozess nach Vertragsende als echter E2E-Test,
+- verantwortliche Person für Incident-Koordination.
