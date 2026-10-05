@@ -15,7 +15,8 @@ export default function OperatorLogin(){
   const startMicrosoft=()=>{
     const next=search.get("next");
     const target=next?.startsWith("/operator")?next:"/operator";
-    const path=`/.auth/login/aad?post_login_redirect_uri=${encodeURIComponent(`/api/operator/sso/callback?next=${encodeURIComponent(target)}`)}`;\n    window.location.assign(new URL(path,window.location.origin).toString());
+    const path=`/.auth/login/aad?post_login_redirect_uri=${encodeURIComponent(`/api/operator/sso/callback?next=${encodeURIComponent(target)}`)}`;
+    window.location.assign(new URL(path,window.location.origin).toString());
   };
 
   const startDemo=async()=>{
