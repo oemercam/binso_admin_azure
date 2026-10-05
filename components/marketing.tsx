@@ -45,7 +45,7 @@ export function MarketingHeader() {
           <Link href="/preise">Preise</Link>
         </nav>
         <div className="marketing-actions">
-          <Link href="/portal/login">Anmelden</Link>
+          <Link href="/login">Anmelden</Link>
           <Button href="/registrieren">14 Tage kostenlos testen</Button>
           <button className="marketing-menu-button" type="button" aria-label={open ? "Menü schliessen" : "Menü öffnen"} onClick={() => setOpen(!open)}>
             <span className={`menu-morph ${open ? "is-open" : ""}`} aria-hidden="true"><i/><i/><i/></span>
@@ -61,7 +61,7 @@ export function MarketingHeader() {
         <Link href="/preise" onClick={() => setOpen(false)}>Preise <Icon name="arrow"/></Link>
       </nav>
       <div className="marketing-mobile-actions">
-        <Button href="/portal/login" variant="secondary">Anmelden</Button>
+        <Button href="/login" variant="secondary">Anmelden</Button>
         <Button href="/registrieren">14 Tage kostenlos testen</Button>
         <Button href="/demo" variant="ghost">Demo starten</Button>
       </div>
@@ -86,8 +86,8 @@ export function MarketingFooter() {
       <Link href="/preise">Preise</Link>
       <Link href="/#sicherheit">Sicherheit</Link>
       <Link href="/demo">Demo</Link>
-      <Link href="/portal">Kundenportal</Link>
-      <Link href="/portal/login">Anmelden</Link>
+      <Link href="/login">Kundenportal</Link>
+      <Link href="/login">Anmelden</Link>
       <Link href="/operator">Admin</Link>
       <Link href="/impressum">Impressum</Link>
       <Link href="/datenschutz">Datenschutz</Link>
