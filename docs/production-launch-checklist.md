@@ -13,7 +13,7 @@ Stand: 5. Oktober 2026
 - [ ] Rollback-Verfahren einmal praktisch verifiziert
 
 ## Automatisierte Produktionskontrollen
-- [x] Dependency Audit mit pnpm audit --audit-level high in Quality
+- [x] High/Critical-Audit der Produktionsabhängigkeiten als hartes Quality-Gate; Dev-Tooling-Advisories separat dokumentiert
 - [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
 - [x] Microsoft Graph als einziger produktiver Mailpfad
 - [x] Graph-Konfigurationsprüfung im Deploy
