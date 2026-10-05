@@ -60,3 +60,5 @@ const fullAuditGate=await fs.readFile('scripts/full-security-audit.mjs','utf8');
 assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
 
 await import("./repository-cleanliness-check.mjs");
+
+await import('./documentation-consistency-check.mjs');
