@@ -143,6 +143,11 @@ async function deleteOrganization(client){
       throw new Error("External Azure Blob objects exist. Purge them first, then set BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED=true.");
     }
 
+    const affectedUsers=await client.query(
+      "select distinct user_id from organization_memberships where organization_id=$1",
+      [organizationId]
+    );
+
     const restrictiveOrgFks=await client.query(
       `select distinct rel.relname as table_name
          from pg_constraint con
@@ -169,6 +174,17 @@ async function deleteOrganization(client){
 
     await client.query("delete from organizations where id=$1",[organizationId]);
 
+    const affectedUserIds=affectedUsers.rows.map(row=>String(row.user_id)).filter(Boolean);
+    if(affectedUserIds.length){
+      await client.query(
+        `delete from app_users u
+          where u.id=any($1::text[])
+            and not exists(select 1 from organization_memberships m where m.user_id=u.id)
+            and not exists(select 1 from platform_operator_assignments p where p.user_id=u.id)`,
+        [affectedUserIds]
+      );
+    }
+
     const remaining={};
     for(const table of await tenantTables(client)){
       if(table==="organizations")continue;
@@ -186,7 +202,8 @@ async function deleteOrganization(client){
       deletedAt:new Date().toISOString(),
       exportConfirmed:true,
       externalBlobCount:blobRows.rowCount??0,
-      externalBlobsPurged:blobRows.rowCount?externalBlobsPurged:true
+      externalBlobsPurged:blobRows.rowCount?externalBlobsPurged:true,
+      affectedUsersReviewed:affectedUsers.rowCount??0
     },null,2),{mode:0o600});
     console.log(JSON.stringify({ok:true,operation:"delete",organizationId,externalBlobCount:blobRows.rowCount??0}));
   }catch(error){
