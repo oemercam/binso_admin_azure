@@ -54,7 +54,7 @@ Dieses Dokument ist die betriebliche Grundlage für die Datenschutzdokumentation
 - Daten: Empfängeradresse, Nachricht, technische Zustellmetadaten
 - Zweck: E-Mail-Verifikation, Login-Code, Passwort-Reset, Systemkommunikation
 - Empfänger: Microsoft Graph / Microsoft 365
-- Verarbeitung: gemäss Microsoft-Vertrags- und Datenstandortmodell; Kernplattform in Azure Switzerland North, zusätzliche Verarbeitungsorte je nach Microsoft-Dienst möglich
+- Verarbeitung: gemäss Microsoft-Vertrags- und Datenstandortmodell; Webanwendung in Azure Switzerland North; weitere Verarbeitungsorte richten sich nach dem jeweils produktiv konfigurierten Microsoft-Dienst
 
 ## Review
 Verantwortlich für die Aktualisierung: Geschäftsführung / technische Produktverantwortung der Binso GmbH.
