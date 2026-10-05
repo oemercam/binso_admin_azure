@@ -2,6 +2,10 @@
 
 Stand: 5. Oktober 2026
 
+## Quelle der Wahrheit
+- [x] Zentrales Betriebsrunbook vorhanden: `docs/production-operations-runbook.md`
+- [x] Diese Checkliste ist die einzige Go-live-Statusliste; Detaildokumente beschreiben Verfahren, nicht konkurrierende Freigabestatus.
+
 ## Release Gate
 - [ ] main Quality grün für den finalen Go-live-Commit
 - [ ] Azure Deploy grün für den finalen Go-live-Commit
@@ -31,8 +35,8 @@ Stand: 5. Oktober 2026
 - [x] Readiness-Endpoint prüft DB, App-Verschlüsselung, Graph-Mail und Stripe-Konfigurationsvollständigkeit
 - [x] kontrolliertes Tooling für mandantenbezogenen Datenexport und endgültige Löschung vorhanden
 - [x] CI prüft Lösch-Schutzbedingungen, Tenant-Fremdschlüssel sowie Cascade-/Restrict-Behandlung
-- [x] Azure Monitoring Readiness Workflow prüft Application Insights, Action Group und Alert-Regeln
-- [x] PostgreSQL Backup Readiness Workflow prüft Serverzustand und konfigurierte Backup-Retention
+- [x] Azure Monitoring Readiness Workflow prüft Application Insights, Action Group und Alert-Regeln; er ersetzt ausdrücklich keinen praktischen Alert-/Empfängertest
+- [x] PostgreSQL Backup Readiness Workflow prüft Serverzustand und konfigurierte Backup-Retention; er ersetzt ausdrücklich keinen echten Point-in-Time-Restore-Test
 
 ## Recht / Vertrag
 - [x] Impressum veröffentlicht
@@ -82,6 +86,13 @@ Stand: 5. Oktober 2026
 - [ ] invoice.paid / invoice.failed mit echten Stripe-Testfällen verifizieren
 - [ ] Kündigung zum Periodenende E2E testen
 - [ ] MWST-/Steuerkonfiguration fachlich bestätigen
+
+## Repository Security
+- [x] Security Policy im Repository dokumentiert (`SECURITY.md`)
+- [x] Dependabot-Konfiguration für npm und GitHub Actions vorhanden
+- [ ] GitHub Private Vulnerability Reporting aktiviert
+- [ ] GitHub Dependabot Alerts aktiviert
+- [ ] offene Code-Scanning-Warnungen triagiert oder behoben
 
 ## Datenschutz / Betrieb
 - [x] Bearbeitungsverzeichnis angelegt
