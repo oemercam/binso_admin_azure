@@ -21,7 +21,8 @@
     "architecture:check": "node scripts/architecture-selfcheck.mjs",
     "architecture:hardcoding": "node scripts/architecture-selfcheck.mjs",
     "css:check": "node scripts/check-css-architecture.mjs",
-    "routes:css-check": "node scripts/check-route-css.mjs"
+    "routes:css-check": "node scripts/check-route-css.mjs",
+    "retention:cleanup": "node scripts/retention-cleanup.mjs"
   },
   "dependencies": {
     "lucide-react": "0.468.0",
