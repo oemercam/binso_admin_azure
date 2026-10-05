@@ -22,7 +22,9 @@ export async function POST(request:NextRequest){
     if(env.databaseUrl){
       const current=await getSession();
       if(!current?.isDemo){
-        await enforceRateLimit(request,'demo-provision',10,60*60*1000);
+        const smokeToken=request.headers.get("x-binso-smoke-test");
+        const trustedSmoke=Boolean(env.smokeTestToken&&smokeToken&&smokeToken===env.smokeTestToken);
+        if(!trustedSmoke)await enforceRateLimit(request,'demo-provision',10,60*60*1000);
         const userId='demo-'+randomUUID(),email=userId+'@example.invalid';
         const created=await provisionOrganization({userId,email,name:'Demo Benutzer',companyName:'Demo',plan:'business',mode:'demo'});
         await createSession({userId,organizationId:created.organizationId,email,name:'Demo Benutzer',role:'owner',ttlHours:24,cookieName:'binso_demo_write'});

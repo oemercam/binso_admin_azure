@@ -48,7 +48,7 @@ Stand: 5. Oktober 2026
 ## Dienstleister
 - Microsoft Azure
 - Stripe
-- Resend
+- Microsoft Graph / Microsoft 365
 Aktuelle Liste und Transferinformationen: /unterauftragsbearbeiter
 
 ## Organisatorische Kontrollen

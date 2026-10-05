@@ -101,7 +101,10 @@ jobs:
 
           node -e "require.resolve('next')"
 
-          PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-standalone.log 2>&1 &
+          export BINSO_SMOKE_TEST_TOKEN="$(openssl rand -hex 32)"
+          echo "::add-mask::$BINSO_SMOKE_TEST_TOKEN"
+
+          PORT=3100 HOSTNAME=127.0.0.1 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node server.js > /tmp/binso-standalone.log 2>&1 &
           APP_PID=$!
           trap 'result=$?; if [ "$result" -ne 0 ]; then cat /tmp/binso-standalone.log; fi; kill $APP_PID 2>/dev/null || true' EXIT
 
@@ -123,10 +126,10 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo > /dev/null
           curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
           curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
-          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
+          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -H "x-binso-smoke-test: $BINSO_SMOKE_TEST_TOKEN" -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
           test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
 
-          BINSO_BASE_URL=http://127.0.0.1:3100 node ../../scripts/check-persistence.mjs
+          BINSO_BASE_URL=http://127.0.0.1:3100 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node ../../scripts/check-persistence.mjs
 
           kill $APP_PID 2>/dev/null || true
           trap - EXIT
@@ -143,6 +146,65 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure production security and mail settings
+        shell: bash
+        env:
+          BINSO_ENTRA_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          set -euo pipefail
+
+          get_setting() {
+            az webapp config appsettings list \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+
+          APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
+          if [ -z "$APP_ENCRYPTION_KEY" ]; then
+            APP_ENCRYPTION_KEY="$(openssl rand -base64 48 | tr -d '\n')"
+            echo "::add-mask::$APP_ENCRYPTION_KEY"
+            az webapp config appsettings set \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --settings "APP_ENCRYPTION_KEY=$APP_ENCRYPTION_KEY" > /dev/null
+            echo "Created stable APP_ENCRYPTION_KEY."
+          else
+            echo "::add-mask::$APP_ENCRYPTION_KEY"
+            echo "APP_ENCRYPTION_KEY already configured."
+          fi
+
+          GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
+          GRAPH_CLIENT_ID="$(get_setting GRAPH_CLIENT_ID)"
+          GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
+          GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
+          for value in "$GRAPH_TENANT_ID" "$GRAPH_CLIENT_ID" "$GRAPH_CLIENT_SECRET" "$GRAPH_SENDER_USER_ID"; do
+            if [ -z "$value" ]; then
+              echo "::error::Microsoft Graph mail configuration is incomplete."
+              exit 1
+            fi
+            echo "::add-mask::$value"
+          done
+
+          az webapp config appsettings set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --settings \
+              "EMAIL_DELIVERY_MODE=graph" \
+              "OPERATOR_ENTRA_TENANT_ID=$BINSO_ENTRA_TENANT_ID" \
+              "OPERATOR_ALLOWED_DOMAIN=binso.ch" > /dev/null
+
+          TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
+            -X POST \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
+            --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET" \
+            --data-urlencode "scope=https://graph.microsoft.com/.default" \
+            --data-urlencode "grant_type=client_credentials" \
+            "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
+          node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
+          echo "Microsoft Graph client-credentials authentication passed."
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
@@ -226,7 +288,6 @@ jobs:
           curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null
           echo "PostgreSQL-backed demo and finance production checks passed."
 
-          BINSO_BASE_URL="$PRODUCTION_URL" node scripts/check-persistence.mjs
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"

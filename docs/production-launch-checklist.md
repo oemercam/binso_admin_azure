@@ -28,7 +28,7 @@ Stand: 5. Oktober 2026
 - [x] zweiter Login-Faktor
 - [x] TOTP + Recovery Codes
 - [x] Authenticator-Pflicht für Owner/Admin/Finance
-- [ ] echte E-Mail-Zustellung inkl. Resend Live-Konfiguration getestet
+- [ ] echte E-Mail-Zustellung über Microsoft Graph / Microsoft 365 getestet
 - [ ] SPF, DKIM, DMARC geprüft
 
 ## Interne Binso-Administration
@@ -36,7 +36,7 @@ Stand: 5. Oktober 2026
 - [x] bestehendes Binso Operator-RBAC angebunden
 - [x] lokale produktive Operator-Passwörter deaktiviert
 - [ ] Entra App Roles im produktiven Tenant verifiziert
-- [ ] Tenant-Pinning konfiguriert
+- [x] Tenant-Pinning wird im Deploy aus dem Azure-Tenant gesetzt
 - [ ] Microsoft Authenticator / Conditional Access mit echtem Mitarbeiter getestet
 - [ ] Offboarding-Test: Rolle/Benutzer in Entra entfernen -> Adminzugriff endet
 

@@ -16,7 +16,7 @@ Dieses Dokument ist die betriebliche Grundlage für die Datenschutzdokumentation
 - Betroffene: Kundenbenutzer
 - Daten: Name, Firmenname, E-Mail, Passwort-Hash, Verifikationsstatus, MFA-/Recovery-Informationen, Sitzungs- und Sicherheitsmetadaten
 - Zweck: Registrierung, Login, Kontosicherheit, Rollen/Berechtigungen
-- Empfänger: Microsoft Azure; Resend für transaktionale E-Mails
+- Empfänger: Microsoft Azure; Microsoft Graph / Microsoft 365 für transaktionale E-Mails
 - Besondere Massnahmen: Passwort-Hashing, OTP nur gehasht, MFA, Recovery Codes nur gehasht, Session-Cookies httpOnly/secure
 
 ## 3. Kundengeschäftsdaten
@@ -53,8 +53,8 @@ Dieses Dokument ist die betriebliche Grundlage für die Datenschutzdokumentation
 - Betroffene: Empfänger von Konto-/Sicherheitsmails
 - Daten: Empfängeradresse, Nachricht, technische Zustellmetadaten
 - Zweck: E-Mail-Verifikation, Login-Code, Passwort-Reset, Systemkommunikation
-- Empfänger: Resend / Plus Five Five, Inc.
-- Verarbeitung: USA; vertragliche Transfergarantien gemäss Provider-DPA
+- Empfänger: Microsoft Graph / Microsoft 365
+- Verarbeitung: gemäss Microsoft-Vertrags- und Datenstandortmodell; Webanwendung in Azure Switzerland North; weitere Verarbeitungsorte richten sich nach dem jeweils produktiv konfigurierten Microsoft-Dienst
 
 ## Review
 Verantwortlich für die Aktualisierung: Geschäftsführung / technische Produktverantwortung der Binso GmbH.
