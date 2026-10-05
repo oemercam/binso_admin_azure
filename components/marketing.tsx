@@ -8,10 +8,6 @@ export function MarketingHeader() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    document.documentElement.removeAttribute("data-theme");
-  }, []);
-
-  useEffect(() => {
     if (!open) return;
     const scrollY = window.scrollY;
     const body = document.body;

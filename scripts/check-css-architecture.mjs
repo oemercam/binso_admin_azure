@@ -100,4 +100,8 @@ if(missing.length){
   throw new Error(`CSS selector coverage failed:\n${details}`);
 }
 
+const variables=new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(match=>match[1]));
+const unresolved=[...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map(match=>match[1]))].filter(name=>!variables.has(name));
+if(unresolved.length)throw new Error(`Undefined central CSS variables: ${unresolved.join(", ")}`);
+
 console.log(`CSS architecture OK: ${used.size} used classes covered by ${runtimeCss.length} runtime stylesheets.`);
