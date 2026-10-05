@@ -108,3 +108,12 @@ const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(ma
 assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
 assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
 console.log('Desktop global search stays inline with anchored results and no modal trigger.');
+
+assert.ok(appCss.includes('.desktop-appbar-actions svg{'),'Desktop header icons must use explicit integer geometry');
+assert.ok(appCss.includes('width:20px;'),'Desktop header icons must use a fixed integer size');
+assert.ok(!appCss.includes('backface-visibility:hidden'),'Desktop header icons must not be forced onto rasterized compositor layers');
+const mediumDesktopBlock=responsiveCss.match(/@media \(min-width:761px\) and \(max-width:1100px\)\{([\s\S]*?)\n\}/)?.[1]??'';
+const wideDesktopBlock=responsiveCss.match(/@media \(min-width:1101px\)\{([\s\S]*?)\n\}/)?.[1]??'';
+assert.ok(mediumDesktopBlock.includes('backdrop-filter:none'),'Medium desktop appbar must avoid blur rasterization');
+assert.ok(wideDesktopBlock.includes('backdrop-filter:none'),'Wide desktop appbar must avoid blur rasterization');
+console.log('Desktop header icons render on a non-rasterized, pixel-stable appbar.');
