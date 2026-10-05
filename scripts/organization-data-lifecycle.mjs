@@ -9,6 +9,7 @@ const organizationId=(process.env.BINSO_ORGANIZATION_ID??"").trim();
 const exportDir=(process.env.BINSO_EXPORT_DIR??"").trim();
 const confirm=(process.env.BINSO_DELETE_CONFIRM??"").trim();
 const exportConfirmed=(process.env.BINSO_DELETE_EXPORT_CONFIRMED??"").trim().toLowerCase()==="true";
+const externalBlobsPurged=(process.env.BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED??"").trim().toLowerCase()==="true";
 
 if(!databaseUrl)throw new Error("DATABASE_URL is required.");
 if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(organizationId)){
@@ -45,6 +46,34 @@ async function tenantTables(client){
   return result.rows.map(row=>String(row.table_name)).filter(name=>/^[a-zA-Z0-9_]+$/.test(name));
 }
 
+async function writeTableExport(client,table,target){
+  const handle=await fs.open(target,"w",0o600);
+  let count=0,offset=0,first=true;
+  try{
+    await handle.write("[");
+    while(true){
+      const result=await client.query(
+        `select * from ${quoted(table)} where organization_id=$1 order by ctid limit 1000 offset $2`,
+        [organizationId,offset]
+      );
+      if(!result.rowCount)break;
+      for(const row of result.rows){
+        if(!first)await handle.write(",");
+        await handle.write("\n"+JSON.stringify(sanitize(row)));
+        first=false;
+        count++;
+      }
+      offset+=result.rowCount;
+      if(result.rowCount<1000)break;
+    }
+    if(!first)await handle.write("\n");
+    await handle.write("]\n");
+  }finally{
+    await handle.close();
+  }
+  return count;
+}
+
 async function exportOrganization(client){
   if(!exportDir)throw new Error("BINSO_EXPORT_DIR is required for export.");
   const organization=(await client.query("select * from organizations where id=$1",[organizationId])).rows[0];
@@ -59,9 +88,7 @@ async function exportOrganization(client){
   const tables=await tenantTables(client);
   for(const table of tables){
     if(table==="organizations")continue;
-    const result=await client.query(`select * from ${quoted(table)} where organization_id=$1`,[organizationId]);
-    counts[table]=result.rowCount??0;
-    await fs.writeFile(path.join(root,table+".json"),JSON.stringify(sanitize(result.rows),null,2),{mode:0o600});
+    counts[table]=await writeTableExport(client,table,path.join(root,table+".json"));
   }
 
   const users=await client.query(
@@ -89,6 +116,7 @@ async function exportOrganization(client){
 async function deleteOrganization(client){
   if(confirm!==organizationId)throw new Error("BINSO_DELETE_CONFIRM must exactly match BINSO_ORGANIZATION_ID.");
   if(!exportConfirmed)throw new Error("Set BINSO_DELETE_EXPORT_CONFIRMED=true only after a verified export has been secured.");
+  if(!exportDir)throw new Error("BINSO_EXPORT_DIR is required so deletion evidence can be stored securely.");
 
   await client.query("begin");
   try{
@@ -111,6 +139,9 @@ async function deleteOrganization(client){
       "select blob_url from file_objects where organization_id=$1 and blob_url is not null",
       [organizationId]
     );
+    if(blobRows.rowCount&&!externalBlobsPurged){
+      throw new Error("External Azure Blob objects exist. Purge them first, then set BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED=true.");
+    }
 
     await client.query("delete from organizations where id=$1",[organizationId]);
 
@@ -123,7 +154,17 @@ async function deleteOrganization(client){
     if(Object.keys(remaining).length)throw new Error("Tenant rows remain after organization deletion: "+JSON.stringify(remaining));
 
     await client.query("commit");
-    console.log(JSON.stringify({ok:true,operation:"delete",organizationId,externalBlobUrlsToPurge:blobRows.rows.map(row=>row.blob_url).filter(Boolean)}));
+    const root=path.resolve(exportDir,organizationId);
+    await fs.mkdir(root,{recursive:true,mode:0o700});
+    await fs.writeFile(path.join(root,"deletion-receipt.json"),JSON.stringify({
+      format:"binso-one-organization-deletion-v1",
+      organizationId,
+      deletedAt:new Date().toISOString(),
+      exportConfirmed:true,
+      externalBlobCount:blobRows.rowCount??0,
+      externalBlobsPurged:blobRows.rowCount?externalBlobsPurged:true
+    },null,2),{mode:0o600});
+    console.log(JSON.stringify({ok:true,operation:"delete",organizationId,externalBlobCount:blobRows.rowCount??0}));
   }catch(error){
     await client.query("rollback");
     throw error;
