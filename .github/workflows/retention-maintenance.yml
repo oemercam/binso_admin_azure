@@ -24,6 +24,8 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Validate manual trigger
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
