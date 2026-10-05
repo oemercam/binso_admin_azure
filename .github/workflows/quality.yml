@@ -23,6 +23,7 @@ jobs:
       - run: pnpm release:check
       - run: pnpm test
       - run: pnpm lint
+      - run: pnpm security:scan
       - run: pnpm css:check
       - run: pnpm typecheck
       - run: pnpm build
@@ -117,6 +118,8 @@ jobs:
           BINSO_BASE_URL=http://127.0.0.1:3000 pnpm routes:css-check
 
           curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
+          test "$(curl -sS -o /tmp/binso-ready.json -w '%{http_code}' http://127.0.0.1:3000/api/health/ready)" = "503"
+          grep -q '"status":"not_ready"' /tmp/binso-ready.json
           echo "Smoke: unauthenticated session"
           curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"authenticated":false'
           echo "Smoke: demo session create"

@@ -3,12 +3,26 @@
 Stand: 5. Oktober 2026
 
 ## Release Gate
-- [ ] main Quality grün
-- [ ] Azure Deploy grün
-- [ ] Produktions-Healthcheck zeigt aktuellen Commit
+- [ ] main Quality grün für den finalen Go-live-Commit
+- [ ] Azure Deploy grün für den finalen Go-live-Commit
+- [ ] Produktions-Healthcheck zeigt den finalen Commit
+- [ ] /api/health/ready liefert status=ready
 - [ ] Datenbankmigrationen erfolgreich
 - [ ] Persistence Smoke Test erfolgreich
-- [ ] Rollback-Verfahren geprüft
+- [x] Rollback-Verfahren dokumentiert
+- [ ] Rollback-Verfahren einmal praktisch verifiziert
+
+## Automatisierte Produktionskontrollen
+- [x] Dependency Audit mit pnpm audit --audit-level high in Quality
+- [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
+- [x] Microsoft Graph als einziger produktiver Mailpfad
+- [x] Graph-Konfigurationsprüfung im Deploy
+- [x] echter Microsoft-Graph-sendMail-Selbsttest als eigener Production-Workflow
+- [x] Azure Architecture Audit prüft produktive Graph-/Security-Konfiguration
+- [x] Stripe Live Configuration Audit prüft Konto, sechs Live-Prices, Webhook und Customer Portal ohne Zahlung auszulösen
+- [x] tägliche automatische Bereinigung abgelaufener Auth-/Session-Artefakte
+- [x] Retention Cleanup zusätzlich bei jedem produktiven Deploy
+- [x] Readiness-Endpoint prüft DB, App-Verschlüsselung, Graph-Mail und Stripe-Konfigurationsvollständigkeit
 
 ## Recht / Vertrag
 - [x] Impressum veröffentlicht
@@ -28,17 +42,19 @@ Stand: 5. Oktober 2026
 - [x] zweiter Login-Faktor
 - [x] TOTP + Recovery Codes
 - [x] Authenticator-Pflicht für Owner/Admin/Finance
-- [ ] echte E-Mail-Zustellung über Microsoft Graph / Microsoft 365 getestet
-- [ ] SPF, DKIM, DMARC geprüft
+- [ ] Microsoft-Graph-Selbsttest in GitHub Actions grün
+- [ ] echte Zustellung an ein externes Testpostfach kontrolliert bestätigt
+- [ ] SPF, DKIM und DMARC für binso.ch geprüft
 
 ## Interne Binso-Administration
 - [x] Microsoft Entra SSO im Code
 - [x] bestehendes Binso Operator-RBAC angebunden
 - [x] lokale produktive Operator-Passwörter deaktiviert
-- [ ] Entra App Roles im produktiven Tenant verifiziert
 - [x] Tenant-Pinning wird im Deploy aus dem Azure-Tenant gesetzt
+- [ ] Entra App Roles im produktiven Tenant mit echten Benutzerkonten verifiziert
 - [ ] Microsoft Authenticator / Conditional Access mit echtem Mitarbeiter getestet
 - [ ] Offboarding-Test: Rolle/Benutzer in Entra entfernen -> Adminzugriff endet
+- [ ] Mail.Send Application Permission auf die erforderliche Mailbox/Scope nach Least-Privilege beschränken und prüfen
 
 ## Billing / Stripe
 - [x] Checkout serverseitig
@@ -47,11 +63,11 @@ Stand: 5. Oktober 2026
 - [x] 14-Tage-Trial ohne Kreditkarte
 - [x] keine automatische Belastung ohne expliziten Aboabschluss
 - [x] rechtliche Bestätigung vor Checkout
-- [ ] alle sechs Live-Preisvarianten testen
+- [x] Trial-Ablauf -> read_only ist automatisiert auf Datenbankebene getestet
+- [ ] Stripe Live Configuration Audit für finalen Stand grün
 - [ ] Live-Kartenzahlung kontrolliert testen
-- [ ] invoice.paid / invoice.failed testen
-- [ ] Kündigung zum Periodenende testen
-- [ ] Trial-Ablauf -> read_only testen
+- [ ] invoice.paid / invoice.failed mit echten Stripe-Testfällen verifizieren
+- [ ] Kündigung zum Periodenende E2E testen
 - [ ] MWST-/Steuerkonfiguration fachlich bestätigen
 
 ## Datenschutz / Betrieb
@@ -59,10 +75,21 @@ Stand: 5. Oktober 2026
 - [x] TOM dokumentiert
 - [x] Incident-Response-Ablauf dokumentiert
 - [x] DPA/Subprocessor-Transparenz
-- [ ] Azure Backup-Restore erfolgreich getestet und dokumentiert
-- [ ] Retention-Werte technisch verbindlich festgelegt
+- [x] technische Auth-/Session-Retention festgelegt und automatisiert
+- [x] Backup-/Restore-Testverfahren dokumentiert
+- [ ] Azure PostgreSQL Point-in-Time-Restore erfolgreich praktisch getestet
+- [ ] Azure-/Application-Insights-Log-Retention verbindlich bestätigen
 - [ ] Kundendatenexport und endgültige Löschung E2E getestet
-- [ ] Production-Secrets/Permissions reviewed
+- [ ] Production-Secrets/Permissions manuell nach Least Privilege reviewed
+- [ ] Verantwortliche Person für Incident-Koordination organisatorisch bestätigt
+
+## Monitoring / Betrieb
+- [x] /api/health vorhanden
+- [x] /api/health/ready vorhanden
+- [x] Azure Architecture Audit inventarisiert App Insights, Alerts und Action Groups
+- [ ] Application Insights produktiv vorhanden und Telemetrie sichtbar
+- [ ] mindestens ein produktiver Alert mit Action Group praktisch ausgelöst/getestet
+- [ ] Alarmempfänger und Eskalationsweg bestätigt
 
 ## UX / Geräte
 - [ ] Desktop Edge/Chrome/Safari prüfen
@@ -72,5 +99,8 @@ Stand: 5. Oktober 2026
 - [ ] Registrierung/OTP/Authenticator auf Mobile prüfen
 - [ ] Checkout/Stripe Portal auf Mobile prüfen
 
+## Domains
+Die geplante produktive Domainumstellung wird bewusst separat durchgeführt und ist nicht Teil dieses Readiness-Hardening-Branches.
+
 ## Go-live Entscheidung
-Erst freigeben, wenn Release Gate komplett grün ist und die mit [ ] markierten Security-/Billing-/E-Mail-Kernpunkte getestet sind.
+Kommerziell freigeben, wenn der finale Quality-/Deploy-Lauf grün ist und die offenen Security-, E-Mail-, Billing-, Restore-, Monitoring- und Geräte-E2E-Punkte praktisch bestätigt wurden.

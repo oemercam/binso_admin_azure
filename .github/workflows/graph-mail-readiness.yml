@@ -1,0 +1,87 @@
+name: Microsoft Graph Mail Readiness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/graph-mail-readiness.yml
+      - lib/server/email.ts
+      - lib/server/env.ts
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  graph-mail:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate Microsoft Graph mail and submit self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          get_setting() {
+            az webapp config appsettings list \
+              --resource-group rg-binso-admin-prod \
+              --name binso-admin-prod \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+
+          GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
+          GRAPH_CLIENT_ID="$(get_setting GRAPH_CLIENT_ID)"
+          GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
+          GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
+
+          for name in GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              echo "::error::$name is missing from the production App Service."
+              exit 1
+            fi
+            echo "::add-mask::$value"
+          done
+
+          if [ "$GRAPH_SENDER_USER_ID" != "one@binso.ch" ]; then
+            echo "::error::GRAPH_SENDER_USER_ID must be one@binso.ch."
+            exit 1
+          fi
+
+          TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
+            -X POST \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
+            --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET" \
+            --data-urlencode "scope=https://graph.microsoft.com/.default" \
+            --data-urlencode "grant_type=client_credentials" \
+            "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
+
+          ACCESS_TOKEN="$(node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1);process.stdout.write(p.access_token)' "$TOKEN_RESPONSE")"
+          echo "::add-mask::$ACCESS_TOKEN"
+
+          PAYLOAD="$(node -e 'const sender=process.argv[1],sha=process.argv[2];process.stdout.write(JSON.stringify({message:{subject:"Binso One – Microsoft Graph Produktionsprüfung "+sha.slice(0,7),body:{contentType:"Text",content:"Automatischer Binso-One-Produktionscheck. Microsoft Graph hat diese Nachricht im Auftrag der Mail-Service-App angenommen."},toRecipients:[{emailAddress:{address:sender}}]},saveToSentItems:false}))' "$GRAPH_SENDER_USER_ID" "$GITHUB_SHA")"
+
+          HTTP_CODE="$(curl -sS --max-time 30 \
+            -o /tmp/graph-send-response \
+            -w '%{http_code}' \
+            -X POST \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data "$PAYLOAD" \
+            "https://graph.microsoft.com/v1.0/users/$GRAPH_SENDER_USER_ID/sendMail")"
+
+          if [ "$HTTP_CODE" != "202" ]; then
+            echo "::error::Microsoft Graph sendMail returned HTTP $HTTP_CODE."
+            cat /tmp/graph-send-response
+            exit 1
+          fi
+
+          echo "Microsoft Graph accepted a production self-test email from one@binso.ch."

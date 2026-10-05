@@ -58,6 +58,7 @@ jobs:
           fi
           pnpm db:migrate
           pnpm db:check
+          pnpm retention:cleanup
 
       - name: Prepare standalone deploy artifact
         env:
@@ -160,12 +161,6 @@ jobs:
               --name "$AZURE_WEBAPP_NAME" \
               --query "[?name=='$1'].value | [0]" -o tsv
           }
-
-          # Remove obsolete mail-provider settings. Binso One uses Microsoft Graph only.
-          az webapp config appsettings delete \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$AZURE_WEBAPP_NAME" \
-            --setting-names RESEND_API_KEY EMAIL_DELIVERY_MODE EMAIL_FROM > /dev/null || true
 
           APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
           if [ -z "$APP_ENCRYPTION_KEY" ]; then
@@ -280,7 +275,8 @@ jobs:
 
           HEALTH_URL="$PRODUCTION_URL/api/health"
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
-          echo "Binso One production health check passed."
+          curl -fsS --max-time 20 "$PRODUCTION_URL/api/health/ready" | grep -q '"status":"ready"'
+          echo "Binso One production health and readiness checks passed."
 
           curl -fsS --max-time 60 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
           echo "Verifying demo session endpoint."

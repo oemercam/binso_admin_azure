@@ -24,5 +24,5 @@
 
 ## Operational requirements
 - APP_ENCRYPTION_KEY must be configured in production.
-- RESEND_API_KEY and EMAIL_FROM must be configured and SPF/DKIM/DMARC verified for the sending domain.
+- Microsoft Graph must be configured with GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET and GRAPH_SENDER_USER_ID. Production sender is one@binso.ch; SPF/DKIM/DMARC must be verified for binso.ch.
 - Production tests must cover registration, resend, invalid/expired codes, attempt exhaustion, email OTP login, TOTP login, recovery-code login and privileged-role MFA gating.

@@ -48,16 +48,27 @@ jobs:
           const settings=JSON.parse(process.argv[2]);
           const map=Object.fromEntries(settings.map(x=>[x.name,x.value]));
           const present=name=>Boolean(String(map[name]??"").trim());
-          console.log(JSON.stringify({
+          const readiness={
             appEncryptionKeyConfigured:present("APP_ENCRYPTION_KEY"),
-            emailDeliveryMode:map.EMAIL_DELIVERY_MODE??null,
             graphTenantConfigured:present("GRAPH_TENANT_ID"),
             graphClientConfigured:present("GRAPH_CLIENT_ID"),
             graphSecretConfigured:present("GRAPH_CLIENT_SECRET"),
             graphSenderConfigured:present("GRAPH_SENDER_USER_ID"),
             operatorEntraTenantPinned:present("OPERATOR_ENTRA_TENANT_ID"),
-            operatorAllowedDomain:map.OPERATOR_ALLOWED_DOMAIN??null
-          },null,2));
+            operatorAllowedDomain:map.OPERATOR_ALLOWED_DOMAIN??null,
+            graphSender:map.GRAPH_SENDER_USER_ID??null
+          };
+          console.log(JSON.stringify(readiness,null,2));
+          if(!readiness.appEncryptionKeyConfigured||
+             !readiness.graphTenantConfigured||
+             !readiness.graphClientConfigured||
+             !readiness.graphSecretConfigured||
+             !readiness.graphSenderConfigured||
+             !readiness.operatorEntraTenantPinned||
+             readiness.operatorAllowedDomain!=="binso.ch"||
+             readiness.graphSender!=="one@binso.ch"){
+            process.exit(1);
+          }
           NODE
 
           echo "=== App Service Authentication / Microsoft Entra ==="
