@@ -54,13 +54,13 @@ export function PrivacyConsent(){
     <section className="privacy-consent-card">
       <div className="privacy-consent-copy">
         <span className="eyebrow">DATENSCHUTZ</span>
-        <h2 id="privacy-consent-title">Deine Datenschutz-Einstellungen</h2>
-        <p>Binso One verwendet technisch notwendige Speichermechanismen für Anmeldung, Sicherheit und Einstellungen. Optionale Performance-Messungen helfen uns, Ladezeiten und Bedienqualität zu verbessern. Wir verwenden keine Werbe- oder Cross-Site-Tracking-Cookies.</p>
+        <h2 id="privacy-consent-title">Datenschutz-Einstellungen</h2>
+        <p>Notwendiger Speicher ermöglicht Anmeldung und Einstellungen. Die optionale Performance-Messung verbessert Ladezeiten. Keine Werbung oder Cross-Site-Tracking.</p>
         <Link href="/datenschutz">Datenschutzerklärung</Link>
       </div>
       <div className="privacy-consent-options">
         <div><span><b>Technisch notwendig</b><small>Für Anmeldung, Sicherheit, Sitzungen und Einstellungen.</small></span><strong>Immer aktiv</strong></div>
-        <label><span><b>Performance</b><small>Technische Web-Vitals wie Ladezeit und Darstellungsstabilität. Keine Werbung und kein Cross-Site-Tracking.</small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
+        <label><span><b>Performance</b><small>Optionale Messung von Ladezeit und Darstellungsstabilität.</small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
       </div>
       <div className="privacy-consent-actions">
         <Button variant="secondary" onClick={()=>{storePreferences(false);setPerformance(false);setOpen(false);}}>Nur notwendige</Button>

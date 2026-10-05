@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { SwissQRBill } from "swissqrbill/svg";
-import { createQrBillData, invoicePaymentIssue } from "@/lib/qr-bill";
+import { createQrBillData, invoicePaymentIssue, responsiveQrSvg } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
 import { Button, EmptyState, Field, Icon, IconButton, Status, Toast } from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -216,6 +217,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [moreOpen,setMoreOpen]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
+  const [dirty,setDirty]=useState(false);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const {directory,loading:customersLoading,error:customersError}=useCustomerDirectory();
   const company=useDocumentCompany();
@@ -259,6 +261,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
       }
+      setDirty(false);
       show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
       if(existing)setEditing(false);
       else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
@@ -273,7 +276,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     : <Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>;
   const desktopActions=existing&&!editing?undefined:headerActions;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview}>
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
     {editing&&companyPending&&<p role="status">Firmendaten werden geladen …</p>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
@@ -296,7 +299,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
             </section>
           </aside>
         </div>
-      : <DocumentEditor type={kind} draft={draft} onChange={next=>setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})} directory={directory}/>}
+      : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
     {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" onClick={()=>{setMoreOpen(false);show("Angebot für den Versand vorbereitet.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></Link></>:<><button type="button" onClick={()=>{setMoreOpen(false);show("Versand wird mit dem E-Mail-Dienst angebunden.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button><Link href="/zahlungen/neu"><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></Link></>}</div></section></div>}
@@ -309,7 +312,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
   return <div className="document-detail-view">
     <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</section>
-    <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{draft.vatRate}%</b></div></section>
+    <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{Number(draft.vatRate).toFixed(2)} %</b></div></section>
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2>Positionen</h2></div>
       <div className="document-read-table">
@@ -321,7 +324,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
           <strong>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
         </div>)}
       </div>
-      <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+      <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
     </section>
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
@@ -333,6 +336,9 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   const names=Object.keys(directory);
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
+  const [positionDraft,setPositionDraft]=useState<LineItem|null>(null);
+  const closePosition=()=>{setMobilePositionId(null);setPositionDraft(null);};
+  const positionDialogRef=useDialogFocus(mobilePositionId!==null,closePosition);
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
@@ -372,7 +378,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           <Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
             {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field>
-          <Field label="MwSt."><select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
+          <Field label="MwSt."><select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></select></Field>
         </div>
       </div>
       <div className="form-section">
@@ -382,7 +388,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           {draft.positions.map(item=>{
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
-              <button className="mobile-position-summary" type="button" onClick={()=>setMobilePositionId(item.id)}>
+              <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
                 <span><b>{item.description}</b><small>{item.quantity} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
                 <strong>{draft.currency??"CHF"} {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
@@ -394,9 +400,9 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
             </div>;
           })}
         </div>
-        <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+        <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
       </div>
-      {mobilePositionId&&(()=>{const item=draft.positions.find(entry=>entry.id===mobilePositionId);if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)setMobilePositionId(null)}}><section className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMobilePositionId(null)}/></header><div className="mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></Field><Field label="Preis"><input inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);setMobilePositionId(null)}}>Position entfernen</button><Button onClick={()=>setMobilePositionId(null)}>Übernehmen</Button></div></section></div>})()}
+      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)closePosition()}}><section ref={positionDialogRef} tabIndex={-1} className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>closePosition()}/></header><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Preis"><input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></section></div>})()}
       <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
     <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft} directory={directory}/> : <OfferPreview draft={draft} directory={directory}/>}</aside>
@@ -404,6 +410,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
 }
 
 function DocumentModal({ title, onClose, children }: { title:string; onClose:()=>void; children:React.ReactNode }) {
+  const [zoomed,setZoomed]=useState(false);
   useEffect(()=>{
     const previous=document.body.style.overflow;
     document.body.style.overflow="hidden";
@@ -423,8 +430,8 @@ function DocumentModal({ title, onClose, children }: { title:string; onClose:()=
     try{await navigator.clipboard.writeText(url);}catch{/* clipboard unavailable */}
   };
   return <div className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
-    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
-    <div className="document-modal-body">{children}</div>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></button><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
+    <div className="document-modal-body"><div className={zoomed?"document-preview-content is-zoomed":"document-preview-content"}>{children}</div></div>
   </div>;
 }
 
@@ -449,7 +456,7 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   const company=useDocumentCompany();
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
-  const payment=useMemo(()=>{try{return {svg:new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:totals.total,currency:draft.currency}),{language:"DE"}).toString(),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,totals.total]);
+  const payment=useMemo(()=>{try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:totals.total,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,totals.total]);
 
   if(company.loading)return <p role="status">Rechnungsvorschau wird geladen …</p>;
   if(company.error)return <p role="alert">{company.error}</p>;
@@ -462,7 +469,7 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
       <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnung Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Zahlbar bis</small><b>{due}</b></div></div>
       <div className="paper-intro"><b>Leistungen</b><p>{draft.note || "Vielen Dank für die Zusammenarbeit. Wir erlauben uns, folgende Leistungen in Rechnung zu stellen."}</p></div>
       <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-      <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
+      <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
       <footer>{company.footer}</footer>
     </section>
     <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="Rechnung Seite 2 von 2: Zahlungsinformationen">
@@ -484,8 +491,8 @@ export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012
     <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebot Nr.</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b><small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
     <div className="paper-intro"><b>Unser Angebot</b><p>{draft.note || "Vielen Dank für dein Interesse. Gerne bieten wir dir die folgenden Leistungen an."}</p></div>
     <table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{item.quantity}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-    <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {draft.vatRate}% <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
-    <section className="paper-closing"><b>Konditionen</b><p>Dieses Angebot ist bis {isoToSwiss(draft.due)} gültig. Alle Beträge sind in CHF ausgewiesen. Die MwSt. von {draft.vatRate}% ist im Total enthalten.</p><p>Wir freuen uns auf die Zusammenarbeit und stehen bei Fragen gerne zur Verfügung.</p></section>
+    <div className="paper-total"><span>Zwischentotal <b>{money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{money(totals.vat)}</b></span><strong>Total {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>
+    <section className="paper-closing"><b>Konditionen</b><p>Dieses Angebot ist bis {isoToSwiss(draft.due)} gültig. Alle Beträge sind in CHF ausgewiesen. Die MwSt. von {Number(draft.vatRate).toFixed(2)} % ist im Total enthalten.</p><p>Wir freuen uns auf die Zusammenarbeit und stehen bei Fragen gerne zur Verfügung.</p></section>
     <footer>{company.footer}</footer>
   </div>;
 }

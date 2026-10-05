@@ -29,3 +29,12 @@ export function createQrBillData(company:Record<string,unknown>,document:{refere
  if(document.currency&&!['CHF','EUR'].includes(document.currency))throw new Error("QR-Rechnungen unterstützen CHF und EUR.");
  return {creditor:{account,name:String(company.legal_name||company.name),address:String(company.street),buildingNumber:String(company.building_number||""),zip:String(company.postal_code),city:String(company.city),country:String(company.country_code||"CH")},amount:Math.round(document.total*100)/100,currency:document.currency==='EUR'?'EUR':'CHF',message:document.number,reference};
 }
+
+/** swissqrbill uses mm coordinates without a viewBox. Preserve the full
+ * 210 × 105 mm slip when CSS scales it to a phone or a preview column. */
+export function responsiveQrSvg(svg:string):string{
+ return svg.replace(/<svg\b([^>]*)>/,(_match,attributes:string)=>{
+  if(/\bviewBox=/.test(attributes))return `<svg${attributes}>`;
+  return `<svg${attributes} viewBox="0 0 ${210*96/25.4} ${105*96/25.4}" preserveAspectRatio="xMidYMid meet">`;
+ });
+}
