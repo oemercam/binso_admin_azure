@@ -7,14 +7,11 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import { startDemoClientSession } from "@/lib/client/backend";
 import { Button, Icon, Logo } from "@/components/ui";
 
-type DemoFocus="overview"|"customers"|"documents"|"time";
-
 export default function Demo(){
   const router=useRouter();
   const [step,setStep]=useState(1);
   const [name,setName]=useState("");
   const [company,setCompany]=useState("");
-  const [focus,setFocus]=useState<DemoFocus>("overview");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [confirmClose,setConfirmClose]=useState(false);
@@ -25,19 +22,20 @@ export default function Demo(){
       return;
     }
     setError("");
-    setStep(current=>Math.min(3,current+1));
+    setStep(current=>Math.min(2,current+1));
   };
 
   const start=async()=>{
     if(loading)return;
+    if(!name.trim()||!company.trim()){setError("Bitte Name und Firma erfassen.");return;}
     setLoading(true);setError("");
     try{
       await startDemoClientSession({
         name:name.trim()||"Thomas Muster",
         company:company.trim()||"Musterwerk AG",
-        focus,
+
       });
-      router.push("/willkommen");
+      router.push("/dashboard");
       router.refresh();
     }catch{
       setError("Demo konnte nicht gestartet werden. Bitte erneut versuchen.");
@@ -52,8 +50,8 @@ export default function Demo(){
     </header>
 
     <section className="demo-onboarding">
-      <div className="demo-progress" aria-label={"Demo Einrichtung, Schritt "+step+" von 3"}>
-        {[1,2,3].map(value=><span key={value} className={step>=value?"active":""} aria-hidden="true"/>)}
+      <div className="demo-progress" aria-label={"Demo Einrichtung, Schritt "+step+" von 2"}>
+        {[1,2].map(value=><span key={value} className={step>=value?"active":""} aria-hidden="true"/>)}
       </div>
 
       {step===1&&<div className="demo-step">
@@ -69,7 +67,7 @@ export default function Demo(){
       </div>}
 
       {step===2&&<div className="demo-step">
-        <span className="eyebrow">SCHRITT 2 VON 3</span>
+        <span className="eyebrow">SCHRITT 2 VON 2</span>
         <h1>Wie soll deine Demo heissen?</h1>
         <p>Diese Angaben werden nur für deine Demo-Ansicht verwendet.</p>
         <div className="demo-form">
@@ -79,30 +77,7 @@ export default function Demo(){
         {error&&<p className="auth-error">{error}</p>}
         <div className="demo-step-actions">
           <Button variant="secondary" onClick={()=>setStep(1)}>Zurück</Button>
-          <Button onClick={next}>Weiter</Button>
-        </div>
-      </div>}
-
-      {step===3&&<div className="demo-step">
-        <span className="eyebrow">SCHRITT 3 VON 3</span>
-        <h1>Was möchtest du zuerst ansehen?</h1>
-        <p>Du kannst danach jederzeit alle Bereiche öffnen.</p>
-        <div className="demo-focus-list">
-          {([
-            ["overview","home","Übersicht","Dashboard und Schnellzugriffe"],
-            ["customers","users","Kunden","Kunden, Kontakte und Aktivitäten"],
-            ["documents","receipt","Belege","Angebote, Rechnungen und Zahlungen"],
-            ["time","clock","Zeiterfassung","Timer und Einträge"],
-          ] as const).map(([value,icon,title,text])=><button type="button" key={value} className={focus===value?"selected":""} onClick={()=>setFocus(value)}>
-            <span className="demo-focus-icon"><Icon name={icon}/></span>
-            <span><b>{title}</b><small>{text}</small></span>
-            {focus===value?<Icon name="check" size={17}/>:<Icon name="arrow" size={17}/>}
-          </button>)}
-        </div>
-        {error&&<p className="auth-error">{error}</p>}
-        <div className="demo-step-actions">
-          <Button variant="secondary" onClick={()=>setStep(2)}>Zurück</Button>
-          <Button onClick={()=>void start()}>{loading?"Demo wird gestartet…":"Demo starten"}</Button>
+          <Button onClick={()=>void start()} disabled={loading}>{loading?"Demo wird gestartet…":"Demo starten"}</Button>
         </div>
       </div>}
 

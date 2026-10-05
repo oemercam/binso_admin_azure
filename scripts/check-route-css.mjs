@@ -162,14 +162,14 @@ async function verifyDemoFlow(){
   if(!response.ok) failures.push(`/api/demo/session: POST returned ${response.status}`);
   if(!cookie.includes("binso_demo=1")) failures.push("/api/demo/session: demo cookie was not issued");
   if(response.ok&&cookie.includes("binso_demo=1")){
-    const dashboard=await fetch(origin+"/willkommen",{
+    const dashboard=await fetch(origin+"/dashboard",{
       redirect:"manual",
       headers:{cookie:"binso_demo=1","cache-control":"no-cache"},
     });
     if(dashboard.status>=300&&dashboard.status<400){
-      failures.push(`/willkommen: demo cookie was rejected with redirect ${dashboard.status}`);
+      failures.push(`/dashboard: demo cookie was rejected with redirect ${dashboard.status}`);
     }else if(!dashboard.ok){
-      failures.push(`/willkommen: demo session returned ${dashboard.status}`);
+      failures.push(`/dashboard: demo session returned ${dashboard.status}`);
     }
   }
 }

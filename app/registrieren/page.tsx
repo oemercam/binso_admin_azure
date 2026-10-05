@@ -34,7 +34,7 @@ export default function Register() {
             company:companyName,
             focus:"overview",
           });
-          router.push("/willkommen");
+          router.push("/dashboard");
           router.refresh();
           return;
         }
@@ -46,7 +46,7 @@ export default function Register() {
         setLoading(false);
         return;
       }
-      router.push("/willkommen");
+      router.push("/dashboard");
       router.refresh();
     }catch(error){
       setError(error instanceof Error?error.message:"Registrierung nicht möglich.");
