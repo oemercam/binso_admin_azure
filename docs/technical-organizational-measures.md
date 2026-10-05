@@ -36,6 +36,8 @@ Stand: 5. Oktober 2026
 
 ## Software-Lieferkette
 - GitHub Pull Requests.
+- Repository Security Policy (`SECURITY.md`).
+- Dependabot-Konfiguration für npm und GitHub Actions.
 - Quality Pipeline mit Tests, Lint, CSS Check, Typecheck, Build und Runtime Smoke Test.
 - Deployment erst nach erfolgreicher Quality Pipeline.
 - Azure Deployment per OIDC statt statischer Azure-Zugangsdaten.
@@ -57,6 +59,11 @@ Aktuelle Liste und Transferinformationen: /unterauftragsbearbeiter
 - Zugriffsentzug bei Austritt/Rollenwechsel.
 - Security-Incidents werden dokumentiert, bewertet und eskaliert.
 - Datenschutz-/Security-Review bei neuen externen Integrationen.
+
+## Betriebsorganisation
+- Zentrales Produktionsrunbook: `docs/production-operations-runbook.md`.
+- Go-live-Status: `docs/production-launch-checklist.md`.
+- Manuelle Nachweise: `docs/production-evidence-log.md`.
 
 ## Offene operative Nachweise vor Go-live
 - Backup-Restore-Test dokumentieren.
