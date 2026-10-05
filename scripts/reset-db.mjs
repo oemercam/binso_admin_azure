@@ -3,12 +3,16 @@ import pg from "pg";
 const url=process.env.DATABASE_URL;
 if(!url) throw new Error("DATABASE_URL is required.");
 const confirmation=process.env.ALLOW_DATABASE_RESET;
-if(confirmation!=="binso-platform-db") throw new Error("Refusing database reset: set ALLOW_DATABASE_RESET=binso-platform-db.");
+if(confirmation!=="I_UNDERSTAND_THIS_DELETES_ALL_DATA") throw new Error("Refusing database reset: explicit destructive confirmation is required.");
 
 const parsed=new URL(url);
-const expectedHost="binso-platform-db.postgres.database.azure.com";
+const productionHost="binso-platform-db.postgres.database.azure.com";
+if(parsed.hostname===productionHost) throw new Error("Refusing database reset: the production PostgreSQL server can never be reset by this script.");
+const expectedHost=process.env.EXPECTED_DATABASE_HOST?.trim();
+if(!expectedHost) throw new Error("EXPECTED_DATABASE_HOST is required for non-production reset.");
 if(parsed.hostname!==expectedHost) throw new Error(`Refusing database reset for unexpected host: ${parsed.hostname}`);
-const expectedDatabase=process.env.EXPECTED_DATABASE_NAME||"binso_platform";
+const expectedDatabase=process.env.EXPECTED_DATABASE_NAME?.trim();
+if(!expectedDatabase) throw new Error("EXPECTED_DATABASE_NAME is required for non-production reset.");
 const database=parsed.pathname.replace(/^\//,"");
 if(database!==expectedDatabase) throw new Error(`Refusing database reset for unexpected database: ${database}`);
 
