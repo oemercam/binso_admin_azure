@@ -77,7 +77,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
       }else{
         await client.query("update quotes set status=case when status='draft' then 'sent' else status end,updated_at=now() where id=$1 and organization_id=$2",[reserved.document.id,session!.organizationId]);
       }
-      await audit(client,{organizationId:session!.organizationId,userId:session!.userId,action:"document.sent",entityType:reserved.document.kind,entityId:reserved.document.id,detail:{documentNumber:reserved.document.number,recipientDomain:reserved.document.customer.email.split("@")[1],provider:result.provider}});
+      await audit(client,{organizationId:session!.organizationId,userId:session!.userId,action:"document.sent",entityType:reserved.document.kind,entityId:reserved.document.id,metadata:{documentNumber:reserved.document.number,recipientDomain:reserved.document.customer.email.split("@")[1],provider:result.provider}});
     });
 
     return json({ok:true,delivered:true,duplicate:false,recipient:reserved.document.customer.email});
