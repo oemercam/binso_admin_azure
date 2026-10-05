@@ -97,14 +97,23 @@ jobs:
             /einstellungen/konto
             /einstellungen/firma
             /einstellungen/team
+            /einstellungen/dokumente
             /einstellungen/abonnement
             /einstellungen/benachrichtigungen
             /einstellungen/sprache
             /einstellungen/sicherheit
             /einstellungen/darstellung
+            /einstellungen/datenschutz
+            /finanzen
             /operator
             /operator/kunden
-            /operator/support
+            /operator/tickets
+            /operator/zahlungen
+            /operator/finanzen
+            /operator/abonnemente
+            /operator/sperrungen
+            /operator/monitoring
+            /operator/ankuendigungen
             /operator/sicherheit
             /operator/audit
             /preview/dashboard
