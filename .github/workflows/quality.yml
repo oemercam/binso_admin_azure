@@ -130,6 +130,7 @@ jobs:
           echo "Smoke: protected APIs"
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/notifications)" = "401"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/auth/sessions)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
           test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
