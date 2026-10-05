@@ -56,6 +56,10 @@ Prioritäten: P1 = blockiert einen Hauptablauf oder zeigt fachlich falsche Ergeb
 | UX-19 | Admin-Tabellen und Konversationen | 1363 × 936 | Tabellen-/Beschreibungstext überwiegend 10–11 px; feste Spalten können lange Inhalte verdrängen | Gut lesbare Desktoptexte und begrenzte flexible Spalten | P2 | Zeilen 13 px, Unterzeilen 12 px, minmax-Spalten, Umbruch, Toolbar-Wrapping |
 | UX-20 | Kundenportal / Header | 1363 × 936 / Codeprüfung | Laufender Timer nur im mobilen Header sichtbar | Desktop: Status und direkter Zugang zur Zeiterfassung | P2 | Kompakter Timer-Link im Desktop-Header |
 
+| UX-21 | Admin / Tickets, Kunden | 1363 × 936 | Suche ohne Treffer lässt nur Tabellenkopf zurück; drei Kundenlinks zeigen auf # | Kompakter Leerzustand; jeder sichtbare Kundenlink öffnet passende Details | P2 | Leere Treffer mit Statuszeile; gemeinsame Demo-Kundenquelle mit stabiler Detail-ID und passendem Namen/Plan/Status |
+
+| UX-22 | Admin / Monitoring | 1363 × 936 | Service Health gleichzeitig 99,99 % und 67 % bei 4/6 verfügbaren Services | Gleiche Momentaufnahme aus tatsächlicher Serviceanzahl | P2 | Beide Anzeigen berechnen denselben Health-Anteil; erfundene INP-Prozentangabe aus Demo entfernt |
+
 Zusätzliche Codehärtung: Kein automatischer Wechsel von fehlgeschlagener produktiver Anmeldung zu Demo; Login-Rücksprung akzeptiert keine protokollrelativen externen URLs.
 
 ## Muss manuell auf echtem Gerät bestätigt werden
@@ -79,3 +83,5 @@ Alle zehn angeforderten pnpm-Befehle werden auf dem finalen Änderungsstand ausg
 ## Erweiterte Desktop-Abnahme für Kunden- und Adminportal
 
 Desktop wird als Arbeitsoberfläche mit persistenter Navigation, direkter Suche, sichtbaren Hauptaktionen und Inline-Positionseditor geprüft. Mobile Navigation und Bottom Sheets werden nicht als verpflichtendes Desktop-Bedienmuster übernommen. Admin-Demo ist eine tatsächlich produktiv gerenderte, isolierte Beispielansicht; sie bestätigt nicht die Daten und Berechtigungen einer echten Microsoft-Operator-Sitzung. Admin-Demo-Einstieg wechselt nach Sitzungsanlage vollständig zur Anwendung und verändert keine Kunden-Demo-Markierung im Local Storage.
+
+Desktop-Admin-Demo zusätzlich gerendert geprüft: Dashboard, Tickets (Statusfilter/Suche), Kunden, Zahlungen, Finanzen, Abonnemente, Sperrungen, Monitoring, Ankündigungen, Sicherheit und Audit. Kein horizontaler Seitenoverflow bei 1363 px auf den geprüften Admin-Hauptseiten. Keine echte Operatoranmeldung, Rechteänderung, Sperrung oder Veröffentlichung ausgelöst.
