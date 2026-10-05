@@ -82,3 +82,10 @@ console.log('Subscription settings use flat separators instead of legacy cards.'
 assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
 assert.ok(responsiveCss.includes('.desktop-search-trigger kbd{display:none}'),'Medium desktop header must compact the search trigger instead of removing the account controls');
 console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
+
+const uiSource=await fs.readFile('components/ui.tsx','utf8');
+const baseCssSource=await fs.readFile('app/styles/base.css','utf8');
+assert.ok(uiSource.includes('strokeWidth: 2'),'Shared icons must use pixel-stable strokes');
+assert.ok(uiSource.includes('vectorEffect: "non-scaling-stroke"'),'Shared icons must keep stroke width stable while scaling');
+assert.ok(baseCssSource.includes('.desktop-notification-button>svg'),'Header icons must use a fixed integer SVG size');
+console.log('Small SVG icons use crisp pixel-stable rendering.');
