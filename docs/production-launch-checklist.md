@@ -46,6 +46,8 @@ Stand: 5. Oktober 2026
 - [x] zweiter Login-Faktor
 - [x] TOTP + Recovery Codes
 - [x] Authenticator-Pflicht für Owner/Admin/Finance
+- [x] serverseitige aktive Sitzungsübersicht und Fernabmeldung anderer Sitzungen implementiert
+- [ ] Sitzungswiderruf mit zwei echten Browsern/Geräten praktisch getestet
 - [ ] Microsoft-Graph-Selbsttest in GitHub Actions grün
 - [ ] echte Zustellung an ein externes Testpostfach kontrolliert bestätigt
 - [ ] SPF, DKIM und DMARC für binso.ch geprüft
