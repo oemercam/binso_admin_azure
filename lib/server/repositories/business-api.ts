@@ -50,7 +50,11 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  }
  if(table==='expenses'&&ownRecordOnly(s.role,'spesen')){values.push(s.userId);where.push(`q.created_by_user_id=$${values.length}`)}
  const requested=Number(filters.get('limit')||1000);const limit=Number.isSafeInteger(requested)?Math.max(1,Math.min(1000,requested)):1000;
- const result=await c.query<Row>(`select * from (${source}) q ${where.length?'where '+where.join(' and '):''} order by q.created_at desc limit ${limit}`,values);
+ const allowedOrder=new Set(['created_at',...(table==='documents'?['issue_date']:[]),...(table==='payments'?['paid_on']:[])]);
+ const requestedOrder=filters.get('order')||'created_at.desc';
+ const parts=requestedOrder.split('.');
+ if(parts.length!==2||!allowedOrder.has(parts[0])||!['asc','desc'].includes(parts[1]))throw new ApiError(400,'invalid_order','Ungültige Sortierung.');
+ const result=await c.query<Row>(`select * from (${source}) q ${where.length?'where '+where.join(' and '):''} order by q.${parts[0]} ${parts[1]},q.id desc limit ${limit}`,values);
  return result.rows;
 }
 export function translateBusinessWrite(table:string,data:Row,insert:boolean){

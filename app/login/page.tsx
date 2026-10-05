@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import {useRouter} from "next/navigation";
 import {FormEvent,useState} from "react";
 import {Button,Icon,Logo} from "@/components/ui";
-import {clearDemoClientSession,startDemoClientSession} from "@/lib/client/backend";
+import {clearDemoClientSession} from "@/lib/client/backend";
 
 type Stage="credentials"|"email"|"totp"|"verify";
 
 export default function Login(){
-  const router=useRouter();
   const [show,setShow]=useState(false);
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -17,13 +15,12 @@ export default function Login(){
   const [stage,setStage]=useState<Stage>("credentials");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
-  const nextPath=()=>{const next=new URLSearchParams(window.location.search).get("next");return next&&next.startsWith("/")?next:"/dashboard"};
+  const nextPath=()=>{const next=new URLSearchParams(window.location.search).get("next");return next&&next.startsWith("/")&&!next.startsWith("//")?next:"/dashboard"};
 
   const finish=(payload:Record<string,unknown>)=>{
     clearDemoClientSession();
     const next=nextPath();
-    router.push(payload.mfaSetupRequired===true?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
-    router.refresh();
+    window.location.replace(payload.mfaSetupRequired===true?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
@@ -36,10 +33,6 @@ export default function Login(){
       return;
     }
     if(!response.ok){
-      if(response.status===503&&payload?.error==="backend_not_configured"){
-        await startDemoClientSession({name:email.split("@")[0]||"Demo",company:"Demo Firma",focus:"overview"});
-        router.push(nextPath());router.refresh();return;
-      }
       throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
     }
     finish(payload);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MarketingFooter, MarketingHeader, ProductPreview, ProductScreen } from "@/components/marketing";
+import { MarketingFooter, MarketingHeader, MarketingFaq, ProductPreview, ProductScreen } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 import { domainConfig } from "@/config/domain";
 import { plans as subscriptionPlans } from "@/lib/plans";
@@ -120,7 +120,7 @@ export default function Home() {
             </article>)}
           </div>
         </div>
-        <ProductScreen route="/preview/dashboard" title="Aktuelle mobile Binso One Oberfläche" variant="mobile"/>
+        <ProductScreen route="/preview/dashboard" title="Aktuelles Binso One Dashboard" variant="desktop"/>
       </section>
 
       <section className="product-callout">
@@ -175,12 +175,12 @@ export default function Home() {
           <span className="eyebrow">FAQ</span>
           <h2>Die wichtigsten Fragen.</h2>
         </div>
-        <div className="faq-list">
+        <MarketingFaq>
           <details><summary>Kann ich Binso One zuerst ausprobieren?</summary><p>Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen.</p></details>
           <details><summary>Brauche ich eine Kreditkarte für den Test?</summary><p>Nein. Die 14-tägige Testphase startet ohne Kreditkarte. Erst wenn du einen Plan aktivierst, wirst du zu Stripe Checkout weitergeleitet.</p></details><details><summary>Was passiert nach den 14 Tagen?</summary><p>Ohne aktiviertes Abo bleibt dein Konto erhalten, wechselt aber in den Nur-Lesen-Modus. Du kannst danach jederzeit einen Plan aktivieren und weiterarbeiten.</p></details>
           <details><summary>Funktioniert Binso One auf dem Smartphone?</summary><p>Ja. Mobile und PWA sind als eigene App-Oberfläche gestaltet und nicht als verkleinerte Desktop-Version.</p></details>
           <details><summary>Kann ich mein Abo kündigen?</summary><p>Ja. Ein aktives Abonnement kann über das bereitgestellte Stripe Customer Portal auf das Ende der laufenden Abrechnungsperiode gekündigt werden. Der bezahlte Zugriff bleibt bis dahin bestehen.</p></details>
-        </div>
+        </MarketingFaq>
       </section>
 
       <section className="marketing-cta">

@@ -6,7 +6,7 @@ import {AppShell} from "./app-shell";
 import {Button,Field,SectionTitle,Status,Toast} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 
-type MfaState={enabled:boolean;required:boolean;role:string};
+type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
 type SessionItem={id:string;userAgent:string|null;lastSeenAt:string|null;expiresAt:string;current:boolean};
 
 function sessionLabel(userAgent:string|null){
@@ -87,7 +87,7 @@ export function SecuritySettingsPage(){
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="surface security-card">
       <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
-      {!mfa?<p>Sicherheitsstatus wird geladen…</p>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
+      {!mfa?<p>Sicherheitsstatus wird geladen…</p>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
         <div className="context-block"><Status tone={mfa.required?"warning":"info"}>{mfa.required?"Erforderlich":"Empfohlen"}</Status><b>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</b><span>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</span></div>
         {!setup&&<Button onClick={()=>void startSetup()}>Authenticator einrichten</Button>}
       </>}

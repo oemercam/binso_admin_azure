@@ -47,6 +47,8 @@ const customerData: Record<string,{ sector:string; city:string; address:string; 
 type CustomerDirectory = typeof customerData;
 
 function useCustomerDirectory() {
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState<string|null>(null);
   const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>({});
   useEffect(()=>{
     apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")
@@ -57,9 +59,10 @@ function useCustomerDirectory() {
         }
         queueMicrotask(()=>setDirectory(next));
       })
-      .catch(()=>queueMicrotask(()=>setDirectory({})));
+      .catch(reason=>setError(reason instanceof Error?reason.message:"Kunden konnten nicht geladen werden."))
+      .finally(()=>setLoading(false));
   },[]);
-  return directory;
+  return {directory,loading,error};
 }
 
 function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
@@ -212,8 +215,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
+  const [saving,setSaving]=useState(false);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
-  const directory=useCustomerDirectory();
+  const {directory,loading:customersLoading,error:customersError}=useCustomerDirectory();
   const company=useDocumentCompany();
   const paymentIssue=kind==="Rechnung"?invoicePaymentIssue(company.raw):null;
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft);
@@ -241,8 +245,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
+    if(saving)return;
     if(isProductionBackendEnabled()&&!draft.customer){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(paymentIssue){show(paymentIssue);return;}
+    setSaving(true);
     let savedNumber=draft.number;
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
@@ -257,21 +263,21 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
     }catch(error){
       show(error instanceof Error?error.message:`${kind} konnte nicht gespeichert werden.`);
-    }
+    }finally{setSaving(false);}
   };
 
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
-    : undefined;
+    : <Button disabled={saving||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={headerActions} preview={preview}>
+  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={headerActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview}>
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
-    {documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
+    {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <DocumentReadView type={kind} draft={draft} directory={directory}/>
       : <DocumentEditor type={kind} draft={draft} onChange={next=>setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})} directory={directory}/>}
-    {editing&&<div className="mobile-document-bar single-action"><Button disabled={Boolean(paymentIssue)||documentLoad.loading||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
+    {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
     {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" onClick={()=>{setMoreOpen(false);show("Angebot für den Versand vorbereitet.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></Link></>:<><button type="button" onClick={()=>{setMoreOpen(false);show("Versand wird mit dem E-Mail-Dienst angebunden.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button><Link href="/zahlungen/neu"><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></Link></>}</div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}

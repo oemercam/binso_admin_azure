@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { EmptyState, Icon, Status } from "./ui";
+import { Icon, Status } from "./ui";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(status)) return "success";
@@ -17,10 +17,16 @@ export function RecordsView({
   placeholder,
   chips = ["Alle","Aktiv","Inaktiv"],
   children,
+  loading=false,
+  error=null,
+  statusGroups={},
 }: {
   items: string[][];
   placeholder: string;
   chips?: string[];
+  loading?: boolean;
+  error?: string|null;
+  statusGroups?: Record<string,string[]>;
   children: (item: string[]) => React.ReactNode;
 }) {
   const [query,setQuery]=useState("");
@@ -34,7 +40,7 @@ export function RecordsView({
       const matchesQuery=!query.trim() || item.join(" ").toLowerCase().includes(query.trim().toLowerCase());
       const state=item.at(-1) ?? "";
       const type=item[1] ?? "";
-      const matchesChip=activeChip==="Alle" || state===activeChip || normalizedChip(type).startsWith(normalizedChip(activeChip)) || normalizedChip(activeChip).startsWith(normalizedChip(type));
+      const matchesChip=activeChip==="Alle" || state===activeChip || statusGroups[activeChip]?.includes(state) || normalizedChip(type).startsWith(normalizedChip(activeChip)) || normalizedChip(activeChip).startsWith(normalizedChip(type));
       return matchesQuery && matchesChip;
     });
 
@@ -43,7 +49,7 @@ export function RecordsView({
       const result=(a[0]??"").localeCompare(b[0]??"","de-CH",{numeric:true,sensitivity:"base"});
       return sort==="asc" ? result : -result;
     });
-  },[activeChip,items,query,sort]);
+  },[activeChip,items,query,sort,statusGroups]);
 
   const reset=()=>{
     setQuery("");
@@ -59,12 +65,12 @@ export function RecordsView({
       <label className="searchbox"><Icon name="search"/><input aria-label={placeholder} value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
       <div className="chips">{chips.map((chip)=><button type="button" onClick={()=>setActiveChip(chip)} className={chip===activeChip?"active":""} key={chip}>{chip}</button>)}</div>
       <button className={`filter-button ${sort!=="default"?"active":""}`} type="button" onClick={cycleSort} title="Sortierung wechseln" aria-label={sort==="asc"?"Sortierung A bis Z":sort==="desc"?"Sortierung Z bis A":"Sortierung einschalten"}><Icon name="filter" size={17}/><span>{sort==="asc"?"A–Z":sort==="desc"?"Z–A":"Sortieren"}</span></button>
-      <span className="records-count" aria-live="polite">{visible.length} {visible.length===1?"Eintrag":"Einträge"}</span>
+      <span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${visible.length} ${visible.length===1?"Eintrag":"Einträge"}`}</span>
       {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Zurücksetzen</button>}
     </div>
 
-    {visible.length ? <div className="records">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div> :
-      <EmptyState icon="search" title="Keine Treffer" text="Passe Suche oder Statusfilter an, um Einträge zu finden." action={<button type="button" className="button button-secondary" onClick={reset}>Filter zurücksetzen</button>}/>}
+    {loading?<p role="status">Einträge werden geladen …</p>:error?<p role="alert">{error}</p>:visible.length ? <div className="records">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div> :
+      <p role="status">{hasFilters?"Keine Treffer":"Noch keine Einträge erfasst"}</p>}
   </>;
 }
 

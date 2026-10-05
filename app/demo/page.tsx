@@ -27,7 +27,7 @@ export default function Demo(){
 
   const start=async()=>{
     if(loading)return;
-    if(!name.trim()||!company.trim()){setError("Bitte Name und Firma erfassen.");return;}
+
     setLoading(true);setError("");
     try{
       await startDemoClientSession({
@@ -35,8 +35,7 @@ export default function Demo(){
         company:company.trim()||"Musterwerk AG",
 
       });
-      router.push("/dashboard");
-      router.refresh();
+      window.location.replace("/dashboard");
     }catch{
       setError("Demo konnte nicht gestartet werden. Bitte erneut versuchen.");
       setLoading(false);
@@ -57,13 +56,13 @@ export default function Demo(){
       {step===1&&<div className="demo-step">
         <span className="eyebrow">BINSO ONE DEMO</span>
         <h1>Binso One selbst ausprobieren.</h1>
-        <p>Du gehst durch einen kurzen Einstieg und landest danach in einer vorbereiteten Demo-Firma. Keine Verifikation und keine Kreditkarte.</p>
+        <p>Starte direkt in einer vorbereiteten Demo-Firma. Keine Verifikation und keine Kreditkarte.</p>
         <div className="demo-summary-list">
           <div><Icon name="users"/><span><b>Beispielkunden</b><small>Kontakte, Angebote und Rechnungen</small></span></div>
           <div><Icon name="clock"/><span><b>Zeiterfassung</b><small>Timer und manuelle Einträge</small></span></div>
           <div><Icon name="receipt"/><span><b>Belege</b><small>Angebote, Rechnungen und Zahlungen</small></span></div>
         </div>
-        <Button onClick={next}>Demo einrichten</Button>
+        <div className="demo-step-actions"><Button onClick={()=>void start()} disabled={loading}>{loading?"Demo wird gestartet…":"Demo starten"}</Button><Button variant="secondary" onClick={next}>Demo personalisieren</Button></div>{error&&<p className="auth-error" role="alert">{error}</p>}
       </div>}
 
       {step===2&&<div className="demo-step">

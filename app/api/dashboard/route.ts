@@ -10,12 +10,12 @@ export async function GET(){
     const invoices=await tenantList<Record<string,unknown>>(
       "documents",
       "id,kind,number,status,issue_date,total,customer:customers(name)",
-      "kind=eq.invoice&order=created_at.desc&limit=5"
+      "kind=eq.invoice&order=issue_date.desc&limit=5"
     );
     const payments=await tenantList<Record<string,unknown>>(
       "payments",
       "id,paid_on,amount,status,customer:customers(name),invoice:documents(number)",
-      "order=created_at.desc&limit=5"
+      "order=paid_on.desc&limit=5"
     );
     const session=await requireSession();
     const analytics=await withTenant(session.organizationId,session.userId,c=>dashboardAnalytics(c,session.organizationId));
