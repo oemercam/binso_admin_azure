@@ -33,7 +33,7 @@ async function uniqueSlug(client:PoolClient,name:string){
 
 export async function provisionOrganization(input:{
  userId:string;email:string;name:string;companyName:string;plan:PlanId;billingCycle?:BillingCycle;mode:"trial"|"demo"|"subscription";
- passwordHash?:string|null;language?:"de-CH"|"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;
+ passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;
 }){
  return withTransaction(async client=>{
    const email=input.email.trim().toLowerCase();
@@ -54,7 +54,7 @@ export async function provisionOrganization(input:{
      `insert into app_users(id,email,display_name,status,password_hash,language,email_verified_at,terms_version,terms_accepted_at,privacy_version,last_login_at,updated_at)
       values($1,$2,$3,'active',$4,$5,$6,$7,case when $7::text is null then null else now() end,$8,now(),now())
       on conflict(id) do update set email=excluded.email,display_name=excluded.display_name,password_hash=coalesce(excluded.password_hash,app_users.password_hash),language=excluded.language,updated_at=now()`,
-     [input.userId,email,displayName,input.passwordHash??null,input.language??"de-CH",input.mode==="demo"?new Date():null,input.termsVersion??null,input.privacyVersion??null]
+     [input.userId,email,displayName,input.passwordHash??null,input.language??"de",input.mode==="demo"?new Date():null,input.termsVersion??null,input.privacyVersion??null]
    );
    const org=await client.query<{id:string}>(
      `insert into organizations(name,slug,status,country,currency,locale,is_demo)
