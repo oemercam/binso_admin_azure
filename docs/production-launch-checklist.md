@@ -58,7 +58,8 @@ Stand: 5. Oktober 2026
 - [ ] Entra App Roles im produktiven Tenant mit echten Benutzerkonten verifiziert
 - [ ] Microsoft Authenticator / Conditional Access mit echtem Mitarbeiter getestet
 - [ ] Offboarding-Test: Rolle/Benutzer in Entra entfernen -> Adminzugriff endet
-- [ ] Mail.Send Application Permission auf die erforderliche Mailbox/Scope nach Least-Privilege beschränken und prüfen
+- [x] Least-Privilege-Runbook für Microsoft Graph / Exchange Application RBAC dokumentiert
+- [ ] Mail.Send Application Permission auf one@binso.ch beschränken und praktisch prüfen
 
 ## Billing / Stripe
 - [x] Checkout serverseitig
