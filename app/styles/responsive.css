@@ -922,7 +922,10 @@
     height:calc(54px + var(--safe-top));
     padding-top:var(--safe-top);
     background:var(--color-bg);
+    -webkit-backdrop-filter:none;
     backdrop-filter:none;
+    opacity:1;
+    isolation:isolate;
   }
   .marketing-nav{
     height:54px;
@@ -1122,6 +1125,11 @@
     min-height:calc(var(--mobile-header-h) + var(--safe-top));
     padding-top:var(--safe-top);
     border-bottom:1px solid var(--color-line);
+    background:var(--color-bg);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    opacity:1;
+    isolation:isolate;
   }
   .portal-header .logo{width:88px;height:28px}
   .portal-card,
@@ -1140,6 +1148,11 @@
     padding-top:var(--safe-top);
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
+    background:var(--color-bg);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    opacity:1;
+    isolation:isolate;
   }
   .demo-onboarding-header .logo{width:88px;height:28px}
   .demo-onboarding{
@@ -2193,6 +2206,24 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
     background:var(--color-bg);
     -webkit-backdrop-filter:none;
     backdrop-filter:none;
+    opacity:1;
+  }
+  .marketing-header::before,
+  .marketing-header::after,
+  .portal-header::before,
+  .portal-header::after,
+  .demo-onboarding-header::before,
+  .demo-onboarding-header::after,
+  .mobile-header::before,
+  .mobile-header::after{display:none}
+  .marketing-header .logo,
+  .portal-header .logo,
+  .demo-onboarding-header .logo,
+  .mobile-header .logo{
+    opacity:1;
+    mix-blend-mode:normal;
+    transform:none;
+    backface-visibility:visible;
   }
   .mobile-header-detail{
     display:grid;
