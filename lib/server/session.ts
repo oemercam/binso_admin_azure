@@ -14,6 +14,7 @@ export type SessionUser={
  email:string;
  name:string;
  role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader";
+ mfaEnabled:boolean;
 };
 
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
@@ -54,12 +55,12 @@ export async function endDemoSession(){
 
 export async function getSession():Promise<SessionUser|null>{
  const jar=await cookies();
- const demo=jar.get('binso_demo')?.value==='1';
- const token=jar.get(demo?'binso_demo_write':env.sessionCookieName)?.value;
+ const demo=jar.get("binso_demo")?.value==="1";
+ const token=jar.get(demo?"binso_demo_write":env.sessionCookieName)?.value;
  if(!token)return null;
  await expireUnpaidTrials();
  const result=await query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo"
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'
@@ -73,8 +74,13 @@ export async function getSession():Promise<SessionUser|null>{
  return session;
 }
 
-export async function requireSession(){
+export async function requireSession(options:{allowMfaEnrollment?:boolean}={}){
  const session=await getSession();
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
+ const privileged=["owner","admin","finance"].includes(session.role);
+ if(privileged&&!session.mfaEnabled&&!options.allowMfaEnrollment){
+   const {ApiError}=await import("@/lib/server/http");
+   throw new ApiError(403,"mfa_enrollment_required","Für dieses Konto muss zuerst die Authenticator-App eingerichtet werden.");
+ }
  return session;
 }

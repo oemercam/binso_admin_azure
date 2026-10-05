@@ -1,73 +1,101 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { Button, Icon, Logo } from "@/components/ui";
-import { clearDemoClientSession, startDemoClientSession } from "@/lib/client/backend";
+import {useRouter} from "next/navigation";
+import {FormEvent,useState} from "react";
+import {Button,Icon,Logo} from "@/components/ui";
+import {clearDemoClientSession,startDemoClientSession} from "@/lib/client/backend";
 
-export default function Login() {
+type Stage="credentials"|"email"|"totp"|"verify";
+
+export default function Login(){
   const router=useRouter();
   const [show,setShow]=useState(false);
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
+  const [code,setCode]=useState("");
+  const [stage,setStage]=useState<Stage>("credentials");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  const nextPath=()=>{const next=new URLSearchParams(window.location.search).get("next");return next&&next.startsWith("/")?next:"/dashboard"};
 
-  const submit=async(event:FormEvent)=>{
-    event.preventDefault();
-    setLoading(true);setError("");
-    try{
-      const response=await fetch("/api/auth/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email,password}),
-      });
-      const payload=await response.json().catch(()=>({}));
-      if(!response.ok){
-        if(response.status===503&&payload?.error==="backend_not_configured"){
-          await startDemoClientSession({
-            name:email.split("@")[0]||"Demo",
-            company:"Demo Firma",
-            focus:"overview",
-          });
-          const next=new URLSearchParams(window.location.search).get("next");
-          router.push(next&&next.startsWith("/")?next:"/dashboard");
-          router.refresh();
-          return;
-        }
-        throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
-      }
-      clearDemoClientSession();
-      const next=new URLSearchParams(window.location.search).get("next");
-      router.push(next&&next.startsWith("/")?next:"/dashboard");
-      router.refresh();
-    }catch(error){
-      setError(error instanceof Error?error.message:"Anmeldung nicht möglich.");
-      setLoading(false);
-    }
+  const finish=(payload:Record<string,unknown>)=>{
+    clearDemoClientSession();
+    const next=nextPath();
+    router.push(payload.mfaSetupRequired===true?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
+    router.refresh();
   };
 
-  return <main className="auth-page">
-    <section className="auth-card">
-      <Logo/>
-      <h1>Willkommen zurück</h1>
-      <p>Melde dich in deinem Binso One Konto an.</p>
-      <form onSubmit={submit}>
-        <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
-        <label>Passwort
-          <div className="password-field">
-            <input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/>
-            <button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button>
-          </div>
-        </label>
-        <div className="form-link"><Link href="/passwort-vergessen">Passwort vergessen?</Link></div>
-        {error&&<p className="auth-error" role="alert">{error}</p>}
-        <Button type="submit">{loading?"Anmeldung läuft…":"Anmelden"}</Button>
-      </form>
-      <div className="auth-divider"><span>oder</span></div>
-      <Button href="/demo" variant="secondary">Demo starten</Button>
-      <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Account erstellen</Link></p>
-    </section>
-  </main>;
+  const loginRequest=async(extra:Record<string,string>={})=>{
+    const response=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,...extra})});
+    const payload=await response.json().catch(()=>({}));
+    if(response.status===202){
+      setCode("");
+      if(payload.requiresEmailVerification)setStage("verify");
+      else setStage(payload.mfaMethod==="totp"?"totp":"email");
+      return;
+    }
+    if(!response.ok){
+      if(response.status===503&&payload?.error==="backend_not_configured"){
+        await startDemoClientSession({name:email.split("@")[0]||"Demo",company:"Demo Firma",focus:"overview"});
+        router.push(nextPath());router.refresh();return;
+      }
+      throw new Error(typeof payload?.message==="string"?payload.message:"Anmeldung nicht möglich.");
+    }
+    finish(payload);
+  };
+
+  const submitCredentials=async(event:FormEvent)=>{
+    event.preventDefault();setLoading(true);setError("");
+    try{await loginRequest();}catch(error){setError(error instanceof Error?error.message:"Anmeldung nicht möglich.");}
+    finally{setLoading(false);}
+  };
+
+  const submitCode=async(event:FormEvent)=>{
+    event.preventDefault();setLoading(true);setError("");
+    try{
+      if(stage==="verify"){
+        const response=await fetch("/api/auth/verify-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,code})});
+        const payload=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
+        finish(payload);return;
+      }
+      await loginRequest(stage==="totp"?{mfaCode:code}:{emailCode:code});
+    }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
+    finally{setLoading(false);}
+  };
+
+  const resend=async()=>{
+    setLoading(true);setError("");
+    try{
+      if(stage==="verify")await fetch("/api/auth/resend-verification",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+      else if(stage==="email")await loginRequest();
+    }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht erneut gesendet werden.");}
+    finally{setLoading(false);}
+  };
+
+  if(stage!=="credentials")return <main className="auth-page"><section className="auth-card">
+    <Logo/><h1>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</h1>
+    <p>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</p>
+    <form onSubmit={submitCode}>
+      <label>{stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}<input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></label>
+      {error&&<p className="auth-error" role="alert">{error}</p>}
+      <Button type="submit" disabled={loading||!code.trim()}>{loading?"Wird geprüft…":"Anmeldung abschliessen"}</Button>
+    </form>
+    {stage!=="totp"&&<button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}>Code erneut senden</button>}
+    <button type="button" className="auth-inline-action" onClick={()=>{setStage("credentials");setCode("");setError("");}}>Zurück</button>
+  </section></main>;
+
+  return <main className="auth-page"><section className="auth-card">
+    <Logo/><h1>Willkommen zurück</h1><p>Melde dich sicher in deinem Binso One Konto an.</p>
+    <form onSubmit={submitCredentials}>
+      <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
+      <label>Passwort<div className="password-field"><input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button></div></label>
+      <div className="form-link"><Link href="/passwort-vergessen">Passwort vergessen?</Link></div>
+      {error&&<p className="auth-error" role="alert">{error}</p>}
+      <Button type="submit" disabled={loading}>{loading?"Anmeldung läuft…":"Weiter"}</Button>
+    </form>
+    <div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button>
+    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Account erstellen</Link></p>
+  </section></main>;
 }
