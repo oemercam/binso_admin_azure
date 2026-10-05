@@ -200,20 +200,11 @@ export function FinancePage() {
 export function CustomersPage() {
   const customerRows=useDemoRows("customers",customers);
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neuer Kunde"><span className="create-action-label">Neuer Kunde</span></Button>}>
-    <div className="tablet-master-detail">
+    <div className="customer-records-layout">
       <div>
         <RecordsView items={customerRows} placeholder="Kunden suchen...">{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
       </div>
-      <aside className="tablet-detail surface">
-        <div className="tablet-detail-head"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
-        <div className="tablet-actions"><Button href="/angebote/neu" variant="secondary">Angebot</Button><Button href="/rechnungen/neu">Rechnung</Button></div>
-        <dl className="detail-list">
-          <div><dt>E-Mail</dt><dd>info@acme.ch</dd></div>
-          <div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div>
-          <div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div>
-        </dl>
-        <Link className="text-link" href="/kunden/acme">Kundendetail öffnen <Icon name="arrow" size={15}/></Link>
-      </aside>
+
     </div>
   </AppShell>;
 }
