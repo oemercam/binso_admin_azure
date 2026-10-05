@@ -1,5 +1,4 @@
 import {NextRequest} from "next/server";
-import {consumeAuthToken} from "@/lib/server/auth-tokens";
 import {consumeEmailCode} from "@/lib/server/email-otp";
 import {createSession,endDemoSession} from "@/lib/server/session";
 import {query} from "@/lib/server/db";
@@ -31,19 +30,11 @@ export async function POST(request:NextRequest){
     assertSameOrigin(request);
     await enforceRateLimit(request,"verify-email",20,60*60_000);
     const body=asObject(await readJson(request,8192));
-    let userId:string|undefined;let email:string|undefined;let organizationId:string|null|undefined;
-    if(typeof body.token==="string"&&body.token.length>=20){
-      const record=await consumeAuthToken("verify_email",body.token);
-      if(!record?.user_id)return json({error:"invalid_or_expired_token",message:"Bestätigungslink ist ungültig oder abgelaufen."},400);
-      userId=record.user_id;email=record.email;organizationId=record.organization_id;
-    }else{
-      email=emailField(body);
-      const code=stringField(body,"code",{min:6,max:6});
-      const user=await query<{id:string}>("select id from app_users where lower(email)=lower($1) and status='active' limit 1",[email]);
-      if(!user.rows[0]||!await consumeEmailCode({email,purpose:"verify_email",code}))return json({error:"invalid_or_expired_code",message:"Der Code ist ungültig oder abgelaufen."},400);
-      userId=user.rows[0].id;
-    }
-    const completed=await completeVerification(userId,email,organizationId);
+    const email=emailField(body);
+    const code=stringField(body,"code",{min:6,max:6});
+    const user=await query<{id:string}>("select id from app_users where lower(email)=lower($1) and status='active' limit 1",[email]);
+    if(!user.rows[0]||!await consumeEmailCode({email,purpose:"verify_email",code}))return json({error:"invalid_or_expired_code",message:"Der Code ist ungültig oder abgelaufen."},400);
+    const completed=await completeVerification(user.rows[0].id,email,null);
     if(!completed)return json({error:"user_not_found",message:"Konto konnte nicht bestätigt werden."},400);
     return json({ok:true,mfaSetupRequired:completed.mfaSetupRequired});
   }catch(error){return apiError(error);}
