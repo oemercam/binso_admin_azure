@@ -11,5 +11,5 @@ export async function GET(){try{
   const id=env.stripePrices[plan.id][billing];if(!configured||!id)return {plan:plan.id,name:plan.name,billing,available:false};
   try{const price=await retrievePrice(id);return {plan:plan.id,name:plan.name,billing,available:true,amount:validatePrice(price,billing),currency:'CHF'};}catch{return {plan:plan.id,name:plan.name,billing,available:false};}
  })));
- return json({configured,live:stripeLiveMode(),items});
+ return json({configured,live:stripeLiveMode(),demo:session.isDemo===true,items});
 }catch(error){return apiError(error)}}

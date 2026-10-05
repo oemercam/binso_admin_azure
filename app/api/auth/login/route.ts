@@ -1,7 +1,7 @@
 import {NextRequest} from "next/server";
 import {query} from "@/lib/server/db";
 import {verifyPassword} from "@/lib/server/password";
-import {createSession} from "@/lib/server/session";
+import {createSession,endDemoSession} from "@/lib/server/session";
 import {apiError,assertSameOrigin,json,readJson} from "@/lib/server/http";
 import {asObject,emailField,stringField} from "@/lib/server/validation";
 import {enforceRateLimit} from "@/lib/server/rate-limit";
@@ -44,6 +44,7 @@ export async function POST(request:NextRequest){
   }
   await query(`update app_users set last_login_at=now(),updated_at=now() where id=$1`,[user.id]);
   await query(`update platform_tenants set last_active_at=now() where organization_id=$1`,[user.organization_id]);
+  await endDemoSession();
   await createSession({userId:user.id,organizationId:user.organization_id,email:user.email,name:user.name,role:user.role});
   return json({ok:true,onboardingComplete:user.onboarding_complete,emailVerified:Boolean(user.email_verified_at)});
  }catch(error){return apiError(error)}
