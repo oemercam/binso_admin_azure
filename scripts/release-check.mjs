@@ -15,3 +15,25 @@ for(const legacy of ['CHF 19','CHF 49','CHF 89']){
 assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.map'),'Pricing page must use canonical trial and plan configuration');
 assert.ok(register.includes('billingCycle')&&register.includes('selectedPlan'),'Registration must preserve selected plan and billing cycle');
 console.log('Release gates passed.');
+
+const forbiddenFiles=[
+  'lib/server/email.ts',
+  'lib/server/env.ts',
+  '.env.example',
+  '.github/workflows/deploy-azure.yml',
+  'README.md',
+  'docs/auth-security-flow.md',
+  'docs/privacy-processing-register.md',
+  'docs/production-launch-checklist.md',
+  'docs/technical-organizational-measures.md'
+];
+for(const path of forbiddenFiles){
+  const source=await fs.readFile(path,'utf8');
+  assert.ok(!/resend/i.test(source),path+' must not contain retired Resend configuration or documentation');
+}
+const email=await fs.readFile('lib/server/email.ts','utf8');
+assert.ok(email.includes('graph.microsoft.com')&&email.includes('sendMail'),'Microsoft Graph must remain the only production mail path');
+const envExample=await fs.readFile('.env.example','utf8');
+for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GRAPH_SENDER_USER_ID']){
+  assert.ok(envExample.includes(name+'='),'.env.example must document '+name);
+}
