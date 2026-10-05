@@ -18,14 +18,13 @@
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
   }
-  .desktop-search-trigger{
+  .desktop-search{
     width:min(48vw,360px);
     min-width:180px;
-    height:36px;
-    padding:0 10px;
-    font-size:11px;
   }
-  .desktop-search-trigger kbd{display:none}
+  .desktop-search-field{height:36px}
+  .desktop-search-field input{height:34px;font-size:11px}
+  .desktop-search-field kbd{display:none}
   .desktop-appbar-actions{
     flex:0 0 auto;
     display:flex;
@@ -1726,30 +1725,8 @@
     backdrop-filter:blur(14px);
     -webkit-backdrop-filter:blur(14px);
   }
-  .desktop-search-trigger{
-    width:min(100%,440px);
-    height:38px;
-    padding:0 11px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    border:1px solid var(--color-line);
-    border-radius:10px;
-    background:var(--color-bg);
-    color:var(--color-muted);
-    font-size:12px;
-    text-align:left;
-  }
-  .desktop-search-trigger span{flex:1}
-  .desktop-search-trigger kbd{
-    padding:3px 6px;
-    border:1px solid var(--color-line);
-    border-radius:6px;
-    background:var(--color-subtle);
-    color:var(--color-muted);
-    font:inherit;
-    font-size:10px;
-  }
+  .desktop-search{width:min(100%,440px)}
+  .desktop-search-field{height:38px}
   .desktop-appbar-actions{display:flex;align-items:center;gap:6px}
   .page-container{padding-top:28px;padding-left:clamp(32px,3vw,48px);padding-right:clamp(32px,3vw,48px)}
   .page-head{margin-bottom:28px}
@@ -2321,7 +2298,7 @@
 
   .desktop-appbar{padding-left:var(--page-x);padding-right:var(--page-x)}
   .desktop-appbar-actions{gap:10px}
-  .desktop-search-trigger{width:min(42vw,520px)}
+  .desktop-search{width:min(42vw,520px)}
 
   .toolbar{
     min-height:48px;
