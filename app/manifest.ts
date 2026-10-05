@@ -6,6 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Binso One",
     short_name: "Binso One",
     description: "Business-Plattform für Schweizer KMU",
+    lang: "de-CH",
+    dir: "ltr",
     start_url: "/dashboard?source=pwa",
     scope: "/",
     display: "standalone",
