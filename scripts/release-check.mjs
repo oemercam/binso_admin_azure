@@ -6,6 +6,10 @@ assert.ok(deploy.includes('Verify current production build and routes'));
 const home=await fs.readFile('app/page.tsx','utf8');
 const pricing=await fs.readFile('app/preise/page.tsx','utf8');
 const register=await fs.readFile('app/registrieren/page.tsx','utf8');
+const loginRoute=await fs.readFile('app/api/auth/login/route.ts','utf8');
+const recoverRoute=await fs.readFile('app/api/auth/recover/route.ts','utf8');
+const registerRouteSource=await fs.readFile('app/api/auth/register/route.ts','utf8');
+const provisioningSource=await fs.readFile('lib/server/provisioning.ts','utf8');
 for(const [name,source] of [['landing',home],['pricing',pricing],['register',register]]){
   assert.ok(!source.includes('30 Tage kostenlos'),name+' must not advertise the old 30-day trial');
 }
@@ -14,6 +18,11 @@ for(const legacy of ['CHF 19','CHF 49','CHF 89']){
 }
 assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.map'),'Pricing page must use canonical trial and plan configuration');
 assert.ok(register.includes('billingCycle')&&register.includes('selectedPlan'),'Registration must preserve selected plan and billing cycle');
+assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue a fresh login code after first email verification');
+assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
+assert.ok(registerRouteSource.includes('profileLanguage=locale==="de"?"de-CH":locale'),'Registration must store Swiss German using canonical de-CH locale');
+assert.ok(provisioningSource.includes('input.language??"de-CH"'),'Provisioning default locale must remain de-CH');
+
 console.log('Release gates passed.');
 
 const email=await fs.readFile('lib/server/email.ts','utf8');
