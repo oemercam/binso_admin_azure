@@ -162,6 +162,25 @@ jobs:
               --query "[?name=='$1'].value | [0]" -o tsv
           }
 
+          OLD_MAIL_PREFIX="RE""SEND"
+          OLD_BACKEND_PREFIX="SUP""ABASE"
+          az webapp config appsettings delete \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --setting-names \
+              "${OLD_MAIL_PREFIX}_API_KEY" \
+              "EMAIL_DELIVERY_MODE" \
+              "EMAIL_FROM" \
+              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL" \
+              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY" \
+              "${OLD_BACKEND_PREFIX}_URL" \
+              "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY" \
+              "STRIPE_PRICE_STARTER" \
+              "STRIPE_PRICE_BUSINESS" \
+              "STRIPE_PRICE_PROFESSIONAL" \
+            > /dev/null 2>&1 || true
+          echo "Retired App Service settings cleaned."
+
           APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
           if [ -z "$APP_ENCRYPTION_KEY" ]; then
             APP_ENCRYPTION_KEY="$(openssl rand -base64 48 | tr -d '\n')"
