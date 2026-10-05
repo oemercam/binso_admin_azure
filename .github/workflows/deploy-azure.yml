@@ -297,17 +297,44 @@ jobs:
           curl -fsS --max-time 20 "$PRODUCTION_URL/api/health/ready" | grep -q '"status":"ready"'
           echo "Binso One production health and readiness checks passed."
 
-          curl -fsS --max-time 60 -c /tmp/binso-production-demo.cookies -X POST -d '{}' -H 'Content-Type: application/json' "$PRODUCTION_URL/api/demo/session" | grep -q '"ok":true'
+          retry_curl() {
+            local output="$1"
+            shift
+            local attempt code
+            for attempt in 1 2 3; do
+              code=$(curl -sS --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 2 --retry-all-errors -o "$output" -w "%{http_code}" "$@" || true)
+              if [ "$code" = "200" ]; then
+                return 0
+              fi
+              echo "Transient production check failure (HTTP $code, attempt $attempt/3): $*"
+              [ -s "$output" ] && cat "$output" || true
+              sleep $((attempt * 3))
+            done
+            return 1
+          }
+
+          DEMO_COOKIE_FILE=/tmp/binso-production-demo.cookies
+          cleanup_demo_session() {
+            curl -sS --connect-timeout 10 --max-time 30 --retry 1 --retry-delay 2 --retry-all-errors               -b "$DEMO_COOKIE_FILE" -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null 2>&1 || true
+          }
+          trap cleanup_demo_session EXIT
+
+          retry_curl /tmp/binso-production-demo-session.json             -c "$DEMO_COOKIE_FILE" -X POST -d '{}' -H 'Content-Type: application/json'             "$PRODUCTION_URL/api/demo/session"
+          grep -q '"ok":true' /tmp/binso-production-demo-session.json
           echo "Verifying demo session endpoint."
+
           for collection in customers customer_contacts products employees expenses documents payments; do
             echo "Verifying PostgreSQL demo collection: $collection"
-            curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies "$PRODUCTION_URL/api/demo/data?collection=$collection" > /tmp/binso-production-data.json
+            retry_curl /tmp/binso-production-data.json               -b "$DEMO_COOKIE_FILE"               "$PRODUCTION_URL/api/demo/data?collection=$collection"
             node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-data.json","utf8"));if(!Array.isArray(data.items)||!data.items.length)process.exit(1)'
           done
+
           echo "Verifying PostgreSQL demo finance."
-          curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies "$PRODUCTION_URL/api/demo/finance" > /tmp/binso-production-finance.json
+          retry_curl /tmp/binso-production-finance.json             -b "$DEMO_COOKIE_FILE"             "$PRODUCTION_URL/api/demo/finance"
           node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-finance.json","utf8"));if(!data.payments?.length||!data.payroll?.length||!data.operatingCosts?.length)process.exit(1)'
-          curl -fsS --max-time 20 -b /tmp/binso-production-demo.cookies -X DELETE "$PRODUCTION_URL/api/demo/session" > /dev/null
+
+          cleanup_demo_session
+          trap - EXIT
           echo "PostgreSQL-backed demo and finance production checks passed."
 
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
