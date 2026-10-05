@@ -79,6 +79,5 @@ assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit
 await fs.access('docs/dependency-security-review.md');
 
 await fs.access('docs/dependency-security-audit.md');
-const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
 assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-level high','Blocking security audit must cover production dependencies at high severity');
 assert.ok(packageJson.scripts['security:scan:all'],'A full dependency audit command must remain available');
