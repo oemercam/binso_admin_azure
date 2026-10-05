@@ -57,11 +57,13 @@ Für den finalen Least-Privilege-Schritt siehe:
 
 ## Datenbank
 
-Migrationen liegen unter:
+Die einzige aktive und kanonische Migrationslinie liegt unter:
 
 ```text
 database/migrations/
 ```
+
+Frühere Backend-/Migrationslinien sind nicht Bestandteil des aktiven Repositorys.
 
 Sie werden im Azure-Deployment vor dem App-Deploy ausgeführt:
 
@@ -224,10 +226,12 @@ QA:
 corepack enable
 corepack prepare pnpm@10.0.0 --activate
 pnpm install --frozen-lockfile
+pnpm repository:clean
 pnpm release:check
 pnpm test
 pnpm lint
 pnpm security:scan
+pnpm security:scan:all
 pnpm css:check
 pnpm typecheck
 pnpm build
@@ -245,5 +249,6 @@ Dokumentierte Betriebsverfahren:
 - `docs/customer-data-lifecycle.md`
 - `docs/incident-response-and-retention.md`
 - `docs/graph-mail-least-privilege.md`
+- `docs/security-review-2026-10-05.md`
 
 Domain-/Custom-Hostname-Konfiguration wird separat durchgeführt und ist nicht Bestandteil dieses Readiness-Blocks.
