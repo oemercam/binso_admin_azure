@@ -26,6 +26,8 @@ for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GR
 const deployWorkflow=await fs.readFile('.github/workflows/deploy-azure.yml','utf8');
 assert.ok(deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must enforce retention cleanup');
 assert.ok(deployWorkflow.includes('/api/health/ready'),'Production deploy must verify readiness health');
+assert.ok(deployWorkflow.includes('retry_curl()'),'Production verification must retry transient HTTP failures');
+assert.ok(deployWorkflow.includes('trap cleanup_demo_session EXIT'),'Production demo verification must always clean up its session');
 await fs.access('.github/workflows/retention-maintenance.yml');
 await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');
@@ -50,6 +52,7 @@ const sessionSecurityUi=await fs.readFile('components/security-settings-page.tsx
 assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.includes('Alle anderen abmelden'),'Security settings must expose real session management');
 
 const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
+assert.equal(packageJson.engines?.node,'>=24 <25','Runtime contract must stay pinned to Node 24');
 assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
 await fs.access('docs/dependency-security-review.md');
 
