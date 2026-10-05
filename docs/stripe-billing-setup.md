@@ -19,7 +19,7 @@ Die sechs Prices m√ºssen aktiv sein, CHF verwenden und jeweils monatlich oder j√
 ## Stripe Dashboard / Workbench
 
 Webhook-URL: `https://<APP_URL>/api/billing/webhook`.
-API-Version: `2026-09-30.endive`, passend zur im Code festgelegten Version.
+API-Version: `2026-08-26.dahlia`, passend zur produktiven Webhook-Konfiguration und zur im Code festgelegten Version.
 Ereignisse:
 
 - `checkout.session.completed`
