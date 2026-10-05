@@ -2,7 +2,8 @@ import "server-only";
 import {env} from "@/lib/server/env";
 import {log} from "@/lib/server/logger";
 
-type Mail={to:string;subject:string;html:string;text:string};
+type MailAttachment={name:string;contentType:string;content:Buffer};
+type Mail={to:string;subject:string;html:string;text:string;attachments?:MailAttachment[]};
 
 type GraphToken={accessToken:string;expiresAt:number};
 let graphToken:GraphToken|null=null;
@@ -46,6 +47,12 @@ async function sendViaGraph(mail:Mail){
     subject:mail.subject,
     body:{contentType:"HTML",content:mail.html},
     toRecipients:[{emailAddress:{address:mail.to}}],
+    attachments:mail.attachments?.map(attachment=>({
+      "@odata.type":"#microsoft.graph.fileAttachment",
+      name:attachment.name,
+      contentType:attachment.contentType,
+      contentBytes:attachment.content.toString("base64"),
+    })),
    },
    saveToSentItems:true,
   }),
