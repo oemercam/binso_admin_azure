@@ -179,32 +179,53 @@ jobs:
           GRAPH_CLIENT_ID="$(get_setting GRAPH_CLIENT_ID)"
           GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
           GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
-          for value in "$GRAPH_TENANT_ID" "$GRAPH_CLIENT_ID" "$GRAPH_CLIENT_SECRET" "$GRAPH_SENDER_USER_ID"; do
-            if [ -z "$value" ]; then
-              echo "::error::Microsoft Graph mail configuration is incomplete."
-              exit 1
-            fi
-            echo "::add-mask::$value"
-          done
+          RESEND_API_KEY="$(get_setting RESEND_API_KEY)"
+          EMAIL_DELIVERY_MODE="$(get_setting EMAIL_DELIVERY_MODE)"
 
           az webapp config appsettings set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
             --settings \
-              "EMAIL_DELIVERY_MODE=graph" \
               "OPERATOR_ENTRA_TENANT_ID=$BINSO_ENTRA_TENANT_ID" \
               "OPERATOR_ALLOWED_DOMAIN=binso.ch" > /dev/null
 
-          TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
-            -X POST \
-            -H 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
-            --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET" \
-            --data-urlencode "scope=https://graph.microsoft.com/.default" \
-            --data-urlencode "grant_type=client_credentials" \
-            "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
-          node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
-          echo "Microsoft Graph client-credentials authentication passed."
+          GRAPH_READY=true
+          for value in "$GRAPH_TENANT_ID" "$GRAPH_CLIENT_ID" "$GRAPH_CLIENT_SECRET" "$GRAPH_SENDER_USER_ID"; do
+            if [ -z "$value" ]; then
+              GRAPH_READY=false
+            else
+              echo "::add-mask::$value"
+            fi
+          done
+
+          if [ "$GRAPH_READY" = "true" ]; then
+            TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
+              -X POST \
+              -H 'Content-Type: application/x-www-form-urlencoded' \
+              --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
+              --data-urlencode "client_secret=$GRAPH_CLIENT_SECRET" \
+              --data-urlencode "scope=https://graph.microsoft.com/.default" \
+              --data-urlencode "grant_type=client_credentials" \
+              "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
+            node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
+            az webapp config appsettings set \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --settings "EMAIL_DELIVERY_MODE=graph" > /dev/null
+            echo "Microsoft Graph client-credentials authentication passed."
+          elif [ -n "$RESEND_API_KEY" ]; then
+            echo "::add-mask::$RESEND_API_KEY"
+            if [ "$EMAIL_DELIVERY_MODE" = "graph" ] || [ "$EMAIL_DELIVERY_MODE" = "microsoft" ] || [ "$EMAIL_DELIVERY_MODE" = "microsoft_graph" ]; then
+              az webapp config appsettings set \
+                --resource-group "$AZURE_RESOURCE_GROUP" \
+                --name "$AZURE_WEBAPP_NAME" \
+                --settings "EMAIL_DELIVERY_MODE=resend" > /dev/null
+            fi
+            echo "::warning::Microsoft Graph mail is not fully configured; existing Resend delivery remains active."
+          else
+            echo "::error::No complete production mail provider is configured. Configure Microsoft Graph or RESEND_API_KEY before go-live."
+            exit 1
+          fi
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
