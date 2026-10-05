@@ -1,6 +1,7 @@
 "use client";
 
 import { useReportWebVitals } from "next/web-vitals";
+import {readPerformanceConsent} from "@/components/privacy-consent";
 
 function safeRoute(pathname:string){
   return pathname.split("/").map(segment=>{
@@ -12,6 +13,7 @@ function safeRoute(pathname:string){
 
 export function WebVitalsReporter(){
   useReportWebVitals(metric=>{
+    if(!readPerformanceConsent())return;
     const body=JSON.stringify({name:metric.name,value:metric.value,rating:metric.rating,route:safeRoute(window.location.pathname)});
     if(navigator.sendBeacon){
       navigator.sendBeacon("/api/telemetry/web-vitals",new Blob([body],{type:"application/json"}));
