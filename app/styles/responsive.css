@@ -1620,6 +1620,28 @@
   .record>strong,
   .record>.status{flex:0 0 auto;white-space:nowrap}
 
+  /* Zeiterfassung follows the same medium-desktop width model as all other workspaces. */
+  .time-layout{
+    width:100%;
+    grid-template-columns:minmax(0,1fr);
+    gap:var(--desktop-section-gap);
+  }
+  .time-layout>.surface{
+    width:100%;
+    min-width:0;
+  }
+  .time-layout>.surface+.surface{margin-top:0}
+  .timer-project{width:min(100%,520px);max-width:520px}
+  .timer-actions{
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:center;
+    gap:var(--desktop-action-gap);
+  }
+  .timer-actions .button{white-space:nowrap}
+  .time-entry-list>div{min-width:0}
+  .time-entry-list strong{white-space:nowrap}
+
   .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
   .document-line-items{min-width:0}
@@ -2312,6 +2334,20 @@
   }
   .quick-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--color-line)}
   .quick-grid{gap:12px}
+
+  .time-layout{
+    width:100%;
+    grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr);
+    gap:var(--desktop-section-y);
+    align-items:start;
+  }
+  .time-layout>.surface{min-width:0}
+  .timer-card{padding:var(--desktop-section-y) var(--desktop-surface-x)}
+  .timer-project{width:min(100%,520px);max-width:520px}
+  .timer-actions{gap:var(--desktop-action-gap)}
+  .timer-actions .button{min-width:112px;white-space:nowrap}
+  .time-entry-list>div{min-width:0}
+  .time-entry-list strong{white-space:nowrap}
 
   .revenue-insight,
   .finance-analysis{
