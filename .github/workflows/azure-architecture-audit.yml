@@ -42,8 +42,31 @@ jobs:
           echo "=== App setting names only ==="
           az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
 
+          echo "=== Production auth/mail readiness (no secret values) ==="
+          APP_SETTINGS_JSON="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" -o json)"
+          node - "$APP_SETTINGS_JSON" <<'NODE'
+          const settings=JSON.parse(process.argv[2]);
+          const map=Object.fromEntries(settings.map(x=>[x.name,x.value]));
+          const present=name=>Boolean(String(map[name]??"").trim());
+          console.log(JSON.stringify({
+            appEncryptionKeyConfigured:present("APP_ENCRYPTION_KEY"),
+            emailDeliveryMode:map.EMAIL_DELIVERY_MODE??null,
+            graphTenantConfigured:present("GRAPH_TENANT_ID"),
+            graphClientConfigured:present("GRAPH_CLIENT_ID"),
+            graphSecretConfigured:present("GRAPH_CLIENT_SECRET"),
+            graphSenderConfigured:present("GRAPH_SENDER_USER_ID"),
+            operatorEntraTenantPinned:present("OPERATOR_ENTRA_TENANT_ID"),
+            operatorAllowedDomain:map.OPERATOR_ALLOWED_DOMAIN??null
+          },null,2));
+          NODE
+
           echo "=== App Service Authentication / Microsoft Entra ==="
           az webapp auth show -g "$APP_RG" -n "$APP_NAME" --query "{enabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,defaultProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,issuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: App Service Authentication configuration unavailable."
+
+          echo "=== App Service Authentication v2 via ARM ==="
+          SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+          AUTH_V2_URL="https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$APP_RG/providers/Microsoft.Web/sites/$APP_NAME/config/authsettingsV2/list?api-version=2023-12-01"
+          az rest --method post --url "$AUTH_V2_URL" --query "properties.{platformEnabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,redirectToProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,openIdIssuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: authsettingsV2 ARM read unavailable."
 
           echo "=== PostgreSQL connection from configured App Service setting ==="
           DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
