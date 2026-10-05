@@ -14,13 +14,9 @@ High- und Critical-Advisories in **Produktionsabhängigkeiten** blockieren den R
 
 ## Bekannter Dev-Tooling-Befund
 
-Der vollständige Audit wird mit einer **einzigen expliziten GHSA-Ausnahme** ausgeführt:
+Der vollständige Audit läuft über `scripts/full-security-audit.mjs`. Das Script führt `pnpm audit --audit-level high --json` aus, wertet die gemeldeten GHSA-IDs aus und toleriert **nur exakt** `GHSA-vfj7-8cjw-p6xm`.
 
-```bash
-pnpm audit --audit-level high --ignore GHSA-vfj7-8cjw-p6xm
-```
-
-Dadurch blockiert Quality weiterhin bei jedem anderen High-/Critical-Finding. Die einzige tolerierte Advisory ist derzeit:
+Dadurch blockiert Quality bei jedem anderen High-/Critical-Finding. Wenn das Audit fehlschlägt, aber keine verifizierbare GHSA-ID liefert, wird ebenfalls blockiert. Die einzige tolerierte Advisory ist derzeit:
 
 - Advisory: `GHSA-vfj7-8cjw-p6xm`
 - Paket: `braces@3.0.3`
