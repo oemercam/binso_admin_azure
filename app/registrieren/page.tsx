@@ -8,6 +8,7 @@ import {Button,Logo} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {billingCycles,domainConfig,planIds,type BillingCycle,type PlanId} from "@/config/domain";
 import {plans} from "@/lib/plans";
+import {legalConfig} from "@/config/legal";
 
 export default function Register(){
   const router=useRouter();
@@ -31,7 +32,7 @@ export default function Register(){
   const submit=async(event:FormEvent)=>{
     event.preventDefault();setLoading(true);setError("");
     try{
-      const response=await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:companyName,company:companyName,email,password,plan:selectedPlan,billingCycle,acceptedTerms,termsVersion:"registration-v1",privacyVersion:"registration-v1",locale:"de",trial:true})});
+      const response=await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:companyName,company:companyName,email,password,plan:selectedPlan,billingCycle,acceptedTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion,locale:"de",trial:true})});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
       clearDemoClientSession();setConfirmation(true);
@@ -81,10 +82,10 @@ export default function Register(){
       <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
       <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
       <label>Passwort<div className="password-field"><input required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 12 Zeichen"/><button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button></div><small className="password-hint">Mindestens 12 Zeichen.</small></label>
-      <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/>Ich akzeptiere die AGB und habe die Datenschutzerklärung zur Kenntnis genommen.</label>
+      <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/>Ich akzeptiere die AGB für Binso One und habe die Datenschutzerklärung sowie die Regelung zur Auftragsbearbeitung zur Kenntnis genommen.</label>
       {error&&<p className="auth-error" role="alert">{error}</p>}
       <Button type="submit" disabled={loading||!acceptedTerms}>{loading?"Account wird erstellt…":"Account erstellen"}</Button>
     </form>
-    <div className="auth-after-submit"><p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> zur Kenntnis genommen zu haben.</p><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>
+    <div className="auth-after-submit"><p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> und die <Link href="/auftragsbearbeitung">Auftragsbearbeitung</Link> zur Kenntnis genommen zu haben.</p><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>
   </section></main>;
 }

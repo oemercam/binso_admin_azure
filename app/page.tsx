@@ -150,7 +150,7 @@ export default function Home() {
             {plan.popular&&<span className="popular">BELIEBT</span>}
             <h3>{plan.name}</h3>
             <p>{plan.description}</p>
-            <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div><p><small>oder CHF {plan.yearly} / Jahr</small></p>
+            <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div><p><small>oder CHF {plan.yearly} / Jahr · exkl. MWST, sofern geschuldet</small></p>
             <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button><Link className="marketing-text-link" href={`/registrieren?plan=${plan.id}&billing=yearly`}>Jährlich starten</Link>
             <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
           </article>)}
