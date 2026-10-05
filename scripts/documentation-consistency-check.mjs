@@ -24,6 +24,8 @@ const [
   privacyConsent,
   webVitals,
   privacyPage,
+  portalRootRoute,
+  registerRoute,
 ]=await Promise.all([
   read("README.md"),
   read("docs/auth-security-flow.md"),
@@ -45,6 +47,8 @@ const [
   read("components/privacy-consent.tsx"),
   read("components/web-vitals-reporter.tsx"),
   read("app/datenschutz/page.tsx"),
+  read("app/portal/page.tsx"),
+  read("app/api/auth/register/route.ts"),
 ]);
 
 const stripeVersion=stripeSource.match(/stripeApiVersion=['"]([^'"]+)['"]/)?.[1];
@@ -86,8 +90,6 @@ for(const required of [
   assert.ok(readme.includes(required),"README must reference "+required);
 }
 
-console.log("Documentation consistency passed: runtime, authentication, billing and operational docs are aligned.");
-
 assert.ok(productPage.includes("domainConfig.trialDays"),"Product page must use the canonical trial duration");
 assert.ok(!productPage.includes("30 Tage kostenlos"),"Product page must not contain the retired 30-day trial");
 assert.ok(!marketing.includes('href="/portal/login"'),"Public login links must use the canonical customer login");
@@ -100,3 +102,17 @@ assert.ok(rootLayout.includes("<PrivacyConsent"),"Privacy consent controls must 
 assert.ok(privacyConsent.includes("Nur notwendige")&&privacyConsent.includes("Alle erlauben"),"Privacy controls must offer explicit choices");
 assert.ok(webVitals.includes("readPerformanceConsent"),"Optional performance telemetry must respect the user's privacy preference");
 assert.ok(privacyPage.includes("Optionale Performance-Messungen")&&privacyPage.includes("keine Werbe- oder Cross-Site-Tracking-Cookies"),"Privacy policy must describe the current consent and tracking behavior");
+
+assert.ok(portalRootRoute.includes('redirect("/login")'),"Legacy portal root must redirect to canonical login");
+assert.ok(!marketing.includes('href="/operator"'),"Public marketing must not advertise the internal admin route");
+assert.ok(!marketing.includes('"/preview/rechnungen"')&&!marketing.includes('"/preview/zeit"'),"Marketing must not label the dashboard capture as module-specific screenshots");
+assert.ok(registerRoute.includes("legalConfig.termsVersion")&&registerRoute.includes("legalConfig.privacyVersion"),"Registration API must enforce the current legal document versions");
+await fs.access("app/einstellungen/datenschutz/page.tsx");
+try{
+  await fs.access("components/portal.tsx");
+  assert.fail("Obsolete duplicate portal UI must not exist");
+}catch(error){
+  if(error?.code!=="ENOENT")throw error;
+}
+
+console.log("Documentation and public-flow consistency passed: runtime, authentication, billing, privacy and legal content are aligned.");
