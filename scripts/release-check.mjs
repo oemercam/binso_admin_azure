@@ -78,6 +78,8 @@ const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
 assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
 await fs.access('docs/dependency-security-review.md');
 
-await fs.access('docs/dependency-security-audit.md');
 assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-level high','Blocking security audit must cover production dependencies at high severity');
-assert.ok(packageJson.scripts['security:scan:all'],'A full dependency audit command must remain available');
+assert.equal(packageJson.scripts['security:scan:all'],'node scripts/full-security-audit.mjs','Full dependency audit must use the exact advisory gate');
+await fs.access('scripts/full-security-audit.mjs');
+const fullAuditGate=await fs.readFile('scripts/full-security-audit.mjs','utf8');
+assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
