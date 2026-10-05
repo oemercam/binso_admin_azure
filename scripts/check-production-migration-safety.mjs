@@ -42,6 +42,9 @@ try{
    const sql=await fs.readFile(path.join("database/migrations",file),"utf8");
    pending.push(file);
    for(const rule of forbidden)if(rule.re.test(sql))violations.push(`${file}: ${rule.label}`);
+   if(/\bupdate\s+[a-z0-9_."-]+\s+set\b/i.test(sql)&&!sql.includes("-- binso:reviewed-data-update")){
+     violations.push(`${file}: UPDATE requires explicit -- binso:reviewed-data-update marker after data-impact review`);
+   }
  }
  if(violations.length){
    throw new Error("Destructive or breaking production migration blocked. Use an explicitly reviewed maintenance procedure instead of automatic deploy:\n"+violations.join("\n"));
