@@ -95,7 +95,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const [mobileMore,setMobileMore]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const router=useRouter();
-  const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));window.location.href=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";}catch{window.location.href="/operator/login";}};
+  const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
