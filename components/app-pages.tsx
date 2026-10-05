@@ -1184,6 +1184,7 @@ export function SubscriptionSettingsPage() {
   const [billingLoading,setBillingLoading]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
+  const [referenceNow]=useState(()=>Date.now());
 
   const prices:Record<string,string>=Object.fromEntries(subscriptionPlans.flatMap(p=>[[p.name,String(p.monthly)],[p.id,String(p.monthly)]]));
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
@@ -1279,7 +1280,7 @@ export function SubscriptionSettingsPage() {
   const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString("de-CH"):"—";
   const trialEndDate=subscription.trial_ends_at?new Date(String(subscription.trial_ends_at)):null;
   const trialEnd=trialEndDate?trialEndDate.toLocaleDateString("de-CH"):"—";
-  const trialDaysRemaining=trialEndDate?Math.max(0,Math.ceil((trialEndDate.getTime()-Date.now())/86400000)):0;
+  const trialDaysRemaining=trialEndDate?Math.max(0,Math.ceil((trialEndDate.getTime()-referenceNow)/86400000)):0;
 
   return <AppShell title="Abonnement" subtitle="Plan, Nutzung und Kontostatus." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
