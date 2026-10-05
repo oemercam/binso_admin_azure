@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MarketingFooter, MarketingHeader } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 import { domainConfig } from "@/config/domain";
@@ -35,7 +36,7 @@ export default function Prices(){
         <p>{plan.description}</p>
         <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div>
         <p><small>oder CHF {plan.yearly} / Jahr</small></p>
-        <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button>
+        <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button><Link className="marketing-text-link" href={`/registrieren?plan=${plan.id}&billing=yearly`}>Jährlich starten</Link>
         <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={15}/>{feature}</li>)}</ul>
       </article>)}
     </div>
