@@ -1,14 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button, Logo } from "@/components/ui";
 import { clearDemoClientSession } from "@/lib/client/backend";
+import { billingCycles, domainConfig, planIds, type BillingCycle, type PlanId } from "@/config/domain";
+import { plans } from "@/lib/plans";
 
 export default function Register() {
   const router=useRouter();
+  const searchParams=useSearchParams();
+  const selectedPlan=useMemo<PlanId>(()=>{
+    const value=searchParams.get("plan");
+    return planIds.includes(value as PlanId)?value as PlanId:"start";
+  },[searchParams]);
+  const billingCycle=useMemo<BillingCycle>(()=>{
+    const value=searchParams.get("billing");
+    return billingCycles.includes(value as BillingCycle)?value as BillingCycle:"monthly";
+  },[searchParams]);
+  const plan=plans.find(item=>item.id===selectedPlan)??plans[0];
+  const subscriptionHref=`/einstellungen/abonnement?plan=${selectedPlan}&billing=${billingCycle}&activate=1`;
+
   const [companyName,setCompanyName]=useState("");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -25,19 +39,17 @@ export default function Register() {
       const response=await fetch("/api/auth/register",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name:companyName,company:companyName,email,password,plan:"start",billingCycle:"monthly",acceptedTerms,termsVersion:"registration-v1",privacyVersion:"registration-v1",locale:"de",trial:true}),
+        body:JSON.stringify({name:companyName,company:companyName,email,password,plan:selectedPlan,billingCycle,acceptedTerms,termsVersion:"registration-v1",privacyVersion:"registration-v1",locale:"de",trial:true}),
       });
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok){
-        throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
-      }
+      if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Registrierung nicht möglich.");
       clearDemoClientSession();
       if(payload.requiresEmailVerification&&payload.emailSent){
         setConfirmation(true);
         setLoading(false);
         return;
       }
-      router.push("/dashboard");
+      router.push(subscriptionHref);
       router.refresh();
     }catch(error){
       setError(error instanceof Error?error.message:"Registrierung nicht möglich.");
@@ -45,13 +57,18 @@ export default function Register() {
     }
   };
 
-  if(confirmation) return <main className="auth-page"><section className="auth-card"><Logo/><h1>E-Mail bestätigen</h1><p>Wir haben dir einen Bestätigungslink gesendet. Öffne den Link, um deine E-Mail-Adresse zu bestätigen. Du kannst dein Testkonto bereits öffnen.</p><Button href="/dashboard">Testkonto öffnen</Button></section></main>;
+  if(confirmation) return <main className="auth-page"><section className="auth-card">
+    <Logo/>
+    <h1>E-Mail bestätigen</h1>
+    <p>Wir haben dir einen Bestätigungslink gesendet. Dein {plan.name}-Testkonto läuft {domainConfig.trialDays} Tage und kann bereits geöffnet werden.</p>
+    <Button href={subscriptionHref}>Testkonto öffnen</Button>
+  </section></main>;
 
   return <main className="auth-page">
     <section className="auth-card">
-      <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/">Abbrechen</Link></div>
+      <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/preise">Abbrechen</Link></div>
       <h1>Konto erstellen</h1>
-      <p>Nur das Nötigste. Weitere Angaben kannst du später ergänzen.</p>
+      <p>{plan.name} · {domainConfig.trialDays} Tage kostenlos · {billingCycle==="yearly"?"jährliche":"monatliche"} Abrechnung nach Aktivierung.</p>
       <form onSubmit={submit}>
         <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
         <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
