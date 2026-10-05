@@ -223,6 +223,36 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Verify PostgreSQL recovery readiness before migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVER="binso-platform-db"
+          RG="$(az resource list --name "$SERVER" --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[0].resourceGroup" -o tsv)"
+          if [ -z "$RG" ]; then
+            echo "::error::Production PostgreSQL Flexible Server was not found."
+            exit 1
+          fi
+          STATE="$(az postgres flexible-server show -g "$RG" -n "$SERVER" --query "state" -o tsv)"
+          RETENTION="$(az postgres flexible-server show -g "$RG" -n "$SERVER" --query "backup.backupRetentionDays" -o tsv)"
+          if [ "$STATE" != "Ready" ]; then
+            echo "::error::Production PostgreSQL is not Ready."
+            exit 1
+          fi
+          if [ -z "$RETENTION" ] || [ "$RETENTION" -lt 7 ]; then
+            echo "::error::Production PostgreSQL backup retention must be at least 7 days before migration."
+            exit 1
+          fi
+          RECOVERY_MARKER="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          {
+            echo "### Production migration recovery marker"
+            echo "- Server: $SERVER"
+            echo "- Backup retention: $RETENTION days"
+            echo "- Pre-migration UTC marker: $RECOVERY_MARKER"
+            echo "- Deploy SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "PostgreSQL recovery readiness passed; pre-migration marker: $RECOVERY_MARKER"
+
       - name: Validate and migrate Azure PostgreSQL
         shell: bash
         env:
