@@ -1,0 +1,62 @@
+name: Production Monitoring Readiness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/production-monitoring-readiness.yml
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  monitoring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify production monitoring resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          RG="rg-binso-admin-prod"
+          APP="binso-admin-prod"
+
+          INSIGHTS_COUNT="$(az resource list -g "$RG" --resource-type Microsoft.Insights/components --query "length(@)" -o tsv)"
+          ACTION_GROUP_COUNT="$(az monitor action-group list -g "$RG" --query "length([?enabled==`true`])" -o tsv)"
+          METRIC_ALERT_COUNT="$(az monitor metrics alert list -g "$RG" --query "length([?enabled==`true`])" -o tsv)"
+          QUERY_ALERT_COUNT="$(az monitor scheduled-query list -g "$RG" --query "length([?enabled==`true`])" -o tsv 2>/dev/null || echo 0)"
+
+          echo "Application Insights resources: $INSIGHTS_COUNT"
+          echo "Enabled action groups: $ACTION_GROUP_COUNT"
+          echo "Enabled metric alerts: $METRIC_ALERT_COUNT"
+          echo "Enabled scheduled-query alerts: $QUERY_ALERT_COUNT"
+
+          if [ "$INSIGHTS_COUNT" -lt 1 ]; then
+            echo "::error::No Application Insights resource exists in the production resource group."
+            exit 1
+          fi
+          if [ "$ACTION_GROUP_COUNT" -lt 1 ]; then
+            echo "::error::No enabled Azure Monitor Action Group exists for production."
+            exit 1
+          fi
+          if [ $((METRIC_ALERT_COUNT + QUERY_ALERT_COUNT)) -lt 1 ]; then
+            echo "::error::No enabled production alert rule exists."
+            exit 1
+          fi
+
+          APP_ID="$(az webapp show -g "$RG" -n "$APP" --query id -o tsv)"
+          if [ -z "$APP_ID" ]; then
+            echo "::error::Production App Service was not found."
+            exit 1
+          fi
+
+          echo "Production monitoring resource gate passed."
