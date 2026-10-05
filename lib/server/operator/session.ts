@@ -4,6 +4,7 @@ import {cookies,headers} from "next/headers";
 import {query} from "@/lib/server/db";
 import {env} from "@/lib/server/env";
 import type {OperatorRole} from "@/lib/permissions";
+import {getEntraOperatorIdentity} from "@/lib/server/operator/entra";
 
 export type OperatorSession={sessionId:string;userId:string;email:string;name:string;role:OperatorRole};
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
@@ -27,5 +28,18 @@ export async function getOperatorSession():Promise<OperatorSession|null>{
  if(session)void query(`update platform_auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }
-export async function requireOperatorSession(){const session=await getOperatorSession();if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}return session}
+export async function requireOperatorSession(){
+ const session=await getOperatorSession();
+ if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
+ if(env.appMode==="production"){
+  const identity=await getEntraOperatorIdentity();
+  const expectedUserId=identity?`entra:${identity.tenantId}:${identity.objectId}`:"";
+  if(!identity||expectedUserId!==session.userId||identity.role!==session.role){
+   await destroyOperatorSession();
+   const {ApiError}=await import("@/lib/server/http");
+   throw new ApiError(401,"entra_reauthentication_required","Microsoft Entra Anmeldung oder Berechtigung ist nicht mehr gültig.");
+  }
+ }
+ return session;
+}
 export async function destroyOperatorSession(){const jar=await cookies();const token=jar.get(env.operatorSessionCookieName)?.value;if(token)await query("delete from platform_auth_sessions where token_hash=$1",[tokenHash(token)]);jar.delete(env.operatorSessionCookieName)}
