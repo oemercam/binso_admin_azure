@@ -176,7 +176,11 @@
   border-radius:var(--radius-md);
   background:var(--color-bg);
 }
-.searchbox input{height:auto;padding:0;border:0;box-shadow:none;background:transparent;font-size:13px}
+.searchbox>input,
+.searchbox>input:focus,
+html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;outline:0}
+.searchbox:focus-within{border-color:var(--color-fg);outline:2px solid var(--color-fg);outline-offset:2px}
+.searchbox>svg{flex:none}
 .searchbox.large{max-width:none}
 .chips,
 .tabs,
@@ -1245,3 +1249,12 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .payment-setup-notice p{font-size:12px;line-height:1.5}
 
 .demo-payment-label{padding:8px 16px;font-size:11px;font-weight:700;color:#000;background:#fff;border-bottom:1px solid #ddd}
+
+/* Form controls use their grid cell width and cannot push beyond page gutters. */
+.form-field{grid-template-columns:minmax(0,1fr)}
+.form-field>span{line-height:1.4;overflow-wrap:anywhere}
+.form-field>input,.form-field>select,.form-field>textarea{width:100%;min-width:0;max-width:100%}
+.detail-grid:has(>.surface:only-child){grid-template-columns:minmax(0,1fr)}
+.entity-hero>div{min-width:0}.entity-hero h2,.entity-hero p{overflow-wrap:anywhere}
+
+.customer-records-layout{width:100%;min-width:0}
