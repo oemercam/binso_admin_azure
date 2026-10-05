@@ -24,9 +24,24 @@ for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GR
 }
 
 const deployWorkflow=await fs.readFile('.github/workflows/deploy-azure.yml','utf8');
-assert.ok(deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must enforce retention cleanup');
+assert.ok(!deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must not couple destructive retention cleanup to application releases');
+assert.ok(deployWorkflow.includes('check-production-migration-safety.mjs'),'Production deploy must run the production migration safety gate');
+assert.ok(deployWorkflow.includes('cancel-in-progress: false'),'Production deploys must never be cancelled mid-flight by a newer commit');
+assert.ok(deployWorkflow.includes('Stale production deploy blocked'),'Production deploy must block stale main commits');
+assert.ok(deployWorkflow.includes('APP_ENCRYPTION_KEY is missing'),'Production deploy must fail closed when the encryption key is missing');
+assert.ok(!deployWorkflow.includes('Created stable APP_ENCRYPTION_KEY'),'Production deploy must never generate encryption keys automatically');
+assert.ok(!deployWorkflow.includes('check-persistence.mjs'),'Production deploy must not run mutation-heavy persistence tests against production');
+assert.ok(deployWorkflow.includes('actions/upload-artifact@v4'),'Production deploy must preserve an immutable build artifact');
+assert.ok(deployWorkflow.includes('backup retention must be at least 7 days'),'Production migration must verify backup retention before schema changes');
 assert.ok(deployWorkflow.includes('/api/health/ready'),'Production deploy must verify readiness health');
 await fs.access('.github/workflows/retention-maintenance.yml');
+const retentionWorkflow=await fs.readFile('.github/workflows/retention-maintenance.yml','utf8');
+assert.ok(!/\n\s*push:\s*\n/.test(retentionWorkflow),'Retention cleanup must not run automatically on normal code pushes');
+assert.ok(retentionWorkflow.includes('RUN_RETENTION'),'Manual retention cleanup must require an explicit confirmation');
+assert.ok(retentionWorkflow.includes('RETENTION_MAX_DELETE_ROWS'),'Retention cleanup must enforce a deletion safety cap');
+await fs.access('scripts/check-production-migration-safety.mjs');
+const resetScript=await fs.readFile('scripts/reset-db.mjs','utf8');
+assert.ok(resetScript.includes('the production PostgreSQL server can never be reset'),'Database reset script must refuse the production server unconditionally');
 await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');
 await fs.access('docs/production-rollback.md');
