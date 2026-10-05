@@ -78,7 +78,7 @@ export async function requireSession(options:{allowMfaEnrollment?:boolean}={}){
  const session=await getSession();
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
  const privileged=["owner","admin","finance"].includes(session.role);
- if(privileged&&!session.mfaEnabled&&!options.allowMfaEnrollment){
+ if(privileged&&!session.isDemo&&!session.mfaEnabled&&!options.allowMfaEnrollment){
    const {ApiError}=await import("@/lib/server/http");
    throw new ApiError(403,"mfa_enrollment_required","Für dieses Konto muss zuerst die Authenticator-App eingerichtet werden.");
  }
