@@ -5,6 +5,7 @@ Stand: 5. Oktober 2026
 ## Quelle der Wahrheit
 - [x] Zentrales Betriebsrunbook vorhanden: `docs/production-operations-runbook.md`
 - [x] Diese Checkliste ist die einzige Go-live-Statusliste; Detaildokumente beschreiben Verfahren, nicht konkurrierende Freigabestatus.
+- [x] Manuelle Go-live-Nachweise werden in `docs/production-evidence-log.md` oder einem gleichwertigen kontrollierten Betriebsnachweis dokumentiert.
 
 ## Release Gate
 - [ ] main Quality grün für den finalen Go-live-Commit
