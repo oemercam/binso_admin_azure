@@ -33,10 +33,10 @@ jobs:
           MAPPING_FILE="$(mktemp)"
           chmod 600 "$SETTINGS_FILE" "$MAPPING_FILE"
           trap 'rm -f "$SETTINGS_FILE" "$MAPPING_FILE"' EXIT
-          az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_')].{name:name,value:value}" -o json > "$SETTINGS_FILE"
+          az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_') || name == 'APP_URL'].{name:name,value:value}" -o json > "$SETTINGS_FILE"
           node scripts/stripe-price-migration.mjs "$SETTINGS_FILE" "$MAPPING_FILE"
           if node -e 'process.exit(Object.keys(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))).length?0:1)' "$MAPPING_FILE"; then
             az webapp config appsettings set -g rg-binso-admin-prod -n binso-admin-prod --settings "@$MAPPING_FILE" -o none
-            az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_')].{name:name,value:value}" -o json > "$SETTINGS_FILE"
+            az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod --query "[?starts_with(name, 'STRIPE_') || name == 'APP_URL'].{name:name,value:value}" -o json > "$SETTINGS_FILE"
           fi
           node scripts/stripe-configuration-audit.mjs "$SETTINGS_FILE"
