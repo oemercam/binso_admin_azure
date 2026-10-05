@@ -4,12 +4,12 @@ import {limitsConfig} from '@/config/limits';
 import {env} from '@/lib/server/env';
 import {ApiError} from '@/lib/server/http';
 import type {BillingCycle,PlanId} from '@/config/domain';
-export const stripeApiVersion='2026-09-30.endive';
+export const stripeApiVersion='2026-08-26.dahlia';
 export type StripeObject=Record<string,unknown>;
 export const objectValue=(value:unknown):StripeObject=>value&&typeof value==='object'&&!Array.isArray(value)?value as StripeObject:{};
 export const stripeId=(value:unknown):string=>typeof value==='string'?value:typeof objectValue(value).id==='string'?String(objectValue(value).id):'';
 export function stripeLiveMode(){return /^(sk|rk)_live_/.test(env.stripeSecretKey??'');}
-export function stripeConfigured(){return Boolean(env.stripeSecretKey&&env.stripeWebhookSecret);}
+export function stripeConfigured(){return Boolean(env.stripeSecretKey&&env.stripeWebhookSecret&&(env.appMode!=='production'||stripeLiveMode()));}
 function secret(){if(!env.stripeSecretKey)throw new ApiError(503,'billing_unavailable','Stripe ist noch nicht vollständig eingerichtet.');return env.stripeSecretKey;}
 async function stripeRequest<T>(path:string,body?:URLSearchParams,idempotencyKey?:string):Promise<T>{
  const headers:Record<string,string>={authorization:`Bearer ${secret()}`,'Stripe-Version':stripeApiVersion};
@@ -29,7 +29,7 @@ export function priceSelection(priceId:string):{plan:PlanId;billing:BillingCycle
 }
 export function validatePrice(price:StripeObject,billing:BillingCycle,requireActive=true){
  const recurring=objectValue(price.recurring),amount=Number(price.unit_amount);
- if((requireActive&&price.active!==true)||price.currency!=='chf'||recurring.interval!==(billing==='monthly'?'month':'year')||Number(recurring.interval_count)!==1||!Number.isSafeInteger(amount)||amount<=0)throw new ApiError(503,'stripe_price_invalid','Der Stripe-Preis ist nicht als gültiger CHF-Abopreis eingerichtet.');
+ if((requireActive&&price.active!==true)||price.livemode!==stripeLiveMode()||price.currency!=='chf'||recurring.interval!==(billing==='monthly'?'month':'year')||Number(recurring.interval_count)!==1||!Number.isSafeInteger(amount)||amount<=0)throw new ApiError(503,'stripe_price_invalid','Der Stripe-Preis ist nicht als gültiger CHF-Abopreis im konfigurierten Stripe-Modus eingerichtet.');
  return amount/100;
 }
 export async function createStripeCustomer(input:{email:string;organizationId:string;name:string}){
