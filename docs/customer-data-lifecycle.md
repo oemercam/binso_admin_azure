@@ -1,0 +1,68 @@
+# Binso One – Kundendaten-Export und endgültige Löschung
+
+Stand: 5. Oktober 2026
+
+## Grundsatz
+Kundendaten werden nicht über einen ungeschützten Self-Service-Endpunkt vollständig gelöscht. Export und endgültige Löschung sind kontrollierte Betreiberprozesse mit expliziten Freigaben.
+
+## Export
+Voraussetzungen:
+- direkter administrativer Zugriff auf die produktive PostgreSQL-Datenbank,
+- ein lokales, verschlüsseltes und nicht im Repository liegendes Zielverzeichnis,
+- die UUID der betroffenen Organisation.
+
+Beispiel:
+
+```bash
+export DATABASE_URL='...'
+export BINSO_ORGANIZATION_ID='<uuid>'
+export BINSO_EXPORT_DIR='/secure/binso-exports'
+pnpm data:export
+```
+
+Der Export:
+- ermittelt alle Tabellen mit `organization_id`,
+- exportiert die Datensätze mandantenbezogen,
+- ergänzt die zugehörigen `app_users`,
+- entfernt Authentifizierungsgeheimnisse, Passwort-Hashes, Tokens und Recovery-Material aus dem Export,
+- erzeugt ein Manifest mit Tabellen- und Datensatzanzahlen,
+- schreibt Dateien mit restriktiven Dateirechten.
+
+Der Export darf niemals in GitHub Actions Logs, normale Support-Tickets oder unverschlüsselte Cloud-Ordner kopiert werden.
+
+## Endgültige Löschung
+Vor der endgültigen Löschung müssen alle folgenden Bedingungen erfüllt sein:
+
+1. Export wurde erstellt, geprüft und sicher übergeben bzw. archiviert.
+2. Organisation ist in Binso One auf `archived` gesetzt.
+3. Es besteht kein aktives, laufendes oder im Trial befindliches Abonnement.
+4. Die Organisation-ID wurde nochmals unabhängig geprüft.
+5. Gesetzliche Aufbewahrungspflichten wurden beurteilt.
+
+Ausführung:
+
+```bash
+export DATABASE_URL='...'
+export BINSO_ORGANIZATION_ID='<uuid>'
+export BINSO_DELETE_CONFIRM='<dieselbe uuid>'
+export BINSO_DELETE_EXPORT_CONFIRMED='true'
+pnpm data:delete
+```
+
+Die Löschung läuft in einer Datenbanktransaktion. Wenn Fremdschlüssel oder verbleibende mandantenbezogene Zeilen eine vollständige Löschung verhindern, wird die Transaktion zurückgerollt. Damit entsteht kein teilweise gelöschter Mandant.
+
+## Dateien / Blob Storage
+Aktuell in PostgreSQL gespeicherte Datei-Inhalte werden durch die Tenant-Cascade mit entfernt. Falls ein Datensatz auf externen Azure Blob Storage verweist, müssen diese Blob-Objekte zusätzlich kontrolliert entfernt und im Löschprotokoll dokumentiert werden.
+
+## E2E-Abnahmetest vor Go-live
+Mit einer eigens dafür angelegten Testorganisation durchführen:
+
+1. Kunde, Mitarbeiter, Rechnung, Zahlung, Zeit, Spese, Supportfall und Datei anlegen.
+2. Export erstellen.
+3. Manifest und Stichproben aus allen Kategorien prüfen.
+4. Testorganisation archivieren und allfälliges Testabonnement beenden.
+5. Endgültige Löschung mit den beiden Bestätigungsvariablen ausführen.
+6. Datenbank prüfen: keine Zeile mit dieser `organization_id` darf mehr vorhanden sein.
+7. Prüfen, dass andere Testorganisationen vollständig unverändert geblieben sind.
+8. Allfällige externe Blob-Objekte kontrollieren.
+9. Ergebnis mit Datum, ausführender Person und Testorganisation dokumentieren.
