@@ -37,3 +37,12 @@ const envExample=await fs.readFile('.env.example','utf8');
 for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GRAPH_SENDER_USER_ID']){
   assert.ok(envExample.includes(name+'='),'.env.example must document '+name);
 }
+
+const deployWorkflow=await fs.readFile('.github/workflows/deploy-azure.yml','utf8');
+assert.ok(deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must enforce retention cleanup');
+assert.ok(deployWorkflow.includes('/api/health/ready'),'Production deploy must verify readiness health');
+await fs.access('.github/workflows/retention-maintenance.yml');
+await fs.access('.github/workflows/graph-mail-readiness.yml');
+await fs.access('app/api/health/ready/route.ts');
+await fs.access('docs/production-rollback.md');
+await fs.access('docs/azure-postgresql-backup-restore.md');
