@@ -99,10 +99,10 @@ try{
  globalThis.__customerPersistenceTest=async(org,user,fn)=>{await db.query("select set_config('app.organization_id',$1,false)",[org]);return fn(client)};
  const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http));
  const customerRepository=await import(dataModule(customerSource));
- const input={name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5};
+ const input={name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
  const created=await customerRepository.createCustomer(sandbox,'sandbox-user',input);
  const updated=await customerRepository.updateCustomer(sandbox,'sandbox-user',created.id,{city:'Bern',sector:'Handel'});
- assert.equal(updated.city,'Bern');assert.equal(updated.sector,'Handel');assert.equal(updated.email,input.email);assert.equal(Number(updated.paymentDays),45);
+ assert.equal(updated.notes,input.notes);assert.equal(updated.uid,input.uid);assert.equal(updated.address,input.address);assert.equal(updated.city,'Bern');assert.equal(updated.sector,'Handel');assert.equal(updated.email,input.email);assert.equal(Number(updated.paymentDays),45);
  assert.equal((await customerRepository.listCustomers(sandbox,'sandbox-user')).find(row=>row.id===created.id).postal_code,'8000');
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await listApiBusiness(client,session,'customers','id=eq.'+created.id)).length,0);

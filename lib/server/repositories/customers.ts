@@ -4,11 +4,11 @@ import {withTenant} from "@/lib/server/db";
 import {audit} from "@/lib/server/audit";
 import {ApiError} from "@/lib/server/http";
 
-export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string};
-const columns=`id,name,contact_name as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,created_at as "createdAt",updated_at as "updatedAt"`;
+export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string};
+const columns=`id,name,contact_name as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
 export function customerInput(body:Record<string,unknown>,partial=false):Partial<CustomerInput>{
  const out:Partial<CustomerInput>={};
- for(const key of ['name','contact','email','phone','address','zipCity','postalCode','city','sector','uid','language','status'] as const){
+ for(const key of ['name','contact','email','phone','address','zipCity','postalCode','city','sector','uid','language','status','notes'] as const){
   if(body[key]===undefined)continue;
   if(typeof body[key]!=="string"||body[key].length>320)throw new ApiError(400,'invalid_field','Ungültiges Kundenfeld: '+key);
   out[key]=body[key].trim();
@@ -34,13 +34,13 @@ export async function createCustomer(organizationId:string,userId:string,input:C
  const id=randomUUID(),{zip,city}=addressParts(input);
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);
  const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');
- const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId]);
+ const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return result.rows[0];
 })}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;
  const {zip,city}=addressParts(input,current);
- const result=await client.query(`update customers set name=$1,legal_name=$1,contact_name=$2,email=$3,phone=$4,address=$5,zip=$6,city=$7,sector=$8,uid=$9,language=$10,payment_days=$11,discount=$12,status=$13,updated_at=now() where id=$14 and organization_id=$15 returning ${columns}`,[input.name??current.name,input.contact??current.contact_name,input.email??current.email,input.phone??current.phone,input.address??current.address,zip,city,input.sector??current.sector,input.uid??current.uid,input.language??current.language,input.paymentDays??current.payment_days,input.discount??current.discount,input.status?statusToDb(input.status):current.status,id,organizationId]);
+ const result=await client.query(`update customers set name=$1,legal_name=$1,contact_name=$2,email=$3,phone=$4,address=$5,zip=$6,city=$7,sector=$8,uid=$9,language=$10,payment_days=$11,discount=$12,status=$13,notes=$16,updated_at=now() where id=$14 and organization_id=$15 returning ${columns}`,[input.name??current.name,input.contact??current.contact_name,input.email??current.email,input.phone??current.phone,input.address??current.address,zip,city,input.sector??current.sector,input.uid??current.uid,input.language??current.language,input.paymentDays??current.payment_days,input.discount??current.discount,input.status?statusToDb(input.status):current.status,id,organizationId,input.notes??current.notes]);
  await audit(client,{organizationId,userId,action:'customer.updated',entityType:'customer',entityId:id});return result.rows[0];
 })}
 export async function deleteCustomer(organizationId:string,userId:string,id:string){return withTenant(organizationId,userId,async client=>{const result=await client.query('update customers set archived_at=now(),updated_at=now() where id=$1 and organization_id=$2 and archived_at is null returning id',[id,organizationId]);if(result.rowCount)await audit(client,{organizationId,userId,action:'customer.archived',entityType:'customer',entityId:id});return Boolean(result.rowCount)})}

@@ -14,11 +14,11 @@ function sessionClient(){
 const a=sessionClient(),b=sessionClient(),suffix=randomUUID().slice(0,8),today=new Date().toISOString().slice(0,10);
 try{
  for(const client of [a,b]){const demo=await client('/api/demo/session','POST',{});assert.equal(demo.databaseBacked,true,'Database-backed sandbox is required');const auth=await client('/api/auth/session');assert.equal(auth.demo,true);assert.equal(auth.configured,true);}
- const customerInput={name:'Persistence '+suffix,email:'customer-'+suffix+'@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST-'+suffix,language:'de',paymentDays:45,discount:5};
+ const customerInput={name:'Persistence '+suffix,email:'customer-'+suffix+'@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST-'+suffix,language:'de',paymentDays:45,discount:5,notes:'Interne Testnotiz '+suffix};
  const customer=(await a('/api/customers','POST',customerInput,201)).item;
  await a('/api/customers/'+customer.id,'PATCH',{city:'Bern',sector:'Handel'});
  const loaded=(await a('/api/customers/'+customer.id)).item;
- assert.equal(loaded.city,'Bern');assert.equal(loaded.sector,'Handel');assert.equal(loaded.email,customerInput.email);assert.equal(loaded.postal_code,'8000');
+ assert.equal(loaded.notes,customerInput.notes);assert.equal(loaded.uid,customerInput.uid);assert.equal(loaded.street,customerInput.address);assert.equal(loaded.city,'Bern');assert.equal(loaded.sector,'Handel');assert.equal(loaded.email,customerInput.email);assert.equal(loaded.postal_code,'8000');
  await b('/api/customers/'+customer.id,'GET',undefined,404);
  const product=(await a('/api/products','POST',{name:'Test '+suffix,kind:'service',sku:suffix,unit:'hour',unitPrice:123.45,vatRate:8.1,description:'Persisted service',status:'inactive'},201)).item;
  assert.equal((await a('/api/products/'+product.id)).item.status,'inactive');
