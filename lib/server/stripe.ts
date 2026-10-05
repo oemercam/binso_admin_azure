@@ -4,7 +4,7 @@ import {limitsConfig} from '@/config/limits';
 import {env} from '@/lib/server/env';
 import {ApiError} from '@/lib/server/http';
 import type {BillingCycle,PlanId} from '@/config/domain';
-export const stripeApiVersion='2026-09-30.endive';
+export const stripeApiVersion='2026-08-26.dahlia';
 export type StripeObject=Record<string,unknown>;
 export const objectValue=(value:unknown):StripeObject=>value&&typeof value==='object'&&!Array.isArray(value)?value as StripeObject:{};
 export const stripeId=(value:unknown):string=>typeof value==='string'?value:typeof objectValue(value).id==='string'?String(objectValue(value).id):'';
