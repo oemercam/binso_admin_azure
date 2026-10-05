@@ -21,8 +21,9 @@ export default function manifest(): MetadataRoute.Manifest {
       { name: "Zeiterfassung", short_name: "Zeit", url: "/zeit" },
     ],
     icons: [
-      { src: "/brand/icon-black.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
-      { src: "/brand/icon-maskable.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" },
+      { src: "/brand/pwa-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/brand/pwa-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/brand/pwa-icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }
