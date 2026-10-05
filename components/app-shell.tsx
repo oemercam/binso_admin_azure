@@ -6,7 +6,7 @@ import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
 import { useDialogFocus } from "./use-dialog-focus";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
 import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import type { SearchItem } from "@/lib/search";
@@ -81,6 +81,9 @@ export function AppShell({
   const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
   const production=useBackendMode();
   const [query, setQuery] = useState("");
+  const [desktopSearchOpen,setDesktopSearchOpen]=useState(false);
+  const desktopSearchRef=useRef<HTMLDivElement|null>(null);
+  const desktopSearchInputRef=useRef<HTMLInputElement|null>(null);
   const [remoteSearch,setRemoteSearch]=useState<{query:string;items:SearchItem[];loading:boolean;error:string|null}>({query:"",items:[],loading:false,error:null});
   const [timerRunning, setTimerRunning] = useState(false);
   const [dark, setDark] = useState(false);
@@ -177,13 +180,31 @@ export function AppShell({
     const onKeyDown=(event:KeyboardEvent)=>{
       if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k"){
         event.preventDefault();
-        setSheet("search");
+        if(window.innerWidth>=761){
+          setSheet(null);
+          setDesktopSearchOpen(true);
+          window.setTimeout(()=>desktopSearchInputRef.current?.focus(),0);
+        }else{
+          setSheet("search");
+        }
       }
-      if(event.key==="Escape") setSheet(null);
+      if(event.key==="Escape"){
+        setDesktopSearchOpen(false);
+        setSheet(null);
+      }
     };
     window.addEventListener("keydown",onKeyDown);
     return()=>window.removeEventListener("keydown",onKeyDown);
   }, []);
+
+  useEffect(()=>{
+    if(!desktopSearchOpen)return;
+    const onPointerDown=(event:PointerEvent)=>{
+      if(desktopSearchRef.current&&!desktopSearchRef.current.contains(event.target as Node))setDesktopSearchOpen(false);
+    };
+    document.addEventListener("pointerdown",onPointerDown);
+    return()=>document.removeEventListener("pointerdown",onPointerDown);
+  },[desktopSearchOpen]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -296,7 +317,25 @@ export function AppShell({
 
     <div className="app-main">
       <div className="desktop-appbar">
-        <button className="desktop-search-trigger" type="button" onClick={() => setSheet("search")}><Icon name="search" size={17}/><span>Suchen</span><kbd>⌘ K</kbd></button>
+        <div ref={desktopSearchRef} className={"desktop-search "+(desktopSearchOpen?"is-open":"")}>
+          <div className="desktop-search-field" role="search">
+            <Icon name="search" size={18}/>
+            <input ref={desktopSearchInputRef} aria-label="Globale Suche" value={query} onFocus={()=>setDesktopSearchOpen(true)} onChange={(e)=>{setQuery(e.target.value);setDesktopSearchOpen(true)}} placeholder="Suchen…"/>
+            {query?<button className="desktop-search-clear" type="button" aria-label="Suche löschen" onClick={()=>{setQuery("");desktopSearchInputRef.current?.focus()}}><Icon name="close" size={15}/></button>:<kbd>⌘ K</kbd>}
+          </div>
+          {desktopSearchOpen&&<div className="desktop-search-results" role="region" aria-label="Suchergebnisse">
+            {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
+            {searchLoading&&<p className="technical-hint" role="status">Suche läuft …</p>}
+            {production&&query.trim().length>=2&&!searchLoading&&searchError&&<p className="technical-hint" role="alert">{searchError}</p>}
+            {production&&query.trim().length>=2&&!searchLoading&&!searchError&&filtered.length===0&&<p className="technical-hint" role="status">Keine Treffer gefunden.</p>}
+            {!production&&!query.trim()&&<p className="desktop-search-hint">Kunden, Rechnungen, Angebote und Tickets durchsuchen.</p>}
+            {filtered.map(item=><Link key={item.href} href={item.href} onClick={()=>setDesktopSearchOpen(false)}>
+              <span className="activity-icon"><Icon name={item.icon}/></span>
+              <div><small>{item.type}</small><b>{item.title}</b><span>{item.meta}</span></div>
+              <Icon name="arrow" size={16}/>
+            </Link>)}
+          </div>}
+        </div>
         <div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}{demoSession&&<span className="app-demo-badge">Demo</span>}
           <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
