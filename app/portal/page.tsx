@@ -1,2 +1,2 @@
-import { PortalHome } from "@/components/portal";
-export default function Page(){return <PortalHome/>}
+import {redirect} from "next/navigation";
+export default function Page(){redirect("/login");}
