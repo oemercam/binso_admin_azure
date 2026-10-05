@@ -103,7 +103,7 @@ export default function Home() {
           </div>
           <Link className="marketing-text-link" href="/produkt">Alle Funktionen ansehen <Icon name="arrow" size={15}/></Link>
         </div>
-        <ProductScreen route="/preview/rechnungen" title="Binso One Rechnungen" variant="desktop"/>
+        <ProductScreen route="/preview/dashboard" title="Aktuelle Binso One Produktoberfläche" variant="desktop"/>
       </section>
 
       <section className="workflow-section">
@@ -120,7 +120,7 @@ export default function Home() {
             </article>)}
           </div>
         </div>
-        <ProductScreen route="/preview/zeit" title="Binso One Zeiterfassung" variant="mobile"/>
+        <ProductScreen route="/preview/dashboard" title="Aktuelle mobile Binso One Oberfläche" variant="mobile"/>
       </section>
 
       <section className="product-callout">
