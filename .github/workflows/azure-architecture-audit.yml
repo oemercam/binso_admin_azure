@@ -40,7 +40,56 @@ jobs:
           echo "=== App Service identity ==="
           az webapp identity show -g "$APP_RG" -n "$APP_NAME" --query "{type:type,principalId:principalId,tenantId:tenantId}" -o json
           echo "=== App setting names only ==="
-          az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
+          APP_SETTING_NAMES="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort)"
+          printf '%s\n' "$APP_SETTING_NAMES"
+          if printf '%s\n' "$APP_SETTING_NAMES" | grep -Eq '^(RESEND_API_KEY|EMAIL_DELIVERY_MODE|EMAIL_FROM)
+          echo "=== App Service Authentication / Microsoft Entra ==="
+          az webapp auth show -g "$APP_RG" -n "$APP_NAME" --query "{enabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,defaultProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,issuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: App Service Authentication configuration unavailable."
+
+          echo "=== App Service Authentication v2 via ARM ==="
+          SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+          AUTH_V2_URL="https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$APP_RG/providers/Microsoft.Web/sites/$APP_NAME/config/authsettingsV2/list?api-version=2023-12-01"
+          az rest --method post --url "$AUTH_V2_URL" --query "properties.{platformEnabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,redirectToProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,openIdIssuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: authsettingsV2 ARM read unavailable."
+
+          echo "=== PostgreSQL connection from configured App Service setting ==="
+          DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          if [ -n "$DATABASE_URL" ]; then
+            echo "::add-mask::$DATABASE_URL"
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+            echo "=== Runtime database privileges (no credentials) ==="
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select rolname,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole from pg_roles where rolname=current_user;"
+            echo "=== Tenant table RLS inventory ==="
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select c.relname,c.relrowsecurity,c.relforcerowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r' and exists(select 1 from pg_attribute a where a.attrelid=c.oid and a.attname='organization_id' and not a.attisdropped) order by c.relname;"
+          else
+            echo "DATABASE_URL is not configured."
+          fi
+
+          echo "=== PostgreSQL Flexible Servers visible to deployment identity ==="
+          az resource list --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[].{name:name,resourceGroup:resourceGroup,location:location}" -o json
+          if [ -n "$PG_RG" ]; then
+            echo "=== PostgreSQL Flexible Server ==="
+            az postgres flexible-server show -g "$PG_RG" -n "$PG_NAME" --query "{name:name,state:state,version:version,location:location,publicNetworkAccess:network.publicNetworkAccess,delegatedSubnetResourceId:network.delegatedSubnetResourceId,privateDnsZoneArmResourceId:network.privateDnsZoneArmResourceId,authConfig:authConfig,backup:backup,highAvailability:highAvailability,storage:storage}" -o json
+            echo "=== PostgreSQL databases ==="
+            az postgres flexible-server db list -g "$PG_RG" -s "$PG_NAME" --query "[].name" -o tsv | sort
+          fi
+
+          echo "=== Storage accounts in App resource group ==="
+          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json || echo "Deployment identity cannot read Storage resources."
+
+          echo "=== Application Insights in App resource group ==="
+          az monitor app-insights component show --app "$APP_NAME" -g "$APP_RG" --query "{name:name,provisioningState:provisioningState,location:location}" -o json 2>/dev/null || echo "No App Insights component named $APP_NAME"
+          echo "=== Application Insights resources (any name) ==="
+          az resource list -g "$APP_RG" --resource-type Microsoft.Insights/components --query "[].{name:name,location:location}" -o json || echo "UNVERIFIED: Insights resource inventory unavailable."
+          echo "=== Metric alerts ==="
+          az monitor metrics alert list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity,scopes:scopes}" -o json || echo "UNVERIFIED: metric alerts unavailable."
+          echo "=== Scheduled query alerts ==="
+          az monitor scheduled-query list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity}" -o json || echo "UNVERIFIED: query alerts unavailable."
+          echo "=== Alert action groups ==="
+          az monitor action-group list -g "$APP_RG" --query "[].{name:name,enabled:enabled}" -o json || echo "UNVERIFIED: action groups unavailable."
+; then
+            echo "::error::Retired mail-provider settings are still present in production."
+            exit 1
+          fi
 
           echo "=== Production auth/mail readiness (no secret values) ==="
           APP_SETTINGS_JSON="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" -o json)"
@@ -48,16 +97,27 @@ jobs:
           const settings=JSON.parse(process.argv[2]);
           const map=Object.fromEntries(settings.map(x=>[x.name,x.value]));
           const present=name=>Boolean(String(map[name]??"").trim());
-          console.log(JSON.stringify({
+          const readiness={
             appEncryptionKeyConfigured:present("APP_ENCRYPTION_KEY"),
-            emailDeliveryMode:map.EMAIL_DELIVERY_MODE??null,
             graphTenantConfigured:present("GRAPH_TENANT_ID"),
             graphClientConfigured:present("GRAPH_CLIENT_ID"),
             graphSecretConfigured:present("GRAPH_CLIENT_SECRET"),
             graphSenderConfigured:present("GRAPH_SENDER_USER_ID"),
             operatorEntraTenantPinned:present("OPERATOR_ENTRA_TENANT_ID"),
-            operatorAllowedDomain:map.OPERATOR_ALLOWED_DOMAIN??null
-          },null,2));
+            operatorAllowedDomain:map.OPERATOR_ALLOWED_DOMAIN??null,
+            graphSender:map.GRAPH_SENDER_USER_ID??null
+          };
+          console.log(JSON.stringify(readiness,null,2));
+          if(!readiness.appEncryptionKeyConfigured||
+             !readiness.graphTenantConfigured||
+             !readiness.graphClientConfigured||
+             !readiness.graphSecretConfigured||
+             !readiness.graphSenderConfigured||
+             !readiness.operatorEntraTenantPinned||
+             readiness.operatorAllowedDomain!=="binso.ch"||
+             readiness.graphSender!=="one@binso.ch"){
+            process.exit(1);
+          }
           NODE
 
           echo "=== App Service Authentication / Microsoft Entra ==="
