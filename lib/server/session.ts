@@ -44,6 +44,7 @@ export async function destroySession(cookieName=env.sessionCookieName){
 }
 
 export async function getSession():Promise<SessionUser|null>{
+ await expireUnpaidTrials();
  const jar=await cookies();
  const demo=jar.get('binso_demo')?.value==='1';
  const token=jar.get(demo?'binso_demo_write':env.sessionCookieName)?.value;
