@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {resolveStripePriceMappings} from './lib/stripe-price-configuration.mjs';
+const monthly={id:'price_month',product:'prod_start',active:true,livemode:false,currency:'chf',unit_amount:2900,recurring:{interval:'month',interval_count:1}};
+const yearly={...monthly,id:'price_year',unit_amount:29000,recurring:{interval:'year',interval_count:1}};
+const values={STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_PRICE_STARTER:'price_month'};
+const get=async path=>path.startsWith('/prices?')?{has_more:false,data:[monthly,yearly]}:monthly;
+assert.deepEqual(await resolveStripePriceMappings(values,get),{STRIPE_PRICE_START_MONTHLY:'price_month',STRIPE_PRICE_START_YEARLY:'price_year'});
+assert.deepEqual(await resolveStripePriceMappings({...values,STRIPE_PRICE_START_MONTHLY:'price_keep'},get),{STRIPE_PRICE_START_YEARLY:'price_year'});
+assert.deepEqual(await resolveStripePriceMappings({...values,STRIPE_SECRET_KEY:'sk_live_fixture'},get),{});
+assert.deepEqual(await resolveStripePriceMappings(values,async path=>path.startsWith('/prices?')?{has_more:false,data:[monthly,yearly,{...yearly,id:'price_ambiguous'}]}:monthly),{STRIPE_PRICE_START_MONTHLY:'price_month'});
+assert.deepEqual(await resolveStripePriceMappings(values,async()=>({...monthly,currency:'eur'})),{});
+assert.deepEqual(await resolveStripePriceMappings(values,async path=>path.startsWith('/prices?')?{has_more:true,data:[yearly]}:monthly),{STRIPE_PRICE_START_MONTHLY:'price_month'});
+console.log('Stripe legacy price migration: existing settings, mode, currency, product and ambiguous/paginated catalogs passed.');

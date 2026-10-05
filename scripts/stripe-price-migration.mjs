@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+import {resolveStripePriceMappings} from './lib/stripe-price-configuration.mjs';
+const settings=JSON.parse(await fs.readFile(process.argv[2],'utf8'));
+const values=Object.fromEntries(settings.map(x=>[x.name,x.value]));
+for(const [name,value] of Object.entries(values))if(value&&/KEY|SECRET/.test(name))console.log(`::add-mask::${value}`);
+const version=(await fs.readFile('lib/server/stripe.ts','utf8')).match(/stripeApiVersion='([^']+)'/)[1];
+const get=async path=>{try{const r=await fetch('https://api.stripe.com/v1'+path,{headers:{authorization:`Bearer ${values.STRIPE_SECRET_KEY}`,'Stripe-Version':version},signal:AbortSignal.timeout(10000)});return r.ok?await r.json():null;}catch{return null;}};
+const mappings=await resolveStripePriceMappings(values,get);
+await fs.writeFile(process.argv[3],JSON.stringify(mappings),{mode:0o600});
+console.log(JSON.stringify({verifiedLegacyPriceMappings:Object.keys(mappings),note:'Only existing active CHF prices in the configured mode and product are mapped; existing settings remain unchanged. No products, prices or payments created.'}));
