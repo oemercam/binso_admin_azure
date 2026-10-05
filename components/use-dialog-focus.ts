@@ -6,11 +6,23 @@ import { useEffect, useRef } from "react";
 export function useDialogFocus(open: boolean, onClose: () => void) {
   const dialogRef = useRef<HTMLElement>(null);
   const closeRef = useRef(onClose);
+  const triggerRef = useRef<HTMLElement|null>(null);
   useEffect(() => { closeRef.current = onClose; }, [onClose]);
+  useEffect(() => {
+    if(open)return;
+    const rememberTrigger = () => {
+      const active = document.activeElement;
+      if(active instanceof HTMLElement && !dialogRef.current?.contains(active)) triggerRef.current = active;
+    };
+    rememberTrigger();
+    document.addEventListener("focusin", rememberTrigger);
+    return () => document.removeEventListener("focusin", rememberTrigger);
+  }, [open]);
   useEffect(() => {
     if (!open || !dialogRef.current) return;
     const dialog = dialogRef.current;
-    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const active = document.activeElement;
+    const trigger = active instanceof HTMLElement && !dialog.contains(active) ? active : triggerRef.current;
     const previousOverflow = document.body.style.overflow;
     const previousRootOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
@@ -18,7 +30,7 @@ export function useDialogFocus(open: boolean, onClose: () => void) {
     const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(
       'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
     )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert]'));
-    (controls()[0] ?? dialog).focus();
+    if(!dialog.contains(document.activeElement)) (controls()[0] ?? dialog).focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); closeRef.current(); return; }
       if (event.key !== "Tab") return;
