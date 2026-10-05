@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MarketingFooter, MarketingHeader, ProductPreview } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
+import {domainConfig} from "@/config/domain";
 
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export default function Product(){
         <span className="eyebrow">PRODUKT</span>
         <h1>Eine Plattform. Klare Prozesse.</h1>
         <p>Binso One verbindet die wichtigsten Abläufe deines Unternehmens – vom ersten Kundenkontakt bis zur Zahlung.</p>
-        <div className="hero-actions"><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
+        <div className="hero-actions"><Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
       </div>
       <ProductPreview/>
     </section>
@@ -60,7 +61,7 @@ export default function Product(){
 
     <section className="marketing-cta product-page-cta">
       <div><span className="eyebrow">BINSO ONE</span><h2>Selbst ausprobieren.</h2><p>Starte direkt mit der Demo oder richte dein eigenes Konto ein.</p></div>
-      <div><Button href="/registrieren">30 Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
+      <div><Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
     </section>
   </main><MarketingFooter/></>
 }
