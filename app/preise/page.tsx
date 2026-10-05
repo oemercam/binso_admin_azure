@@ -40,6 +40,6 @@ export default function Prices(){
         <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={15}/>{feature}</li>)}</ul>
       </article>)}
     </div>
-    <section className="pricing-foot"><div><h2>Alle Pläne starten mit 14 Tagen Testphase.</h2><p>Keine Kreditkarte nötig. Ohne aktiviertes Abo wechselt das Konto nach der Testphase in den Nur-Lesen-Modus; deine Daten bleiben erhalten.</p><small>Alle Preise in CHF. Allfällige Steuern werden im Stripe Checkout transparent ausgewiesen.</small></div><Button href="/demo" variant="secondary">Demo ohne Registrierung</Button></section>
+    <section className="pricing-foot"><div><h2>Alle Pläne starten mit 14 Tagen Testphase.</h2><p>Keine Kreditkarte nötig. Ohne aktiviertes Abo wechselt das Konto nach der Testphase in den Nur-Lesen-Modus; deine Daten bleiben erhalten.</p><small>Alle Preise in CHF. Steuerdetails werden im Stripe Checkout ausgewiesen, soweit sie für dein Konto konfiguriert sind.</small></div><Button href="/demo" variant="secondary">Demo ohne Registrierung</Button></section>
   </main><MarketingFooter/></>;
 }
