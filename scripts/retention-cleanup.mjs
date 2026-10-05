@@ -34,11 +34,6 @@ const pool=new Pool({
   connectionTimeoutMillis:8000
 });
 
-async function count(text,params=[]){
-  const result=await pool.query(text,params);
-  return result.rowCount??0;
-}
-
 try{
   const identity=await pool.query("select current_database() as database");
   if(identity.rows[0]?.database!==expectedDatabase)throw new Error("Connected database does not match EXPECTED_DATABASE_NAME.");
