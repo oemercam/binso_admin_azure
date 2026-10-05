@@ -56,3 +56,28 @@ await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');
 await fs.access('docs/production-rollback.md');
 await fs.access('docs/azure-postgresql-backup-restore.md');
+
+await fs.access('scripts/organization-data-lifecycle.mjs');
+await fs.access('scripts/data-lifecycle-schema-test.mjs');
+await fs.access('docs/customer-data-lifecycle.md');
+await fs.access('.github/workflows/production-monitoring-readiness.yml');
+await fs.access('.github/workflows/postgresql-backup-readiness.yml');
+const lifecycle=await fs.readFile('scripts/organization-data-lifecycle.mjs','utf8');
+for(const guard of ['BINSO_DELETE_CONFIRM','BINSO_DELETE_EXPORT_CONFIRMED','Organization must be archived before final deletion','Active/trial billing state blocks final deletion']){
+  assert.ok(lifecycle.includes(guard),'Customer deletion safeguard missing: '+guard);
+}
+
+await fs.access('docs/graph-mail-least-privilege.md');
+
+await fs.access('app/api/auth/sessions/route.ts');
+await fs.access('app/api/auth/sessions/[id]/route.ts');
+const sessionSecurityUi=await fs.readFile('components/security-settings-page.tsx','utf8');
+assert.ok(sessionSecurityUi.includes('/api/auth/sessions')&&sessionSecurityUi.includes('Alle anderen abmelden'),'Security settings must expose real session management');
+
+const packageJson=JSON.parse(await fs.readFile('package.json','utf8'));
+assert.ok(packageJson.scripts?.['security:scan']?.includes('audit --prod --audit-level high'),'Quality security gate must block high production dependency advisories');
+await fs.access('docs/dependency-security-review.md');
+
+await fs.access('docs/dependency-security-audit.md');
+assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-level high','Blocking security audit must cover production dependencies at high severity');
+assert.ok(packageJson.scripts['security:scan:all'],'A full dependency audit command must remain available');

@@ -96,6 +96,10 @@ export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
   return parseResponse<T>(response,"Änderung konnte nicht gespeichert werden.");
 }
 
+export async function apiDelete<T>(path:string):Promise<T>{
+  const response=await fetch(path,{method:"DELETE"});
+  return parseResponse<T>(response,"Löschen konnte nicht ausgeführt werden.");
+}
 
 export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
   const response=await fetch(path,{method:"POST",body:form});

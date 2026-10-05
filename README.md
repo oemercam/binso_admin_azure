@@ -1,177 +1,249 @@
 # Binso One
 
-Binso One is the app-first business platform by Binso GmbH for Swiss SMEs.
+Binso One ist die app-first Business-Plattform der Binso GmbH für Schweizer KMU.
 
-## Current release: v0.10 security hardening
-
-The standalone demo still works without external services. With Supabase configured, the customer and Operator areas use tenant-isolated production persistence. Stripe is a production integration. Transactional email is handled exclusively through Microsoft Graph / Microsoft 365 and requires complete Graph configuration in production. No fallback email provider is configured.
-
-### Production foundations
-
-- Supabase email/password authentication through server API routes
-- HttpOnly SameSite sessions with refresh-token handling
-- password recovery and password reset
-- protected customer and Operator routes
-- tenant memberships and PostgreSQL Row Level Security
-- account restrictions enforced at the database boundary
-- private tenant-aware file storage
-- customers and contacts
-- products and services
-- employees
-- expenses and private receipt uploads
-- customer-invoice payments
-- time entries
-- support tickets, replies, internal Operator notes and private attachments
-- company and personal profile settings
-- offers and invoices with atomic database create/update functions
-- dashboard aggregates and global tenant search
-- Operator dashboard, customers, tickets, account lifecycle, restrictions, announcements, monitoring and audit
-- Stripe Checkout, Billing Portal and signed/idempotent webhook foundation
-- Microsoft Graph / Microsoft 365 transactional-email integration and authorized Operator test email
-
-### v0.10 security hardening
-
-- composite tenant foreign keys prevent cross-tenant references even if another UUID is guessed
-- distributed PostgreSQL-backed auth rate limiting for login, registration and password recovery
-- rate-limit identifiers are stored only as SHA-256/HMAC fingerprints
-- rate-limit policy is allowlisted and fixed in PostgreSQL so callers cannot raise their own limits
-- standard `Retry-After` headers for throttled authentication requests
-- refresh-token-only sessions may pass the route guard so the server can refresh them
-- payment creation requires an idempotency key and PostgreSQL enforces one financial write per tenant/key
-- payment retry uses the same browser-generated idempotency key
-- Operator support replies/status changes have explicit RLS mutation policies
-- active account state cannot be restored while a live restriction still exists
-- restriction create/remove keeps account lifecycle state consistent
-- private upload mutations require same-origin requests
-- multipart uploads are rejected before parsing when the request is oversized
-- upload purpose must match a real entity in the same tenant
-- PNG, JPEG, WebP and PDF signatures are validated instead of trusting only MIME headers
-- user-supplied SVG uploads are not accepted
-- signup errors no longer expose provider-specific account-existence details
-- mutation-route audit confirms same-origin checks across customer and Operator API writes
-
-### Explicitly not marked complete
-
-The following still require real provider configuration or final domain implementation:
-
-- live Stripe account, products/prices, Portal settings and webhook secret
-- Microsoft Graph application permissions and production sender mailbox verified
-- final offer/invoice PDF generation and email attachment delivery
-- standards-compliant Swiss QR bill generation
-- bank synchronization
-- secure Operator impersonation/support access
-- verified cross-device session management and MFA enrollment
-- full production translations for DE / FR / IT / EN / TR
-
-Binso One does not invent payment cards, SaaS invoices, SLA values, device sessions or Operator identities when those data sources are not connected.
-
-## Stack
+## Produktionsarchitektur
 
 - Next.js 16 App Router
-- React 19
-- TypeScript
-- Supabase Auth
-- PostgreSQL / PostgREST
-- Supabase private Storage
-- PostgreSQL RLS for tenant isolation
-- Stripe Checkout / Billing Portal / signed webhook foundation
-- Microsoft Graph / Microsoft 365 transactional-email foundation
-- PWA manifest and conservative service-worker caching
-- Azure App Service deployment through GitHub Actions
+- React 19 / TypeScript
+- Azure App Service
+- Azure Database for PostgreSQL
+- serverseitige, datenbankgestützte Sessions
+- E-Mail + Passwort, E-Mail-Verifikation, Login-OTP und TOTP/Recovery Codes
+- Microsoft Entra ID für interne Binso-Operatoren
+- Microsoft Graph / Microsoft 365 als einziger produktiver E-Mail-Pfad
+- Stripe Checkout, Billing Portal und signierte/idempotente Webhooks
+- PostgreSQL Row Level Security und serverseitiger Tenant-Kontext
+- private Dateiablage in PostgreSQL; Azure Blob Storage kann serverseitig über Managed Identity oder SAS angebunden werden
+- PWA mit restriktivem Service-Worker-Caching
+- GitHub Actions mit Azure OIDC Deployment
 
-Customer-facing data requests use the authenticated user JWT and RLS. The Supabase service-role key is reserved for narrowly scoped trusted server operations such as verified Stripe webhooks and distributed public-auth rate limiting.
+Es gibt keinen Fallback auf einen zweiten E-Mail-Provider.
 
-## Backend setup
+## Sicherheitsmodell
 
-Apply all files in `supabase/migrations` in filename order.
+### Kunden
+- Registrierung mit E-Mail und Passwort
+- sechsstellige E-Mail-Verifikation vor produktivem Session-Zugriff
+- zusätzlicher Login-Faktor
+- TOTP mit einmaligen Recovery Codes
+- Owner, Admin und Finance müssen Authenticator MFA verwenden
+- HttpOnly/Secure/SameSite Session-Cookies
+- serverseitige Rollen- und Tenant-Prüfung
+- PostgreSQL-RLS und zusammengesetzte Tenant-Fremdschlüssel
+- Rate Limits für öffentliche Auth-Endpunkte
+- OTPs, Recovery Codes und Sessiontokens werden nur gehasht bzw. geschützt gespeichert
 
-Local `.env.local`:
+### Interne Binso-Administration
+- Microsoft Entra ID / Azure App Service Authentication
+- App-Rollen werden auf das interne Plattform-RBAC gemappt
+- lokale produktive Operator-Passwörter sind deaktiviert
+- Operator-Sessions werden gegen die aktuelle Entra-Identität und Rolle geprüft
+- Microsoft Authenticator / Conditional Access werden durch Entra gesteuert
 
-```env
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_MARKETING_URL=https://www.binso.ch
+### E-Mail
+Produktive Transaktionsmails laufen ausschliesslich über Microsoft Graph.
 
-# Generate a long random server-only value.
-RATE_LIMIT_SECRET=<random-secret>
+Erforderlich:
+- `GRAPH_TENANT_ID`
+- `GRAPH_CLIENT_ID`
+- `GRAPH_CLIENT_SECRET`
+- `GRAPH_SENDER_USER_ID`
 
-NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<server-only-service-role-key>
+Der aktuelle Produktionssender ist `one@binso.ch`.
 
-STRIPE_SECRET_KEY=<stripe-secret-key>
-STRIPE_WEBHOOK_SECRET=<stripe-webhook-secret>
-STRIPE_PRICE_START=<price-id>
-STRIPE_PRICE_BUSINESS=<price-id>
-STRIPE_PRICE_PRO=<price-id>
+Für den finalen Least-Privilege-Schritt siehe:
+`docs/graph-mail-least-privilege.md`
 
-GRAPH_TENANT_ID=<microsoft-entra-tenant-id>
-GRAPH_CLIENT_ID=<app-registration-client-id>
-GRAPH_CLIENT_SECRET=<app-registration-client-secret>
-GRAPH_SENDER_USER_ID=<sender-mailbox-user-id-or-address>
-```
+## Datenbank
 
-Do not expose `RATE_LIMIT_SECRET`, the Supabase service-role key, Stripe secrets or Microsoft Graph credentials through `NEXT_PUBLIC_*`.
-
-For Stripe, configure monthly recurring Prices for Start, Business and Pro, enable the Customer Portal, and register:
+Migrationen liegen unter:
 
 ```text
-https://<your-app-host>/api/billing/webhook
+database/migrations/
 ```
 
-Current billing webhook events:
+Sie werden im Azure-Deployment vor dem App-Deploy ausgeführt:
 
-- `checkout.session.completed`
-- `customer.subscription.updated`
-- `customer.subscription.deleted`
-- `invoice.paid`
-- `invoice.payment_failed`
+```bash
+pnpm db:migrate
+pnpm db:check
+```
 
-For Microsoft Graph, grant the application the required mail-sending permission, configure the sender mailbox, and use Operator → Monitoring to test the production sender path.
+Der Deploy bricht ab, wenn Migration oder Datenbankprüfung fehlschlagen.
 
-## Local QA
+## Stripe
+
+Produktive Abonnements verwenden ausschliesslich Stripe-Live-Konfiguration.
+
+Erforderlich:
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_START_MONTHLY`
+- `STRIPE_PRICE_START_YEARLY`
+- `STRIPE_PRICE_BUSINESS_MONTHLY`
+- `STRIPE_PRICE_BUSINESS_YEARLY`
+- `STRIPE_PRICE_PRO_MONTHLY`
+- `STRIPE_PRICE_PRO_YEARLY`
+
+Der Workflow **Stripe Billing Configuration** prüft unter anderem:
+- Live-Key
+- freigeschaltetes Konto
+- sechs aktive CHF-Recurring-Prices
+- produktiven Webhook
+- notwendige Webhook-Events
+- aktives Live-Customer-Portal
+
+Der Audit erzeugt keine Zahlung.
+
+Details:
+`docs/stripe-billing-setup.md`
+
+## Retention und Kundendaten-Lifecycle
+
+Automatische Bereinigung:
+- E-Mail-/Auth-Artefakte: standardmässig 7 Tage nach Verbrauch/Ablauf
+- abgelaufene Sessions: standardmässig 30 Tage
+- abgelaufene MFA-Enrollment-Secrets: werden bereinigt
+
+Die Bereinigung läuft täglich und zusätzlich beim produktiven Deployment.
+
+Kontrollierter Export und endgültige Löschung:
+
+```bash
+pnpm data:export
+pnpm data:delete
+```
+
+Die Löschung ist fail-closed und benötigt:
+- archivierte Organisation
+- bestätigten Export
+- exakte Organisations-ID als zweite Bestätigung
+- keinen aktiven/Trial-Billingstatus
+- bestätigte Bereinigung allfälliger externer Azure-Blobs
+
+Details:
+`docs/customer-data-lifecycle.md`
+
+## Health und Readiness
+
+Liveness:
+
+```text
+/api/health
+```
+
+Production Readiness:
+
+```text
+/api/health/ready
+```
+
+Der Readiness-Endpunkt prüft:
+- PostgreSQL
+- App-Verschlüsselung
+- Microsoft-Graph-Konfiguration
+- Stripe-Konfigurationsvollständigkeit
+
+In Produktion werden keine Secret-Details ausgegeben.
+
+## GitHub Actions
+
+Wichtige Workflows:
+
+- **Quality**
+  - Release Gates
+  - Tests
+  - ESLint
+  - Dependency Security Audit
+  - CSS Architecture
+  - TypeScript
+  - Production Build
+  - Runtime Smoke Tests
+
+- **Deploy Azure App Service**
+  - Datenbankmigration
+  - Datenbankprüfung
+  - Retention Cleanup
+  - Standalone Artifact
+  - Azure OIDC Login
+  - Microsoft-Graph-Konfigurationsprüfung
+  - App-Service-Deploy
+  - Worker-Konvergenz
+  - Health-/Readiness-Prüfung
+  - Produktions-Smoke-Tests
+
+- **Microsoft Graph Mail Readiness**
+  - Client-Credentials-Prüfung
+  - echter Graph-`sendMail`-Selbsttest
+
+- **Stripe Billing Configuration**
+  - Live-Billing-Konfiguration ohne Zahlung
+
+- **Retention Maintenance**
+  - tägliche Auth-/Session-Bereinigung
+
+- **Azure Architecture Audit**
+  - App Service, Entra, PostgreSQL, Storage und Monitoring-Inventar
+
+- **Production Monitoring Readiness**
+  - Application Insights
+  - Action Group
+  - mindestens eine aktive Alert-Regel
+
+- **PostgreSQL Backup Readiness**
+  - Serverzustand
+  - konfigurierte Backup-Retention
+
+## Lokale Entwicklung
+
+Die aktuelle Beispielkonfiguration steht in `.env.example`.
+
+Minimal:
+
+```env
+APP_MODE=local
+APP_URL=http://localhost:3000
+DATABASE_URL=
+APP_ENCRYPTION_KEY=
+
+GRAPH_TENANT_ID=
+GRAPH_CLIENT_ID=
+GRAPH_CLIENT_SECRET=
+GRAPH_SENDER_USER_ID=
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+```
+
+Keine Secrets mit `NEXT_PUBLIC_` veröffentlichen.
+
+QA:
 
 ```powershell
 corepack enable
-corepack prepare pnpm@latest --activate
+corepack prepare pnpm@10.0.0 --activate
 pnpm install --frozen-lockfile
+pnpm release:check
+pnpm test
 pnpm lint
+pnpm security:scan
+pnpm css:check
 pnpm typecheck
 pnpm build
-pnpm dev
 ```
 
-## Security posture
+## Go-live
 
-- centralized CSP and security headers
-- private/no-store caching for authenticated-style routes and APIs
-- same-origin enforcement on browser mutations
-- bounded JSON and multipart request sizes
-- account-enumeration-resistant login/recovery/signup errors
-- distributed auth throttling through a service-role-only RPC
-- server-side tenant resolution
-- RLS plus composite tenant foreign keys
-- private tenant-prefixed storage
-- signature/MIME/size validation for user uploads
-- support internal notes excluded from customer RLS
-- dedicated server-checked Operator authorization
-- Operator audit trail for critical actions
-- idempotent payment writes
-- signed Stripe webhooks and idempotent billing events
-- no full card-data storage
-- isolated demo state
+Der verbindliche aktuelle Stand steht in:
 
-## CI
+`docs/production-launch-checklist.md`
 
-GitHub Actions runs:
+Dokumentierte Betriebsverfahren:
+- `docs/production-rollback.md`
+- `docs/azure-postgresql-backup-restore.md`
+- `docs/customer-data-lifecycle.md`
+- `docs/incident-response-and-retention.md`
+- `docs/graph-mail-least-privilege.md`
 
-- frozen-lockfile install
-- ESLint with zero warnings
-- TypeScript typecheck
-- production build
-- runtime route smoke tests
-- health/auth/demo checks
-- billing/integration authorization checks
-- unsigned Stripe-webhook rejection
-- security-header checks
-
-Azure deployment performs a production health check after deployment.
+Domain-/Custom-Hostname-Konfiguration wird separat durchgeführt und ist nicht Bestandteil dieses Readiness-Blocks.

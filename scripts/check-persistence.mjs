@@ -14,7 +14,7 @@ function sessionClient(){
 }
 const a=sessionClient(),b=sessionClient(),suffix=randomUUID().slice(0,8),today=new Date().toISOString().slice(0,10);
 try{
- for(const client of [a,b]){const demo=await client('/api/demo/session','POST',{});assert.equal(demo.databaseBacked,true,'Database-backed sandbox is required');const auth=await client('/api/auth/session');assert.equal(auth.demo,true);assert.equal(auth.configured,true);}
+ for(const client of [a,b]){const demo=await client('/api/demo/session','POST',{});assert.equal(demo.databaseBacked,true,'Database-backed sandbox is required');const auth=await client('/api/auth/session');assert.equal(auth.demo,true);assert.equal(auth.configured,true);const sessions=await client('/api/auth/sessions');assert.ok(Array.isArray(sessions.items)&&sessions.items.some(item=>item.current===true),'Current server-side session must be listed');}
  const customerInput={name:'Persistence '+suffix,email:'customer-'+suffix+'@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST-'+suffix,language:'de',paymentDays:45,discount:5,notes:'Interne Testnotiz '+suffix};
  const customer=(await a('/api/customers','POST',customerInput,201)).item;
  await a('/api/customers/'+customer.id,'PATCH',{city:'Bern',sector:'Handel'});

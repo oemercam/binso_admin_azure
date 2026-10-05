@@ -1,0 +1,55 @@
+name: PostgreSQL Backup Readiness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/postgresql-backup-readiness.yml
+      - docs/azure-postgresql-backup-restore.md
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify Azure PostgreSQL backup configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVER="binso-platform-db"
+          RG="$(az resource list --name "$SERVER" --resource-type Microsoft.DBforPostgreSQL/flexibleServers --query "[0].resourceGroup" -o tsv)"
+          if [ -z "$RG" ]; then
+            echo "::error::Azure PostgreSQL Flexible Server was not found."
+            exit 1
+          fi
+
+          RETENTION="$(az postgres flexible-server show -g "$RG" -n "$SERVER" --query "backup.backupRetentionDays" -o tsv)"
+          GEO="$(az postgres flexible-server show -g "$RG" -n "$SERVER" --query "backup.geoRedundantBackup" -o tsv)"
+          STATE="$(az postgres flexible-server show -g "$RG" -n "$SERVER" --query "state" -o tsv)"
+
+          echo "Server state: $STATE"
+          echo "Backup retention days: $RETENTION"
+          echo "Geo-redundant backup: $GEO"
+
+          if [ "$STATE" != "Ready" ]; then
+            echo "::error::PostgreSQL server is not Ready."
+            exit 1
+          fi
+          if [ -z "$RETENTION" ] || [ "$RETENTION" -lt 7 ]; then
+            echo "::error::Backup retention must be at least 7 days."
+            exit 1
+          fi
+
+          echo "Backup configuration gate passed. A real point-in-time restore test is still required before commercial go-live."

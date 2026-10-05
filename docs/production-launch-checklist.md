@@ -13,7 +13,7 @@ Stand: 5. Oktober 2026
 - [ ] Rollback-Verfahren einmal praktisch verifiziert
 
 ## Automatisierte Produktionskontrollen
-- [x] Dependency Audit mit pnpm audit --audit-level high in Quality
+- [x] High/Critical-Audit der Produktionsabhängigkeiten als hartes Quality-Gate; Dev-Tooling-Advisories separat dokumentiert
 - [x] Regressionstest verhindert die Wiedereinführung eines ausgemusterten Mail-Providers
 - [x] Microsoft Graph als einziger produktiver Mailpfad
 - [x] Graph-Konfigurationsprüfung im Deploy
@@ -23,6 +23,10 @@ Stand: 5. Oktober 2026
 - [x] tägliche automatische Bereinigung abgelaufener Auth-/Session-Artefakte
 - [x] Retention Cleanup zusätzlich bei jedem produktiven Deploy
 - [x] Readiness-Endpoint prüft DB, App-Verschlüsselung, Graph-Mail und Stripe-Konfigurationsvollständigkeit
+- [x] kontrolliertes Tooling für mandantenbezogenen Datenexport und endgültige Löschung vorhanden
+- [x] CI prüft die Lösch-Schutzbedingungen und ON-DELETE-CASCADE-Regeln
+- [x] Azure Monitoring Readiness Workflow prüft Application Insights, Action Group und Alert-Regeln
+- [x] PostgreSQL Backup Readiness Workflow prüft Serverzustand und konfigurierte Backup-Retention
 
 ## Recht / Vertrag
 - [x] Impressum veröffentlicht
@@ -42,6 +46,8 @@ Stand: 5. Oktober 2026
 - [x] zweiter Login-Faktor
 - [x] TOTP + Recovery Codes
 - [x] Authenticator-Pflicht für Owner/Admin/Finance
+- [x] serverseitige aktive Sitzungsübersicht und Fernabmeldung anderer Sitzungen implementiert
+- [ ] Sitzungswiderruf mit zwei echten Browsern/Geräten praktisch getestet
 - [ ] Microsoft-Graph-Selbsttest in GitHub Actions grün
 - [ ] echte Zustellung an ein externes Testpostfach kontrolliert bestätigt
 - [ ] SPF, DKIM und DMARC für binso.ch geprüft
@@ -54,7 +60,8 @@ Stand: 5. Oktober 2026
 - [ ] Entra App Roles im produktiven Tenant mit echten Benutzerkonten verifiziert
 - [ ] Microsoft Authenticator / Conditional Access mit echtem Mitarbeiter getestet
 - [ ] Offboarding-Test: Rolle/Benutzer in Entra entfernen -> Adminzugriff endet
-- [ ] Mail.Send Application Permission auf die erforderliche Mailbox/Scope nach Least-Privilege beschränken und prüfen
+- [x] Least-Privilege-Runbook für Microsoft Graph / Exchange Application RBAC dokumentiert
+- [ ] Mail.Send Application Permission auf one@binso.ch beschränken und praktisch prüfen
 
 ## Billing / Stripe
 - [x] Checkout serverseitig
@@ -77,9 +84,11 @@ Stand: 5. Oktober 2026
 - [x] DPA/Subprocessor-Transparenz
 - [x] technische Auth-/Session-Retention festgelegt und automatisiert
 - [x] Backup-/Restore-Testverfahren dokumentiert
+- [ ] PostgreSQL Backup Readiness Workflow grün
 - [ ] Azure PostgreSQL Point-in-Time-Restore erfolgreich praktisch getestet
 - [ ] Azure-/Application-Insights-Log-Retention verbindlich bestätigen
-- [ ] Kundendatenexport und endgültige Löschung E2E getestet
+- [x] Kundendatenexport und endgültige Löschung technisch implementiert und abgesichert
+- [ ] Kundendatenexport und endgültige Löschung mit einer echten Testorganisation E2E ausgeführt
 - [ ] Production-Secrets/Permissions manuell nach Least Privilege reviewed
 - [ ] Verantwortliche Person für Incident-Koordination organisatorisch bestätigt
 
@@ -87,6 +96,7 @@ Stand: 5. Oktober 2026
 - [x] /api/health vorhanden
 - [x] /api/health/ready vorhanden
 - [x] Azure Architecture Audit inventarisiert App Insights, Alerts und Action Groups
+- [ ] Production Monitoring Readiness Workflow grün
 - [ ] Application Insights produktiv vorhanden und Telemetrie sichtbar
 - [ ] mindestens ein produktiver Alert mit Action Group praktisch ausgelöst/getestet
 - [ ] Alarmempfänger und Eskalationsweg bestätigt

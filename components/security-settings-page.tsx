@@ -4,9 +4,22 @@ import {useEffect,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
 import {AppShell} from "./app-shell";
 import {Button,Field,SectionTitle,Status,Toast} from "./ui";
-import {apiGet,apiPatch,apiPost} from "@/lib/client/backend";
+import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 
 type MfaState={enabled:boolean;required:boolean;role:string};
+type SessionItem={id:string;userAgent:string|null;lastSeenAt:string|null;expiresAt:string;current:boolean};
+
+function sessionLabel(userAgent:string|null){
+  const ua=userAgent??"";
+  const browser=/Edg\//.test(ua)?"Edge":/Firefox\//.test(ua)?"Firefox":/CriOS\//.test(ua)?"Chrome":/Chrome\//.test(ua)?"Chrome":/Safari\//.test(ua)?"Safari":"Browser";
+  const device=/iPhone/.test(ua)?"iPhone":/iPad/.test(ua)?"iPad":/Android/.test(ua)?"Android":/Macintosh/.test(ua)?"Mac":/Windows/.test(ua)?"Windows":"Gerät";
+  return browser+" · "+device;
+}
+function sessionDate(value:string|null){
+  if(!value)return "Noch keine Aktivität";
+  const date=new Date(value);
+  return Number.isNaN(date.getTime())?"Unbekannt":date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
+}
 
 export function SecuritySettingsPage(){
   const router=useRouter();
@@ -20,9 +33,15 @@ export function SecuritySettingsPage(){
   const [newPassword,setNewPassword]=useState("");
   const [confirmPassword,setConfirmPassword]=useState("");
   const [toast,setToast]=useState<string|null>(null);
+  const [sessions,setSessions]=useState<SessionItem[]>([]);
+  const [sessionsLoading,setSessionsLoading]=useState(true);
 
   useEffect(()=>{
     apiGet<MfaState>("/api/auth/mfa").then(setMfa).catch(error=>setToast(error instanceof Error?error.message:"Sicherheitsstatus konnte nicht geladen werden."));
+    apiGet<{items:SessionItem[]}>("/api/auth/sessions")
+      .then(payload=>setSessions(payload.items))
+      .catch(error=>setToast(error instanceof Error?error.message:"Sitzungen konnten nicht geladen werden."))
+      .finally(()=>setSessionsLoading(false));
   },[]);
 
   const startSetup=async()=>{
@@ -49,6 +68,22 @@ export function SecuritySettingsPage(){
     }catch(error){setToast(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");}
   };
 
+  const revokeSession=async(id:string)=>{
+    try{
+      await apiDelete<{ok:boolean}>("/api/auth/sessions/"+encodeURIComponent(id));
+      setSessions(current=>current.filter(item=>item.id!==id));
+      setToast("Sitzung abgemeldet.");
+    }catch(error){setToast(error instanceof Error?error.message:"Sitzung konnte nicht abgemeldet werden.");}
+  };
+
+  const revokeOtherSessions=async()=>{
+    try{
+      const result=await apiDelete<{ok:boolean;revoked:number}>("/api/auth/sessions");
+      setSessions(current=>current.filter(item=>item.current));
+      setToast(result.revoked===1?"Eine weitere Sitzung wurde abgemeldet.":result.revoked>1?String(result.revoked)+" weitere Sitzungen wurden abgemeldet.":"Keine weiteren aktiven Sitzungen.");
+    }catch(error){setToast(error instanceof Error?error.message:"Andere Sitzungen konnten nicht abgemeldet werden.");}
+  };
+
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="surface security-card">
       <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
@@ -70,6 +105,20 @@ export function SecuritySettingsPage(){
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
       <p>{mfa?.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung."}</p>
+    </section>
+
+    <section className="surface security-card">
+      <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" onClick={()=>void revokeOtherSessions()}>Alle anderen abmelden</Button>:undefined}/>
+      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
+        {sessions.map(item=><div key={item.id}>
+          <div>
+            <b>{sessionLabel(item.userAgent)}</b>
+            <small>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt)} · Ablauf: {sessionDate(item.expiresAt)}</small>
+          </div>
+          {item.current?<Status tone="success">Aktuell</Status>:<Button variant="secondary" onClick={()=>void revokeSession(item.id)}>Abmelden</Button>}
+        </div>)}
+      </div>}
+      <p className="settings-note">Es werden nur serverseitig tatsächlich aktive Sitzungen angezeigt. Geräteorte werden nicht geschätzt oder erfunden.</p>
     </section>
 
     <section className="surface security-card">
