@@ -3,6 +3,8 @@ import { MarketingFooter, MarketingHeader, ProductPreview, ProductScreen } from 
 import { Button, Icon } from "@/components/ui";
 import { domainConfig } from "@/config/domain";
 import { plans as subscriptionPlans } from "@/lib/plans";
+import { domainConfig } from "@/config/domain";
+import { plans as subscriptionPlans } from "@/lib/plans";
 
 const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
