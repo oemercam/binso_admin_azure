@@ -564,7 +564,7 @@ function MonitoringCockpit({services,api,database,availability,errorRate,inciden
   const affected=services.length?Math.round(degraded/services.length*100):0;
   return <div className="monitoring-cockpit">
     <div className="monitoring-kpis monitoring-kpis-visual">
-      <section><div><span>Verfügbarkeit</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
+      <section><div><span>Service Health</span><strong>{availability}</strong><small>{healthy}/{services.length} Services operational · Momentaufnahme</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":availability} as React.CSSProperties}><b>{availability}</b></div></section>
       <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
       <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(affected)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
@@ -575,7 +575,7 @@ function MonitoringCockpit({services,api,database,availability,errorRate,inciden
       <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Service Health</b><strong>{health}%</strong></div><div className="monitoring-compact-ring" style={{"--health":String(health)+"%"} as React.CSSProperties}><span>{healthy}/{services.length}</span></div><small>Operational verfügbare Services</small></section>
       <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Aktive Störungen</b><strong>{incidents.length}</strong></div><div className="monitoring-compact-ring incidents" style={{"--health":String(affected)+"%"} as React.CSSProperties}><span>{degraded}</span></div><small>Anteil beeinträchtigter Services</small></section>
     </div>
-    <div className="monitoring-technical-summary"><b>Technische Übersicht</b><p>Alle zentralen Plattformwerte auf einen Blick: Verfügbarkeit, API- und Datenbank-Latenz, Service Health und aktive Störungen. INP-Stichproben: {errorRate}. Darunter bleiben Service-Status und Ereignisse für die technische Detailanalyse sichtbar.</p></div>
+    <div className="monitoring-technical-summary"><b>Technische Übersicht</b><p>Alle zentralen Plattformwerte auf einen Blick: Aktueller Service-Status, API- und Datenbank-Latenz, Service Health und aktive Störungen. INP-Stichproben: {errorRate}. Darunter bleiben Service-Status und Ereignisse für die technische Detailanalyse sichtbar.</p></div>
   </div>;
 }
 

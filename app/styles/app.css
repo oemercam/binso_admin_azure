@@ -972,8 +972,9 @@ textarea{
 .notification-list b{font-size:12px}
 .notification-list p{margin:3px 0;color:var(--color-muted);font-size:11px}
 .notification-list small{color:var(--color-muted);font-size:10px}
-.notification-settings-link,
-.notification-mark-all{min-height:46px;display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.notification-list>a.notification-settings-link{min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px}
+.notification-settings-link>span{white-space:nowrap;min-width:0}
+.notification-settings-link>svg{flex:none}
 .notification-badge{position:absolute;min-width:16px;height:16px;padding:0 4px;display:grid;place-items:center;border-radius:999px;background:var(--color-fg);color:var(--color-bg);font-size:8px;font-style:normal}
 .filter-sheet-actions{
   position:sticky;

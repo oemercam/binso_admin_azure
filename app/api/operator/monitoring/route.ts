@@ -28,7 +28,7 @@ export async function GET(){
     }));
     return json({
       checkedAt:new Date().toISOString(),
-      build:{sha:process.env.DEPLOY_SHA??process.env.GITHUB_SHA??null,node:process.version},
+      build:{sha:process.env.BINSO_BUILD_SHA??null,node:process.version},
       latencyMs:{api:Math.round(performance.now()-started),database:databaseLatencyMs},
       services:[
         {name:"Web App",status:"operational",detail:"Next.js Anwendung"},

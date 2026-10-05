@@ -47,6 +47,10 @@ jobs:
           if [ -n "$DATABASE_URL" ]; then
             echo "::add-mask::$DATABASE_URL"
             PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+            echo "=== Runtime database privileges (no credentials) ==="
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select rolname,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole from pg_roles where rolname=current_user;"
+            echo "=== Tenant table RLS inventory ==="
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select c.relname,c.relrowsecurity,c.relforcerowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r' and exists(select 1 from pg_attribute a where a.attrelid=c.oid and a.attname='organization_id' and not a.attisdropped) order by c.relname;"
           else
             echo "DATABASE_URL is not configured."
           fi
@@ -65,3 +69,11 @@ jobs:
 
           echo "=== Application Insights in App resource group ==="
           az monitor app-insights component show --app "$APP_NAME" -g "$APP_RG" --query "{name:name,provisioningState:provisioningState,location:location}" -o json 2>/dev/null || echo "No App Insights component named $APP_NAME"
+          echo "=== Application Insights resources (any name) ==="
+          az resource list -g "$APP_RG" --resource-type Microsoft.Insights/components --query "[].{name:name,location:location}" -o json || echo "UNVERIFIED: Insights resource inventory unavailable."
+          echo "=== Metric alerts ==="
+          az monitor metrics alert list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity,scopes:scopes}" -o json || echo "UNVERIFIED: metric alerts unavailable."
+          echo "=== Scheduled query alerts ==="
+          az monitor scheduled-query list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity}" -o json || echo "UNVERIFIED: query alerts unavailable."
+          echo "=== Alert action groups ==="
+          az monitor action-group list -g "$APP_RG" --query "[].{name:name,enabled:enabled}" -o json || echo "UNVERIFIED: action groups unavailable."

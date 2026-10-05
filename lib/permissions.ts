@@ -41,8 +41,8 @@ export function normalizeTenantRole(role:string):TenantRole{
  return (["owner","admin","finance","hr","project_manager","member","reader"] as string[]).includes(role)?role as TenantRole:"reader";
 }
 const universalTenantPermissions=new Set<TenantPermission>(["support:read","support:write","feedback:write"]);
-export function tenantCan(role:string,permission:TenantPermission){return universalTenantPermissions.has(permission)||tenantGrants[normalizeTenantRole(role)].has(permission)}
-export function tenantPermissions(role:string){return Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions]))}
+export function tenantCan(role:string,permission:TenantPermission){return Object.hasOwn(tenantGrants,role)&&(universalTenantPermissions.has(permission)||tenantGrants[normalizeTenantRole(role)].has(permission))}
+export function tenantPermissions(role:string){return Object.hasOwn(tenantGrants,role)?Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions])):[]}
 
 export function localRoleToTenant(role:LocalUserRole|string):TenantRole{
  const map:Record<string,TenantRole>={Inhaber:"owner",Admin:"admin",Finanzen:"finance",Personal:"hr",Projektleitung:"project_manager",Mitarbeiter:"member",Lesen:"reader"};
@@ -82,5 +82,5 @@ export const operatorGrants:Record<OperatorRole,ReadonlySet<OperatorPermission>>
  platform_billing:new Set(["platform:read","organizations:read","subscriptions:read","subscriptions:manage"]),
  platform_auditor:new Set(["platform:read","organizations:read","operators:read","platform_audit:read"])
 };
-export function operatorCan(role:OperatorRole|string,permission:OperatorPermission){return operatorGrants[(role in operatorGrants?role:"platform_support") as OperatorRole].has(permission)}
-export function operatorPermissions(role:OperatorRole|string){return Array.from(operatorGrants[(role in operatorGrants?role:"platform_support") as OperatorRole])}
+export function operatorCan(role:OperatorRole|string,permission:OperatorPermission){return Object.hasOwn(operatorGrants,role)&&operatorGrants[role as OperatorRole].has(permission)}
+export function operatorPermissions(role:OperatorRole|string){return Object.hasOwn(operatorGrants,role)?Array.from(operatorGrants[role as OperatorRole]):[]}
