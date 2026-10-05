@@ -1,2 +1,2 @@
-import { WelcomePage } from "@/components/app-pages";
-export default function Page(){return <WelcomePage/>;}
+import {redirect} from "next/navigation";
+export default function Page(){redirect("/dashboard");}

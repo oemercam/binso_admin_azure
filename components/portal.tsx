@@ -156,7 +156,7 @@ export function PortalRegister(){
     try{
       if(backendConfigured===false){
         await startDemoSession({name:email.split("@")[0]||"Demo",company:companyName,focus:"overview"});
-        router.push("/willkommen");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
@@ -174,7 +174,7 @@ export function PortalRegister(){
         setLoading(false);
         return;
       }
-      router.push("/willkommen");
+      router.push("/dashboard");
       router.refresh();
     }catch(error){
       setError(error instanceof Error?error.message:"Registrierung nicht möglich.");

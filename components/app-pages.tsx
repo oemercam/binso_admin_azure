@@ -197,31 +197,6 @@ export function FinancePage() {
   </AppShell>;
 }
 
-export function WelcomePage() {
-  return <AppShell title="Willkommen bei Binso One" subtitle="Starte mit dem, was du gerade brauchst." active="dashboard">
-    <div className="onboarding-progress" aria-label="Einrichtung">
-      <div><span>1</span><b>Konto erstellt</b></div><i/>
-      <div className="active"><span>2</span><b>Erster Schritt</b></div><i/>
-      <div><span>3</span><b>Binso One nutzen</b></div>
-    </div>
-    <section className="onboarding-intro">
-      <span className="eyebrow">SCHNELLSTART</span>
-      <h2>Was möchtest du zuerst machen?</h2>
-      <p>Du musst nicht zuerst alles einrichten. Wähle eine Aufgabe und ergänze Firmendaten später.</p>
-    </section>
-    <div className="welcome-grid">
-      <Link href="/kunden/neu"><span><Icon name="users"/></span><div><b>Kunde erfassen</b><small>Lege deinen ersten Kunden mit den wichtigsten Angaben an.</small></div><Icon name="arrow"/></Link>
-      <Link href="/angebote/neu"><span><Icon name="file"/></span><div><b>Angebot erstellen</b><small>Erstelle direkt ein Angebot mit Live-Vorschau.</small></div><Icon name="arrow"/></Link>
-      <Link href="/rechnungen/neu"><span><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Erstelle eine Rechnung und prüfe sie vor dem Versand.</small></div><Icon name="arrow"/></Link>
-      <Link href="/dashboard"><span><Icon name="home"/></span><div><b>Erst umsehen</b><small>Öffne das Dashboard und lerne Binso One kennen.</small></div><Icon name="arrow"/></Link>
-    </div>
-    <div className="onboarding-footer">
-      <p>Firmendaten, Logo, MwSt. und Zahlungsbedingungen kannst du jederzeit unter Einstellungen ergänzen.</p>
-      <Button href="/dashboard">Zum Dashboard</Button>
-    </div>
-  </AppShell>;
-}
-
 export function CustomersPage() {
   const customerRows=useDemoRows("customers",customers);
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neuer Kunde"><span className="create-action-label">Neuer Kunde</span></Button>}>
