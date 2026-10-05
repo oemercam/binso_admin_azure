@@ -6,10 +6,11 @@ Dieses Dokument ist die betriebliche Grundlage für die Datenschutzdokumentation
 
 ## 1. Öffentliche Website
 - Betroffene: Website-Besucher
-- Daten: IP-/Request-Metadaten, technische Browser-/Geräteinformationen, Performance-Telemetrie
-- Zweck: Auslieferung, Sicherheit, Fehleranalyse, Performance
+- Daten: IP-/Request-Metadaten und technische Browser-/Geräteinformationen; optionale Performance-Telemetrie (Web-Vitals und gekürzte Route) nur nach entsprechender Auswahl
+- Zweck: Auslieferung, Sicherheit, Fehleranalyse und – bei Einwilligung – Performance-Optimierung
 - Empfänger: Microsoft Azure
 - Aufbewahrung: gemäss konfigurierter Betriebs-/Log-Retention
+- Auswahl: Optionale Performance-Messung kann über die Cookie-/Datenschutz-Einstellungen aktiviert oder deaktiviert werden; Werbe- und Cross-Site-Tracking-Cookies werden nicht eingesetzt.
 - Ausland: abhängig von Microsoft-Support-/Unterauftragsstrukturen
 
 ## 2. Kundenkonto und Authentifizierung
