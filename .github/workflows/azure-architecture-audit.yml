@@ -40,7 +40,16 @@ jobs:
           echo "=== App Service identity ==="
           az webapp identity show -g "$APP_RG" -n "$APP_NAME" --query "{type:type,principalId:principalId,tenantId:tenantId}" -o json
           echo "=== App setting names only ==="
-          az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort
+          APP_SETTING_NAMES="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[].name" -o tsv | sort)"
+          printf '%s\n' "$APP_SETTING_NAMES"
+          OLD_MAIL_PREFIX="RE""SEND"
+          OLD_BACKEND_PREFIX="SUP""ABASE"
+          for retired in             "${OLD_MAIL_PREFIX}_API_KEY"             "EMAIL_DELIVERY_MODE"             "EMAIL_FROM"             "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL"             "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY"             "${OLD_BACKEND_PREFIX}_URL"             "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY"             "STRIPE_PRICE_STARTER"             "STRIPE_PRICE_BUSINESS"             "STRIPE_PRICE_PROFESSIONAL"; do
+            if printf '%s\n' "$APP_SETTING_NAMES" | grep -Fxq "$retired"; then
+              echo "::error::Retired production App Service setting still exists: $retired"
+              exit 1
+            fi
+          done
 
           echo "=== Production auth/mail readiness (no secret values) ==="
           APP_SETTINGS_JSON="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" -o json)"
