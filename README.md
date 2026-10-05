@@ -244,6 +244,9 @@ Der verbindliche aktuelle Stand steht in:
 
 `docs/production-launch-checklist.md`
 
+Zentrale Betriebsübersicht:
+- `docs/production-operations-runbook.md`
+
 Dokumentierte Betriebsverfahren:
 - `docs/auth-security-flow.md`
 - `docs/entra-operator-sso.md`
