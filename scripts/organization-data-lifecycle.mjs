@@ -143,6 +143,30 @@ async function deleteOrganization(client){
       throw new Error("External Azure Blob objects exist. Purge them first, then set BINSO_EXTERNAL_BLOBS_PURGE_CONFIRMED=true.");
     }
 
+    const restrictiveOrgFks=await client.query(
+      `select distinct rel.relname as table_name
+         from pg_constraint con
+         join pg_class rel on rel.oid=con.conrelid
+         join pg_namespace ns on ns.oid=rel.relnamespace
+         join pg_class ref on ref.oid=con.confrelid
+        where con.contype='f'
+          and ns.nspname='public'
+          and ref.relname='organizations'
+          and con.confdeltype<>'c'
+          and exists(
+            select 1 from information_schema.columns col
+             where col.table_schema='public'
+               and col.table_name=rel.relname
+               and col.column_name='organization_id'
+          )
+        order by rel.relname`
+    );
+    for(const row of restrictiveOrgFks.rows){
+      const table=String(row.table_name);
+      if(!/^[a-zA-Z0-9_]+$/.test(table))throw new Error("Unsafe table identifier in deletion plan.");
+      await client.query(`delete from ${quoted(table)} where organization_id=$1`,[organizationId]);
+    }
+
     await client.query("delete from organizations where id=$1",[organizationId]);
 
     const remaining={};
