@@ -1642,6 +1642,30 @@
   .time-entry-list>div{min-width:0}
   .time-entry-list strong{white-space:nowrap}
 
+  .plan-hero{
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+  }
+  .plan-hero>:last-child{grid-column:1/-1;justify-self:start}
+  .subscription-detail-grid{
+    grid-template-columns:minmax(0,1fr);
+    border-top:1px solid var(--color-line);
+    border-bottom:1px solid var(--color-line);
+  }
+  .subscription-detail-grid>.surface{
+    padding:var(--desktop-section-y) 0;
+    border:0;
+    border-radius:0;
+  }
+  .subscription-detail-grid>.surface+.surface{
+    border-left:0;
+    border-top:1px solid var(--color-line);
+  }
+  .invoices-panel{
+    padding-left:0;
+    padding-right:0;
+  }
+
   .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
   .document-line-items{min-width:0}
@@ -2371,6 +2395,55 @@
   .notification-center,
   .support-summary,
   .support-master-detail{width:100%;max-width:none}
+
+  /* Subscription/settings content is informational, not a stack of cards. */
+  .plan-hero{
+    min-height:auto;
+    margin:0 0 var(--desktop-section-gap);
+    padding:20px 0 var(--desktop-section-y);
+    grid-template-columns:minmax(0,1fr) auto auto;
+    gap:24px;
+    border:0;
+    border-top:1px solid var(--color-line);
+    border-bottom:1px solid var(--color-line);
+    border-radius:0;
+  }
+  .subscription-detail-grid{
+    width:100%;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0;
+    border-top:1px solid var(--color-line);
+    border-bottom:1px solid var(--color-line);
+  }
+  .subscription-detail-grid>.surface{
+    min-width:0;
+    padding:var(--desktop-section-y) var(--desktop-surface-x);
+    border:0;
+    border-radius:0;
+  }
+  .subscription-detail-grid>.surface+.surface{border-left:1px solid var(--color-line)}
+  .subscription-detail-grid>.surface>.section-title{
+    margin-bottom:14px;
+    padding-bottom:12px;
+  }
+  .invoices-panel{
+    margin-top:var(--desktop-section-gap);
+    padding:var(--desktop-section-y) 0;
+    border:0;
+    border-top:1px solid var(--color-line);
+    border-bottom:1px solid var(--color-line);
+    border-radius:0;
+  }
+  .invoices-panel>.section-title{margin-bottom:14px}
+  .invoices-panel .empty-state{
+    min-height:170px;
+    padding:28px 0;
+  }
+  .danger-zone{
+    width:100%;
+    max-width:none;
+    margin-top:var(--desktop-section-gap);
+  }
 
   .documents-hub-grid{gap:18px}
   .documents-hub-grid>.surface{min-width:0}
