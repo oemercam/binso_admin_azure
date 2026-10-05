@@ -31,6 +31,7 @@ export default function Register() {
   const [error,setError]=useState("");
   const [confirmation,setConfirmation]=useState(false);
   const [acceptedTerms,setAcceptedTerms]=useState(false);
+  const [resendStatus,setResendStatus]=useState("");
 
   const submit=async(event:FormEvent)=>{
     event.preventDefault();
@@ -57,18 +58,30 @@ export default function Register() {
     }
   };
 
+  const resendVerification=async()=>{
+    setResendStatus("Wird gesendet…");
+    try{
+      const response=await fetch("/api/auth/resend-verification",{method:"POST",headers:{"Content-Type":"application/json"}});
+      if(!response.ok)throw new Error();
+      setResendStatus("Bestätigungs-E-Mail wurde erneut gesendet.");
+    }catch{setResendStatus("E-Mail konnte nicht erneut gesendet werden.");}
+  };
+
   if(confirmation) return <main className="auth-page"><section className="auth-card">
     <Logo/>
     <h1>E-Mail bestätigen</h1>
-    <p>Wir haben dir einen Bestätigungslink gesendet. Dein {plan.name}-Testkonto läuft {domainConfig.trialDays} Tage und kann bereits geöffnet werden.</p>
+    <p>Wir haben dir einen Bestätigungslink an <b>{email}</b> gesendet. Dein {plan.name}-Testkonto läuft {domainConfig.trialDays} Tage und kann bereits geöffnet werden.</p>
+    <div className="auth-plan-summary"><b>{plan.name}</b><span>{billingCycle==="yearly"?`CHF ${plan.yearly} / Jahr`:`CHF ${plan.monthly} / Monat`} nach Aktivierung</span><small>Keine Kreditkarte für die Testphase. Ohne Abo danach Nur-Lesen.</small></div>
     <Button href={subscriptionHref}>Testkonto öffnen</Button>
+    <button type="button" className="auth-inline-action" onClick={()=>void resendVerification()}>Bestätigungs-E-Mail erneut senden</button>
+    {resendStatus&&<p className="auth-status" role="status">{resendStatus}</p>}
   </section></main>;
 
   return <main className="auth-page">
     <section className="auth-card">
       <div className="auth-topbar"><Logo/><Link className="auth-cancel" href="/preise">Abbrechen</Link></div>
       <h1>Konto erstellen</h1>
-      <p>{plan.name} · {domainConfig.trialDays} Tage kostenlos · {billingCycle==="yearly"?"jährliche":"monatliche"} Abrechnung nach Aktivierung.</p>
+      <p>{domainConfig.trialDays} Tage kostenlos testen. Keine Kreditkarte erforderlich.</p><div className="auth-plan-summary"><b>{plan.name}</b><span>{billingCycle==="yearly"?`CHF ${plan.yearly} / Jahr`:`CHF ${plan.monthly} / Monat`} nach Aktivierung</span><small>Ohne Abo nach der Testphase: Nur-Lesen, Daten bleiben erhalten.</small></div>
       <form onSubmit={submit}>
         <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
         <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>

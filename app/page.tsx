@@ -70,8 +70,8 @@ export default function Home() {
             <Button href="/demo" variant="secondary">Demo starten</Button>
           </div>
           <div className="trust-row">
-            <span><Icon name="lock"/> Schweizer Business-Software</span>
-            <span><Icon name="clock"/> In wenigen Minuten startklar</span>
+            <span><Icon name="lock"/> Keine Kreditkarte für die Testphase</span>
+            <span><Icon name="clock"/> Nach 14 Tagen nur mit aktivem Abo weiterbearbeiten</span>
           </div>
         </div>
         <ProductPreview/>
@@ -177,7 +177,7 @@ export default function Home() {
         </div>
         <div className="faq-list">
           <details><summary>Kann ich Binso One zuerst ausprobieren?</summary><p>Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen.</p></details>
-          <details><summary>Brauche ich eine Kreditkarte für den Test?</summary><p>Nein. Für die Testphase ist keine Kreditkarte notwendig.</p></details>
+          <details><summary>Brauche ich eine Kreditkarte für den Test?</summary><p>Nein. Die 14-tägige Testphase startet ohne Kreditkarte. Erst wenn du einen Plan aktivierst, wirst du zu Stripe Checkout weitergeleitet.</p></details><details><summary>Was passiert nach den 14 Tagen?</summary><p>Ohne aktiviertes Abo bleibt dein Konto erhalten, wechselt aber in den Nur-Lesen-Modus. Du kannst danach jederzeit einen Plan aktivieren und weiterarbeiten.</p></details>
           <details><summary>Funktioniert Binso One auf dem Smartphone?</summary><p>Ja. Mobile und PWA sind als eigene App-Oberfläche gestaltet und nicht als verkleinerte Desktop-Version.</p></details>
           <details><summary>Kann ich später den Plan wechseln?</summary><p>Ja. Der Plan kann später an die Grösse und Anforderungen deines Unternehmens angepasst werden.</p></details>
         </div>
