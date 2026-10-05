@@ -27,12 +27,12 @@ const pool=new Pool({
 const quoted=value=>'"'+String(value).replaceAll('"','""')+'"';
 const sensitiveKey=/(password|secret|token|recovery|hash|encryption|sas|credential)/i;
 function sanitize(value){
+  if(value instanceof Date)return value.toISOString();
+  if(Buffer.isBuffer(value))return {encoding:"base64",value:value.toString("base64")};
   if(Array.isArray(value))return value.map(sanitize);
-  if(value&&typeof value==="object"&&!Buffer.isBuffer(value)){
+  if(value&&typeof value==="object"){
     return Object.fromEntries(Object.entries(value).filter(([key])=>!sensitiveKey.test(key)).map(([key,item])=>[key,sanitize(item)]));
   }
-  if(Buffer.isBuffer(value))return {encoding:"base64",value:value.toString("base64")};
-  if(value instanceof Date)return value.toISOString();
   return value;
 }
 
@@ -174,8 +174,18 @@ async function deleteOrganization(client){
 try{
   const client=await pool.connect();
   try{
-    if(operation==="export")await exportOrganization(client);
-    else await deleteOrganization(client);
+    if(operation==="export"){
+      await client.query("begin isolation level repeatable read read only");
+      try{
+        await exportOrganization(client);
+        await client.query("commit");
+      }catch(error){
+        await client.query("rollback");
+        throw error;
+      }
+    }else{
+      await deleteOrganization(client);
+    }
   }finally{
     client.release();
   }
