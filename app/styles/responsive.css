@@ -1537,8 +1537,89 @@
 }
 
 @media (min-width:761px) and (max-width:1100px){
-  .page-container{padding-left:clamp(22px,3vw,30px);padding-right:clamp(22px,3vw,30px)}
-  .page-head{margin-bottom:24px}
+  .page-container{
+    width:100%;
+    max-width:none;
+    padding-left:clamp(24px,3.2vw,34px);
+    padding-right:clamp(24px,3.2vw,34px);
+  }
+  .page-head{
+    margin-bottom:22px;
+    align-items:flex-start;
+    gap:18px;
+  }
+  .page-head>div{flex:1;min-width:0}
+  .page-actions{
+    flex:0 0 auto;
+    align-items:center;
+  }
+  .page-actions .responsive-create-action{
+    width:auto;
+    min-width:max-content;
+    height:40px;
+    min-height:40px;
+    padding-inline:13px;
+    display:inline-flex;
+    flex-wrap:nowrap;
+    border-radius:10px;
+    box-shadow:none;
+  }
+  .page-actions .responsive-create-action svg{flex:0 0 auto}
+  .page-actions .responsive-create-action>span{display:inline;white-space:nowrap}
+
+  /* A master/detail grid may only reserve a second column when a detail pane actually exists. */
+  .tablet-master-detail:not(:has(>.tablet-detail)),
+  .tablet-master-detail:not(:has(>aside.tablet-detail)){
+    grid-template-columns:minmax(0,1fr);
+  }
+  .invoice-master-detail:not(:has(>.invoice-tablet-preview)){
+    grid-template-columns:minmax(0,1fr);
+  }
+  .invoice-master-detail>div,
+  .customer-records-layout,
+  .records,
+  .toolbar{width:100%;min-width:0}
+
+  /* Medium desktop toolbar: use the full row instead of squeezing every control onto one line. */
+  .toolbar{
+    display:grid;
+    grid-template-columns:minmax(220px,1fr) auto auto;
+    gap:10px 12px;
+    align-items:center;
+  }
+  .toolbar .searchbox{
+    width:100%;
+    max-width:none;
+    min-width:0;
+    grid-column:1;
+  }
+  .toolbar .chips{
+    min-width:0;
+    grid-column:2;
+    overflow-x:auto;
+  }
+  .toolbar .filter-button{grid-column:3}
+  .toolbar .records-count{
+    grid-column:1;
+    grid-row:2;
+    margin-left:0;
+    justify-self:start;
+  }
+  .toolbar .toolbar-reset{
+    grid-column:2/4;
+    grid-row:2;
+    justify-self:end;
+  }
+
+  .record{
+    width:100%;
+    min-width:0;
+    gap:10px;
+  }
+  .record-main{min-width:0}
+  .record>strong,
+  .record>.status{flex:0 0 auto;white-space:nowrap}
+
   .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
   .document-line-items{min-width:0}
