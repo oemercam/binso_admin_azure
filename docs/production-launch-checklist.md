@@ -23,6 +23,10 @@ Stand: 5. Oktober 2026
 - [x] tägliche automatische Bereinigung abgelaufener Auth-/Session-Artefakte
 - [x] Retention Cleanup zusätzlich bei jedem produktiven Deploy
 - [x] Readiness-Endpoint prüft DB, App-Verschlüsselung, Graph-Mail und Stripe-Konfigurationsvollständigkeit
+- [x] kontrolliertes Tooling für mandantenbezogenen Datenexport und endgültige Löschung vorhanden
+- [x] CI prüft die Lösch-Schutzbedingungen und ON-DELETE-CASCADE-Regeln
+- [x] Azure Monitoring Readiness Workflow prüft Application Insights, Action Group und Alert-Regeln
+- [x] PostgreSQL Backup Readiness Workflow prüft Serverzustand und konfigurierte Backup-Retention
 
 ## Recht / Vertrag
 - [x] Impressum veröffentlicht
@@ -77,9 +81,11 @@ Stand: 5. Oktober 2026
 - [x] DPA/Subprocessor-Transparenz
 - [x] technische Auth-/Session-Retention festgelegt und automatisiert
 - [x] Backup-/Restore-Testverfahren dokumentiert
+- [ ] PostgreSQL Backup Readiness Workflow grün
 - [ ] Azure PostgreSQL Point-in-Time-Restore erfolgreich praktisch getestet
 - [ ] Azure-/Application-Insights-Log-Retention verbindlich bestätigen
-- [ ] Kundendatenexport und endgültige Löschung E2E getestet
+- [x] Kundendatenexport und endgültige Löschung technisch implementiert und abgesichert
+- [ ] Kundendatenexport und endgültige Löschung mit einer echten Testorganisation E2E ausgeführt
 - [ ] Production-Secrets/Permissions manuell nach Least Privilege reviewed
 - [ ] Verantwortliche Person für Incident-Koordination organisatorisch bestätigt
 
@@ -87,6 +93,7 @@ Stand: 5. Oktober 2026
 - [x] /api/health vorhanden
 - [x] /api/health/ready vorhanden
 - [x] Azure Architecture Audit inventarisiert App Insights, Alerts und Action Groups
+- [ ] Production Monitoring Readiness Workflow grün
 - [ ] Application Insights produktiv vorhanden und Telemetrie sichtbar
 - [ ] mindestens ein produktiver Alert mit Action Group praktisch ausgelöst/getestet
 - [ ] Alarmempfänger und Eskalationsweg bestätigt
