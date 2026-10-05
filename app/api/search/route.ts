@@ -1,3 +1,35 @@
-import {NextRequest} from "next/server";import {requireSession} from "@/lib/server/session";import {tenantCan,permissionForModule,ownRecordOnly} from "@/lib/permissions";import {apiError,json} from "@/lib/server/http";import {getOrganizationPlan} from "@/lib/server/plan-access";import {planAllowsModule} from "@/config/plan-access";import {listRecords} from "@/lib/server/repositories/records";
+import { NextRequest } from "next/server";
+import { requireSession } from "@/lib/server/session";
+import { tenantCan, permissionForModule } from "@/lib/permissions";
+import { apiError, json } from "@/lib/server/http";
+import { getOrganizationPlan } from "@/lib/server/plan-access";
+import { planAllowsModule } from "@/config/plan-access";
+import { withTenant } from "@/lib/server/db";
+import { listApiBusiness } from "@/lib/server/repositories/business-api";
+import { searchSources, searchItem, type SearchItem } from "@/lib/search";
+
 export const runtime="nodejs";
-export async function GET(request:NextRequest){try{const s=await requireSession();const plan=await getOrganizationPlan(s.organizationId);const q=(request.nextUrl.searchParams.get("q")||"").trim().toLocaleLowerCase("de-CH");if(q.length<2)return json({items:[]});const modules=["kunden","offerten","auftraege","rechnungen","projekte","zeiterfassung","spesen","aufgaben","lieferanten","eingangsrechnungen","produkte","dokumente","vertraege"] as const;const out:{label:string;sub:string;href:string}[]=[];for(const moduleKey of modules){const permission=permissionForModule(moduleKey,"read");if(!permission||!tenantCan(s.role,permission)||!planAllowsModule(plan,moduleKey))continue;const rows=await listRecords(s.organizationId,s.userId,moduleKey,ownRecordOnly(s.role,moduleKey));for(const item of rows){const hay=[item.status,...item.row,Object.values(item.fields)].join(" ").toLocaleLowerCase("de-CH");if(!hay.includes(q))continue;out.push({label:String(item.row?.[0]||item.fields?.Bezeichnung||moduleKey),sub:moduleKey,href:`/${moduleKey}/${item.id}`});if(out.length>=12)return json({items:out})}}return json({items:out})}catch(e){return apiError(e)}}
+export async function GET(request:NextRequest) {
+  try {
+    const session=await requireSession();
+    const query=(request.nextUrl.searchParams.get("q")||"").trim().toLocaleLowerCase("de-CH");
+    if(query.length<2)return json({items:[]});
+    const plan=await getOrganizationPlan(session.organizationId);
+    const items=await withTenant(session.organizationId,session.userId,async client=>{
+      const results:SearchItem[]=[];
+      for(const source of searchSources){
+        const permission=permissionForModule(source.module,"read");
+        if(!permission||!tenantCan(session.role,permission)||!planAllowsModule(plan,source.module))continue;
+        const filters="kind" in source?"kind=eq."+source.kind:"";
+        const rows=await listApiBusiness(client,session,source.table,filters);
+        for(const row of rows){
+          if(!JSON.stringify(row).toLocaleLowerCase("de-CH").includes(query))continue;
+          results.push(searchItem(source,row));
+          if(results.length>=12)return results;
+        }
+      }
+      return results;
+    });
+    return json({items});
+  } catch(error){return apiError(error);}
+}
