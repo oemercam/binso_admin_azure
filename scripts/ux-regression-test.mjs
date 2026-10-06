@@ -189,3 +189,15 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Wide customer details must use the canonical three-pane proportions.");
   console.log("Customer details use company facts, active content and toolbox panes.");
 }
+
+
+// Canonical web detail standard: information | work area | toolbox.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  for(const marker of ['active="zahlungen"','active="produkte"','active="mitarbeiter"','active="spesen"','active="support"']) assert(pages.includes(marker),"Expected entity detail module is missing: "+marker);
+  assert((pages.match(/entity-detail-workspace/g)||[]).length>=5,"Payment, product, employee, expense and support details must use the canonical entity workspace.");
+  assert(responsive.includes(".entity-detail-workspace{"),"The canonical entity detail workspace must be centrally styled.");
+  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Entity details must use the standard three-pane desktop proportions.");
+  console.log("Core web entity details use information, work area and toolbox panes.");
+}
