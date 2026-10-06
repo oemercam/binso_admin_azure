@@ -46,3 +46,25 @@ const handler=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOp
 const results=await handler.GET({nextUrl:new URL('https://example.invalid/api/search?q=Probe')});
 assert.deepEqual(results.items.map(item=>item.href),['/spesen/own']);
 console.log('Search respects member record ownership.');
+// Exercise both expense mutations: module write alone cannot grant approval.
+for(const path of ['app/api/expenses/route.ts','app/api/expenses/[id]/route.ts']){
+ for(const role of ['member','reader','hr','finance','owner','admin','project_manager']){
+  let writes=0;
+  const databaseUrl=moduleUrl(`export async function requireTenantFeature(){return {role:${JSON.stringify(role)}}} export async function tenantList(){return []} export async function tenantInsert(){globalThis.__expenseWrites++;return [{id:'expense'}]} export async function tenantUpdate(){globalThis.__expenseWrites++;return [{id:'expense'}]}`);
+  const httpUrl=moduleUrl(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>({status:e.status??500,data:{error:e.code}});`);
+  let expenseSource=await fs.readFile(path,'utf8');
+  expenseSource=expenseSource.replaceAll('"@/lib/server/http"',JSON.stringify(httpUrl)).replaceAll('"@/lib/server/database"',JSON.stringify(databaseUrl));
+  const expense=await import(moduleUrl(ts.transpileModule(expenseSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+  for(const status of ['approved','rejected']){
+   globalThis.__expenseWrites=0;
+   const request={body:{merchant:'SBB',amount:42,vatRate:8.1,status}};
+   const response=path.includes('[id]')?await expense.PATCH(request,{params:Promise.resolve({id:'expense'})}):await expense.POST(request);
+   const allowed=['owner','admin','project_manager'].includes(role);
+   assert.equal(response.status,allowed?(path.includes('[id]')?200:201):403,`${path} ${role} ${status}`);
+   writes=globalThis.__expenseWrites;
+   assert.equal(writes,allowed?1:0,'Forbidden approval must not write');
+  }
+ }
+}
+delete globalThis.__expenseWrites;
+console.log('Expense approval/rejection rejects unauthorized roles before either mutation writes.');
