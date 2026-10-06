@@ -54,6 +54,7 @@ try{
  const team=(await a('/api/settings/team/invitations'));assert.ok(team.members.length&&Array.isArray(team.invitations));
  const quote=(await a('/api/documents','POST',{...docInput,kind:'offer',validUntil:today},201)).item;assert.equal((await a('/api/documents/'+quote.number)).item.kind,'offer');
  const time=(await a('/api/time-entries','POST',{durationMinutes:37,projectName:'Persisted project label',customerId:customer.id,description:'Persisted activity',startedAt:today+'T12:00:00'},201)).item;
+ assert.equal(time.customer_name,customerInput.name,'Creation response must immediately include the actual customer');assert.ok(time.employee_name,'Creation response must identify the person');
  const timeRead=(await a('/api/time-entries')).items.find(item=>item.id===time.id);assert.equal(timeRead.customer_id,customer.id);assert.equal(timeRead.project_name,'Persisted project label');assert.equal(Number(timeRead.duration_minutes),37);
  await a('/api/time-tracker','POST',{action:'start',project:'Persistent timer'});assert.equal((await a('/api/time-tracker')).tracker.project_label,'Persistent timer');await a('/api/time-tracker','POST',{action:'pause'});
  const support=(await a('/api/support/tickets','POST',{subject:'Persistence '+suffix,category:'question',priority:'normal',message:'Synthetic persisted message'},201)).item;

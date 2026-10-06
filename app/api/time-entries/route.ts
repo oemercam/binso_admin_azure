@@ -11,7 +11,7 @@ export async function GET(request:NextRequest){
     const s=await requireSession();authorize(s,"time:read");
     const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select t.id,coalesce(p.name,t.project_label,t.description) project_name,t.description,t.employee_id,t.customer_id,t.project_id,
       t.work_date started_at,round(t.hours*60) duration_minutes,t.hours,t.billable,t.approved,t.invoiced_invoice_id,t.sales_rate,t.created_at,
-      c.name customer_name,concat_ws(' ',e.first_name,e.last_name) employee_name
+      c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name
       from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id
       left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id
       left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id
@@ -41,7 +41,8 @@ export async function POST(request:NextRequest){
         values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,false,$8)
         returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,created_at`,
         [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,Boolean(customers?.rows[0]?.id??found.rows[0]?.customer_id)]);
-      return result.rows[0];
+      const context=(await c.query("select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2",[result.rows[0].id,s.organizationId])).rows[0];
+      return {...result.rows[0],...context};
     });return json({item},201);
   }catch(e){return apiError(e)}
 }

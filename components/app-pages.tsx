@@ -937,7 +937,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||"Interne Planung",description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
+        const payload=await apiPost<{item:typeof remoteEntries[number]}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?"Arbeitszeit":"Interne Planung"),description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);

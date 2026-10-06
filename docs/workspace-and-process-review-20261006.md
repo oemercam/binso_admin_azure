@@ -24,6 +24,7 @@
 - Finanzansicht vermeidet dreifache Betragsdarstellung; freie Zeiträume schließen den letzten Monat ein und filtern Monatswerte innerhalb der tatsächlichen Datumsgrenzen. Lange Vergleiche werden explizit als letzte 24 Monate gekennzeichnet.
 
 ## Ergänzte Abläufe
+- Dokumentbearbeitung zeigt das Formular allein. Die Vorschau wird bei Bedarf über die Kopfaktion geöffnet; die doppelte Live-Vorschau entfällt.
 - Dokumente: PDF mit Positionen, Summen und QR-Zahlteil; Versand über den vorhandenen Graph-Maildienst. Ein Versandauftrag wird gespeichert; identische Wiederholung verschickt nicht erneut. Nicht bestätigte Zustellung wird als Fehler ausgewiesen. Ein hängender Versand sperrt Änderungen und muss anhand des Postausgangs geklärt werden.
 - Angebote: Entwurf → übergeben → angenommen/abgelehnt. Kundenentscheid wird durch eine berechtigte Person erfasst. Nur angenommene Angebote desselben Kunden und derselben Währung können einmal in eine aktive Rechnung überführt werden. Es gibt keinen neuen öffentlichen Unterschriftenprozess.
 - Rechnungen: ausgestellte Dokumente sind gesperrt; unbezahlt stornierbare Rechnungen geben zugeordnete Zeiten und Spesen wieder frei. Zahlungen werden weiterhin mit dem vorhandenen Zahlungsprozess erfasst.

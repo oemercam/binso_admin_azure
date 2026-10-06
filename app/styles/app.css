@@ -495,7 +495,7 @@ textarea{
   font-size:12px;
   white-space:nowrap;
 }
-.invoice-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.78fr);gap:18px;align-items:start}
+.invoice-workspace{display:block}
 .invoice-form{overflow:hidden}
 .document-actions{margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .document-customer-hint{margin:5px 0 10px;color:var(--color-muted);font-size:11px}
@@ -535,7 +535,6 @@ textarea{
 .paper-closing p{margin:0 0 10px;color:#333}
 .invoice-payment-intro{margin-top:26px}
 .paper footer{margin-top:auto;padding-top:28px;border-top:1px solid #e5e5e3;color:#666;font-size:8px;line-height:1.45}
-.desktop-document-preview,
 .invoice-tablet-preview{position:sticky;top:18px;padding:22px;background:var(--color-bg);border-radius:var(--radius-lg)}
 .document-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .document-preview-heading h2{margin:0;font-size:14px}
