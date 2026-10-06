@@ -256,7 +256,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
       queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
     }).catch(error=>show(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden."));
-  },[existing,kind,searchParams]);
+  },[existing,kind,sourceTimeEntries,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
