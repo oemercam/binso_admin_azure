@@ -68,7 +68,7 @@ function useCustomerDirectory() {
 }
 
 function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
-  if(!number)return {customer:"",number:"",date:"",due:kind==="Rechnung"?"30":"",vatRate:"8.1",note:"",positions:[{id:"line-1",description:"",quantity:"1",price:"0.00"}]};
+  if(!number)return {customer:"",number:"",date:"",due:kind==="Rechnung"?"30":"",vatRate:"8.1",note:"",positions:[{id:"line-1",description:"",quantity:"1",unit:"Stück",price:"0.00"}]};
   return {
     customer:"Acme AG",
     number,
@@ -77,8 +77,8 @@ function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
     vatRate:"8.1",
     note:"",
     positions:[
-      { id:"line-1", description:"Website Konzept", quantity:"24", price:"120.00" },
-      { id:"line-2", description:"Design & Umsetzung", quantity:"12", price:"95.00" },
+      { id:"line-1", description:"Website Konzept", quantity:"24", unit:"Stunden", price:"120.00" },
+      { id:"line-2", description:"Design & Umsetzung", quantity:"12", unit:"Stunden", price:"95.00" },
     ],
   };
 }
@@ -386,17 +386,18 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
       <div className="form-section">
         <div className="section-title"><h2>Positionen</h2><button className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></button></div>
         <div className="line-items document-line-items">
-          <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span><span/></div>
+          <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Einheit</span><span>Einzelpreis</span><span>Total</span><span/></div>
           {draft.positions.map(item=>{
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
               <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
-                <span><b>{item.description}</b><small>{item.quantity} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
+                <span><b>{item.description}</b><small>{item.quantity} {item.unit??"Stück"} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
                 <strong>{draft.currency??"CHF"} {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
               <label className="mobile-line-field description"><span>Beschreibung</span><input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
               <label className="mobile-line-field"><span>Menge</span><input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
-              <label className="mobile-line-field"><span>Preis</span><input aria-label="Preis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
+              <label className="mobile-line-field"><span>Einheit</span><select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></select></label>
+              <label className="mobile-line-field"><span>Einzelpreis</span><input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
               <div className="mobile-line-total"><span>Total</span><b>{money(lineTotal)}</b></div>
               <button className="line-remove" type="button" aria-label="Position entfernen" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}><Icon name="close" size={15}/></button>
             </div>;
@@ -404,7 +405,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </div>
         <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
       </div>
-      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)closePosition()}}><section ref={positionDialogRef} tabIndex={-1} className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>closePosition()}/></header><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Preis"><input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></section></div>})()}
+      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)closePosition()}}><section ref={positionDialogRef} tabIndex={-1} className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>closePosition()}/></header><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></select></Field><Field label="Einzelpreis"><input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></section></div>})()}
       <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
     <aside className="desktop-document-preview"><div className="document-preview-heading"><h2>Live-Vorschau</h2><small>Änderungen werden sofort übernommen</small></div>{type==="Rechnung" ? <InvoicePreview draft={draft} directory={directory}/> : <OfferPreview draft={draft} directory={directory}/>}</aside>

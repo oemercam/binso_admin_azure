@@ -103,7 +103,8 @@ html[data-theme="light"] .logo[src*="-white"]{filter:invert(1)}
   align-items:center;
   justify-content:center;
   border-radius:50%;
-  background:var(--color-subtle);
+  background:var(--color-inverse-bg);
+  color:var(--color-inverse-fg);
   font-size:12px;
   font-weight:700;
 }
@@ -258,4 +259,17 @@ html[data-theme="dark"] textarea{
   display:block;
   border-radius:8px;
   background:var(--color-line);
+}
+
+
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
 }

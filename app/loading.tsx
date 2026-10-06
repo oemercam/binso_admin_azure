@@ -1,8 +1,11 @@
-import { Skeleton } from "@/components/ui";
+import { Logo } from "@/components/ui";
 
 export default function Loading() {
-  return <main className="loading-shell" aria-label="Wird geladen">
-    <aside className="loading-sidebar"><Skeleton className="skeleton-logo"/>{Array.from({length:7}).map((_,i)=><Skeleton className="skeleton-nav" key={i}/>)}</aside>
-    <section className="loading-main"><Skeleton className="skeleton-title"/><Skeleton className="skeleton-subtitle"/><div className="loading-metrics">{Array.from({length:4}).map((_,i)=><Skeleton className="skeleton-metric" key={i}/>)}</div><Skeleton className="skeleton-panel"/></section>
+  return <main className="app-launch-screen" aria-label="Binso One wird geladen" aria-live="polite">
+    <div className="app-launch-brand">
+      <Logo compact/>
+      <span className="app-launch-pulse" aria-hidden="true"/>
+    </div>
+    <span className="sr-only">Binso One wird geladen.</span>
   </main>;
 }
