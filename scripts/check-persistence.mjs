@@ -43,7 +43,7 @@ try{
  assert.match(docRead.issue_date,/^\d{4}-\d{2}-\d{2}$/);assert.match(docRead.due_date,/^\d{4}-\d{2}-\d{2}$/);assert.equal(docRead.status,'draft');assert.match(docRead.qr_reference,/^\d{27}$/);assert.equal(docRead.customer_id,customer.id);assert.equal(docRead.note,docInput.note);assert.equal(docRead.items.length,2);assert.equal(Number(docRead.items[1].vat_rate),2.6);
  await b('/api/documents/'+invoice.number,'GET',undefined,404);
  const quote=(await a('/api/documents','POST',{...docInput,kind:'offer',validUntil:today},201)).item;assert.equal((await a('/api/documents/'+quote.number)).item.kind,'offer');
- const time=(await a('/api/time-entries','POST',{durationMinutes:37,projectName:'Persisted project label',customerName:customerInput.name,description:'Persisted activity',startedAt:today+'T12:00:00'},201)).item;
+ const time=(await a('/api/time-entries','POST',{durationMinutes:37,projectName:'Persisted project label',customerId:customer.id,description:'Persisted activity',startedAt:today+'T12:00:00'},201)).item;
  const timeRead=(await a('/api/time-entries')).items.find(item=>item.id===time.id);assert.equal(timeRead.customer_id,customer.id);assert.equal(timeRead.project_name,'Persisted project label');assert.equal(Number(timeRead.duration_minutes),37);
  await a('/api/time-tracker','POST',{action:'start',project:'Persistent timer'});assert.equal((await a('/api/time-tracker')).tracker.project_label,'Persistent timer');await a('/api/time-tracker','POST',{action:'pause'});
  const support=(await a('/api/support/tickets','POST',{subject:'Persistence '+suffix,category:'question',priority:'normal',message:'Synthetic persisted message'},201)).item;
