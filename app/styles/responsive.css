@@ -386,11 +386,7 @@
     grid-template-columns:minmax(0,1fr);
     gap:var(--desktop-section-gap);
   }
-  .time-layout>.surface{
-    width:100%;
-    min-width:0;
-  }
-  .time-layout>.surface+.surface{margin-top:0}
+  .time-layout>.time-section{width:100%;min-width:0}\n  .time-layout>.time-section+.time-section{margin-top:0}\n  .time-overview-section{padding-left:0;border-left:0;border-top:1px solid var(--color-line);padding-top:var(--desktop-section-gap)}
   .timer-project{width:min(100%,520px);max-width:520px}
   .timer-actions{
     display:flex;
@@ -583,8 +579,7 @@
     gap:var(--desktop-section-y);
     align-items:start;
   }
-  .time-layout>.surface{min-width:0}
-  .timer-card{padding:var(--desktop-section-y) var(--desktop-surface-x)}
+  .time-layout>.time-section{min-width:0}\n  .timer-card{padding:0}\n  .time-overview-section{padding-left:var(--desktop-section-y);border-left:1px solid var(--color-line);border-top:0;padding-top:0}
   .timer-project{width:min(100%,520px);max-width:520px}
   .timer-actions{gap:var(--desktop-action-gap)}
   .timer-actions .button{min-width:112px;white-space:nowrap}
@@ -2969,9 +2964,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-header-detail .mobile-back{margin-inline-start:calc(var(--control-h-mobile) / -2)}
   .mobile-header-detail .mobile-detail-actions{margin-inline-end:calc(var(--control-h-mobile) / -2)}
   .document-facts b{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
-  .time-layout>.surface{border-top:0}
-  .time-layout>.timer-card>.tabs{border-top:0}
-  .time-layout>.surface+.surface{margin-top:20px}
+  .time-layout>.time-section{border-top:0}\n  .time-layout>.timer-card>.tabs{border-top:0}\n  .time-layout>.time-section+.time-section{margin-top:20px}\n  .time-overview-section{padding-left:0;border-left:0}
   .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
   .bottom-sheet>.form-grid{min-height:0;overflow-y:auto}
   .app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}
