@@ -164,6 +164,9 @@
 
 /* Shared non-mobile behavior */
 @media (min-width:761px){
+  .desktop-record-table{display:block}
+  .desktop-record-head,.desktop-record-row{display:grid}
+  .mobile-record-list{display:none}
 .sheet-layer{align-items:center;padding:24px}
   .bottom-sheet{
     max-height:calc(100dvh - 48px);
@@ -3204,3 +3207,4 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
 }
+

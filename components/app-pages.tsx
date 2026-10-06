@@ -241,7 +241,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neuer Kunde"><span className="create-action-label">Neuer Kunde</span></Button>}>
     <div className="customer-records-layout">
       <div>
-        <RecordsView loading={loading} error={error} items={customerRows} placeholder="Kunden suchen...">{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
+        <RecordsView loading={loading} error={error} items={customerRows} placeholder="Kunden suchen..." columns={[{label:"Kunde",index:0},{label:"Branche",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
       </div>
 
     </div>
@@ -403,7 +403,7 @@ function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=fa
 export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const {rows:offerRows,loading,error}=useDocumentRows("offer",offers,forceDemo);
   return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Angebot"><span className="create-action-label">Neues Angebot</span></Button>}>
-    <RecordsView loading={loading} error={error} items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen"]}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
+    <RecordsView loading={loading} error={error} items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen","Abgelehnt","Abgelaufen"]} columns={[{label:"Angebot",index:0},{label:"Kunde",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:3,status:true}]} rowHref={row=>`/angebote/${row[0]}`}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -412,7 +412,7 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neue Rechnung"><span className="create-action-label">Neue Rechnung</span></Button>}>
     <div className="tablet-master-detail invoice-master-detail">
       <div>
-        <RecordsView loading={loading} error={error} items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Offen","Bezahlt","Überfällig"]} statusGroups={{Offen:["Gesendet","Teilweise bezahlt","Überfällig"]}}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
+        <RecordsView loading={loading} error={error} items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Entwurf","Offen","Teilweise bezahlt","Bezahlt","Überfällig","Storniert"]} statusGroups={{Offen:["Gesendet"]}} columns={[{label:"Rechnung",index:0},{label:"Kunde",index:1},{label:"Datum",index:2},{label:"Betrag",index:3,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/rechnungen/${row[0]}`}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
       </div>
       {forceDemo&&<aside className="tablet-detail invoice-tablet-preview"><InvoicePreview/></aside>}
     </div>
@@ -422,7 +422,7 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
 export function PaymentsPage() {
   const {rows:paymentRows,loading,error}=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend"]}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
+    <RecordsView loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend","Storniert"]} columns={[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}]} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -518,7 +518,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
 export function ProductsPage() {
   const {rows:productRows,loading,error}=useDemoRows("products",products);
   return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Produkt"><span className="create-action-label">Neues Produkt</span></Button>}>
-    <RecordsView loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
+    <RecordsView loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]} columns={[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -596,7 +596,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
 export function EmployeesPage() {
   const {rows:employeeRows,loading,error}=useDemoRows("employees",employees);
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Mitarbeiter hinzufügen"><span className="create-action-label">Mitarbeiter hinzufügen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen...">{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
+    <RecordsView loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -701,7 +701,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 export function ExpensesPage() {
   const {rows:expenseRows,loading,error}=useDemoRows("expenses",expenses);
   return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Spese erfassen"><span className="create-action-label">Spese erfassen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Eingereicht","Genehmigt","Entwurf"]}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
+    <RecordsView loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Entwurf","Eingereicht","Genehmigt","Abgelehnt"]} columns={[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -951,7 +951,7 @@ export function SupportPage() {
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
     <div className="support-summary"><Metric label="Offen" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="support"/><Metric label="Gelöst" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst"]}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} columns={[{label:"Ticket",index:0},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
 
     </div>
   </AppShell>;

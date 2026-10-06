@@ -20,6 +20,8 @@ export function RecordsView({
   loading=false,
   error=null,
   statusGroups={},
+  columns,
+  rowHref,
 }: {
   items: string[][];
   placeholder: string;
@@ -27,11 +29,14 @@ export function RecordsView({
   loading?: boolean;
   error?: string|null;
   statusGroups?: Record<string,string[]>;
+  columns?: Array<{label:string;index:number;align?:"left"|"right";status?:boolean}>;
+  rowHref?: (item:string[])=>string|undefined;
   children: (item: string[]) => React.ReactNode;
 }) {
   const [query,setQuery]=useState("");
   const [activeChip,setActiveChip]=useState(chips[0] ?? "Alle");
   const [sort,setSort]=useState<"default"|"asc"|"desc">("default");
+  const [sortIndex,setSortIndex]=useState(0);
 
   const normalizedChip=(value:string)=>value.toLowerCase().replace(/e?n$/, "");
 
@@ -46,10 +51,10 @@ export function RecordsView({
 
     if(sort==="default") return filtered;
     return [...filtered].sort((a,b)=>{
-      const result=(a[0]??"").localeCompare(b[0]??"","de-CH",{numeric:true,sensitivity:"base"});
+      const result=(a[sortIndex]??"").localeCompare(b[sortIndex]??"","de-CH",{numeric:true,sensitivity:"base"});
       return sort==="asc" ? result : -result;
     });
-  },[activeChip,items,query,sort,statusGroups]);
+  },[activeChip,items,query,sort,sortIndex,statusGroups]);
 
   const reset=()=>{
     setQuery("");
@@ -57,19 +62,19 @@ export function RecordsView({
     setSort("default");
   };
 
-  const cycleSort=()=>setSort(current=>current==="default"?"asc":current==="asc"?"desc":"default");
+  const cycleSort=(index=0)=>{if(sortIndex!==index){setSortIndex(index);setSort("asc");return;}setSort(current=>current==="default"?"asc":current==="asc"?"desc":"default")};
   const hasFilters=query.trim().length>0 || activeChip!==(chips[0]??"Alle") || sort!=="default";
 
   return <>
     <div className="toolbar">
       <label className="searchbox"><Icon name="search"/><input aria-label={placeholder} value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
       <div className="chips">{chips.map((chip)=><button type="button" onClick={()=>setActiveChip(chip)} className={chip===activeChip?"active":""} key={chip}>{chip}</button>)}</div>
-      <button className={`filter-button ${sort!=="default"?"active":""}`} type="button" onClick={cycleSort} title="Sortierung wechseln" aria-label={sort==="asc"?"Sortierung A bis Z":sort==="desc"?"Sortierung Z bis A":"Sortierung einschalten"}><Icon name="filter" size={17}/><span>{sort==="asc"?"A–Z":sort==="desc"?"Z–A":"Sortieren"}</span></button>
+      <button className={`filter-button ${sort!=="default"?"active":""}`} type="button" onClick={()=>cycleSort()} title="Sortierung wechseln" aria-label={sort==="asc"?"Sortierung A bis Z":sort==="desc"?"Sortierung Z bis A":"Sortierung einschalten"}><Icon name="filter" size={17}/><span>{sort==="asc"?"A–Z":sort==="desc"?"Z–A":"Sortieren"}</span></button>
       <span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${visible.length} ${visible.length===1?"Eintrag":"Einträge"}`}</span>
       {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Zurücksetzen</button>}
     </div>
 
-    {loading?<p role="status">Einträge werden geladen …</p>:error?<p role="alert">{error}</p>:visible.length ? <div className="records">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div> :
+    {loading?<p role="status">Einträge werden geladen …</p>:error?<p role="alert">{error}</p>:visible.length ? <><div className="desktop-record-table">{columns&&<div className="desktop-record-head" role="row" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><button type="button" role="columnheader" className={col.align==="right"?"align-right":""} key={col.label} onClick={()=>cycleSort(col.index)}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</button>)}<span aria-hidden="true"/></div>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<Link href={href} className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</Link>:<div className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</div>})}</div><div className="records mobile-record-list">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
       <p role="status">{hasFilters?"Keine Treffer":"Noch keine Einträge erfasst"}</p>}
   </>;
 }
