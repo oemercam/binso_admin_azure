@@ -284,8 +284,6 @@
   .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tablet-master-detail{grid-template-columns:minmax(300px,.9fr) minmax(320px,1.1fr)}
   .tablet-detail{display:block;position:sticky;top:18px}
-  .invoice-workspace{grid-template-columns:1fr}
-  .desktop-document-preview{position:relative;top:auto}
   .time-layout{grid-template-columns:1fr}
   .expense-layout{grid-template-columns:220px minmax(0,1fr)}
   .thread-composer{
@@ -680,11 +678,6 @@
 
   .documents-hub-grid{gap:18px}
   .documents-hub-grid>.surface{min-width:0}
-
-  .invoice-workspace{
-    grid-template-columns:minmax(0,1.25fr) minmax(430px,.75fr);
-    gap:var(--desktop-section-y);
-  }
   .invoice-form{
     overflow:visible;
   }
@@ -697,7 +690,6 @@
   .invoice-form .document-customer-hint{margin:10px 0 0}
   .invoice-form .document-line-items{margin-top:2px}
   .invoice-form .invoice-totals{margin-top:20px}
-  .desktop-document-preview{top:88px}
 
   .document-desktop-workspace{
     display:grid;
@@ -1077,11 +1069,7 @@
   .tabs{margin-bottom:12px;padding-bottom:8px}
 
   /* Document workspaces use available desktop width without oversized gutters. */
-  .invoice-workspace{
-    grid-template-columns:minmax(560px,1fr) minmax(440px,.86fr);
-    gap:var(--desktop-workspace-gap);
-  }
-  .desktop-document-preview,.invoice-tablet-preview{
+  .invoice-tablet-preview{
     top:calc(var(--desktop-header-h) + var(--desktop-page-top));
     padding:16px;
   }
@@ -1114,7 +1102,6 @@
 /* Large desktop refinement */
 @media (min-width:1500px){
 .document-desktop-workspace{grid-template-columns:minmax(0,1fr) 280px}
-  .invoice-workspace{grid-template-columns:minmax(0,1.35fr) minmax(500px,.65fr)}
   .revenue-chart svg{height:300px}
   .finance-month-bars{min-height:290px}
 
@@ -1783,7 +1770,6 @@
   .document-read-lines small{margin-top:3px;color:var(--color-muted);font-size:10px}
   .document-read-lines strong{font-size:11px;white-space:nowrap}
   .document-more-sheet .sheet-menu>button,.document-more-sheet .sheet-menu>a{width:100%;min-height:var(--mobile-sheet-row-h);padding:8px 0;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;gap:10px;align-items:center;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
-  .invoice-workspace{display:block}
   .invoice-form{border:0;border-radius:0;overflow:visible}
   .invoice-form .form-section{padding:18px 0}
   .invoice-form .form-section:first-child{padding-top:0}
@@ -1853,7 +1839,6 @@
   .mobile-position-sheet-total b{font-size:14px}
   .mobile-position-remove{justify-self:start;min-height:40px}
   .mobile-position-fields>.button{width:100%;min-height:48px}
-  .desktop-document-preview,
   .invoice-tablet-preview{display:none}
   .document-modal-body{
     width:100%;
@@ -2637,8 +2622,6 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .document-modal .qr-code{width:100%;height:auto;aspect-ratio:1}
   .document-modal .qr-info{font-size:clamp(6px,1.9vw,8px)}
   .document-modal .qr-amount{grid-column:2;font-size:clamp(7px,2.2vw,9px)}
-
-.invoice-workspace{display:block}
   .invoice-form{padding:0;border:0;border-radius:0}
   .invoice-form>.form-section{padding:14px 0;margin:0;border-top:1px solid var(--color-line)}
   .invoice-form>.form-section:first-child{padding-top:4px;border-top:0}
