@@ -128,7 +128,6 @@ export function AppShell({
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null);
   const [timerNow, setTimerNow] = useState(0);
   const [timerProjectLabel,setTimerProjectLabel]=useState("");
-  const [accountInitials,setAccountInitials]=useState("TM");
   const [demoSession,setDemoSession]=useState(false);
   const [notifications,setNotifications]=useState<NotificationItem[]>([]);
   const [notificationsLoading,setNotificationsLoading]=useState(false);
@@ -374,9 +373,8 @@ export function AppShell({
             </Link>)}
           </div>}
         </div>
-        <div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}{demoSession&&<span className="app-demo-badge">Demo</span>}
-          <button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
+        <div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
+          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Icon name="user" size={18}/></button>
         </div>
       </div>
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
@@ -386,10 +384,9 @@ export function AppShell({
         </div>
         {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
         {backHref&&mobileActions&&<div className="mobile-detail-actions">{mobileActions}</div>}
-        <div className="mobile-header-actions">{demoSession&&<span className="app-demo-badge mobile">Demo</span>}
-          <IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
+        <div className="mobile-header-actions"><IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}>{accountInitials}</button>
+          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Icon name="user" size={18}/></button>
         </div>
       </header>
 
@@ -461,7 +458,7 @@ export function AppShell({
           </div>}
 
           {sheet === "account" && <div className="account-sheet">
-            <div className="account-sheet-profile"><span className="avatar avatar-large">{accountInitials}</span><div><b>Mein Binso One</b><small>Persönliche Einstellungen</small></div></div>
+            <div className="account-sheet-profile"><span className="avatar avatar-large"><Icon name="user" size={22}/></span><div><b>Mein Binso One</b><small>Persönliche Einstellungen</small></div></div>
             <div className="sheet-menu">
               <SheetLink href="/einstellungen/konto" icon="user" title="Persönliche Daten" text="Profil und Sprache" onSelect={() => setSheet(null)}/>
               <SheetLink href="/einstellungen/sicherheit" icon="lock" title="Sicherheit" text="Passwort und Sitzungen" onSelect={() => setSheet(null)}/>
