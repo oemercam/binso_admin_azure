@@ -1022,7 +1022,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   })();
   const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
-  const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};\n  const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
+  const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+  const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file)return;
