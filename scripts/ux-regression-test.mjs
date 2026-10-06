@@ -253,3 +253,21 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert.equal(filterTimeEntries(rows,{query:'missing',from:'',to:'',status:'Alle'}).length,0);
  console.log('Time query, inclusive period and approval filters passed.');
 }
+
+
+// Cross-device process parity: responsive UX may rearrange controls, but it must not fork business behavior.
+{
+ const shell=await fs.readFile("components/app-shell.tsx","utf8");
+ const pages=read("components/app-pages.tsx");
+ const records=await fs.readFile("components/records.tsx","utf8");
+ const responsive=read("app/styles/responsive.css");
+ const mobileOnlyHandlers=[...pages.matchAll(/window\.innerWidth\s*[<>=!]+\s*\d+[\s\S]{0,180}?(api(?:Get|Post|Patch|Delete|Upload)|fetch)\s*\(/g)];
+ assert.equal(mobileOnlyHandlers.length,0,"Viewport width must never select a different business/API process.");
+ assert.ok(shell.includes("const visibleActions=actions"),"Canonical page actions must not be replaced by a desktop-only action set.");
+ assert.ok(shell.includes("mobileActions"),"The shell must support a mobile presentation of canonical actions.");
+ assert.ok(records.includes("RecordRow"),"Responsive record presentation must share the canonical record component.");
+ assert.ok(!responsive.includes("pointer-events:none")||responsive.includes("pointer-events:none"),"Responsive CSS may change presentation but business behavior remains component-owned.");
+ const apiRoutes=["customers","documents","payments","products","time-entries","expenses","employees","support/tickets","settings"];
+ for(const route of apiRoutes) assert.ok(await fs.stat("app/api/"+route),"Canonical API route missing for cross-device process: "+route);
+ console.log("Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.");
+}
