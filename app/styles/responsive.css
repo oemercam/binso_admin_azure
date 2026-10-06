@@ -386,11 +386,7 @@
     grid-template-columns:minmax(0,1fr);
     gap:var(--desktop-section-gap);
   }
-  .time-layout>.surface{
-    width:100%;
-    min-width:0;
-  }
-  .time-layout>.surface+.surface{margin-top:0}
+  .time-layout>.time-section{width:100%;min-width:0}\n  .time-layout>.time-section+.time-section{margin-top:0}\n  .time-overview-section{padding-left:0;border-left:0;border-top:1px solid var(--color-line);padding-top:var(--desktop-section-gap)}
   .timer-project{width:min(100%,520px);max-width:520px}
   .timer-actions{
     display:flex;
@@ -433,6 +429,19 @@
 
 /* Wide desktop */
 @media (min-width:1101px){
+  .customer-detail-workspace,
+  .entity-detail-workspace{
+    display:grid;
+    grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%);
+    gap:24px;
+    align-items:start;
+  }
+  .customer-info-pane,
+  .entity-info-pane,
+  .desktop-context-rail{position:sticky;top:82px;align-self:start;min-width:0}
+  .desktop-detail-main,
+  .entity-edit-main{min-width:0}
+
 .desktop-appbar{
     position:sticky;
     top:0;
@@ -475,9 +484,9 @@
   .page-head{
     min-height:auto;
     margin:0 0 22px;
-    padding:0 0 22px;
+    padding:0;
     align-items:flex-start;
-    border-bottom:1px solid var(--color-line);
+    border-bottom:0;
   }
   .page-head h1{font-size:30px;line-height:1.05}
   .page-head p{max-width:780px;margin-top:8px}
@@ -532,8 +541,8 @@
   .section-title{
     min-height:var(--desktop-action-h);
     margin-bottom:12px;
-    padding-bottom:12px;
-    border-bottom:1px solid var(--color-line);
+    padding-bottom:0;
+    border-bottom:0;
   }
   .section-title h2{font-size:15px}
   .section-title>.icon-action,
@@ -583,8 +592,7 @@
     gap:var(--desktop-section-y);
     align-items:start;
   }
-  .time-layout>.surface{min-width:0}
-  .timer-card{padding:var(--desktop-section-y) var(--desktop-surface-x)}
+  .time-layout>.time-section{min-width:0}\n  .timer-card{padding:0}\n  .time-overview-section{padding-left:var(--desktop-section-y);border-left:1px solid var(--color-line);border-top:0;padding-top:0}
   .timer-project{width:min(100%,520px);max-width:520px}
   .timer-actions{gap:var(--desktop-action-gap)}
   .timer-actions .button{min-width:112px;white-space:nowrap}
@@ -686,7 +694,7 @@
 
   .document-desktop-workspace{
     display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(360px,32%);
+    grid-template-columns:minmax(300px,30%) minmax(520px,1fr) minmax(250px,22%);
     gap:36px;
     align-items:start;
   }
@@ -752,6 +760,34 @@
     aspect-ratio:210/297;
     box-shadow:0 8px 24px rgba(0,0,0,.06);
   }
+  .document-workspace-page{min-width:0;overflow:hidden}
+  .document-workspace-page .document-pages{display:block}
+  .document-workspace-page .document-pages>.paper{display:none}
+  .document-workspace-page.page-1 .document-pages>.paper:nth-child(1){display:block}
+  .document-workspace-page.page-2 .document-pages>.paper:nth-child(2){display:block}
+  .document-page-navigation{
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    border-top:1px solid var(--color-line);
+    font-size:11px;
+    font-weight:700;
+  }
+  .document-page-navigation button{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    color:inherit;
+  }
+  .document-page-navigation button:not(:disabled):hover{background:var(--color-subtle)}
+  .document-page-navigation button:disabled{opacity:.28}
+
 
   .document-detail-view{border-top:1px solid var(--color-line)}
   .document-detail-section{padding:24px 0;border-bottom:1px solid var(--color-line)}
@@ -777,6 +813,16 @@
   }
   .desktop-detail-main,
   .entity-edit-main{min-width:0}
+  .desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}
+  .page-head-detail{margin-bottom:20px}
+  .page-head-detail + :is(.desktop-detail-workspace,.document-desktop-workspace,.desktop-detail-single,.entity-edit-workspace){margin-top:0}
+  .employee-tab-panel{padding:0}
+  .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
+  .employee-tab-panel .compact-list>div,
+  .employee-tab-panel .compact-list>a{min-height:58px;padding-block:10px}
+  .desktop-context-rail .desktop-summary-facts>span{min-height:44px}
+  .desktop-context-rail .desktop-toolbox>a,
+  .desktop-context-rail .desktop-toolbox>button{min-height:58px}
   .form-main-new{display:block}
   .desktop-context-rail{
     min-width:0;
@@ -901,7 +947,7 @@
     --desktop-header-h:56px;
     --desktop-page-top:20px;
     --desktop-page-bottom:48px;
-    --desktop-page-head-gap:16px;
+    --desktop-page-head-gap:20px;
     --desktop-workspace-gap:16px;
     --desktop-section-gap:20px;
     --desktop-row-h:56px;
@@ -1064,7 +1110,7 @@
 
 /* Large desktop refinement */
 @media (min-width:1500px){
-.document-desktop-workspace{grid-template-columns:minmax(0,1fr) minmax(420px,30%)}
+.document-desktop-workspace{grid-template-columns:minmax(320px,30%) minmax(560px,1fr) minmax(260px,20%)}
   .invoice-workspace{grid-template-columns:minmax(0,1.35fr) minmax(500px,.65fr)}
   .revenue-chart svg{height:300px}
   .finance-month-bars{min-height:290px}
@@ -2931,9 +2977,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-header-detail .mobile-back{margin-inline-start:calc(var(--control-h-mobile) / -2)}
   .mobile-header-detail .mobile-detail-actions{margin-inline-end:calc(var(--control-h-mobile) / -2)}
   .document-facts b{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
-  .time-layout>.surface{border-top:0}
-  .time-layout>.timer-card>.tabs{border-top:0}
-  .time-layout>.surface+.surface{margin-top:20px}
+  .time-layout>.time-section{border-top:0}\n  .time-layout>.timer-card>.tabs{border-top:0}\n  .time-layout>.time-section+.time-section{margin-top:20px}\n  .time-overview-section{padding-left:0;border-left:0}
   .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
   .bottom-sheet>.form-grid{min-height:0;overflow-y:auto}
   .app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}

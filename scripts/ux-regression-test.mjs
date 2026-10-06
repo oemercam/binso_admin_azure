@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
+const read=path=>requireReadCache.get(path)??'';
+const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await fs.readFile(path,'utf8')])));
 let source=await fs.readFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
@@ -134,3 +136,93 @@ assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must 
 assert.ok(manifestSource.includes('/brand/pwa-icon-maskable-512.png'),'PWA manifest must expose a maskable Binso One icon');
 assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen metadata must use the Binso One artwork');
 console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');
+
+
+// Wide document workspace contract: information | single-page preview | toolbox.
+{
+  const documents=read("components/documents.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(documents.includes("document-workspace-page"),"Document detail must expose the central single-page preview.");
+  assert(documents.includes("document-page-navigation"),"Multi-page invoices must expose page navigation.");
+  assert(documents.includes("Seite {workspacePage+1} / 2"),"Invoice workspace must show the active page count.");
+  assert(responsive.includes("grid-template-columns:minmax(300px,30%) minmax(520px,1fr) minmax(250px,22%)"),"Wide document detail must use the canonical three-pane grid.");
+  assert(responsive.includes(".document-workspace-page.page-2 .document-pages>.paper:nth-child(2)"),"Document preview must render one selected page at a time.");
+  console.log("Invoices and offers use the canonical information, single-page preview and toolbox workspace.");
+}
+
+
+// Heading rhythm contract: headings provide hierarchy; adjacent content owns dividers.
+{
+  const responsive=read("app/styles/responsive.css");
+  assert(!/\.page-head\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Desktop page headings must not add a divider that can stack with content borders.");
+  assert(!/\.section-title\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Shared section headings must not create stacked dividers.");
+  console.log("Shared page and section headings cannot create consecutive divider lines.");
+}
+
+
+// Detail heading rhythm: the AppShell owns the entity title; detail content must not repeat it.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(!pages.includes('<div className="desktop-detail-main"><div className="entity-hero"><span className="record-avatar large">A</span>'),"Customer detail must not repeat the company heading below AppShell.");
+  assert(responsive.includes("--desktop-page-head-gap:20px"),"Desktop heading-to-content spacing must use the canonical rhythm.");
+  assert(responsive.includes(".desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}"),"Detail tabs must use the canonical heading/divider spacing.");
+  console.log("Detail headings and tab dividers use one consistent vertical rhythm.");
+}
+
+
+// Terminal row divider contract: containers may close a section; their final data row must not draw a second line.
+{
+  const appCss=read("app/styles/app.css");
+  assert(appCss.includes(".detail-list>div:last-child,"),"Detail lists must suppress the final row divider.");
+  assert(appCss.includes(".compact-list>div:last-child,"),"Compact lists must suppress the final row divider.");
+  assert(appCss.includes(".contact-list>div:last-child{border-bottom:0}"),"Contact lists must suppress the final row divider.");
+  console.log("Final rows cannot create duplicate section closing dividers.");
+}
+
+
+// Customer detail workspace contract: company facts | active work area | toolbox.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared three-pane workspace.");
+  assert(pages.includes('className="customer-info-pane"'),"Customer details must expose a dedicated company information pane.");
+  assert(pages.includes('aria-label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
+  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Wide customer details must use the canonical three-pane proportions.");
+  console.log("Customer details use company facts, active content and toolbox panes.");
+}
+
+
+// Canonical web detail standard: information | work area | toolbox.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  for(const marker of ['active="zahlungen"','active="produkte"','active="mitarbeiter"','active="spesen"','active="support"']) assert(pages.includes(marker),"Expected entity detail module is missing: "+marker);
+  assert((pages.match(/entity-detail-workspace/g)||[]).length>=5,"Payment, product, employee, expense and support details must use the canonical entity workspace.");
+  assert(responsive.includes(".entity-detail-workspace{"),"The canonical entity detail workspace must be centrally styled.");
+  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Entity details must use the standard three-pane desktop proportions.");
+  console.log("Core web entity details use information, work area and toolbox panes.");
+}
+
+
+// Finance periods: presets are shortcuts, not a limitation.
+{
+  const pages=read("components/app-pages.tsx");
+  assert(pages.includes("Zeitraum wählen"),"Finance must offer a custom period in addition to presets.");
+  assert(pages.includes('Field label="Von"')&&pages.includes('Field label="Bis"'),"Custom finance periods must expose from/to date controls.");
+  assert(pages.includes('range==="custom"'),"Finance calculations must support the custom range mode.");
+  console.log("Finance supports free from/to periods alongside quick presets.");
+}
+
+
+// Desktop process integrity: time tracking must persist explicit customer/project identity and customer detail has one info pane per path.
+{
+ const pages=read("components/app-pages.tsx");
+ const tracker=await fs.readFile("app/api/time-tracker/route.ts","utf8");
+ const entries=await fs.readFile("app/api/time-entries/route.ts","utf8");
+ assert(pages.includes("projectId:manualProject||null")&&pages.includes("customerId:manualCustomer||null"),"Manual time must submit canonical customer/project IDs.");
+ assert(tracker.includes("project_customer_mismatch")&&entries.includes("project_customer_mismatch"),"Timer and manual time APIs must reject customer/project mismatches.");
+ const demoCustomer=pages.slice(pages.indexOf('if(!production){\n    return <AppShell title="Acme AG"'),pages.indexOf('if(!customer) return'));
+ assert.equal((demoCustomer.match(/customer-info-pane/g)||[]).length,1,"Demo customer detail must render exactly one company information pane.");
+ console.log("Desktop customer and time-tracking processes preserve canonical entity identity.");
+}

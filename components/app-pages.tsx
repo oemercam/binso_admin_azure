@@ -186,10 +186,13 @@ export function FinancePage() {
   const [error,setError]=useState<string|null>(null);
   const [range,setRange]=useState("month");
   const [focusMonth,setFocusMonth]=useState<string|null>(null);
+  const [customFrom,setCustomFrom]=useState("");
+  const [customTo,setCustomTo]=useState("");
   useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production]);
   const now=new Date();
   const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
-  const rangeBounds=(()=>{let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
+  const customRange=range==="custom"&&customFrom&&customTo;
+  const rangeBounds=(()=>{if(customRange){const start=new Date(customFrom+"T00:00:00");const end=new Date(customTo+"T00:00:00");end.setDate(end.getDate()+1);return{start,end}}let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
   const bounds=focusMonth?(()=>{const [year,month]=focusMonth.split("-").map(Number);const start=new Date(year,month-1,1);return{start,end:new Date(year,month,1)}})():rangeBounds;
   const payments=(data.payments??[]);
   const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
@@ -199,7 +202,9 @@ export function FinancePage() {
   const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
   const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
   const costs=expense+operating+staff,result=income-costs;
-  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{
+  const customMonths=customRange?Math.max(1,Math.min(24,(rangeBounds.end.getFullYear()-rangeBounds.start.getFullYear())*12+rangeBounds.end.getMonth()-rangeBounds.start.getMonth()+1)):0;
+  const visibleMonths=range==="custom"?customMonths:ranges[range].months;
+  const monthly=Array.from({length:Math.min(24,visibleMonths)},(_,i)=>{
     const d=new Date(rangeBounds.end.getFullYear(),rangeBounds.end.getMonth()-1-i,1);
     const sameMonth=(value:unknown)=>{const x=new Date(String(value??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()};
     const monthIncome=payments.filter(item=>sameMonth(item.payment_date)).reduce((s,item)=>s+Number(item.amount??0),0);
@@ -209,10 +214,12 @@ export function FinancePage() {
     const monthCosts=monthExpense+monthOperating+monthStaff;
     return{key:String(d.getFullYear())+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("de-CH",{month:"short"}),income:monthIncome,costs:monthCosts,result:monthIncome-monthCosts};
   }).reverse();
-  const singlePeriod=ranges[range].months===1||focusMonth!==null;
+  const singlePeriod=(range!=="custom"&&ranges[range].months===1)||focusMonth!==null;
+  const customInvalid=range==="custom"&&(!customFrom||!customTo||customFrom>customTo);
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
     {error&&<p role="alert">{error}</p>}
-    <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}</div>
+    <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}<button type="button" className={range==="custom"&&!focusMonth?"active":""} onClick={()=>{setRange("custom");setFocusMonth(null)}}>Zeitraum wählen</button></div>
+    {range==="custom"&&<div className="finance-custom-range"><Field label="Von"><input type="date" value={customFrom} onChange={e=>{setCustomFrom(e.target.value);setFocusMonth(null)}}/></Field><Field label="Bis"><input type="date" value={customTo} min={customFrom||undefined} onChange={e=>{setCustomTo(e.target.value);setFocusMonth(null)}}/></Field>{customInvalid&&<small>Bitte einen gültigen Zeitraum von–bis wählen.</small>}</div>}
     <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
     <section className="finance-analysis">
       <div className="section-title"><div><span className="eyebrow">{singlePeriod?"FINANZFLUSS":"MONATSVERGLEICH"}</span><h2>{singlePeriod?"So entsteht dein Ergebnis":"Einnahmen, Kosten und Ergebnis"}</h2></div>{focusMonth&&<button type="button" className="text-action" onClick={()=>setFocusMonth(null)}>Zeitraum anzeigen</button>}</div>
@@ -288,15 +295,14 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   };
 
   if(!production){
-    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Kunden"} actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
-      <div className="desktop-detail-workspace">
-        <div className="desktop-detail-main"><div className="entity-hero"><span className="record-avatar large">A</span><div><h2>Acme AG</h2><p>Bauunternehmen · Zürich</p></div><Status tone="success">Aktiv</Status></div>
-      <div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Kunden"} >
+      <div className="customer-detail-workspace">
+        <aside className="customer-info-pane"><span className="compact-section-label">Firma</span><strong>Acme AG</strong><dl className="detail-list"><div><dt>Status</dt><dd>Aktiv</dd></div><div><dt>Ort</dt><dd>Zürich</dd></div><div><dt>Branche</dt><dd>Bauunternehmen</dd></div></dl></aside><div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
       {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section></div>}
       {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
       {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link></div></section>}
       {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kundendaten aktualisiert</b><small>Demo</small></div></div></div></section>}</div>
-        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Kundenübersicht</span><strong>Acme AG</strong><small>Bauunternehmen · Zürich</small><div className="desktop-summary-facts"><span>Status <b>Aktiv</b></span><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section></aside>
+        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
       </div>
       {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
       {contactToast&&<Toast title={contactToast}/>}
@@ -309,15 +315,13 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const sector=String(customer.sector??"");
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
-  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref="/kunden" backLabel="Kunden" actions={<><Button href="/angebote/neu" variant="secondary">Angebot erstellen</Button><Button href="/rechnungen/neu">Rechnung erstellen</Button></>}>
-    <div className="desktop-detail-workspace">
-      <div className="desktop-detail-main"><div className="entity-hero"><span className="record-avatar large">{name.slice(0,1)}</span><div><h2>{name}</h2>{[sector,city].some(Boolean)&&<p>{[sector,city].filter(Boolean).join(" · ")}</p>}</div><Status tone={status==="active"?"success":"neutral"}>{status==="active"?"Aktiv":"Inaktiv"}</Status></div>
-    <div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref="/kunden" backLabel="Kunden" >
+    <div className="customer-detail-workspace">\n      <aside className="customer-info-pane"><span className="compact-section-label">Firma</span><strong>{name}</strong><dl className="detail-list"><div><dt>Status</dt><dd>{status==="active"?"Aktiv":"Inaktiv"}</dd></div><div><dt>Ort</dt><dd>{city||"—"}</dd></div><div><dt>Branche</dt><dd>{sector||"—"}</dd></div></dl></aside>\n      <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
     {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>E-Mail</dt><dd>{String(customer.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(customer.phone??"—")}</dd></div><div><dt>Adresse</dt><dd>{String(customer.street??"—")}<br/>{[customer.postal_code,customer.city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>UID</dt><dd>{String(customer.uid??"—")}</dd></div></dl></section></div>}
     {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div>})}</div>:<EmptyState icon="users" title="Noch keine Kontakte" text="Füge den ersten Ansprechpartner für diesen Kunden hinzu."/>}</section>}
     {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/>{customerDocuments.length?<div className="compact-list">{customerDocuments.map(item=>{const kind=String(item.kind);const statusValue=String(item.status??"draft");const statusLabel:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};return <Link href={(kind==="offer"?"/angebote/":"/rechnungen/")+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{swissDate(item.issue_date)} · {moneyChf(item.total)}</span><Status tone={statusValue==="paid"||statusValue==="accepted"?"success":statusValue==="overdue"||statusValue==="declined"?"danger":"warning"}>{statusLabel[statusValue]??statusValue}</Status></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Belege" text="Angebote und Rechnungen für diesen Kunden erscheinen hier."/>}</section>}
     {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kunde erstellt</b><small>{new Date(String(customer.created_at)).toLocaleString("de-CH")}</small></div></div><div><i/><div><b>Zuletzt aktualisiert</b><small>{new Date(String(customer.updated_at)).toLocaleString("de-CH")}</small></div></div></div></section>}</div>
-      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Kundenübersicht</span><strong>{name}</strong><small>{[sector,city].filter(Boolean).join(" · ")||"Kundendaten"}</small><div className="desktop-summary-facts"><span>Status <b>{status==="active"?"Aktiv":"Inaktiv"}</b></span><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section></aside>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
     </div>
     {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
     {contactToast&&<Toast title={contactToast} tone={contactToast.includes("konnte")?"danger":"success"}/>}
@@ -487,7 +491,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   },[production,paymentId]);
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="desktop-detail-workspace">
+    <div className="entity-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>CHF 4’346.40</strong><small>02.10.2026 · Verbucht</small><dl className="detail-list"><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span><Link href="/rechnungen/RE-2026-019"><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>RE-2026-019</small></span><Icon name="arrow" size={15}/></Link><Link href="/kunden/acme"><Icon name="users"/><span><b>Kunde öffnen</b><small>Acme AG</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -501,7 +506,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const status=String(payment.status??"booked");
   const statusLabel:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="desktop-detail-workspace">
+    <div className="entity-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>{moneyChf(payment.amount)}</strong><small>{swissDate(payment.paid_on)} · {statusLabel[status]??status}</small><dl className="detail-list"><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href="/kunden"><Icon name="users"/><span><b>Kundenübersicht</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -565,8 +571,9 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
-    <div className={existing?"entity-edit-workspace":"form-page"}>
+  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace":"form-page"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Produkt</span><strong>{name||"Produkt"}</strong><small>{type} · {status}</small><dl className="detail-list"><div><dt>Einheit</dt><dd>{unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</dd></div><div><dt>MwSt.</dt><dd>{vatRate}%</dd></div></dl></aside>}
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         <div className="form-grid two">
           <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
@@ -579,7 +586,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Produktübersicht</span><strong>{price?moneyChf(Number(price.replace(",","."))):"CHF 0.00"}</strong><small>{type} · {unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>MwSt. <b>{vatRate}%</b></span>{sku&&<span>Artikelnummer <b>{sku}</b></span>}</div></section><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Produktübersicht</span><strong>{price?moneyChf(Number(price.replace(",","."))):"CHF 0.00"}</strong><small>{type} · {unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>MwSt. <b>{vatRate}%</b></span>{sku&&<span>Artikelnummer <b>{sku}</b></span>}</div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Änderungen übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
@@ -603,6 +610,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [role,setRole]=useState("");
   const [load,setLoad]=useState(existing?"100":"100");
   const [entryDate,setEntryDate]=useState("");
+  const [weeklyHours,setWeeklyHours]=useState("42");
+  const [vacationDays,setVacationDays]=useState("25");
+  const [address,setAddress]=useState("");
   const [status,setStatus]=useState("Aktiv");
   const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
@@ -624,7 +634,10 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setPhone(String(item.phone??""));
         setRole(String(item.job_title??""));
         setLoad(String(item.workload_percent??"100"));
-        setEntryDate(String(item.entry_date??""));
+        setEntryDate(String(item.entry_date??item.start_date??""));
+        setWeeklyHours(String(item.weekly_hours??"42"));
+        setVacationDays(String(item.vacation_days??"25"));
+        setAddress(String(item.address??""));
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
       });
     }).catch(()=>undefined);
@@ -633,7 +646,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const save=async()=>{
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
-      const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,status:status==="Inaktiv"?"inactive":"active"};
+      const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
       if(production){
         if(existing&&employeeId) await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
         else await apiPost("/api/employees",payload);
@@ -649,8 +662,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={(!existing||employeeTab==="overview")?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
-    <div className={existing?"desktop-detail-workspace":"desktop-detail-single"}>
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><dl className="detail-list"><div><dt>Status</dt><dd>{status}</dd></div><div><dt>Pensum</dt><dd>{load}%</dd></div><div><dt>Eintritt</dt><dd>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</dd></div></dl></aside>}
       <div className="desktop-detail-main">
     {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
@@ -667,6 +681,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Funktion"><input value={role} onChange={e=>setRole(e.target.value)}/></Field>
         <Field label="Pensum"><input inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
         <Field label="Eintritt"><input type="date" value={entryDate} onChange={e=>setEntryDate(e.target.value)}/></Field>
+        <Field label="Wochenstunden"><input inputMode="decimal" value={weeklyHours} onChange={e=>setWeeklyHours(e.target.value)}/></Field>
+        <Field label="Ferientage / Jahr"><input inputMode="decimal" value={vacationDays} onChange={e=>setVacationDays(e.target.value)}/></Field>
+        <Field label="Adresse" className="full"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
@@ -675,7 +692,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
     {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledger.files.length&&<EmptyState icon="file" title="Keine Dokumente" text="Für diesen Mitarbeiter sind keine Dokumente geladen."/>}</section>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Wochenstunden <b>{weeklyHours} h</b></span><span>Ferien <b>{vacationDays} Tage</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Stammdaten übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
@@ -775,8 +792,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
-    <div className={existing?"expense-layout expense-detail-workspace":"expense-layout"}>
+  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button onClick={()=>void save()}>Einreichen</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Spese</span><strong>{amount?moneyChf(Number(amount.replace(",","."))):"CHF 0.00"}</strong><small>{merchant||category}</small><dl className="detail-list"><div><dt>Status</dt><dd>{status}</dd></div><div><dt>Datum</dt><dd>{date?new Date(date).toLocaleDateString("de-CH"):"—"}</dd></div><div><dt>Kategorie</dt><dd>{category}</dd></div></dl></aside>}
       <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
       <div className="form-page">
         <div className="form-grid two">
@@ -792,6 +810,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Beleg</span><strong>{receiptFile?.name||"Spesenbeleg"}</strong><small>{scanState==="done"?"Belegdaten erkannt":"Angaben prüfen"}</small></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Änderungen übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("gültigen")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
@@ -807,19 +826,21 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [manualOpen,setManualOpen]=useState(false);
   const [projectOpen,setProjectOpen]=useState(false);
   const [timerProject,setTimerProject]=useState("Interne Planung");
+  const [timerCustomer,setTimerCustomer]=useState("");
   const [manualDate,setManualDate]=useState("");
   const [manualDuration,setManualDuration]=useState("01:00");
   const [manualCustomer,setManualCustomer]=useState("");
-  const [manualProject,setManualProject]=useState("Interne Planung");
+  const [manualProject,setManualProject]=useState("");
   const [manualDescription,setManualDescription]=useState("");
-  const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string}>>([]);
+  const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items)}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo]);
-  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>>([]);
+  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
+  const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
 
   useEffect(()=>{
-    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project)}).catch(()=>undefined)};
+    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
     queueMicrotask(()=>setManualDate(new Date().toLocaleDateString("en-CA")));
     window.addEventListener("binso-timer-change",sync);
@@ -836,11 +857,11 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
   const setProject=async(project:string)=>{
-    try{const state=await changeTimer("project",project);setTimerProject(state.project);setProjectOpen(false)}
+    try{const selected=availableProjects.find(item=>item.name===project&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer("project",project,selected?.id??null,timerCustomer||null);setTimerProject(state.project);setProjectOpen(false)}
     catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
   const toggleTimer=async()=>{
-    try{const state=await changeTimer(running?"pause":"start",timerProject);setRunning(state.running);setSeconds(state.seconds)}
+    try{const selected=availableProjects.find(item=>item.name===timerProject&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
     catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
   };
 
@@ -868,7 +889,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||"Interne Planung",description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -880,30 +901,34 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   };
 
   const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
-  const productionEntries=remoteEntries.length?<div className="compact-list time-entry-list">{remoteEntries.map(item=><div key={item.id}><b>{item.project_name||"Zeiteintrag"}</b><span>{item.description||"Erfasste Arbeitszeit"}</span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong></div>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
+  const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
+  const billableSelection=remoteEntries.filter(item=>selectedTimeIds.includes(item.id)&&item.billable&&item.approved&&!item.invoiced_invoice_id);
+  const invoiceHref=billableSelection.length?"/rechnungen/neu?timeEntries="+encodeURIComponent(billableSelection.map(item=>item.id).join(",")):"";
+  const groupedEntries=Object.entries(remoteEntries.reduce<Record<string,typeof remoteEntries>>((groups,item)=>{const key=(item.customer_name||"Intern")+" · "+(item.project_name||"Ohne Auftrag");(groups[key]??=[]).push(item);return groups},{}));
+  const productionEntries=remoteEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{item.description||"Erfasste Arbeitszeit"}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">Intern</Status>}</div>)}</div></section>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
 
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
     <div className="time-layout">
-      <section className="surface timer-card">
+      <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
-          <div className="timer-project"><small>Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
+          <div className="timer-project"><small>Kunde</small><select value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProject("Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
           <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
           {!forceDemo?productionEntries:demoEntries}
-          <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
+          <div className="time-entry-actions"><Button variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{billableSelection.length>0&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}</div>
         </>}
       </section>
-      {timeTab==="timer"&&<section className="surface">
+      {timeTab==="timer"&&<section className="time-section time-overview-section">
         <SectionTitle title={!forceDemo?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
         {!forceDemo?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>}
     </div>
-    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option value="">Keine Zuordnung</option>{availableCustomers.map(item=><option key={item.id} value={item.name}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Projekt"><input value={manualProject} onChange={e=>setManualProject(e.target.value)} placeholder="Projekt"/></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -997,7 +1022,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   })();
   const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
-  const ticketStatusLabel:Record<string,string>={open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",resolved:"Gelöst",closed:"Geschlossen"};
+  const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+  const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file)return;
@@ -1050,7 +1076,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   const production=useBackendMode();
   return <AppShell title={ticketSubject} subtitle={ticketReference+" · "+(ticketStatusLabel[ticketStatus]??ticketStatus)} active="support" backHref="/support" backLabel="Support">
-    <div className="desktop-detail-workspace support-detail-workspace">
+    <div className="entity-detail-workspace support-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Support</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><dl className="detail-list"><div><dt>Status</dt><dd>{ticketStatusLabel[ticketStatus]??ticketStatus}</dd></div><div><dt>Priorität</dt><dd>{ticketPriorityLabel[String(ticket?.priority??"normal")]??String(ticket?.priority??"Normal")}</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="support-thread">
       <div className="thread-day">Heute</div>
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>

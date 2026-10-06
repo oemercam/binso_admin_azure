@@ -97,6 +97,24 @@ html[data-theme="light"] .logo[src*="-white"]{filter:invert(1)}
   color:inherit;
 }
 .icon-button:hover,.icon-action:hover{background:var(--color-subtle)}
+.desktop-notification-button,
+.mobile-notification-button,
+.avatar.avatar-button{
+  background:transparent;
+  color:var(--color-fg);
+  border-radius:0;
+  transition:none;
+}
+.desktop-notification-button:hover,
+.desktop-notification-button:active,
+.mobile-notification-button:hover,
+.mobile-notification-button:active,
+.avatar.avatar-button:hover,
+.avatar.avatar-button:active{
+  background:transparent;
+  color:var(--color-fg);
+  transform:none;
+}
 
 .avatar{
   display:inline-flex;

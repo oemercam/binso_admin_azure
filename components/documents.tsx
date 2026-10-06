@@ -19,6 +19,7 @@ type LineItem = {
   price: string;
   vatRate?: string;
   unit?: string;
+  timeEntryIds?: string[];
 };
 
 type DocumentDraft = {
@@ -131,7 +132,7 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
     currency:draft.currency??"CHF",
-    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate)})),
+    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),timeEntryIds:item.timeEntryIds??[]})),
   };
 }
 
@@ -182,6 +183,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
       quantity:String(line.quantity??"1"),
       price:String(line.unit_price??"0.00"),
       unit:String(line.unit??"Stück"),
+      timeEntryIds:Array.isArray(line.time_entry_ids)?line.time_entry_ids.map(String):[],
       vatRate:String(line.vat_rate??item.vat_rate??"0"),
     })),
   };
@@ -217,6 +219,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
+  const [workspacePage,setWorkspacePage]=useState(0);
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const [dirty,setDirty]=useState(false);
@@ -228,6 +231,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
+  const sourceTimeEntriesParam=kind==="Rechnung"&&!existing?(searchParams.get("timeEntries")??""):"";
 
   useEffect(()=>{
     if(existing||!sourceOffer||kind!=="Rechnung") return;
@@ -241,6 +245,19 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     }
     apiGet<{items:Array<Record<string,unknown>>}>("/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],"Angebot");setDraft(current=>({...source,number:current.number,date:current.date,due:"30"}));}}).catch(()=>undefined);
   },[existing,sourceOffer,kind,setDraft]);
+
+  useEffect(()=>{
+    if(existing||kind!=="Rechnung"||!sourceTimeEntriesParam||!isProductionBackendEnabled())return;
+    const sourceTimeEntries=sourceTimeEntriesParam.split(",").filter(Boolean);
+    apiGet<{items:Array<{id:string;hours:number;description?:string|null;sales_rate:number;customer_name:string;project_name:string}>}>("/api/time-entries/billing?ids="+encodeURIComponent(sourceTimeEntries.join(","))).then(payload=>{
+      if(!payload.items.length)return;
+      const customer=payload.items[0].customer_name;
+      if(payload.items.some(item=>item.customer_name!==customer)){setToast("Für eine Rechnung müssen alle Zeiten zum gleichen Kunden gehören.");window.setTimeout(()=>setToast(null),2300);return;}
+      const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[item.project_name]??=[]).push(item);return all},{}));
+      const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
+      queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
+    }).catch(error=>{setToast(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden.");window.setTimeout(()=>setToast(null),2300)});
+  },[existing,kind,sourceTimeEntriesParam,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
@@ -285,6 +302,20 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail"><DocumentReadView type={kind} draft={draft} directory={directory}/></div>
+          <section className="document-inline-preview" aria-label={kind+" Vorschau"}>
+            <div className="document-preview-heading">
+              <div><span className="compact-section-label">Vorschau</span><h2>{kind}</h2></div>
+              <button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button>
+            </div>
+            <div className={"document-workspace-page page-"+(workspacePage+1)}>
+              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
+            </div>
+            {kind==="Rechnung"&&<nav className="document-page-navigation" aria-label="Rechnungsseiten">
+              <button type="button" aria-label="Vorherige Seite" disabled={workspacePage===0} onClick={()=>setWorkspacePage(0)}><Icon name="chevron-left" size={16}/></button>
+              <span>Seite {workspacePage+1} / 2</span>
+              <button type="button" aria-label="Nächste Seite" disabled={workspacePage===1} onClick={()=>setWorkspacePage(1)}><Icon name="chevron-right" size={16}/></button>
+            </nav>}
+          </section>
           <aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
               <span className="compact-section-label">Aktionen</span>
@@ -294,10 +325,6 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
               {kind==="Angebot"
                 ? <Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>Rechnung erstellen</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
                 : <Link href="/zahlungen/neu"><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
-            </section>
-            <section className="document-inline-preview">
-              <div className="document-preview-heading"><h2>Vorschau</h2><button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button></div>
-              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
             </section>
           </aside>
         </div>
