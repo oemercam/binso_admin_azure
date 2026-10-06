@@ -201,3 +201,13 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Entity details must use the standard three-pane desktop proportions.");
   console.log("Core web entity details use information, work area and toolbox panes.");
 }
+
+
+// Finance periods: presets are shortcuts, not a limitation.
+{
+  const pages=read("components/app-pages.tsx");
+  assert(pages.includes("Zeitraum wählen"),"Finance must offer a custom period in addition to presets.");
+  assert(pages.includes('Field label="Von"')&&pages.includes('Field label="Bis"'),"Custom finance periods must expose from/to date controls.");
+  assert(pages.includes('range==="custom"'),"Finance calculations must support the custom range mode.");
+  console.log("Finance supports free from/to periods alongside quick presets.");
+}
