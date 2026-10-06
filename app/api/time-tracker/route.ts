@@ -17,7 +17,7 @@ export async function GET(){
 export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);const s=await requireSession();authorize(s,"time:write");
-    const body=await readJson<{action?:unknown;project?:unknown}>(request);
+    const body=await readJson<{action?:unknown;project?:unknown;projectId?:unknown;customerId?:unknown}>(request);
     if(!["start","pause","project","finish"].includes(String(body.action)))throw new ApiError(400,"invalid_action","Ungültige Aktion.");
     return json(await withTenant(s.organizationId,s.userId,async c=>{
       await c.query("select pg_advisory_xact_lock(hashtextextended($1,0))",[s.organizationId+":"+s.userId]);
@@ -33,15 +33,19 @@ export async function POST(request:NextRequest){
         await c.query("delete from active_time_trackers where organization_id=$1 and user_id=$2",[s.organizationId,s.userId]);
         return {tracker:null,item:entry.rows[0]};
       }
-      const projects=await c.query("select id from projects where organization_id=$1 and name=$2 and archived_at is null",[s.organizationId,label]);
+      const projectId=cleanText(body.projectId,80);
+      const customerId=cleanText(body.customerId,80);
+      const projects=projectId?await c.query("select id,name,customer_id from projects where organization_id=$1 and id=$2 and archived_at is null",[s.organizationId,projectId]):await c.query("select id,name,customer_id from projects where organization_id=$1 and name=$2 and archived_at is null",[s.organizationId,label]);
       if(projects.rowCount&&projects.rowCount>1)throw new ApiError(409,"ambiguous_project","Bitte ein eindeutiges Projekt auswählen.");
+      if(projectId&&projects.rowCount!==1)throw new ApiError(400,"project_invalid","Bitte einen gültigen Auftrag auswählen.");
+      if(customerId&&projects.rows[0]?.customer_id&&String(projects.rows[0].customer_id)!==customerId)throw new ApiError(400,"project_customer_mismatch","Der Auftrag gehört nicht zum gewählten Kunden.");
       const running=body.action==="start"||(body.action==="project"&&current?.state==="running");
       const saved=await c.query(`insert into active_time_trackers(organization_id,user_id,state,active_since,accumulated_seconds,project_label,project_id)
         values($1,$2,$3,case when $3='running' then now() else null end,$4,$5,$6)
         on conflict(organization_id,user_id) do update set state=excluded.state,active_since=excluded.active_since,
         accumulated_seconds=excluded.accumulated_seconds,project_label=excluded.project_label,project_id=excluded.project_id,updated_at=now() returning *,accumulated_seconds as seconds`,
         [s.organizationId,s.userId,running?"running":"paused",seconds,label,projects.rows[0]?.id??null]);
-      return {tracker:saved.rows[0]};
+      return {tracker:{...saved.rows[0],customer_id:projects.rows[0]?.customer_id??customerId??null}};
     }));
   }catch(e){return apiError(e)}
 }
