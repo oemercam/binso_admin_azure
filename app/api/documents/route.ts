@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantRpc } from "@/lib/server/database";
 
-type Line={unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;timeEntryIds?:unknown};
+type Line={unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
-  kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
+  sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
 };
 
@@ -38,6 +38,7 @@ export async function POST(request:NextRequest){
       quantity:Number(item.quantity),
       unit_price:Number(item.unitPrice),
       vat_rate:item.vatRate===undefined?Number(body.vatRate):Number(item.vatRate),
+      expense_ids:Array.isArray(item.expenseIds)?item.expenseIds.map(String).slice(0,100):[],
       time_entry_ids:Array.isArray(item.timeEntryIds)?item.timeEntryIds.map(String).slice(0,100):[],
     }));
     if(items.some(item=>!Number.isFinite(item.vat_rate)||item.vat_rate<0||item.vat_rate>100||!item.description||!Number.isFinite(item.quantity)||item.quantity<0||!Number.isFinite(item.unit_price)||item.unit_price<0)){
@@ -45,6 +46,7 @@ export async function POST(request:NextRequest){
     }
 
     const result=await tenantRpc("create_document_atomic",{
+      p_source_offer:cleanText(body.sourceOffer,80)||null,
       p_customer_id:customer.id,
       p_kind:kind,
       p_number:number,

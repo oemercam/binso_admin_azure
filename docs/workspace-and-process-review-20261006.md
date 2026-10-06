@@ -23,9 +23,19 @@
 - Supportlisten zeigen kurze Referenzen und melden Ladefehler.
 - Finanzansicht vermeidet dreifache Betragsdarstellung; freie Zeiträume schließen den letzten Monat ein und filtern Monatswerte innerhalb der tatsächlichen Datumsgrenzen. Lange Vergleiche werden explizit als letzte 24 Monate gekennzeichnet.
 
-## Prüfgrenzen / offene Abläufe
-Die Route-Inventur und Quellcodeprüfung ist keine vollständige Live-Abnahme jeder Rolle. Nicht abgeschlossen: tatsächlicher Dokumentversand, Angebotsannahme/Statusübergänge, vollständiger Spesenprozess mit Erstattung/Weiterverrechnung, Zuordnung von Zeiten zu bestehenden Rechnungsentwürfen, separate Aufträge/Projekte/Lohn/MWST/Berichte-Module, vollständige Übersetzung und rollen-/planabhängige Navigation. Keine dieser Funktionen wird durch diese Änderung als fertig ausgewiesen.
-Zeitfreigabe ist serverseitig auf owner/admin/project_manager eingeschränkt, Verrechnung nur für freigegebene, unverrechnete kundengebundene Zeiten. Tenant-Integrität und Datenbanksperren bleiben Bestandteil der bestehenden Tests.
+## Ergänzte Abläufe
+- Dokumente: PDF mit Positionen, Summen und QR-Zahlteil; Versand über den vorhandenen Graph-Maildienst. Ein Versandauftrag wird gespeichert; identische Wiederholung verschickt nicht erneut. Nicht bestätigte Zustellung wird als Fehler ausgewiesen. Ein hängender Versand sperrt Änderungen und muss anhand des Postausgangs geklärt werden.
+- Angebote: Entwurf → übergeben → angenommen/abgelehnt. Kundenentscheid wird durch eine berechtigte Person erfasst. Nur angenommene Angebote desselben Kunden und derselben Währung können einmal in eine aktive Rechnung überführt werden. Es gibt keinen neuen öffentlichen Unterschriftenprozess.
+- Rechnungen: ausgestellte Dokumente sind gesperrt; unbezahlt stornierbare Rechnungen geben zugeordnete Zeiten und Spesen wieder frei. Zahlungen werden weiterhin mit dem vorhandenen Zahlungsprozess erfasst.
+- Spesen: Entwurf → eingereicht → genehmigt/abgelehnt. Projektleitung darf eigene Spesen nicht selbst freigeben. Genehmigte Belege sind gesperrt; Erstattung dokumentiert eine bereits erfolgte Zahlung mit Referenz und löst keine Banküberweisung aus. Verrechenbare Spesen werden nur einmal und für passenden Kunden/Währung zugeordnet. Wiederholte Erstellung mit derselben Anfragekennung erzeugt keinen zweiten Datensatz.
+- Zeiten: freigegebene, kundengebundene Zeiten können neue oder bestehende Rechnungsentwürfe ergänzen. Die verbindliche Zuordnung erfolgt atomar beim Speichern. Stundensätze sind CHF; unbeabsichtigte Übernahme als EUR wird abgewiesen.
+- Team: korrekte Benutzer-/Entitlement-Abfrage, Einladungsannahme für neue und bestehende Konten, Widerruf, Benutzerlimit und Rollenprüfung. Bestehende Konten behalten ihr Passwort. Abgelaufene, widerrufene und bereits verwendete Einladungen sind gesperrt.
+- Navigation und Hauptaktionen berücksichtigen Rolle, Plan und Schreibschutz; eingeschränkte Dashboard-Rollen erhalten nur erlaubte Kennzahlen. Berechtigungen werden zusätzlich serverseitig geprüft.
+
+## Validierung und Prüfgrenzen
+Die Route-Inventur und Quellcodeprüfung ist keine vollständige Live-Abnahme jeder Rolle. Automatisierte PostgreSQL-/RLS-Tests prüfen Statuswechsel, Schreibsperren, Konvertierung, Spesenfreigabe, Erstattung, Verrechnung, PDF/QR, Versand-Wiederholung/Fehler und Einladungsannahme. E-Mails werden in diesen Tests durch einen synthetischen Versand ersetzt; es werden keine Kunden angeschrieben und keine echten Zahlungen ausgelöst. Der Deployment-Check prüft zusätzlich Teamabfrage und tatsächliche PDF-Erzeugung im Produktionsruntime.
+
+Separate Aufträge/Projekte/Lohn/MWST/Berichte-Module, vollständige Übersetzung und echter Operator-Supportzugriff sind weiterhin nicht als vollständig implementiert ausgewiesen. Graph-Konfiguration und reale Zustellung bleiben abhängig vom eingerichteten Mailkonto. Erstattung ist eine Buchungsbestätigung, keine Banking-Integration.
 
 ## Vollständiges Seiteninventar
 - /agb
@@ -49,6 +59,7 @@ Zeitfreigabe ist serverseitig auf owner/admin/project_manager eingeschränkt, Ve
 - /einstellungen/sicherheit
 - /einstellungen/sprache
 - /einstellungen/team
+- /einladung
 - /email-bestaetigen
 - /finanzen
 - /impressum

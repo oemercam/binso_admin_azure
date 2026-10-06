@@ -26,7 +26,7 @@ assert.ok(!/Demo-Rechnung|Demo-Zahlteil|Nicht bezahlen|Beispielkonto/.test(invoi
 for(const value of ['Individuelle Rechnungseinleitung','Individueller Rechnungsabschluss','Seefeldstrasse 73','31.10.2026','216.20','Stunde','viewBox='])assert.ok(invoice.includes(value),value);
 assert.equal((invoice.match(/class="sender-line"/g)||[]).length,1);
 const paid=renderToStaticMarkup(React.createElement(exports.InvoicePreview,{draft:{...draft,status:'paid'},directory}));
-assert.ok(paid.includes('vollständig beglichen'));assert.ok(!paid.includes('Bitte überweisen'));
+assert.ok(paid.includes('vollständig beglichen'));assert.ok(!paid.includes('Bitte überweisen'));assert.ok(!paid.includes('qr-payment-slip'),'Paid invoice must not expose a payable QR slip');
 const offer=renderToStaticMarkup(React.createElement(exports.OfferPreview,{draft:{...draft,number:'AN-2026-012',title:'Modern Workplace Erweiterung',due:'2026-10-31',currency:'EUR'},directory}));
 for(const value of ['Modern Workplace Erweiterung','Individuelle Angebotseinleitung','Individueller Angebotsabschluss','Seefeldstrasse 73','31.10.2026','Gesamtbetrag EUR'])assert.ok(offer.includes(value),value);
 assert.ok(!offer.includes('in CHF'));

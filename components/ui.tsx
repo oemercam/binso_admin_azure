@@ -1,3 +1,6 @@
+"use client";
+import {usePageAccess} from "@/lib/client/page-access";
+import {Children,cloneElement,isValidElement} from "react";
 import Link from "next/link";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
@@ -73,6 +76,7 @@ export function Button({
   className = "",
   disabled = false,
   ariaLabel,
+  requiresWrite=false,
 }: {
   href?: string;
   children?: React.ReactNode;
@@ -83,7 +87,11 @@ export function Button({
   className?: string;
   disabled?: boolean;
   ariaLabel?: string;
+  requiresWrite?:boolean;
 }) {
+  const access=usePageAccess();
+  disabled=disabled||requiresWrite&&!access.write;
+  if(href&&!access.canOpen(href))return null;
   const cls = `button button-${variant} ${className}`.trim();
   const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
   return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
@@ -101,8 +109,10 @@ export function SectionTitle({ title, action }: { title: string; action?: React.
   return <div className="section-title"><h2>{title}</h2>{action}</div>;
 }
 
-export function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
-  return <label className={`form-field ${className}`.trim()}><span>{label}</span>{children}</label>;
+export function Field({ label, children, className = "",allowReadOnlyInput=false }: { label: string; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean }) {
+  const access=usePageAccess();
+  const fields=access.write||allowReadOnlyInput?children:Children.map(children,child=>isValidElement<Record<string,unknown>>(child)&&typeof child.type==='string'&&['input','select','textarea'].includes(child.type)?cloneElement(child,{disabled:true}):child);
+  return <label className={`form-field ${className}`.trim()}><span>{label}</span>{fields}</label>;
 }
 
 export function EmptyState({ icon = "file", title, text, action }: { icon?: string; title: string; text: string; action?: React.ReactNode }) {

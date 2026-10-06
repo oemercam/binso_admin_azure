@@ -15,7 +15,7 @@ const sqlSources:Record<string,string>={
  support_tickets:`select id,case_number,subject,status,category,created_at,updated_at from support_cases where organization_id=$1`,
  products:`select id,name,item_type kind,sku,unit,unit_price,vat_rate,description,status,created_at,updated_at from products_services where organization_id=$1 and archived_at is null`,
  employees:`select id,coalesce(first_name,split_part(name,' ',1)) first_name,coalesce(last_name,substring(name from position(' ' in name)+1)) last_name,email,phone,title job_title,workload_percent,weekly_hours,vacation_days,address,start_date,start_date entry_date,case when active then 'active' else 'inactive' end status,created_at,updated_at from employees where organization_id=$1 and archived_at is null`,
- expenses:`select e.id,e.employee_id,coalesce(e.merchant,e.description) merchant,e.expense_date,coalesce(e.category_label,e.category) category,e.quantity*e.unit_price amount,e.currency,e.vat_rate,e.description,case when e.status='open' then 'draft' else e.status end status,e.created_at,e.updated_at,e.created_by_user_id,json_build_object('first_name',split_part(m.name,' ',1),'last_name',substring(m.name from position(' ' in m.name)+1)) employee from expenses e left join employees m on m.id=e.employee_id and m.organization_id=e.organization_id where e.organization_id=$1 and e.archived_at is null`,
+ expenses:`select e.id,e.employee_id,e.customer_id,e.billable,e.invoiced_invoice_id,e.reimbursed_at,e.reimbursement_reference,e.reviewed_at,e.reviewed_by_user_id,coalesce(e.merchant,e.description) merchant,e.expense_date,coalesce(e.category_label,e.category) category,e.quantity*e.unit_price amount,e.currency,e.vat_rate,e.description,case when e.status='open' then 'draft' else e.status end status,e.created_at,e.updated_at,e.created_by_user_id,json_build_object('first_name',split_part(m.name,' ',1),'last_name',substring(m.name from position(' ' in m.name)+1)) employee from expenses e left join employees m on m.id=e.employee_id and m.organization_id=e.organization_id where e.organization_id=$1 and e.archived_at is null`,
  payments:`select p.id,p.invoice_id,coalesce(p.payer_customer_id,i.customer_id) customer_id,p.payment_date paid_on,p.amount,p.method,p.reference note,case when p.allocation_status='matched' then 'booked' else 'pending' end status,p.created_at,json_build_object('name',c.name) customer,json_build_object('number',i.invoice_no,'total',i.total_amount) invoice from payments p left join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id left join customers c on c.id=coalesce(p.payer_customer_id,i.customer_id) and c.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null`,
  customers:`select id,name,contact_name,email,phone,address,address street,zip,zip postal_code,city,sector,uid,notes,language,payment_days,discount,status,created_at,updated_at from customers where organization_id=$1 and archived_at is null`,
  customer_contacts:`select id,customer_id,split_part(name,' ',1) first_name,substring(name from position(' ' in name)+1) last_name,email,phone,role_label job_title,is_primary,created_at,updated_at from customer_contacts where organization_id=$1`
@@ -36,7 +36,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      ${k==='invoice'?'d.total_amount':`coalesce((select sum(l.quantity*l.unit_price*(1+l.vat_rate/100)) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
      json_build_object('name',c.name,'street',c.address,'postal_code',c.zip,'city',c.city) customer,
-     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
+     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
      from ${t} d join customers c on c.id=d.customer_id and c.organization_id=d.organization_id where d.organization_id=$1 and d.archived_at is null`);
   }
   if(!sources.length)throw new ApiError(403,'forbidden','Keine Berechtigung.');source=sources.join(' union all ');
@@ -71,6 +71,8 @@ export function translateBusinessWrite(table:string,data:Row,insert:boolean){
   const category=String(data.category??'other');
   Object.assign(out,{merchant:data.merchant,expense_date:data.expense_date,category:['expense','material','travel','other'].includes(category)?category:category==='Reise'?'travel':category==='Material'?'material':category==='Verpflegung'?'expense':'other',category_label:category,quantity:1,unit_price:data.amount,currency:data.currency,vat_rate:data.vat_rate,description:data.description||data.merchant,status:['draft','submitted','approved','posted','rejected'].includes(String(data.status))?data.status:'draft'});
   if(data.employee_id!==undefined)out.employee_id=data.employee_id;
+  if(data.customer_id!==undefined)out.customer_id=data.customer_id;
+  if(data.billable!==undefined)out.billable=data.billable;
  }else if(table==='customer_contacts'){Object.assign(out,{customer_id:data.customer_id,name:[data.first_name,data.last_name].join(' '),first_name:data.first_name,last_name:data.last_name,email:data.email,phone:data.phone,role_label:data.job_title,is_primary:data.is_primary})}
  else throw new ApiError(400,'unsupported_write','Ungültige Datenquelle.');
  if(insert)out.external_id=randomUUID();
@@ -113,12 +115,21 @@ export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:str
  if(!['CHF','EUR'].includes(String(args.p_currency)))throw new ApiError(400,'currency_invalid','Ungültige Währung.');
  const found=await c.query('select id from customers where id::text=$1 and organization_id=$2 and archived_at is null',[args.p_customer_id,s.organizationId]);
  if(!found.rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');
+ let sourceQuoteId:string|null=null;
+ if(invoice&&operation==='create_document_atomic'&&args.p_source_offer){
+  const quote=(await c.query("select id,status,customer_id,currency from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update",[s.organizationId,args.p_source_offer])).rows[0];
+  if(!quote||quote.status!=='accepted'||quote.customer_id!==args.p_customer_id||quote.currency!==args.p_currency)throw new ApiError(409,'offer_not_accepted','Für die Rechnung muss ein angenommenes Angebot desselben Kunden und derselben Währung vorliegen.');
+  if((await c.query('select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\'cancelled\'',[s.organizationId,quote.id])).rowCount)throw new ApiError(409,'offer_already_invoiced','Aus diesem Angebot wurde bereits eine Rechnung erstellt.');
+  sourceQuoteId=quote.id;
+ }
  let id:string;
  if(operation==='update_document_atomic'){
   const existing=await c.query(`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`,[args.p_current_number,s.organizationId]);
   const row=existing.rows[0];if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
-  if((invoice&&Number(row.paid_amount)>0)||['accepted','cancelled'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
+  if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   await c.query(`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`,[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]);
+  if(invoice)await c.query("update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);
   if(invoice)await c.query("update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);
   await c.query(`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`,[id,s.organizationId]);
  }else{
@@ -126,16 +137,24 @@ export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:str
   await c.query(`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)
    values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`,[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]);
  }
+ if(sourceQuoteId)await c.query("update invoices set source_quote_id=$3 where organization_id=$1 and id=$2",[s.organizationId,id,sourceQuoteId]);
  let position=0;
  for(const raw of args.p_items as Row[]){
   const lineVat=raw.vat_rate===undefined?vat:Number(raw.vat_rate);
   if(!Number.isFinite(lineVat)||lineVat<0||lineVat>100)throw new ApiError(400,'vat_invalid','Ungültiger MwSt.-Satz.');
   const inserted=await c.query(`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`,[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??"Stück").slice(0,40),raw.unit_price,lineVat]);
+  if(invoice&&Array.isArray(raw.expense_ids)&&raw.expense_ids.length){
+   const ids=raw.expense_ids.map(String).slice(0,100);
+   const linked=await c.query("update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id",[s.organizationId,ids,id,args.p_customer_id,args.p_currency]);
+   if(linked.rowCount!==ids.length)throw new ApiError(409,'expenses_changed','Mindestens eine Spese ist nicht mehr verrechenbar.');
+   for(const row of linked.rows)await c.query('insert into invoice_line_expenses(organization_id,invoice_line_id,expense_id) values($1,$2,$3)',[s.organizationId,inserted.rows[0].id,row.id]);
+  }
   if(invoice&&Array.isArray(raw.time_entry_ids)&&raw.time_entry_ids.length){
+   if(args.p_currency!=='CHF')throw new ApiError(409,'time_currency_mismatch','Stundensätze werden in CHF geführt. Diese Zeiten benötigen eine CHF-Rechnung.');
    const ids=raw.time_entry_ids.map(String).slice(0,100);
    const linked=await c.query(`update time_entries set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and customer_id=$4 and billable=true and approved=true and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id`,[s.organizationId,ids,id,args.p_customer_id]);
    if(linked.rowCount!==ids.length)throw new ApiError(409,'time_entries_changed','Mindestens ein Zeiteintrag ist nicht mehr verrechenbar. Bitte Auswahl aktualisieren.');
-   for(const row of linked.rows)await c.query('insert into invoice_line_time_entries(invoice_line_id,time_entry_id) values($1,$2)',[inserted.rows[0].id,row.id]);
+   for(const row of linked.rows)await c.query('insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)',[s.organizationId,inserted.rows[0].id,row.id]);
   }
  }
  if(invoice)await c.query(`update invoices set subtotal=x.subtotal,vat_amount=x.vat,total_amount=x.subtotal+x.vat from (select round(sum(quantity*unit_price),2) subtotal,round(sum(quantity*unit_price*vat_rate/100),2) vat from invoice_lines where invoice_id=$1 and organization_id=$2) x where invoices.id=$1 and invoices.organization_id=$2`,[id,s.organizationId]);

@@ -60,9 +60,9 @@ for(const path of ['app/api/expenses/route.ts','app/api/expenses/[id]/route.ts']
    const request={body:{merchant:'SBB',amount:42,vatRate:8.1,status}};
    const response=path.includes('[id]')?await expense.PATCH(request,{params:Promise.resolve({id:'expense'})}):await expense.POST(request);
    const allowed=['owner','admin','project_manager'].includes(role);
-   assert.equal(response.status,allowed?(path.includes('[id]')?200:201):403,`${path} ${role} ${status}`);
+   assert.equal(response.status,allowed?(path.includes('[id]')?200:409):403,`${path} ${role} ${status}`);
    writes=globalThis.__expenseWrites;
-   assert.equal(writes,allowed?1:0,'Forbidden approval must not write');
+   assert.equal(writes,allowed&&path.includes('[id]')?1:0,'Forbidden approval must not write');
   }
  }
 }

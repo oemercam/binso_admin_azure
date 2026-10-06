@@ -23,12 +23,13 @@ export async function GET(request:NextRequest){try{
 }catch(e){return apiError(e)}}
 export async function POST(request:NextRequest){
  try{
-  assertSameOrigin(request);const s=await requireSession();authorize(s,'documents:write');
+  assertSameOrigin(request);const s=await requireSession();
   const form=await request.formData(),file=form.get('file'),purpose=String(form.get('purpose')||'document'),entityId=String(form.get('entityId')||'');
   if(!(file instanceof File))throw new ApiError(400,'file_required','Datei fehlt.');
   if(file.size>limitsConfig.maxFileUploadBytes)throw new ApiError(413,'file_too_large',`Datei ist grösser als ${megabytes(limitsConfig.maxFileUploadBytes)} MB.`);
   if(!allowed.has(file.type))throw new ApiError(400,'file_type_invalid','Dateityp ist nicht erlaubt.');
   const relation=relations[purpose];
+  if(purpose==='document')authorize(s,'documents:write');
   if(!relation&&!['document','company_logo','profile_avatar'].includes(purpose))throw new ApiError(400,'purpose_invalid','Ungültiger Dateizweck.');
   if(relation){
    authorize(s,relation.permission);
@@ -41,6 +42,11 @@ export async function POST(request:NextRequest){
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
   const sha256=createHash('sha256').update(buffer).digest('hex');
   const item=await withTenant(s.organizationId,s.userId,async c=>{
+   if(purpose==='expense_receipt'){
+    const expense=(await c.query("select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update",[s.organizationId,entityId])).rows[0];
+    if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
+    if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');
+   }
    const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id)
     values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
