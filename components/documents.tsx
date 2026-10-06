@@ -247,7 +247,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   },[existing,sourceOffer,kind,setDraft]);
 
   useEffect(()=>{
-    if(existing||kind!=="Rechnung"||!sourceTimeEntries.length||!isProductionBackendEnabled())return;
+    if(existing||kind!=="Rechnung"||!sourceTimeEntriesParam||!isProductionBackendEnabled())return;
+    const sourceTimeEntries=sourceTimeEntriesParam.split(",").filter(Boolean);
     apiGet<{items:Array<{id:string;hours:number;description?:string|null;sales_rate:number;customer_name:string;project_name:string}>}>("/api/time-entries/billing?ids="+encodeURIComponent(sourceTimeEntries.join(","))).then(payload=>{
       if(!payload.items.length)return;
       const customer=payload.items[0].customer_name;
@@ -255,8 +256,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[item.project_name]??=[]).push(item);return all},{}));
       const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
       queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
-    }).catch(error=>show(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden."));
-  },[existing,kind,sourceTimeEntries,setDraft]);
+    }).catch(error=>{setToast(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden.");window.setTimeout(()=>setToast(null),2300)});
+  },[existing,kind,sourceTimeEntriesParam,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
