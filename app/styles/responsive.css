@@ -920,15 +920,20 @@
     padding:0 var(--page-x);
     display:flex;
     align-items:center;
-    justify-content:flex-end;
+    justify-content:space-between;
+    gap:12px;
     border-bottom:1px solid var(--color-line);
     background:color-mix(in srgb,var(--color-bg) 96%,transparent);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
   }
-  /* The global desktop header is deliberately quiet: notification + account only. */
-  .desktop-appbar>.desktop-search,
-  .desktop-appbar .desktop-header-timer,
+  /* Authenticated web header contract: global search, running timer, notifications, account. */
+  .desktop-appbar>.desktop-search{
+    display:block;
+    width:min(42vw,520px);
+    min-width:240px;
+  }
+  .desktop-appbar .desktop-header-timer{display:flex}
   .desktop-appbar .app-demo-badge{display:none}
   .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
 
