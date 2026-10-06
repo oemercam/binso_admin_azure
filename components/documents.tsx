@@ -19,6 +19,7 @@ type LineItem = {
   price: string;
   vatRate?: string;
   unit?: string;
+  timeEntryIds?: string[];
 };
 
 type DocumentDraft = {
@@ -131,7 +132,7 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
     currency:draft.currency??"CHF",
-    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate)})),
+    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),timeEntryIds:item.timeEntryIds??[]})),
   };
 }
 
@@ -182,6 +183,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
       quantity:String(line.quantity??"1"),
       price:String(line.unit_price??"0.00"),
       unit:String(line.unit??"Stück"),
+      timeEntryIds:Array.isArray(line.time_entry_ids)?line.time_entry_ids.map(String):[],
       vatRate:String(line.vat_rate??item.vat_rate??"0"),
     })),
   };
@@ -229,6 +231,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
+  const sourceTimeEntries=kind==="Rechnung"&&!existing?(searchParams.get("timeEntries")??"").split(",").filter(Boolean):[];
 
   useEffect(()=>{
     if(existing||!sourceOffer||kind!=="Rechnung") return;
@@ -242,6 +245,18 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     }
     apiGet<{items:Array<Record<string,unknown>>}>("/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],"Angebot");setDraft(current=>({...source,number:current.number,date:current.date,due:"30"}));}}).catch(()=>undefined);
   },[existing,sourceOffer,kind,setDraft]);
+
+  useEffect(()=>{
+    if(existing||kind!=="Rechnung"||!sourceTimeEntries.length||!isProductionBackendEnabled())return;
+    apiGet<{items:Array<{id:string;hours:number;description?:string|null;sales_rate:number;customer_name:string;project_name:string}>}>("/api/time-entries/billing?ids="+encodeURIComponent(sourceTimeEntries.join(","))).then(payload=>{
+      if(!payload.items.length)return;
+      const customer=payload.items[0].customer_name;
+      if(payload.items.some(item=>item.customer_name!==customer)){show("Für eine Rechnung müssen alle Zeiten zum gleichen Kunden gehören.");return;}
+      const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[item.project_name]??=[]).push(item);return all},{}));
+      const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
+      queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
+    }).catch(error=>show(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden."));
+  },[existing,kind,searchParams]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
