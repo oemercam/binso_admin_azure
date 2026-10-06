@@ -485,7 +485,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   },[production,paymentId]);
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="customer-detail-workspace">
+    <div className="entity-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>Zahlungsdetails</strong><small>Verbuchung und Zuordnung</small></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span><Link href="/rechnungen/RE-2026-019"><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>RE-2026-019</small></span><Icon name="arrow" size={15}/></Link><Link href="/kunden/acme"><Icon name="users"/><span><b>Kunde öffnen</b><small>Acme AG</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -499,7 +500,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const status=String(payment.status??"booked");
   const statusLabel:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
-    <div className="customer-detail-workspace">
+    <div className="entity-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>Zahlungsdetails</strong><small>Verbuchung und Zuordnung</small></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href="/kunden"><Icon name="users"/><span><b>Kundenübersicht</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -563,8 +565,9 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={<Button onClick={()=>void save()}>Speichern</Button>}>
-    <div className={existing?"entity-edit-workspace":"form-page"}>
+  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace":"form-page"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Produkt</span><strong>{name||"Produkt"}</strong><small>{type} · {status}</small><dl className="detail-list"><div><dt>Einheit</dt><dd>{unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</dd></div><div><dt>MwSt.</dt><dd>{vatRate}%</dd></div></dl></aside>}
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         <div className="form-grid two">
           <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
@@ -577,7 +580,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Produktübersicht</span><strong>{price?moneyChf(Number(price.replace(",","."))):"CHF 0.00"}</strong><small>{type} · {unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>MwSt. <b>{vatRate}%</b></span>{sku&&<span>Artikelnummer <b>{sku}</b></span>}</div></section><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Produktübersicht</span><strong>{price?moneyChf(Number(price.replace(",","."))):"CHF 0.00"}</strong><small>{type} · {unit==="hour"?"Stunde":unit==="piece"?"Stück":"Pauschal"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>MwSt. <b>{vatRate}%</b></span>{sku&&<span>Artikelnummer <b>{sku}</b></span>}</div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Änderungen übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
@@ -653,8 +656,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={(!existing||employeeTab==="overview")?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
-    <div className={existing?"desktop-detail-workspace":"desktop-detail-single"}>
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><dl className="detail-list"><div><dt>Status</dt><dd>{status}</dd></div><div><dt>Pensum</dt><dd>{load}%</dd></div><div><dt>Eintritt</dt><dd>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</dd></div></dl></aside>}
       <div className="desktop-detail-main">
     {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
@@ -682,7 +686,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
     {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledger.files.length&&<EmptyState icon="file" title="Keine Dokumente" text="Für diesen Mitarbeiter sind keine Dokumente geladen."/>}</section>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Wochenstunden <b>{weeklyHours} h</b></span><span>Ferien <b>{vacationDays} Tage</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Wochenstunden <b>{weeklyHours} h</b></span><span>Ferien <b>{vacationDays} Tage</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Stammdaten übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
@@ -1057,7 +1061,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   const production=useBackendMode();
   return <AppShell title={ticketSubject} subtitle={ticketReference+" · "+(ticketStatusLabel[ticketStatus]??ticketStatus)} active="support" backHref="/support" backLabel="Support">
-    <div className="desktop-detail-workspace support-detail-workspace">
+    <div className="entity-detail-workspace support-detail-workspace">
+      <aside className="entity-info-pane"><span className="compact-section-label">Support</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><dl className="detail-list"><div><dt>Status</dt><dd>{ticketStatusLabel[ticketStatus]??ticketStatus}</dd></div><div><dt>Priorität</dt><dd>{ticket?.priority??"Normal"}</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="support-thread">
       <div className="thread-day">Heute</div>
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
