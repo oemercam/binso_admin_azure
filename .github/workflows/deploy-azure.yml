@@ -340,3 +340,45 @@ jobs:
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"
+
+      - name: Verify production remains stable after warm-up
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          echo "Waiting before delayed production stability verification..."
+          sleep 120
+
+          for attempt in {1..10}; do
+            health_code=$(curl -sS -o /tmp/binso-delayed-health.json -w "%{http_code}" --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/api/health?stability=$attempt" || true)
+            ready_code=$(curl -sS -o /tmp/binso-delayed-ready.json -w "%{http_code}" --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/api/health/ready?stability=$attempt" || true)
+
+            if [ "$health_code" != "200" ] || [ "$ready_code" != "200" ] || ! grep -q "$DEPLOY_SHA" /tmp/binso-delayed-health.json || ! grep -q '"status":"ready"' /tmp/binso-delayed-ready.json; then
+              echo "::error::Production became unhealthy during delayed stability verification (attempt $attempt/10, health=$health_code, ready=$ready_code)."
+              echo "Health response:"; cat /tmp/binso-delayed-health.json 2>/dev/null || true
+              echo "Readiness response:"; cat /tmp/binso-delayed-ready.json 2>/dev/null || true
+              exit 1
+            fi
+
+            echo "Delayed stability check $attempt/10 passed."
+            sleep 15
+          done
+
+          curl -fsS --connect-timeout 10 --max-time 60 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/" > /tmp/binso-delayed-home.html
+          test -s /tmp/binso-delayed-home.html
+          echo "Production remained healthy after warm-up."
+
+      - name: Capture Azure diagnostics on deployment failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          echo "::group::App Service state"
+          az webapp show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --query '{state:state,availabilityState:availabilityState,hostNames:hostNames,httpsOnly:httpsOnly}' -o json
+          echo "::endgroup::"
+          echo "::group::App Service configuration"
+          az webapp config show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --query '{linuxFxVersion:linuxFxVersion,alwaysOn:alwaysOn,http20Enabled:http20Enabled,ftpsState:ftpsState}' -o json
+          echo "::endgroup::"
+          echo "::group::Recent App Service logs"
+          az webapp log tail --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --provider application --timeout 60 || true
+          echo "::endgroup::"
