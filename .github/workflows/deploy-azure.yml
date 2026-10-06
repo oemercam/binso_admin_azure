@@ -333,6 +333,14 @@ jobs:
           retry_curl /tmp/binso-production-finance.json             -b "$DEMO_COOKIE_FILE"             "$PRODUCTION_URL/api/demo/finance"
           node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-finance.json","utf8"));if(!data.payments?.length||!data.payroll?.length||!data.operatingCosts?.length)process.exit(1)'
 
+          echo "Verifying team schema and PDF runtime."
+          retry_curl /tmp/binso-production-team.json -b "$DEMO_COOKIE_FILE" "$PRODUCTION_URL/api/settings/team/invitations"
+          node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-team.json","utf8"));if(!Array.isArray(data.members)||!Array.isArray(data.invitations)||!data.members.length)process.exit(1)'
+          retry_curl /tmp/binso-production-documents.json -b "$DEMO_COOKIE_FILE" "$PRODUCTION_URL/api/documents?kind=invoice"
+          DOCUMENT_NUMBER=$(node -e 'const fs=require("fs");const data=JSON.parse(fs.readFileSync("/tmp/binso-production-documents.json","utf8"));const doc=data.items.find(item=>item.kind==="invoice");if(!doc)process.exit(1);process.stdout.write(encodeURIComponent(doc.number))')
+          retry_curl /tmp/binso-production-document.pdf -b "$DEMO_COOKIE_FILE" "$PRODUCTION_URL/api/documents/$DOCUMENT_NUMBER/pdf"
+          node -e 'const fs=require("fs");const pdf=fs.readFileSync("/tmp/binso-production-document.pdf");if(pdf.length<1000||pdf.subarray(0,5).toString()!=="%PDF-")process.exit(1)'
+
           cleanup_demo_session
           trap - EXIT
           echo "PostgreSQL-backed demo and finance production checks passed."

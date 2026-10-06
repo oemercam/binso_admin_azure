@@ -1,5 +1,8 @@
 "use client";
 
+import {PageAccessContext,usePageAccess} from "@/lib/client/page-access";
+import {routePermission,tenantCan,permissionForModule} from "@/lib/permissions";
+import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
@@ -90,6 +93,16 @@ export function AppShell({
   const pathname=usePathname();
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
+  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
+  const [accessError,setAccessError]=useState<string|null>(null);
+  useEffect(()=>{if(pathname.startsWith('/preview/')){queueMicrotask(()=>setAccess({role:'owner',plan:'pro',readOnly:true}));return;}apiGet<{authenticated:boolean;tenant?:{role?:string;plan?:PlanId;readOnly?:boolean}}>('/api/auth/session').then(s=>{if(!s.authenticated)throw new Error('Bitte melde dich an.');setAccess({role:s.tenant?.role??'reader',plan:s.tenant?.plan??'pro',readOnly:s.tenant?.readOnly===true});}).catch(e=>setAccessError(e instanceof Error?e.message:'Zugang konnte nicht geprüft werden.'));},[pathname]);
+  const canOpen=(href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));};
+  const accessModule=moduleForPath(pathname);
+  const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente'].includes(pathname)?'organization:write':'organization:read';
+  const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement'].includes(pathname);
+  const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write');
+  const visibleActions=actions;
+  const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
   const shellRef=useRef<HTMLDivElement>(null);
   const dirty=unsavedChanges??formDirty;
@@ -327,14 +340,14 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+  return <PageAccessContext.Provider value={{write:canWrite,canOpen}}><div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowLeave.current=true;const url=new URL(href);if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
         <Link href="/dashboard" className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span>Start</span></Link>
-        {desktopNavGroups.map(group=><div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label">{group.label}</span>{desktopNav.filter(([href])=>group.paths.includes(href)).map(([href,label,icon])=><Link key={href} href={href} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span>{label}</span></Link>)}</div>)}
+        {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label">{group.label}</span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span>{label}</span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
         <Link href="/support" className={active==="support" ? "active" : ""}><Icon name="support"/><span>Support</span></Link>
@@ -387,19 +400,19 @@ export function AppShell({
             <h1>{title}</h1>
             {subtitle && <p>{subtitle}</p>}
           </div>
-          {actions && <div className="page-actions mobile-page-actions">{actions}</div>}
+          {visibleActions&&allowed&&<div className="page-actions mobile-page-actions">{visibleActions}</div>}
         </div>
-        {actions && <div className="desktop-page-actions" aria-label="Seitenaktionen">{actions}</div>}
-        {children}
+        {visibleActions&&allowed&&<div className="desktop-page-actions" aria-label="Seitenaktionen">{visibleActions}</div>}
+        {!access&&!accessError?<p role="status">Zugang wird geprüft …</p>:accessError?<p role="alert">{accessError}</p>:allowed?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
       {!preview && !formActive && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
-        <Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>
+        {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>}
         <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
-        <Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>
+        {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>}
         <button type="button" className={["produkte","spesen","finanzen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
       </nav>}
 
@@ -496,9 +509,11 @@ export function AppShell({
         </section>
       </div>}
     </div>
-  </div>;
+  </div></PageAccessContext.Provider>;
 }
 
 function SheetLink({ href, icon, title, text, onSelect }: { href: string; icon: string; title: string; text: string; onSelect: () => void }) {
+  const access=usePageAccess();
+  if(!access.canOpen(href))return null;
   return <Link href={href} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>;
 }

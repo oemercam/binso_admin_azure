@@ -27,7 +27,7 @@ export const tenantGrants:Record<TenantRole,ReadonlySet<TenantPermission>>={
  admin:new Set(allPermissions.filter(p=>p!=="billing:write")),
  finance:new Set([
   "organization:read","users:read","billing:read","customers:read","customers:write","sales:read","invoices:read","invoices:write","payments:read","payments:write",
-  "purchasing:read","purchasing:write","accounting:read","accounting:write","bank:read","bank:write","vat:read","vat:write","reports:read","documents:read","documents:write","contracts:read"
+  "time:read","expenses:read","expenses:write","purchasing:read","purchasing:write","accounting:read","accounting:write","bank:read","bank:write","vat:read","vat:write","reports:read","documents:read","documents:write","contracts:read"
  ]),
  hr:new Set(["organization:read","users:read","employees:read","employees:write","absence:read","absence:write","payroll:read","payroll:write","documents:read","documents:write","reports:read"]),
  project_manager:new Set(["organization:read","customers:read","customers:write","sales:read","sales:write","projects:read","projects:write","time:read","time:write","expenses:read","expenses:write","tasks:read","tasks:write","masterdata:read","documents:read","documents:write","contracts:read","reports:read"]),

@@ -62,6 +62,7 @@ const sensitiveRoutes = [
 ];
 
 const nextConfig: NextConfig = {
+  serverExternalPackages:["pdfkit"],
   reactStrictMode: true,
   env: { BINSO_BUILD_SHA: process.env.BINSO_BUILD_SHA ?? process.env.GITHUB_SHA ?? "development" },
   output: "standalone",

@@ -122,7 +122,7 @@ function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Rec
 
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
-  const [data,setData]=useState<{stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
+  const [data,setData]=useState<{canInvoices?:boolean;canPayments?:boolean;stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState<string|null>(null);
   const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
@@ -160,22 +160,22 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const monthInvoiceCount=monthInvoices.reduce((sum,item)=>sum+Number(item.invoice_count??1),0);
 
   return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
-    <div className="metrics-grid">
+    {data.canInvoices!==false&&data.canPayments!==false&&<div className="metrics-grid">
       <Metric label="Umsatz im Monat" value={moneyChf(monthRevenue)} hint="Rechnungsvolumen" icon="chart"/>
       <Metric label="Rechnungen" value={String(monthInvoiceCount)} hint="In diesem Monat" icon="receipt"/>
       <Metric label="Zahlungseingänge" value={moneyChf(monthPaid)} hint="Verbucht im Monat" icon="wallet"/>
       <Metric label="Kunden" value={String(monthCustomers)} hint="Mit Rechnungen im Monat" icon="users"/>
-    </div>
-    <RevenueInsight invoices={analyticsInvoices} onMonthChange={setDashboardMonth}/>
+    </div>}
+    {data.canInvoices!==false&&data.canPayments!==false&&<RevenueInsight invoices={analyticsInvoices} onMonthChange={setDashboardMonth}/>}
     <div className="dashboard-grid">
-      <section className="surface">
+      {data.canInvoices!==false&&<section className="surface">
         <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
         {invoices.length?<div className="recent-invoices">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+encodeURIComponent(String(item.number))} key={String(item.id)}><b>{customer?.name??"Kunde"}</b><span>{String(item.number)}</span></Link>})}</div>:<p>Keine Rechnungen erfasst.</p>}
-      </section>
-      <section className="surface">
+      </section>}
+      {data.canPayments!==false&&<section className="surface">
         <SectionTitle title="Letzte Zahlungen" action={<Link href="/zahlungen">Alle Zahlungen</Link>}/>
         {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<p>Keine Zahlungen erfasst.</p>}
-      </section>
+      </section>}
     </div>
     <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
   </AppShell>;
@@ -580,7 +580,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
@@ -596,7 +596,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
         </div>
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
-      <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
@@ -671,7 +671,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button onClick={()=>void save()}>Speichern</Button>:undefined}>
+  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:undefined}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
@@ -695,7 +695,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Adresse" className="full"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
-      <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
     </div>}
     {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
@@ -732,16 +732,30 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [status,setStatus]=useState(existing?"Eingereicht":"Eingereicht");
   const [canApproveExpense,setCanApproveExpense]=useState(false);
   useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>setCanApproveExpense(["owner","admin","project_manager","manager"].includes(data.tenant?.role??""))).catch(()=>undefined);},[]);
+  const [expenseCustomer,setExpenseCustomer]=useState("");
+  const [expenseBillable,setExpenseBillable]=useState(false);
+  const [expenseCustomers,setExpenseCustomers]=useState<Array<{id:string;name:string}>>([]);
+  const [reimbursedAt,setReimbursedAt]=useState<string|null>(null),[reimbursementRef,setReimbursementRef]=useState("");
+  const [invoicedId,setInvoicedId]=useState<string|null>(null),[canFinanceExpense,setCanFinanceExpense]=useState(false);
+  const [createdExpenseId,setCreatedExpenseId]=useState(expenseId??"");
+  const expenseRequestKey=useRef("");
+  const [expenseFiles,setExpenseFiles]=useState<Array<{id:string;fileName:string}>>([]);
+  const [expenseBusy,setExpenseBusy]=useState(false),[reimbursementOpen,setReimbursementOpen]=useState(false);
+  useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(s=>setCanFinanceExpense(["owner","admin","finance"].includes(s.tenant?.role??""))).catch(()=>{});apiGet<{items:Array<{id:string;name:string}>}>("/api/customers").then(s=>setExpenseCustomers(s.items)).catch(()=>{});},[]);
+  const [persistedExpenseStatus,setPersistedExpenseStatus]=useState('');
+  const lockedExpense=['approved','posted'].includes(persistedExpenseStatus);
   const [receiptFile,setReceiptFile]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?"/api/employees":"/api/demo/data?collection=employees").then(data=>setAvailableEmployees(data.items)).catch(()=>setToast("Mitarbeiter konnten nicht geladen werden."));},[]);
+  useEffect(()=>{if(!expenseId)return;apiGet<{items:typeof expenseFiles}>("/api/files?expenseId="+encodeURIComponent(expenseId)).then(s=>setExpenseFiles(s.items)).catch(()=>setToast('Belege konnten nicht geladen werden.'));},[expenseId]);
+
+  useEffect(()=>{apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?"/api/expenses/options":"/api/demo/data?collection=employees").then(data=>setAvailableEmployees(data.items)).catch(()=>setToast("Mitarbeiter konnten nicht geladen werden."));},[]);
 
   useEffect(()=>{
     if(!production||!existing||!expenseId) return;
     apiGet<{item:Record<string,unknown>}>("/api/expenses/"+encodeURIComponent(expenseId)).then(payload=>{
       const item=payload.item;
       queueMicrotask(()=>{
-        setPerson(String(item.employee_id??""));
+        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??""));setExpenseCustomer(String(item.customer_id??""));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??""));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);
         setDate(String(item.expense_date??"").slice(0,10));
         setCategory(({travel:"Reise",expense:"Verpflegung",material:"Material",other:"Sonstiges"} as Record<string,string>)[String(item.category)]??String(item.category??"Reise"));
         setAmount(Number(item.amount??0).toFixed(2));
@@ -749,7 +763,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         setVatRate(String(item.vat_rate??"8.1"));
         setMerchant(String(item.merchant??""));
         setDescription(String(item.description??""));
-        const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
+        const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
       });
     }).catch(error=>setToast(error instanceof Error?error.message:"Spese konnte nicht geladen werden."));
@@ -772,21 +786,25 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   };
 
   const save=async()=>{
+    if(expenseBusy||lockedExpense)return;
     const value=Number(amount.replace(",","."));
+    if(expenseBillable&&!expenseCustomer){setToast("Bitte einen Kunden für die Weiterverrechnung wählen.");return;}
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
     const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
-    try{
-      const payload={employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
-      let targetExpenseId=expenseId??"";
+    setExpenseBusy(true);try{
+      const payload={customerId:expenseCustomer,billable:expenseBillable,employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
+      let targetExpenseId=expenseId??createdExpenseId;let receiptUploaded=false;
       if(production){
-        if(existing&&expenseId){
-          const result=await apiPatch<{item:{id:string}}>("/api/expenses/"+encodeURIComponent(expenseId),payload);
-          targetExpenseId=result.item?.id??expenseId;
+        if(targetExpenseId){
+          if(receiptFile){const form=new FormData();form.append('file',receiptFile);form.append('purpose','expense_receipt');form.append('entityId',targetExpenseId);await apiUpload('/api/files',form);receiptUploaded=true;setReceiptFile(null);}
+          const result=await apiPatch<{item:{id:string}}>("/api/expenses/"+encodeURIComponent(targetExpenseId),payload);
+          targetExpenseId=result.item?.id??targetExpenseId;
         }else{
-          const result=await apiPost<{item:{id:string}}>("/api/expenses",payload);
-          targetExpenseId=result.item.id;
+          if(!expenseRequestKey.current)expenseRequestKey.current=crypto.randomUUID();
+          const result=await apiPost<{item:{id:string}}>("/api/expenses",payload,{idempotencyKey:expenseRequestKey.current});
+          targetExpenseId=result.item.id;setCreatedExpenseId(targetExpenseId);
         }
-        if(receiptFile&&targetExpenseId){
+        if(receiptFile&&targetExpenseId&&!receiptUploaded){
           const form=new FormData();
           form.append("file",receiptFile);
           form.append("purpose","expense_receipt");
@@ -801,17 +819,19 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }catch(error){
       setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
-    }
+    }finally{setExpenseBusy(false);}
   };
 
+  const recordReimbursement=async()=>{if(expenseBusy||!expenseId)return;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? [employeeLabel,status].join(" · ") : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button onClick={()=>void save()}>Einreichen</Button>:undefined}>
+  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? [employeeLabel,status].join(" · ") : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Einreichen</Button>:undefined}>
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
 
-      <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
+      {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
       <div className="form-page">
-        <div className="form-grid two">
+        {expenseFiles.length>0&&<section><h2>Belege</h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
+        <fieldset disabled={lockedExpense||expenseBusy} className="form-grid two" style={{border:0,padding:0,margin:0}}>
           <Field label="Händler / Firma"><input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option value="">Keine Zuordnung</option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</select></Field>
           <Field label="Datum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
@@ -820,12 +840,15 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           <Field label="Währung"><select value={currency} onChange={e=>setCurrency(e.target.value)}><option>CHF</option><option>EUR</option></select></Field>
           <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
           {existing&&<Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Entwurf</option><option>Eingereicht</option>{(canApproveExpense||status==="Genehmigt")&&<option disabled={!canApproveExpense}>Genehmigt</option>}{(canApproveExpense||status==="Abgelehnt")&&<option disabled={!canApproveExpense}>Abgelehnt</option>}</select></Field>}
+          <Field label="Weiterverrechnen"><select value={expenseBillable?'yes':'no'} onChange={e=>setExpenseBillable(e.target.value==='yes')}><option value="no">Nicht weiterverrechnen</option><option value="yes">An Kunden weiterverrechnen</option></select></Field>
+          {expenseBillable&&<Field label="Kunde"><select value={expenseCustomer} onChange={e=>setExpenseCustomer(e.target.value)}><option value="">Kunde auswählen</option>{expenseCustomers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></Field>}
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
-        </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>
+        </fieldset>
+        {!lockedExpense&&<div className="mobile-sticky-save"><Button requiresWrite disabled={expenseBusy} onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{lockedExpense&&<p>Genehmigte Spesen sind gesperrt.</p>}{reimbursedAt?<p>Erstattet am {new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}>Erstattung erfassen</Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary">Weiterverrechnen</Button>}{invoicedId&&<p>Bereits einer Rechnung zugeordnet.</p>}<Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
+    {reimbursementOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Erstattung erfassen"><h2>Erfolgte Erstattung erfassen</h2><p>Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst.</p><Field label="Zahlungsreferenz"><input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}>Abbrechen</Button><Button disabled={expenseBusy||!reimbursementRef.trim()} onClick={()=>void recordReimbursement()}>Erstattung erfassen</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("gültigen")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -859,6 +882,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items)}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo]);
   const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
+  const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState("");
+  const [billingDrafts,setBillingDrafts]=useState<Array<{number:string;customer_id:string;status:string}>>([]),[billingError,setBillingError]=useState<string|null>(null);
+  const openBilling=async()=>{setBillingOpen(true);setBillingError(null);try{const data=await apiGet<{items:typeof billingDrafts}>('/api/documents?kind=invoice');setBillingDrafts(data.items.filter(i=>i.status==='draft'));}catch(e){setBillingError(e instanceof Error?e.message:'Rechnungsentwürfe konnten nicht geladen werden.')}};
 
   useEffect(()=>{
     const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
@@ -936,7 +962,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     {employeeFilter&&<p role="status">Arbeitszeiten des ausgewählten Mitarbeiters · <Link href="/zeit">Alle anzeigen</Link></p>}
     <div className="chips" aria-label="Zeitstatus">{["Alle","Zu prüfen","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>
     {mixedCustomers&&<p role="alert">Bitte nur Zeiten eines Kunden für eine Rechnung auswählen.</p>}
-    {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}
+    {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}
     <div className="time-layout">
       <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
@@ -947,7 +973,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
         </>:<>
           <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
           {!forceDemo?productionEntries:demoEntries}
-          <div className="time-entry-actions"><Button variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}</div>
+          <div className="time-entry-actions"><Button requiresWrite variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}</div>
         </>}
       </section>
       {timeTab==="timer"&&<section className="time-section time-overview-section">
@@ -958,6 +984,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     </div>
     {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
     {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {billingOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Zeiten verrechnen"><h2>Zeiten verrechnen</h2><p>Die Verknüpfung erfolgt erst beim Speichern der Rechnung.</p><Field allowReadOnlyInput label="Rechnung"><select value={billingTarget} onChange={e=>setBillingTarget(e.target.value)}><option value="">Neue Rechnung</option>{billingDrafts.filter(i=>i.customer_id===billableSelection[0]?.customer_id).map(i=><option key={i.number} value={i.number}>{i.number} · Entwurf</option>)}</select></Field>{billingError&&<p role="alert">{billingError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setBillingOpen(false)}>Abbrechen</Button><Button href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}>Positionen übernehmen</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -1189,7 +1216,7 @@ export function AccountSettingsPage() {
 
   const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
     <div className="settings-detail-grid">
       <section className="surface settings-profile">
         <div className="profile-avatar">{avatarUrl?<img src={avatarUrl} alt={displayName}/>:initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
@@ -1202,7 +1229,7 @@ export function AccountSettingsPage() {
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
           <Field label="Funktion"><input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
@@ -1270,7 +1297,7 @@ export function CompanySettingsPage() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
     <div className="settings-detail-grid">
       <section className="surface company-logo-card"><img src={logoUrl||"/brand/logo-black.svg"} alt="Firmenlogo"/><div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
@@ -1283,7 +1310,7 @@ export function CompanySettingsPage() {
           <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div></dl></section>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}

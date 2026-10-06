@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import {tenantCan} from "@/lib/permissions";
 import { SwissQRBill } from "swissqrbill/svg";
 import { createQrBillData, invoicePaymentIssue, responsiveQrSvg } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -19,6 +20,7 @@ type LineItem = {
   price: string;
   vatRate?: string;
   unit?: string;
+  expenseIds?: string[];
   timeEntryIds?: string[];
 };
 
@@ -133,7 +135,7 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
     currency:draft.currency??"CHF",
-    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),timeEntryIds:item.timeEntryIds??[]})),
+    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),expenseIds:item.expenseIds??[],timeEntryIds:item.timeEntryIds??[]})),
   };
 }
 
@@ -185,6 +187,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
       quantity:String(line.quantity??"1"),
       price:String(line.unit_price??"0.00"),
       unit:String(line.unit??"Stück"),
+      expenseIds:Array.isArray(line.expense_ids)?line.expense_ids.map(String):[],
       timeEntryIds:Array.isArray(line.time_entry_ids)?line.time_entry_ids.map(String):[],
       vatRate:String(line.vat_rate??item.vat_rate??"0"),
     })),
@@ -221,6 +224,13 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
+  const [documentRole,setDocumentRole]=useState("");
+  const [demoDocument,setDemoDocument]=useState(true);
+  const [documentReadOnly,setDocumentReadOnly]=useState(true);
+  const [sendOpen,setSendOpen]=useState(false),[recipient,setRecipient]=useState("");
+  const [actionBusy,setActionBusy]=useState(false),[actionError,setActionError]=useState<string|null>(null);
+  const [sendKey,setSendKey]=useState("");
+  useEffect(()=>{apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(s=>{setDocumentRole(s.tenant?.role??"");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch(()=>{});},[]);
   const [workspacePage,setWorkspacePage]=useState(0);
   const [detailTab,setDetailTab]=useState<"positions"|"document">("positions");
   const [toast,setToast]=useState<string|null>(null);
@@ -236,7 +246,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const selectedCustomerId=!existing?searchParams.get("customerId"):null;
   useEffect(()=>{if(!selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer)setDraft(current=>({...current,customer:customer[0],customerId:selectedCustomerId}));},[selectedCustomerId,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
-  const sourceTimeEntriesParam=kind==="Rechnung"&&!existing?(searchParams.get("timeEntries")??""):"";
+  const sourceTimeEntriesParam=kind==="Rechnung"?(searchParams.get("timeEntries")??""):"";
 
   useEffect(()=>{
     if(existing||!sourceOffer||kind!=="Rechnung") return;
@@ -251,18 +261,26 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     apiGet<{items:Array<Record<string,unknown>>}>("/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],"Angebot");setDraft(current=>({...source,number:current.number,date:current.date,due:"30"}));}}).catch(()=>undefined);
   },[existing,sourceOffer,kind,setDraft]);
 
+  const sourceExpenseParam=kind==='Rechnung'?(searchParams.get('expenses')??''):'';
+  const importedSources=useRef("");
   useEffect(()=>{
-    if(existing||kind!=="Rechnung"||!sourceTimeEntriesParam||!isProductionBackendEnabled())return;
-    const sourceTimeEntries=sourceTimeEntriesParam.split(",").filter(Boolean);
-    apiGet<{items:Array<{id:string;hours:number;description?:string|null;sales_rate:number;customer_name:string;project_name:string}>}>("/api/time-entries/billing?ids="+encodeURIComponent(sourceTimeEntries.join(","))).then(payload=>{
-      if(!payload.items.length)return;
-      const customer=payload.items[0].customer_name;
-      if(payload.items.some(item=>item.customer_name!==customer)){setToast("Für eine Rechnung müssen alle Zeiten zum gleichen Kunden gehören.");window.setTimeout(()=>setToast(null),2300);return;}
-      const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
-      const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
-      queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
-    }).catch(error=>{setToast(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden.");window.setTimeout(()=>setToast(null),2300)});
-  },[existing,kind,sourceTimeEntriesParam,setDraft]);
+    if(kind!=="Rechnung"||(!sourceTimeEntriesParam&&!sourceExpenseParam)||!isProductionBackendEnabled()||existing&&(documentLoad.loading||!draft.id))return;
+    const key=(documentKey??'new')+':'+sourceTimeEntriesParam+':'+sourceExpenseParam;
+    if(importedSources.current===key)return;importedSources.current=key;
+    const load=async()=>{
+      const times=sourceTimeEntriesParam?(await apiGet<{items:Array<{id:string;hours:number;description?:string;sales_rate:number;customer_id:string;customer_name:string;project_name:string}>}>("/api/time-entries/billing?ids="+encodeURIComponent(sourceTimeEntriesParam))).items:[];
+      const expenses=sourceExpenseParam?(await apiGet<{items:Array<{id:string;customer_id:string;customer_name:string;description:string;quantity:number;unit_price:number;vat_rate:number;currency:string}>}>("/api/expenses/billing?ids="+encodeURIComponent(sourceExpenseParam))).items:[];
+      if(times.length!==sourceTimeEntriesParam.split(',').filter(Boolean).length||expenses.length!==sourceExpenseParam.split(',').filter(Boolean).length)throw new Error('Mindestens ein Eintrag ist nicht mehr verrechenbar.');
+      const sources=[...times,...expenses];const customer=sources[0]?.customer_id;
+      if(!customer||sources.some(i=>i.customer_id!==customer)||existing&&draft.customerId!==customer)throw new Error('Alle Positionen müssen zum Kunden dieser Rechnung gehören.');
+      if(existing&&draft.status!=='draft')throw new Error('Zeiten und Spesen können nur einem Rechnungsentwurf hinzugefügt werden.');
+      if(expenses.some(i=>i.currency!==(existing?draft.currency:expenses[0].currency)))throw new Error('Die Währungen der Spesen und Rechnung müssen übereinstimmen.');
+      if(times.length&&(existing?draft.currency:expenses[0]?.currency??draft.currency)!=='CHF')throw new Error('Stundensätze werden in CHF geführt. Für diese Zeiten ist eine CHF-Rechnung erforderlich.');
+      const groups=Object.values(times.reduce<Record<string,typeof times>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
+      const positions:LineItem[]=[...groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)})),...expenses.map(i=>({id:'expense-'+i.id,description:i.description,quantity:String(i.quantity),price:String(i.unit_price),unit:'Stück',vatRate:String(i.vat_rate),expenseIds:[i.id]}))];
+      setDraft(current=>({...current,customer:sources[0].customer_name,customerId:customer,currency:expenses[0]?.currency??current.currency,positions:existing?[...current.positions,...positions]:positions,subtotal:undefined,vat:undefined,total:undefined}));setDirty(true);setEditing(true);
+    };void load().catch(e=>setActionError(e instanceof Error?e.message:'Positionen konnten nicht geladen werden.'));
+  },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft.id,draft.customerId,draft.status,draft.currency,documentKey,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
@@ -280,7 +298,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload={...documentPayload(kind,draft),customerId:directory[draft.customer]?.id??draft.customerId};
+        const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:directory[draft.customer]?.id??draft.customerId};
         const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload);
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
@@ -294,8 +312,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     }finally{setSaving(false);}
   };
 
-  const canEdit=!existing||!(Number(draft.paidAmount)>0||["accepted","cancelled"].includes(draft.status??""));
-  const canRecordPayment=kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft");
+  const canWrite=!documentReadOnly&&tenantCan(documentRole,kind==="Rechnung"?"invoices:write":"sales:write");
+  const canEdit=canWrite&&(!existing||draft.status==="draft");
+  const processAction=async(action:string)=>{if(actionBusy)return;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/status",{action});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setMoreOpen(false);show("Status aktualisiert.")}catch(e){setActionError(e instanceof Error?e.message:"Status konnte nicht geändert werden.")}finally{setActionBusy(false)}};
+  const sendDocument=async()=>{if(actionBusy)return;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show("Dokument als PDF versendet.")}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{setActionBusy(false)}};
+  const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft");
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/>{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
@@ -303,6 +324,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const desktopActions=headerActions;
 
   return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
+    {actionError&&!moreOpen&&!sendOpen&&<p role="alert">{actionError}</p>}
     {editing&&companyPending&&<p role="status">Firmendaten werden geladen …</p>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
@@ -330,7 +352,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
             </nav>}
           </section>}
           </div>
-          {(kind==="Angebot"||canRecordPayment)&&<aside className="document-desktop-rail">
+          {(kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"invoices:write")||canRecordPayment)&&<aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
               <span className="compact-section-label">Aktionen</span>
               {kind==="Angebot"
@@ -342,7 +364,14 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
-    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></Link></>:<><button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button>{canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></Link>}</>}</div></section></div>}
+    {moreOpen&&<div className="sheet-layer"><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><header className="sheet-header"><h2>Weitere Aktionen</h2><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">
+      <a href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"}><Icon name="file"/><span>PDF herunterladen</span></a>
+      {canWrite&&!['cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}
+      {canWrite&&draft.status==='draft'&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('issue')}><Icon name="check"/><span>{kind==='Rechnung'?'Rechnung stellen':'Als übergeben erfassen'}</span></button>}
+      {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><button type="button" disabled={actionBusy} onClick={()=>void processAction('accept')}>Kundenannahme erfassen</button><button type="button" disabled={actionBusy} onClick={()=>void processAction('decline')}>Kundenablehnung erfassen</button></>}
+      {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('cancel')}>Rechnung stornieren</button>}
+      </div>{actionError&&<p role="alert">{actionError}</p>}</section></div>}
+    {sendOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Dokument senden"><header className="sheet-header"><div><h2>{kind} als PDF senden</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setSendOpen(false)}/></header><Field label="Empfänger"><input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das Dokument wird als PDF versendet. Ein Entwurf wird danach ausgestellt und ist nicht mehr bearbeitbar.</p>{actionError&&<p role="alert">{actionError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -351,7 +380,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const totals=useDocumentTotals(draft);
   const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
   return <div className="document-detail-view">
-    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</section>
+    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</section>
     <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{Number(draft.vatRate).toFixed(2)} %</b></div></section>
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2>Positionen</h2></div>
