@@ -156,3 +156,14 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(!/\.section-title\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Shared section headings must not create stacked dividers.");
   console.log("Shared page and section headings cannot create consecutive divider lines.");
 }
+
+
+// Detail heading rhythm: the AppShell owns the entity title; detail content must not repeat it.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(!pages.includes('<div className="desktop-detail-main"><div className="entity-hero"><span className="record-avatar large">A</span>'),"Customer detail must not repeat the company heading below AppShell.");
+  assert(responsive.includes("--desktop-page-head-gap:20px"),"Desktop heading-to-content spacing must use the canonical rhythm.");
+  assert(responsive.includes(".desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}"),"Detail tabs must use the canonical heading/divider spacing.");
+  console.log("Detail headings and tab dividers use one consistent vertical rhythm.");
+}
