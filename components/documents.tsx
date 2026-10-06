@@ -217,6 +217,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
+  const [workspacePage,setWorkspacePage]=useState(0);
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const [dirty,setDirty]=useState(false);
@@ -285,6 +286,20 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail"><DocumentReadView type={kind} draft={draft} directory={directory}/></div>
+          <section className="document-inline-preview" aria-label={kind+" Vorschau"}>
+            <div className="document-preview-heading">
+              <div><span className="compact-section-label">Vorschau</span><h2>{kind}</h2></div>
+              <button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button>
+            </div>
+            <div className={"document-workspace-page page-"+(workspacePage+1)}>
+              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
+            </div>
+            {kind==="Rechnung"&&<nav className="document-page-navigation" aria-label="Rechnungsseiten">
+              <button type="button" aria-label="Vorherige Seite" disabled={workspacePage===0} onClick={()=>setWorkspacePage(0)}><Icon name="chevron-left" size={16}/></button>
+              <span>Seite {workspacePage+1} / 2</span>
+              <button type="button" aria-label="Nächste Seite" disabled={workspacePage===1} onClick={()=>setWorkspacePage(1)}><Icon name="chevron-right" size={16}/></button>
+            </nav>}
+          </section>
           <aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
               <span className="compact-section-label">Aktionen</span>
@@ -294,10 +309,6 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
               {kind==="Angebot"
                 ? <Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>Rechnung erstellen</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
                 : <Link href="/zahlungen/neu"><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
-            </section>
-            <section className="document-inline-preview">
-              <div className="document-preview-heading"><h2>Vorschau</h2><button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button></div>
-              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
             </section>
           </aside>
         </div>
