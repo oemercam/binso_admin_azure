@@ -25,6 +25,12 @@ const desktopNav = [
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
 
+const desktopNavGroups = [
+  {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
+  {label:"Arbeit & Team",paths:["/zeit","/mitarbeiter"]},
+  {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen"]},
+];
+
 const searchItems:SearchItem[] = [
   { type: "Kunde", title: "Acme AG", meta: "Zürich · Aktiv", href: "/kunden/acme", icon: "users" },
   { type: "Rechnung", title: "RE-2026-019", meta: "Acme AG · CHF 4’346.40", href: "/rechnungen/RE-2026-019", icon: "receipt" },
@@ -327,11 +333,8 @@ export function AppShell({
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
-        {desktopNav.map(([href,label,icon]) =>
-          <Link key={href} href={href} className={active===href.slice(1) ? "active" : ""}>
-            <Icon name={icon}/><span>{label}</span>
-          </Link>
-        )}
+        <Link href="/dashboard" className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span>Start</span></Link>
+        {desktopNavGroups.map(group=><div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label">{group.label}</span>{desktopNav.filter(([href])=>group.paths.includes(href)).map(([href,label,icon])=><Link key={href} href={href} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span>{label}</span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
         <Link href="/support" className={active==="support" ? "active" : ""}><Icon name="support"/><span>Support</span></Link>

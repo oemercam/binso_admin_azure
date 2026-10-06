@@ -256,6 +256,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
   const [contactOpen,setContactOpen]=useState(false);
   const [contactToast,setContactToast]=useState<string|null>(null);
+  const [loadError,setLoadError]=useState<string|null>(null);
   const [customer,setCustomer]=useState<Record<string,unknown>|null>(null);
   const [contacts,setContacts]=useState<Array<Record<string,unknown>>>([]);
   const [customerDocuments,setCustomerDocuments]=useState<Array<Record<string,unknown>>>([]);
@@ -275,7 +276,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
       setCustomer(customerPayload.item);
       setContacts(contactPayload.items);
       setCustomerDocuments(documentPayload.items);
-    })).catch(()=>undefined);
+    })).catch(error=>setLoadError(error instanceof Error?error.message:"Kunde konnte nicht geladen werden."));
   },[production,customerId]);
 
   const saveContact=async()=>{
@@ -302,13 +303,14 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
       {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
       {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link></div></section>}
       {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kundendaten aktualisiert</b><small>Demo</small></div></div></div></section>}</div>
-        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
+        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
       </div>
       {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
       {contactToast&&<Toast title={contactToast}/>}
     </AppShell>;
   }
 
+  if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
   if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref="/kunden" backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
@@ -316,12 +318,14 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
   return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref="/kunden" backLabel="Kunden" >
-    <div className="customer-detail-workspace">\n      <aside className="customer-info-pane"><span className="compact-section-label">Firma</span><strong>{name}</strong><dl className="detail-list"><div><dt>Status</dt><dd>{status==="active"?"Aktiv":"Inaktiv"}</dd></div><div><dt>Ort</dt><dd>{city||"—"}</dd></div><div><dt>Branche</dt><dd>{sector||"—"}</dd></div></dl></aside>\n      <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+    <div className="customer-detail-workspace">
+      <aside className="customer-info-pane"><span className="compact-section-label">Firma</span><strong>{name}</strong><dl className="detail-list"><div><dt>Status</dt><dd>{status==="active"?"Aktiv":"Inaktiv"}</dd></div><div><dt>Ort</dt><dd>{city||"—"}</dd></div><div><dt>Branche</dt><dd>{sector||"—"}</dd></div></dl></aside>
+      <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
     {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>E-Mail</dt><dd>{String(customer.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(customer.phone??"—")}</dd></div><div><dt>Adresse</dt><dd>{String(customer.street??"—")}<br/>{[customer.postal_code,customer.city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>UID</dt><dd>{String(customer.uid??"—")}</dd></div></dl></section></div>}
     {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div>})}</div>:<EmptyState icon="users" title="Noch keine Kontakte" text="Füge den ersten Ansprechpartner für diesen Kunden hinzu."/>}</section>}
     {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/>{customerDocuments.length?<div className="compact-list">{customerDocuments.map(item=>{const kind=String(item.kind);const statusValue=String(item.status??"draft");const statusLabel:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};return <Link href={(kind==="offer"?"/angebote/":"/rechnungen/")+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{swissDate(item.issue_date)} · {moneyChf(item.total)}</span><Status tone={statusValue==="paid"||statusValue==="accepted"?"success":statusValue==="overdue"||statusValue==="declined"?"danger":"warning"}>{statusLabel[statusValue]??statusValue}</Status></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Belege" text="Angebote und Rechnungen für diesen Kunden erscheinen hier."/>}</section>}
     {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kunde erstellt</b><small>{new Date(String(customer.created_at)).toLocaleString("de-CH")}</small></div></div><div><i/><div><b>Zuletzt aktualisiert</b><small>{new Date(String(customer.updated_at)).toLocaleString("de-CH")}</small></div></div></div></section>}</div>
-      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
     </div>
     {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
     {contactToast&&<Toast title={contactToast} tone={contactToast.includes("konnte")?"danger":"success"}/>}
@@ -428,6 +432,10 @@ export function PaymentsPage() {
 
 export function PaymentForm() {
   const router=useRouter();
+  const searchParams=useSearchParams();
+  const sourceInvoice=searchParams.get("invoice");
+  const [saving,setSaving]=useState(false);
+  const savePending=useRef(false);
   const [toast,setToast]=useState<string|null>(null);
   const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
   const [amount,setAmount]=useState("");
@@ -437,15 +445,19 @@ export function PaymentForm() {
   const [note,setNote]=useState("");
   const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;customer?:{name?:string}}>>([]);
   useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
+  useEffect(()=>{if(!sourceInvoice)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(Number(item.total)-Number(item.paid_amount)));});},[sourceInvoice,availableInvoices]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
+  const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):"/zahlungen";
 
   const save=async()=>{
+    if(savePending.current)return;
     const value=Number(amount.replace(",","."));
     if(!selectedInvoice||!Number.isFinite(value)||value<=0){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    savePending.current=true;setSaving(true);
     try{
       if(isProductionBackendEnabled()){
         const key=idempotencyKey||window.crypto.randomUUID();
@@ -458,13 +470,13 @@ export function PaymentForm() {
         appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
       setToast("Zahlung gespeichert.");
-      window.setTimeout(()=>router.push("/zahlungen"),700);
+      window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
       setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
-    }
+    }finally{savePending.current=false;setSaving(false);}
   };
-  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen" actions={<Button onClick={save}>Zahlung speichern</Button>}>
+  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"} actions={<Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button>}>
     <div className="form-page narrow">
       <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(Number(item.total)-Number(item.paid_amount)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {moneyChf(Number(item.total)-Number(item.paid_amount))}</option>)}</select></Field>
       <div className="form-grid two">
@@ -473,7 +485,7 @@ export function PaymentForm() {
         <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
         <Field label="Notiz"><input placeholder="Optional" value={note} onChange={e=>setNote(e.target.value)}/></Field>
       </div>
-      <div className="mobile-sticky-save"><Button onClick={save}>Zahlung speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("gültigen")?"danger":"success"}/>}
   </AppShell>;
@@ -640,7 +652,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setAddress(String(item.address??""));
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
       });
-    }).catch(()=>undefined);
+    }).catch(error=>setToast(error instanceof Error?error.message:"Mitarbeiter konnte nicht geladen werden."));
   },[production,existing,employeeId]);
 
   const save=async()=>{
@@ -688,11 +700,11 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       </div>
       <div className="mobile-sticky-save"><Button onClick={()=>void save()}>Speichern</Button></div>
     </div>}
-    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href="/zeit" variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
-    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href="/spesen/neu" variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
+    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
+    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
     {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledger.files.length&&<EmptyState icon="file" title="Keine Dokumente" text="Für diesen Mitarbeiter sind keine Dokumente geladen."/>}</section>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Wochenstunden <b>{weeklyHours} h</b></span><span>Ferien <b>{vacationDays} Tage</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Stammdaten übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/zeit"><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href="/spesen/neu"><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Mitarbeiter</span><strong>{displayName}</strong><small>{role||"Funktion nicht hinterlegt"}</small><div className="desktop-summary-facts"><span>Status <b>{status}</b></span><span>Pensum <b>{load}%</b></span><span>Wochenstunden <b>{weeklyHours} h</b></span><span>Ferien <b>{vacationDays} Tage</b></span><span>Eintritt <b>{entryDate?new Date(entryDate).toLocaleDateString("de-CH"):"—"}</b></span></div></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Stammdaten übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link><Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
@@ -707,8 +719,9 @@ export function ExpensesPage() {
 
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
+  const searchParams=useSearchParams();
   const production=useBackendMode();
-  const [person,setPerson]=useState("");
+  const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
   const [availableEmployees,setAvailableEmployees]=useState<Array<{id:string;first_name:string;last_name:string}>>([]);
   const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
   const [category,setCategory]=useState(existing?"Reise":"Reise");
@@ -740,7 +753,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
       });
-    }).catch(()=>undefined);
+    }).catch(error=>setToast(error instanceof Error?error.message:"Spese konnte nicht geladen werden."));
   },[production,existing,expenseId]);
 
   const scanReceipt=async(file:File|null)=>{
@@ -820,7 +833,14 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const searchParams=useSearchParams();
   const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":undefined;
   const production=useBackendMode()&&!forceDemo;
-  const [timeTab,setTimeTab]=useState<"timer"|"entries">("timer");
+  const employeeFilter=searchParams.get("employeeId");
+  const [entriesError,setEntriesError]=useState<string|null>(null);
+  const [entriesLoading,setEntriesLoading]=useState(!forceDemo);
+  const [entryFilter,setEntryFilter]=useState("Alle");
+  const [canApprove,setCanApprove]=useState(false);
+  const [canInvoice,setCanInvoice]=useState(false);
+  useEffect(()=>{if(forceDemo)return;apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>{const role=data.tenant?.role;setCanApprove(["owner","admin","project_manager","manager"].includes(role??""));setCanInvoice(["owner","admin","finance"].includes(role??""));}).catch(()=>undefined);},[forceDemo]);
+  const [timeTab,setTimeTab]=useState<"timer"|"entries">(employeeFilter?"entries":"timer");
   const [running,setRunning]=useState(false);
   const [seconds,setSeconds]=useState(0);
   const [manualOpen,setManualOpen]=useState(false);
@@ -836,23 +856,25 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items)}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo]);
-  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
+  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
 
   useEffect(()=>{
     const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
+    const syncTimer=window.setInterval(sync,30000);
+    window.addEventListener("focus",sync);
     queueMicrotask(()=>setManualDate(new Date().toLocaleDateString("en-CA")));
     window.addEventListener("binso-timer-change",sync);
-    return()=>window.removeEventListener("binso-timer-change",sync);
+    return()=>{window.clearInterval(syncTimer);window.removeEventListener("focus",sync);window.removeEventListener("binso-timer-change",sync);};
   },[]);
 
   useEffect(()=>{
     if(forceDemo) return;
-    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries":"/api/demo/data?collection=time_entries")
+    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""):"/api/demo/data?collection=time_entries")
       .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
-      .catch(()=>undefined);
-  },[production,forceDemo]);
+      .catch(error=>setEntriesError(error instanceof Error?error.message:"Zeiteinträge konnten nicht geladen werden.")).finally(()=>setEntriesLoading(false));
+  },[production,forceDemo,employeeFilter]);
 
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
@@ -867,7 +889,6 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
   const formatMinutes=(value:number)=>`${Math.floor(value/60)}:${String(value%60).padStart(2,"0")}`;
-  const remoteTotal=remoteEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
 
   const stop=async()=>{
     try{
@@ -903,22 +924,29 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const billableSelection=remoteEntries.filter(item=>selectedTimeIds.includes(item.id)&&item.billable&&item.approved&&!item.invoiced_invoice_id);
+  const mixedCustomers=new Set(billableSelection.map(item=>item.customer_id||item.customer_name)).size>1;
+  const visibleEntries=remoteEntries.filter(item=>entryFilter==="Alle"||entryFilter==="Verrechnet"&&item.invoiced_invoice_id||entryFilter==="Freigegeben"&&item.approved&&!item.invoiced_invoice_id||entryFilter==="Zu prüfen"&&item.billable&&!item.approved&&!item.invoiced_invoice_id||entryFilter==="Intern"&&!item.billable);
+  const remoteTotal=visibleEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
   const invoiceHref=billableSelection.length?"/rechnungen/neu?timeEntries="+encodeURIComponent(billableSelection.map(item=>item.id).join(",")):"";
-  const groupedEntries=Object.entries(remoteEntries.reduce<Record<string,typeof remoteEntries>>((groups,item)=>{const key=(item.customer_name||"Intern")+" · "+(item.project_name||"Ohne Auftrag");(groups[key]??=[]).push(item);return groups},{}));
-  const productionEntries=remoteEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{item.description||"Erfasste Arbeitszeit"}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">Intern</Status>}</div>)}</div></section>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
+  const groupedEntries=Object.entries(visibleEntries.reduce<Record<string,typeof remoteEntries>>((groups,item)=>{const key=(item.customer_name||"Intern")+" · "+(item.project_name||"Ohne Auftrag");(groups[key]??=[]).push(item);return groups},{}));
+  const productionEntries=entriesLoading?<p role="status">Zeiteinträge werden geladen …</p>:entriesError?<p role="alert">{entriesError}</p>:visibleEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{canInvoice&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{[swissDate(item.started_at),item.description||"Erfasste Arbeitszeit"].filter(Boolean).join(" · ")}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable&&canApprove?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">{item.billable?"Zu prüfen":"Intern"}</Status>}</div>)}</div></section>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
 
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
+    {employeeFilter&&<p role="status">Arbeitszeiten des ausgewählten Mitarbeiters · <Link href="/zeit">Alle anzeigen</Link></p>}
+    <div className="chips" aria-label="Zeitstatus">{["Alle","Zu prüfen","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>
+    {mixedCustomers&&<p role="alert">Bitte nur Zeiten eines Kunden für eine Rechnung auswählen.</p>}
+    {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}
     <div className="time-layout">
       <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
-          <div className="timer-project"><small>Kunde</small><select value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProject("Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
+          <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0} value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProject("Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
           <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
           {!forceDemo?productionEntries:demoEntries}
-          <div className="time-entry-actions"><Button variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{billableSelection.length>0&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}</div>
+          <div className="time-entry-actions"><Button variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button href={invoiceHref} icon="receipt">Rechnung erstellen ({billableSelection.length})</Button>}</div>
         </>}
       </section>
       {timeTab==="timer"&&<section className="time-section time-overview-section">

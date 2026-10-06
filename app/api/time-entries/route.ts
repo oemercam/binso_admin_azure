@@ -38,9 +38,9 @@ export async function POST(request:NextRequest){
       if(customerId&&found.rows[0]?.customer_id&&String(found.rows[0].customer_id)!==customerId)throw new ApiError(400,"project_customer_mismatch","Der Auftrag gehört nicht zum gewählten Kunden.");
       const employee=await c.query("select id from employees where organization_id=$1 and lower(email)=lower($2) and archived_at is null",[s.organizationId,s.email]);
       const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id)
-        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,true,false,$8)
-        returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,created_at`,
-        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project]);
+        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,false,$8)
+        returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,created_at`,
+        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,Boolean(customers?.rows[0]?.id??found.rows[0]?.customer_id)]);
       return result.rows[0];
     });return json({item},201);
   }catch(e){return apiError(e)}

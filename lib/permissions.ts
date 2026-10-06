@@ -67,7 +67,8 @@ export function routePermission(pathname:string):TenantPermission|undefined{
  if(pathname.startsWith("/einstellungen"))return "organization:read";
  const segment=pathname.split("/").filter(Boolean)[0]||"dashboard";
  if(segment==="dashboard")return "organization:read";
- return permissionForModule(segment,"read");
+ const aliases:Record<string,string>={angebote:"offerten",zeit:"zeiterfassung",mitarbeiter:"personal",belege:"dokumente"};
+ return permissionForModule(aliases[segment]??segment,"read");
 }
 export function ownRecordOnly(role:string,moduleKey:string){
  return normalizeTenantRole(role)==="member"&&["zeiterfassung","spesen","aufgaben"].includes(moduleKey);

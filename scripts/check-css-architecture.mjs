@@ -57,6 +57,7 @@ for(const legacy of [
 let css="";
 for(const file of runtimeCss){
   const source=fs.readFileSync(path.join(styleDir,file),"utf8");
+  if(/\\[nr]/.test(source))throw new Error(`Literal newline escape in app/styles/${file}`);
   css+="\n"+source;
 
   if(source.includes("!important"))throw new Error(`!important is not allowed in app/styles/${file}`);

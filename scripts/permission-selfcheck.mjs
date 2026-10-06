@@ -8,6 +8,7 @@ const {tenantCan,operatorCan,routePermission}=await import(permissionsUrl);
 for(const role of ['owner','admin','finance'])assert.equal(tenantCan(role,'accounting:read'),true);
 for(const role of ['member','reader','hr','project_manager'])assert.equal(tenantCan(role,'accounting:read'),false);
 assert.equal(routePermission('/finanzen'),'accounting:read');
+for(const [route,permission] of [['/angebote','sales:read'],['/zeit','time:read'],['/mitarbeiter','employees:read'],['/belege','documents:read']])assert.equal(routePermission(route),permission);
 assert.equal(operatorCan('platform_support','subscriptions:read'),false);
 assert.equal(operatorCan('platform_billing','subscriptions:read'),true);
 for(const role of ['unknown','__proto__','constructor','']){
