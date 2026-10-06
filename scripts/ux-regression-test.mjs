@@ -147,3 +147,12 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(responsive.includes(".document-workspace-page.page-2 .document-pages>.paper:nth-child(2)"),"Document preview must render one selected page at a time.");
   console.log("Invoices and offers use the canonical information, single-page preview and toolbox workspace.");
 }
+
+
+// Heading rhythm contract: headings provide hierarchy; adjacent content owns dividers.
+{
+  const responsive=read("app/styles/responsive.css");
+  assert(!/\.page-head\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Desktop page headings must not add a divider that can stack with content borders.");
+  assert(!/\.section-title\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Shared section headings must not create stacked dividers.");
+  console.log("Shared page and section headings cannot create consecutive divider lines.");
+}
