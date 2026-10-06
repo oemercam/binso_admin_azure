@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
-const read=path=>fs.readFile(path,'utf8');
+const read=path=>requireReadCache.get(path)??'';
+const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await fs.readFile(path,'utf8')])));
 let source=await fs.readFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
