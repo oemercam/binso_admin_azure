@@ -11,7 +11,22 @@ try{
  await db.exec('create extension pgcrypto; create role schema_owner; grant usage,create on schema public to schema_owner; set role schema_owner');
  for(const file of (await fs.readdir('database/migrations')).filter(x=>x.endsWith('.sql')).sort()){
   await db.exec('begin');
-  try{await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));await db.exec('commit')}catch(e){await db.exec('rollback');throw new Error(file+': '+e.message)}
+  try{
+   const presentation=file==='0037_demo_document_presentation.sql';
+   const probe='00000000-0000-4000-8000-000000000077';
+   if(presentation)await db.query("insert into organizations(id,name,legal_name,slug,is_demo) values($1,'Binso Demo AG','Binso Demo AG','presentation-production-probe',false)",[probe]);
+   if(presentation)await db.query("select set_config('app.organization_id',$1,true)",[demo]);
+   const before=presentation?(await db.query('select id,organization_id,customer_id,subtotal,vat_amount,total_amount,paid_amount from invoices order by id')).rows:null;
+   await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
+   if(presentation){
+    assert.deepEqual((await db.query('select id,organization_id,customer_id,subtotal,vat_amount,total_amount,paid_amount from invoices order by id')).rows,before,'Demo presentation migration must preserve IDs, links and financial amounts');
+    assert.equal((await db.query('select name from organizations where id=$1',[probe])).rows[0].name,'Binso Demo AG','Non-demo organizations must remain untouched');
+    assert.equal((await db.query('select legal_name from organizations where id=$1',[demo])).rows[0].legal_name,'Alpenblick Digital AG');
+    assert.equal((await db.query("select count(*)::int n from invoices where organization_id=$1 and invoice_no like 'DEMO-%'",[demo])).rows[0].n,0);
+    await db.query('delete from organizations where id=$1',[probe]);
+   }
+   await db.exec('commit')
+  }catch(e){await db.exec('rollback');throw new Error(file+': '+e.message)}
  }
  await db.exec('reset role');
  await db.exec(`create role tenant_probe; grant usage on schema public to tenant_probe; grant select,insert,update,delete on all tables in schema public to tenant_probe;`);
