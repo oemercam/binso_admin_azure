@@ -167,3 +167,13 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(responsive.includes(".desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}"),"Detail tabs must use the canonical heading/divider spacing.");
   console.log("Detail headings and tab dividers use one consistent vertical rhythm.");
 }
+
+
+// Terminal row divider contract: containers may close a section; their final data row must not draw a second line.
+{
+  const appCss=read("app/styles/app.css");
+  assert(appCss.includes(".detail-list>div:last-child,"),"Detail lists must suppress the final row divider.");
+  assert(appCss.includes(".compact-list>div:last-child,"),"Compact lists must suppress the final row divider.");
+  assert(appCss.includes(".contact-list>div:last-child{border-bottom:0}"),"Contact lists must suppress the final row divider.");
+  console.log("Final rows cannot create duplicate section closing dividers.");
+}
