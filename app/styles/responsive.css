@@ -164,6 +164,9 @@
 
 /* Shared non-mobile behavior */
 @media (min-width:761px){
+  .desktop-record-table{display:block}
+  .desktop-record-head,.desktop-record-row{display:grid}
+  .mobile-record-list{display:none}
 .sheet-layer{align-items:center;padding:24px}
   .bottom-sheet{
     max-height:calc(100dvh - 48px);
@@ -3205,14 +3208,3 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bottom-sheet{animation:none}
 }
 
-
-/* Desktop data management standard: dense sortable table; mobile keeps the proven compact list. */
-@media (min-width:1024px){
-  .desktop-record-table{display:block}
-  .desktop-record-head,.desktop-record-row{display:grid}
-  .mobile-record-list{display:none}
-}
-@media (max-width:1023px){
-  .desktop-record-table{display:none}
-  .mobile-record-list{display:block}
-}
