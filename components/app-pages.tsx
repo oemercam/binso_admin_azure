@@ -786,8 +786,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={<Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button>}>
-    <div className={existing?"expense-layout expense-detail-workspace":"expense-layout"}>
+  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button onClick={()=>void save()}>Einreichen</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
+      {existing&&<aside className="entity-info-pane"><span className="compact-section-label">Spese</span><strong>{amount?moneyChf(Number(amount.replace(",","."))):"CHF 0.00"}</strong><small>{merchant||category}</small><dl className="detail-list"><div><dt>Status</dt><dd>{status}</dd></div><div><dt>Datum</dt><dd>{date?new Date(date).toLocaleDateString("de-CH"):"—"}</dd></div><div><dt>Kategorie</dt><dd>{category}</dd></div></dl></aside>}
       <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
       <div className="form-page">
         <div className="form-grid two">
@@ -803,6 +804,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         </div>
         <div className="mobile-sticky-save"><Button onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>
       </div>
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Beleg</span><strong>{receiptFile?.name||"Spesenbeleg"}</strong><small>{scanState==="done"?"Belegdaten erkannt":"Angaben prüfen"}</small></section><section className="desktop-toolbox"><button type="button" onClick={()=>void save()}><Icon name="check"/><span><b>Speichern</b><small>Änderungen übernehmen</small></span><Icon name="arrow" size={15}/></button><Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {toast&&<Toast title={toast} tone={toast.includes("gültigen")||toast.includes("konnte")?"danger":"success"}/>}
   </AppShell>;
