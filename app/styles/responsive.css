@@ -429,6 +429,19 @@
 
 /* Wide desktop */
 @media (min-width:1101px){
+  .customer-detail-workspace,
+  .entity-detail-workspace{
+    display:grid;
+    grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%);
+    gap:24px;
+    align-items:start;
+  }
+  .customer-info-pane,
+  .entity-info-pane,
+  .desktop-context-rail{position:sticky;top:82px;align-self:start;min-width:0}
+  .desktop-detail-main,
+  .entity-edit-main{min-width:0}
+
 .desktop-appbar{
     position:sticky;
     top:0;
