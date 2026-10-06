@@ -255,7 +255,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .record-avatar.large{width:52px;height:52px;min-width:52px;font-size:18px}
 
 .desktop-record-table{display:none;width:100%;min-width:0;border-top:1px solid var(--color-line)}
-.desktop-record-head,.desktop-record-row{grid-template-columns:repeat(var(--record-columns,4),minmax(0,1fr)) 28px}
 .desktop-record-head{min-height:40px;align-items:center;border-bottom:1px solid var(--color-line)}
 .desktop-record-head button{min-width:0;padding:0 10px;border:0;background:transparent;color:var(--color-muted);font-size:11px;font-weight:700;text-align:left;white-space:nowrap;cursor:pointer}
 .desktop-record-head button:first-child,.desktop-record-row>span:first-child{padding-left:4px}
