@@ -894,6 +894,168 @@
   }
   .settings-list>a{border-top:1px solid var(--color-line)}
   .settings-list>a:nth-last-child(-n+2){border-bottom:1px solid var(--color-line)}
+
+
+/* Binso One Desktop UI Standard V1 */
+  :root{
+    --desktop-header-h:56px;
+    --desktop-page-top:20px;
+    --desktop-page-bottom:48px;
+    --desktop-page-head-gap:16px;
+    --desktop-workspace-gap:16px;
+    --desktop-section-gap:20px;
+    --desktop-row-h:56px;
+    --desktop-toolbar-h:40px;
+    --desktop-detail-min:420px;
+    --desktop-list-min:520px;
+  }
+
+  .app-main{min-height:100dvh}
+  .desktop-appbar{
+    position:sticky;
+    top:0;
+    z-index:18;
+    height:var(--desktop-header-h);
+    min-height:var(--desktop-header-h);
+    padding:0 var(--page-x);
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    border-bottom:1px solid var(--color-line);
+    background:color-mix(in srgb,var(--color-bg) 96%,transparent);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  /* The global desktop header is deliberately quiet: notification + account only. */
+  .desktop-appbar>.desktop-search,
+  .desktop-appbar .desktop-header-timer,
+  .desktop-appbar .app-demo-badge{display:none}
+  .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+  .page-container{
+    max-width:var(--content-max);
+    padding:var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);
+  }
+  .page-head{
+    min-height:0;
+    margin:0 0 var(--desktop-page-head-gap);
+    padding:0;
+    align-items:flex-end;
+  }
+  .page-head h1{font-size:26px;line-height:1.12}
+  .page-head p{margin-top:5px;font-size:13px;line-height:1.4}
+  .page-head .mobile-page-actions{display:none}
+  .desktop-page-actions{
+    min-height:var(--desktop-toolbar-h);
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+  }
+  .desktop-back{margin:0 0 8px}
+
+  /* One shared rhythm for page sections. */
+  .page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type{margin-top:0}
+  .page-container>section,
+  .page-container>.surface,
+  .page-container>.dashboard-grid,
+  .page-container>.detail-grid,
+  .page-container>.quick-section,
+  .page-container>.finance-analysis,
+  .page-container>.finance-breakdown{margin-top:var(--desktop-section-gap)}
+  .page-container>.toolbar,
+  .page-container>.desktop-page-actions+.toolbar{margin-top:0}
+
+  /* Flat work surfaces: borders separate information, cards are reserved for true groups. */
+  .surface{padding:18px}
+  .section-title{min-height:28px}
+  .section-title h2{font-size:14px}
+
+  /* Canonical list/search toolbar. */
+  .toolbar{
+    min-height:var(--desktop-toolbar-h);
+    margin-bottom:10px;
+    gap:8px;
+    flex-wrap:nowrap;
+  }
+  .searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:9px}
+  .searchbox.large{max-width:620px}
+  .chips{min-width:0}
+  .chips button,.tabs button,.notification-center-tabs button{height:34px;min-height:34px}
+  .filter-button{height:36px;min-height:36px}
+  .records-count{white-space:nowrap}
+
+  /* Dense business lists. */
+  .records{border-top:1px solid var(--color-line)}
+  .record{
+    min-height:var(--desktop-row-h);
+    padding:8px 4px;
+    gap:10px;
+    transition:background var(--motion-fast) var(--motion-ease-standard);
+  }
+  .record-avatar{width:34px;height:34px;min-width:34px}
+  .record:hover{transform:none;background:color-mix(in srgb,var(--color-fg) 3%,transparent)}
+
+  /* Shared master/detail workspace for wide screens. */
+  .tablet-master-detail{
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:var(--desktop-workspace-gap);
+    align-items:start;
+  }
+  .tablet-master-detail:has(>.tablet-detail){
+    grid-template-columns:minmax(var(--desktop-list-min),1.05fr) minmax(var(--desktop-detail-min),.95fr);
+  }
+  .tablet-detail{
+    min-width:0;
+    display:block;
+    align-self:start;
+    position:sticky;
+    top:calc(var(--desktop-header-h) + var(--desktop-page-top));
+    max-height:calc(100dvh - var(--desktop-header-h) - (var(--desktop-page-top) * 2));
+    overflow:auto;
+  }
+  .tablet-detail-head{min-height:52px;padding:0 0 12px}
+  .tablet-actions,.tablet-document-actions{margin:12px 0 8px}
+  .entity-hero{margin-bottom:14px}
+  .tabs{margin-bottom:12px;padding-bottom:8px}
+
+  /* Document workspaces use available desktop width without oversized gutters. */
+  .invoice-workspace{
+    grid-template-columns:minmax(560px,1fr) minmax(440px,.86fr);
+    gap:var(--desktop-workspace-gap);
+  }
+  .desktop-document-preview,.invoice-tablet-preview{
+    top:calc(var(--desktop-header-h) + var(--desktop-page-top));
+    padding:16px;
+  }
+
+  /* Forms share one readable measure; detail workspaces may opt out naturally. */
+  .form-page{max-width:960px}
+  .form-page.narrow{max-width:760px}
+  .form-section,.settings-form{padding:18px 0}
+  .form-grid{gap:12px 14px}
+
+  /* Dashboard: compact KPIs, useful content gets the space. */
+  .metrics-grid{gap:0;border-block:1px solid var(--color-line)}
+  .metric{min-height:96px;padding:14px 18px}
+  .metric:first-child{padding-left:0}
+  .metric+.metric{border-left:1px solid var(--color-line)}
+  .metric strong{margin:10px 0 4px;font-size:22px}
+  .dashboard-grid,.detail-grid{gap:var(--desktop-workspace-gap);margin-top:var(--desktop-section-gap)}
+  .quick-section{margin-top:var(--desktop-section-gap)}
+  .quick-grid{gap:8px}
+
+  /* Settings/detail pages follow the same vertical rhythm. */
+  .detail-list>div,.operator-detail-list>div{min-height:42px;padding:10px 0}
+  .compact-list>div,.compact-list>a{min-height:50px}
+  .contact-list>div{min-height:56px;padding:8px 0}
+}
+
+
+
 }
 
 /* Large desktop refinement */
@@ -2993,175 +3155,4 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Reduced motion on desktop */
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
-}
-
-/* Binso One Desktop UI Standard V1
-   Canonical desktop-only workspace rules. Keep page-specific desktop overrides out
-   of responsive.css; new desktop behaviour belongs here or in shared components. */
-
-@media (min-width: 1024px){
-  :root{
-    --desktop-header-h:56px;
-    --desktop-page-top:20px;
-    --desktop-page-bottom:48px;
-    --desktop-page-head-gap:16px;
-    --desktop-workspace-gap:16px;
-    --desktop-section-gap:20px;
-    --desktop-row-h:56px;
-    --desktop-toolbar-h:40px;
-    --desktop-detail-min:420px;
-    --desktop-list-min:520px;
-  }
-
-  .app-main{min-height:100dvh}
-  .desktop-appbar{
-    position:sticky;
-    top:0;
-    z-index:18;
-    height:var(--desktop-header-h);
-    min-height:var(--desktop-header-h);
-    padding:0 var(--page-x);
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    border-bottom:1px solid var(--color-line);
-    background:color-mix(in srgb,var(--color-bg) 96%,transparent);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-  /* The global desktop header is deliberately quiet: notification + account only. */
-  .desktop-appbar>.desktop-search,
-  .desktop-appbar .desktop-header-timer,
-  .desktop-appbar .app-demo-badge{display:none}
-  .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
-
-  .page-container{
-    max-width:var(--content-max);
-    padding:var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);
-  }
-  .page-head{
-    min-height:0;
-    margin:0 0 var(--desktop-page-head-gap);
-    padding:0;
-    align-items:flex-end;
-  }
-  .page-head h1{font-size:26px;line-height:1.12}
-  .page-head p{margin-top:5px;font-size:13px;line-height:1.4}
-  .page-head .mobile-page-actions{display:none}
-  .desktop-page-actions{
-    min-height:var(--desktop-toolbar-h);
-    margin:0 0 12px;
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:8px;
-  }
-  .desktop-back{margin:0 0 8px}
-
-  /* One shared rhythm for page sections. */
-  .page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type{margin-top:0}
-  .page-container>section,
-  .page-container>.surface,
-  .page-container>.dashboard-grid,
-  .page-container>.detail-grid,
-  .page-container>.quick-section,
-  .page-container>.finance-analysis,
-  .page-container>.finance-breakdown{margin-top:var(--desktop-section-gap)}
-  .page-container>.toolbar,
-  .page-container>.desktop-page-actions+.toolbar{margin-top:0}
-
-  /* Flat work surfaces: borders separate information, cards are reserved for true groups. */
-  .surface{padding:18px}
-  .section-title{min-height:28px}
-  .section-title h2{font-size:14px}
-
-  /* Canonical list/search toolbar. */
-  .toolbar{
-    min-height:var(--desktop-toolbar-h);
-    margin-bottom:10px;
-    gap:8px;
-    flex-wrap:nowrap;
-  }
-  .searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:9px}
-  .searchbox.large{max-width:620px}
-  .chips{min-width:0}
-  .chips button,.tabs button,.notification-center-tabs button{height:34px;min-height:34px}
-  .filter-button{height:36px;min-height:36px}
-  .records-count{white-space:nowrap}
-
-  /* Dense business lists. */
-  .records{border-top:1px solid var(--color-line)}
-  .record{
-    min-height:var(--desktop-row-h);
-    padding:8px 4px;
-    gap:10px;
-    transition:background var(--motion-fast) var(--motion-ease-standard);
-  }
-  .record-avatar{width:34px;height:34px;min-width:34px}
-  .record:hover{transform:none;background:color-mix(in srgb,var(--color-fg) 3%,transparent)}
-
-  /* Shared master/detail workspace for wide screens. */
-  .tablet-master-detail{
-    min-width:0;
-    display:grid;
-    grid-template-columns:minmax(0,1fr);
-    gap:var(--desktop-workspace-gap);
-    align-items:start;
-  }
-  .tablet-master-detail:has(>.tablet-detail){
-    grid-template-columns:minmax(var(--desktop-list-min),1.05fr) minmax(var(--desktop-detail-min),.95fr);
-  }
-  .tablet-detail{
-    min-width:0;
-    display:block;
-    align-self:start;
-    position:sticky;
-    top:calc(var(--desktop-header-h) + var(--desktop-page-top));
-    max-height:calc(100dvh - var(--desktop-header-h) - (var(--desktop-page-top) * 2));
-    overflow:auto;
-  }
-  .tablet-detail-head{min-height:52px;padding:0 0 12px}
-  .tablet-actions,.tablet-document-actions{margin:12px 0 8px}
-  .entity-hero{margin-bottom:14px}
-  .tabs{margin-bottom:12px;padding-bottom:8px}
-
-  /* Document workspaces use available desktop width without oversized gutters. */
-  .invoice-workspace{
-    grid-template-columns:minmax(560px,1fr) minmax(440px,.86fr);
-    gap:var(--desktop-workspace-gap);
-  }
-  .desktop-document-preview,.invoice-tablet-preview{
-    top:calc(var(--desktop-header-h) + var(--desktop-page-top));
-    padding:16px;
-  }
-
-  /* Forms share one readable measure; detail workspaces may opt out naturally. */
-  .form-page{max-width:960px}
-  .form-page.narrow{max-width:760px}
-  .form-section,.settings-form{padding:18px 0}
-  .form-grid{gap:12px 14px}
-
-  /* Dashboard: compact KPIs, useful content gets the space. */
-  .metrics-grid{gap:0;border-block:1px solid var(--color-line)}
-  .metric{min-height:96px;padding:14px 18px}
-  .metric:first-child{padding-left:0}
-  .metric+.metric{border-left:1px solid var(--color-line)}
-  .metric strong{margin:10px 0 4px;font-size:22px}
-  .dashboard-grid,.detail-grid{gap:var(--desktop-workspace-gap);margin-top:var(--desktop-section-gap)}
-  .quick-section{margin-top:var(--desktop-section-gap)}
-  .quick-grid{gap:8px}
-
-  /* Settings/detail pages follow the same vertical rhythm. */
-  .detail-list>div,.operator-detail-list>div{min-height:42px;padding:10px 0}
-  .compact-list>div,.compact-list>a{min-height:50px}
-  .contact-list>div{min-height:56px;padding:8px 0}
-}
-
-@media (min-width: 1440px){
-  :root{--page-x:clamp(32px,2.2vw,48px)}
-  .tablet-master-detail:has(>.tablet-detail){grid-template-columns:minmax(600px,1.08fr) minmax(480px,.92fr)}
-}
-
-@media (min-width: 1800px){
-  :root{--content-max:1800px}
 }
