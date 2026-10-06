@@ -168,19 +168,6 @@ export function AppShell({
     return()=>window.clearTimeout(timer);
   },[preview]);
 
-  useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
-    apiGet<{authenticated:boolean;user?:{email?:string}}>("/api/auth/session")
-      .then(session=>{
-        const email=session.user?.email??"";
-        const local=email.split("@")[0]??"";
-        const parts=local.split(/[._-]+/).filter(Boolean);
-        const initials=(parts.length>1?(parts[0][0]+parts[1][0]):local.slice(0,2)).toUpperCase();
-        if(initials) queueMicrotask(()=>setAccountInitials(initials));
-      })
-      .catch(()=>undefined);
-  },[]);
-
 
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
