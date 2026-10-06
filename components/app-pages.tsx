@@ -12,6 +12,7 @@ export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import {buildFinanceMonths} from "@/lib/finance-periods";
 import {plans as subscriptionPlans} from '@/lib/plans';
 import {legalConfig} from '@/config/legal';
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
@@ -184,16 +185,17 @@ export function FinancePage() {
   const production=useBackendMode();
   const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;expenses?:Array<Record<string,unknown>>;payroll?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
   const [error,setError]=useState<string|null>(null);
+  const [loading,setLoading]=useState(true);
   const [range,setRange]=useState("month");
   const [focusMonth,setFocusMonth]=useState<string|null>(null);
   const [customFrom,setCustomFrom]=useState("");
   const [customTo,setCustomTo]=useState("");
-  useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production]);
+  useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden.")).finally(()=>setLoading(false))},[production]);
   const now=new Date();
   const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
   const customRange=range==="custom"&&customFrom&&customTo;
   const rangeBounds=(()=>{if(customRange){const start=new Date(customFrom+"T00:00:00");const end=new Date(customTo+"T00:00:00");end.setDate(end.getDate()+1);return{start,end}}let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
-  const bounds=focusMonth?(()=>{const [year,month]=focusMonth.split("-").map(Number);const start=new Date(year,month-1,1);return{start,end:new Date(year,month,1)}})():rangeBounds;
+  const bounds=focusMonth?(()=>{const [year,month]=focusMonth.split("-").map(Number);const start=new Date(year,month-1,1);return{start:new Date(Math.max(start.getTime(),rangeBounds.start.getTime())),end:new Date(Math.min(new Date(year,month,1).getTime(),rangeBounds.end.getTime()))}})():rangeBounds;
   const payments=(data.payments??[]);
   const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
   const income=selected.reduce((sum,item)=>sum+Number(item.amount??0),0);
@@ -202,25 +204,18 @@ export function FinancePage() {
   const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
   const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
   const costs=expense+operating+staff,result=income-costs;
-  const customMonths=customRange?Math.max(1,Math.min(24,(rangeBounds.end.getFullYear()-rangeBounds.start.getFullYear())*12+rangeBounds.end.getMonth()-rangeBounds.start.getMonth()+1)):0;
-  const visibleMonths=range==="custom"?customMonths:ranges[range].months;
-  const monthly=Array.from({length:Math.min(24,visibleMonths)},(_,i)=>{
-    const d=new Date(rangeBounds.end.getFullYear(),rangeBounds.end.getMonth()-1-i,1);
-    const sameMonth=(value:unknown)=>{const x=new Date(String(value??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()};
-    const monthIncome=payments.filter(item=>sameMonth(item.payment_date)).reduce((s,item)=>s+Number(item.amount??0),0);
-    const monthExpense=(data.expenses??[]).filter(item=>sameMonth(item.expense_date)).reduce((s,item)=>s+Number(item.amount??0),0);
-    const monthOperating=(data.operatingCosts??[]).filter(item=>sameMonth(item.cost_date)).reduce((s,item)=>s+Number(item.amount??0),0);
-    const monthStaff=(data.payroll??[]).filter(item=>sameMonth(String(item.period??"")+"-01")).reduce((s,item)=>s+Number(item.gross_amount??0),0);
-    const monthCosts=monthExpense+monthOperating+monthStaff;
-    return{key:String(d.getFullYear())+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("de-CH",{month:"short"}),income:monthIncome,costs:monthCosts,result:monthIncome-monthCosts};
-  }).reverse();
-  const singlePeriod=(range!=="custom"&&ranges[range].months===1)||focusMonth!==null;
+  const monthReview=buildFinanceMonths(data,rangeBounds);
+  const monthly=monthReview.items;
+  const singlePeriod=monthly.length===1||focusMonth!==null;
   const customInvalid=range==="custom"&&(!customFrom||!customTo||customFrom>customTo);
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
+    {loading&&<p role="status">Finanzdaten werden geladen …</p>}
     {error&&<p role="alert">{error}</p>}
     <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}<button type="button" className={range==="custom"&&!focusMonth?"active":""} onClick={()=>{setRange("custom");setFocusMonth(null)}}>Zeitraum wählen</button></div>
     {range==="custom"&&<div className="finance-custom-range"><Field label="Von"><input type="date" value={customFrom} onChange={e=>{setCustomFrom(e.target.value);setFocusMonth(null)}}/></Field><Field label="Bis"><input type="date" value={customTo} min={customFrom||undefined} onChange={e=>{setCustomTo(e.target.value);setFocusMonth(null)}}/></Field>{customInvalid&&<small>Bitte einen gültigen Zeitraum von–bis wählen.</small>}</div>}
-    <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
+    {!loading&&!error&&!customInvalid&&<>
+    {!singlePeriod&&<div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>}
+
     <section className="finance-analysis">
       <div className="section-title"><div><span className="eyebrow">{singlePeriod?"FINANZFLUSS":"MONATSVERGLEICH"}</span><h2>{singlePeriod?"So entsteht dein Ergebnis":"Einnahmen, Kosten und Ergebnis"}</h2></div>{focusMonth&&<button type="button" className="text-action" onClick={()=>setFocusMonth(null)}>Zeitraum anzeigen</button>}</div>
       {singlePeriod?<div className="finance-flow" aria-label="Finanzfluss">
@@ -232,7 +227,8 @@ export function FinancePage() {
         {monthly.map(item=><button type="button" role="row" key={item.key} onClick={()=>setFocusMonth(item.key)}><b>{item.label}</b><span>{moneyChf(item.income)}</span><span>{moneyChf(item.costs)}</span><strong>{moneyChf(item.result)}</strong></button>)}
       </div>}
     </section>
-    <div className="finance-breakdown"><section><h3>Kostenübersicht</h3><div><span>Betriebsausgaben</span><strong>{moneyChf(operating)}</strong></div><div><span>Personalkosten</span><strong>{moneyChf(staff)}</strong></div><div><span>Spesen</span><strong>{moneyChf(expense)}</strong></div></section><section><h3>Datenbasis</h3><p>Einnahmen stammen aus verbuchten Zahlungen. Spesen, Betriebskosten und freigegebene Lohnläufe werden für denselben Zeitraum aus der Datenbank ausgewertet.</p></section></div>
+    {!singlePeriod&&monthReview.truncated&&<p>Monatsvergleich: letzte 24 Monate. Die Summen gelten für den gesamten Zeitraum.</p>}
+    </>}
   </AppShell>;
 }
 
@@ -494,24 +490,25 @@ export function PaymentForm() {
 export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const production=useBackendMode();
   const [payment,setPayment]=useState<Record<string,unknown>|null>(null);
+  const [paymentError,setPaymentError]=useState<string|null>(null);
 
   useEffect(()=>{
     if(!production) return;
     apiGet<{item:Record<string,unknown>}>("/api/payments/"+encodeURIComponent(paymentId))
       .then(payload=>queueMicrotask(()=>setPayment(payload.item)))
-      .catch(()=>undefined);
+      .catch(error=>setPaymentError(error instanceof Error?error.message:"Zahlung konnte nicht geladen werden."));
   },[production,paymentId]);
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
     <div className="entity-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
+      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><Status tone="success">Verbucht</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span><Link href="/rechnungen/RE-2026-019"><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>RE-2026-019</small></span><Icon name="arrow" size={15}/></Link><Link href="/kunden/acme"><Icon name="users"/><span><b>Kunde öffnen</b><small>Acme AG</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle="Daten werden geladen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><EmptyState icon="wallet" title="Zahlung wird geladen" text="Die Zahlungsdaten werden abgerufen."/></AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle="Daten werden geladen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;
@@ -520,9 +517,9 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
     <div className="entity-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
+      <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
-      <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href="/kunden"><Icon name="users"/><span><b>Kundenübersicht</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
+      <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href={payment.customer_id?"/kunden/"+encodeURIComponent(String(payment.customer_id)):"/kunden"}><Icon name="users"/><span><b>{payment.customer_id?"Kunde öffnen":"Kundenübersicht"}</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
   </AppShell>;
 }
@@ -646,7 +643,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setPhone(String(item.phone??""));
         setRole(String(item.job_title??""));
         setLoad(String(item.workload_percent??"100"));
-        setEntryDate(String(item.entry_date??item.start_date??""));
+        setEntryDate(String(item.entry_date??item.start_date??"").slice(0,10));
         setWeeklyHours(String(item.weekly_hours??"42"));
         setVacationDays(String(item.vacation_days??"25"));
         setAddress(String(item.address??""));
@@ -745,9 +742,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       const item=payload.item;
       queueMicrotask(()=>{
         setPerson(String(item.employee_id??""));
-        setDate(String(item.expense_date??""));
-        setCategory(String(item.category??"Reise"));
-        setAmount(String(item.amount??"0.00"));
+        setDate(String(item.expense_date??"").slice(0,10));
+        setCategory(({travel:"Reise",expense:"Verpflegung",material:"Material",other:"Sonstiges"} as Record<string,string>)[String(item.category)]??String(item.category??"Reise"));
+        setAmount(Number(item.amount??0).toFixed(2));
         setCurrency(String(item.currency??"CHF"));
         setVatRate(String(item.vat_rate??"8.1"));
         setMerchant(String(item.merchant??""));
@@ -807,7 +804,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }
   };
 
-  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? person+" · "+status : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button onClick={()=>void save()}>Einreichen</Button>:undefined}>
+  const selectedEmployee=availableEmployees.find(item=>item.id===person);
+  const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
+  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? [employeeLabel,status].join(" · ") : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button onClick={()=>void save()}>Einreichen</Button>:undefined}>
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
 
       <label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/>
@@ -816,7 +815,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           <Field label="Händler / Firma"><input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option value="">Keine Zuordnung</option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</select></Field>
           <Field label="Datum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
-          <Field label="Kategorie"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option></select></Field>
+          <Field label="Kategorie"><select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option><option>Sonstiges</option></select></Field>
           <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
           <Field label="Währung"><select value={currency} onChange={e=>setCurrency(e.target.value)}><option>CHF</option><option>EUR</option></select></Field>
           <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
@@ -963,25 +962,33 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   </AppShell>;
 }
 
+function supportReference(id:string,caseNumber?:string|null){
+  const raw=String(caseNumber??id);
+  if(/^(?:T-)?[0-9a-f-]{20,}$/i.test(raw))return "T-"+id.replace(/-/g,"").slice(0,8).toUpperCase();
+  return raw.startsWith("#")?raw:"#"+raw;
+}
 function useSupportRows(){
   const [rows,setRows]=useState<string[][]>([]);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
     apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?"/api/support/tickets":"/api/demo/data?collection=support_tickets")
       .then(payload=>{
         const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
-        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status])));
+        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));
       })
-      .catch(()=>undefined);
+      .catch(error=>setError(error instanceof Error?error.message:"Tickets konnten nicht geladen werden."))
+      .finally(()=>setLoading(false));
   },[]);
-  return rows;
+  return {rows,loading,error};
 }
 
 export function SupportPage() {
-  const ticketRows=useSupportRows();
+  const {rows:ticketRows,loading,error}=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
     <div className="support-summary"><Metric label="Offen" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="support"/><Metric label="Gelöst" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="check"/></div>
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} columns={[{label:"Ticket",index:0},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
 
     </div>
   </AppShell>;
@@ -1044,12 +1051,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
-  const ticketReference=(()=>{
-    const raw=String(ticket?.case_number??ticketId);
-    if(/^T-[0-9a-f-]{20,}$/i.test(raw))return "T-"+String(ticket?.id??ticketId).replace(/-/g,"").slice(0,8).toUpperCase();
-    if(/^[0-9a-f-]{20,}$/i.test(raw))return "T-"+raw.replace(/-/g,"").slice(0,8).toUpperCase();
-    return raw.startsWith("#")?raw:"#"+raw;
-  })();
+  const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
   const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
   const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};

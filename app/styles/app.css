@@ -1644,3 +1644,10 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .document-desktop-detail>.tabs + .document-detail-view{border-top:0}
 
 .time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
+
+.desktop-detail-main>.surface{border-radius:0;box-shadow:none;border-inline:0}
+.entity-detail-workspace .success-panel{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:16px;padding:20px 0;text-align:left}
+.entity-detail-workspace .success-panel h2{margin:0;font-size:20px}
+.entity-detail-workspace .success-panel>span{margin:0}
+
+.toolbar + .desktop-record-table{border-top:0}

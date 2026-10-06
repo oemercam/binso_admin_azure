@@ -226,3 +226,19 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert.equal((demoCustomer.match(/customer-info-pane/g)||[]).length,0,"Demo customer detail must not repeat company facts in a side pane.");
  console.log("Desktop customer and time-tracking processes preserve canonical entity identity.");
 }
+// Actual month calculations must respect partial and exclusive date bounds.
+{
+ const source=await fs.readFile('lib/finance-periods.ts','utf8');
+ const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+ const {buildFinanceMonths}=await import(moduleUrl(js));
+ const data={payments:[{payment_date:'2026-09-01',amount:900},{payment_date:'2026-10-01',amount:50},{payment_date:'2026-10-06',amount:70},{payment_date:'2026-10-07',amount:800}],expenses:[{expense_date:'2026-10-06',amount:20}]};
+ const partial=buildFinanceMonths(data,{start:new Date(2026,9,2),end:new Date(2026,9,7)});
+ assert.deepEqual(partial.items.map(row=>[row.key,row.income,row.costs,row.result]),[['2026-10',70,20,50]]);
+ const full=buildFinanceMonths(data,{start:new Date(2026,9,1),end:new Date(2026,10,1)});
+ assert.deepEqual(full.items.map(row=>row.key),['2026-10']);
+ assert.equal(full.items[0].income,920);
+ const year=buildFinanceMonths({}, {start:new Date(2025,11,1),end:new Date(2026,1,1)});
+ assert.deepEqual(year.items.map(row=>row.key),['2025-12','2026-01']);
+ assert.equal(buildFinanceMonths({}, {start:new Date(2020,0,1),end:new Date(2026,0,1)}).truncated,true);
+ console.log('Finance month comparison includes the final month and excludes values outside partial date ranges.');
+}
