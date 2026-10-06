@@ -29,6 +29,7 @@ type DocumentDraft = {
   customer: string;
   customerId?: string;
   status?: string;
+  paidAmount?: number;
   subtotal?: number;
   vat?: number;
   total?: number;
@@ -47,18 +48,18 @@ const customerData: Record<string,{ sector:string; city:string; address:string; 
   "Berger Bau AG": { sector:"Bauunternehmen", city:"Luzern", address:"Pilatusstrasse 20", zip:"6003" },
 };
 
-type CustomerDirectory = typeof customerData;
+type CustomerDirectory = Record<string,{id?:string;sector:string;city:string;address:string;zip:string}>;
 
 function useCustomerDirectory() {
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState<string|null>(null);
-  const [directory,setDirectory]=useState<Record<string,{sector:string;city:string;address:string;zip:string}>>({});
+  const [directory,setDirectory]=useState<CustomerDirectory>({});
   useEffect(()=>{
-    apiGet<{items:Array<{name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")
+    apiGet<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")
       .then(payload=>{
-        const next:Record<string,{sector:string;city:string;address:string;zip:string}>={};
+        const next:CustomerDirectory={};
         for(const item of payload.items){
-          next[item.name]={sector:item.sector??"",city:item.city??"",address:item.street??"",zip:item.postal_code??""};
+          next[item.name]={id:item.id,sector:item.sector??"",city:item.city??"",address:item.street??"",zip:item.postal_code??""};
         }
         queueMicrotask(()=>setDirectory(next));
       })
@@ -169,6 +170,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     customerId:String(item.customer_id??""),
     currency:String(item.currency??"CHF"),
     status:String(item.status??"draft"),
+    paidAmount:Number(item.paid_amount??0),
     subtotal:Number(item.subtotal),
     vat:Number(item.vat_amount),
     total:Number(item.total),
@@ -230,6 +232,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const paymentIssue=kind==="Rechnung"&&!company.loading?(company.error||invoicePaymentIssue(company.raw)):null;
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
+  const selectedCustomerId=!existing?searchParams.get("customerId"):null;
+  useEffect(()=>{if(!selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer)setDraft(current=>({...current,customer:customer[0],customerId:selectedCustomerId}));},[selectedCustomerId,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
   const sourceTimeEntriesParam=kind==="Rechnung"&&!existing?(searchParams.get("timeEntries")??""):"";
 
@@ -253,7 +257,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       if(!payload.items.length)return;
       const customer=payload.items[0].customer_name;
       if(payload.items.some(item=>item.customer_name!==customer)){setToast("Für eine Rechnung müssen alle Zeiten zum gleichen Kunden gehören.");window.setTimeout(()=>setToast(null),2300);return;}
-      const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[item.project_name]??=[]).push(item);return all},{}));
+      const groups=Object.values(payload.items.reduce<Record<string,typeof payload.items>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
       const positions=groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)}));
       queueMicrotask(()=>setDraft(current=>({...current,customer,positions})));
     }).catch(error=>{setToast(error instanceof Error?error.message:"Zeiten konnten nicht geladen werden.");window.setTimeout(()=>setToast(null),2300)});
@@ -275,7 +279,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=documentPayload(kind,draft);
+        const payload={...documentPayload(kind,draft),customerId:directory[draft.customer]?.id??draft.customerId};
         const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload);
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
@@ -289,9 +293,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     }finally{setSaving(false);}
   };
 
+  const canEdit=!existing||!(Number(draft.paidAmount)>0||["accepted","cancelled"].includes(draft.status??""));
+  const canRecordPayment=kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft");
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
-    ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
+    ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/>{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>;
   const desktopActions=existing&&!editing?undefined:headerActions;
 
@@ -319,19 +325,19 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
           <aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
               <span className="compact-section-label">Aktionen</span>
-              <button type="button" onClick={()=>setEditing(true)}><Icon name="edit" size={17}/><span><b>Bearbeiten</b><small>Dokumentdaten ändern</small></span><Icon name="arrow" size={15}/></button>
+              <button type="button" disabled={!canEdit} onClick={()=>setEditing(true)}><Icon name="edit" size={17}/><span><b>Bearbeiten</b><small>Dokumentdaten ändern</small></span><Icon name="arrow" size={15}/></button>
               <button type="button" onClick={()=>setPreview(true)}><Icon name="file" size={17}/><span><b>Vorschau öffnen</b><small>Dokument gross anzeigen</small></span><Icon name="arrow" size={15}/></button>
-              <button type="button" onClick={()=>show(kind==="Angebot"?"Angebot für den Versand vorbereitet.":"Versand wird mit dem E-Mail-Dienst angebunden.")}><Icon name="mail" size={17}/><span><b>Senden</b><small>{kind==="Angebot"?"Angebot versenden":"Rechnung versenden"}</small></span><Icon name="arrow" size={15}/></button>
+              <button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><Icon name="mail" size={17}/><span><b>Senden</b><small>{kind==="Angebot"?"Angebot versenden":"Rechnung versenden"}</small></span><Icon name="arrow" size={15}/></button>
               {kind==="Angebot"
                 ? <Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>Rechnung erstellen</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
-                : <Link href="/zahlungen/neu"><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
+                : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
             </section>
           </aside>
         </div>
       : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
-    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" onClick={()=>{setMoreOpen(false);show("Angebot für den Versand vorbereitet.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></Link></>:<><button type="button" onClick={()=>{setMoreOpen(false);show("Versand wird mit dem E-Mail-Dienst angebunden.")}}><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button><Link href="/zahlungen/neu"><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></Link></>}</div></section></div>}
+    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Weitere Aktionen</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">{kind==="Angebot"?<><button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Angebot für den Versand vorbereiten</small></div><Icon name="arrow" size={17}/></button><Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="receipt"/></span><div><b>Rechnung erstellen</b><small>Daten aus diesem Angebot übernehmen</small></div><Icon name="arrow" size={17}/></Link></>:<><button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><span className="sheet-menu-icon"><Icon name="mail"/></span><div><b>Senden</b><small>Rechnung versenden</small></div><Icon name="arrow" size={17}/></button>{canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><span className="sheet-menu-icon"><Icon name="wallet"/></span><div><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></div><Icon name="arrow" size={17}/></Link>}</>}</div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
   </AppShell>;
 }

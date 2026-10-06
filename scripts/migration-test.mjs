@@ -262,5 +262,30 @@ try{
 
  delete globalThis.__provisionTest;
  delete globalThis.__customerPersistenceTest;
+ // Execute the actual timer handlers against the migrated database.
+ const timerSession={organizationId:provisioned.organizationId,userId:'demo-provision-test',name:'Demo Test',email:'demo-provision-test@example.invalid',role:'owner'};
+ globalThis.__timerSession=timerSession;
+ globalThis.__timerTenant=async(org,user,task)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);const result=await task(client);await db.exec('commit');return result;}catch(e){await db.exec('rollback');throw e;}};
+ const timerHttp=dataModule(`export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}} export const apiError=e=>({error:e.code,status:e.status});export const json=x=>x;export const assertSameOrigin=()=>{};export const cleanText=(x)=>typeof x==='string'?x.trim():'';export const readJson=async x=>x.body;`);
+ let timerSource=await fs.readFile('app/api/time-tracker/route.ts','utf8');
+ const timerDependencies={"@/lib/server/session":dataModule('export const requireSession=async()=>globalThis.__timerSession;'),"@/lib/server/rbac":dataModule('export const authorize=()=>{};'),"@/lib/server/db":dataModule('export const withTenant=(...args)=>globalThis.__timerTenant(...args);'),"@/lib/server/http":timerHttp};
+ for(const [key,url] of Object.entries(timerDependencies))timerSource=timerSource.replaceAll(JSON.stringify(key),JSON.stringify(url));
+ const timer=await import(dataModule(timerSource));
+ await db.query("select set_config('app.organization_id',$1,false)",[timerSession.organizationId]);
+ const timerCustomer=(await db.query('select id from customers where organization_id=$1 order by id limit 1',[timerSession.organizationId])).rows[0].id;
+ const started=await timer.POST({body:{action:'start',project:'Direct customer work',customerId:timerCustomer,projectId:null}});
+ assert.equal(started.tracker.customer_id,timerCustomer);
+ assert.equal((await timer.GET()).tracker.customer_id,timerCustomer,'Reload retains customer without a project');
+ await db.query('update active_time_trackers set accumulated_seconds=3600,active_since=now() where organization_id=$1 and user_id=$2',[timerSession.organizationId,timerSession.userId]);
+ assert.equal((await timer.POST({body:{action:'project',project:'Other work',customerId:null,projectId:null}})).error,'tracker_context_locked');
+ const paused=await timer.POST({body:{action:'pause'}});assert.equal(paused.tracker.customer_id,timerCustomer);assert.equal(paused.tracker.state,'paused');
+ const finished=await timer.POST({body:{action:'finish'}});assert.ok(finished.item.id);
+ const finishedTime=(await db.query('select customer_id,project_id,billable,hours from time_entries where id=$1',[finished.item.id])).rows[0];
+ assert.equal(finishedTime.customer_id,timerCustomer);assert.equal(finishedTime.project_id,null);assert.equal(finishedTime.billable,true);assert.ok(Number(finishedTime.hours)>=1);
+ assert.equal((await timer.GET()).tracker,null);
+ const internal=await timer.POST({body:{action:'start',project:'Internal work',customerId:null,projectId:null}});assert.equal(internal.tracker.billable,false);
+ const invalid=await timer.POST({body:{action:'project',project:'Invalid',customerId:'00000000-0000-4000-8000-000000000001',projectId:null}});assert.equal(invalid.error,'customer_invalid');
+ delete globalThis.__timerSession;delete globalThis.__timerTenant;
+ console.log('Timer customer-only start/reload/pause/finish, context lock and internal work passed.');
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}
