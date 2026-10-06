@@ -138,14 +138,14 @@ assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen
 console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');
 
 
-// Wide document workspace contract: information | single-page preview | toolbox.
+// Wide document workspace contract: one active content view | workflow actions.
 {
   const documents=read("components/documents.tsx");
   const responsive=read("app/styles/responsive.css");
   assert(documents.includes("document-workspace-page"),"Document detail must expose the central single-page preview.");
   assert(documents.includes("document-page-navigation"),"Multi-page invoices must expose page navigation.");
   assert(documents.includes("Seite {workspacePage+1} / 2"),"Invoice workspace must show the active page count.");
-  assert(responsive.includes("grid-template-columns:minmax(300px,30%) minmax(520px,1fr) minmax(250px,22%)"),"Wide document detail must use the canonical three-pane grid.");
+  assert(documents.includes('detailTab===\"document\"&&<section'),"Preview must only mount when the document view is selected.");
   assert(responsive.includes(".document-workspace-page.page-2 .document-pages>.paper:nth-child(2)"),"Document preview must render one selected page at a time.");
   console.log("Invoices and offers use the canonical information, single-page preview and toolbox workspace.");
 }
@@ -185,10 +185,10 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 {
   const pages=read("components/app-pages.tsx");
   const responsive=read("app/styles/responsive.css");
-  assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared three-pane workspace.");
-  assert(pages.includes('className="customer-info-pane"'),"Customer details must expose a dedicated company information pane.");
+  assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared workspace.");
+  assert(!pages.includes('className="customer-info-pane"'),"Customer details must not duplicate company facts in a separate pane.");
   assert(pages.includes('aria-label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
-  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Wide customer details must use the canonical three-pane proportions.");
+  assert(responsive.includes("grid-template-columns:minmax(0,1fr) minmax(240px,280px)"),"Wide customer details must use the shared main-content and action-rail proportions.");
   console.log("Customer details use company facts, active content and toolbox panes.");
 }
 
@@ -200,7 +200,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   for(const marker of ['active="zahlungen"','active="produkte"','active="mitarbeiter"','active="spesen"','active="support"']) assert(pages.includes(marker),"Expected entity detail module is missing: "+marker);
   assert((pages.match(/entity-detail-workspace/g)||[]).length>=5,"Payment, product, employee, expense and support details must use the canonical entity workspace.");
   assert(responsive.includes(".entity-detail-workspace{"),"The canonical entity detail workspace must be centrally styled.");
-  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Entity details must use the standard three-pane desktop proportions.");
+  assert(responsive.includes("grid-template-columns:minmax(0,1fr) minmax(240px,280px)"),"Entity details must use the shared main-content and action-rail proportions.");
   console.log("Core web entity details use information, work area and toolbox panes.");
 }
 
@@ -223,6 +223,6 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert(pages.includes("projectId:manualProject||null")&&pages.includes("customerId:manualCustomer||null"),"Manual time must submit canonical customer/project IDs.");
  assert(tracker.includes("project_customer_mismatch")&&entries.includes("project_customer_mismatch"),"Timer and manual time APIs must reject customer/project mismatches.");
  const demoCustomer=pages.slice(pages.indexOf('if(!production){\n    return <AppShell title="Acme AG"'),pages.indexOf('if(!customer) return'));
- assert.equal((demoCustomer.match(/customer-info-pane/g)||[]).length,1,"Demo customer detail must render exactly one company information pane.");
+ assert.equal((demoCustomer.match(/customer-info-pane/g)||[]).length,0,"Demo customer detail must not repeat company facts in a side pane.");
  console.log("Desktop customer and time-tracking processes preserve canonical entity identity.");
 }

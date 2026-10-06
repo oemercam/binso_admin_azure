@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
+import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantUpdate, requireTenantFeature } from "@/lib/server/database";
 
 type Body={employeeId?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
@@ -16,10 +16,11 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
 
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
   try{
-    await requireTenantFeature("expenses");
+    const tenant=await requireTenantFeature("expenses");
     assertSameOrigin(request);
     const {id}=await params;
     const body=await readJson<Body>(request,16384);
+    if(["approved","rejected"].includes(String(body.status))&&!["owner","admin","project_manager","manager"].includes(tenant.role))throw new ApiError(403,"approval_forbidden","Nur berechtigte Personen können Spesen genehmigen oder ablehnen.");
     const merchant=cleanText(body.merchant,200),amount=Number(body.amount),vat=Number(body.vatRate);
     const status=cleanText(body.status,40);
     if(!merchant||!Number.isFinite(amount)||amount<0||!Number.isFinite(vat)||vat<0) return json({error:"invalid_expense",message:"Spesenangaben sind ungültig."},400);

@@ -222,6 +222,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [editing,setEditing]=useState(!existing);
   const [moreOpen,setMoreOpen]=useState(false);
   const [workspacePage,setWorkspacePage]=useState(0);
+  const [detailTab,setDetailTab]=useState<"positions"|"document">("positions");
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const [dirty,setDirty]=useState(false);
@@ -299,7 +300,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const headerActions=existing&&!editing
     ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/>{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>;
-  const desktopActions=existing&&!editing?undefined:headerActions;
+  const desktopActions=headerActions;
 
   return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
     {editing&&companyPending&&<p role="status">Firmendaten werden geladen …</p>}
@@ -307,8 +308,14 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
     {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
-          <div className="document-desktop-detail"><DocumentReadView type={kind} draft={draft} directory={directory}/></div>
-          <section className="document-inline-preview" aria-label={kind+" Vorschau"}>
+          <div className="document-desktop-detail">
+            <div className="tabs" aria-label="Dokumentansicht">
+              <button type="button" className={detailTab==="positions"?"active":""} aria-pressed={detailTab==="positions"} onClick={()=>setDetailTab("positions")}>Übersicht</button>
+              <button type="button" className={detailTab==="document"?"active":""} aria-pressed={detailTab==="document"} onClick={()=>setDetailTab("document")}>Dokument</button>
+            </div>
+            {detailTab==="positions"&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}
+
+          {detailTab==="document"&&<section className="document-inline-preview" aria-label={kind+" Vorschau"}>
             <div className="document-preview-heading">
               <div><span className="compact-section-label">Vorschau</span><h2>{kind}</h2></div>
               <button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button>
@@ -321,13 +328,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
               <span>Seite {workspacePage+1} / 2</span>
               <button type="button" aria-label="Nächste Seite" disabled={workspacePage===1} onClick={()=>setWorkspacePage(1)}><Icon name="chevron-right" size={16}/></button>
             </nav>}
-          </section>
+          </section>}
+          </div>
           <aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
               <span className="compact-section-label">Aktionen</span>
-              <button type="button" disabled={!canEdit} onClick={()=>setEditing(true)}><Icon name="edit" size={17}/><span><b>Bearbeiten</b><small>Dokumentdaten ändern</small></span><Icon name="arrow" size={15}/></button>
-              <button type="button" onClick={()=>setPreview(true)}><Icon name="file" size={17}/><span><b>Vorschau öffnen</b><small>Dokument gross anzeigen</small></span><Icon name="arrow" size={15}/></button>
-              <button type="button" disabled title="Dokumentversand ist noch nicht verfügbar"><Icon name="mail" size={17}/><span><b>Senden</b><small>{kind==="Angebot"?"Angebot versenden":"Rechnung versenden"}</small></span><Icon name="arrow" size={15}/></button>
               {kind==="Angebot"
                 ? <Link href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>Rechnung erstellen</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
                 : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
@@ -361,6 +366,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
       </div>
       <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
     </section>
+    {type==="Rechnung"&&<section className="document-payment-facts" aria-label="Zahlungsstand"><span>Bezahlt <b>{draft.currency??"CHF"} {money(Number(draft.paidAmount??0))}</b></span><span>Offen <b>{draft.currency??"CHF"} {money(Math.max(0,totals.total-Number(draft.paidAmount??0)))}</b></span></section>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
 }

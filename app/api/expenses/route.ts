@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
+import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
 
 type ExpenseBody={employeeId?:unknown;employeeName?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
@@ -12,9 +12,10 @@ export async function GET(request:NextRequest){
 
 export async function POST(request:NextRequest){
   try{
-    await requireTenantFeature("expenses");
+    const tenant=await requireTenantFeature("expenses");
     assertSameOrigin(request);
     const body=await readJson<ExpenseBody>(request,16384);
+    if(["approved","rejected"].includes(String(body.status))&&!["owner","admin","project_manager","manager"].includes(tenant.role))throw new ApiError(403,"approval_forbidden","Nur berechtigte Personen können Spesen genehmigen oder ablehnen.");
     const merchant=cleanText(body.merchant,200);
     const amount=Number(body.amount),vatRate=Number(body.vatRate);
     if(!merchant) return json({error:"merchant_required",message:"Bitte Händler oder Zweck eingeben."},400);
