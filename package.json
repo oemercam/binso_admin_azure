@@ -52,6 +52,9 @@
   },
   "packageManager": "pnpm@10.0.0",
   "pnpm": {
+    "overrides": {
+      "source-map-js": "1.2.2"
+    },
     "onlyBuiltDependencies": [
       "unrs-resolver"
     ]
