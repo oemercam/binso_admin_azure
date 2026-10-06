@@ -686,7 +686,7 @@
 
   .document-desktop-workspace{
     display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(360px,32%);
+    grid-template-columns:minmax(300px,30%) minmax(520px,1fr) minmax(250px,22%);
     gap:36px;
     align-items:start;
   }
@@ -752,6 +752,34 @@
     aspect-ratio:210/297;
     box-shadow:0 8px 24px rgba(0,0,0,.06);
   }
+  .document-workspace-page{min-width:0;overflow:hidden}
+  .document-workspace-page .document-pages{display:block}
+  .document-workspace-page .document-pages>.paper{display:none}
+  .document-workspace-page.page-1 .document-pages>.paper:nth-child(1){display:block}
+  .document-workspace-page.page-2 .document-pages>.paper:nth-child(2){display:block}
+  .document-page-navigation{
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    border-top:1px solid var(--color-line);
+    font-size:11px;
+    font-weight:700;
+  }
+  .document-page-navigation button{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    color:inherit;
+  }
+  .document-page-navigation button:not(:disabled):hover{background:var(--color-subtle)}
+  .document-page-navigation button:disabled{opacity:.28}
+
 
   .document-detail-view{border-top:1px solid var(--color-line)}
   .document-detail-section{padding:24px 0;border-bottom:1px solid var(--color-line)}
@@ -1064,7 +1092,7 @@
 
 /* Large desktop refinement */
 @media (min-width:1500px){
-.document-desktop-workspace{grid-template-columns:minmax(0,1fr) minmax(420px,30%)}
+.document-desktop-workspace{grid-template-columns:minmax(320px,30%) minmax(560px,1fr) minmax(260px,20%)}
   .invoice-workspace{grid-template-columns:minmax(0,1.35fr) minmax(500px,.65fr)}
   .revenue-chart svg{height:300px}
   .finance-month-bars{min-height:290px}
