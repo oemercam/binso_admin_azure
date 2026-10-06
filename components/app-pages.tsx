@@ -831,7 +831,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [manualDate,setManualDate]=useState("");
   const [manualDuration,setManualDuration]=useState("01:00");
   const [manualCustomer,setManualCustomer]=useState("");
-  const [manualProject,setManualProject]=useState("Interne Planung");
+  const [manualProject,setManualProject]=useState("");
   const [manualDescription,setManualDescription]=useState("");
   const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
@@ -841,7 +841,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
 
   useEffect(()=>{
-    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project)}).catch(()=>undefined)};
+    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
     queueMicrotask(()=>setManualDate(new Date().toLocaleDateString("en-CA")));
     window.addEventListener("binso-timer-change",sync);
@@ -858,11 +858,11 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
   const setProject=async(project:string)=>{
-    try{const state=await changeTimer("project",project);setTimerProject(state.project);setProjectOpen(false)}
+    try{const selected=availableProjects.find(item=>item.name===project&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer("project",project,selected?.id??null,timerCustomer||null);setTimerProject(state.project);setProjectOpen(false)}
     catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
   const toggleTimer=async()=>{
-    try{const state=await changeTimer(running?"pause":"start",timerProject);setRunning(state.running);setSeconds(state.seconds)}
+    try{const selected=availableProjects.find(item=>item.name===timerProject&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
     catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
   };
 
@@ -890,7 +890,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerName:manualCustomer,projectName:manualProject,description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
+        const payload=await apiPost<{item:{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||"Interne Planung",description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -929,7 +929,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
       </section>}
     </div>
     {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value)}><option value="">Keine Zuordnung</option>{availableCustomers.map(item=><option key={item.id} value={item.name}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Projekt"><input value={manualProject} onChange={e=>setManualProject(e.target.value)} placeholder="Projekt"/></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
 }
