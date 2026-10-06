@@ -213,3 +213,16 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(pages.includes('range==="custom"'),"Finance calculations must support the custom range mode.");
   console.log("Finance supports free from/to periods alongside quick presets.");
 }
+
+
+// Desktop process integrity: time tracking must persist explicit customer/project identity and customer detail has one info pane per path.
+{
+ const pages=read("components/app-pages.tsx");
+ const tracker=await fs.readFile("app/api/time-tracker/route.ts","utf8");
+ const entries=await fs.readFile("app/api/time-entries/route.ts","utf8");
+ assert(pages.includes("projectId:manualProject||null")&&pages.includes("customerId:manualCustomer||null"),"Manual time must submit canonical customer/project IDs.");
+ assert(tracker.includes("project_customer_mismatch")&&entries.includes("project_customer_mismatch"),"Timer and manual time APIs must reject customer/project mismatches.");
+ const demoCustomer=pages.slice(pages.indexOf('if(!production){\n    return <AppShell title="Acme AG"'),pages.indexOf('if(!customer) return'));
+ assert.equal((demoCustomer.match(/customer-info-pane/g)||[]).length,1,"Demo customer detail must render exactly one company information pane.");
+ console.log("Desktop customer and time-tracking processes preserve canonical entity identity.");
+}
