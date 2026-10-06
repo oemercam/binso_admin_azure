@@ -186,10 +186,13 @@ export function FinancePage() {
   const [error,setError]=useState<string|null>(null);
   const [range,setRange]=useState("month");
   const [focusMonth,setFocusMonth]=useState<string|null>(null);
+  const [customFrom,setCustomFrom]=useState("");
+  const [customTo,setCustomTo]=useState("");
   useEffect(()=>{apiGet<typeof data>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production]);
   const now=new Date();
   const ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
-  const rangeBounds=(()=>{let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
+  const customRange=range==="custom"&&customFrom&&customTo;
+  const rangeBounds=(()=>{if(customRange){const start=new Date(customFrom+"T00:00:00");const end=new Date(customTo+"T00:00:00");end.setDate(end.getDate()+1);return{start,end}}let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}return{start,end}})();
   const bounds=focusMonth?(()=>{const [year,month]=focusMonth.split("-").map(Number);const start=new Date(year,month-1,1);return{start,end:new Date(year,month,1)}})():rangeBounds;
   const payments=(data.payments??[]);
   const selected=payments.filter(item=>{const d=new Date(String(item.payment_date??""));return d>=bounds.start&&d<bounds.end});
@@ -199,7 +202,9 @@ export function FinancePage() {
   const operating=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
   const staff=((data.payroll??[])).filter(x=>{const d=new Date(String(x.period??"")+"-01");return d>=bounds.start&&d<bounds.end}).reduce((s,x)=>s+Number(x.gross_amount??0),0);
   const costs=expense+operating+staff,result=income-costs;
-  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{
+  const customMonths=customRange?Math.max(1,Math.min(24,(rangeBounds.end.getFullYear()-rangeBounds.start.getFullYear())*12+rangeBounds.end.getMonth()-rangeBounds.start.getMonth()+1)):0;
+  const visibleMonths=range==="custom"?customMonths:ranges[range].months;
+  const monthly=Array.from({length:Math.min(24,visibleMonths)},(_,i)=>{
     const d=new Date(rangeBounds.end.getFullYear(),rangeBounds.end.getMonth()-1-i,1);
     const sameMonth=(value:unknown)=>{const x=new Date(String(value??""));return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()};
     const monthIncome=payments.filter(item=>sameMonth(item.payment_date)).reduce((s,item)=>s+Number(item.amount??0),0);
@@ -209,10 +214,12 @@ export function FinancePage() {
     const monthCosts=monthExpense+monthOperating+monthStaff;
     return{key:String(d.getFullYear())+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("de-CH",{month:"short"}),income:monthIncome,costs:monthCosts,result:monthIncome-monthCosts};
   }).reverse();
-  const singlePeriod=ranges[range].months===1||focusMonth!==null;
+  const singlePeriod=(range!=="custom"&&ranges[range].months===1)||focusMonth!==null;
+  const customInvalid=range==="custom"&&(!customFrom||!customTo||customFrom>customTo);
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
     {error&&<p role="alert">{error}</p>}
-    <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}</div>
+    <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}<button type="button" className={range==="custom"&&!focusMonth?"active":""} onClick={()=>{setRange("custom");setFocusMonth(null)}}>Zeitraum wählen</button></div>
+    {range==="custom"&&<div className="finance-custom-range"><Field label="Von"><input type="date" value={customFrom} onChange={e=>{setCustomFrom(e.target.value);setFocusMonth(null)}}/></Field><Field label="Bis"><input type="date" value={customTo} min={customFrom||undefined} onChange={e=>{setCustomTo(e.target.value);setFocusMonth(null)}}/></Field>{customInvalid&&<small>Bitte einen gültigen Zeitraum von–bis wählen.</small>}</div>}
     <div className="metrics-grid finance-metrics"><Metric label="Einnahmen" value={moneyChf(income)} hint="Verbuchte Zahlungen" icon="wallet"/><Metric label="Ausgaben" value={moneyChf(expense+operating)} hint="Spesen und Betrieb" icon="card"/><Metric label="Personalkosten" value={moneyChf(staff)} hint="Bruttolöhne im Zeitraum" icon="users"/><Metric label="Ergebnis" value={moneyChf(result)} hint="Einnahmen minus Kosten" icon="chart"/></div>
     <section className="finance-analysis">
       <div className="section-title"><div><span className="eyebrow">{singlePeriod?"FINANZFLUSS":"MONATSVERGLEICH"}</span><h2>{singlePeriod?"So entsteht dein Ergebnis":"Einnahmen, Kosten und Ergebnis"}</h2></div>{focusMonth&&<button type="button" className="text-action" onClick={()=>setFocusMonth(null)}>Zeitraum anzeigen</button>}</div>
