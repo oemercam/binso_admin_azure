@@ -1624,9 +1624,9 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
     -webkit-backdrop-filter:blur(12px);
   }
   /* The global desktop header is deliberately quiet: notification + account only. */
-  .desktop-search,
-  .desktop-header-timer,
-  .desktop-appbar .app-demo-badge{display:none!important}
+  .desktop-appbar>.desktop-search,
+  .desktop-appbar .desktop-header-timer,
+  .desktop-appbar .app-demo-badge{display:none}
   .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
 
   .page-container{
