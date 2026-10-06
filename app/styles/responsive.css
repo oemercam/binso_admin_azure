@@ -805,7 +805,9 @@
   }
   .desktop-detail-main,
   .entity-edit-main{min-width:0}
-  .desktop-detail-main>.tabs{margin-bottom:18px}
+  .desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}
+  .page-head-detail{margin-bottom:20px}
+  .page-head-detail + :is(.desktop-detail-workspace,.document-desktop-workspace,.desktop-detail-single,.entity-edit-workspace){margin-top:0}
   .employee-tab-panel{padding:0}
   .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
   .employee-tab-panel .compact-list>div,
@@ -937,7 +939,7 @@
     --desktop-header-h:56px;
     --desktop-page-top:20px;
     --desktop-page-bottom:48px;
-    --desktop-page-head-gap:16px;
+    --desktop-page-head-gap:20px;
     --desktop-workspace-gap:16px;
     --desktop-section-gap:20px;
     --desktop-row-h:56px;
