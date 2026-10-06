@@ -1632,3 +1632,10 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .document-payment-facts{display:flex;justify-content:flex-end;gap:24px;padding:16px 0;border-top:1px solid var(--color-line);font-size:13px}
 .document-payment-facts b{display:block;margin-top:6px;font-variant-numeric:tabular-nums}
 .document-desktop-detail>.tabs{margin-top:0}
+
+.document-header-icons{display:flex;align-items:center;gap:8px}
+.document-desktop-workspace:not(:has(>.document-desktop-rail)){grid-template-columns:minmax(0,1fr)}
+.document-workspace-page .document-pages{display:block}
+.document-workspace-page .document-pages>.paper{display:none}
+.document-workspace-page.page-1 .document-pages>.paper:first-child,
+.document-workspace-page.page-2 .document-pages>.paper:nth-child(2){display:flex}
