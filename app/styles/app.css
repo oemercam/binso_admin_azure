@@ -266,7 +266,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-row>span:first-child{font-weight:700}
 .desktop-record-row>.align-right{text-align:right;font-variant-numeric:tabular-nums}
 .desktop-record-row>svg{justify-self:end}
-.table-status-cell{overflow:visible!important}
+.desktop-record-row>.table-status-cell{overflow:visible}
 
 
 /* Master/detail and detail pages */
