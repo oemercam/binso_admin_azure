@@ -805,6 +805,14 @@
   }
   .desktop-detail-main,
   .entity-edit-main{min-width:0}
+  .desktop-detail-main>.tabs{margin-bottom:18px}
+  .employee-tab-panel{padding:0}
+  .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
+  .employee-tab-panel .compact-list>div,
+  .employee-tab-panel .compact-list>a{min-height:58px;padding-block:10px}
+  .desktop-context-rail .desktop-summary-facts>span{min-height:44px}
+  .desktop-context-rail .desktop-toolbox>a,
+  .desktop-context-rail .desktop-toolbox>button{min-height:58px}
   .form-main-new{display:block}
   .desktop-context-rail{
     min-width:0;
