@@ -177,3 +177,15 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(appCss.includes(".contact-list>div:last-child{border-bottom:0}"),"Contact lists must suppress the final row divider.");
   console.log("Final rows cannot create duplicate section closing dividers.");
 }
+
+
+// Customer detail workspace contract: company facts | active work area | toolbox.
+{
+  const pages=read("components/app-pages.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared three-pane workspace.");
+  assert(pages.includes('className="customer-info-pane"'),"Customer details must expose a dedicated company information pane.");
+  assert(pages.includes('aria-label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
+  assert(responsive.includes("grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%)"),"Wide customer details must use the canonical three-pane proportions.");
+  console.log("Customer details use company facts, active content and toolbox panes.");
+}
