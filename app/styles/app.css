@@ -296,6 +296,11 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 }
 .detail-list dt{color:var(--color-muted);font-size:12px}
 .detail-list dd{margin:0;font-size:12px;font-weight:550;overflow-wrap:anywhere}
+.detail-list>div:last-child,
+.operator-detail-list>div:last-child,
+.compact-list>div:last-child,
+.compact-list>a:last-child,
+.contact-list>div:last-child{border-bottom:0}
 .compact-list{margin-top:12px}
 .compact-list>div,
 .compact-list>a{
