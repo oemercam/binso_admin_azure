@@ -3099,6 +3099,10 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Small mobile refinement */
 @media (max-width:640px){
+  .contact-list>div{flex-wrap:wrap;gap:8px}
+  .contact-actions{margin-left:auto}
+  .time-filter-toolbar .searchbox{flex-basis:100%;width:100%}
+  .time-filter-toolbar .form-field{flex:1;min-width:0;width:auto}
 .privacy-consent-layer{padding:10px}
   .privacy-consent-card{padding:18px;border-radius:14px}
   .privacy-consent-actions{display:grid;grid-template-columns:1fr}
@@ -3193,4 +3197,3 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
 }
-

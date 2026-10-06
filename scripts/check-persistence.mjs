@@ -21,6 +21,16 @@ try{
  const loaded=(await a('/api/customers/'+customer.id)).item;
  assert.equal(loaded.notes,customerInput.notes);assert.equal(loaded.uid,customerInput.uid);assert.equal(loaded.street,customerInput.address);assert.equal(loaded.city,'Bern');assert.equal(loaded.sector,'Handel');assert.equal(loaded.email,customerInput.email);assert.equal(loaded.postal_code,'8000');
  await b('/api/customers/'+customer.id,'GET',undefined,404);
+ const contact=(await a('/api/customers/'+customer.id+'/contacts','POST',{firstName:'Anna Maria',lastName:'von Beispiel',email:'anna-'+suffix+'@example.invalid',isPrimary:true},201)).item;
+ assert.equal(contact.first_name,'Anna Maria');assert.equal(contact.last_name,'von Beispiel');assert.equal(contact.is_primary,true);
+ const secondContact=(await a('/api/customers/'+customer.id+'/contacts','POST',{firstName:'Max',lastName:'Test',isPrimary:true},201)).item;
+ let contacts=(await a('/api/customers/'+customer.id+'/contacts')).items;
+ assert.equal(contacts.filter(item=>item.is_primary).length,1);assert.equal(contacts.find(item=>item.id===contact.id).is_primary,false);
+ await a('/api/customers/'+customer.id+'/contacts/'+contact.id,'PATCH',{firstName:'Anna Maria',lastName:'von Beispiel',jobTitle:'Buchhaltung',isPrimary:true});
+ contacts=(await a('/api/customers/'+customer.id+'/contacts')).items;assert.equal(contacts.find(item=>item.id===contact.id).job_title,'Buchhaltung');assert.equal(contacts.filter(item=>item.is_primary).length,1);
+ await b('/api/customers/'+customer.id+'/contacts/'+contact.id,'PATCH',{firstName:'Cross',lastName:'Tenant'},404);
+ await a('/api/customers/'+customer.id+'/contacts/'+secondContact.id,'DELETE');assert.equal((await a('/api/customers/'+customer.id+'/contacts')).items.length,1);
+
  const product=(await a('/api/products','POST',{name:'Test '+suffix,kind:'service',sku:suffix,unit:'hour',unitPrice:123.45,vatRate:8.1,description:'Persisted service',status:'inactive'},201)).item;
  assert.equal((await a('/api/products/'+product.id)).item.status,'inactive');
  const employee=(await a('/api/employees','POST',{firstName:'Anna Maria',lastName:'Beispiel',email:'employee-'+suffix+'@example.invalid',phone:'000',jobTitle:'Test',workloadPercent:80,entryDate:today,status:'active'},201)).item;

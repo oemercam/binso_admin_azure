@@ -302,6 +302,38 @@ try{
  assert.equal(manualCreated.status,201);assert.equal(manualCreated.data.item.customer_id,documentArgs.p_customer_id);assert.equal(manualCreated.data.item.billable,true);assert.equal(manualCreated.data.item.employee_name,'Fixture Person');
  const manualReloaded=(await manualTimeHandler.GET({nextUrl:new URL('https://example.invalid/api/time-entries')})).data.items.find(i=>i.id===manualCreated.data.item.id);
  assert.ok(manualCreated.data.item.customer_name);assert.equal(manualCreated.data.item.customer_name,manualReloaded.customer_name,'Customer label must match the reloaded record immediately');assert.equal(manualReloaded.employee_name,'Fixture Person');
+
+ // Contacts retain structured names and exactly one selected primary under a customer lock.
+ const contactSource=(await fs.readFile('lib/server/repositories/contacts.ts','utf8')).replace('import "server-only";','').replace('"../db"',JSON.stringify(processDb)).replace('"../http"',JSON.stringify(processHttp)).replace('"../audit"',JSON.stringify(audit));
+ const contactRepository=await import(dataModule(contactSource));
+ const contactA=await contactRepository.saveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,null,{firstName:'Anna Maria',lastName:'von Beispiel',email:'anna@example.invalid',isPrimary:true});
+ assert.equal(contactA.first_name,'Anna Maria');assert.equal(contactA.last_name,'von Beispiel');assert.equal(contactA.is_primary,true);
+ const contactB=await contactRepository.saveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,null,{firstName:'Max',lastName:'Test',isPrimary:true});
+ const contactRows=await listApiBusiness(client,session,'customer_contacts','customer_id=eq.'+documentArgs.p_customer_id);
+ assert.equal(contactRows.filter(c=>c.is_primary).length,1);assert.equal(contactRows.find(c=>c.id===contactA.id).first_name,'Anna Maria');assert.equal(contactRows.find(c=>c.id===contactA.id).is_primary,false);
+ const editedContact=await contactRepository.saveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,contactA.id,{firstName:'Anna Maria',lastName:'von Beispiel',jobTitle:'Buchhaltung',isPrimary:true});
+ assert.equal(editedContact.job_title,'Buchhaltung');assert.equal(editedContact.is_primary,true);
+ await assert.rejects(()=>contactRepository.saveCustomerContact({...globalThis.__processSession,organizationId:sandbox},documentArgs.p_customer_id,contactA.id,{firstName:'Cross',lastName:'Tenant'}),e=>e.code==='not_found');
+ await assert.rejects(()=>contactRepository.saveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,null,{firstName:'Bad',lastName:'Email',email:'invalid'}),e=>e.code==='email_invalid');
+ await contactRepository.archiveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,contactB.id);
+ assert.equal((await listApiBusiness(client,session,'customer_contacts','id=eq.'+contactB.id)).length,0);
+ assert.ok((await db.query('select archived_at from customer_contacts where id=$1',[contactB.id])).rows[0].archived_at,'Archiving preserves contact references');
+ const manualInternal=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',durationMinutes:45,startedAt:'2026-10-06T12:00:00',billable:false,salesRate:125}});
+ assert.equal(manualInternal.data.item.billable,false);assert.equal(Number(manualInternal.data.item.sales_rate),125);
+ assert.equal((await manualTimeHandler.POST({body:{durationMinutes:60,billable:true}})).data.error,'billable_customer_required');
+ assert.equal((await manualTimeHandler.POST({body:{durationMinutes:60,salesRate:-10}})).data.error,'rate_invalid');
+
+ const contactHttpDependencies={"@/lib/server/http":processHttp,"@/lib/server/database":dataModule('export async function requireTenantFeature(){return {session:globalThis.__processSession}}'),"@/lib/server/rbac":processRbac,"@/lib/server/repositories/contacts":dataModule(contactSource)};
+ let contactRouteSource=await fs.readFile('app/api/customers/[id]/contacts/[contactId]/route.ts','utf8');
+ for(const [key,url] of Object.entries(contactHttpDependencies))contactRouteSource=contactRouteSource.replaceAll(JSON.stringify(key),JSON.stringify(url));
+ const contactRoute=await import(dataModule(contactRouteSource));
+ globalThis.__processSession={...session,role:'employee'};
+ assert.equal((await contactRoute.DELETE({},{params:Promise.resolve({id:documentArgs.p_customer_id,contactId:contactA.id})})).status,403);
+ globalThis.__processSession={...session,organizationStatus:'read_only'};
+ assert.equal((await contactRoute.PATCH({body:{firstName:'A',lastName:'B'}},{params:Promise.resolve({id:documentArgs.p_customer_id,contactId:contactA.id})})).status,403);
+ globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
+ assert.equal((await contactRoute.PATCH({body:{firstName:'Anna Maria',lastName:'von Beispiel',isPrimary:true}},{params:Promise.resolve({id:documentArgs.p_customer_id,contactId:contactA.id})})).status,200);
+ console.log('Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.');
  const processSource=(await fs.readFile('lib/server/document-process.ts','utf8')).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./audit"',JSON.stringify(audit));
  const {changeDocumentStatus}=await import(dataModule(processSource));
  const processQuote=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'FLOW-QUOTE',p_valid_until:'2099-12-31'});

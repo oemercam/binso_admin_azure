@@ -4,14 +4,17 @@ import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import {filterTimeEntries} from "@/lib/time-entry-filter";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
+import ConfirmDialog from "./confirm-dialog";
+import {useDialogFocus} from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
 import { InvoicePreview } from "./documents";
 export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
-import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, apiDelete, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {buildFinanceMonths} from "@/lib/finance-periods";
 import {plans as subscriptionPlans} from '@/lib/plans';
 import {legalConfig} from '@/config/legal';
@@ -251,6 +254,12 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const returnTo=requestedReturnTo==="/dashboard"?"/dashboard":"/kunden";
   const [tab,setTab]=useState<"overview"|"contacts"|"docs"|"activity">("overview");
   const [contactOpen,setContactOpen]=useState(false);
+  const [contactId,setContactId]=useState<string|null>(null);
+  const [contactPrimary,setContactPrimary]=useState(false);
+  const [contactSaving,setContactSaving]=useState(false);
+  const contactBusy=useRef(false);
+  const [removeContact,setRemoveContact]=useState<string|null>(null);
+  const contactDialog=useDialogFocus(contactOpen,()=>{if(!contactBusy.current)setContactOpen(false)});
   const [contactToast,setContactToast]=useState<string|null>(null);
   const [loadError,setLoadError]=useState<string|null>(null);
   const [customer,setCustomer]=useState<Record<string,unknown>|null>(null);
@@ -275,19 +284,33 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     })).catch(error=>setLoadError(error instanceof Error?error.message:"Kunde konnte nicht geladen werden."));
   },[production,customerId]);
 
+  const openContact=(contact?:Record<string,unknown>)=>{
+    setContactId(contact?String(contact.id):null);
+    setFirstName(String(contact?.first_name??""));setLastName(String(contact?.last_name??""));
+    setContactEmail(String(contact?.email??""));setContactPhone(String(contact?.phone??""));setContactRole(String(contact?.job_title??""));
+    setContactPrimary(contact?.is_primary===true||!contact&&contacts.length===0);setContactOpen(true);
+  };
+  const remove=async()=>{if(!removeContact||contactBusy.current)return;contactBusy.current=true;setContactSaving(true);try{
+    await apiDelete("/api/customers/"+encodeURIComponent(customerId)+"/contacts/"+encodeURIComponent(removeContact));
+    setContacts(current=>current.filter(c=>c.id!==removeContact));setRemoveContact(null);setContactToast("Kontakt entfernt.");
+  }catch(e){setContactToast(e instanceof Error?e.message:"Kontakt konnte nicht entfernt werden.")}finally{contactBusy.current=false;setContactSaving(false)}};
   const saveContact=async()=>{
     if(!production){setContactToast("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");return;}
+    if(contactBusy.current)return;
+    if(!firstName.trim()||!lastName.trim()){setContactToast("Vorname und Nachname sind erforderlich.");return;}
+    contactBusy.current=true;setContactSaving(true);
     try{
-      const payload=await apiPost<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts",{
-        firstName,lastName,email:contactEmail,phone:contactPhone,jobTitle:contactRole,isPrimary:contacts.length===0,
+      const payload=await (contactId?apiPatch:apiPost)<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts"+(contactId?"/"+encodeURIComponent(contactId):""),{
+        firstName,lastName,email:contactEmail,phone:contactPhone,jobTitle:contactRole,isPrimary:contactPrimary,
       });
-      setContacts(current=>[...current,payload.item]);
+      setContacts(current=>[...current.filter(c=>c.id!==payload.item.id).map(c=>contactPrimary?{...c,is_primary:false}:c),payload.item]);
       setFirstName("");setLastName("");setContactEmail("");setContactPhone("");setContactRole("");
       setContactOpen(false);
       setContactToast("Kontakt gespeichert.");
     }catch(error){
       setContactToast(error instanceof Error?error.message:"Kontakt konnte nicht gespeichert werden.");
     }
+    finally{contactBusy.current=false;setContactSaving(false)}
     window.setTimeout(()=>setContactToast(null),2600);
   };
 
@@ -296,35 +319,36 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
       <div className="customer-detail-workspace">
         <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
       {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section></div>}
-      {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
+      {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
       {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link></div></section>}
       {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kundendaten aktualisiert</b><small>Demo</small></div></div></div></section>}</div>
-        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
+        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>openContact()}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
       </div>
-      {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
+      {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section ref={contactDialog} tabIndex={-1} className="bottom-sheet contact-sheet" role="dialog" aria-modal="true" aria-label={contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={contactSaving} onClick={()=>void saveContact()}>{contactSaving?"Wird gespeichert…":"Kontakt speichern"}</Button></div></section></div>}
       {contactToast&&<Toast title={contactToast}/>}
     </AppShell>;
   }
 
   if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
-  if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref="/kunden" backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
+  if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
   const sector=String(customer.sector??"");
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
-  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref="/kunden" backLabel="Kunden" >
+  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" >
     <div className="customer-detail-workspace">
 
       <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
     {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>E-Mail</dt><dd>{String(customer.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(customer.phone??"—")}</dd></div><div><dt>Adresse</dt><dd>{String(customer.street??"—")}<br/>{[customer.postal_code,customer.city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>UID</dt><dd>{String(customer.uid??"—")}</dd></div></dl></section></div>}
-    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" onClick={()=>setContactOpen(true)}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div>})}</div>:<EmptyState icon="users" title="Noch keine Kontakte" text="Füge den ersten Ansprechpartner für diesen Kunden hinzu."/>}</section>}
-    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/>{customerDocuments.length?<div className="compact-list">{customerDocuments.map(item=>{const kind=String(item.kind);const statusValue=String(item.status??"draft");const statusLabel:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};return <Link href={(kind==="offer"?"/angebote/":"/rechnungen/")+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{swissDate(item.issue_date)} · {moneyChf(item.total)}</span><Status tone={statusValue==="paid"||statusValue==="accepted"?"success":statusValue==="overdue"||statusValue==="declined"?"danger":"warning"}>{statusLabel[statusValue]??statusValue}</Status></Link>})}</div>:<EmptyState icon="receipt" title="Noch keine Belege" text="Angebote und Rechnungen für diesen Kunden erscheinen hier."/>}</section>}
+    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}<div className="contact-actions"><Button requiresWrite variant="ghost" icon="edit" ariaLabel={fullName+" bearbeiten"} onClick={()=>openContact(contact)}/><Button requiresWrite variant="ghost" icon="close" ariaLabel={fullName+" entfernen"} onClick={()=>setRemoveContact(String(contact.id))}/></div></div>})}</div>:<p>Keine Kontakte erfasst</p>}</section>}
+    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/>{customerDocuments.length?<div className="compact-list">{customerDocuments.map(item=>{const kind=String(item.kind);const statusValue=String(item.status??"draft");const statusLabel:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};return <Link href={(kind==="offer"?"/angebote/":"/rechnungen/")+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{swissDate(item.issue_date)} · {moneyChf(item.total)}</span><Status tone={statusValue==="paid"||statusValue==="accepted"?"success":statusValue==="overdue"||statusValue==="declined"?"danger":"warning"}>{statusLabel[statusValue]??statusValue}</Status></Link>})}</div>:<p>Keine Belege erfasst</p>}</section>}
     {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kunde erstellt</b><small>{new Date(String(customer.created_at)).toLocaleString("de-CH")}</small></div></div><div><i/><div><b>Zuletzt aktualisiert</b><small>{new Date(String(customer.updated_at)).toLocaleString("de-CH")}</small></div></div></div></section>}</div>
-      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>setContactOpen(true)}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>openContact()}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
     </div>
-    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section className="bottom-sheet contact-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Kontakt hinzufügen</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveContact()}>Kontakt speichern</Button></div></section></div>}
-    {contactToast&&<Toast title={contactToast} tone={contactToast.includes("konnte")?"danger":"success"}/>}
+    {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section ref={contactDialog} tabIndex={-1} className="bottom-sheet contact-sheet" role="dialog" aria-modal="true" aria-label={contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field><Field label="Hauptkontakt" className="full"><input type="checkbox" checked={contactPrimary} onChange={e=>setContactPrimary(e.target.checked)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={contactSaving} onClick={()=>void saveContact()}>{contactSaving?"Wird gespeichert…":"Kontakt speichern"}</Button></div></section></div>}
+    {removeContact&&<ConfirmDialog open danger busy={contactSaving} title="Kontakt entfernen?" message="Der Kontakt wird aus der Kundenliste entfernt. Bestehende Dokumente bleiben erhalten." confirmLabel={contactSaving?"Wird entfernt…":"Entfernen"} onCancel={()=>{if(!contactBusy.current)setRemoveContact(null)}} onConfirm={()=>void remove()}/>}
+    {contactToast&&<Toast title={contactToast} tone={contactToast==="Kontakt gespeichert."||contactToast==="Kontakt entfernt."?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -861,6 +885,13 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [entriesError,setEntriesError]=useState<string|null>(null);
   const [entriesLoading,setEntriesLoading]=useState(!forceDemo);
   const [entryFilter,setEntryFilter]=useState("Alle");
+  const [entryQuery,setEntryQuery]=useState("");
+  const [entryFrom,setEntryFrom]=useState("");
+  const [entryTo,setEntryTo]=useState("");
+  const [timeSaving,setTimeSaving]=useState(false);
+  const timeBusy=useRef(false);
+  const [manualBillable,setManualBillable]=useState(true);
+  const [manualRate,setManualRate]=useState("0");
   const [canApprove,setCanApprove]=useState(false);
   const [canInvoice,setCanInvoice]=useState(false);
   useEffect(()=>{if(forceDemo)return;apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>{const role=data.tenant?.role;setCanApprove(["owner","admin","project_manager","manager"].includes(role??""));setCanInvoice(["owner","admin","finance"].includes(role??""));}).catch(()=>undefined);},[forceDemo]);
@@ -868,7 +899,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [running,setRunning]=useState(false);
   const [seconds,setSeconds]=useState(0);
   const [manualOpen,setManualOpen]=useState(false);
+  const manualDialog=useDialogFocus(manualOpen,()=>{if(!timeBusy.current)setManualOpen(false)});
   const [projectOpen,setProjectOpen]=useState(false);
+  const projectDialog=useDialogFocus(projectOpen,()=>setProjectOpen(false));
   const [timerProject,setTimerProject]=useState("Interne Planung");
   const [timerCustomer,setTimerCustomer]=useState("");
   const [manualDate,setManualDate]=useState("");
@@ -905,39 +938,46 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
 
+  const billingDialog=useDialogFocus(billingOpen,()=>setBillingOpen(false));
   const setProject=async(project:string)=>{
     try{const selected=availableProjects.find(item=>item.name===project&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer("project",project,selected?.id??null,timerCustomer||null);setTimerProject(state.project);setProjectOpen(false)}
     catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
   const toggleTimer=async()=>{
+    if(timeBusy.current)return;timeBusy.current=true;setTimeSaving(true);
     try{const selected=availableProjects.find(item=>item.name===timerProject&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
     catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
+    finally{timeBusy.current=false;setTimeSaving(false)}
   };
 
   const formatted=[Math.floor(seconds/3600),Math.floor((seconds%3600)/60),seconds%60].map(value=>String(value).padStart(2,"0")).join(":");
   const formatMinutes=(value:number)=>`${Math.floor(value/60)}:${String(value%60).padStart(2,"0")}`;
 
   const stop=async()=>{
+    if(timeBusy.current)return;timeBusy.current=true;setTimeSaving(true);
     try{
       await changeTimer("finish",timerProject);
       setRunning(false);setSeconds(0);setToast("Zeiteintrag gespeichert.");
-      if(production){const payload=await apiGet<{items:typeof remoteEntries}>("/api/time-entries");setRemoteEntries(payload.items)}
+      if(production){const payload=await apiGet<{items:typeof remoteEntries}>("/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""));setRemoteEntries(payload.items)}
     }catch(error){setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.")}
+    finally{timeBusy.current=false;setTimeSaving(false)}
     window.setTimeout(()=>setToast(null),2400);
   };
 
   const saveManual=async()=>{
+    if(timeBusy.current)return;
     const [hours,minutes]=manualDuration.split(":").map(Number);
     const durationMinutes=(Number.isFinite(hours)?hours:0)*60+(Number.isFinite(minutes)?minutes:0);
-    if(durationMinutes<=0){
+    if(durationMinutes<=0||durationMinutes>1440||!/^\d{4}-\d{2}-\d{2}$/.test(manualDate)){
       setToast("Bitte eine gültige Dauer erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    timeBusy.current=true;setTimeSaving(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:typeof remoteEntries[number]}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?"Arbeitszeit":"Interne Planung"),description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes});
+        const payload=await apiPost<{item:typeof remoteEntries[number]}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?"Arbeitszeit":"Interne Planung"),description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes,billable:!!manualCustomer&&manualBillable,salesRate:Number(manualRate)});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -945,6 +985,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     }catch(error){
       setToast(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.");
     }
+    finally{timeBusy.current=false;setTimeSaving(false)}
     window.setTimeout(()=>setToast(null),2400);
   };
 
@@ -952,14 +993,15 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const billableSelection=remoteEntries.filter(item=>selectedTimeIds.includes(item.id)&&item.billable&&item.approved&&!item.invoiced_invoice_id);
   const mixedCustomers=new Set(billableSelection.map(item=>item.customer_id||item.customer_name)).size>1;
-  const visibleEntries=remoteEntries.filter(item=>entryFilter==="Alle"||entryFilter==="Verrechnet"&&item.invoiced_invoice_id||entryFilter==="Freigegeben"&&item.approved&&!item.invoiced_invoice_id||entryFilter==="Zu prüfen"&&item.billable&&!item.approved&&!item.invoiced_invoice_id||entryFilter==="Intern"&&!item.billable);
+  const visibleEntries=filterTimeEntries(remoteEntries,{query:entryQuery,from:entryFrom,to:entryTo,status:entryFilter});
   const remoteTotal=visibleEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
   const invoiceHref=billableSelection.length?"/rechnungen/neu?timeEntries="+encodeURIComponent(billableSelection.map(item=>item.id).join(",")):"";
   const groupedEntries=Object.entries(visibleEntries.reduce<Record<string,typeof remoteEntries>>((groups,item)=>{const key=(item.customer_name||(item.billable?"Ohne Kundenzuordnung":"Intern"))+" · "+(item.project_name||"Ohne Auftrag");(groups[key]??=[]).push(item);return groups},{}));
-  const productionEntries=entriesLoading?<p role="status">Zeiteinträge werden geladen …</p>:entriesError?<p role="alert">{entriesError}</p>:visibleEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{canInvoice&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{[swissDate(item.started_at),item.description||"Erfasste Arbeitszeit"].filter(Boolean).join(" · ")}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.billable&&!item.customer_id?<Status tone="warning">Kunde fehlt</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable&&canApprove?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">{item.billable?"Zu prüfen":"Intern"}</Status>}</div>)}</div></section>)}</div>:<EmptyState icon="clock" title="Noch keine Zeiteinträge" text="Starte den Timer oder erfasse die erste Zeit manuell."/>;
+  const productionEntries=entriesLoading?<p role="status">Zeiteinträge werden geladen …</p>:entriesError?<p role="alert">{entriesError}</p>:visibleEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{canInvoice&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{[swissDate(item.started_at),item.description||"Erfasste Arbeitszeit"].filter(Boolean).join(" · ")}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.billable&&!item.customer_id?<Status tone="warning">Kunde fehlt</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable&&canApprove?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">{item.billable?"Zu prüfen":"Intern"}</Status>}</div>)}</div></section>)}</div>:<p role="status">{remoteEntries.length?"Keine Zeiteinträge für diese Auswahl":"Keine Zeiteinträge erfasst"}</p>;
 
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
     {employeeFilter&&<p role="status">Arbeitszeiten des ausgewählten Mitarbeiters · <Link href="/zeit">Alle anzeigen</Link></p>}
+    <div className="toolbar time-filter-toolbar"><label className="searchbox"><Icon name="search"/><input aria-label="Zeiteinträge suchen" placeholder="Kunde, Mitarbeiter oder Tätigkeit suchen" value={entryQuery} onChange={e=>setEntryQuery(e.target.value)}/></label><Field allowReadOnlyInput label="Von"><input type="date" value={entryFrom} max={entryTo||undefined} onChange={e=>setEntryFrom(e.target.value)}/></Field><Field allowReadOnlyInput label="Bis"><input type="date" value={entryTo} min={entryFrom||undefined} onChange={e=>setEntryTo(e.target.value)}/></Field>{(entryQuery||entryFrom||entryTo||entryFilter!=="Alle")&&<button type="button" className="toolbar-reset" onClick={()=>{setEntryQuery("");setEntryFrom("");setEntryTo("");setEntryFilter("Alle");setSelectedTimeIds([])}}>Zurücksetzen</button>}</div>
     <div className="chips" aria-label="Zeitstatus">{["Alle","Zu prüfen","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>
     {mixedCustomers&&<p role="alert">Bitte nur Zeiten eines Kunden für eine Rechnung auswählen.</p>}
     {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}
@@ -969,7 +1011,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
         {timeTab==="timer"?<>
           <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0} value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProject("Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
-          <div className="timer-actions"><Button onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button variant="secondary" icon="stop" onClick={()=>void stop()} disabled={!running&&seconds===0}>Stoppen</Button></div>
+          <div className="timer-actions"><Button requiresWrite disabled={timeSaving} onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button requiresWrite variant="secondary" icon="stop" onClick={()=>void stop()} disabled={timeSaving||!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
           <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
           {!forceDemo?productionEntries:demoEntries}
@@ -982,9 +1024,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>}
     </div>
-    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field></div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button onClick={()=>void saveManual()}>Speichern</Button></div></section></div>}
-    {billingOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Zeiten verrechnen"><h2>Zeiten verrechnen</h2><p>Die Verknüpfung erfolgt erst beim Speichern der Rechnung.</p><Field allowReadOnlyInput label="Rechnung"><select value={billingTarget} onChange={e=>setBillingTarget(e.target.value)}><option value="">Neue Rechnung</option>{billingDrafts.filter(i=>i.customer_id===billableSelection[0]?.customer_id).map(i=><option key={i.number} value={i.number}>{i.number} · Entwurf</option>)}</select></Field>{billingError&&<p role="alert">{billingError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setBillingOpen(false)}>Abbrechen</Button><Button href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}>Positionen übernehmen</Button></div></section></div>}
+    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section ref={projectDialog} tabIndex={-1} className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section ref={manualDialog} tabIndex={-1} className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field>{production&&manualCustomer&&<><Field label="Verrechenbar"><input type="checkbox" checked={manualBillable} onChange={e=>setManualBillable(e.target.checked)}/></Field><Field label="Stundensatz CHF"><input type="number" min="0" step="0.05" disabled={!manualBillable} value={manualRate} onChange={e=>setManualRate(e.target.value)}/></Field></>}</div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={timeSaving} onClick={()=>void saveManual()}>{timeSaving?"Wird gespeichert…":"Speichern"}</Button></div></section></div>}
+    {billingOpen&&<div className="sheet-layer"><section ref={billingDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Zeiten verrechnen"><h2>Zeiten verrechnen</h2><p>Die Verknüpfung erfolgt erst beim Speichern der Rechnung.</p><Field allowReadOnlyInput label="Rechnung"><select value={billingTarget} onChange={e=>setBillingTarget(e.target.value)}><option value="">Neue Rechnung</option>{billingDrafts.filter(i=>i.customer_id===billableSelection[0]?.customer_id).map(i=><option key={i.number} value={i.number}>{i.number} · Entwurf</option>)}</select></Field>{billingError&&<p role="alert">{billingError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setBillingOpen(false)}>Abbrechen</Button><Button href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}>Positionen übernehmen</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
 }
@@ -1183,11 +1225,15 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [loadError,setLoadError]=useState<string|null>(null);
+  const [saving,setSaving]=useState(false);
+  const saveBusy=useRef(false);
   const [avatarUrl,setAvatarUrl]=useState("");
   const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
+    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
     apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
       .then(payload=>{
         const item=payload.item??{};
@@ -1199,10 +1245,11 @@ export function AccountSettingsPage() {
           setAvatarUrl(String(item.avatar_url??""));
           setJobTitle(String(item.job_title??""));
         });
-      }).catch(()=>undefined);
+      }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[]);
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
+    if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle});
@@ -1211,13 +1258,14 @@ export function AccountSettingsPage() {
     }catch(error){
       setToast(error instanceof Error?error.message:"Persönliche Daten konnten nicht gespeichert werden.");
     }
+    finally{saveBusy.current=false;setSaving(false)}
     window.setTimeout(()=>setToast(null),2400);
   };
 
   const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
-    <div className="settings-detail-grid">
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button>:<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
+    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
         <div className="profile-avatar">{avatarUrl?<img src={avatarUrl} alt={displayName}/>:initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
@@ -1229,10 +1277,10 @@ export function AccountSettingsPage() {
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
           <Field label="Funktion"><input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div></dl></section>}
-    </div>
-    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
+    </div>}
+    {toast&&<Toast title={toast} tone={toast.endsWith("gespeichert.")?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1247,6 +1295,10 @@ export function CompanySettingsPage() {
   const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [loadError,setLoadError]=useState<string|null>(null);
+  const [saving,setSaving]=useState(false);
+  const saveBusy=useRef(false);
 
   const uploadLogo=async(file:File|undefined)=>{
     if(!file) return;
@@ -1269,7 +1321,7 @@ export function CompanySettingsPage() {
   };
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
+    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
     apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
       const item=payload.item;
       queueMicrotask(()=>{
@@ -1282,10 +1334,11 @@ export function CompanySettingsPage() {
         setEmail(String(item.email??""));
         setPhone(String(item.phone??""));
       });
-    }).catch(()=>undefined);
+    }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[]);
 
   const save=async(message="Firmendaten gespeichert.")=>{
+    if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone});
@@ -1294,11 +1347,12 @@ export function CompanySettingsPage() {
     }catch(error){
       setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
     }
+    finally{saveBusy.current=false;setSaving(false)}
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:<Button variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
-    <div className="settings-detail-grid">
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button>:<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
+    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
       <section className="surface company-logo-card"><img src={logoUrl||"/brand/logo-black.svg"} alt="Firmenlogo"/><div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
@@ -1310,10 +1364,10 @@ export function CompanySettingsPage() {
           <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
           <Field label="Telefon"><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         </div>
-        <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
+        <div className="mobile-sticky-save"><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div></dl></section>}
-    </div>
-    {toast&&<Toast title={toast} tone={toast.includes("konnten")?"danger":"success"}/>}
+    </div>}
+    {toast&&<Toast title={toast} tone={toast.endsWith("gespeichert.")?"success":"danger"}/>}
   </AppShell>;
 }
 
