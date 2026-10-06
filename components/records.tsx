@@ -69,7 +69,7 @@ export function RecordsView({
     <div className="toolbar">
       <label className="searchbox"><Icon name="search"/><input aria-label={placeholder} value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
       <div className="chips">{chips.map((chip)=><button type="button" onClick={()=>setActiveChip(chip)} className={chip===activeChip?"active":""} key={chip}>{chip}</button>)}</div>
-      <button className={`filter-button ${sort!=="default"?"active":""}`} type="button" onClick={cycleSort} title="Sortierung wechseln" aria-label={sort==="asc"?"Sortierung A bis Z":sort==="desc"?"Sortierung Z bis A":"Sortierung einschalten"}><Icon name="filter" size={17}/><span>{sort==="asc"?"A–Z":sort==="desc"?"Z–A":"Sortieren"}</span></button>
+      <button className={`filter-button ${sort!=="default"?"active":""}`} type="button" onClick={()=>cycleSort()} title="Sortierung wechseln" aria-label={sort==="asc"?"Sortierung A bis Z":sort==="desc"?"Sortierung Z bis A":"Sortierung einschalten"}><Icon name="filter" size={17}/><span>{sort==="asc"?"A–Z":sort==="desc"?"Z–A":"Sortieren"}</span></button>
       <span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${visible.length} ${visible.length===1?"Eintrag":"Einträge"}`}</span>
       {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Zurücksetzen</button>}
     </div>
