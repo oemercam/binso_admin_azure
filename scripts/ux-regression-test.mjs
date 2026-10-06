@@ -242,3 +242,14 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert.equal(buildFinanceMonths({}, {start:new Date(2020,0,1),end:new Date(2026,0,1)}).truncated,true);
  console.log('Finance month comparison includes the final month and excludes values outside partial date ranges.');
 }
+
+// Search and period bounds apply together before time totals are computed.
+{
+ const source=await fs.readFile('lib/time-entry-filter.ts','utf8');
+ const {filterTimeEntries}=await import(moduleUrl(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+ const rows=[{customer_name:'Acme',description:'Beratung',started_at:'2026-10-01',billable:true,approved:true},{customer_name:'Acme',description:'Beratung',started_at:'2026-10-06',billable:true,approved:false},{customer_name:'Andere',started_at:'2026-10-06',billable:false}];
+ assert.deepEqual(filterTimeEntries(rows,{query:'acme',from:'2026-10-06',to:'2026-10-06',status:'Zu prüfen'}),[rows[1]]);
+ assert.deepEqual(filterTimeEntries(rows,{query:'',from:'',to:'',status:'Intern'}),[rows[2]]);
+ assert.equal(filterTimeEntries(rows,{query:'missing',from:'',to:'',status:'Alle'}).length,0);
+ console.log('Time query, inclusive period and approval filters passed.');
+}

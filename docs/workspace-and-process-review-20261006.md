@@ -38,6 +38,16 @@ Die Route-Inventur und Quellcodeprüfung ist keine vollständige Live-Abnahme je
 
 Separate Aufträge/Projekte/Lohn/MWST/Berichte-Module, vollständige Übersetzung und echter Operator-Supportzugriff sind weiterhin nicht als vollständig implementiert ausgewiesen. Graph-Konfiguration und reale Zustellung bleiben abhängig vom eingerichteten Mailkonto. Erstattung ist eine Buchungsbestätigung, keine Banking-Integration.
 
+## Ergänzungen der Kontakt- und Ladeprüfung
+- Kontakte: strukturierte Vor-/Nachnamen, Bearbeiten, Hauptkontaktwechsel und Entfernen aus der Liste. Die additive Migration erhält Kontakt-IDs; Entfernen archiviert statt Dokumentreferenzen zu löschen. Hauptkontaktwechsel ist je Kunde serialisiert.
+- Zeiteinträge: Suche über Kunde/Mitarbeiter/Tätigkeit, inklusive Von-/Bis-Datumsfilter und gefilterte Gesamtdauer; manuelle Kundenzeit kann explizit nicht verrechenbar sein und einen CHF-Stundensatz erhalten. Timer und manuelles Speichern blockieren gleichzeitige Klicks.
+- Konto/Firma/Dokumente: Laden und Fehler werden angezeigt; Bearbeiten und Speichern bleiben nach Ladefehlern gesperrt. Die schreibgeschützte Vorschau meldet keinen vorgetäuschten Speichererfolg. Bearbeitung aktiviert den vorhandenen Schutz beim Verlassen.
+- Operator: zentrale Lade-/Fehlerdarstellung statt leeren Listen oder Nullwerten bei fehlgeschlagenen Abfragen; Planpreise stammen aus der gemeinsamen Konfiguration. Kundenkontozugriff bleibt bis zur tatsächlichen Implementierung deaktiviert.
+- Bestätigungsdialoge: Fokusführung, Escape und Fokus-Rückgabe; während Kontaktentfernung ist erneutes Bestätigen gesperrt.
+- Listen: Status-/Typfilter vergleichen vollständige Werte und machen die Auswahl für Hilfstechnologien sichtbar.
+
+Validierung: PostgreSQL-Prozesstests prüfen Namenspersistenz, Hauptkontaktwechsel, Bearbeiten/Archivieren, Tenant-Isolation, Schreibrechte, Read-only sowie nicht verrechenbare Kundenzeit und Stundensätze. Produktions-Persistenzprüfung erweitert um Kontaktanlage/-bearbeitung/-archivierung in getrennten Demo-Sandboxes. Diese Tests sind keine vollständige echte Kundenreise mit E-Mail/MFA und ersetzen keine physische iPhone-PWA-Abnahme. Die bekannten fehlenden Moduloberflächen und unvollständigen Übersetzungen bleiben offen.
+
 ## Vollständiges Seiteninventar
 - /agb
 - /angebote

@@ -23,9 +23,11 @@ export async function GET(request:NextRequest){
 export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);const s=await requireSession();authorize(s,"time:write");
-    const body=await readJson<{durationMinutes?:unknown;projectName?:unknown;projectId?:unknown;customerId?:unknown;description?:unknown;startedAt?:unknown}>(request,16384);
+    const body=await readJson<{durationMinutes?:unknown;projectName?:unknown;projectId?:unknown;customerId?:unknown;description?:unknown;startedAt?:unknown;billable?:unknown;salesRate?:unknown}>(request,16384);
     const duration=Number(body.durationMinutes);
     if(!Number.isFinite(duration)||duration<=0||duration>1440)throw new ApiError(400,"duration_invalid","Ungültige Dauer.");
+    const salesRate=body.salesRate===undefined?0:Number(body.salesRate);
+    if(!Number.isFinite(salesRate)||salesRate<0||salesRate>100000)throw new ApiError(400,"rate_invalid","Ungültiger Stundensatz.");
     const rawDate=cleanText(body.startedAt,40);const workDate=rawDate?new Date(rawDate):new Date();
     if(!Number.isFinite(workDate.getTime()))throw new ApiError(400,"date_invalid","Ungültiges Datum.");
     const item=await withTenant(s.organizationId,s.userId,async c=>{
@@ -36,11 +38,14 @@ export async function POST(request:NextRequest){
       const customers=customerId?await c.query("select id from customers where organization_id=$1 and id=$2 and archived_at is null",[s.organizationId,customerId]):null;
       if(customerId&&customers?.rowCount!==1)throw new ApiError(400,"customer_invalid","Bitte einen gültigen Kunden auswählen.");
       if(customerId&&found.rows[0]?.customer_id&&String(found.rows[0].customer_id)!==customerId)throw new ApiError(400,"project_customer_mismatch","Der Auftrag gehört nicht zum gewählten Kunden.");
+      const resolvedCustomer=customers?.rows[0]?.id??found.rows[0]?.customer_id??null;
+      if(body.billable===true&&!resolvedCustomer)throw new ApiError(400,"billable_customer_required","Verrechenbare Zeiten benötigen einen Kunden.");
+      const billable=Boolean(resolvedCustomer)&&body.billable!==false;
       const employee=await c.query("select id from employees where organization_id=$1 and lower(email)=lower($2) and archived_at is null",[s.organizationId,s.email]);
-      const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id)
-        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,false,$8)
-        returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,created_at`,
-        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,Boolean(customers?.rows[0]?.id??found.rows[0]?.customer_id)]);
+      const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate)
+        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,false,$8,$13)
+        returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,
+        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,billable,salesRate]);
       const context=(await c.query("select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2",[result.rows[0].id,s.organizationId])).rows[0];
       return {...result.rows[0],...context};
     });return json({item},201);

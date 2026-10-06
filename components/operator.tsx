@@ -84,28 +84,34 @@ function operatorPlan(value:string|undefined){
   return map[value??""]??"—";
 }
 
+function OperatorLoadState({loading,error}:{loading:boolean;error:string|null}){
+ return loading?<p role="status">Daten werden geladen …</p>:<div role="alert"><p>{error}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>;
+}
+
 function useOperatorTickets(){
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<OperatorTicket[]>([]);
   useEffect(()=>{
     if(!production) return;
     apiGet<{items:OperatorTicket[]}>("/api/operator/tickets")
       .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
-  return {production,items};
+  return {production,items,loading,loadError};
 }
 
 function useOperatorCustomers(){
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<OperatorTenant[]>([]);
   useEffect(()=>{
     if(!production) return;
     apiGet<{items:OperatorTenant[]}>("/api/operator/customers")
       .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
-  return {production,items};
+  return {production,items,loading,loadError};
 }
 
 
@@ -182,9 +188,10 @@ function operatorSubtitle(key: string, detail: string) {
 
 function OperatorDashboard() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [data,setData]=useState<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>({});
   const [metric,setMetric]=useState<"availability"|"users"|"api">("availability");
-  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined)},[production]);
+  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false))},[production]);
   const stats=data.stats??{};
   const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket));
   const incidents=data.incidents??[];
@@ -192,6 +199,8 @@ function OperatorDashboard() {
   const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
   const metricInfo={availability:["Systemverfügbarkeit","99.99 %","+0.01 %","0,6,12,18,24"],users:["Aktive Nutzer",production?String(stats.users_active??0):"128","aktuell online","0,6,12,18,24"],api:["Antwortzeit API","182 ms","−12 %","0,6,12,18,24"]} as const;
   const current=metricInfo[metric];
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+
   if(production)return <div className="operator-dashboard-cockpit">
     <div className="operator-ticket-stats">{[
       ["Kunden",Number(stats.customers_total??0),"/operator/kunden"],
@@ -226,7 +235,7 @@ function OperatorDashboard() {
 }
 
 function TicketsView() {
-  const {production,items}=useOperatorTickets();
+  const {production,items,loading,loadError}=useOperatorTickets();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
   const demoTicketVisible=tickets.filter(([nr,subject,customer,status])=>{
@@ -234,6 +243,8 @@ function TicketsView() {
     const matchFilter=filter==="all"||status===filter;
     return matchQuery&&matchFilter;
   });
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <section className="surface operator-table-card">
     <div className="operator-toolbar"><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {tickets.length}</button><button className={filter==="Offen"?"active":""} onClick={()=>setFilter("Offen")}>Offen</button><button className={filter==="In Bearbeitung"?"active":""} onClick={()=>setFilter("In Bearbeitung")}>In Bearbeitung</button><button className={filter==="Wartet auf Kunde"?"active":""} onClick={()=>setFilter("Wartet auf Kunde")}>Wartet auf Kunde</button></div><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tickets suchen..."/></label></div>
@@ -261,6 +272,7 @@ function TicketsView() {
 
 function TicketDetail({ticketId}:{ticketId:string}) {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
@@ -271,7 +283,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     if(!production) return;
     apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>("/api/operator/tickets/"+encodeURIComponent(ticketId))
       .then(payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);}))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production,ticketId]);
 
   const update=async(field:"status"|"priority",value:string)=>{
@@ -300,6 +312,8 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     }
     window.setTimeout(()=>setToast(null),2200);
   };
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
@@ -338,7 +352,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
 }
 
 function CustomersView() {
-  const {production,items}=useOperatorCustomers();
+  const {production,items,loading,loadError}=useOperatorCustomers();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
   const demoCustomerVisible=demoCustomers.filter(({name,status})=>{
@@ -346,6 +360,8 @@ function CustomersView() {
     const matchFilter=filter==="all"||status===filter;
     return matchQuery&&matchFilter;
   });
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <section className="surface">
     <div className="operator-toolbar"><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Kunden suchen..."/></label><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="Aktiv"?"active":""} onClick={()=>setFilter("Aktiv")}>Aktiv</button><button className={filter==="Eingeschränkt"?"active":""} onClick={()=>setFilter("Eingeschränkt")}>Eingeschränkt</button></div></div>
@@ -366,6 +382,7 @@ function CustomersView() {
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [toast,setToast]=useState<string|null>(null);
   const [data,setData]=useState<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>({});
 
@@ -373,7 +390,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
     if(!production) return;
     apiGet<typeof data>("/api/operator/customers/"+encodeURIComponent(tenantId))
       .then(payload=>queueMicrotask(()=>setData(payload)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production,tenantId]);
 
   const notify=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
@@ -381,7 +398,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const demoCustomer=demoCustomers.find(item=>item.id===tenantId);
   if(!production&&!demoCustomer)return <p role="status">Kunde nicht gefunden.</p>;
   if(!production&&demoCustomer) return <>
-    <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">{demoCustomer.name[0]}</span><div><h2>{demoCustomer.name}</h2><p>Demo-Kunde</p></div></div><div className="operator-customer-actions"><Status tone={demoCustomer.status==="Aktiv"?"success":"warning"}>{demoCustomer.status}</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff ist im Demo-Modus nur simuliert.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div></div>
+    <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">{demoCustomer.name[0]}</span><div><h2>{demoCustomer.name}</h2><p>Demo-Kunde</p></div></div><div className="operator-customer-actions"><Status tone={demoCustomer.status==="Aktiv"?"success":"warning"}>{demoCustomer.status}</Status><Button variant="secondary" disabled>Support-Zugriff nicht verfügbar</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div></div>
     <div className="operator-customer-metrics"><Metric label="Plan" value={demoCustomer.plan} hint="Demo" icon="card"/><Metric label="Benutzer" value="—" hint="Demo" icon="users"/><Metric label="Offene Tickets" value={String(tickets.filter(item=>item[2]===demoCustomer.name&&item[3]!=="Gelöst").length)} hint="Demo" icon="support"/><Metric label="Zahlungsstatus" value="—" hint="Demo" icon="wallet"/></div>
     {toast&&<Toast title={toast}/>}
   </>;
@@ -390,11 +407,13 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const tenant=overview.tenant as Record<string,unknown>|null|undefined;
   const account=overview.account as Record<string,unknown>|null|undefined;
   const restrictions=Array.isArray(overview.active_restrictions)?overview.active_restrictions as Array<Record<string,unknown>>:[];
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+
   if(!tenant) return <section className="surface"><EmptyState icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></section>;
 
   const plan=String(account?.plan??"trial");
   const accountStatus=String(account?.account_status??"active");
-  const planPrice:Record<string,string>={trial:"CHF 0",start:"CHF 19",business:"CHF 49",pro:"CHF 89"};
+  const planPrice:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
   const userLimit=Number(account?.user_limit??0);
   const users=Number(overview.users??0);
   const openTickets=Number(overview.open_tickets??0);
@@ -402,7 +421,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   return <>
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} {tenant.city?"· "+String(tenant.city):""}</p></div></div>
-      <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" onClick={()=>notify("Support-Zugriff bleibt deaktiviert, bis die Impersonation sicher implementiert ist.")}>Support-Zugriff</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
+      <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled>Support-Zugriff nicht verfügbar</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
     </div>
     <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={planPrice[plan]+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={String(openTickets)} hint="Aktuelle Anfragen" icon="support"/><Metric label="Kundenzahlungen" value={"CHF "+Number(overview.payments_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="wallet"/></div>
     <div className="operator-customer-grid">
@@ -447,14 +466,17 @@ function OperatorFinanceView({demo=false}:{demo?:boolean}){
 
 function PaymentsView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
 
   useEffect(()=>{
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/payments")
       .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
@@ -481,6 +503,7 @@ function PaymentsView() {
 
 function SubscriptionsView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [selected,setSelected]=useState<Record<string,unknown>|null>(null);
   const [toast,setToast]=useState<string|null>(null);
@@ -489,7 +512,7 @@ function SubscriptionsView() {
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/accounts")
       .then(payload=>setItems(payload.items))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
   useEffect(()=>{load();},[load]);
 
@@ -512,7 +535,9 @@ function SubscriptionsView() {
   }
 
   const grouped=["trial","start","business","pro"].map(plan=>({plan,items:items.filter(item=>item.plan===plan)}));
-  const price:Record<string,string>={trial:"CHF 0",start:"CHF 19",business:"CHF 49",pro:"CHF 89"};
+  const price:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   return <>
     <div className="operator-grid thirds">
@@ -521,13 +546,14 @@ function SubscriptionsView() {
     <section className="surface operator-table-card">
       <div className="operator-table"><div className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></div>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <button type="button" className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b><small>{String(item.tenant_id).slice(0,8)}</small></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></button>})}</div>
     </section>
-    {selected&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="operator-confirm subscription-detail-modal"><span className="confirm-icon"><Icon name="card"/></span><h2>{String((selected.tenant as {name?:string}|undefined)?.name??"Kunde")}</h2><p>Plan und interner Kontostatus. Externes Stripe-Billing ist noch nicht verbunden.</p><label>Plan<select value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial">Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></select></label><label>Abonnement<select value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></select></label><label>Benutzerlimit<input type="number" min="1" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></label><div><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected.tenant_id)}>Kunde öffnen</Button></div></section></div>}
+    {selected&&<div className="operator-modal-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><section className="operator-confirm subscription-detail-modal"><span className="confirm-icon"><Icon name="card"/></span><h2>{String((selected.tenant as {name?:string}|undefined)?.name??"Kunde")}</h2><p>Plan und interner Kontostatus. Stripe-Abonnements werden über Stripe verwaltet; interne Kontosperren ändern keine Stripe-Zahlungen.</p><label>Plan<select value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial">Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></select></label><label>Abonnement<select value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></select></label><label>Benutzerlimit<input type="number" min="1" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></label><div><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected.tenant_id)}>Kunde öffnen</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
 function RestrictionsView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const {items:customers}=useOperatorCustomers();
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [tenantId,setTenantId]=useState("");
@@ -540,7 +566,7 @@ function RestrictionsView() {
 
   const load=useCallback(()=>{
     if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/restrictions").then(payload=>setItems(payload.items)).catch(()=>undefined);
+    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/restrictions").then(payload=>setItems(payload.items)).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
 
   useEffect(()=>{load();},[load]);
@@ -567,6 +593,8 @@ function RestrictionsView() {
   };
 
   const active=production?items.filter(item=>item.active===true):[];
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+
   return <>
     <div className="operator-grid">
       <section className="surface restriction-form">
@@ -617,12 +645,13 @@ function MonitoringCockpit({services,api,database,errorRate,incidents}:{services
 
 function MonitoringView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
     if(!production) return;
-    apiGet<typeof data>("/api/operator/monitoring").then(payload=>queueMicrotask(()=>setData(payload))).catch(()=>undefined);
+    apiGet<typeof data>("/api/operator/monitoring").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
 
   const testEmail=async()=>{
@@ -634,6 +663,8 @@ function MonitoringView() {
     }
     window.setTimeout(()=>setToast(null),2600);
   };
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} errorRate="—" incidents={[]}/>;
 
@@ -663,6 +694,7 @@ function MonitoringView() {
 
 function AnnouncementsView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [title,setTitle]=useState("");
   const [kind,setKind]=useState("information");
@@ -674,7 +706,7 @@ function AnnouncementsView() {
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/announcements")
       .then(payload=>setItems(payload.items))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
 
   useEffect(()=>{load();},[load]);
@@ -704,6 +736,8 @@ function AnnouncementsView() {
   const kindLabel:Record<string,string>={information:"Information",maintenance:"Wartung",incident:"Störung",feature:"Neue Funktion"};
   const audienceLabel:Record<string,string>={all:"Alle Kunden",start:"Start",business:"Business",pro:"Pro"};
 
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+
   return <div className="operator-grid">
     <section className="surface">
       <SectionTitle title="Neue Ankündigung"/>
@@ -720,14 +754,17 @@ function AnnouncementsView() {
 
 function SecurityView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
 
   useEffect(()=>{
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/users")
       .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <>
     <section className="surface">
@@ -755,6 +792,7 @@ function SecurityView() {
 
 function AuditView() {
   const production=useBackendMode();
+  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
   const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
   const [query,setQuery]=useState("");
   const demoAuditRows=[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].filter(row=>!query.trim()||row.join(" ").toLowerCase().includes(query.trim().toLowerCase()));
@@ -763,8 +801,10 @@ function AuditView() {
     if(!production) return;
     apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/audit")
       .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(()=>undefined);
+      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
   },[production]);
+
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
 
   if(!production) return <section className="surface">
     <div className="operator-toolbar"><span className="operator-demo-filter">Demo · letzte 7 Tage</span><label className="searchbox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Audit durchsuchen..."/></label></div>

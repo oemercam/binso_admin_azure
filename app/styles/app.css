@@ -1650,3 +1650,11 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .entity-detail-workspace .success-panel>span{margin:0}
 
 .toolbar + .desktop-record-table{border-top:0}
+
+/* Shared controls for contact maintenance and free time periods. */
+.contact-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.contact-actions .button{min-width:36px;width:36px;padding:0}
+.contact-list>div>div:not(.contact-actions){min-width:0;flex:1;overflow-wrap:anywhere}
+.time-filter-toolbar{align-items:end;flex-wrap:wrap}
+.time-filter-toolbar .form-field{min-width:140px;width:160px}
+.time-filter-toolbar .searchbox{flex:1;min-width:200px}
