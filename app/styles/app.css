@@ -1571,9 +1571,9 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .recent-invoices>a{display:flex;align-items:center;gap:12px;min-height:48px;border-bottom:1px solid var(--color-line)}
 .recent-invoices b{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .recent-invoices span{flex:none;color:var(--color-muted);font-size:11px;white-space:nowrap}
-.time-entry-list>div{grid-template-columns:minmax(0,1fr) auto;text-align:left;padding:12px 0;gap:4px 12px}
-.time-entry-list b,.time-entry-list span{grid-column:1;min-width:0;overflow-wrap:anywhere}
-.time-entry-list strong{grid-column:2;grid-row:1 / span 2;align-self:center}
+.time-entry-list>div{text-align:left;padding:12px 0;gap:4px 12px}
+.time-entry-list b,.time-entry-list span{min-width:0;overflow-wrap:break-word}
+.time-entry-list strong{align-self:center;white-space:nowrap}
 .timer-card:has([aria-selected="true"][role="tab"]:last-child){text-align:left}
 .sheet-body{min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;padding-block:14px;-webkit-overflow-scrolling:touch}
 .bottom-sheet>.sheet-header,.bottom-sheet>.sheet-handle,.bottom-sheet>.filter-sheet-actions{flex:none}
@@ -1642,3 +1642,5 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 
 .desktop-detail-main>.tabs + .detail-grid>.surface:first-child,
 .document-desktop-detail>.tabs + .document-detail-view{border-top:0}
+
+.time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
