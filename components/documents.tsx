@@ -527,7 +527,8 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   const company=useDocumentCompany();
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
-  const payment=useMemo(()=>{try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:totals.total,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,totals.total]);
+  const balance=draft.status==='paid'||draft.status==='cancelled'?0:Math.max(0,totals.total-Number(draft.paidAmount??0));
+  const payment=useMemo(()=>{if(balance===0)return {svg:'',issue:null};try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:balance,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,balance]);
 
   if(company.loading)return <p role="status">Rechnungsvorschau wird geladen …</p>;
   if(company.error)return <p role="alert">{company.error}</p>;
@@ -540,13 +541,13 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
       <div className="paper-intro">{draft.title&&<h2>{draft.title}</h2>}<p>{draft.note || String(company.raw.invoice_intro_text||"Für die erbrachten Leistungen stellen wir Ihnen folgende Rechnung.")}</p></div>
       <table><thead><tr><th>Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Betrag</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{numberValue(item.quantity).toLocaleString("de-CH",{maximumFractionDigits:3})}{item.unit&&<small className="paper-unit">{item.unit}</small>}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
       <DocumentTotals draft={draft} totals={totals}/>
-      <section className="paper-closing invoice-payment-intro"><p>{draft.status==="paid"?"Der Rechnungsbetrag wurde vollständig beglichen. Vielen Dank für Ihre Zahlung.":`Bitte überweisen Sie den Rechnungsbetrag${due?" bis zum "+due:""} mit dem QR-Zahlteil auf der folgenden Seite.`}</p><DocumentText text={String(company.raw.invoice_footer_text||"Vielen Dank für Ihr Vertrauen. Bei Fragen zu dieser Rechnung stehen wir Ihnen gerne zur Verfügung.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
+      <section className="paper-closing invoice-payment-intro"><p>{draft.status==="cancelled"?"Diese Rechnung wurde storniert. Es ist keine Zahlung erforderlich.":draft.status==="paid"?"Der Rechnungsbetrag wurde vollständig beglichen. Vielen Dank für Ihre Zahlung.":`Bitte überweisen Sie den Rechnungsbetrag${due?" bis zum "+due:""} mit dem QR-Zahlteil auf der folgenden Seite.`}</p><DocumentText text={String(company.raw.invoice_footer_text||"Vielen Dank für Ihr Vertrauen. Bei Fragen zu dieser Rechnung stehen wir Ihnen gerne zur Verfügung.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
       <footer>{company.footer}</footer>
     </section>
     <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="Rechnung Seite 2 von 2: Zahlungsinformationen">
-      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div><div className="qr-page-reference"><span>Rechnung {draft.number}</span><b>{draft.currency??"CHF"} {money(totals.total)}</b></div>
+      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div><div className="qr-page-reference"><span>Rechnung {draft.number}</span><b>{draft.currency??"CHF"} {money(balance)}</b></div>
       <div className="qr-page-spacer" aria-hidden="true"/>
-      {payment.svg?<div className="qr-payment-slip" dangerouslySetInnerHTML={{__html:payment.svg}}/>:<div className="payment-setup-notice"><b>QR-Zahlteil noch nicht verfügbar</b><p>{payment.issue}</p></div>}
+      {balance===0?<p>{draft.status==="cancelled"?"Storniert – keine Zahlung erforderlich.":"Vollständig bezahlt – keine weitere Zahlung erforderlich."}</p>:payment.svg?<div className="qr-payment-slip" dangerouslySetInnerHTML={{__html:payment.svg}}/>:<div className="payment-setup-notice"><b>QR-Zahlteil noch nicht verfügbar</b><p>{payment.issue}</p></div>}
     </section>
   </div>;
 }
