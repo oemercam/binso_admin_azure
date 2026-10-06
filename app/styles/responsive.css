@@ -3204,3 +3204,15 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
 }
+
+
+/* Desktop data management standard: dense sortable table; mobile keeps the proven compact list. */
+@media (min-width:1024px){
+  .desktop-record-table{display:block}
+  .desktop-record-head,.desktop-record-row{display:grid}
+  .mobile-record-list{display:none}
+}
+@media (max-width:1023px){
+  .desktop-record-table{display:none}
+  .mobile-record-list{display:block}
+}
