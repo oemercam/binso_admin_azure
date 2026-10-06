@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
+const read=path=>fs.readFile(path,'utf8');
 let source=await fs.readFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
