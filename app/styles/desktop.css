@@ -107,9 +107,12 @@
   .tablet-master-detail{
     min-width:0;
     display:grid;
-    grid-template-columns:minmax(var(--desktop-list-min),1.05fr) minmax(var(--desktop-detail-min),.95fr);
+    grid-template-columns:minmax(0,1fr);
     gap:var(--desktop-workspace-gap);
     align-items:start;
+  }
+  .tablet-master-detail:has(>.tablet-detail){
+    grid-template-columns:minmax(var(--desktop-list-min),1.05fr) minmax(var(--desktop-detail-min),.95fr);
   }
   .tablet-detail{
     min-width:0;
@@ -159,7 +162,7 @@
 
 @media (min-width: 1440px){
   :root{--page-x:clamp(32px,2.2vw,48px)}
-  .tablet-master-detail{grid-template-columns:minmax(600px,1.08fr) minmax(480px,.92fr)}
+  .tablet-master-detail:has(>.tablet-detail){grid-template-columns:minmax(600px,1.08fr) minmax(480px,.92fr)}
 }
 
 @media (min-width: 1800px){
