@@ -492,7 +492,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
     <div className="entity-detail-workspace">
-      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>Zahlungsdetails</strong><small>Verbuchung und Zuordnung</small></aside>
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>CHF 4’346.40</strong><small>02.10.2026 · Verbucht</small><dl className="detail-list"><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name="check" size={28}/></span><h2>CHF 4’346.40</h2><p>Zahlung erfolgreich verbucht</p><Status tone="success">Verbucht</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>02.10.2026</dd></div><div><dt>Rechnung</dt><dd>RE-2026-019</dd></div><div><dt>Kunde</dt><dd>Acme AG</dd></div><div><dt>Zahlungsart</dt><dd>Banküberweisung</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span><Link href="/rechnungen/RE-2026-019"><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>RE-2026-019</small></span><Icon name="arrow" size={15}/></Link><Link href="/kunden/acme"><Icon name="users"/><span><b>Kunde öffnen</b><small>Acme AG</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -507,7 +507,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const statusLabel:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
     <div className="entity-detail-workspace">
-      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>Zahlungsdetails</strong><small>Verbuchung und Zuordnung</small></aside>
+      <aside className="entity-info-pane"><span className="compact-section-label">Zahlung</span><strong>{moneyChf(payment.amount)}</strong><small>{swissDate(payment.paid_on)} · {statusLabel[status]??status}</small><dl className="detail-list"><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><p>{status==="booked"?"Zahlung verbucht":"Zahlungsstatus"}</p><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
       <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href="/kunden"><Icon name="users"/><span><b>Kundenübersicht</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
@@ -1022,7 +1022,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   })();
   const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
-  const ticketStatusLabel:Record<string,string>={open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",resolved:"Gelöst",closed:"Geschlossen"};
+  const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};\n  const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file)return;
@@ -1076,7 +1076,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const production=useBackendMode();
   return <AppShell title={ticketSubject} subtitle={ticketReference+" · "+(ticketStatusLabel[ticketStatus]??ticketStatus)} active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
-      <aside className="entity-info-pane"><span className="compact-section-label">Support</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><dl className="detail-list"><div><dt>Status</dt><dd>{ticketStatusLabel[ticketStatus]??ticketStatus}</dd></div><div><dt>Priorität</dt><dd>{ticket?.priority??"Normal"}</dd></div></dl></aside>
+      <aside className="entity-info-pane"><span className="compact-section-label">Support</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><dl className="detail-list"><div><dt>Status</dt><dd>{ticketStatusLabel[ticketStatus]??ticketStatus}</dd></div><div><dt>Priorität</dt><dd>{ticketPriorityLabel[String(ticket?.priority??"normal")]??String(ticket?.priority??"Normal")}</dd></div></dl></aside>
       <div className="desktop-detail-main"><div className="support-thread">
       <div className="thread-day">Heute</div>
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
