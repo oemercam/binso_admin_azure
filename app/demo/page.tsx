@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { startDemoClientSession } from "@/lib/client/backend";
 import { Logo } from "@/components/ui";
 
@@ -17,7 +17,7 @@ export default function Demo(){
     }
   };
 
-  return <main className="app-launch-screen" aria-live="polite">
+  useEffect(()=>{void start();},[]);\n\n  return <main className="app-launch-screen" aria-live="polite">
     <button className="app-launch-brand" type="button" onClick={()=>void start()} aria-label="Binso One erneut öffnen">
       <Logo compact/>
       <span className="app-launch-pulse" aria-hidden="true"/>
