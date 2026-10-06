@@ -606,7 +606,8 @@ textarea{
 .time-overview-section{padding-left:32px;border-left:1px solid var(--color-line)}
 .timer-project{max-width:360px;margin:18px auto 0;text-align:left}
 .timer-project small{display:block;margin-bottom:5px;color:var(--color-muted);font-size:10px}
-.timer-project button{
+.timer-project button,
+.timer-project select{
   width:100%;
   min-height:44px;
   padding:0 12px;
@@ -1597,3 +1598,15 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .paper-unit{display:block;color:#555;font-size:inherit;white-space:nowrap}
 .paper-text{white-space:pre-line}
 .qr-page-reference{display:flex;justify-content:space-between;gap:12px;margin-top:18px;padding-inline:36px;font-variant-numeric:tabular-nums}
+
+.time-groups{display:grid;gap:22px}
+.time-group{min-width:0;border-bottom:1px solid var(--color-line);padding-bottom:18px}
+.time-group:last-child{border-bottom:0;padding-bottom:0}
+.time-group-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:8px}
+.time-group-head>div{display:grid;gap:3px}
+.time-group-head small{color:var(--color-muted);font-size:11px}
+.time-entry-list>div{grid-template-columns:24px minmax(0,1fr) auto auto;align-items:center}
+.time-entry-list input[type="checkbox"]{width:16px;height:16px;margin:0}
+.time-entry-list>div>span:nth-child(2){display:grid;gap:3px;min-width:0}
+.time-entry-list>div>span:nth-child(2) small{color:var(--color-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.time-entry-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px}
