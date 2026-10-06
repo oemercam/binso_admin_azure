@@ -904,7 +904,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
     <div className="time-layout">
-      <section className="surface timer-card">
+      <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
           <div className="timer-project"><small>Projekt</small><button type="button" onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
@@ -916,7 +916,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
           <Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>
         </>}
       </section>
-      {timeTab==="timer"&&<section className="surface">
+      {timeTab==="timer"&&<section className="time-section time-overview-section">
         <SectionTitle title={!forceDemo?"Übersicht":timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
         {!forceDemo?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
