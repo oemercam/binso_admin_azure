@@ -134,3 +134,16 @@ assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must 
 assert.ok(manifestSource.includes('/brand/pwa-icon-maskable-512.png'),'PWA manifest must expose a maskable Binso One icon');
 assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen metadata must use the Binso One artwork');
 console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');
+
+
+// Wide document workspace contract: information | single-page preview | toolbox.
+{
+  const documents=read("components/documents.tsx");
+  const responsive=read("app/styles/responsive.css");
+  assert(documents.includes("document-workspace-page"),"Document detail must expose the central single-page preview.");
+  assert(documents.includes("document-page-navigation"),"Multi-page invoices must expose page navigation.");
+  assert(documents.includes("Seite {workspacePage+1} / 2"),"Invoice workspace must show the active page count.");
+  assert(responsive.includes("grid-template-columns:minmax(300px,30%) minmax(520px,1fr) minmax(250px,22%)"),"Wide document detail must use the canonical three-pane grid.");
+  assert(responsive.includes(".document-workspace-page.page-2 .document-pages>.paper:nth-child(2)"),"Document preview must render one selected page at a time.");
+  console.log("Invoices and offers use the canonical information, single-page preview and toolbox workspace.");
+}
