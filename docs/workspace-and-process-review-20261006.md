@@ -10,6 +10,19 @@
 - Kunden-/Personal-/Zahlungsdetails nutzen zwei statt drei erzwungene Spalten; redundant vorhandene linke Kurzansicht entfällt.
 - Spesen-API sperrt Genehmigung/Ablehnung für Mitarbeiter und andere nicht genehmigungsberechtigte Rollen.
 
+## Nachkorrekturen aus der Browser-Abnahme
+- Leere Aktionsspalte bei bezahlten Rechnungen entfällt; Kopfaktionen liegen nebeneinander.
+- Seitenwechsel im Rechnungsdokument gilt auch außerhalb des breiten Desktop-Breakpoints.
+- Doppelte Speicheraktionen bei Produkten, Personal und Spesen entfernt.
+- Alte Zeilen-Spaltenregeln in der Zeiterfassung entfernt; Einträge nutzen die volle Breite.
+- Verrechenbare Zeiten ohne Kunden zeigen eine fehlende Zuordnung statt „Intern“.
+- Spesenformulare übernehmen Datum, Kategorien und zweistellige Beträge korrekt; Kopfzeile zeigt den Mitarbeiter statt einer UUID.
+- Zahlungsdetail zeigt den Status einmal, öffnet den zugehörigen Kunden und meldet Ladefehler.
+- Unimplementierter Operator-Supportzugriff ist deaktiviert statt lokal als aktiv dargestellt.
+
+- Supportlisten zeigen kurze Referenzen und melden Ladefehler.
+- Finanzansicht vermeidet dreifache Betragsdarstellung; freie Zeiträume schließen den letzten Monat ein und filtern Monatswerte innerhalb der tatsächlichen Datumsgrenzen. Lange Vergleiche werden explizit als letzte 24 Monate gekennzeichnet.
+
 ## Prüfgrenzen / offene Abläufe
 Die Route-Inventur und Quellcodeprüfung ist keine vollständige Live-Abnahme jeder Rolle. Nicht abgeschlossen: tatsächlicher Dokumentversand, Angebotsannahme/Statusübergänge, vollständiger Spesenprozess mit Erstattung/Weiterverrechnung, Zuordnung von Zeiten zu bestehenden Rechnungsentwürfen, separate Aufträge/Projekte/Lohn/MWST/Berichte-Module, vollständige Übersetzung und rollen-/planabhängige Navigation. Keine dieser Funktionen wird durch diese Änderung als fertig ausgewiesen.
 Zeitfreigabe ist serverseitig auf owner/admin/project_manager eingeschränkt, Verrechnung nur für freigegebene, unverrechnete kundengebundene Zeiten. Tenant-Integrität und Datenbanksperren bleiben Bestandteil der bestehenden Tests.

@@ -843,8 +843,8 @@
   .desktop-summary-card{
     min-width:0;
     display:grid;
-    border-top:1px solid var(--color-line);
   }
+  .desktop-toolbox{border-top:1px solid var(--color-line)}
   .desktop-toolbox>.compact-section-label,
   .desktop-summary-card>.compact-section-label{
     padding:0 0 10px;
@@ -872,10 +872,7 @@
   .desktop-toolbox b{font-size:12px}
   .desktop-toolbox small{color:var(--color-muted);font-size:10px;line-height:1.35}
 
-  .desktop-summary-card{
-    padding:0 0 16px;
-    border-bottom:1px solid var(--color-line);
-  }
+  .desktop-summary-card{padding:0 0 16px}
   .desktop-summary-card>strong{
     margin-top:16px;
     font-size:28px;
@@ -891,7 +888,6 @@
     margin-top:16px;
     display:grid;
     gap:0;
-    border-top:1px solid var(--color-line);
   }
   .desktop-summary-facts>span{
     min-height:42px;
