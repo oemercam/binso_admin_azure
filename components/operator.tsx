@@ -264,7 +264,6 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const [supportAccess,setSupportAccess]=useState(false);
   const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
   const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
 
@@ -332,7 +331,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       <SectionTitle title="Kunde"/>
       <h3>{String(tenant?.name??"Kunde")}</h3><p>{String(tenant?.uid??"")} {tenant?.city?"· "+String(tenant.city):""}</p>
       {Boolean(tenant?.id)&&<Link href={"/operator/kunden/"+String(tenant?.id)}>Kundendetails öffnen →</Link>}
-      <div className="context-block"><small>Support-Zugriff</small><b>{supportAccess?"Aktiv · 30 Minuten":"Nicht aktiv"}</b><span>Nur zeitlich begrenzt und auditierbar starten.</span><Button variant="secondary" onClick={()=>{setSupportAccess(!supportAccess);setToast(supportAccess?"Support-Zugriff beendet.":"Support-Zugriff vorbereitet. Technische Impersonation ist noch nicht aktiviert.");window.setTimeout(()=>setToast(null),2200)}}>{supportAccess?"Zugriff beenden":"Zugriff starten"}</Button></div>
+      <div className="context-block"><small>Support-Zugriff</small><b>Nicht verfügbar</b><span>Der direkte Zugriff auf Kundenkonten ist noch nicht verfügbar.</span><Button variant="secondary" disabled>Zugriff starten</Button></div>
     </aside>
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </div>;

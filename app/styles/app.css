@@ -1639,3 +1639,6 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .document-workspace-page .document-pages>.paper{display:none}
 .document-workspace-page.page-1 .document-pages>.paper:first-child,
 .document-workspace-page.page-2 .document-pages>.paper:nth-child(2){display:flex}
+
+.desktop-detail-main>.tabs + .detail-grid>.surface:first-child,
+.document-desktop-detail>.tabs + .document-detail-view{border-top:0}
