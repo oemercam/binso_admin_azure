@@ -28,8 +28,16 @@ try{
  const expense=(await a('/api/expenses','POST',{employeeId:employee.id,merchant:'Test Hotel',expenseDate:today,category:'Reise',amount:123.45,currency:'CHF',vatRate:8.1,description:'Persisted expense',status:'submitted'},201)).item;
  let expenseRead=(await a('/api/expenses/'+expense.id)).item;
  assert.equal(expenseRead.category,'Reise');assert.equal(expenseRead.status,'submitted');assert.equal(expenseRead.employee_id,employee.id);
+ const bytes=Uint8Array.from(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jVn0AAAAASUVORK5CYII=','base64'));
+ const receiptForm=new FormData();receiptForm.append('file',new Blob([bytes],{type:'image/png'}),'test-receipt.png');receiptForm.append('purpose','expense_receipt');receiptForm.append('entityId',expense.id);
+ const receipt=(await a('/api/files','POST',receiptForm,201)).item;
+ assert.equal(receipt.expense_id,expense.id);assert.ok((await a('/api/files?expenseId='+expense.id)).items.find(item=>item.id===receipt.id));
+ assert.deepEqual(new Uint8Array(await a('/api/files/'+receipt.id+'/download')),bytes);
+ await b('/api/files/'+receipt.id+'/download','GET',undefined,404);
  await a('/api/expenses/'+expense.id,'PATCH',{employeeId:employee.id,merchant:'Test Hotel',expenseDate:today,category:'Verpflegung',amount:124,currency:'CHF',vatRate:2.6,description:'Updated expense',status:'approved'});
  expenseRead=(await a('/api/expenses/'+expense.id)).item;assert.equal(expenseRead.category,'Verpflegung');assert.equal(expenseRead.employee_id,employee.id);assert.equal(expenseRead.status,'approved');
+ const blockedReceipt=await a('/api/files','POST',receiptForm,409);assert.equal(blockedReceipt.error,'expense_locked');
+ await a('/api/expenses/'+expense.id,'PATCH',{employeeId:employee.id,merchant:'Test Hotel',expenseDate:today,amount:99,currency:'CHF',vatRate:2.6,status:'submitted'},409);
  const docInput={kind:'invoice',customerId:customer.id,customerName:customerInput.name,issueDate:today,dueDate:today,vatRate:8.1,currency:'CHF',note:'Persisted note',items:[{description:'Service',quantity:2,unitPrice:100,vatRate:8.1},{description:'Material',quantity:1,unitPrice:50,vatRate:2.6}]};
  const company=(await a('/api/settings/company')).item;
  const paymentSettings=(await a('/api/settings/documents')).item;
@@ -42,6 +50,8 @@ try{
  const docRead=(await a('/api/documents/'+invoice.number)).item;
  assert.match(docRead.issue_date,/^\d{4}-\d{2}-\d{2}$/);assert.match(docRead.due_date,/^\d{4}-\d{2}-\d{2}$/);assert.equal(docRead.status,'draft');assert.match(docRead.qr_reference,/^\d{27}$/);assert.equal(docRead.customer_id,customer.id);assert.equal(docRead.note,docInput.note);assert.equal(docRead.items.length,2);assert.equal(Number(docRead.items[1].vat_rate),2.6);
  await b('/api/documents/'+invoice.number,'GET',undefined,404);
+ const pdf=Buffer.from(await a('/api/documents/'+invoice.number+'/pdf'));assert.equal(pdf.subarray(0,5).toString(),'%PDF-');assert.ok(pdf.length>1000);
+ const team=(await a('/api/settings/team/invitations'));assert.ok(team.members.length&&Array.isArray(team.invitations));
  const quote=(await a('/api/documents','POST',{...docInput,kind:'offer',validUntil:today},201)).item;assert.equal((await a('/api/documents/'+quote.number)).item.kind,'offer');
  const time=(await a('/api/time-entries','POST',{durationMinutes:37,projectName:'Persisted project label',customerId:customer.id,description:'Persisted activity',startedAt:today+'T12:00:00'},201)).item;
  const timeRead=(await a('/api/time-entries')).items.find(item=>item.id===time.id);assert.equal(timeRead.customer_id,customer.id);assert.equal(timeRead.project_name,'Persisted project label');assert.equal(Number(timeRead.duration_minutes),37);
@@ -52,12 +62,6 @@ try{
  assert.equal((await a('/api/settings/profile')).item.theme,'dark');
  await a('/api/settings/company','PATCH',{name:'Sandbox '+suffix,city:'Bern',postalCode:'3000'});assert.equal((await a('/api/settings/company')).item.city,'Bern');
  await a('/api/settings/notifications','PATCH',{kind:'Rechnungen',channel:'email',enabled:false});assert.equal((await a('/api/settings/notifications')).items.find(item=>item.kind==='Rechnungen').email,false);
- const bytes=Uint8Array.from(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jVn0AAAAASUVORK5CYII=','base64'));
- const receiptForm=new FormData();receiptForm.append('file',new Blob([bytes],{type:'image/png'}),'test-receipt.png');receiptForm.append('purpose','expense_receipt');receiptForm.append('entityId',expense.id);
- const receipt=(await a('/api/files','POST',receiptForm,201)).item;
- assert.equal(receipt.expense_id,expense.id);assert.ok((await a('/api/files?expenseId='+expense.id)).items.find(item=>item.id===receipt.id));
- assert.deepEqual(new Uint8Array(await a('/api/files/'+receipt.id+'/download')),bytes);
- await b('/api/files/'+receipt.id+'/download','GET',undefined,404);
  const avatarForm=new FormData();avatarForm.append('file',new Blob([bytes],{type:'image/png'}),'test-avatar.png');avatarForm.append('purpose','profile_avatar');
  const avatar=(await a('/api/files','POST',avatarForm,201)).item;assert.equal((await a('/api/settings/profile')).item.avatar_url,'/api/files/'+avatar.id+'/download');
  const logoForm=new FormData();logoForm.append('file',new Blob([bytes],{type:'image/png'}),'test-logo.png');logoForm.append('purpose','company_logo');
