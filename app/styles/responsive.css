@@ -434,16 +434,33 @@
 @media (min-width:1101px){
   .customer-detail-workspace,
   .entity-detail-workspace{
+    width:100%;
     display:grid;
-    grid-template-columns:minmax(250px,24%) minmax(480px,1fr) minmax(260px,22%);
-    gap:24px;
+    grid-template-columns:minmax(220px,260px) minmax(520px,1fr) minmax(240px,280px);
+    gap:32px;
     align-items:start;
   }
   .customer-info-pane,
   .entity-info-pane,
   .desktop-context-rail{position:sticky;top:82px;align-self:start;min-width:0}
+  .customer-info-pane,
+  .entity-info-pane{padding-right:8px}
+  .customer-info-pane>.compact-section-label,
+  .entity-info-pane>.compact-section-label{display:block;margin-bottom:12px}
+  .customer-info-pane>strong,
+  .entity-info-pane>strong{display:block;margin:0 0 6px;font-size:20px;line-height:1.2;overflow-wrap:anywhere}
+  .customer-info-pane>small,
+  .entity-info-pane>small{display:block;margin-bottom:18px;color:var(--color-muted);line-height:1.45;overflow-wrap:anywhere}
+  .customer-info-pane>.detail-list,
+  .entity-info-pane>.detail-list{margin-top:0}
   .desktop-detail-main,
   .entity-edit-main{min-width:0}
+  .desktop-detail-main>.tabs{margin-bottom:20px}
+  .desktop-detail-main>.form-page{max-width:none}
+  .desktop-detail-main .form-grid{column-gap:18px;row-gap:16px}
+  .desktop-context-rail{padding-left:0}
+  .desktop-summary-card>strong,
+  .desktop-summary-card>small{overflow-wrap:anywhere}
 
 .desktop-appbar{
     position:sticky;
@@ -919,11 +936,17 @@
     top:86px;
   }
 
-  .support-detail-workspace .support-thread{
-    max-width:none;
-    min-height:calc(100dvh - 210px);
-    margin:0;
+  .support-detail-workspace{
+    grid-template-columns:minmax(220px,250px) minmax(520px,1fr) minmax(240px,280px);
   }
+  .support-detail-workspace .support-thread{
+    width:100%;
+    max-width:860px;
+    min-height:calc(100dvh - 230px);
+    margin:0 auto;
+    padding-bottom:0;
+  }
+  .support-detail-workspace .message{max-width:min(76%,620px)}
   .support-detail-workspace .thread-composer{
     position:sticky;
     left:auto;
