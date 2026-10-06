@@ -600,8 +600,10 @@ textarea{
 .mobile-document-bar{display:none}
 
 /* Time */
-.time-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.time-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:32px}
+.time-section{min-width:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
 .timer-card{text-align:center}
+.time-overview-section{padding-left:32px;border-left:1px solid var(--color-line)}
 .timer-project{max-width:360px;margin:18px auto 0;text-align:left}
 .timer-project small{display:block;margin-bottom:5px;color:var(--color-muted);font-size:10px}
 .timer-project button{
