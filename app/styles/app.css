@@ -1015,21 +1015,18 @@ textarea{
 .payment-context small{display:block;color:var(--color-muted);font-size:10px}
 .payment-context b{display:block;margin:3px 0;font-size:12px}
 .payment-context span{color:var(--color-muted);font-size:11px}
-.success-panel{
-  max-width:780px;
-  min-height:0;
-  padding:18px;
-  display:grid;
-  place-items:center;
-  gap:6px;
-  border:0;
+.payment-detail-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px 16px;
+  padding:0 0 16px;
   border-bottom:1px solid var(--color-line);
-  border-radius:0;
-  text-align:center;
 }
-.success-panel>span{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--color-subtle)}
-.success-panel h2{margin:3px 0 0;font-size:24px}
-.success-panel p{margin:0;color:var(--color-muted);font-size:11px}
+.payment-detail-summary h2{margin:0;font-size:20px;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.payment-detail-summary>.status{flex:none;margin-left:auto}
+.payment-detail-summary + .detail-card{border-top:0}
 .detail-card{max-width:780px}
 
 /* Sheets and overlays */
@@ -1661,9 +1658,6 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
 
 .desktop-detail-main>.surface{border-radius:0;box-shadow:none;border-inline:0}
-.entity-detail-workspace .success-panel{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:16px;padding:20px 0;text-align:left}
-.entity-detail-workspace .success-panel h2{margin:0;font-size:20px}
-.entity-detail-workspace .success-panel>span{margin:0}
 
 .toolbar + .desktop-record-table{border-top:0}
 
