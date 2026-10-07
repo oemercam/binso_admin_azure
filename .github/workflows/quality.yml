@@ -9,6 +9,9 @@ concurrency:
   cancel-in-progress: true
 permissions:
   contents: read
+
+env:
+  BINSO_BUILD_SHA: ${{ github.sha }}
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -29,6 +32,31 @@ jobs:
       - run: pnpm css:check
       - run: pnpm typecheck
       - run: pnpm build
+      - name: Package verified production artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .next/standalone/server.js
+          rm -rf deploy
+          mkdir -p deploy/app/.next
+          cp -R .next/standalone/. deploy/app/
+          cp -R .next/static deploy/app/.next/static
+          if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
+          printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
+          cd deploy/app
+          zip -qr ../binso-one.zip .
+          cd ../..
+          test -s deploy/binso-one.zip
+          unzip -l deploy/binso-one.zip | grep -q 'server.js'
+      - name: Upload verified production artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: binso-one-${{ github.sha }}
+          path: deploy/binso-one.zip
+          if-no-files-found: error
+          retention-days: 2
       - name: Runtime smoke test
         shell: bash
         run: |
