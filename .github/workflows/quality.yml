@@ -53,7 +53,7 @@ jobs:
           mkdir -p deploy/app/node_modules/@swc
           cp -RL node_modules/@swc/helpers deploy/app/node_modules/@swc/helpers
           test -f deploy/app/node_modules/@swc/helpers/package.json
-          test -e deploy/app/node_modules/@swc/helpers/_/_interop_require_default.js
+          node -e "require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
