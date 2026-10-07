@@ -3196,10 +3196,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Reduced motion on desktop */
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
-}
 
-/* V20 mobile document detail: compact customer/status row, canonical actions sheet and crisp PWA chrome. */
-@media (max-width: 767px){
+  /* Document detail: compact customer/status row, canonical actions sheet and crisp PWA chrome. */
   .document-customer-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 4px}
   .document-customer-heading h2{margin:0;min-width:0}
   .document-customer-heading .status{flex:none}
