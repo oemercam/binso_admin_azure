@@ -1547,7 +1547,7 @@
   .metric:nth-child(n+3){border-top:1px solid var(--color-line)}
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
-  .metrics-grid{border-top:0!important;border-bottom:0!important}
+  .metrics-grid{border-top:0;border-bottom:0}
   .metric-top{font-size:10px}
   .metric-top svg{width:14px;height:14px}
   .metric strong{margin-top:7px;font-size:19px}
