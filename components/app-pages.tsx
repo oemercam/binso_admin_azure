@@ -1,4 +1,6 @@
 "use client";
+import {DocumentList,FinanceTabs,type DocumentListItem} from "./document-list";
+import {financialStatus,openAmount,formatCurrency} from "@/lib/financial-status";
 
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
@@ -60,7 +62,7 @@ function notificationDate(value:string){
 
 function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
-    String(item.name??""),String(item.sector??"—"),String(item.city??"—"),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="products") return items.map(item=>[
     String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
@@ -78,7 +80,7 @@ function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[])
     const customer=item.customer as {name?:string}|null|undefined;
     const invoice=item.invoice as {number?:string}|null|undefined;
     const statusMap:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
-    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,paymentMethodLabel(item.method)].filter(Boolean).join(" · "),moneyChf(item.amount),statusMap[String(item.status)]??String(item.status??"")];
+    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,paymentMethodLabel(item.method)].filter(Boolean).join(" · "),formatCurrency(item.amount,String(item.currency??"CHF")),statusMap[String(item.status)]??String(item.status??"")];
   });
   return [];
 }
@@ -184,7 +186,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   </AppShell>;
 }
 
-export function FinancePage() {
+export function FinanceAnalysisPage() {
   const production=useBackendMode();
   const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;expenses?:Array<Record<string,unknown>>;payroll?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
   const [error,setError]=useState<string|null>(null);
@@ -240,7 +242,7 @@ export function CustomersPage() {
   return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neuer Kunde"><span className="create-action-label">Neuer Kunde</span></Button>}>
     <div className="customer-records-layout">
       <div>
-        <RecordsView loading={loading} error={error} items={customerRows} placeholder="Kunden suchen..." columns={[{label:"Kunde",index:0},{label:"Branche",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={`${sector} · ${city}`} status={status}/>}}</RecordsView>
+        <RecordsView loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={[{label:"Kunde",index:0},{label:"Kontakt",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={[city,sector].filter(value=>value&&value!=="—").join(" · ")} status={status}/>}}</RecordsView>
       </div>
 
     </div>
@@ -264,6 +266,13 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const [loadError,setLoadError]=useState<string|null>(null);
   const [customer,setCustomer]=useState<Record<string,unknown>|null>(null);
   const [contacts,setContacts]=useState<Array<Record<string,unknown>>>([]);
+  const [customerActivity,setCustomerActivity]=useState<Array<{at:string;title:string;detail:string}>>([]);
+  const [customerSummary,setCustomerSummary]=useState<FinancialSummary|null>(null);
+  const [customerActions,setCustomerActions]=useState(false);
+  const customerActionDialog=useDialogFocus(customerActions,()=>setCustomerActions(false));
+  const [contactMenu,setContactMenu]=useState<Record<string,unknown>|null>(null);
+  const contactMenuDialog=useDialogFocus(!!contactMenu,()=>setContactMenu(null));
+  const [customerDocumentsError,setCustomerDocumentsError]=useState<string|null>(null);
   const [customerDocuments,setCustomerDocuments]=useState<Array<Record<string,unknown>>>([]);
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
@@ -273,10 +282,12 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 
   useEffect(()=>{
     if(!production) return;
+    apiGet<{items:typeof customerActivity}>("/api/customers/"+encodeURIComponent(customerId)+"/activity").then(data=>setCustomerActivity(data.items)).catch(()=>undefined);
+    apiGet<FinancialSummary>("/api/finance/overview?customerId="+encodeURIComponent(customerId)).then(setCustomerSummary).catch(()=>undefined);
     Promise.all([
       apiGet<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)),
       apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts"),
-      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/documents"),
+      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/documents").catch(e=>{setCustomerDocumentsError(e.message);return {items:[]}}),
     ]).then(([customerPayload,contactPayload,documentPayload])=>queueMicrotask(()=>{
       setCustomer(customerPayload.item);
       setContacts(contactPayload.items);
@@ -314,45 +325,32 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     window.setTimeout(()=>setContactToast(null),2600);
   };
 
-  if(!production){
-    return <AppShell title="Acme AG" subtitle="Bauunternehmen · Zürich" active="kunden" backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":"Kunden"} >
-      <div className="customer-detail-workspace">
-        <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
-      {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>Acme AG</dd></div><div><dt>E-Mail</dt><dd>info@acme.ch</dd></div><div><dt>Telefon</dt><dd>+41 44 123 45 67</dd></div><div><dt>Adresse</dt><dd>Bahnhofstrasse 123<br/>8001 Zürich</dd></div><div><dt>UID</dt><dd>CHE-123.456.789</dd></div></dl></section></div>}
-      {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/><div className="contact-list"><div><span className="record-avatar">TM</span><div><b>Thomas Meier</b><small>Geschäftsführer · thomas.meier@acme.ch · +41 79 123 45 67</small></div><Status tone="success">Hauptkontakt</Status></div></div></section>}
-      {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/><div className="compact-list"><Link href="/rechnungen/RE-2026-019"><b>RE-2026-019</b><span>12.09.2026 · CHF 4’346.40</span><Status tone="success">Bezahlt</Status></Link></div></section>}
-      {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kundendaten aktualisiert</b><small>Demo</small></div></div></div></section>}</div>
-        <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>1</b></span><span>Belege <b>1</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>openContact()}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
-      </div>
-      {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section ref={contactDialog} tabIndex={-1} className="bottom-sheet contact-sheet" role="dialog" aria-modal="true" aria-label={contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}</h2><p>Kontakt wird direkt Acme AG zugeordnet.</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={contactSaving} onClick={()=>void saveContact()}>{contactSaving?"Wird gespeichert…":"Kontakt speichern"}</Button></div></section></div>}
-      {contactToast&&<Toast title={contactToast}/>}
-    </AppShell>;
-  }
-
-  if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
+      if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
   if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
   const sector=String(customer.sector??"");
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
-  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" >
+  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button variant="ghost" icon="more" ariaLabel="Kundenaktionen" onClick={()=>setCustomerActions(true)}/>} >
     <div className="customer-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Belege</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
-    {tab==="overview"&&<div className="detail-grid"><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list"><div><dt>Firma</dt><dd>{name}</dd></div><div><dt>E-Mail</dt><dd>{String(customer.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(customer.phone??"—")}</dd></div><div><dt>Adresse</dt><dd>{String(customer.street??"—")}<br/>{[customer.postal_code,customer.city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>UID</dt><dd>{String(customer.uid??"—")}</dd></div></dl></section></div>}
-    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}<div className="contact-actions"><Button requiresWrite variant="ghost" icon="edit" ariaLabel={fullName+" bearbeiten"} onClick={()=>openContact(contact)}/><Button requiresWrite variant="ghost" icon="close" ariaLabel={fullName+" entfernen"} onClick={()=>setRemoveContact(String(contact.id))}/></div></div>})}</div>:<p>Keine Kontakte erfasst</p>}</section>}
-    {tab==="docs"&&<section className="surface customer-tab-panel"><SectionTitle title="Belege"/>{customerDocuments.length?<div className="compact-list">{customerDocuments.map(item=>{const kind=String(item.kind);const statusValue=String(item.status??"draft");const statusLabel:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};return <Link href={(kind==="offer"?"/angebote/":"/rechnungen/")+String(item.number)} key={String(item.id)}><b>{String(item.number)}</b><span>{swissDate(item.issue_date)} · {moneyChf(item.total)}</span><Status tone={statusValue==="paid"||statusValue==="accepted"?"success":statusValue==="overdue"||statusValue==="declined"?"danger":"warning"}>{statusLabel[statusValue]??statusValue}</Status></Link>})}</div>:<p>Keine Belege erfasst</p>}</section>}
-    {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/><div className="timeline"><div><i/><div><b>Kunde erstellt</b><small>{new Date(String(customer.created_at)).toLocaleString("de-CH")}</small></div></div><div><i/><div><b>Zuletzt aktualisiert</b><small>{new Date(String(customer.updated_at)).toLocaleString("de-CH")}</small></div></div></div></section>}</div>
-      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Belege <b>{customerDocuments.length}</b></span></div></section><section className="desktop-toolbox" aria-label="Kundenaktionen"><Link href={"/angebote/neu?customerId="+encodeURIComponent(customerId)}><Icon name="file"/><span><b>Angebot erstellen</b><small>Neues Angebot für den Kunden</small></span><Icon name="arrow" size={15}/></Link><Link href={"/rechnungen/neu?customerId="+encodeURIComponent(customerId)}><Icon name="receipt"/><span><b>Rechnung erstellen</b><small>Neue Rechnung für den Kunden</small></span><Icon name="arrow" size={15}/></Link><button type="button" onClick={()=>openContact()}><Icon name="users"/><span><b>Kontakt hinzufügen</b><small>Ansprechperson erfassen</small></span><Icon name="arrow" size={15}/></button></section></aside>
+      <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Finanzen</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
+    {tab==="overview"&&<><div className="metrics-grid">{customerSummary?.invoices.map(item=><Metric key={item.currency} label="Offener Rechnungsbetrag" value={formatCurrency(item.open_amount,item.currency)} icon="receipt"/>)}{customerSummary?.invoices.map(item=><Metric key={'revenue-'+item.currency} label={'Umsatz '+new Date().getFullYear()} value={formatCurrency(item.revenue,item.currency)} hint="Ausgestellte Rechnungen, inkl. MwSt." icon="wallet"/>)}{customerSummary?.time&&<Metric label="Erfasste / verrechnete Zeit" value={Number(customerSummary.time.hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'} hint={Number(customerSummary.time.invoiced_hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h verrechnet'} icon="clock"/>}</div><section className="surface"><SectionTitle title="Kundendetails"/><Status tone={status==='active'?'success':'neutral'}>{status==='active'?'Aktiv':'Inaktiv'}</Status><dl className="detail-list">{[['Firma',name],['Hauptkontakt',contacts.filter(contact=>contact.is_primary).map(contact=>[contact.first_name,contact.last_name].filter(Boolean).join(' ')).join(', ')],['E-Mail',customer.email],['Telefon',customer.phone],['Adresse',[customer.street,customer.postal_code,city].filter(Boolean).join(' ')],['UID',customer.uid]].filter(([,value])=>Boolean(value)).map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{String(value)}</dd></div>)}</dl>{(!customer.email||!customer.phone||!customer.street)&&<Button href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'} variant="secondary">Kundendaten vervollständigen</Button>}</section></>}
+    {tab==="contacts"&&<section className="surface customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");const initials=String(contact.first_name??"").slice(0,1)+String(contact.last_name??"").slice(0,1);return <div key={String(contact.id)}><span className="record-avatar">{initials.toUpperCase()}</span><div><b>{fullName}</b><small>{[contact.job_title,contact.email,contact.phone].filter(Boolean).join(" · ")}</small></div>{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}<div className="contact-actions"><Button requiresWrite variant="ghost" icon="edit" ariaLabel={fullName+" bearbeiten"} onClick={()=>openContact(contact)}/><Button variant="ghost" icon="more" ariaLabel={fullName+" Aktionen"} onClick={()=>setContactMenu(contact)}/></div></div>})}</div>:<p>Keine Kontakte erfasst</p>}</section>}
+    {tab==="docs"&&<section className="customer-tab-panel"><SectionTitle title="Finanzen"/><DocumentList items={customerDocuments as DocumentListItem[]} error={customerDocumentsError}/></section>}
+    {tab==="activity"&&<section className="surface customer-tab-panel"><SectionTitle title="Aktivität"/>{customerActivity.length?<div className="timeline">{customerActivity.map((item,index)=><div key={item.at+index}><i/><div><b>{item.title}</b><small>{swissDate(item.at)} · {item.detail}</small></div></div>)}</div>:<p>Keine Geschäftsaktivität vorhanden</p>}</section>}</div>
+      <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Angebote / Rechnungen <b>{customerDocuments.length}</b></span></div></section></aside>
     </div>
+    {customerActions&&<div className="sheet-layer"><section ref={customerActionDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Kundenaktionen"><header className="sheet-header"><h2>{name}</h2><Button icon="close" ariaLabel="Schliessen" variant="ghost" onClick={()=>setCustomerActions(false)}/></header><div className="sheet-menu"><Link href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'}>Kunde bearbeiten</Link><button type="button" onClick={()=>{setCustomerActions(false);openContact()}}>Kontakt hinzufügen</button><Link href={'/angebote/neu?customerId='+encodeURIComponent(customerId)}>Angebot erstellen</Link><Link href={'/rechnungen/neu?customerId='+encodeURIComponent(customerId)}>Rechnung erstellen</Link><Link href={'/zeit?customerId='+encodeURIComponent(customerId)}>Zeit erfassen</Link><Link href={'/projekte/neu?customerId='+encodeURIComponent(customerId)}>Auftrag / Projekt starten</Link></div></section></div>}
+    {contactMenu&&<div className="sheet-layer"><section ref={contactMenuDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Kontaktaktionen"><header className="sheet-header"><h2>Kontaktaktionen</h2><Button variant="ghost" icon="close" ariaLabel="Schliessen" onClick={()=>setContactMenu(null)}/></header><div className="sheet-menu"><button type="button" onClick={()=>{openContact(contactMenu);setContactMenu(null)}}>Kontakt bearbeiten / Hauptkontakt festlegen</button>{!!contactMenu.email&&<a href={'mailto:'+String(contactMenu.email)}>E-Mail senden</a>}{!!contactMenu.phone&&<a href={'tel:'+String(contactMenu.phone)}>Anrufen</a>}</div><hr/><Button requiresWrite variant="ghost" onClick={()=>{setRemoveContact(String(contactMenu.id));setContactMenu(null)}}>Kontakt entfernen</Button></section></div>}
     {contactOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setContactOpen(false)}}><section ref={contactDialog} tabIndex={-1} className="bottom-sheet contact-sheet" role="dialog" aria-modal="true" aria-label={contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"}</h2><p>{"Kontakt wird direkt "+name+" zugeordnet."}</p></div><button className="icon-button" onClick={()=>setContactOpen(false)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="form-grid two"><Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field><Field label="Hauptkontakt" className="full"><input type="checkbox" checked={contactPrimary} onChange={e=>setContactPrimary(e.target.checked)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setContactOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={contactSaving} onClick={()=>void saveContact()}>{contactSaving?"Wird gespeichert…":"Kontakt speichern"}</Button></div></section></div>}
     {removeContact&&<ConfirmDialog open danger busy={contactSaving} title="Kontakt entfernen?" message="Der Kontakt wird aus der Kundenliste entfernt. Bestehende Dokumente bleiben erhalten." confirmLabel={contactSaving?"Wird entfernt…":"Entfernen"} onCancel={()=>{if(!contactBusy.current)setRemoveContact(null)}} onConfirm={()=>void remove()}/>}
     {contactToast&&<Toast title={contactToast} tone={contactToast==="Kontakt gespeichert."||contactToast==="Kontakt entfernt."?"success":"danger"}/>}
   </AppShell>;
 }
 
-export function CustomerForm() {
+export function CustomerForm({customerId}:{customerId?:string}={}) {
   const router=useRouter();
   const searchParams=useSearchParams();
   const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/kunden";
@@ -365,7 +363,9 @@ export function CustomerForm() {
   const [postalCode,setPostalCode]=useState("");
   const [uid,setUid]=useState("");
   const [notes,setNotes]=useState("");
+  const [customerStatus,setCustomerStatus]=useState("active");
   const [toast,setToast]=useState<string|null>(null);
+  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));}).catch(e=>setToast(e.message));},[customerId]);
   const save=async()=>{
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
@@ -373,16 +373,16 @@ export function CustomerForm() {
       return;
     }
     try{
-      if(isProductionBackendEnabled()) await apiPost("/api/customers",{name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes});
+      if(isProductionBackendEnabled()) await (customerId?apiPatch:apiPost)("/api/customers"+(customerId?"/"+encodeURIComponent(customerId):""),{name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus});
       else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
-      window.setTimeout(()=>router.push("/kunden"),700);
+      window.setTimeout(()=>router.push(customerId?"/kunden/"+encodeURIComponent(customerId):"/kunden"),700);
     }catch(error){
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell title="Kunde erstellen" subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
+  return <AppShell title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
     <div className="form-page">
       <section className="form-section clean">
         <h2>Grundangaben</h2>
@@ -391,62 +391,29 @@ export function CustomerForm() {
           <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
           <Field label="Telefon"><input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
           <Field label="Ort"><input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
-          <Field label="Branche"><select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></select></Field>
+          <Field label="Status"><select value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></select></Field><Field label="Branche"><select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></select></Field>
         </div>
       </section>
       <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><input inputMode="numeric" value={postalCode} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field><Field label="UID"><input value={uid} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field></div></details>
-      <div className="mobile-sticky-save"><Button onClick={save}>Kunde speichern</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save}>{customerId?"Änderungen speichern":"Kunde speichern"}</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={company.trim()&&city.trim()?"success":"danger"}/>}
   </AppShell>;
 }
 
-function useDocumentRows(kind:"offer"|"invoice",defaults:string[][],forceDemo=false){
-  const [rows,setRows]=useState<string[][]>([]);
-  const [loading,setLoading]=useState(!forceDemo);
-  const [error,setError]=useState<string|null>(null);
-  useEffect(()=>{
-    if(forceDemo){queueMicrotask(()=>setRows(defaults));return;}
-    apiGet<{items:Array<{number:string;status:string;issue_date:string;total:number;customer?:{name?:string}}>}>(isProductionBackendEnabled()?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`)
-      .then(payload=>{
-        const statusMap:Record<string,string>={draft:"Entwurf",sent:"Gesendet",accepted:"Angenommen",declined:"Abgelehnt",open:"Offen",partial:"Teilweise bezahlt",paid:"Bezahlt",overdue:"Überfällig",cancelled:"Storniert"};
-        const mapped=payload.items.map(item=>{
-          const customer=item.customer?.name??"Kunde";
-          const status=statusMap[item.status]??item.status;
-          if(kind==="offer") return [item.number,customer,moneyChf(item.total),status];
-          return [item.number,customer,swissDate(item.issue_date),moneyChf(item.total),status];
-        });
-        queueMicrotask(()=>setRows(mapped));
-      })
-      .catch(reason=>setError(reason instanceof Error?reason.message:"Belege konnten nicht geladen werden."))
-      .finally(()=>setLoading(false));
-  },[kind,defaults,forceDemo]);
-  return {rows,loading,error};
+function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"invoice";forceDemo?:boolean}){
+ const [items,setItems]=useState<DocumentListItem[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null);
+ useEffect(()=>{apiGet<{items:DocumentListItem[]}>(isProductionBackendEnabled()?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`).then(data=>setItems(data.items.map(item=>({...item,kind})))).catch(e=>setError(e instanceof Error?e.message:"Finanzen konnten nicht geladen werden.")).finally(()=>setLoading(false));},[kind,forceDemo]);
+ const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote";
+ return <AppShell title={title} active={route} actions={<Button href={`/${route}/neu`} icon="plus" className="page-add-button responsive-create-action" ariaLabel={invoice?"Neue Rechnung":"Neues Angebot"}>{invoice?"Neue Rechnung":"Neues Angebot"}</Button>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error}/></AppShell>;
 }
-
-export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}) {
-  const {rows:offerRows,loading,error}=useDocumentRows("offer",offers,forceDemo);
-  return <AppShell title="Angebote" subtitle="Professionelle Angebote in wenigen Klicks erstellen." active="angebote" actions={<Button href="/angebote/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Angebot"><span className="create-action-label">Neues Angebot</span></Button>}>
-    <RecordsView loading={loading} error={error} items={offerRows} placeholder="Angebote suchen..." chips={["Alle","Entwurf","Gesendet","Angenommen","Abgelehnt","Abgelaufen"]} columns={[{label:"Angebot",index:0},{label:"Kunde",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:3,status:true}]} rowHref={row=>`/angebote/${row[0]}`}>{([nr,name,amount,status])=><RecordRow href={`/angebote/${nr}`} icon="file" title={nr} meta={name} value={amount} status={status}/>}</RecordsView>
-  </AppShell>;
-}
-
-export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}) {
-  const {rows:invoiceRows,loading,error}=useDocumentRows("invoice",invoices,forceDemo);
-  return <AppShell title="Rechnungen" subtitle="Erstellen, senden und Zahlungsstatus im Blick behalten." active="rechnungen" actions={<Button href="/rechnungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neue Rechnung"><span className="create-action-label">Neue Rechnung</span></Button>}>
-    <div className="tablet-master-detail invoice-master-detail">
-      <div>
-        <RecordsView loading={loading} error={error} items={invoiceRows} placeholder="Rechnungen suchen..." chips={["Alle","Entwurf","Offen","Teilweise bezahlt","Bezahlt","Überfällig","Storniert"]} statusGroups={{Offen:["Gesendet"]}} columns={[{label:"Rechnung",index:0},{label:"Kunde",index:1},{label:"Datum",index:2},{label:"Betrag",index:3,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/rechnungen/${row[0]}`}>{([nr,name,date,amount,status])=><RecordRow href={`/rechnungen/${nr}`} icon="receipt" title={nr} meta={`${name} · ${date}`} value={amount} status={status}/>}</RecordsView>
-      </div>
-      {forceDemo&&<aside className="tablet-detail invoice-tablet-preview"><InvoicePreview/></aside>}
-    </div>
-  </AppShell>;
-}
+export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="offer" forceDemo={forceDemo}/>;}
+export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="invoice" forceDemo={forceDemo}/>;}
 
 export function PaymentsPage() {
   const {rows:paymentRows,loading,error}=useDemoRows("payments",payments);
   return <AppShell title="Zahlungen" subtitle="Eingänge und offene Beträge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend","Storniert"]} columns={[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}]} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
+    <FinanceTabs/><RecordsView countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Ausstehend","Storniert"]} columns={[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}]} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
 
@@ -463,16 +430,16 @@ export function PaymentForm() {
   const [idempotencyKey,setIdempotencyKey]=useState("");
   const [invoiceId,setInvoiceId]=useState("");
   const [note,setNote]=useState("");
-  const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;customer?:{name?:string}}>>([]);
-  useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
-  useEffect(()=>{if(!sourceInvoice)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(Number(item.total)-Number(item.paid_amount)));});},[sourceInvoice,availableInvoices]);
+  const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;customer?:{name?:string}}>>([]);
+  useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
+  useEffect(()=>{if(!sourceInvoice)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));});},[sourceInvoice,availableInvoices]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):"/zahlungen";
 
   const save=async()=>{
     if(savePending.current)return;
     const value=Number(amount.replace(",","."));
-    if(!selectedInvoice||!Number.isFinite(value)||value<=0){
+    if(!selectedInvoice||!Number.isFinite(value)||value<=0||value>openAmount(selectedInvoice)){
       setToast("Bitte einen gültigen Betrag erfassen.");
       window.setTimeout(()=>setToast(null),2200);
       return;
@@ -498,12 +465,13 @@ export function PaymentForm() {
   };
   return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"} actions={<Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button>}>
     <div className="form-page narrow">
-      <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(Number(item.total)-Number(item.paid_amount)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {moneyChf(Number(item.total)-Number(item.paid_amount))}</option>)}</select></Field>
+      <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</select></Field>
+      {selectedInvoice&&<p>Offener Betrag: {formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}
       <div className="form-grid two">
-        <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
-        <Field label="Betrag"><input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field>
-        <Field label="Zahlungsmethode"><select value={method} onChange={e=>setMethod(e.target.value)}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
-        <Field label="Notiz"><input placeholder="Optional" value={note} onChange={e=>setNote(e.target.value)}/></Field>
+        <Field label="Zahlungsdatum"><input type="date" value={date} onChange={e=>{setDate(e.target.value);setIdempotencyKey("")}}/></Field>
+        <Field label={"Zahlungsbetrag "+(selectedInvoice?.currency??"CHF")}><input inputMode="decimal" value={amount} onChange={e=>{setAmount(e.target.value);setIdempotencyKey("")}}/></Field>
+        <Field label="Zahlungsmethode"><select value={method} onChange={e=>{setMethod(e.target.value);setIdempotencyKey("")}}><option>Banküberweisung</option><option>Kreditkarte</option><option>TWINT</option><option>Bar</option></select></Field>
+        <Field label="Notiz"><input placeholder="Optional" value={note} onChange={e=>{setNote(e.target.value);setIdempotencyKey("")}}/></Field>
       </div>
       <div className="mobile-sticky-save"><Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button></div>
     </div>
@@ -542,7 +510,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     <div className="entity-detail-workspace">
 
       <div className="desktop-detail-main"><div className="success-panel"><span><Icon name={status==="booked"?"check":"clock"} size={28}/></span><h2>{"CHF "+Number(payment.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</h2><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{statusLabel[status]??status}</Status></div>
-      <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div><div><dt>Notiz</dt><dd>{String(payment.note??"—")}</dd></div></dl></section></div>
+      <section className="surface detail-card"><dl className="detail-list"><div><dt>Datum</dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt>Rechnung</dt><dd>{invoice?.number??"—"}</dd></div><div><dt>Kunde</dt><dd>{customer?.name??"—"}</dd></div><div><dt>Zahlungsart</dt><dd>{paymentMethodLabel(payment.method)}</dd></div>{Boolean(payment.note)&&<div><dt>Notiz</dt><dd>{String(payment.note)}</dd></div>}</dl></section></div>
       <aside className="desktop-context-rail"><section className="desktop-toolbox"><span className="compact-section-label">Zugehörig</span>{invoice?.number&&<Link href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b>Rechnung öffnen</b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></Link>}<Link href={payment.customer_id?"/kunden/"+encodeURIComponent(String(payment.customer_id)):"/kunden"}><Icon name="users"/><span><b>{payment.customer_id?"Kunde öffnen":"Kundenübersicht"}</b><small>{customer?.name??"Kunde"}</small></span><Icon name="arrow" size={15}/></Link><Link href="/zahlungen"><Icon name="wallet"/><span><b>Alle Zahlungen</b><small>Zahlungsverlauf öffnen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
   </AppShell>;
@@ -733,7 +701,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 
 export function ExpensesPage() {
   const {rows:expenseRows,loading,error}=useDemoRows("expenses",expenses);
-  return <AppShell title="Spesen" subtitle="Belege erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Spese erfassen"><span className="create-action-label">Spese erfassen</span></Button>}>
+  return <AppShell title="Spesen" subtitle="Quittungen erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Spese erfassen"><span className="create-action-label">Spese erfassen</span></Button>}>
     <RecordsView loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Entwurf","Eingereicht","Genehmigt","Abgelehnt"]} columns={[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
 }
@@ -770,7 +738,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const lockedExpense=['approved','posted'].includes(persistedExpenseStatus);
   const [receiptFile,setReceiptFile]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(!expenseId)return;apiGet<{items:typeof expenseFiles}>("/api/files?expenseId="+encodeURIComponent(expenseId)).then(s=>setExpenseFiles(s.items)).catch(()=>setToast('Belege konnten nicht geladen werden.'));},[expenseId]);
+  useEffect(()=>{if(!expenseId)return;apiGet<{items:typeof expenseFiles}>("/api/files?expenseId="+encodeURIComponent(expenseId)).then(s=>setExpenseFiles(s.items)).catch(()=>setToast('Quittungen konnten nicht geladen werden.'));},[expenseId]);
 
   useEffect(()=>{apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?"/api/expenses/options":"/api/demo/data?collection=employees").then(data=>setAvailableEmployees(data.items)).catch(()=>setToast("Mitarbeiter konnten nicht geladen werden."));},[]);
 
@@ -854,7 +822,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
 
       {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
       <div className="form-page">
-        {expenseFiles.length>0&&<section><h2>Belege</h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
+        {expenseFiles.length>0&&<section><h2>Quittungen</h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
         <fieldset disabled={lockedExpense||expenseBusy} className="form-grid two" style={{border:0,padding:0,margin:0}}>
           <Field label="Händler / Firma"><input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option value="">Keine Zuordnung</option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</select></Field>
@@ -884,7 +852,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const employeeFilter=searchParams.get("employeeId");
   const [entriesError,setEntriesError]=useState<string|null>(null);
   const [entriesLoading,setEntriesLoading]=useState(!forceDemo);
-  const [entryFilter,setEntryFilter]=useState("Alle");
+  const [entryFilter,setEntryFilter]=useState(searchParams.has("invoice")?"Freigegeben":"Alle");
   const [entryQuery,setEntryQuery]=useState("");
   const [entryFrom,setEntryFrom]=useState("");
   const [entryTo,setEntryTo]=useState("");
@@ -893,34 +861,38 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [manualBillable,setManualBillable]=useState(true);
   const [manualRate,setManualRate]=useState("0");
   const [canApprove,setCanApprove]=useState(false);
+  const [canSetPolicy,setCanSetPolicy]=useState(false),[approvalRequired,setApprovalRequired]=useState(true);
+  useEffect(()=>{if(forceDemo)return;apiGet<{time_approval_required:boolean}>("/api/time-entries/policy").then(data=>setApprovalRequired(data.time_approval_required)).catch(()=>undefined)},[forceDemo]);
   const [canInvoice,setCanInvoice]=useState(false);
-  useEffect(()=>{if(forceDemo)return;apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>{const role=data.tenant?.role;setCanApprove(["owner","admin","project_manager","manager"].includes(role??""));setCanInvoice(["owner","admin","finance"].includes(role??""));}).catch(()=>undefined);},[forceDemo]);
-  const [timeTab,setTimeTab]=useState<"timer"|"entries">(employeeFilter?"entries":"timer");
+  useEffect(()=>{if(forceDemo)return;apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>{const role=data.tenant?.role;setCanSetPolicy(["owner","admin"].includes(role??""));setCanApprove(["owner","admin","project_manager","manager"].includes(role??""));setCanInvoice(["owner","admin","finance"].includes(role??""));}).catch(()=>undefined);},[forceDemo]);
+  const [timeTab,setTimeTab]=useState<"timer"|"entries">(employeeFilter||searchParams.has("invoice")?"entries":"timer");
   const [running,setRunning]=useState(false);
   const [seconds,setSeconds]=useState(0);
-  const [manualOpen,setManualOpen]=useState(false);
+  const [manualOpen,setManualOpen]=useState(!!searchParams.get("customerId")&&!searchParams.has("invoice"));
   const manualDialog=useDialogFocus(manualOpen,()=>{if(!timeBusy.current)setManualOpen(false)});
   const [projectOpen,setProjectOpen]=useState(false);
   const projectDialog=useDialogFocus(projectOpen,()=>setProjectOpen(false));
   const [timerProject,setTimerProject]=useState("Interne Planung");
+  const [timerProjectId,setTimerProjectId]=useState<string|null>(null);
   const [timerCustomer,setTimerCustomer]=useState("");
   const [manualDate,setManualDate]=useState("");
   const [manualDuration,setManualDuration]=useState("01:00");
-  const [manualCustomer,setManualCustomer]=useState("");
-  const [manualProject,setManualProject]=useState("");
+  const [manualCustomer,setManualCustomer]=useState(searchParams.get("customerId")??"");
+  const [manualProject,setManualProject]=useState(searchParams.get("projectId")??"");
   const [manualDescription,setManualDescription]=useState("");
-  const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null}>>([]);
+  const [manualInternalCategory,setManualInternalCategory]=useState("Administration");
+  const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null;status?:string;hours?:number;invoiced_hours?:number;invoice_numbers?:string[]}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items)}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo]);
-  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
+  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){setTimerProject(selected.name);setTimerProjectId(selected.id);setTimerCustomer(selected.customer_id??"");setManualCustomer(selected.customer_id??"")}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams]);
+  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
-  const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState("");
+  const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState(searchParams.get("invoice")??"");
   const [billingDrafts,setBillingDrafts]=useState<Array<{number:string;customer_id:string;status:string}>>([]),[billingError,setBillingError]=useState<string|null>(null);
   const openBilling=async()=>{setBillingOpen(true);setBillingError(null);try{const data=await apiGet<{items:typeof billingDrafts}>('/api/documents?kind=invoice');setBillingDrafts(data.items.filter(i=>i.status==='draft'));}catch(e){setBillingError(e instanceof Error?e.message:'Rechnungsentwürfe konnten nicht geladen werden.')}};
 
   useEffect(()=>{
-    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
+    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
     const syncTimer=window.setInterval(sync,30000);
     window.addEventListener("focus",sync);
@@ -940,12 +912,12 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
   const billingDialog=useDialogFocus(billingOpen,()=>setBillingOpen(false));
   const setProject=async(project:string)=>{
-    try{const selected=availableProjects.find(item=>item.name===project&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer("project",project,selected?.id??null,timerCustomer||null);setTimerProject(state.project);setProjectOpen(false)}
+    try{const selected=availableProjects.find(item=>item.id===project);const customerId=selected?.customer_id??null;const state=await changeTimer("project",selected?.name??project,selected?.id??null,customerId);setTimerProjectId(selected?.id??null);setTimerCustomer(customerId??"");setTimerProject(state.project);setProjectOpen(false)}
     catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
   const toggleTimer=async()=>{
     if(timeBusy.current)return;timeBusy.current=true;setTimeSaving(true);
-    try{const selected=availableProjects.find(item=>item.name===timerProject&&(!timerCustomer||item.customer_id===timerCustomer));const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
+    try{const selected=availableProjects.find(item=>item.id===timerProjectId);const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
     catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
     finally{timeBusy.current=false;setTimeSaving(false)}
   };
@@ -977,7 +949,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:typeof remoteEntries[number]}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?"Arbeitszeit":"Interne Planung"),description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes,billable:!!manualCustomer&&manualBillable,salesRate:Number(manualRate)});
+        const payload=await apiPost<{item:typeof remoteEntries[number]}>("/api/time-entries",{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?"Arbeitszeit":manualInternalCategory),description:manualDescription,startedAt:manualDate+"T12:00:00",durationMinutes,billable:!!manualCustomer&&manualBillable,salesRate:Number(manualRate)});
         setRemoteEntries(current=>[payload.item,...current]);
       }
       setManualOpen(false);
@@ -990,26 +962,30 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   };
 
   const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
+  const submitTime=async(id:string)=>{try{const data=await apiPatch<{item:{submitted_at:string}}>("/api/time-entries/"+encodeURIComponent(id),{action:"submit"});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,submitted_at:data.item.submitted_at}:item));}catch(e){setToast(e instanceof Error?e.message:"Zeit konnte nicht eingereicht werden.")}};
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const billableSelection=remoteEntries.filter(item=>selectedTimeIds.includes(item.id)&&item.billable&&item.approved&&!item.invoiced_invoice_id);
   const mixedCustomers=new Set(billableSelection.map(item=>item.customer_id||item.customer_name)).size>1;
-  const visibleEntries=filterTimeEntries(remoteEntries,{query:entryQuery,from:entryFrom,to:entryTo,status:entryFilter});
+  const visibleEntries=filterTimeEntries(searchParams.has("invoice")?remoteEntries.filter(item=>item.customer_id===searchParams.get("customerId")):remoteEntries,{query:entryQuery,from:entryFrom,to:entryTo,status:entryFilter});
   const remoteTotal=visibleEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
   const invoiceHref=billableSelection.length?"/rechnungen/neu?timeEntries="+encodeURIComponent(billableSelection.map(item=>item.id).join(",")):"";
   const groupedEntries=Object.entries(visibleEntries.reduce<Record<string,typeof remoteEntries>>((groups,item)=>{const key=(item.customer_name||(item.billable?"Ohne Kundenzuordnung":"Intern"))+" · "+(item.project_name||"Ohne Auftrag");(groups[key]??=[]).push(item);return groups},{}));
-  const productionEntries=entriesLoading?<p role="status">Zeiteinträge werden geladen …</p>:entriesError?<p role="alert">{entriesError}</p>:visibleEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{canInvoice&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{[swissDate(item.started_at),item.description||"Erfasste Arbeitszeit"].filter(Boolean).join(" · ")}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.billable&&!item.customer_id?<Status tone="warning">Kunde fehlt</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable&&canApprove?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:<Status tone="neutral">{item.billable?"Zu prüfen":"Intern"}</Status>}</div>)}</div></section>)}</div>:<p role="status">{remoteEntries.length?"Keine Zeiteinträge für diese Auswahl":"Keine Zeiteinträge erfasst"}</p>;
+  const productionEntries=entriesLoading?<p role="status">Zeiteinträge werden geladen …</p>:entriesError?<p role="alert">{entriesError}</p>:visibleEntries.length?<div className="time-groups">{groupedEntries.map(([group,items])=><section className="time-group" key={group}><div className="time-group-head"><div><b>{group.split(" · ")[0]}</b><small>{group.split(" · ").slice(1).join(" · ")}</small></div><strong>{formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}</strong></div><div className="compact-list time-entry-list">{items.map(item=><div key={item.id}>{canInvoice&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<input type="checkbox" aria-label="Zeit für Rechnung auswählen" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:<span/>}<span><b>{item.employee_name||item.project_name||"Zeiteintrag"}</b><small>{[swissDate(item.started_at),item.description||"Erfasste Arbeitszeit"].filter(Boolean).join(" · ")}</small></span><strong>{formatMinutes(Number(item.duration_minutes??0))}</strong>{item.invoiced_invoice_id?<Status tone="success">Verrechnet</Status>:item.billable&&!item.customer_id?<Status tone="warning">Kunde fehlt</Status>:item.approved?<Status tone="success">Freigegeben</Status>:item.billable&&canApprove?<button type="button" className="text-action" onClick={()=>void approveTime(item.id)}>Freigeben</button>:item.billable&&!item.submitted_at?<button type="button" className="text-action" onClick={()=>void submitTime(item.id)}>Zur Prüfung</button>:<Status tone="neutral">{item.billable?(item.submitted_at?"Zur Prüfung":"Erfasst"):"Intern"}</Status>}</div>)}</div></section>)}</div>:<p role="status">{remoteEntries.length?"Keine Zeiteinträge für diese Auswahl":"Keine Zeiteinträge erfasst"}</p>;
 
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
+    {canSetPolicy&&<details className="optional-details"><summary>Freigabe für neue Zeiteinträge</summary><Field label="Freigabe erforderlich"><input type="checkbox" checked={approvalRequired} onChange={async e=>{try{const data=await apiPatch<{time_approval_required:boolean}>("/api/time-entries/policy",{required:e.target.checked});setApprovalRequired(data.time_approval_required)}catch(error){setToast(error instanceof Error?error.message:"Einstellung konnte nicht gespeichert werden.")}}}/></Field><p>Die Einstellung gilt für neue Einträge. Bestehende Freigaben bleiben erhalten.</p></details>}
+    {searchParams.get("projectId")&&availableProjects.filter(project=>project.id===searchParams.get("projectId")).map(project=><section className="surface" key={project.id}><SectionTitle title={project.name}/><p>{availableCustomers.find(customer=>customer.id===project.customer_id)?.name??'Intern'} · {({planned:'Geplant',active:'Aktiv',in_progress:'Aktiv',blocked:'Blockiert',completed:'Abgeschlossen',cancelled:'Storniert'} as Record<string,string>)[project.status??'']??project.status}</p><p>{Number(project.hours??0).toLocaleString('de-CH',{maximumFractionDigits:2})} h erfasst · {Number(project.invoiced_hours??0).toLocaleString('de-CH',{maximumFractionDigits:2})} h verrechnet</p>{project.invoice_numbers?.map(number=><Link key={number} href={'/rechnungen/'+encodeURIComponent(number)}>{number}</Link>)}</section>)}
+    {canApprove&&<Button variant="secondary" href="/projekte/neu" icon="plus">Auftrag / Projekt starten</Button>}
     {employeeFilter&&<p role="status">Arbeitszeiten des ausgewählten Mitarbeiters · <Link href="/zeit">Alle anzeigen</Link></p>}
     <div className="toolbar time-filter-toolbar"><label className="searchbox"><Icon name="search"/><input aria-label="Zeiteinträge suchen" placeholder="Kunde, Mitarbeiter oder Tätigkeit suchen" value={entryQuery} onChange={e=>setEntryQuery(e.target.value)}/></label><Field allowReadOnlyInput label="Von"><input type="date" value={entryFrom} max={entryTo||undefined} onChange={e=>setEntryFrom(e.target.value)}/></Field><Field allowReadOnlyInput label="Bis"><input type="date" value={entryTo} min={entryFrom||undefined} onChange={e=>setEntryTo(e.target.value)}/></Field>{(entryQuery||entryFrom||entryTo||entryFilter!=="Alle")&&<button type="button" className="toolbar-reset" onClick={()=>{setEntryQuery("");setEntryFrom("");setEntryTo("");setEntryFilter("Alle");setSelectedTimeIds([])}}>Zurücksetzen</button>}</div>
-    <div className="chips" aria-label="Zeitstatus">{["Alle","Zu prüfen","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>
+    <div className="chips" aria-label="Zeitstatus">{["Alle","Erfasst","Zur Prüfung","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>
     {mixedCustomers&&<p role="alert">Bitte nur Zeiten eines Kunden für eine Rechnung auswählen.</p>}
     {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}
     <div className="time-layout">
       <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
-          <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0} value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProject("Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
+          <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0||!!availableProjects.find(item=>item.id===timerProjectId)?.customer_id} value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProjectId(null);setTimerProject(e.target.value?"Arbeitszeit":"Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button requiresWrite disabled={timeSaving} onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button requiresWrite variant="secondary" icon="stop" onClick={()=>void stop()} disabled={timeSaving||!running&&seconds===0}>Stoppen</Button></div>
         </>:<>
@@ -1024,8 +1000,8 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>}
     </div>
-    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section ref={projectDialog} tabIndex={-1} className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{["Interne Planung",...availableProjects.filter(item=>!timerCustomer||item.customer_id===timerCustomer).map(item=>item.name)].map(project=><button type="button" key={project} className={timerProject===project?"active":""} onClick={()=>setProject(project)}><span><b>{project.split(" · ")[0]}</b><small>{project.split(" · ")[1]??"Intern"}</small></span>{timerProject===project?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
-    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section ref={manualDialog} tabIndex={-1} className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>setManualProject(e.target.value)}><option value="">Keine Zuordnung</option>{availableProjects.filter(item=>!manualCustomer||item.customer_id===manualCustomer).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>setManualProject(e.target.value)}><option>Website Redesign</option><option>Support</option></select></Field>}<Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field>{production&&manualCustomer&&<><Field label="Verrechenbar"><input type="checkbox" checked={manualBillable} onChange={e=>setManualBillable(e.target.checked)}/></Field><Field label="Stundensatz CHF"><input type="number" min="0" step="0.05" disabled={!manualBillable} value={manualRate} onChange={e=>setManualRate(e.target.value)}/></Field></>}</div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={timeSaving} onClick={()=>void saveManual()}>{timeSaving?"Wird gespeichert…":"Speichern"}</Button></div></section></div>}
+    {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section ref={projectDialog} tabIndex={-1} className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{[{id:"Administration",name:"Administration",customer_id:null},{id:"Weiterbildung",name:"Weiterbildung",customer_id:null},{id:"Interne IT",name:"Interne IT",customer_id:null},...availableProjects].map(project=><button type="button" key={project.id} className={timerProjectId===project.id||!timerProjectId&&timerProject===project.name?"active":""} onClick={()=>setProject(project.id)}><span><b>{project.name}</b><small>{availableCustomers.find(customer=>customer.id===project.customer_id)?.name??"Intern"}</small></span>{(timerProjectId===project.id||!timerProjectId&&timerProject===project.name)?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
+    {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section ref={manualDialog} tabIndex={-1} className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select disabled={!!availableProjects.find(item=>item.id===manualProject)?.customer_id} value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>{setManualProject(e.target.value);const project=availableProjects.find(item=>item.id===e.target.value);if(project)setManualCustomer(project.customer_id??"")}}><option value="">Keine Zuordnung</option>{availableProjects.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>{setManualProject(e.target.value);const project=availableProjects.find(item=>item.id===e.target.value);if(project)setManualCustomer(project.customer_id??"")}}><option>Website Redesign</option><option>Support</option></select></Field>}<>{!manualCustomer&&!manualProject&&<Field label="Interne Tätigkeit"><select value={manualInternalCategory} onChange={e=>setManualInternalCategory(e.target.value)}><option>Administration</option><option>Weiterbildung</option><option>Interne IT</option></select></Field>}</><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field>{production&&manualCustomer&&<><Field label="Verrechenbar"><input type="checkbox" checked={manualBillable} onChange={e=>setManualBillable(e.target.checked)}/></Field><Field label="Stundensatz CHF"><input type="number" min="0" step="0.05" disabled={!manualBillable} value={manualRate} onChange={e=>setManualRate(e.target.value)}/></Field></>}</div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={timeSaving} onClick={()=>void saveManual()}>{timeSaving?"Wird gespeichert…":"Speichern"}</Button></div></section></div>}
     {billingOpen&&<div className="sheet-layer"><section ref={billingDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Zeiten verrechnen"><h2>Zeiten verrechnen</h2><p>Die Verknüpfung erfolgt erst beim Speichern der Rechnung.</p><Field allowReadOnlyInput label="Rechnung"><select value={billingTarget} onChange={e=>setBillingTarget(e.target.value)}><option value="">Neue Rechnung</option>{billingDrafts.filter(i=>i.customer_id===billableSelection[0]?.customer_id).map(i=><option key={i.number} value={i.number}>{i.number} · Entwurf</option>)}</select></Field>{billingError&&<p role="alert">{billingError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setBillingOpen(false)}>Abbrechen</Button><Button href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}>Positionen übernehmen</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
   </AppShell>;
@@ -1351,7 +1327,7 @@ export function CompanySettingsPage() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Belege und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button>:<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={editing?<Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button>:<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>}>
     {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
       <section className="surface company-logo-card"><img src={logoUrl||"/brand/logo-black.svg"} alt="Firmenlogo"/><div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
@@ -1570,18 +1546,16 @@ export function AppearanceSettingsPage() {
   </AppShell>;
 }
 
-export function DocumentsHubPage() {
-  const {rows:offerRows}=useDocumentRows("offer",offers);
-  const {rows:invoiceRows}=useDocumentRows("invoice",invoices);
-  const {rows:paymentRows}=useDemoRows("payments",payments);
-  return <AppShell title="Belege" subtitle="Angebote, Rechnungen und Zahlungen im Überblick." active="belege">
-    <div className="documents-hub-grid">
-      <section className="surface"><SectionTitle title="Angebote" action={<Link href="/angebote">Alle anzeigen</Link>}/><div className="compact-list">{offerRows.slice(0,5).map(([nr,name,amount,status])=><Link key={nr} href={`/angebote/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/angebote/neu" variant="secondary" icon="plus" className="full-button">Angebot erstellen</Button></section>
-      <section className="surface"><SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="compact-list">{invoiceRows.slice(0,5).map(([nr,name,,amount,status])=><Link key={nr} href={`/rechnungen/${nr}`}><b>{nr} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/rechnungen/neu" variant="secondary" icon="plus" className="full-button">Rechnung erstellen</Button></section>
-      <section className="surface"><SectionTitle title="Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/><div className="compact-list">{paymentRows.slice(0,5).map(([id,date,name,,amount,status])=><Link key={id} href={`/zahlungen/${id}`}><b>{date} · {name}</b><span>{amount}</span><Status>{status}</Status></Link>)}</div><Button href="/zahlungen/neu" variant="secondary" icon="plus" className="full-button">Zahlung erfassen</Button></section>
-    </div>
-  </AppShell>;
+type FinancialSummary={invoices:Array<{currency:string;open_count:number;overdue_count:number;draft_count:number;open_amount:number;revenue:number}>;offers:{draft_count:number;actionable_count:number}|null;time:{hours:number;ready_hours:number;invoiced_hours:number}|null};
+export function FinancePage(){
+ const [summary,setSummary]=useState<FinancialSummary|null>(null);
+ const [items,setItems]=useState<DocumentListItem[]>([]),[time,setTime]=useState<Array<{hours:number}>>([]),[loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null);
+ useEffect(()=>{apiGet<FinancialSummary>("/api/finance/overview").then(setSummary).catch(e=>setError(e.message));apiGet<{items:DocumentListItem[]}>(isProductionBackendEnabled()?"/api/documents":"/api/demo/data?collection=documents").then(data=>setItems(data.items)).catch(e=>setError(e instanceof Error?e.message:"Finanzen konnten nicht geladen werden.")).finally(()=>setLoading(false));apiGet<{items:Array<{hours:number}>}>("/api/time-entries/billing").then(data=>setTime(data.items)).catch(()=>undefined);},[]);
+ const invoices=items.filter(item=>item.kind==='invoice'),open=invoices.filter(item=>['open','partial','overdue'].includes(financialStatus(item))),overdue=open.filter(item=>financialStatus(item)==='overdue'),drafts=items.filter(item=>financialStatus(item)==='draft');
+ const currencies=summary?summary.invoices.map(item=>item.currency):[...new Set(invoices.map(item=>item.currency??'CHF'))];
+ return <AppShell title="Finanzen" subtitle="Wo ist der nächste Schritt nötig?" active="finanzen"><FinanceTabs/>{loading?<p role="status">Finanzen werden geladen …</p>:error?<p role="alert">{error}</p>:<><div className="metrics-grid"><Metric label="Offene Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length)} hint="Offen und teilweise bezahlt" icon="receipt"/><Metric label="Überfällige Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.overdue_count,0)??overdue.length)} hint="Fälligkeit überschritten" icon="clock"/><Metric label="Entwürfe" value={String(summary?summary.invoices.reduce((sum,item)=>sum+item.draft_count,0)+(summary.offers?.draft_count??0):drafts.length)} hint="Angebote und Rechnungen" icon="file"/>{currencies.map(currency=><Metric key={currency} label={`Umsatz ${new Date().getFullYear()}`} value={formatCurrency(summary?.invoices.find(item=>item.currency===currency)?.revenue??invoices.filter(item=>item.currency===currency&&!['draft','cancelled'].includes(item.status??'')&&item.issue_date?.startsWith(String(new Date().getFullYear()))).reduce((sum,item)=>sum+Number(item.total),0),currency)} hint="Ausgestellte Rechnungen, inkl. MwSt." icon="wallet"/>)}</div><SectionTitle title="Nächste Schritte"/><div className="compact-list"><Link href="/rechnungen"><b>Offene Rechnungen prüfen</b><span>{summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length} Rechnungen</span></Link><Link href="/angebote"><b>Angebote weiterführen</b><span>{summary?.offers?.actionable_count??items.filter(item=>item.kind==='offer'&&['draft','sent','accepted'].includes(financialStatus(item))).length} Angebote</span></Link>{summary?.time&&<Link href="/zeit"><b>Freigegebene Zeit verrechnen</b><span>{Number(summary?.time?.ready_hours??time.reduce((sum,item)=>sum+Number(item.hours),0)).toLocaleString('de-CH',{maximumFractionDigits:2})} h bereit zur Verrechnung</span></Link>}<Link href="/finanzen/analyse"><b>Einnahmen und Kosten analysieren</b></Link></div><SectionTitle title="Offene Rechnungen"/><DocumentList items={open} kind="invoice"/></>}</AppShell>;
 }
+export function DocumentsHubPage(){return <FinancePage/>;}
 
 export function NotificationsPage() {
   const production=useBackendMode();

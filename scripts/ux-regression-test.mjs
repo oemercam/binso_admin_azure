@@ -11,6 +11,7 @@ const dependencies={
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',
  '@/lib/permissions':'export const ownRecordOnly=()=>false;export const tenantCan=()=>true;',
+ '@/lib/financial-status':ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText,
  '@/lib/qr-bill':'export const invoicePaymentIssue=()=>null;',
 };
 for(const [specifier,stub] of Object.entries(dependencies))source=source.replace(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub)));
@@ -270,3 +271,12 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  for(const route of apiRoutes) assert.ok(await fs.stat("app/api/"+route),"Canonical API route missing for cross-device process: "+route);
  console.log("Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.");
 }
+
+const {matchesRecordChip}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/list-filter.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+assert.equal(matchesRecordChip('Angebote','Angenommen','Angebot'),true);
+assert.equal(matchesRecordChip('Angebote','Bezahlt','Rechnung'),false);
+assert.equal(matchesRecordChip('Rechnungen','Bezahlt','Rechnung'),true);
+assert.equal(matchesRecordChip('Produkte','Aktiv','Produkt'),true);
+assert.equal(matchesRecordChip('Offen','Teilweise bezahlt','Rechnung',{Offen:['Teilweise bezahlt','Überfällig']}),true);
+assert.equal(matchesRecordChip('Bezahlt','Offen','Rechnung'),false);
+console.log('Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.');

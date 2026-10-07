@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   openGraph: { title: "Binso One Produkt", description: "Eine Plattform für die wichtigsten Abläufe Schweizer KMU.", url: "/produkt", images: ["/opengraph-image"] },
 };
 const modules=[
-  ["users","Kunden","Kontakte, Aktivitäten und Belege zentral."],
+  ["users","Kunden","Kontakte, Aktivitäten und Finanzen zentral."],
   ["file","Angebote","Erstellen, prüfen und nachverfolgen."],
   ["receipt","Rechnungen","Live-Vorschau und klare Status."],
   ["wallet","Zahlungen","Eingänge und offene Beträge."],
   ["clock","Zeiterfassung","Timer oder manuelle Erfassung."],
-  ["card","Spesen","Belege mobil erfassen."],
+  ["card","Spesen","Quittungen mobil erfassen."],
   ["users","Mitarbeiter","Team und Rollen verwalten."],
   ["box","Produkte","Produkte und Dienstleistungen pflegen."],
 ] as const;

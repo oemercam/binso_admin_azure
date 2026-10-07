@@ -95,7 +95,7 @@ export async function provisionOrganization(input:{
    if(input.mode==="demo"){
      await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
      await client.query("select set_config('app.user_id',$1,true)",[input.userId]);
-     await seedDatabaseDemo(client,organizationId,input.userId);
+     await seedDatabaseDemo(client,organizationId,input.userId,email);
      await client.query(`insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','demo') on conflict do nothing`,[organizationId]);
    }
    return {organizationId,expiresAt,plan:planId};

@@ -41,7 +41,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "spesen", label: "Spesen", href: "/spesen",
-    description: "Spesen und Belege mobil erfassen, prüfen und weiterverrechnen.", primaryAction: "Spese erfassen",
+    description: "Spesen und Quittungen mobil erfassen, prüfen und weiterverrechnen.", primaryAction: "Spese erfassen",
     columns: ["Datum", "Beschreibung", "Projekt", "Betrag", "Status"],
   },
   {
