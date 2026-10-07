@@ -78,15 +78,9 @@ jobs:
           rm -rf deploy/app
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
-          if [ -d deploy/app/node_modules ]; then
-            cp -RL deploy/app/node_modules /tmp/binso-standalone-node_modules
-            rm -rf deploy/app/node_modules
-            mv /tmp/binso-standalone-node_modules deploy/app/node_modules
-          fi
-          mkdir -p deploy/app/node_modules/@swc
-          cp -RL node_modules/@swc/helpers deploy/app/node_modules/@swc/helpers
-          test -f deploy/app/node_modules/@swc/helpers/package.json
-          node -e "require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
+          rm -rf deploy/app/node_modules
+          cp -RL node_modules deploy/app/node_modules
+          node -e "require('./deploy/app/node_modules/next/dist/server/next.js'); require('./deploy/app/node_modules/@next/env'); require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
