@@ -1464,7 +1464,7 @@
     padding-top:var(--mobile-page-top);
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
-    padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 42px);
+    padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px);
   }
   .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
   .page-head h1{font-size:21px;line-height:1.12}
