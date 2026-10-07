@@ -384,7 +384,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
     </section>
     <section className="document-facts">
-      <div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div>
+      <div><small>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</small><b>{isoToSwiss(draft.date)}</b></div>
       {type==="Angebot"
         ? <div><small>Gültig bis</small><b>{draft.due&&isoToSwiss(draft.due)}</b></div>
         : <><div><small>Zahlungsfrist</small><b>{draft.due&&draft.due+" Tage"}</b></div>{displayStatus==="paid"?(draft.paidOn&&<div><small>Bezahlt am</small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small>Fällig am</small><b>{dueDate}</b></div>}</>}

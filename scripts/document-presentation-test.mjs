@@ -40,7 +40,7 @@ const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.M
 const readExports={};
 Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels);
 const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
-assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1);
+assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1);
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');
 const openRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01'},directory}));assert.ok(openRead.includes('Offen'));assert.ok(openRead.includes('Fällig am'));assert.ok(openRead.includes('document-mobile-price'));assert.ok(openRead.includes('CHF 100.00 / Stunde'));
 assert.equal(financial.financialStatus({kind:'invoice',status:'sent',total:100,paid_amount:0,due_date:'2026-10-20'},'2026-10-07'),'open');
@@ -50,3 +50,14 @@ assert.equal(financial.financialStatus({kind:'invoice',status:'cancelled',total:
 assert.equal(financial.documentDateLabel({kind:'invoice',status:'sent',total:100,paid_amount:0,due_date:'2026-09-29'},'2026-10-07'),'8 Tage überfällig');
 assert.equal(financial.financialStatus({kind:'offer',status:'sent',valid_until:'2026-10-01'},'2026-10-07'),'expired');
 console.log('Operational document details: real paid date, no fabricated legacy date, derived open/overdue/partial/paid states, cancellation and mobile quantity/unit/unit-price/amount passed.');
+
+const listSource=await fs.readFile('components/document-list.tsx','utf8');
+const listAst=ts.createSourceFile('document-list.tsx',listSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+const listFragment=listAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DocumentList').getText(listAst);
+const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const listExports={};
+Function('require','exports','RecordsView','RecordRow','financialStatus','financialStatusLabels','documentDateLabel','formatCurrency',listCompiled)(require,listExports,()=>null,()=>null,financial.financialStatus,financial.financialStatusLabels,financial.documentDateLabel,financial.formatCurrency);
+const outstandingList=listExports.DocumentList({items:[],kind:'invoice',outstanding:true});
+assert.deepEqual(outstandingList.props.chips,['Alle','Überfällig']);assert.equal(outstandingList.props.emptyLabel('Alle'),'Keine offenen Rechnungen');
+assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt']);
+console.log('Finance overview filters describe its outstanding invoice subset; the full invoice list retains all main filters.');
