@@ -351,3 +351,24 @@ console.log('Project-linked idle timer context survives synchronization without 
   console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts; revenue uses completed-month comparisons.');
  }finally{if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow;}
 }
+
+// Backend failures must never acquire a success colour through keyword heuristics.
+{
+ let checked=0;
+ for(const path of ['components/app-pages.tsx','components/documents.tsx']){
+  const source=await fs.readFile(path,'utf8');const ast=ts.createSourceFile(path,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+  const inspect=node=>{
+   if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='Toast'){
+    const title=node.attributes.properties.find(attribute=>attribute.name?.getText(ast)==='title');
+    const tone=node.attributes.properties.find(attribute=>attribute.name?.getText(ast)==='tone');
+    if(title?.initializer?.expression?.getText(ast)==='toast'&&tone?.initializer?.expression){
+     const expression=tone.initializer.expression.getText(ast);const evaluate=Function('toast','kind','return ('+expression+');');
+     for(const error of ['Server nicht erreichbar.','Zugriff verweigert.','Daten konnten nicht gespeichert.'])assert.equal(evaluate(error,'Rechnung'),'danger',path+' must distinguish failure from confirmed success');
+     ++checked;
+    }
+   }
+   ts.forEachChild(node,inspect);
+  };inspect(ast);
+ }
+ assert.ok(checked>=12);console.log('Unknown server failures stay errors across '+checked+' form, document, time and billing feedback paths.');
+}

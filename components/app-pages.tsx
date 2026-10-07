@@ -437,9 +437,10 @@ export function PaymentForm() {
   const searchParams=useSearchParams();
   const sourceInvoice=searchParams.get("invoice");
   const [saving,setSaving]=useState(false);
+  const [saved,setSaved]=useState(false);
   const savePending=useRef(false);
   const [toast,setToast]=useState<string|null>(null);
-  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
+  const [date,setDate]=useState(()=>businessDate());
   const [amount,setAmount]=useState("");
   const [method,setMethod]=useState("Banküberweisung");
   const [idempotencyKey,setIdempotencyKey]=useState("");
@@ -471,15 +472,16 @@ export function PaymentForm() {
         const displayDate=date.split("-").reverse().join(".");
         appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
-      setToast("Zahlung gespeichert.");
+      setSaved(true);setToast("Zahlung gespeichert.");
       window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
+      savePending.current=false;setSaving(false);
       setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
-    }finally{savePending.current=false;setSaving(false);}
+    }
   };
-  return <AppShell title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"} actions={<Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button>}>
-    <div className="form-page narrow">
+  return <AppShell unsavedChanges={saved?false:undefined} title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"} actions={<Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button>}>
+    <div className="form-page narrow" inert={saving}>
       <Field label="Rechnung"><select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</select></Field>
       {selectedInvoice&&<p>Offener Betrag: {formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}
       <div className="form-grid two">
@@ -490,7 +492,7 @@ export function PaymentForm() {
       </div>
       <div className="mobile-sticky-save"><Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("gültigen")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast==="Zahlung gespeichert."?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -750,7 +752,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const production=useBackendMode();
   const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
   const [availableEmployees,setAvailableEmployees]=useState<Array<{id:string;first_name:string;last_name:string}>>([]);
-  const [date,setDate]=useState(()=>new Date().toISOString().slice(0,10));
+  const [date,setDate]=useState(()=>businessDate());
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState("");
   const [currency,setCurrency]=useState("CHF");
@@ -879,7 +881,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{lockedExpense&&<p>Genehmigte Spesen sind gesperrt.</p>}{reimbursedAt?<p>Erstattet am {new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}>Erstattung erfassen</Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary">Weiterverrechnen</Button>}{invoicedId&&<p>Bereits einer Rechnung zugeordnet.</p>}<Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
     {reimbursementOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Erstattung erfassen"><h2>Erfolgte Erstattung erfassen</h2><p>Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst.</p><Field label="Zahlungsreferenz"><input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}>Abbrechen</Button><Button disabled={expenseBusy||!reimbursementRef.trim()} onClick={()=>void recordReimbursement()}>Erstattung erfassen</Button></div></section></div>}
-    {toast&&<Toast title={toast} tone={toast.includes("gültigen")||toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={["Spese und Beleg gespeichert.","Spese gespeichert.","Spese eingereicht.","Erstattung erfasst."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1044,7 +1046,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     {projectOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setProjectOpen(false)}}><section ref={projectDialog} tabIndex={-1} className="bottom-sheet project-sheet" role="dialog" aria-modal="true" aria-label="Projekt auswählen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Projekt auswählen</h2><p>Die Zeit wird direkt dem gewählten Projekt zugeordnet.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setProjectOpen(false)}><Icon name="close"/></button></header><div className="choice-list">{[{id:"Administration",name:"Administration",customer_id:null},{id:"Weiterbildung",name:"Weiterbildung",customer_id:null},{id:"Interne IT",name:"Interne IT",customer_id:null},...availableProjects].map(project=><button type="button" key={project.id} className={timerProjectId===project.id||!timerProjectId&&timerProject===project.name?"active":""} onClick={()=>setProject(project.id)}><span><b>{project.name}</b><small>{availableCustomers.find(customer=>customer.id===project.customer_id)?.name??"Intern"}</small></span>{(timerProjectId===project.id||!timerProjectId&&timerProject===project.name)?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div></section></div>}
     {manualOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setManualOpen(false)}}><section ref={manualDialog} tabIndex={-1} className="bottom-sheet manual-time-sheet" role="dialog" aria-modal="true" aria-label="Zeit manuell erfassen"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Zeit erfassen</h2><p>Eintrag direkt dem Kunden oder Projekt zuordnen.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setManualOpen(false)}><Icon name="close"/></button></header><div className="sheet-body"><div className="form-grid two"><Field label="Datum"><input type="date" value={manualDate} onChange={e=>setManualDate(e.target.value)}/></Field><Field label="Dauer"><input type="time" value={manualDuration} onChange={e=>setManualDuration(e.target.value)}/></Field>{production?<Field label="Kunde"><select disabled={!!availableProjects.find(item=>item.id===manualProject)?.customer_id} value={manualCustomer} onChange={e=>{setManualCustomer(e.target.value);setManualProject("")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Kunde"><select value={manualCustomer||"Acme AG"} onChange={e=>setManualCustomer(e.target.value)}><option>Acme AG</option><option>Müller GmbH</option></select></Field>}{production?<Field label="Auftrag / Projekt"><select value={manualProject} onChange={e=>{setManualProject(e.target.value);const project=availableProjects.find(item=>item.id===e.target.value);if(project)setManualCustomer(project.customer_id??"")}}><option value="">Keine Zuordnung</option>{availableProjects.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>:<Field label="Projekt"><select value={manualProject==="Interne Planung"?"Website Redesign":manualProject} onChange={e=>{setManualProject(e.target.value);const project=availableProjects.find(item=>item.id===e.target.value);if(project)setManualCustomer(project.customer_id??"")}}><option>Website Redesign</option><option>Support</option></select></Field>}<>{!manualCustomer&&!manualProject&&<Field label="Interne Tätigkeit"><select value={manualInternalCategory} onChange={e=>setManualInternalCategory(e.target.value)}><option>Administration</option><option>Weiterbildung</option><option>Interne IT</option></select></Field>}</><Field className="full" label="Beschreibung"><input value={manualDescription} onChange={e=>setManualDescription(e.target.value)} placeholder="Was wurde gemacht?"/></Field>{production&&manualCustomer&&<><Field label="Verrechenbar"><input type="checkbox" checked={manualBillable} onChange={e=>setManualBillable(e.target.checked)}/></Field><Field label="Stundensatz CHF"><input type="number" min="0" step="0.05" disabled={!manualBillable} value={manualRate} onChange={e=>setManualRate(e.target.value)}/></Field></>}</div></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setManualOpen(false)}>Abbrechen</Button><Button requiresWrite disabled={timeSaving} onClick={()=>void saveManual()}>{timeSaving?"Wird gespeichert…":"Speichern"}</Button></div></section></div>}
     {billingOpen&&<div className="sheet-layer"><section ref={billingDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Zeiten verrechnen"><h2>Zeiten verrechnen</h2><p>Die Verknüpfung erfolgt erst beim Speichern der Rechnung.</p><Field allowReadOnlyInput label="Rechnung"><select value={billingTarget} onChange={e=>setBillingTarget(e.target.value)}><option value="">Neue Rechnung</option>{billingDrafts.filter(i=>i.customer_id===billableSelection[0]?.customer_id).map(i=><option key={i.number} value={i.number}>{i.number} · Entwurf</option>)}</select></Field>{billingError&&<p role="alert">{billingError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setBillingOpen(false)}>Abbrechen</Button><Button disabled={!billableSelection.length||mixedCustomers||!!billingError} href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}>Positionen übernehmen</Button></div></section></div>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("gültige")||toast.includes("keine")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={["Zeiteintrag gespeichert.","Zeit freigegeben."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1127,7 +1129,7 @@ export function SupportTicketForm() {
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
       <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast==="Ticket erstellt."?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1210,7 +1212,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     </div></div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="desktop-summary-facts"><span>Status <b>{ticketStatusLabel[ticketStatus]??ticketStatus}</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
-    {toast&&<Toast title={toast} tone="danger"/>}
+    {toast&&<Toast title={toast} tone={toast==="Datei angehängt."?"success":toast==="Datei im Demo-Modus nicht dauerhaft gespeichert."?"info":"danger"}/>}
   </AppShell>;
 }
 
@@ -1297,7 +1299,7 @@ export function AccountSettingsPage() {
         <div className="mobile-sticky-save"><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Name</dt><dd>{displayName}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div><div><dt>Funktion</dt><dd>{jobTitle||"—"}</dd></div></dl></section>}
     </div>}
-    {toast&&<Toast title={toast} tone={toast.endsWith("gespeichert.")?"success":"danger"}/>}
+    {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1384,7 +1386,7 @@ export function CompanySettingsPage() {
         <div className="mobile-sticky-save"><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}>{saving?"Wird gespeichert…":"Speichern"}</Button></div>
       </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt>Firmenname</dt><dd>{name||"—"}</dd></div><div><dt>UID</dt><dd>{uid||"—"}</dd></div><div><dt>Adresse</dt><dd>{street||"—"}<br/>{[postalCode,city].filter(Boolean).join(" ")||"—"}</dd></div><div><dt>E-Mail</dt><dd>{email||"—"}</dd></div><div><dt>Telefon</dt><dd>{phone||"—"}</dd></div></dl></section>}
     </div>}
-    {toast&&<Toast title={toast} tone={toast.endsWith("gespeichert.")?"success":"danger"}/>}
+    {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -1486,7 +1488,7 @@ export function SubscriptionSettingsPage() {
         <header><button type="button" onClick={()=>setBillingInvoice(null)}><Icon name="back"/>Schliessen</button><strong>Rechnungsvorschau</strong><button type="button" aria-label="Teilen" onClick={()=>{const text=`Binso One · Rechnung ${billingInvoice.date} · ${billingInvoice.amount}`;if(navigator.share)void navigator.share({title:"Binso One Rechnung",text}).catch(()=>undefined);else void navigator.clipboard?.writeText(text)}}><Icon name="upload"/></button></header>
         <div className="document-modal-body"><div className="paper"><div className="paper-brand"><img src="/brand/logo-black.svg" alt="Binso"/><span>RECHNUNG</span></div><div className="sender-line">Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell</div><div className="paper-meta"><div><b>Musterwerk AG</b><span>Demo-Firma</span></div><div><small>Datum</small><b>{billingInvoice.date}</b><small>Status</small><b>Bezahlt</b></div></div><div className="paper-intro"><b>Binso One</b><p>Business Abonnement · monatliche Nutzung</p></div><table><thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis</th><th>Total</th></tr></thead><tbody><tr><td>Binso One Business</td><td>1</td><td>49.00</td><td>49.00</td></tr></tbody></table><div className="paper-total"><strong>Total CHF <b>49.00</b></strong></div><footer>Binso GmbH · CHE-173.401.068 · www.binso.ch · +41 58 510 88 58</footer></div></div>
       </div>}
-      {toast&&<Toast title={toast}/>}
+      {toast&&<Toast title={toast} tone={toast.startsWith("Stripe Checkout abgeschlossen.")||toast==="Planwechsel abgebrochen."?"info":"danger"}/>}
     </AppShell>;
   }
 
@@ -1525,7 +1527,7 @@ export function SubscriptionSettingsPage() {
     <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Planwechsel, Zahlungsmittel und Kündigung werden über Stripe Billing ausgeführt.":"Ohne verbundenes Billing gibt es hier keine produktive Kündigungsaktion."}</p></div><Button variant="secondary" disabled={!billingConnected||billingLoading} onClick={()=>void openPortal()}>Abonnement verwalten</Button></div>
 
     {dialog==="plan"&&billingConfigured&&!billingConnected&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="bottom-sheet subscription-sheet" role="dialog" aria-modal="true"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Plan auswählen</h2><p>Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet.</p></div><button className="icon-button" onClick={()=>setDialog(null)} aria-label="Schliessen"><Icon name="close"/></button></header><div className="sheet-body"><Field label="Zahlungszeitraum"><select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly">Monatlich</option><option value="yearly">Jährlich</option></select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{price?.available?moneyChf(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div><label className="billing-legal-consent"><input type="checkbox" checked={acceptedPaidTerms} onChange={e=>setAcceptedPaidTerms(e.target.checked)}/><span>Ich bestätige den kostenpflichtigen Abschluss gemäss <Link href="/agb" target="_blank">AGB</Link> und habe <Link href="/datenschutz" target="_blank">Datenschutz</Link> sowie <Link href="/auftragsbearbeitung" target="_blank">Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label><p className="technical-hint">Das Abonnement wird erst durch den erfolgreichen Stripe-Checkout aktiviert. Laufzeit und Preis werden vor dem Abschluss nochmals angezeigt.</p></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!acceptedPaidTerms||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}>{billingLoading?"Checkout wird geöffnet…":"Kostenpflichtig zu Stripe"}</Button></div></section></div>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("nicht")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast.startsWith("Stripe Checkout abgeschlossen.")||toast==="Planwechsel abgebrochen."?"info":"danger"}/>}
   </AppShell>;
 }
 

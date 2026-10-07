@@ -363,7 +363,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('cancel')}><Icon name="close"/><span>Rechnung stornieren</span></button>}
       </div>{actionError&&<p role="alert">{actionError}</p>}</section></div>}
     {sendOpen&&<div className="sheet-layer"><section className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Dokument senden"><header className="sheet-header"><div><h2>{kind} als PDF senden</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setSendOpen(false)}/></header><Field label="Empfänger"><input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das Dokument wird als PDF versendet. Ein Entwurf wird danach ausgestellt und ist nicht mehr bearbeitbar.</p>{actionError&&<p role="alert">{actionError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></section></div>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")||toast.includes("Bitte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
