@@ -505,6 +505,7 @@
     gap:var(--desktop-action-gap);
   }
   .desktop-page-actions:empty{display:none}
+  .page-container:has(>.desktop-page-actions:not(:empty)) .mobile-sticky-save{display:none}
   .desktop-page-actions .button{
     min-height:var(--desktop-action-h);
     height:var(--desktop-action-h);
@@ -602,8 +603,8 @@
   .revenue-insight,
   .finance-analysis{
     width:100%;
-    margin-top:22px;
-    padding:24px 0;
+    margin-top:16px;
+    padding:16px 0;
     border-left:0;
     border-right:0;
     border-radius:0;

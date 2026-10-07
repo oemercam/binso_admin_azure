@@ -114,16 +114,17 @@ function formatSwissPhone(value:unknown){const raw=String(value??"").trim();cons
 function formatSwissUid(value:unknown){const raw=String(value??"").trim().toUpperCase();const digits=raw.replace(/\D/g,"");if(digits.length===9)return `CHE-${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}`;return raw;}
 
 function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Record<string,unknown>>;demo?:boolean;onMonthChange?:(month:number)=>void}) {
-  const [activeMonth,setActiveMonth]=useState(()=>new Date().getMonth());
+  const [activeMonth,setActiveMonth]=useState(()=>Number(businessDate().slice(5,7))-1);
   const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=[7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400], previous=[3600,5400,6200,9300,7700,8500,11900,10800,9400,13600,12600,16500];
-  if(!demo){current.fill(0);previous.fill(0);const now=new Date();for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===now.getFullYear()) current[date.getMonth()]+=amount;else if(date.getFullYear()===now.getFullYear()-1) previous[date.getMonth()]+=amount;}}
-  const total=current.reduce((a,b)=>a+b,0), previousTotal=previous.reduce((a,b)=>a+b,0), change=previousTotal?((total-previousTotal)/previousTotal*100):0, max=Math.max(1,...current,...previous);
-  const activeChange=previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
+  if(!demo){current.fill(0);previous.fill(0);const year=Number(businessDate().slice(0,4));for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===year) current[date.getMonth()]+=amount;else if(date.getFullYear()===year-1) previous[date.getMonth()]+=amount;}}
+  const currentMonth=Number(businessDate().slice(5,7))-1;
+  const total=current.reduce((a,b)=>a+b,0), comparableTotal=current.slice(0,currentMonth).reduce((a,b)=>a+b,0), previousTotal=previous.slice(0,currentMonth).reduce((a,b)=>a+b,0), change=previousTotal?((comparableTotal-previousTotal)/previousTotal*100):null, max=Math.max(1,...current,...previous);
+  const activeChange=activeMonth<currentMonth&&previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
   return <section className="surface revenue-insight">
-    <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div><p className="trend-positive">↗ {change.toFixed(1)} % <span>zum Vorjahr</span></p></div><span className="revenue-period">12 Monate</span></div>
-    <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
-    <div className="revenue-bars" aria-label="Umsatz der letzten zwölf Monate">
-      {current.map((value,index)=>{const delta=previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${value>0?Math.max(18,value/max*100):0}%`}}/><span>{months[index]}</span></button>})}
+    <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div>{change!==null&&<p className={change<0?"trend-negative":"trend-positive"}>{change<0?"↘":"↗"} {change.toFixed(1)} % <span>Jan–{months[currentMonth-1]} zum Vorjahr</span></p>}</div><span className="revenue-period">{businessDate().slice(0,4)}</span></div>
+    <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeMonth===currentMonth?"Laufender Monat":activeMonth>currentMonth?"Künftiger Monat":activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
+    <div className="revenue-bars" aria-label="Monatsumsatz im laufenden Jahr">
+      {current.map((value,index)=>{const delta=index<currentMonth&&previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-pressed={activeMonth===index} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${value>0?Math.max(18,value/max*100):0}%`}}/><span>{months[index]}</span></button>})}
     </div>
   </section>;
 }
@@ -368,25 +369,36 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [notes,setNotes]=useState("");
   const [customerStatus,setCustomerStatus]=useState("active");
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));}).catch(e=>setToast(e.message));},[customerId]);
+  const [loadingRecord,setLoadingRecord]=useState(!!customerId);
+  const [recordError,setRecordError]=useState<string|null>(null);
+  const [savingRecord,setSavingRecord]=useState(false);
+  const saveRecordPending=useRef(false);
+  const [editedRecord,setEditedRecord]=useState(false);
+  const [savedRecord,setSavedRecord]=useState(false);
+  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));}).catch(e=>setRecordError(e instanceof Error?e.message:"Kunde konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));},[customerId]);
   const save=async()=>{
+    if(saveRecordPending.current||loadingRecord||recordError)return;
     if(!company.trim() || !city.trim()){
       setToast("Firmenname und Ort sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    saveRecordPending.current=true;setSavingRecord(true);
     try{
       if(isProductionBackendEnabled()) await (customerId?apiPatch:apiPost)("/api/customers"+(customerId?"/"+encodeURIComponent(customerId):""),{name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus});
       else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
-      window.setTimeout(()=>router.push(customerId?"/kunden/"+encodeURIComponent(customerId):"/kunden"),700);
+      setSavedRecord(true);
+      window.setTimeout(()=>router.push(customerId?"/kunden/"+encodeURIComponent(customerId):returnTo),700);
     }catch(error){
+      saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref="/kunden" backLabel="Kunden" actions={<Button onClick={save}>Speichern</Button>}>
-    <div className="form-page">
+  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<p role="status">Kunde wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button requiresWrite disabled={savingRecord} onClick={save}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}>
+    <div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
       <section className="form-section clean">
         <h2>Grundangaben</h2>
         <div className="form-grid two">
@@ -398,9 +410,9 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
         </div>
       </section>
       <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><input inputMode="numeric" value={postalCode} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field><Field label="UID"><input value={uid} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field></div></details>
-      <div className="mobile-sticky-save"><Button onClick={save}>{customerId?"Änderungen speichern":"Kunde speichern"}</Button></div>
+      <div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={save}>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={company.trim()&&city.trim()?"success":"danger"}/>}
+    {toast&&<Toast title={toast} tone={toast==="Kunde gespeichert."?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -538,6 +550,12 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [description,setDescription]=useState("");
   const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
+  const [loadingRecord,setLoadingRecord]=useState(existing);
+  const [recordError,setRecordError]=useState<string|null>(null);
+  const [savingRecord,setSavingRecord]=useState(false);
+  const saveRecordPending=useRef(false);
+  const [editedRecord,setEditedRecord]=useState(false);
+  const [savedRecord,setSavedRecord]=useState(false);
 
   useEffect(()=>{
     if(!production||!existing||!productId) return;
@@ -553,13 +571,16 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
         setDescription(String(item.description??""));
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
       });
-    }).catch(()=>undefined);
+    }).catch(error=>setRecordError(error instanceof Error?error.message:"Produkt konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));
   },[production,existing,productId]);
 
   const save=async()=>{
+    if(saveRecordPending.current||loadingRecord||recordError)return;
     if(!name.trim()||!price.trim()){setToast("Name und Verkaufspreis sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
+    saveRecordPending.current=true;setSavingRecord(true);
     try{
       const numericPrice=Number(price.replace(",","."));
+      if(!Number.isFinite(numericPrice)||numericPrice<0)throw new Error("Bitte einen gültigen Verkaufspreis erfassen.");
       const payload={name:name.trim(),kind:type==="Produkt"?"product":"service",sku,unit,unitPrice:numericPrice,vatRate:Number(vatRate),description,status:status==="Inaktiv"?"inactive":"active"};
       if(production){
         if(existing&&productId) await apiPatch("/api/products/"+encodeURIComponent(productId),payload);
@@ -567,16 +588,19 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
       }else if(!existing){
         appendDemoRow("products",[name.trim(),type,"CHF "+numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Aktiv"]);
       }
+      setSavedRecord(true);
       setToast("Produkt gespeichert.");
       window.setTimeout(()=>router.push("/produkte"),700);
     }catch(error){
+      saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Produkt konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
     }
   };
 
-  return <AppShell title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:undefined}>
-    <div className={existing?"entity-detail-workspace":"form-page"}>
+  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<p role="status">Produkt wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         <div className="form-grid two">
@@ -591,9 +615,9 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
         </div>
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
-      <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast==="Produkt gespeichert."?"success":"danger"}/>}
   </AppShell>;
 }
 
@@ -620,6 +644,12 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [status,setStatus]=useState("Aktiv");
   const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
+  const [loadingRecord,setLoadingRecord]=useState(existing);
+  const [recordError,setRecordError]=useState<string|null>(null);
+  const [savingRecord,setSavingRecord]=useState(false);
+  const saveRecordPending=useRef(false);
+  const [editedRecord,setEditedRecord]=useState(false);
+  const [savedRecord,setSavedRecord]=useState(false);
 
   const [ledger,setLedger]=useState<{times:Array<{id:string;started_at:string;duration_minutes:number;project_name:string}>;expenses:Array<{id:string;merchant:string;amount:number;expense_date:string}>;files:Array<{id:string;fileName:string}>}>({times:[],expenses:[],files:[]});
   useEffect(()=>{
@@ -644,11 +674,13 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setAddress(String(item.address??""));
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
       });
-    }).catch(error=>setToast(error instanceof Error?error.message:"Mitarbeiter konnte nicht geladen werden."));
+    }).catch(error=>setRecordError(error instanceof Error?error.message:"Mitarbeiter konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));
   },[production,existing,employeeId]);
 
   const save=async()=>{
+    if(saveRecordPending.current||loadingRecord||recordError)return;
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
+    saveRecordPending.current=true;setSavingRecord(true);
     try{
       const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
       if(production){
@@ -657,16 +689,19 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       }else if(!existing){
         appendDemoRow("employees",[firstName.trim()+" "+lastName.trim(),role.trim(),load+"%",status]);
       }
+      setSavedRecord(true);
       setToast("Mitarbeiter gespeichert.");
       window.setTimeout(()=>router.push("/mitarbeiter"),700);
     }catch(error){
+      saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Mitarbeiter konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
     }
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  return <AppShell title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Speichern</Button>:undefined}>
+  if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" active="mitarbeiter" backHref="/mitarbeiter">{loadingRecord?<p role="status">Mitarbeiter wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>:undefined}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
@@ -676,7 +711,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       <button role="tab" aria-selected={employeeTab==="expenses"} className={employeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}>Spesen</button>
       <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
     </div>}
-    {(!existing||employeeTab==="overview")&&<div className="form-page">
+    {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
       <div className="form-grid two">
         <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -690,7 +725,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Adresse" className="full"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
       </div>
-      <div className="mobile-sticky-save"><Button requiresWrite onClick={()=>void save()}>Speichern</Button></div>
+      <div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>
     </div>}
     {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
@@ -698,7 +733,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{employeeTab!=="time"&&<Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link>}{employeeTab!=="expenses"&&<Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link>}</section></aside>}
     </div>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toast==="Mitarbeiter gespeichert."?"success":"danger"}/>}
   </AppShell>;
 }
 

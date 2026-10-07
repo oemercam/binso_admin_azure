@@ -1461,10 +1461,10 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .payment-summary-strip small{font-size:9px}
 
 /* Finance insight dashboard */
-.revenue-insight{padding:24px;margin-top:18px}
+.revenue-insight{padding:16px 0;margin-top:14px}
 .revenue-insight-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
-.revenue-insight-head h2{margin:4px 0 10px;font-size:22px;letter-spacing:-.02em}
-.revenue-total{font-size:34px;font-weight:760;letter-spacing:-.04em}
+.revenue-insight-head h2{margin:4px 0 6px;font-size:16px;letter-spacing:-.02em}
+.revenue-total{font-size:24px;font-weight:760;letter-spacing:-.04em}
 .revenue-period{border:1px solid var(--color-line);border-radius:12px;padding:9px 12px;font-size:12px;color:var(--color-muted)}
 .trend-positive,.trend-negative{margin:6px 0 0;font-size:13px;font-weight:700}.trend-positive{color:#16a34a}.trend-negative{color:#dc2626}.trend-positive span,.trend-negative span{color:var(--color-muted);font-weight:500}
 .revenue-chart{margin-top:24px}.revenue-chart svg{display:block;width:100%;height:220px;overflow:visible}
@@ -1498,7 +1498,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .settings-switch.is-on{background:#22c55e}.settings-switch.is-on>span{transform:translateX(18px)}
 .settings-switch:disabled{opacity:.45;cursor:not-allowed}
 
-.revenue-bars{height:178px;margin-top:20px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px}
+.revenue-bars{height:130px;margin-top:20px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px}
 .revenue-bars button{height:100%;min-width:0;padding:0;display:grid;grid-template-rows:1fr 18px;align-items:end;border:0;background:transparent;color:var(--color-muted);font-size:9px;cursor:pointer}
 .revenue-bars i{width:100%;min-height:12px;display:block;align-self:end;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--color-fg) 18%,transparent);transition:height .22s ease,background .18s ease}
 .revenue-bars button.active i,.revenue-bars button:hover i{background:var(--color-fg)}
@@ -1681,3 +1681,6 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
   .mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
 
 .document-mobile-price{display:none}
+
+.app-session-loading{min-height:48px;display:flex;align-items:center}
+.app-session-loading>span{width:28px;height:3px;background:var(--color-fg);border-radius:2px}

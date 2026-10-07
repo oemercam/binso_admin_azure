@@ -12,7 +12,9 @@ const demoMaxAge=60*60*24;
 
 export async function GET(){
   const store=await cookies();
-  return json({active:store.get(demoCookie)?.value==="1",mode:"demo"},200);
+  const marked=store.get(demoCookie)?.value==="1";
+  const active=marked&&(!env.databaseUrl||(await getSession())?.isDemo===true);
+  return json({active,mode:"demo"},200);
 }
 
 export async function POST(request:NextRequest){
