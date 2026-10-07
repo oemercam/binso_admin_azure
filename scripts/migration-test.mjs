@@ -140,6 +140,7 @@ try{
  const entitlementModule=dataModule((await fs.readFile('lib/subscription-plans.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)));
  const {provisionOrganization}=await import(dataModule(provisionSource.replace("'@/lib/subscription-plans'",JSON.stringify(entitlementModule))));
  const provisioned=await provisionOrganization({userId:'demo-provision-test',email:'demo-provision-test@example.invalid',name:'Demo Test',companyName:'Demo',plan:'business',mode:'demo'});
+ assert.equal((await db.query('select email from employees where organization_id=$1 order by external_id limit 1',[provisioned.organizationId])).rows[0].email,'demo-provision-test@example.invalid','Writable demo timers must resolve the seeded user employee');
  assert.equal((await db.query('select is_demo from organizations where id=$1',[provisioned.organizationId])).rows[0].is_demo,true);
  assert.ok((await db.query('select count(*)::int n from invoices where organization_id=$1',[provisioned.organizationId])).rows[0].n>20);
  // Exercise real provisioning for 50 independent production-style trial tenants.
