@@ -317,7 +317,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft");
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
-    ? <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/>{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
+    ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></div>;
   const desktopActions=headerActions;
 
@@ -343,7 +343,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
-    {moreOpen&&<div className="sheet-layer"><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><header className="sheet-header"><h2>Weitere Aktionen</h2><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">
+    {moreOpen&&<div className="sheet-layer"><section className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle" aria-hidden="true"/><header className="sheet-header"><h2>Weitere Aktionen</h2><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">
+      <button type="button" onClick={()=>{setMoreOpen(false);setPreview(true)}}><Icon name="file"/><span>Vorschau</span></button>
       <a href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"}><Icon name="file"/><span>PDF herunterladen</span></a>
       {canWrite&&!['cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}
       {canWrite&&draft.status==='draft'&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('issue')}><Icon name="check"/><span>{kind==='Rechnung'?'Rechnung stellen':'Als übergeben erfassen'}</span></button>}
@@ -359,7 +360,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const totals=useDocumentTotals(draft);
   const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
   return <div className="document-detail-view">
-    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><h2>{draft.customer}</h2>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</section>
+    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><div className="document-customer-heading"><h2>{draft.customer}</h2>{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</div>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}</section>
     <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{Number(draft.vatRate).toFixed(2)} %</b></div></section>
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2>Positionen</h2></div>
@@ -367,14 +368,14 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
         <div className="document-read-head" aria-hidden="true"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
           <b>{item.description}</b>
-          <span>{item.quantity}</span>
+          <span>{item.quantity} {item.unit??"Stück"}</span>
           <span>{draft.currency??"CHF"} {money(numberValue(item.price))}</span>
           <strong>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
         </div>)}
       </div>
       <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
     </section>
-    {type==="Rechnung"&&<section className="document-payment-facts" aria-label="Zahlungsstand"><span>Bezahlt <b>{draft.currency??"CHF"} {money(Number(draft.paidAmount??0))}</b></span><span>Offen <b>{draft.currency??"CHF"} {money(Math.max(0,totals.total-Number(draft.paidAmount??0)))}</b></span></section>}
+    {type==="Rechnung"&&draft.status!=="paid"&&<section className="document-payment-facts" aria-label="Zahlungsstand">{Number(draft.paidAmount??0)>0&&<span>Bezahlt <b>{draft.currency??"CHF"} {money(Number(draft.paidAmount??0))}</b></span>}<span>Offen <b>{draft.currency??"CHF"} {money(Math.max(0,totals.total-Number(draft.paidAmount??0)))}</b></span></section>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
 }
