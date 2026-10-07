@@ -3204,6 +3204,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   .document-more-sheet{height:auto;min-height:0;max-height:min(72dvh,620px)}
   .document-more-sheet>.sheet-header{position:static;top:auto;padding-top:0}
   .document-more-sheet>.sheet-menu{overflow-y:auto}
-  .mobile-header,.mobile-header *{filter:none!important;-webkit-filter:none!important;mix-blend-mode:normal!important}
-  .mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1!important}
+  .mobile-header,.mobile-header *{filter:none;-webkit-filter:none;mix-blend-mode:normal}
+  .mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
 }
