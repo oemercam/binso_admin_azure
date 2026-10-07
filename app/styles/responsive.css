@@ -1887,10 +1887,13 @@
   .timer-card{border-left:0;border-right:0;border-radius:0}
   .timer-card{padding-top:12px}
   .timer-project{max-width:none;margin:12px auto 0}
-  .timer-ring{width:164px;height:164px;margin:18px auto;border-width:8px}
-  .timer-ring strong{font-size:27px}
+  .timer-ring{width:148px;height:148px;margin:14px auto;border-width:7px}
+  .timer-ring strong{font-size:25px}
   .timer-ring span{max-width:118px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .timer-actions{justify-content:center;margin-bottom:14px}
   .timer-actions .button{min-height:44px;height:44px}
+  .time-overview-section{padding-bottom:18px;margin-bottom:24px}
+  .time-overview-section .full-button{margin-bottom:12px}
   .global-timer{
     left:max(var(--mobile-page-x),var(--safe-left));
     right:max(var(--mobile-page-x),var(--safe-right));
