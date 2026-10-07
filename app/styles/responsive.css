@@ -3196,4 +3196,14 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Reduced motion on desktop */
 @media (min-width:761px) and (prefers-reduced-motion:reduce){
 .bottom-sheet{animation:none}
+
+  /* Document detail: compact customer/status row, canonical actions sheet and crisp PWA chrome. */
+  .document-customer-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 4px}
+  .document-customer-heading h2{margin:0;min-width:0}
+  .document-customer-heading .status{flex:none}
+  .document-more-sheet{height:auto;min-height:0;max-height:min(72dvh,620px)}
+  .document-more-sheet>.sheet-header{position:static;top:auto;padding-top:0}
+  .document-more-sheet>.sheet-menu{overflow-y:auto}
+  .mobile-header,.mobile-header *{filter:none;-webkit-filter:none;mix-blend-mode:normal}
+  .mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
 }
