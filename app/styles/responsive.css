@@ -788,12 +788,6 @@
   .document-page-navigation button:disabled{opacity:.28}
 
 
-  .document-customer-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 4px}
-  .document-customer-heading h2{margin:0;min-width:0}
-  .document-customer-heading .status{flex:none}
-  .document-payment-facts{width:min(100%,330px);margin:0 0 0 auto;padding-top:10px;border-top:1px solid var(--color-line)}
-  .document-payment-facts>span{min-height:32px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--color-line);font-size:12px}
-  .document-payment-facts b{font-variant-numeric:tabular-nums}
   .document-detail-view{border-top:1px solid var(--color-line)}
   .document-detail-section{padding:24px 0;border-bottom:1px solid var(--color-line)}
   .document-facts{
