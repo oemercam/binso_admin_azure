@@ -1769,7 +1769,7 @@
   .document-read-lines b{font-size:12px}
   .document-read-lines small{margin-top:3px;color:var(--color-muted);font-size:10px}
   .document-read-lines strong{font-size:11px;white-space:nowrap}
-  .document-more-sheet .sheet-menu>button,.document-more-sheet .sheet-menu>a{width:100%;min-height:var(--mobile-sheet-row-h);padding:8px 0;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;gap:10px;align-items:center;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
+  .document-more-sheet .sheet-menu>button,.document-more-sheet .sheet-menu>a,.sheet-menu>button{width:100%;min-height:var(--mobile-sheet-row-h);padding:8px 0;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;gap:10px;align-items:center;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
   .invoice-form{border:0;border-radius:0;overflow:visible}
   .invoice-form .form-section{padding:18px 0}
   .invoice-form .form-section:first-child{padding-top:0}
@@ -1987,7 +1987,7 @@
   }
   .sheet-header h2{font-size:17px}
   .sheet-header p{font-size:10px}
-  .sheet-menu>a{
+  .sheet-menu>a,.sheet-menu>button{
     min-height:var(--mobile-sheet-row-h);
     padding:8px 0;
     grid-template-columns:32px minmax(0,1fr) 16px;
@@ -2362,11 +2362,11 @@
     padding-right:max(var(--mobile-page-x),var(--safe-right));
   }
 
-  .sheet-menu>a{
+  .sheet-menu>a,.sheet-menu>button{
     width:100%;
     min-width:0;
   }
-  .sheet-menu>a>div{min-width:0}
+  .sheet-menu>:is(a,button)>div{min-width:0}
   .sheet-menu :is(b,small){overflow-wrap:anywhere}
 
   .demo-onboarding{
