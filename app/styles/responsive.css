@@ -1024,7 +1024,7 @@
   .searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:9px}
   .searchbox.large{max-width:620px}
   .chips{min-width:0}
-  .chips button,.tabs button,.notification-center-tabs button{height:34px;min-height:34px}
+  .chips button,.tabs button,.tabs a,.notification-center-tabs button{height:34px;min-height:34px}
   .filter-button{height:36px;min-height:36px}
   .records-count{white-space:nowrap}
 
@@ -1615,7 +1615,7 @@
     padding-right:0;
     overflow-x:auto;
   }
-  .chips button,.tabs button{
+  .chips button,.tabs button,.tabs a{
     height:var(--mobile-chip-h);
     min-height:var(--mobile-chip-h);
     padding:0 10px;
@@ -1623,14 +1623,6 @@
     font-size:11px;
     line-height:1;
     display:inline-flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .tabs button.active,
-  .tabs a.active{
-    height:var(--mobile-chip-h);
-    min-height:var(--mobile-chip-h);
-    padding-block:0;
     align-items:center;
     justify-content:center;
   }

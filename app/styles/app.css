@@ -194,6 +194,10 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .tabs button,
 .tabs a,
 .notification-center-tabs button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:none;
   min-height:35px;
   height:35px;
   padding:0 11px;
@@ -202,6 +206,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   background:transparent;
   color:var(--color-fg);
   font-size:12px;
+  line-height:1;
   white-space:nowrap;
 }
 .chips button.active,
