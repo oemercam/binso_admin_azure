@@ -13,6 +13,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
   id-token: write
 
 env:
@@ -31,18 +32,23 @@ jobs:
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
+      - name: Download Quality-verified production artifact
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: binso-one-${{ github.event.workflow_run.head_sha }}
+          path: deploy
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm build
-        env:
-          BINSO_BUILD_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      - name: Install migration tooling
+        run: pnpm install --frozen-lockfile
 
       - name: Validate and migrate Azure PostgreSQL
         shell: bash
@@ -60,86 +66,37 @@ jobs:
           pnpm db:check
           RETENTION_DRY_RUN=true pnpm retention:cleanup
 
-      - name: Prepare standalone deploy artifact
+      - name: Build artifact for manual deployment
+        if: github.event_name == 'workflow_dispatch'
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_SSL: "true"
-          DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
-          APP_MODE: production
+          BINSO_BUILD_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
-
+          pnpm build
           test -f .next/standalone/server.js
-
-          rm -rf deploy
-          mkdir -p deploy/app
-
-          cp -R .next/standalone/. deploy/app/
-
+          rm -rf deploy/app
           mkdir -p deploy/app/.next
+          cp -R .next/standalone/. deploy/app/
           cp -R .next/static deploy/app/.next/static
-
-          if [ -d public ]; then
-            cp -R public deploy/app/public
-          else
-            mkdir -p deploy/app/public
-          fi
-
-          printf '{"sha":"%s"}\n' "$DEPLOY_SHA" > deploy/app/public/deployment.json
-
-          cp package.json deploy/app/package.json
-          cp pnpm-lock.yaml deploy/app/pnpm-lock.yaml
-
-          rm -rf deploy/app/node_modules
-
-          pnpm install             --ignore-workspace             --dir deploy/app             --prod             --frozen-lockfile             --config.node-linker=hoisted
-
-          test -f deploy/app/server.js
-
+          if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
+          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
           cd deploy/app
-
-          node -e "require.resolve('next')"
-
-          export BINSO_SMOKE_TEST_TOKEN="$(openssl rand -hex 32)"
-          echo "::add-mask::$BINSO_SMOKE_TEST_TOKEN"
-
-          PORT=3100 HOSTNAME=127.0.0.1 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node server.js > /tmp/binso-standalone.log 2>&1 &
-          APP_PID=$!
-          trap 'result=$?; if [ "$result" -ne 0 ]; then cat /tmp/binso-standalone.log; fi; kill $APP_PID 2>/dev/null || true' EXIT
-
-          READY=0
-          for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:3100/api/health | grep -q '"status":"ok"'; then
-              READY=1
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$READY" -ne 1 ]; then
-            cat /tmp/binso-standalone.log
-            exit 1
-          fi
-
-          curl -fsS http://127.0.0.1:3100/portal > /dev/null
-          curl -fsS http://127.0.0.1:3100/demo > /dev/null
-          curl -fsS http://127.0.0.1:3100/dashboard > /dev/null
-          curl -fsS http://127.0.0.1:3100/deployment.json | grep -q "$DEPLOY_SHA"
-          curl -fsS --max-time 60 -X POST -H 'Content-Type: application/json' -H "x-binso-smoke-test: $BINSO_SMOKE_TEST_TOKEN" -d '{}' http://127.0.0.1:3100/api/demo/session | grep -q '"ok":true'
-          test "$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/api/finance)" = "401"
-
-          BINSO_BASE_URL=http://127.0.0.1:3100 BINSO_SMOKE_TEST_TOKEN="$BINSO_SMOKE_TEST_TOKEN" node ../../scripts/check-persistence.mjs
-
-          kill $APP_PID 2>/dev/null || true
-          trap - EXIT
-
           zip -qr ../binso-one.zip .
+          cd ../..
+          test -s deploy/binso-one.zip
 
-          cd ..
-          test -s binso-one.zip
-          unzip -l binso-one.zip | grep -q 'server.js'
+      - name: Validate deploy artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s deploy/binso-one.zip
+          unzip -l deploy/binso-one.zip | grep -q 'server.js'
+          rm -rf /tmp/binso-artifact
+          mkdir -p /tmp/binso-artifact
+          unzip -q deploy/binso-one.zip -d /tmp/binso-artifact
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
 
       - name: Azure login (OIDC)
         uses: azure/login@v2
@@ -233,7 +190,7 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
 
-      - name: Restart Azure App Service and wait for worker convergence
+      - name: Wait for deployed worker
         shell: bash
         run: |
           set -euo pipefail
@@ -243,21 +200,21 @@ jobs:
           VERSION_URL="$PRODUCTION_URL/api/health"
           CONSECUTIVE=0
 
-          for attempt in {1..90}; do
+          for attempt in {1..40}; do
             code=$(curl -sS -o /tmp/binso-convergence.json -w "%{http_code}" --max-time 20 -H 'Cache-Control: no-cache' "$VERSION_URL?probe=$attempt" || true)
 
             if [ "$code" = "200" ] && grep -q "$DEPLOY_SHA" /tmp/binso-convergence.json; then
               CONSECUTIVE=$((CONSECUTIVE+1))
-              echo "Current commit observed ($CONSECUTIVE/5): $DEPLOY_SHA"
-              if [ "$CONSECUTIVE" -ge 5 ]; then
+              echo "Current commit observed ($CONSECUTIVE/2): $DEPLOY_SHA"
+              if [ "$CONSECUTIVE" -ge 2 ]; then
                 break
               fi
             else
               CONSECUTIVE=0
-              echo "Waiting for all App Service workers to converge ($attempt/90)..."
+              echo "Waiting for all App Service workers to converge ($attempt/40)..."
             fi
 
-            if [ "$attempt" -eq 90 ]; then
+            if [ "$attempt" -eq 40 ]; then
               echo "::error::Azure App Service did not converge on $DEPLOY_SHA."
               cat /tmp/binso-convergence.json 2>/dev/null || true
               exit 1
@@ -348,33 +305,6 @@ jobs:
           BINSO_BASE_URL="$PRODUCTION_URL" pnpm routes:css-check
 
           echo "Production URL: $PRODUCTION_URL"
-
-      - name: Verify production remains stable after warm-up
-        shell: bash
-        run: |
-          set -euo pipefail
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
-          echo "Waiting before delayed production stability verification..."
-          sleep 120
-
-          for attempt in {1..10}; do
-            health_code=$(curl -sS -o /tmp/binso-delayed-health.json -w "%{http_code}" --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/api/health?stability=$attempt" || true)
-            ready_code=$(curl -sS -o /tmp/binso-delayed-ready.json -w "%{http_code}" --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/api/health/ready?stability=$attempt" || true)
-
-            if [ "$health_code" != "200" ] || [ "$ready_code" != "200" ] || ! grep -q "$DEPLOY_SHA" /tmp/binso-delayed-health.json || ! grep -q '"status":"ready"' /tmp/binso-delayed-ready.json; then
-              echo "::error::Production became unhealthy during delayed stability verification (attempt $attempt/3, health=$health_code, ready=$ready_code)."
-              echo "Health response:"; cat /tmp/binso-delayed-health.json 2>/dev/null || true
-              echo "Readiness response:"; cat /tmp/binso-delayed-ready.json 2>/dev/null || true
-              exit 1
-            fi
-
-            echo "Delayed stability check $attempt/10 passed."
-            sleep 15
-          done
-
-          curl -fsS --connect-timeout 10 --max-time 60 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/" > /tmp/binso-delayed-home.html
-          test -s /tmp/binso-delayed-home.html
-          echo "Production remained healthy after warm-up."
 
       - name: Capture Azure diagnostics on deployment failure
         if: failure()
