@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {invalidateClientSession,readClientSession} from "./session-cache";
 
 export function isProductionBackendEnabled(){
   if(typeof window==="undefined") return false;
@@ -27,42 +28,50 @@ export function clearDemoClientSession(){
     "binso.demo.startedAt",
     "binso.demo.expiresAt",
   ].forEach(key=>window.localStorage.removeItem(key));
+  invalidateClientSession();
+  window.localStorage.setItem("binso.session.changed",String(Date.now()));
+  for(const key of Object.keys(window.sessionStorage)){if(key.startsWith("binso.list:"))window.sessionStorage.removeItem(key);}
 }
 
-export async function startDemoClientSession({
-  name="Demo",
-  company="Demo Firma",
-  focus="overview",
-}:{
-  name?:string;
-  company?:string;
-  focus?:string;
-}={}){
-  if(typeof window==="undefined") throw new Error("Demo-Sitzung kann nur im Browser gestartet werden.");
-
-  const now=Date.now();
-  window.localStorage.setItem("binso.demo.session","1");
-  window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
-  window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
-  window.localStorage.setItem("binso.demo.focus",focus);
-  window.localStorage.setItem("binso.demo.startedAt",String(now));
-  window.localStorage.setItem("binso.demo.expiresAt",String(now+24*60*60*1000));
-
-  const response=await fetch("/api/demo/session",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-  });
-  const payload=await response.json().catch(()=>({}));
-  if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");
-  else window.localStorage.removeItem("binso.demo.database");
-  if(!response.ok){
+let demoStart:Promise<void>|null=null;
+export function startDemoClientSession({name="Demo",company="Demo Firma",focus="overview"}:{name?:string;company?:string;focus?:string}={}):Promise<void>{
+  if(typeof window==="undefined")return Promise.reject(new Error("Demo-Sitzung kann nur im Browser gestartet werden."));
+  if(demoStart)return demoStart;
+  const request=(async()=>{
+    const response=await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
+    const payload=await parseResponse<{ok?:boolean;databaseBacked?:boolean;expiresIn?:number}>(response,"Demo-Sitzung konnte nicht gestartet werden.");
+    if(payload.ok!==true)throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
     clearDemoClientSession();
-    throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
-  }
+    const now=Date.now();
+    window.localStorage.setItem("binso.demo.session","1");
+    window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
+    window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
+    window.localStorage.setItem("binso.demo.focus",focus);
+    window.localStorage.setItem("binso.demo.startedAt",String(now));
+    window.localStorage.setItem("binso.demo.expiresAt",String(now+(payload.expiresIn??86400)*1000));
+    if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");
+  })();
+  demoStart=request;
+  void request.finally(()=>{if(demoStart===request)demoStart=null;}).catch(()=>{});
+  return request;
+}
+
+let logoutPending:Promise<void>|null=null;
+export function logoutClientSession():Promise<void>{
+  if(logoutPending)return logoutPending;
+  const request=(async()=>{
+    const payload=await apiPost<{ok?:boolean}>("/api/auth/logout",{});
+    if(payload.ok!==true)throw new Error("Abmelden konnte nicht bestätigt werden. Bitte erneut versuchen.");
+    clearDemoClientSession();
+  })();
+  logoutPending=request;
+  void request.finally(()=>{if(logoutPending===request)logoutPending=null;}).catch(()=>{});
+  return request;
 }
 
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   const payload=await response.json().catch(()=>({}));
+  if(response.status===401){invalidateClientSession();if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
   if(!response.ok){
     const message=typeof payload?.message==="string"?payload.message:fallback;
     throw new Error(message);
@@ -83,6 +92,7 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
 }
 
 export async function apiGet<T>(path:string):Promise<T>{
+  if(path==="/api/auth/session")return readClientSession() as Promise<T>;
   const response=await fetch(path,{method:"GET",cache:"no-store"});
   return parseResponse<T>(response,"Daten konnten nicht geladen werden.");
 }

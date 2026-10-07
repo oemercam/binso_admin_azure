@@ -12,7 +12,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ConfirmDialog from "./confirm-dialog";
 import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
-import { apiGet, apiPatch, apiPost, clearDemoClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import {cachedClientSession,invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 
 const desktopNav = [
@@ -65,6 +66,8 @@ function notificationTime(value:string){
   return date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
 }
 
+function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true}:null;}
+
 export function AppShell({
   title,
   subtitle,
@@ -93,9 +96,26 @@ export function AppShell({
   const pathname=usePathname();
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
-  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
+  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(()=>accessFromSession(cachedClientSession()));
+  const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
-  useEffect(()=>{if(pathname.startsWith('/preview/')){queueMicrotask(()=>setAccess({role:'owner',plan:'pro',readOnly:true}));return;}if(access)return;apiGet<{authenticated:boolean;tenant?:{role?:string;plan?:PlanId;readOnly?:boolean}}>('/api/auth/session').then(s=>{if(!s.authenticated)throw new Error('Bitte melde dich an.');setAccess({role:s.tenant?.role??'reader',plan:s.tenant?.plan??'pro',readOnly:s.tenant?.readOnly===true});}).catch(e=>setAccessError(e instanceof Error?e.message:'Zugang konnte nicht geprüft werden.'));},[pathname,access]);
+  useEffect(()=>{
+    if(pathname.startsWith('/preview/')){queueMicrotask(()=>{setAccess({role:'owner',plan:'pro',readOnly:true});setAccessError(null)});return;}
+    let active=true;let refreshRevision=0;
+    const refresh=()=>{const requestedRevision=++refreshRevision;return apiGet<ClientSession>('/api/auth/session').then(session=>{
+      if(!active||requestedRevision!==refreshRevision)return;
+      setAccess(accessFromSession(session));
+      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');
+    }).catch(error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}});};
+    const resume=(event:PageTransitionEvent)=>{if(event.persisted){invalidateClientSession();setAccess(null);void refresh();}};
+    const storage=(event:StorageEvent)=>{if(event.key==='binso.session.changed'){invalidateClientSession();void refresh();}};
+    void refresh();
+    window.addEventListener('focus',refresh);
+    window.addEventListener('binso-session-invalid',refresh);
+    window.addEventListener('storage',storage);window.addEventListener('pageshow',resume);
+    return()=>{active=false;window.removeEventListener('focus',refresh);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
+  },[pathname,accessRetry]);
+
   const canOpen=(href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));};
   const accessModule=moduleForPath(pathname);
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente'].includes(pathname)?'organization:write':'organization:read';
@@ -133,6 +153,10 @@ export function AppShell({
     document.addEventListener("click",navigate,true);
     return()=>{window.removeEventListener("beforeunload",beforeUnload);document.removeEventListener("click",navigate,true);};
   },[dirty,pathname]);
+  const [logoutBusy,setLogoutBusy]=useState(false);
+  const logoutBusyRef=useRef(false);
+  const [confirmLogout,setConfirmLogout]=useState(false);
+  const [logoutError,setLogoutError]=useState<string|null>(null);
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
   const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
   const production=useBackendMode();
@@ -332,16 +356,20 @@ export function AppShell({
     catch(error){setTimerNotice(error instanceof Error?error.message:"Zeiteintrag konnte nicht gespeichert werden.")}
   }
 
-  async function logout(){
-    clearDemoClientSession();
-    try{ await fetch("/api/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"}}); }
-    finally{ window.location.replace("/login"); }
+  async function logout(confirmed=false){
+    if(logoutBusyRef.current)return;
+    if(dirty&&!confirmed){setSheet(null);setConfirmLogout(true);return;}
+    logoutBusyRef.current=true;setLogoutBusy(true);setLogoutError(null);
+    try{await logoutClientSession();allowLeave.current=true;window.location.replace("/login");}
+    catch(error){setConfirmLogout(false);setLogoutError(error instanceof Error?error.message:"Abmelden ist fehlgeschlagen. Bitte erneut versuchen.");logoutBusyRef.current=false;setLogoutBusy(false);}
   }
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
   return <PageAccessContext.Provider value={{write:canWrite,canOpen}}><div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowLeave.current=true;const url=new URL(href);if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
+    {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span>{logoutError}</span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}>Erneut versuchen</button></div>}
     {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
@@ -403,7 +431,7 @@ export function AppShell({
           {visibleActions&&allowed&&<div className="page-actions mobile-page-actions">{visibleActions}</div>}
         </div>
         {visibleActions&&allowed&&<div className="desktop-page-actions" aria-label="Seitenaktionen">{visibleActions}</div>}
-        {!access&&!accessError?<p role="status">Zugang wird geprüft …</p>:accessError?<p role="alert">{accessError}</p>:allowed?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        {!access&&!accessError?<div className="app-session-loading" role="status" aria-label="Binso One wird geladen"><span/></div>:accessError?<div role="alert"><p>{accessError}</p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}>Erneut versuchen</Button><Link className="button button-secondary" href="/login">Anmelden</Link></div></div>:allowed?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
@@ -447,7 +475,7 @@ export function AppShell({
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button>
+              <button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button>
             </div>
           </>}
 
@@ -470,7 +498,7 @@ export function AppShell({
             </div>
             <div className="sheet-secondary">
               <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button>
+              <button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button>
             </div>
           </div>}
 
