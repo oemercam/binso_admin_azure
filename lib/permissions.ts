@@ -64,6 +64,7 @@ export const modulePermissionMap:Record<string,{read:TenantPermission;write:Tena
 
 export function permissionForModule(moduleKey:string,action:"read"|"write"){return modulePermissionMap[moduleKey]?.[action]}
 export function routePermission(pathname:string):TenantPermission|undefined{
+ if(pathname==="/finanzen"||pathname==="/belege")return "documents:read";
  if(pathname.startsWith("/einstellungen"))return "organization:read";
  const segment=pathname.split("/").filter(Boolean)[0]||"dashboard";
  if(segment==="dashboard")return "organization:read";

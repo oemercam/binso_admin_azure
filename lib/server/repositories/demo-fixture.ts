@@ -4,7 +4,7 @@ import type {PoolClient} from 'pg';
 import {ApiError} from '../http';
 export const demoTemplateId='00000000-0000-4000-8000-000000000099';
 // Fixed canonical tables, ordered by their foreign keys. No platform or authentication records are copied.
-const tables=['customers','employees','suppliers','products_services','projects','orders','contracts','quotes','quote_lines','invoices','invoice_lines','payments','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
+const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
 export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId:string){
  const target=await c.query('select is_demo from organizations where id=$1',[organizationId]);
  if(target.rows[0]?.is_demo!==true||organizationId===demoTemplateId)throw new ApiError(403,'demo_target_invalid','Ungültiger Demo-Mandant.');
@@ -32,10 +32,16 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
     else if(typeof value==='string'&&ids.has(value))row[key]=ids.get(value);
    }
    if(table==='support_cases')row.case_number=String(original.case_number)+'-'+organizationId;
-   if(table==='employees')row.email=(original===(source.get(table)??[])[0]?userId:String(row.id))+'@example.invalid';
+   if(table==='employees')row.email=String(original.name??'mitarbeiter').toLowerCase().replace(/[^a-z]+/g,'.')+'.'+organizationId.slice(0,8)+'@alpenblick-digital.ch';
    records.push(row);
   }
   if(records.length)await c.query(`insert into ${table}(${columns}) select ${columns} from jsonb_populate_recordset(null::${table},$1::jsonb) on conflict(id) do nothing`,[JSON.stringify(records)]);
+ }
+ for(const [table,foreign] of [['invoice_line_time_entries','time_entry_id'],['invoice_line_expenses','expense_id']] as const){
+  await c.query("select set_config('app.organization_id',$1,true)",[demoTemplateId]);
+  const links=(await c.query(`select invoice_line_id,${foreign} from ${table} where organization_id=$1`,[demoTemplateId])).rows;
+  await c.query("select set_config('app.organization_id',$1,true)",[organizationId]);
+  for(const link of links)await c.query(`insert into ${table}(organization_id,invoice_line_id,${foreign}) values($1,$2,$3) on conflict do nothing`,[organizationId,ids.get(link.invoice_line_id),ids.get(link[foreign])]);
  }
  await c.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',1) on conflict do nothing`,[organizationId]);
 }

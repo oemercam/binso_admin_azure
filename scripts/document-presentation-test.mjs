@@ -31,3 +31,22 @@ const offer=renderToStaticMarkup(React.createElement(exports.OfferPreview,{draft
 for(const value of ['Modern Workplace Erweiterung','Individuelle Angebotseinleitung','Individueller Angebotsabschluss','Seefeldstrasse 73','31.10.2026','Gesamtbetrag EUR'])assert.ok(offer.includes(value),value);
 assert.ok(!offer.includes('in CHF'));
 console.log('Invoice and offer markup: company texts, address, units, dates, currency, paid status and unmarked demo documents passed.');
+
+const financialJs=ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const financial=await import('data:text/javascript;base64,'+Buffer.from(financialJs).toString('base64'));
+const readNodes=new Set(['DocumentReadView','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate']);
+const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView};';
+const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const readExports={};
+Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels);
+const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
+assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1);
+const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');
+const openRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01'},directory}));assert.ok(openRead.includes('Offen'));assert.ok(openRead.includes('Fällig am'));assert.ok(openRead.includes('document-mobile-price'));assert.ok(openRead.includes('CHF 100.00 / Stunde'));
+assert.equal(financial.financialStatus({kind:'invoice',status:'sent',total:100,paid_amount:0,due_date:'2026-10-20'},'2026-10-07'),'open');
+assert.equal(financial.financialStatus({kind:'invoice',status:'partial',total:100,paid_amount:30,due_date:'2026-10-01'},'2026-10-07'),'overdue');
+assert.equal(financial.financialStatus({kind:'invoice',status:'sent',total:100,paid_amount:100,due_date:'2026-10-01'},'2026-10-07'),'paid');
+assert.equal(financial.financialStatus({kind:'invoice',status:'cancelled',total:100,paid_amount:0,due_date:'2026-10-01'},'2026-10-07'),'cancelled');
+assert.equal(financial.documentDateLabel({kind:'invoice',status:'sent',total:100,paid_amount:0,due_date:'2026-09-29'},'2026-10-07'),'8 Tage überfällig');
+assert.equal(financial.financialStatus({kind:'offer',status:'sent',valid_until:'2026-10-01'},'2026-10-07'),'expired');
+console.log('Operational document details: real paid date, no fabricated legacy date, derived open/overdue/partial/paid states, cancellation and mobile quantity/unit/unit-price/amount passed.');

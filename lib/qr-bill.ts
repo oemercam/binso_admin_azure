@@ -8,7 +8,7 @@ export function validSwissIban(value:unknown):boolean{
 }
 export function invoicePaymentIssue(company:Record<string,unknown>):string|null{
  const account=normalizeIban(company.qr_iban||company.iban);
- if(!account)return "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Belege erfassen.";
+ if(!account)return "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen.";
  if(!validSwissIban(account))return "Bitte eine gültige Schweizer oder Liechtensteiner IBAN für die QR-Rechnung erfassen.";
  if(!String(company.legal_name||company.name||"").trim()||!company.street||!company.postal_code||!company.city)return "Bitte die vollständige Firmenadresse unter Einstellungen → Firma erfassen.";
  for(const [value,max] of [[company.legal_name||company.name,70],[company.street,70],[company.building_number,16],[company.postal_code,16],[company.city,35]] as Array<[unknown,number]>){

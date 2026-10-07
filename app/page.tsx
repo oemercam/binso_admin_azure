@@ -8,7 +8,7 @@ const benefits=[
   ["users","Kunden","Kontakte und Historie sofort griffbereit."],
   ["receipt","Rechnungen","Erstellen, prüfen und Zahlungen verfolgen."],
   ["clock","Zeit","Arbeitszeit direkt dem richtigen Auftrag zuordnen."],
-  ["card","Spesen","Belege unterwegs erfassen und sauber weitergeben."],
+  ["card","Spesen","Quittungen unterwegs erfassen und sauber weitergeben."],
 ] as const;
 
 const workflow=[
@@ -93,7 +93,7 @@ export default function Home() {
           </div>
           <div className="feature-list">
             {[
-              ["Kunden","Kontakte, Notizen und Belege zentral.","/kunden"],
+              ["Kunden","Kontakte, Notizen und Finanzen zentral.","/kunden"],
               ["Angebote","Schnell erstellen und nachverfolgen.","/angebote"],
               ["Rechnungen","Saubere Vorschau und klare Status.","/rechnungen"],
               ["Zahlungen","Eingänge und offene Beträge im Blick.","/zahlungen"],
@@ -133,7 +133,7 @@ export default function Home() {
         <div className="mobile-callout-copy">
           <div><b>Start</b><span>Übersicht und Schnellzugriffe</span></div>
           <div><b>Kunden</b><span>Kontakte und Aktivitäten</span></div>
-          <div><b>Belege</b><span>Angebote, Rechnungen, Zahlungen</span></div>
+          <div><b>Finanzen</b><span>Angebote, Rechnungen, Zahlungen</span></div>
           <div><b>Zeit</b><span>Timer und Einträge</span></div>
           <div><b>Mehr</b><span>Produkte, Spesen, Team, Einstellungen</span></div>
         </div>

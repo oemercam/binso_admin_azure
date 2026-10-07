@@ -15,7 +15,7 @@ export async function GET(request:NextRequest){
       from time_entries t
       join customers c on c.id=t.customer_id and c.organization_id=t.organization_id
       left join projects p on p.id=t.project_id and p.organization_id=t.organization_id
-      where t.organization_id=$1 and t.billable=true and t.approved=true and t.invoiced_invoice_id is null
+      where t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null
         and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))
       order by c.name,project_name,t.work_date,t.created_at`,[s.organizationId,ids])).rows);
     return json({items});

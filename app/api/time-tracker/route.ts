@@ -28,7 +28,7 @@ export async function POST(request:NextRequest){
         if(!current)return {tracker:null};
         if(seconds<=0)throw new ApiError(400,"empty_tracker","Es läuft noch keine Zeitmessung.");
         const entry=await c.query(`insert into time_entries(organization_id,external_id,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,project_id,project_label,employee_id,customer_id)
-          values($1,$2,$3,'employee',current_date,$4,$5,$6,false,$7,$8,$9,(select id from employees where organization_id=$1 and lower(email)=lower($10) and archived_at is null limit 1),coalesce($11::uuid,(select customer_id from projects where id=$8 and organization_id=$1))) returning id,description,work_date,hours,created_at`,
+          values($1,$2,$3,'employee',current_date,$4,$5,$6,$6 and (select not time_approval_required from organizations where id=$1),$7,$8,$9,(select id from employees where organization_id=$1 and lower(email)=lower($10) and archived_at is null limit 1),coalesce($11::uuid,(select customer_id from projects where id=$8 and organization_id=$1))) returning id,description,work_date,hours,created_at`,
           [s.organizationId,randomUUID(),s.name,seconds/3600,current.project_label+" · "+current.activity_label,current.billable,s.userId,current.project_id,current.project_label,s.email,current.customer_id]);
         await c.query("delete from active_time_trackers where organization_id=$1 and user_id=$2",[s.organizationId,s.userId]);
         return {tracker:null,item:entry.rows[0]};

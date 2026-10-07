@@ -190,6 +190,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .tabs::-webkit-scrollbar{display:none}
 .chips button,
 .tabs button,
+.tabs a,
 .notification-center-tabs button{
   min-height:35px;
   height:35px;
@@ -203,6 +204,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 }
 .chips button.active,
 .tabs button.active,
+.tabs a.active,
 .notification-center-tabs button.active{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .filter-button{
   min-height:36px;
@@ -1668,3 +1670,5 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
   .document-more-sheet>.sheet-menu{overflow-y:auto}
   .mobile-header,.mobile-header *{filter:none;-webkit-filter:none;mix-blend-mode:normal}
   .mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
+
+.document-mobile-price{display:none}

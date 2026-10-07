@@ -411,17 +411,17 @@ export function AppShell({
       {!preview && !formActive && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>}
-        <button type="button" className={["angebote","rechnungen","zahlungen","belege"].includes(active)?"active":""} onClick={() => setSheet("docs")}><Icon name="receipt"/><span>Belege</span></button>
+        <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span>Finanzen</span></Link>
         {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>}
-        <button type="button" className={["produkte","spesen","finanzen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
+        <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
       </nav>}
 
       {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
-        <section ref={dialogRef} tabIndex={-1} className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
+        <section ref={dialogRef} tabIndex={-1} className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">
             <div>
-              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Belege" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}</h2>
+              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}</h2>
               {sheet === "docs" && <p>Dokumente und Zahlungen direkt öffnen.</p>}
               {sheet === "quick" && <p>Häufige Aufgaben ohne Umweg starten.</p>}
               {sheet === "account" && <p>Profil, Darstellung und Sitzung.</p>}
@@ -430,7 +430,7 @@ export function AppShell({
           </header>
 
           {sheet === "docs" && <div className="sheet-menu">
-            <SheetLink href="/belege" icon="receipt" title="Belegübersicht" text="Angebote, Rechnungen und Zahlungen zusammen" onSelect={() => setSheet(null)}/>
+            <SheetLink href="/finanzen" icon="receipt" title="Finanzübersicht" text="Angebote, Rechnungen und Zahlungen zusammen" onSelect={() => setSheet(null)}/>
             <SheetLink href="/angebote" icon="file" title="Angebote" text="Erstellen und nachverfolgen" onSelect={() => setSheet(null)}/>
             <SheetLink href="/rechnungen" icon="receipt" title="Rechnungen" text="Erstellen, senden und verwalten" onSelect={() => setSheet(null)}/>
             <SheetLink href="/zahlungen" icon="wallet" title="Zahlungen" text="Eingänge und offene Beträge" onSelect={() => setSheet(null)}/>
@@ -440,8 +440,8 @@ export function AppShell({
             <div className="sheet-menu">
               <SheetLink href="/produkte" icon="box" title="Produkte" text="Produkte und Dienstleistungen" onSelect={() => setSheet(null)}/>
               <SheetLink href="/mitarbeiter" icon="users" title="Mitarbeiter" text="Stammdaten und Arbeitsverhältnis" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/spesen" icon="card" title="Spesen" text="Belege und Freigaben" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/finanzen" icon="chart" title="Finanzen" text="Einnahmen, Kosten und Auswertungen" onSelect={() => setSheet(null)}/>
+              <SheetLink href="/spesen" icon="card" title="Spesen" text="Quittungen und Freigaben" onSelect={() => setSheet(null)}/>
+              <SheetLink href="/finanzen/analyse" icon="chart" title="Finanzanalyse" text="Einnahmen, Kosten und Auswertungen" onSelect={() => setSheet(null)}/>
               <SheetLink href="/support" icon="support" title="Support" text="Tickets und Hilfe" onSelect={() => setSheet(null)}/>
               <SheetLink href="/einstellungen" icon="settings" title="Einstellungen" text="Alle Einstellungen" onSelect={() => setSheet(null)}/>
             </div>

@@ -11,6 +11,7 @@ const dependencies={
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',
  '@/lib/permissions':'export const ownRecordOnly=()=>false;export const tenantCan=()=>true;',
+ '@/lib/financial-status':ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText,
  '@/lib/qr-bill':'export const invoicePaymentIssue=()=>null;',
 };
 for(const [specifier,stub] of Object.entries(dependencies))source=source.replace(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub)));

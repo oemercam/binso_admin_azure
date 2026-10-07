@@ -2398,7 +2398,7 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
 
   .app-main{
     min-height:100dvh;
-    padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 8px);
+    padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);
   }
   .mobile-header{
     width:100%;
@@ -2933,6 +2933,7 @@ input:not([type="checkbox"]):not([type="radio"]),
     text-align:left;
   }
   .document-read-row>span:nth-of-type(2){display:none}
+  .document-mobile-price{display:inline;font-size:inherit}
   .document-read-row>strong{
     grid-column:2;
     grid-row:1/3;

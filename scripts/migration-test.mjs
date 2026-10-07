@@ -51,7 +51,8 @@ try{
  const http=dataModule('export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}');
  const qrSource=(await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/shared/utils.js',import.meta.url).href));
  const qrModule=dataModule(qrSource);
- const businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','').replace('"../http"',JSON.stringify(http)).replace('"../audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule));
+ const financialModule=dataModule(await fs.readFile("lib/financial-status.ts","utf8"));
+ const businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','').replace('"../http"',JSON.stringify(http)).replace('"../audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule)).replace('"@/lib/financial-status"',JSON.stringify(financialModule));
  const {listApiBusiness,mutateApiBusiness}=await import(dataModule(businessSource));
  const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length}}};
  const session={organizationId:demo,userId:'demo-readonly',role:'owner'};
@@ -397,7 +398,7 @@ try{
  await changeDocumentStatus(client,session,timeDraft.number,'cancel','');
  assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[processTime])).rows[0].invoiced_invoice_id,null,'Cancellation releases time for a corrected invoice');
  // Actual PDF generator, including the full Swiss QR page.
- const pdfSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"pdfkit"',JSON.stringify(new URL('../node_modules/pdfkit/js/pdfkit.js',import.meta.url).href)).replace('"swissqrbill/pdf"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/pdf/index.js',import.meta.url).href)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule));
+ const pdfSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"pdfkit"',JSON.stringify(new URL('../node_modules/pdfkit/js/pdfkit.js',import.meta.url).href)).replace('"swissqrbill/pdf"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/pdf/index.js',import.meta.url).href)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule)).replace('"@/lib/financial-status"',JSON.stringify(financialModule));
  const pdfModule=dataModule(pdfSource);const {documentPdf}=await import(pdfModule);
  const generatedPdf=await documentPdf((await listApiBusiness(client,session,'documents','number=eq.'+pending.number))[0],company);
  assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 2'));
@@ -452,6 +453,64 @@ try{
  assert.equal((await invitationHandler.POST({body:{token:'flow-revoked-token',password:originalPassword}})).status,400);
  console.log('PDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.');
  console.log('Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.');
+
+ // Full business process and short paths use actual handlers against isolated PostgreSQL fixtures.
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/permissions':permissions})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const projectHandler=await loadProcessRoute('app/api/projects/route.ts');
+ globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
+ const projectCreated=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
+ assert.equal(projectCreated.status,201,JSON.stringify(projectCreated));
+ const projectReplay=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
+ assert.equal(projectCreated.data.item.id,projectReplay.data.item.id,'An offer starts exactly one project');
+ assert.equal((await projectHandler.POST({body:{name:'Wrong tenant',customerId:'10000000-0000-4000-8000-000000000002',sourceOffer:processQuote.number}})).status,409);
+ const timeCreated=await manualTimeHandler.POST({body:{projectId:projectCreated.data.item.id,description:'Migration and rollout',durationMinutes:750,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ assert.equal(timeCreated.status,201,JSON.stringify(timeCreated));assert.equal(timeCreated.data.item.customer_id,documentArgs.p_customer_id,'Project supplies customer without redundant selection');
+ const timeReview=await loadProcessRoute('app/api/time-entries/[id]/route.ts');
+ const submitted=await timeReview.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:timeCreated.data.item.id})});assert.equal(submitted.status,200,JSON.stringify(submitted));assert.ok(submitted.data.item.submitted_at);
+ assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,200);
+ const serviceArgs={...documentArgs,p_number:'PROCESS-TIME-INVOICE',p_items:[{description:'IT-Support September',quantity:12.5,unit:'Std.',unit_price:180,vat_rate:8.1,time_entry_ids:[timeCreated.data.item.id]},{description:'A long description for the rollout of adapters and workplace connectivity',quantity:2,unit:'Stück',unit_price:60,vat_rate:8.1}]};
+ const atomic=(operation,args)=>globalThis.__processTransaction(demo,c=>mutateApiBusiness(c,session,operation,args));
+ const timeInvoice=await atomic('create_document_atomic',serviceArgs);assert.equal(Number(timeInvoice.total),2561.97);
+ await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-TIME-DUP'}),e=>e.code==='time_entries_changed');
+ assert.equal((await db.query('select count(*)::int n from invoices where organization_id=$1 and invoice_no=$2',[demo,'PROCESS-TIME-DUP'])).rows[0].n,0,'Failed double billing rolls back the whole invoice');
+ const unusedTime=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})});
+ await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-INTRA-DUP',p_items:[{description:'One',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]},{description:'Two',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]}]}),e=>e.code==='duplicate_service');
+ assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[unusedTime.data.item.id])).rows[0].invoiced_invoice_id,null);
+ await changeDocumentStatus(client,session,timeInvoice.number,'issue','');
+ const paymentBase={p_invoice_id:timeInvoice.id,p_method:'bank',p_note:'Process payment'};
+ await assert.rejects(()=>atomic('create_payment_idempotent',{...paymentBase,p_paid_on:'2026-10-01',p_amount:2561.98,p_idempotency_key:'process-overpay'}),e=>e.code==='payment_exceeds_balance');
+ await atomic('create_payment_idempotent',{...paymentBase,p_paid_on:'2026-10-03',p_amount:1000,p_idempotency_key:'process-payment-1'});
+ let reloaded=(await listApiBusiness(client,session,'documents','id=eq.'+timeInvoice.id))[0];assert.equal(reloaded.payment_status,'partial');assert.equal(reloaded.paid_on,null);assert.equal((await import(financialModule)).openAmount(reloaded),1561.97);
+ await atomic('create_payment_idempotent',{...paymentBase,p_paid_on:'2026-10-01',p_amount:500,p_idempotency_key:'process-payment-2'});
+ const finalArgs={...paymentBase,p_paid_on:'2026-10-06',p_amount:1061.97,p_idempotency_key:'process-payment-3'};const finalPayment=await atomic('create_payment_idempotent',finalArgs);assert.equal((await atomic('create_payment_idempotent',finalArgs)).id,finalPayment.id);
+ reloaded=(await listApiBusiness(client,session,'documents','id=eq.'+timeInvoice.id))[0];assert.equal(reloaded.payment_status,'paid');assert.equal(reloaded.paid_on,'2026-10-06','Completion date comes from chronologically accumulated actual payments');
+ await assert.rejects(()=>atomic('create_payment_idempotent',{...finalArgs,p_idempotency_key:'process-paid-duplicate',p_amount:1}),e=>e.code==='payment_exceeds_balance');
+ assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,404,'Invoiced time is locked');
+ const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,200);
+ const immediate=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.data.item.approved,true);
+ const internalProcessTime=await manualTimeHandler.POST({body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
+ await policy.PATCH({body:{required:true}});
+ globalThis.__processSession={...globalThis.__processSession,role:'member'};assert.equal((await policy.PATCH({body:{required:false}})).status,403);assert.equal((await projectHandler.POST({body:{name:'Forbidden'}})).status,403);
+ globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
+ assert.equal((await listApiBusiness(client,session,'documents','number=eq.'+processQuote.number))[0].project_id,projectCreated.data.item.id);
+ assert.equal((await listApiBusiness(client,session,'documents','id=eq.'+converted.id))[0].source_offer,processQuote.number);
+
+ const summarySource=(await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions));
+ const {financialSummary}=await import(dataModule(summarySource));
+ const ownerSummary=await financialSummary(client,session,documentArgs.p_customer_id);assert.ok(ownerSummary.invoices.length);assert.ok(Number(ownerSummary.time.ready_hours)>=1);
+ const restrictedSummary=await financialSummary(client,{...session,role:'member'},documentArgs.p_customer_id);assert.equal(restrictedSummary.invoices.length,0);assert.equal(restrictedSummary.offers,null,'A shared workspace cannot expose restricted finance data');
+ const activity=await loadProcessRoute('app/api/customers/[id]/activity/route.ts');
+ const customerEvents=await activity.GET({}, {params:Promise.resolve({id:documentArgs.p_customer_id})});assert.equal(customerEvents.status,200,JSON.stringify(customerEvents));for(const title of ['Rechnung erstellt','Angebot angenommen','Zahlung erhalten','Projekt gestartet','Arbeitszeit erfasst'])assert.ok(customerEvents.data.items.some(item=>item.title===title),title);
+ const recordsSource=(await fs.readFile('lib/server/repositories/records.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/config/domain"',JSON.stringify(dataModule(await fs.readFile('config/domain.ts','utf8'))));
+ const records=await import(dataModule(recordsSource));
+ const externalTime=(await db.query('select external_id from time_entries where id=$1',[timeCreated.data.item.id])).rows[0].external_id;
+ await assert.rejects(()=>records.deleteRecord(demo,session.userId,externalTime),e=>e.code==='time_locked');
+  const externalInvoice=(await db.query('select external_id from invoices where id=$1',[timeInvoice.id])).rows[0].external_id;
+ await assert.rejects(()=>records.deleteRecord(demo,session.userId,externalInvoice),e=>e.code==='document_locked');
+ const externalPayment=(await db.query('select external_id from payments where id=$1',[finalPayment.id])).rows[0].external_id;
+ await assert.rejects(()=>records.deleteRecord(demo,session.userId,externalPayment),e=>e.code==='payment_locked');
+ console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
  delete globalThis.__processSession;delete globalThis.__processTransaction;delete globalThis.__processPlatform;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}
