@@ -42,12 +42,18 @@ jobs:
           rm -rf deploy
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
-          # pnpm uses symlinked package graphs. A plain copy of Next standalone
-          # can leave those links pointing outside the ZIP. Materialize the entire
-          # production dependency tree so the artifact is self-contained.
+          # Build a portable production dependency tree with pnpm itself.
+          # This preserves package relationships correctly instead of copying
+          # pnpm's symlinked development node_modules tree.
+          rm -rf deploy/runtime
+          pnpm deploy --prod --legacy deploy/runtime
           rm -rf deploy/app/node_modules
-          cp -RL node_modules deploy/app/node_modules
-          node -e "require('./deploy/app/node_modules/next/dist/server/next.js'); require('./deploy/app/node_modules/@next/env'); require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
+          mv deploy/runtime/node_modules deploy/app/node_modules
+          rm -rf deploy/runtime
+          (
+            cd deploy/app
+            node -e "require('next/dist/server/next.js'); require('@next/env'); require('@swc/helpers/_/_interop_require_default')"
+          )
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
