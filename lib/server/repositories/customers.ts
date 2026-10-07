@@ -5,7 +5,7 @@ import {audit} from "@/lib/server/audit";
 import {ApiError} from "@/lib/server/http";
 
 export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string};
-const columns=`id,name,contact_name as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
+const columns=`id,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
 export function customerInput(body:Record<string,unknown>,partial=false):Partial<CustomerInput>{
  const out:Partial<CustomerInput>={};
  for(const key of ['name','contact','email','phone','address','zipCity','postalCode','city','sector','uid','language','status','notes'] as const){

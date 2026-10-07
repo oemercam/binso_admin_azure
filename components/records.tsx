@@ -1,4 +1,5 @@
 "use client";
+import {matchesRecordChip} from "@/lib/list-filter";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -49,14 +50,13 @@ export function RecordsView({
   useEffect(()=>{const storedChips:string[]=JSON.parse(chipsKey);try{const saved=JSON.parse(window.sessionStorage.getItem("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle");setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)?saved.sortIndex:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>setRestored(true));},[chipsKey,placeholder]);
   useEffect(()=>{if(!restored)return;try{window.sessionStorage.setItem("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex}));}catch{}},[restored,query,activeChip,sort,sortIndex,placeholder]);
 
-  const normalizedChip=(value:string)=>value.toLowerCase().replace(/e?n$/, "");
 
   const visible=useMemo(()=>{
     const filtered=items.filter(item=>{
       const matchesQuery=!query.trim() || item.join(" ").toLowerCase().includes(query.trim().toLowerCase());
       const state=item.at(-1) ?? "";
       const type=item[typeIndex] ?? "";
-      const matchesChip=activeChip==="Alle" || state===activeChip || statusGroups[activeChip]?.includes(state) || !!type && normalizedChip(type)===normalizedChip(activeChip);
+      const matchesChip=matchesRecordChip(activeChip,state,type,statusGroups);
       return matchesQuery && matchesChip;
     });
 
