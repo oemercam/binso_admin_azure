@@ -41,14 +41,19 @@ jobs:
           rm -rf deploy
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
-          # pnpm's symlinked dependency layout can leave traced standalone links
-          # pointing outside the artifact. Materialize the traced node_modules so
-          # the ZIP is self-contained on Azure.
+          # Next standalone tracing with pnpm can omit a package that Next itself
+          # loads at runtime. Materialize traced modules and explicitly copy the
+          # runtime helper package plus its dependency so the ZIP is portable.
           if [ -d deploy/app/node_modules ]; then
             cp -RL deploy/app/node_modules /tmp/binso-standalone-node_modules
             rm -rf deploy/app/node_modules
             mv /tmp/binso-standalone-node_modules deploy/app/node_modules
           fi
+          mkdir -p deploy/app/node_modules/@swc
+          cp -RL node_modules/@swc/helpers deploy/app/node_modules/@swc/helpers
+          cp -RL node_modules/tslib deploy/app/node_modules/tslib
+          test -f deploy/app/node_modules/@swc/helpers/package.json
+          test -e deploy/app/node_modules/@swc/helpers/_/_interop_require_default.js
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
