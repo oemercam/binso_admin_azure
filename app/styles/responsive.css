@@ -1893,6 +1893,24 @@
   .timer-actions{justify-content:center;margin-bottom:14px}
   .timer-actions .button{min-height:44px;height:44px}
   .time-overview-section{padding-bottom:18px;margin-bottom:24px}
+  /* Keep the final business rows fully clear of the floating PWA navigation. */
+  .page-container{scroll-padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px)}
+  .page-container> :last-child{margin-bottom:24px}
+  .time-groups{gap:14px}
+  .time-group{padding-bottom:14px}
+  .time-group-head{margin-bottom:4px}
+  .time-entry-list>div{
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:4px 12px;
+    padding:10px 0;
+  }
+  .time-entry-list>div>span:first-child:empty,
+  .time-entry-list>div>input[type="checkbox"]{grid-column:1;grid-row:1/3}
+  .time-entry-list>div>span:nth-child(2){grid-column:1;min-width:0}
+  .time-entry-list>div>strong{grid-column:2;grid-row:1}
+  .time-entry-list>div>.status,
+  .time-entry-list>div>.text-action{grid-column:2;grid-row:2;justify-self:end}
+
   .time-overview-section .full-button{margin-bottom:12px}
   .global-timer{
     left:max(var(--mobile-page-x),var(--safe-left));
