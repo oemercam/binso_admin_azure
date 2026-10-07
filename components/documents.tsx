@@ -366,7 +366,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const statusLabel=({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
   const statusTone=draft.status==="paid"||draft.status==="accepted"?"success":draft.status==="overdue"||draft.status==="cancelled"||draft.status==="declined"||draft.status==="expired"?"danger":"neutral";
   return <div className="document-detail-view">
-    <section className="document-detail-section document-customer-section">
+    <section className="document-detail-section">
       <span className="eyebrow">KUNDE</span>
       <div className="document-customer-heading"><h2>{draft.customer}</h2>{draft.status&&<Status tone={statusTone}>{statusLabel}</Status>}</div>
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
