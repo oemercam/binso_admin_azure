@@ -29,6 +29,8 @@ try{
   }catch(e){await db.exec('rollback');throw new Error(file+': '+e.message)}
  }
  await db.exec('reset role');
+ const demoProfiles=(await db.query("select c.id,c.city,c.address,c.email,(select count(*)::int from customer_contacts cc where cc.organization_id=c.organization_id and cc.customer_id=c.id and cc.is_primary and cc.archived_at is null) primary_contacts from customers c where c.organization_id=$1 and c.external_id in ('demo-customer-acme','demo-customer-alpin','demo-customer-nova')",[demo])).rows;
+ assert.equal(demoProfiles.length,3);assert.ok(demoProfiles.every(c=>c.city&&c.address&&c.email&&!c.email.endsWith('example.invalid')&&c.primary_contacts===1),'Every canonical demo customer needs a plausible profile and one main contact');
  await db.exec(`create role tenant_probe; grant usage on schema public to tenant_probe; grant select,insert,update,delete on all tables in schema public to tenant_probe;`);
  await db.exec('set role tenant_probe');
  assert.equal((await db.query('select count(*)::int n from invoices')).rows[0].n,0);
