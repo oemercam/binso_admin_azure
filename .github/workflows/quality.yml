@@ -42,18 +42,12 @@ jobs:
           rm -rf deploy
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
-          # Next standalone tracing with pnpm can omit a package that Next itself
-          # loads at runtime. Materialize traced modules and explicitly copy the
-          # runtime helper package plus its dependency so the ZIP is portable.
-          if [ -d deploy/app/node_modules ]; then
-            cp -RL deploy/app/node_modules /tmp/binso-standalone-node_modules
-            rm -rf deploy/app/node_modules
-            mv /tmp/binso-standalone-node_modules deploy/app/node_modules
-          fi
-          mkdir -p deploy/app/node_modules/@swc
-          cp -RL node_modules/@swc/helpers deploy/app/node_modules/@swc/helpers
-          test -f deploy/app/node_modules/@swc/helpers/package.json
-          node -e "require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
+          # pnpm uses symlinked package graphs. A plain copy of Next standalone
+          # can leave those links pointing outside the ZIP. Materialize the entire
+          # production dependency tree so the artifact is self-contained.
+          rm -rf deploy/app/node_modules
+          cp -RL node_modules deploy/app/node_modules
+          node -e "require('./deploy/app/node_modules/next/dist/server/next.js'); require('./deploy/app/node_modules/@next/env'); require('./deploy/app/node_modules/@swc/helpers/_/_interop_require_default')"
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
