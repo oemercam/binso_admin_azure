@@ -78,6 +78,11 @@ jobs:
           rm -rf deploy/app
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
+          if [ -d deploy/app/node_modules ]; then
+            cp -RL deploy/app/node_modules /tmp/binso-standalone-node_modules
+            rm -rf deploy/app/node_modules
+            mv /tmp/binso-standalone-node_modules deploy/app/node_modules
+          fi
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
           printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
