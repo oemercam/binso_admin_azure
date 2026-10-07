@@ -138,16 +138,15 @@ assert.ok(layoutSource.includes('/brand/apple-touch-icon.png'),'Apple homescreen
 console.log('Apple and PWA installation icons use the Binso One artwork with One wordmark.');
 
 
-// Wide document workspace contract: one active content view | workflow actions.
+// Document detail contract: operational workspace; customer-facing rendering belongs to preview only.
 {
   const documents=read("components/documents.tsx");
-  const responsive=read("app/styles/responsive.css");
-  assert(documents.includes("document-workspace-page"),"Document detail must expose the central single-page preview.");
-  assert(documents.includes("document-page-navigation"),"Multi-page invoices must expose page navigation.");
-  assert(documents.includes("Seite {workspacePage+1} / 2"),"Invoice workspace must show the active page count.");
-  assert(documents.includes('detailTab===\"document\"&&<section'),"Preview must only mount when the document view is selected.");
-  assert(responsive.includes(".document-workspace-page.page-2 .document-pages>.paper:nth-child(2)"),"Document preview must render one selected page at a time.");
-  console.log("Invoices and offers use the canonical information, single-page preview and toolbox workspace.");
+  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory}/>"),"Document detail must expose the operational read view.");
+  assert(!documents.includes('detailTab===\\\"document\\\"'),"Invoice and offer detail pages must not embed a second document-shaped preview.");
+  assert(!documents.includes("document-inline-preview"),"The final customer document belongs exclusively to the preview action.");
+  assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");
+  assert(documents.includes("Angebotsvorschau")&&documents.includes("Rechnungsvorschau"),"Invoice and offer previews must remain dedicated preview surfaces.");
+  console.log("Invoice and offer details are operational workspaces; customer-document rendering exists only in preview.");
 }
 
 
