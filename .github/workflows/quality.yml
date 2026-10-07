@@ -1,3 +1,4 @@
+# Runner recovery trigger: 2026-10-07
 name: Quality
 on:
   push:
