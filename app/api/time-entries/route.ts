@@ -45,7 +45,7 @@ export async function POST(request:NextRequest){
       const approvalRequired=(await c.query("select time_approval_required from organizations where id=$1",[s.organizationId])).rows[0]?.time_approval_required!==false;
       const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate)
         values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,$14,$8,$13)
-        returning id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,
+        returning id,project_id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,
         [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,billable,salesRate,billable&&!approvalRequired]);
       const context=(await c.query("select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2",[result.rows[0].id,s.organizationId])).rows[0];
       return {...result.rows[0],...context};

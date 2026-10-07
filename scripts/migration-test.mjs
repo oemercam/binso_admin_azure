@@ -338,7 +338,7 @@ try{
  globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
  assert.equal((await contactRoute.PATCH({body:{firstName:'Anna Maria',lastName:'von Beispiel',isPrimary:true}},{params:Promise.resolve({id:documentArgs.p_customer_id,contactId:contactA.id})})).status,200);
  console.log('Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.');
- const processSource=(await fs.readFile('lib/server/document-process.ts','utf8')).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./audit"',JSON.stringify(audit));
+ const processSource=(await fs.readFile('lib/server/document-process.ts','utf8')).replace('"@/lib/financial-status"',JSON.stringify(financialModule)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./audit"',JSON.stringify(audit));
  const {changeDocumentStatus}=await import(dataModule(processSource));
  const processQuote=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'FLOW-QUOTE',p_valid_until:'2099-12-31'});
  await assert.rejects(()=>changeDocumentStatus(client,session,processQuote.number,'accept',''),e=>e.code==='transition_invalid');

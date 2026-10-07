@@ -4,5 +4,5 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 export default defineConfig([
   ...nextVitals,
   { rules: { "@next/next/no-img-element": "off" } },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([".next/**", "out/**", "build/**", "deploy/**", "next-env.d.ts"]),
 ]);
