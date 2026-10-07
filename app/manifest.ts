@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Business-Plattform für Schweizer KMU",
     lang: "de-CH",
     dir: "ltr",
-    start_url: "/dashboard?source=pwa",
+    start_url: "/?source=pwa",
     scope: "/",
     display: "standalone",
     orientation: "any",
