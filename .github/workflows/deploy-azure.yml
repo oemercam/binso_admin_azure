@@ -112,44 +112,95 @@ jobs:
         run: |
           set -euo pipefail
 
+          az_retry() {
+            local attempt delay
+            delay=3
+            for attempt in 1 2 3 4 5; do
+              if "$@"; then
+                return 0
+              fi
+              if [ "$attempt" -eq 5 ]; then
+                echo "::error::Azure CLI command failed after $attempt attempts." >&2
+                return 1
+              fi
+              echo "Azure API request failed (attempt $attempt/5); retrying in ${delay}s..." >&2
+              sleep "$delay"
+              delay=$((delay * 2))
+            done
+          }
+
+          # Read App Service settings once. Repeated list calls can trigger Azure
+          # management-plane throttling and unnecessarily slow every deployment.
+          SETTINGS_JSON="$(az_retry az webapp config appsettings list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            -o json)"
+
           get_setting() {
-            az webapp config appsettings list \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --name "$AZURE_WEBAPP_NAME" \
-              --query "[?name=='$1'].value | [0]" -o tsv
+            jq -r --arg name "$1" '.[] | select(.name == $name) | .value' <<<"$SETTINGS_JSON" | head -n 1
+          }
+
+          has_setting() {
+            jq -e --arg name "$1" '.[] | any(.name == $name)' <<<"$SETTINGS_JSON" > /dev/null
           }
 
           OLD_MAIL_PREFIX="RE""SEND"
           OLD_BACKEND_PREFIX="SUP""ABASE"
-          az webapp config appsettings delete \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$AZURE_WEBAPP_NAME" \
-            --setting-names \
-              "${OLD_MAIL_PREFIX}_API_KEY" \
-              "EMAIL_DELIVERY_MODE" \
-              "EMAIL_FROM" \
-              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL" \
-              "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY" \
-              "${OLD_BACKEND_PREFIX}_URL" \
-              "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY" \
-              "STRIPE_PRICE_STARTER" \
-              "STRIPE_PRICE_BUSINESS" \
-              "STRIPE_PRICE_PROFESSIONAL" \
-            > /dev/null 2>&1 || true
-          echo "Retired App Service settings cleaned."
+          RETIRED_SETTINGS=(
+            "${OLD_MAIL_PREFIX}_API_KEY"
+            "EMAIL_DELIVERY_MODE"
+            "EMAIL_FROM"
+            "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_URL"
+            "NEXT_PUBLIC_${OLD_BACKEND_PREFIX}_ANON_KEY"
+            "${OLD_BACKEND_PREFIX}_URL"
+            "${OLD_BACKEND_PREFIX}_SERVICE_ROLE_KEY"
+            "STRIPE_PRICE_STARTER"
+            "STRIPE_PRICE_BUSINESS"
+            "STRIPE_PRICE_PROFESSIONAL"
+          )
+          SETTINGS_TO_DELETE=()
+          for name in "${RETIRED_SETTINGS[@]}"; do
+            if has_setting "$name"; then SETTINGS_TO_DELETE+=("$name"); fi
+          done
+          if [ "${#SETTINGS_TO_DELETE[@]}" -gt 0 ]; then
+            az_retry az webapp config appsettings delete \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --setting-names "${SETTINGS_TO_DELETE[@]}" > /dev/null
+            echo "Retired App Service settings cleaned."
+          else
+            echo "No retired App Service settings found."
+          fi
 
           APP_ENCRYPTION_KEY="$(get_setting APP_ENCRYPTION_KEY)"
+          SETTINGS_TO_SET=()
           if [ -z "$APP_ENCRYPTION_KEY" ]; then
             APP_ENCRYPTION_KEY="$(openssl rand -base64 48 | tr -d '\n')"
             echo "::add-mask::$APP_ENCRYPTION_KEY"
-            az webapp config appsettings set \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --name "$AZURE_WEBAPP_NAME" \
-              --settings "APP_ENCRYPTION_KEY=$APP_ENCRYPTION_KEY" > /dev/null
-            echo "Created stable APP_ENCRYPTION_KEY."
+            SETTINGS_TO_SET+=("APP_ENCRYPTION_KEY=$APP_ENCRYPTION_KEY")
+            echo "Stable APP_ENCRYPTION_KEY will be created."
           else
             echo "::add-mask::$APP_ENCRYPTION_KEY"
             echo "APP_ENCRYPTION_KEY already configured."
+          fi
+
+          CURRENT_OPERATOR_TENANT="$(get_setting OPERATOR_ENTRA_TENANT_ID)"
+          CURRENT_OPERATOR_DOMAIN="$(get_setting OPERATOR_ALLOWED_DOMAIN)"
+          if [ "$CURRENT_OPERATOR_TENANT" != "$BINSO_ENTRA_TENANT_ID" ]; then
+            SETTINGS_TO_SET+=("OPERATOR_ENTRA_TENANT_ID=$BINSO_ENTRA_TENANT_ID")
+          fi
+          if [ "$CURRENT_OPERATOR_DOMAIN" != "binso.ch" ]; then
+            SETTINGS_TO_SET+=("OPERATOR_ALLOWED_DOMAIN=binso.ch")
+          fi
+
+          if [ "${#SETTINGS_TO_SET[@]}" -gt 0 ]; then
+            az_retry az webapp config appsettings set \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --settings "${SETTINGS_TO_SET[@]}" > /dev/null
+            echo "Required App Service settings updated in one request."
+          else
+            echo "Required App Service settings already current."
           fi
 
           GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
@@ -157,15 +208,8 @@ jobs:
           GRAPH_CLIENT_SECRET="$(get_setting GRAPH_CLIENT_SECRET)"
           GRAPH_SENDER_USER_ID="$(get_setting GRAPH_SENDER_USER_ID)"
 
-          az webapp config appsettings set \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$AZURE_WEBAPP_NAME" \
-            --settings \
-              "OPERATOR_ENTRA_TENANT_ID=$BINSO_ENTRA_TENANT_ID" \
-              "OPERATOR_ALLOWED_DOMAIN=binso.ch" > /dev/null
-
           for name in GRAPH_TENANT_ID GRAPH_CLIENT_ID GRAPH_CLIENT_SECRET GRAPH_SENDER_USER_ID; do
-            value="$(get_setting "$name")"
+            value="${!name}"
             if [ -z "$value" ]; then
               echo "::error::Microsoft Graph mail configuration is incomplete: $name is missing."
               exit 1
@@ -173,7 +217,7 @@ jobs:
             echo "::add-mask::$value"
           done
 
-          TOKEN_RESPONSE="$(curl -fsS --max-time 30 \
+          TOKEN_RESPONSE="$(curl -fsS --retry 3 --retry-delay 2 --retry-all-errors --max-time 30 \
             -X POST \
             -H 'Content-Type: application/x-www-form-urlencoded' \
             --data-urlencode "client_id=$GRAPH_CLIENT_ID" \
@@ -194,8 +238,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          az webapp restart --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME"
-
           DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
           VERSION_URL="$PRODUCTION_URL/api/health"
           CONSECUTIVE=0
@@ -318,5 +360,5 @@ jobs:
           az webapp config show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --query '{linuxFxVersion:linuxFxVersion,alwaysOn:alwaysOn,http20Enabled:http20Enabled,ftpsState:ftpsState}' -o json
           echo "::endgroup::"
           echo "::group::Recent App Service logs"
-          az webapp log tail --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --provider application --timeout 60 || true
+          timeout 60s az webapp log tail --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --provider application || true
           echo "::endgroup::"
