@@ -1552,6 +1552,16 @@
   .metric strong{margin-top:7px;font-size:19px}
   .dashboard-grid,
   .detail-grid{grid-template-columns:1fr;gap:var(--mobile-section-gap);margin-top:var(--mobile-section-gap)}
+  .dashboard-grid>.surface{
+    margin:0;
+    padding:18px 0;
+    border:0;
+  }
+  .dashboard-grid>.surface+.surface{
+    margin-top:0;
+    padding-top:18px;
+    border-top:1px solid var(--color-line);
+  }
   .surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .quick-section{margin-top:var(--mobile-section-gap)}
   .quick-section>.section-title{margin-bottom:12px}
