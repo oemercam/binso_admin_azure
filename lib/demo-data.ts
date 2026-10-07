@@ -47,7 +47,7 @@ export const expenses: string[][] = [
 export const payments: string[][] = [
   ["1","02.10.2026","Acme AG","RE-2026-019 · Banküberweisung","CHF 4’346.40","Verbucht"],
   ["2","30.09.2026","Müller GmbH","RE-2026-018 · Karte","CHF 1’200.00","Verbucht"],
-  ["3","28.09.2026","Schmid Consulting","RE-2026-015","CHF 1’745.00","Ausstehend"],
+  ["3","28.09.2026","Schmid Consulting","RE-2026-015 · Banküberweisung","CHF 875.00","Verbucht"],
 ];
 
 export const supportTickets: string[][] = [
