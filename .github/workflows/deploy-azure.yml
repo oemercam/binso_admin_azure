@@ -58,7 +58,7 @@ jobs:
           fi
           pnpm db:migrate
           pnpm db:check
-          pnpm retention:cleanup
+          RETENTION_DRY_RUN=true pnpm retention:cleanup
 
       - name: Prepare standalone deploy artifact
         env:
