@@ -7,7 +7,7 @@ import {loadTheme,saveTheme} from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {filterTimeEntries} from "@/lib/time-entry-filter";
-import { readTimer, changeTimer } from "@/lib/client/time-tracker";
+import { readTimer, changeTimer, withIdleTimerContext, type TimerState } from "@/lib/client/time-tracker";
 import ConfirmDialog from "./confirm-dialog";
 import {useDialogFocus} from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
@@ -875,6 +875,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [timerProject,setTimerProject]=useState("Interne Planung");
   const [timerProjectId,setTimerProjectId]=useState<string|null>(null);
   const [timerCustomer,setTimerCustomer]=useState("");
+  const timerContext=useRef<Pick<TimerState,"project"|"projectId"|"customerId">|null>(null);
   const [manualDate,setManualDate]=useState("");
   const [manualDuration,setManualDuration]=useState("01:00");
   const [manualCustomer,setManualCustomer]=useState(searchParams.get("customerId")??"");
@@ -884,7 +885,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null;status?:string;hours?:number;invoiced_hours?:number;invoice_numbers?:string[]}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){setTimerProject(selected.name);setTimerProjectId(selected.id);setTimerCustomer(selected.customer_id??"");setManualCustomer(selected.customer_id??"")}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams]);
+  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(async([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);setSeconds(state.seconds)}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams]);
   const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
   const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState(searchParams.get("invoice")??"");
@@ -892,7 +893,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const openBilling=async()=>{setBillingOpen(true);setBillingError(null);try{const data=await apiGet<{items:typeof billingDrafts}>('/api/documents?kind=invoice');setBillingDrafts(data.items.filter(i=>i.status==='draft'));}catch(e){setBillingError(e instanceof Error?e.message:'Rechnungsentwürfe konnten nicht geladen werden.')}};
 
   useEffect(()=>{
-    const sync=()=>{readTimer().then(state=>{setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
+    const sync=()=>{readTimer().then(saved=>{const state=withIdleTimerContext(saved,timerContext.current);setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
     const syncTimer=window.setInterval(sync,30000);
     window.addEventListener("focus",sync);
@@ -912,7 +913,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
 
   const billingDialog=useDialogFocus(billingOpen,()=>setBillingOpen(false));
   const setProject=async(project:string)=>{
-    try{const selected=availableProjects.find(item=>item.id===project);const customerId=selected?.customer_id??null;const state=await changeTimer("project",selected?.name??project,selected?.id??null,customerId);setTimerProjectId(selected?.id??null);setTimerCustomer(customerId??"");setTimerProject(state.project);setProjectOpen(false)}
+    try{const selected=availableProjects.find(item=>item.id===project);const customerId=selected?.customer_id??null;const state=await changeTimer("project",selected?.name??project,selected?.id??null,customerId);timerContext.current={project:state.project,projectId:state.projectId??null,customerId:state.customerId??null};setTimerProjectId(selected?.id??null);setTimerCustomer(customerId??"");setTimerProject(state.project);setProjectOpen(false)}
     catch(error){setToast(error instanceof Error?error.message:"Projekt konnte nicht gespeichert werden.")}
   };
   const toggleTimer=async()=>{
@@ -985,7 +986,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
       <section className="time-section timer-card">
         <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
         {timeTab==="timer"?<>
-          <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0||!!availableProjects.find(item=>item.id===timerProjectId)?.customer_id} value={timerCustomer} onChange={e=>{setTimerCustomer(e.target.value);setTimerProjectId(null);setTimerProject(e.target.value?"Arbeitszeit":"Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
+          <div className="timer-project"><small>Kunde</small><select disabled={running||seconds>0||!!availableProjects.find(item=>item.id===timerProjectId)?.customer_id} value={timerCustomer} onChange={e=>{timerContext.current={project:e.target.value?"Arbeitszeit":"Interne Planung",projectId:null,customerId:e.target.value||null};setTimerCustomer(e.target.value);setTimerProjectId(null);setTimerProject(e.target.value?"Arbeitszeit":"Interne Planung")}}><option value="">Intern</option>{availableCustomers.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><small>Auftrag / Projekt</small><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></div>
           <div className={`timer-ring ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button requiresWrite disabled={timeSaving} onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button><Button requiresWrite variant="secondary" icon="stop" onClick={()=>void stop()} disabled={timeSaving||!running&&seconds===0}>Stoppen</Button></div>
         </>:<>

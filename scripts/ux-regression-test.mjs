@@ -280,3 +280,14 @@ assert.equal(matchesRecordChip('Produkte','Aktiv','Produkt'),true);
 assert.equal(matchesRecordChip('Offen','Teilweise bezahlt','Rechnung',{Offen:['Teilweise bezahlt','Überfällig']}),true);
 assert.equal(matchesRecordChip('Bezahlt','Offen','Rechnung'),false);
 console.log('Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.');
+
+const timerSource=await fs.readFile('lib/client/time-tracker.ts','utf8');
+const timerAst=ts.createSourceFile('time-tracker.ts',timerSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+const contextFunction=timerAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='withIdleTimerContext').getText(timerAst);
+const {withIdleTimerContext}=await import(moduleUrl(ts.transpileModule(contextFunction,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+const projectContext={project:'Cloud Migration',projectId:'project-one',customerId:'customer-one'};
+const idleTimer={running:false,seconds:0,project:'Arbeitszeit',projectId:null,customerId:null};
+assert.deepEqual(withIdleTimerContext(idleTimer,projectContext),{...idleTimer,...projectContext});
+for(const active of [{...idleTimer,running:true,seconds:0},{...idleTimer,seconds:90}])assert.equal(withIdleTimerContext(active,projectContext),active,'An active or paused timer with recorded time must keep its actual context');
+assert.equal(withIdleTimerContext(idleTimer,null),idleTimer);
+console.log('Project-linked idle timer context survives synchronization without changing active or already recorded time.');
