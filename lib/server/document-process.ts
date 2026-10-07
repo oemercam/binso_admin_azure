@@ -1,3 +1,4 @@
+import {businessDate} from "@/lib/financial-status";
 import {requireModuleEntitlement} from "@/lib/server/plan-access";
 import "server-only";
 import type {PoolClient} from "pg";
@@ -18,7 +19,7 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
  let next:string;
  if(action==='issue'&&row.status==='draft'){const amount=kind==='invoice'?Number(row.total_amount):Number((await c.query('select coalesce(sum(quantity*unit_price),0) total from quote_lines where organization_id=$1 and quote_id=$2',[s.organizationId,row.id])).rows[0].total);if(amount<=0)throw new ApiError(409,'document_empty','Ein Dokument ohne positiven Betrag kann nicht ausgestellt werden.');next='sent';}
  else if(kind==='offer'&&['accept','decline'].includes(action)&&row.status==='sent'){
-  if(action==='accept'&&row.valid_until&&String(row.valid_until instanceof Date?row.valid_until.toISOString().slice(0,10):row.valid_until).slice(0,10)<new Date().toISOString().slice(0,10))throw new ApiError(409,'offer_expired','Das Angebot ist abgelaufen.');
+  if(action==='accept'&&row.valid_until&&String(row.valid_until instanceof Date?row.valid_until.toISOString().slice(0,10):row.valid_until).slice(0,10)<businessDate())throw new ApiError(409,'offer_expired','Das Angebot ist abgelaufen.');
   next=action==='accept'?'accepted':'declined';
  }else if(kind==='invoice'&&action==='cancel'&&['draft','sent','overdue'].includes(row.status)&&Number(row.paid_amount)===0)next='cancelled';
  else throw new ApiError(409,'transition_invalid','Dieser Statuswechsel ist nicht möglich.');

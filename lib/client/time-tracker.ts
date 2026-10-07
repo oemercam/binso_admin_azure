@@ -1,6 +1,7 @@
 "use client";
 import { apiGet, apiPost, isProductionBackendEnabled } from "./backend";
 export type TimerState={running:boolean;seconds:number;project:string;projectId?:string|null;customerId?:string|null};
+export function withIdleTimerContext(state:TimerState,context:Pick<TimerState,'project'|'projectId'|'customerId'>|null):TimerState{return !state.running&&state.seconds===0&&context?{...state,...context}:state;}
 type Tracker={state:string;seconds:number;project_label:string;project_id?:string|null;customer_id?:string|null};
 export async function readTimer():Promise<TimerState>{
   if(isProductionBackendEnabled()){

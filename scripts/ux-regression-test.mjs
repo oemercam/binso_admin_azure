@@ -1,6 +1,9 @@
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
+import {createRequire} from 'node:module';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const read=path=>requireReadCache.get(path)??'';
@@ -251,7 +254,10 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert.deepEqual(filterTimeEntries(rows,{query:'acme',from:'2026-10-06',to:'2026-10-06',status:'Zu prüfen'}),[rows[1]]);
  assert.deepEqual(filterTimeEntries(rows,{query:'',from:'',to:'',status:'Intern'}),[rows[2]]);
  assert.equal(filterTimeEntries(rows,{query:'missing',from:'',to:'',status:'Alle'}).length,0);
- console.log('Time query, inclusive period and approval filters passed.');
+ const scoped=[{...rows[0],project_id:'p1',customer_id:'c1'},{...rows[1],project_id:'p1',customer_id:'c1'},{...rows[2],project_id:'p2',customer_id:'c2'}];
+ assert.deepEqual(filterTimeEntries(scoped,{query:'',from:'2026-10-06',to:'2026-10-06',status:'Alle',projectId:'p1'}),[scoped[1]]);
+ assert.deepEqual(filterTimeEntries(scoped,{query:'',from:'',to:'',status:'Alle',customerId:'c2'}),[scoped[2]]);
+ console.log('Time query, today-only period, project/customer context and approval filters passed.');
 }
 
 
@@ -280,3 +286,36 @@ assert.equal(matchesRecordChip('Produkte','Aktiv','Produkt'),true);
 assert.equal(matchesRecordChip('Offen','Teilweise bezahlt','Rechnung',{Offen:['Teilweise bezahlt','Überfällig']}),true);
 assert.equal(matchesRecordChip('Bezahlt','Offen','Rechnung'),false);
 console.log('Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.');
+
+const timerSource=await fs.readFile('lib/client/time-tracker.ts','utf8');
+const timerAst=ts.createSourceFile('time-tracker.ts',timerSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+const contextFunction=timerAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='withIdleTimerContext').getText(timerAst);
+const {withIdleTimerContext}=await import(moduleUrl(ts.transpileModule(contextFunction,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+const projectContext={project:'Cloud Migration',projectId:'project-one',customerId:'customer-one'};
+const idleTimer={running:false,seconds:0,project:'Arbeitszeit',projectId:null,customerId:null};
+assert.deepEqual(withIdleTimerContext(idleTimer,projectContext),{...idleTimer,...projectContext});
+for(const active of [{...idleTimer,running:true,seconds:0},{...idleTimer,seconds:90}])assert.equal(withIdleTimerContext(active,projectContext),active,'An active or paused timer with recorded time must keep its actual context');
+assert.equal(withIdleTimerContext(idleTimer,null),idleTimer);
+console.log('Project-linked idle timer context survives synchronization without changing active or already recorded time.');
+
+// Exercise actual list rendering with status columns followed by metadata and hidden IDs.
+{
+ const {compareRecordValues}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/record-sort.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+ assert.ok(compareRecordValues('CHF 900.00',"CHF 1’200.00")<0);
+ assert.ok(compareRecordValues('31.12.2025','01.01.2026')<0);
+ assert.ok(compareRecordValues('2026-10-02','2026-10-12')<0);
+ assert.ok(compareRecordValues('RE-9','RE-10')<0);
+ const list=await fs.readFile('components/records.tsx','utf8');
+ const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n');
+ const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
+ const render=(chip='Alle',sort='default',sortIndex=1)=>{
+  let hook=0;const states=['',chip,sort,sortIndex,true];const exports={};
+  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues);
+  return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
+ };
+ const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
+ const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(sorted.includes('Betrag ↑'));assert.ok(sorted.includes('Betrag ↓'));
+ console.log('Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.');
+}

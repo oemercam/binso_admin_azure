@@ -512,8 +512,13 @@ export function AppShell({
   </div></PageAccessContext.Provider>;
 }
 
-function SheetLink({ href, icon, title, text, onSelect }: { href: string; icon: string; title: string; text: string; onSelect: () => void }) {
+export function SheetLink({ href, icon, title, text, onSelect }: { href: string; icon: string; title: string; text?: string; onSelect: () => void }) {
   const access=usePageAccess();
   if(!access.canOpen(href))return null;
-  return <Link href={href} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>;
+  return <Link href={href} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b>{title}</b>{text&&<small>{text}</small>}</div><Icon name="arrow" size={17}/></Link>;
+}
+
+export function SheetButton({icon,title,text,onSelect}:{icon:string;title:string;text?:string;onSelect:()=>void}){
+ const access=usePageAccess();
+ return <button type="button" disabled={!access.write} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b>{title}</b>{text&&<small>{text}</small>}</div><Icon name="arrow" size={17}/></button>;
 }
