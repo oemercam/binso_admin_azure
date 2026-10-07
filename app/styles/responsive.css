@@ -1876,6 +1876,13 @@
   .document-modal .qr-info{min-width:0;overflow-wrap:anywhere}
   .document-modal .qr-amount{grid-column:2;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:10px}
 
+  .time-filter-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .time-filter-toolbar .searchbox{grid-column:1/-1}
+  .time-filter-toolbar .form-field{width:100%;min-width:0}
+  .time-filter-toolbar .form-field input{width:100%;min-width:0}
+  .time-filter-toolbar-timer{display:none}
+  .time-project-create{margin-bottom:12px}
+  .time-layout>.timer-card>.tabs{margin-bottom:10px}
   .time-layout{display:block}
   .timer-card{border-left:0;border-right:0;border-radius:0}
   .timer-card{padding-top:12px}

@@ -362,7 +362,7 @@ jobs:
             ready_code=$(curl -sS -o /tmp/binso-delayed-ready.json -w "%{http_code}" --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$PRODUCTION_URL/api/health/ready?stability=$attempt" || true)
 
             if [ "$health_code" != "200" ] || [ "$ready_code" != "200" ] || ! grep -q "$DEPLOY_SHA" /tmp/binso-delayed-health.json || ! grep -q '"status":"ready"' /tmp/binso-delayed-ready.json; then
-              echo "::error::Production became unhealthy during delayed stability verification (attempt $attempt/10, health=$health_code, ready=$ready_code)."
+              echo "::error::Production became unhealthy during delayed stability verification (attempt $attempt/3, health=$health_code, ready=$ready_code)."
               echo "Health response:"; cat /tmp/binso-delayed-health.json 2>/dev/null || true
               echo "Readiness response:"; cat /tmp/binso-delayed-ready.json 2>/dev/null || true
               exit 1
