@@ -56,12 +56,13 @@ jobs:
           )
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
-          printf '{"sha":"%s"}\\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
+          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
           cd deploy/app
           zip -qr ../binso-one.zip .
           cd ../..
           test -s deploy/binso-one.zip
-          unzip -l deploy/binso-one.zip | grep -q 'server.js'
+          unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
+          grep -q 'server.js' /tmp/binso-zip-contents.txt
       - name: Smoke test exact production artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash

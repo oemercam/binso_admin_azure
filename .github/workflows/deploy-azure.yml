@@ -100,7 +100,8 @@ jobs:
         run: |
           set -euo pipefail
           test -s deploy/binso-one.zip
-          unzip -l deploy/binso-one.zip | grep -q 'server.js'
+          unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
+          grep -q 'server.js' /tmp/binso-zip-contents.txt
           rm -rf /tmp/binso-artifact
           mkdir -p /tmp/binso-artifact
           unzip -q deploy/binso-one.zip -d /tmp/binso-artifact
