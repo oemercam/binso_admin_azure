@@ -359,23 +359,45 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
   const totals=useDocumentTotals(draft);
   const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
+  const currency=draft.currency??"CHF";
+  const isInvoice=type==="Rechnung";
+  const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
+  const outstanding=Math.max(0,totals.total-Number(draft.paidAmount??0));
+  const statusLabel=({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
+  const statusTone=draft.status==="paid"||draft.status==="accepted"?"success":draft.status==="overdue"||draft.status==="cancelled"||draft.status==="declined"||draft.status==="expired"?"danger":"neutral";
   return <div className="document-detail-view">
-    <section className="document-detail-section"><span className="eyebrow">KUNDE</span><div className="document-customer-heading"><h2>{draft.customer}</h2>{draft.status&&<Status tone={draft.status==="paid"?"success":draft.status==="overdue"||draft.status==="cancelled"?"danger":"neutral"}>{({draft:"Entwurf",sent:type==="Angebot"?"Übergeben":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status]??draft.status}</Status>}</div>{[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}</section>
-    <section className="document-facts"><div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div><div><small>{type==="Angebot"?"Gültig bis":"Zahlungsfrist"}</small><b>{type==="Angebot"?isoToSwiss(draft.due):(draft.due?draft.due+" Tage":"Nicht hinterlegt")}</b></div><div><small>MwSt.</small><b>{Number(draft.vatRate).toFixed(2)} %</b></div></section>
+    <section className="document-detail-section">
+      <span className="eyebrow">KUNDE</span>
+      <div className="document-customer-heading"><h2>{draft.customer}</h2>{draft.status&&<Status tone={statusTone}>{statusLabel}</Status>}</div>
+      {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
+    </section>
+    <section className="document-facts">
+      <div><small>{type}datum</small><b>{isoToSwiss(draft.date)}</b></div>
+      {type==="Angebot"
+        ? <div><small>Gültig bis</small><b>{draft.due&&isoToSwiss(draft.due)}</b></div>
+        : <><div><small>Zahlungsfrist</small><b>{draft.due&&draft.due+" Tage"}</b></div>{dueDate&&<div><small>Fällig am</small><b>{dueDate}</b></div>}</>}
+    </section>
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2>Positionen</h2></div>
       <div className="document-read-table">
-        <div className="document-read-head" aria-hidden="true"><span>Beschreibung</span><span>Menge</span><span>Preis</span><span>Total</span></div>
+        <div className="document-read-head" aria-hidden="true"><span>Bezeichnung</span><span>Menge / Einheit</span><span>Einzelpreis</span><span>Betrag</span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
           <b>{item.description}</b>
           <span>{item.quantity} {item.unit??"Stück"}</span>
-          <span>{draft.currency??"CHF"} {money(numberValue(item.price))}</span>
-          <strong>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
+          <span>{currency} {money(numberValue(item.price))}</span>
+          <strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
         </div>)}
       </div>
-      <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+      <div className="invoice-totals">
+        <span>Zwischentotal <b>{currency} {money(totals.subtotal)}</b></span>
+        <span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{currency} {money(totals.vat)}</b></span>
+        <strong>Total <b>{currency} {money(totals.total)}</b></strong>
+      </div>
     </section>
-    {type==="Rechnung"&&draft.status!=="paid"&&<section className="document-payment-facts" aria-label="Zahlungsstand">{Number(draft.paidAmount??0)>0&&<span>Bezahlt <b>{draft.currency??"CHF"} {money(Number(draft.paidAmount??0))}</b></span>}<span>Offen <b>{draft.currency??"CHF"} {money(Math.max(0,totals.total-Number(draft.paidAmount??0)))}</b></span></section>}
+    {isInvoice&&draft.status!=="paid"&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand">
+      {Number(draft.paidAmount??0)>0&&<span>Bereits bezahlt <b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
+      <span>Offener Betrag <b>{currency} {money(outstanding)}</b></span>
+    </section>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
   </div>;
 }
