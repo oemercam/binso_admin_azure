@@ -1614,9 +1614,21 @@
   .chips button,.tabs button{
     height:var(--mobile-chip-h);
     min-height:var(--mobile-chip-h);
-    padding-inline:10px;
+    padding:0 10px;
     border-radius:8px;
     font-size:11px;
+    line-height:1;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .tabs button.active,
+  .tabs a.active{
+    height:var(--mobile-chip-h);
+    min-height:var(--mobile-chip-h);
+    padding-block:0;
+    align-items:center;
+    justify-content:center;
   }
   .records{margin-top:2px}
   .record{
