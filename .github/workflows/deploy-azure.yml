@@ -79,13 +79,13 @@ jobs:
           mkdir -p deploy/app/.next
           cp -R .next/standalone/. deploy/app/
           rm -rf deploy/runtime
-          pnpm deploy --prod --legacy deploy/runtime
+          pnpm --filter binso-one deploy --prod --legacy deploy/runtime
           rm -rf deploy/app/node_modules
           mv deploy/runtime/node_modules deploy/app/node_modules
           rm -rf deploy/runtime
           (
             cd deploy/app
-            node -e "require('next/dist/server/next.js'); require('@next/env'); require('@swc/helpers/_/_interop_require_default')"
+            node -e "require('next/dist/server/next.js'); require('node:module').createRequire(require.resolve('next/package.json'))('@next/env'); require('@swc/helpers/_/_interop_require_default')"
           )
           cp -R .next/static deploy/app/.next/static
           if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi

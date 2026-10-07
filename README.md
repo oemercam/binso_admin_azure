@@ -224,7 +224,7 @@ QA:
 
 ```powershell
 corepack enable
-corepack prepare pnpm@10.0.0 --activate
+corepack prepare pnpm@10.17.1 --activate
 pnpm install --frozen-lockfile
 pnpm repository:clean
 pnpm docs:check
