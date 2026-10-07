@@ -231,8 +231,6 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [actionBusy,setActionBusy]=useState(false),[actionError,setActionError]=useState<string|null>(null);
   const [sendKey,setSendKey]=useState("");
   useEffect(()=>{apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(s=>{setDocumentRole(s.tenant?.role??"");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch(()=>{});},[]);
-  const [workspacePage,setWorkspacePage]=useState(0);
-  const [detailTab,setDetailTab]=useState<"positions"|"document">("positions");
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const [dirty,setDirty]=useState(false);
@@ -331,26 +329,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {customersLoading?<p role="status">Kunden werden geladen …</p>:customersError?<p role="alert">{customersError}</p>:documentLoad.loading?<p role="status">Dokument wird geladen …</p>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
-            <div className="tabs" aria-label="Dokumentansicht">
-              <button type="button" className={detailTab==="positions"?"active":""} aria-pressed={detailTab==="positions"} onClick={()=>setDetailTab("positions")}>Übersicht</button>
-              <button type="button" className={detailTab==="document"?"active":""} aria-pressed={detailTab==="document"} onClick={()=>setDetailTab("document")}>Dokument</button>
-            </div>
-            {detailTab==="positions"&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}
-
-          {detailTab==="document"&&<section className="document-inline-preview" aria-label={kind+" Vorschau"}>
-            <div className="document-preview-heading">
-              <div><span className="compact-section-label">Vorschau</span><h2>{kind}</h2></div>
-              <button type="button" className="text-action" onClick={()=>setPreview(true)}>Vergrössern</button>
-            </div>
-            <div className={"document-workspace-page page-"+(workspacePage+1)}>
-              {kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}
-            </div>
-            {kind==="Rechnung"&&<nav className="document-page-navigation" aria-label="Rechnungsseiten">
-              <button type="button" aria-label="Vorherige Seite" disabled={workspacePage===0} onClick={()=>setWorkspacePage(0)}><Icon name="chevron-left" size={16}/></button>
-              <span>Seite {workspacePage+1} / 2</span>
-              <button type="button" aria-label="Nächste Seite" disabled={workspacePage===1} onClick={()=>setWorkspacePage(1)}><Icon name="chevron-right" size={16}/></button>
-            </nav>}
-          </section>}
+            <DocumentReadView type={kind} draft={draft} directory={directory}/>
           </div>
           {(kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"invoices:write")||canRecordPayment)&&<aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
