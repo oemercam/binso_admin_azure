@@ -35,12 +35,22 @@ jobs:
       - run: pnpm build
       - name: Install isolated browser test tooling
         run: |
-          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.56.1
-          node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps chromium
+          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps chromium webkit
       - name: Responsive UX browser regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser
+          BINSO_UX_CAPTURE_ALL: 1
+        run: node scripts/ux-browser-test.mjs
+      - name: Safari engine mobile and tablet regression
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: webkit
+          BINSO_UX_DEVICE: iPhone 13
+          BINSO_UX_WIDTHS: 375,430,820
+          BINSO_UX_ROUTES: /dashboard,/finanzen,/support/ticket-one,/rechnungen,/zeit,/mitarbeiter/neu,/mitarbeiter/employee-one,/projekte/neu,/rechnungen/RE-TEST-1,/kunden/neu,/produkte/neu,/spesen/neu,/angebote/neu,/zahlungen/neu
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser/webkit
         run: node scripts/ux-browser-test.mjs
       - name: Upload responsive UX evidence
         if: always()

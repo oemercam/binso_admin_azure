@@ -12,13 +12,14 @@ function PdfPage({pdf,pageNumber}: {pdf:PDFDocumentProxy;pageNumber:number}) {
     let active=true;
     let lastWidth=0;
     let renderTask:ReturnType<Awaited<ReturnType<PDFDocumentProxy['getPage']>>['render']>|undefined;
-    const observer=new ResizeObserver(()=>{
+    let frame=0;
+    const draw=()=>{
       const width=element.parentElement?.clientWidth??0;
       if(width<=0||width===lastWidth)return;
       lastWidth=width;
       renderTask?.cancel();
       void pdf.getPage(pageNumber).then(page=>{
-        if(!active)return;
+        if(!active||width!==lastWidth)return;
         const base=page.getViewport({scale:1});
         const viewport=page.getViewport({scale:width/base.width});
         const ratio=Math.min(window.devicePixelRatio||1,2);
@@ -29,9 +30,10 @@ function PdfPage({pdf,pageNumber}: {pdf:PDFDocumentProxy;pageNumber:number}) {
         renderTask=page.render({canvas:element,viewport,transform:ratio===1?undefined:[ratio,0,0,ratio,0,0]});
         return renderTask.promise;
       }).catch(reason=>{if(active&&reason?.name!=="RenderingCancelledException")setError("PDF-Seite konnte nicht angezeigt werden.")});
-    });
+    };
+    const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw)});
     observer.observe(element.parentElement??element);
-    return()=>{active=false;observer.disconnect();renderTask?.cancel()};
+    return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
   },[pdf,pageNumber]);
   return <section className="pdf-page" aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
 }

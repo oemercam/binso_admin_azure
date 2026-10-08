@@ -30,8 +30,8 @@ export function MetricTiles({ children }: { children: ReactNode }) {
   return <div className="metrics-grid bo-metric-tiles">{children}</div>;
 }
 
-export function MetricTile({ label, value }: { label: string; value: ReactNode }) {
-  return <Metric label={label} value={value}/>;
+export function MetricTile({ label, value, hint }: { label: string; value: ReactNode; hint?:string }) {
+  return <Metric label={label} value={value} hint={hint}/>;
 }
 
 export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {
@@ -53,13 +53,5 @@ export function ActionSheet({label,open,onClose,children,busy=false}: {label:str
 /** The same compact action sheet is used for entity editors on every viewport. */
 export function ActionsMenu({label, children, busy=false}: {label:string;children:ReactNode;busy?:boolean}) {
   const [open,setOpen]=useState(false);
-  const dialog=useDialogFocus(open,()=>{if(!busy)setOpen(false)});
-  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/>{open&&createPortal(
-    <div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)setOpen(false)}}>
-      <section ref={dialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={label}>
-        <div className="sheet-handle"/><header className="sheet-header"><h2>{label}</h2><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={()=>setOpen(false)}><Icon name="close"/></button></header>
-        <div className="sheet-menu" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setOpen(false)}}>{children}</div>
-      </section>
-    </div>,document.body
-  )}</>;
+  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>setOpen(false)}><div className="sheet-menu" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setOpen(false)}}>{children}</div></ActionSheet></>;
 }

@@ -1,5 +1,5 @@
 import type { Data } from "swissqrbill/types";
-import { isQRReferenceValid, isIBANValid, isQRIBAN } from "swissqrbill/utils";
+import { isQRReferenceValid, isSCORReferenceValid, isIBANValid, isQRIBAN } from "swissqrbill/utils";
 
 export function normalizeIban(value:unknown):string{return String(value??"").replace(/\s/g,"").toUpperCase();}
 export function validSwissIban(value:unknown):boolean{
@@ -17,17 +17,26 @@ export function invoicePaymentIssue(company:Record<string,unknown>):string|null{
  if(!/^[A-Z]{2}$/.test(String(company.country_code||"CH")))return "Bitte einen gültigen Ländercode in der Firmenadresse erfassen.";
  return null;
 }
-export function createQrBillData(company:Record<string,unknown>,document:{reference?:string;number:string;total:number;currency?:string}):Data{
+export function createQrBillData(company:Record<string,unknown>,document:{reference?:string;number:string;total:number;currency?:string;debtor?:Record<string,unknown>}):Data{
  const issue=invoicePaymentIssue(company);if(issue)throw new Error(issue);
  const account=normalizeIban(company.qr_iban||company.iban);
  let reference:string|undefined;
  if(isQRIBAN(account)){
   if(!document.reference||!isQRReferenceValid(document.reference))throw new Error("Die QR-Referenz ist erst nach dem Speichern der Rechnung verfügbar.");
   reference=document.reference;
+ }else if(document.reference?.replace(/\s/g,"").toUpperCase().startsWith("RF")){
+  reference=document.reference.replace(/\s/g,"").toUpperCase();if(!isSCORReferenceValid(reference))throw new Error("Die Zahlungsreferenz ist ungültig.");
  }
  if(!Number.isFinite(document.total)||document.total<=0||document.total>999999999.99)throw new Error("Für die QR-Rechnung ist ein gültiger positiver Betrag erforderlich.");
  if(document.currency&&!['CHF','EUR'].includes(document.currency))throw new Error("QR-Rechnungen unterstützen CHF und EUR.");
- return {creditor:{account,name:String(company.legal_name||company.name),address:String(company.street),buildingNumber:String(company.building_number||""),zip:String(company.postal_code),city:String(company.city),country:String(company.country_code||"CH")},amount:Math.round(document.total*100)/100,currency:document.currency==='EUR'?'EUR':'CHF',message:document.number,reference};
+ const person=document.debtor;
+ const rawCountry=String(person?.country_code||person?.country||"CH").trim();
+ const countryAliases:Record<string,string>={schweiz:"CH",suisse:"CH",switzerland:"CH",liechtenstein:"LI",deutschland:"DE",germany:"DE","österreich":"AT",austria:"AT",frankreich:"FR",france:"FR",italien:"IT",italy:"IT"};
+ const debtorCountry=countryAliases[rawCountry.toLowerCase()]||rawCountry.toUpperCase();
+ if(person?.name&&(person.street||person.address)&&(person.postal_code||person.zip)&&person.city&&!/^[A-Z]{2}$/.test(debtorCountry))throw new Error("Bitte den Ländercode der Kundenadresse prüfen.");
+ const street=String(person?.street||person?.address||""),parts=!person?.building_number?street.match(/^(.*\S)\s+(\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?)$/):null;
+ const debtor=person&&person.name&&(person.street||person.address)&&(person.postal_code||person.zip)&&person.city?{name:String(person.name),address:parts?.[1]||street,buildingNumber:String(person.building_number||parts?.[2]||""),zip:String(person.postal_code||person.zip),city:String(person.city),country:debtorCountry}:undefined;
+ return {debtor,creditor:{account,name:String(company.legal_name||company.name),address:String(company.street),buildingNumber:String(company.building_number||""),zip:String(company.postal_code),city:String(company.city),country:String(company.country_code||"CH")},amount:Math.round(document.total*100)/100,currency:document.currency==='EUR'?'EUR':'CHF',message:document.number,reference};
 }
 
 /** swissqrbill uses mm coordinates without a viewBox. Preserve the full

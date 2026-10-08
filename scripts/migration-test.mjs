@@ -92,6 +92,7 @@ try{
  const october=analytics.analyticsInvoices.find(row=>new Date(row.issue_date).toISOString().startsWith('2026-10'));
  assert.ok(october&&Number(october.invoice_count)>=1&&Number(october.customer_count)>=1);
  assert.ok(analytics.analyticsPayments.length>12);
+ assert.equal(analytics.customerCount,Number((await db.query('select count(*) count from customers where organization_id=$1 and archived_at is null',[demo])).rows[0].count),'Dashboard counts all current customers, independently of month invoices');
  const fixtureSource=(await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http));
  const {seedDatabaseDemo}=await import(dataModule(fixtureSource));
  const sandbox='00000000-0000-4000-8000-000000000098';
@@ -108,6 +109,10 @@ try{
  const clonedCustomer=(await listApiBusiness(client,clonedSession,'customers',''))[0];
  assert.notEqual(clonedCustomer.id,'10000000-0000-4000-8000-000000000001');
  const {translateBusinessWrite}=await import(dataModule(businessSource));
+ const employeeWrite=translateBusinessWrite('employees',{first_name:'Test',last_name:'Person',email:'employee-qa@example.invalid',start_date:'2026-10-08',weekly_hours:37.5,workload_percent:80,vacation_days:25},true);
+ assert.equal(employeeWrite.data.start_date,'2026-10-08','Employee entry date survives API-to-storage translation');
+ assert.equal(translateBusinessWrite('employees',{email:'employee-qa@example.invalid',entry_date:'2026-10-01'},false).data.start_date,'2026-10-01');
+ assert.equal(translateBusinessWrite('employees',{email:'employee-qa@example.invalid',start_date:null,entry_date:'2026-10-01'},false).data.start_date,null,'An intentional cleared date does not resurrect a stale alias');
  const expenseWrite=translateBusinessWrite('expenses',{merchant:'Test Hotel',category:'Reise',expense_date:'2026-10-04',amount:123.45,currency:'CHF',vat_rate:8.1,description:'Test expense',status:'submitted'},true);
  const fields={...expenseWrite.data,organization_id:sandbox};const keys=Object.keys(fields);
  const persistedExpense=await client.query(`insert into expenses(${keys.join(',')}) values(${keys.map((_,i)=>'$'+(i+1)).join(',')}) returning id`,Object.values(fields));
@@ -289,6 +294,12 @@ try{
  assert.equal((await timer.GET()).tracker,null);
  const internal=await timer.POST({body:{action:'start',project:'Internal work',customerId:null,projectId:null}});assert.equal(internal.tracker.billable,false);
  const invalid=await timer.POST({body:{action:'project',project:'Invalid',customerId:'00000000-0000-4000-8000-000000000001',projectId:null}});assert.equal(invalid.error,'customer_invalid');
+ await db.query("update active_time_trackers set state='paused', accumulated_seconds=1,active_since=null where organization_id=$1 and user_id=$2",[timerSession.organizationId,timerSession.userId]);
+ const shortFinished=await timer.POST({body:{action:'finish'}});
+ assert.ok(shortFinished.item.id,'A one-second timer must create a valid entry');
+ assert.ok(Math.abs(Number(shortFinished.item.hours)*3600-1)<0.002,'Timer seconds must survive database persistence');
+ assert.equal((await timer.GET()).tracker,null);
+ assert.deepEqual(await timer.POST({body:{action:'finish'}}),{tracker:null},'Repeated stop must not duplicate an entry');
  delete globalThis.__timerSession;delete globalThis.__timerTenant;
  console.log('Timer customer-only start/reload/pause/finish, context lock and internal work passed.');
 
@@ -338,7 +349,7 @@ try{
  globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
  assert.equal((await contactRoute.PATCH({body:{firstName:'Anna Maria',lastName:'von Beispiel',isPrimary:true}},{params:Promise.resolve({id:documentArgs.p_customer_id,contactId:contactA.id})})).status,200);
  console.log('Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.');
- const processSource=(await fs.readFile('lib/server/document-process.ts','utf8')).replace('"@/lib/financial-status"',JSON.stringify(financialModule)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./audit"',JSON.stringify(audit));
+ const processSource=(await fs.readFile('lib/server/document-process.ts','utf8')).replace('"@/lib/qr-bill"',JSON.stringify(qrModule)).replace('"@/lib/financial-status"',JSON.stringify(financialModule)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./audit"',JSON.stringify(audit));
  const {changeDocumentStatus}=await import(dataModule(processSource));
  const processQuote=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'FLOW-QUOTE',p_valid_until:'2099-12-31'});
  await assert.rejects(()=>changeDocumentStatus(client,session,processQuote.number,'accept',''),e=>e.code==='transition_invalid');
@@ -364,6 +375,18 @@ try{
  const databaseSource=(await fs.readFile('lib/server/database.ts','utf8')).replace('import "server-only";','').replace('"./repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"./plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"./audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./session"',JSON.stringify(processSession)).replace('"./db"',JSON.stringify(processDb)).replace('"./repositories/operator-api"',JSON.stringify(dataModule('export function listOperatorBusiness(){}export function insertOperatorBusiness(){}export function updateOperatorBusiness(){}'))).replace('"./operator/audit"',JSON.stringify(dataModule('export function platformAudit(){}'))).replace('"./operator/session"',JSON.stringify(dataModule('export function requireOperatorSession(){}')));
  function businessUrlForProcess(){return dataModule(businessSource)}
  const databaseProcess=await import(dataModule(databaseSource));
+ const employeeValidation=dataModule(await fs.readFile('lib/employee-validation.ts','utf8'));
+ const employeeRouteSource=(await fs.readFile('app/api/employees/route.ts','utf8')).replace('"@/lib/employee-validation"',JSON.stringify(employeeValidation)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/database"',JSON.stringify(dataModule(databaseSource)));
+ const employeeRoute=await import(dataModule(employeeRouteSource));
+ const employeeBody={firstName:'Regression',lastName:'Employee',email:'regression-employee@example.invalid',jobTitle:'ICT',workloadPercent:80,weeklyHours:37.5,vacationDays:25,entryDate:'2026-10-08'};
+ assert.equal((await employeeRoute.POST({body:{...employeeBody,email:'bad-email'}})).status,400);
+ assert.equal((await employeeRoute.POST({body:{...employeeBody,entryDate:'2026-02-30'}})).status,400);
+ const createdEmployee=await employeeRoute.POST({body:employeeBody});assert.equal(createdEmployee.status,201);
+ assert.equal(String((await db.query('select start_date::text from employees where id=$1',[createdEmployee.data.item.id])).rows[0].start_date),'2026-10-08');
+ const employeeEditSource=(await fs.readFile('app/api/employees/[id]/route.ts','utf8')).replace('"@/lib/employee-validation"',JSON.stringify(employeeValidation)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/database"',JSON.stringify(dataModule(databaseSource)));
+ const employeeEdit=await import(dataModule(employeeEditSource));
+ assert.equal((await employeeEdit.PATCH({body:{...employeeBody,weeklyHours:38}},{params:Promise.resolve({id:createdEmployee.data.item.id})})).status,200);
+ assert.equal(String((await db.query('select start_date::text from employees where id=$1',[createdEmployee.data.item.id])).rows[0].start_date),'2026-10-08','Editing hours must not clear the employee entry date');
  const expenseBody={employee_id:null,customer_id:documentArgs.p_customer_id,billable:true,merchant:'Fixture meal',expense_date:'2026-10-06',category:'Verpflegung',amount:42,currency:'CHF',vat_rate:8.1,status:'submitted'};
  const expenseId=(await databaseProcess.tenantInsert('expenses',expenseBody))[0].id;
  const repeatedExpense=(await databaseProcess.tenantInsert('expenses',expenseBody,'expense-process-retry'))[0].id;
@@ -403,9 +426,21 @@ try{
  // Actual PDF generator, including the full Swiss QR page.
  const pdfSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"pdfkit"',JSON.stringify(new URL('../node_modules/pdfkit/js/pdfkit.js',import.meta.url).href)).replace('"swissqrbill/pdf"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/pdf/index.js',import.meta.url).href)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule)).replace('"@/lib/financial-status"',JSON.stringify(financialModule));
  const pdfModule=dataModule(pdfSource);const {documentPdf}=await import(pdfModule);
- const generatedPdf=await documentPdf((await listApiBusiness(client,session,'documents','number=eq.'+pending.number))[0],company);
- assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 2'));
+ const pdfInvoice=(await listApiBusiness(client,session,'documents','number=eq.'+pending.number))[0];
+ const draftPdf=await documentPdf(pdfInvoice,company);
+ const generatedPdf=await documentPdf({...pdfInvoice,status:'sent'},company);
+ assert.ok(draftPdf.length<generatedPdf.length,'Draft PDF never exposes a payable QR code');
+ if(process.env.BINSO_PDF_QA_DIR){await fs.mkdir(process.env.BINSO_PDF_QA_DIR,{recursive:true});for(const [name,doc] of [['invoice',{...pdfInvoice,status:'sent'}],['partial',{...pdfInvoice,status:'partial',paid_amount:100}],['draft',pdfInvoice],['long',{...pdfInvoice,status:'sent',items:Array.from({length:75},(_,i)=>({...pdfInvoice.items[0],description:'Position '+(i+1)+' – professionelle Beratung und Implementation'}))}],['oversized',{...pdfInvoice,status:'sent',items:[{...pdfInvoice.items[0],description:'Lange Beschreibung mit vollständigem Inhalt. '.repeat(300)+'ENDMARKER'}]}]])await fs.writeFile(process.env.BINSO_PDF_QA_DIR+'/'+name+'.pdf',await documentPdf(doc,company));}
+ assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 1'),'Compact invoice and QR slip share one A4 page');
  const cancelledPdf=await documentPdf((await listApiBusiness(client,session,'documents','number=eq.'+timeDraft.number))[0],company);assert.ok(cancelledPdf.length<generatedPdf.length,'Cancelled document has no payable QR code');
+ const previewSource=(await fs.readFile('app/api/documents/preview/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule));
+ const previewRoute=await import(dataModule(previewSource));
+ const previewBody={kind:'Rechnung',customerId:documentArgs.p_customer_id,number:'PREVIEW',date:'2026-10-08',due:'30',currency:'CHF',positions:[{description:'Draft preview',quantity:2,price:100,vatRate:8.1}]};
+ const beforePreview=Number((await db.query('select count(*) n from invoices where organization_id=$1',[demo])).rows[0].n);
+ const previewResponse=await previewRoute.POST({body:previewBody});assert.equal(previewResponse.status,200);assert.equal(Buffer.from(await previewResponse.arrayBuffer()).subarray(0,4).toString(),'%PDF');
+ assert.equal(Number((await db.query('select count(*) n from invoices where organization_id=$1',[demo])).rows[0].n),beforePreview,'Preview does not persist or finalize an invoice');
+ assert.equal((await previewRoute.POST({body:{...previewBody,customerId:clonedCustomer.id}})).status,404,'Preview cannot read another tenant customer');
+ assert.equal((await previewRoute.POST({body:{...previewBody,positions:[{quantity:-1,price:100}]}})).status,400);
  globalThis.__sendCount=0;globalThis.__sendFail=false;
  const mailFixture=dataModule(`export const mailLayout=(title,body)=>title+body;export async function sendMail(mail){globalThis.__sendCount++;if(!mail.attachments[0].content.subarray(0,4).toString().includes('%PDF'))throw Error('Missing PDF');if(globalThis.__sendFail)throw Error('Fixture provider failure');return {delivered:true}}`);
  const sendSource=(await fs.readFile('app/api/documents/[number]/send/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/document-process"',JSON.stringify(dataModule(processSource))).replace('"@/lib/server/repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule)).replace('"@/lib/server/email"',JSON.stringify(mailFixture)).replace('"@/lib/server/audit"',JSON.stringify(audit));
@@ -413,14 +448,18 @@ try{
  const sendInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-SEND'});
  const sendRequest={body:{recipient:'fixture@example.invalid',requestKey:'send-success'}};
  globalThis.__processSession={...session,isDemo:false};
+ assert.equal((await sender.POST(sendRequest,{params:Promise.resolve({number:sendInvoice.number})})).status,409,'Draft sends are blocked before any mail or delivery record');
+ assert.equal(globalThis.__sendCount,0);
+ await changeDocumentStatus(client,session,sendInvoice.number,'issue','');
  assert.equal((await sender.POST(sendRequest,{params:Promise.resolve({number:sendInvoice.number})})).status,200);
  assert.equal((await sender.POST(sendRequest,{params:Promise.resolve({number:sendInvoice.number})})).status,200);
  assert.equal(globalThis.__sendCount,1,'Identical send requests deliver once');
  assert.equal((await db.query('select status from invoices where id=$1',[sendInvoice.id])).rows[0].status,'sent');
  const failedInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-SEND-FAIL'});globalThis.__sendFail=true;
+ await changeDocumentStatus(client,session,failedInvoice.number,'issue','');
  const failedRequest={body:{recipient:'fixture@example.invalid',requestKey:'send-failure'}};
  assert.equal((await sender.POST(failedRequest,{params:Promise.resolve({number:failedInvoice.number})})).status,502);
- assert.equal((await db.query('select status from invoices where id=$1',[failedInvoice.id])).rows[0].status,'draft');
+ assert.equal((await db.query('select status from invoices where id=$1',[failedInvoice.id])).rows[0].status,'sent');
  assert.equal((await sender.POST(failedRequest,{params:Promise.resolve({number:failedInvoice.number})})).status,409);
  assert.equal(globalThis.__sendCount,2,'Unconfirmed sends do not retry automatically');
  globalThis.__processSession={...session,isDemo:true};

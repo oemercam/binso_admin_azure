@@ -20,3 +20,12 @@ export function buildFinanceMonths(data:FinancePeriodData,bounds:PeriodBounds,ma
   }).reverse();
   return {items,truncated:count>maxMonths};
 }
+
+/** Calendar periods in the application's business date; end is exclusive. */
+export function financeWindow(range:string,from:string,to:string,today:string):PeriodBounds {
+ const now=new Date(today+'T12:00:00');
+ if(range==='custom'){const end=new Date(to+'T00:00:00');end.setDate(end.getDate()+1);return {start:new Date(from+'T00:00:00'),end}};
+ const end=['last','three','six'].includes(range)?new Date(now.getFullYear(),now.getMonth(),1):range==='year'?new Date(now.getFullYear()+1,0,1):new Date(now.getFullYear(),now.getMonth()+1,1);
+ const start=range==='year'?new Date(now.getFullYear(),0,1):new Date(end.getFullYear(),end.getMonth()-({month:1,last:1,three:3,six:6}[range]??3),1);
+ return {start,end};
+}
