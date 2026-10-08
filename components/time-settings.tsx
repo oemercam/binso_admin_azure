@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useRef,useState} from 'react';
 import {AppShell} from './app-shell';
-import { Button, Field, Toast, Input, FormActions } from "./ui";
+import { Button, Field, Input, FormActions } from "./ui";
 import {apiGet,apiPatch} from '@/lib/client/backend';
 export function TimeSettingsPage(){
  const [required,setRequired]=useState(true),[initial,setInitial]=useState(true),[allowed,setAllowed]=useState(false),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState<string|null>(null),[saved,setSaved]=useState(false);
@@ -13,8 +13,8 @@ export function TimeSettingsPage(){
    {loading?<p role="status">Einstellung wird geladen …</p>:<Field label="Freigabe erforderlich"><Input type="checkbox" checked={required} disabled={!allowed||saving} onChange={e=>{setRequired(e.target.checked);setSaved(false)}}/></Field>}
    {!loading&&!allowed&&!error&&<p>Nur Inhaber und Administratoren können diese Einstellung ändern.</p>}
    {error&&<p role="alert">{error}</p>}
+   {saved&&<p role="status">Zeiterfassungseinstellung gespeichert.</p>}
   </section>
   {allowed&&<FormActions ><Button requiresWrite disabled={loading||saving||required===initial} onClick={()=>void save()}>{saving?'Wird gespeichert…':'Speichern'}</Button></FormActions>}
-  {saved&&<Toast title="Zeiterfassungseinstellung gespeichert."/>}
  </AppShell>
 }
