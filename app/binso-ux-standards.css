@@ -1,0 +1,19 @@
+/* Binso One shared page/detail UI primitives. */
+.bo-page-heading,.bo-detail-heading{display:grid;gap:6px;min-width:0}
+.bo-page-heading-main,.bo-detail-heading-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;overflow-wrap:anywhere}
+.bo-page-heading p,.bo-detail-heading p{margin:0;color:var(--muted, #71717a);font-size:.875rem}
+.bo-detail-heading-main .status{flex-shrink:0}
+.bo-create-action{width:44px;height:44px;flex:0 0 44px;border:0;border-radius:50%;background:#000;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.bo-create-action:disabled{opacity:.45;cursor:not-allowed}
+.bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.bo-metric-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bo-metric-tile{background:var(--surface-secondary, #f4f4f5);border:0;box-shadow:none;border-radius:12px;padding:12px;min-width:0;display:grid;gap:5px}
+.bo-metric-tile span{font-size:.75rem;color:var(--muted,#71717a)}
+.bo-metric-tile strong{font-size:clamp(1rem,2.5vw,1.3rem);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.bo-metric-tiles>.bo-metric-tile:nth-child(3):last-child{grid-column:1/-1}
+.bo-list-search{display:flex;align-items:center;gap:10px;width:100%;min-width:0;border:1px solid var(--border,#d4d4d8);border-radius:10px;padding:0 12px;min-height:44px}
+.bo-list-search input{width:100%;min-width:0;border:0;background:transparent;color:inherit;outline:0;font:inherit}
+.bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
+@media(min-width:768px){.bo-metric-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.bo-metric-tiles>.bo-metric-tile:nth-child(3):last-child{grid-column:auto}}
+@media(prefers-color-scheme:dark){.bo-metric-tile{background:var(--surface-secondary,#242427)}.bo-list-search{border-color:var(--border,#44444a)}}
