@@ -37,12 +37,12 @@ const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'s
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
-const summary={invoices:[],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
+const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);}
-const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,releaseReceiptScan;
+const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -77,9 +77,11 @@ try{
    else if(p==='/api/support/tickets/ticket-one/messages')data={items:Array.from({length:30},(_,i)=>({id:'message-'+i,author_type:i%2?'support':'customer',body:'Testnachricht '+(i+1)+' – Prüfung des scrollbareren Nachrichtenverlaufs.',created_at:'2026-10-08T10:00:00Z'}))};
    else if(p==='/api/expenses/options')data={items:[employee]};
    else if(p==='/api/files')data={items:[]};
+   else if(p==='/api/time-entries'&&groupingFixture&&!url.searchParams.has('employeeId'))data={items:[{id:'internal',project_name:'Administration',employee_name:'Test Person',duration_minutes:90,started_at:'2026-10-08T09:00:00Z',billable:false,approved:true},{id:'group-one',customer_id:customer.id,customer_name:customer.name,project_name:'Managed IT Services',duration_minutes:750,started_at:'2026-10-08T09:00:00Z',billable:true,approved:true},{id:'group-two',customer_id:customer.id,customer_name:customer.name,project_name:'Managed IT Services',duration_minutes:750,started_at:'2026-10-08T10:00:00Z',billable:true,approved:true},{id:'other-customer',customer_id:'customer-two',customer_name:'Alpin Systems AG',project_name:'Managed IT Services',duration_minutes:405,started_at:'2026-10-08T11:00:00Z',billable:true,approved:true},{id:'other-project',customer_id:customer.id,customer_name:customer.name,project_name:'Modern Workplace',duration_minutes:450,started_at:'2026-10-08T12:00:00Z',billable:true,approved:true,invoiced_invoice_id:'already-invoiced'}]};
    else if(p==='/api/time-entries')data={items:url.searchParams.has('employeeId')?(employeeLedgerFixture?[{id:'employee-time',description:'Modern Workplace',project_name:'Modern Workplace',duration_minutes:450,started_at:'2026-10-08T09:00:00Z',approved:true,billable:true}]:[]):[{id:'time-one',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:90,started_at:'2026-10-08T09:00:00Z',billable:true,approved:true},{id:'time-two',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:45,started_at:'2026-10-08T11:00:00Z',billable:true,approved:true}]};
    else if(p.endsWith('/pdf'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});
-   else if(p==='/api/customers/customer-one/contacts'||p==='/api/customers/customer-one/activity')data={items:[]};
+   else if(p==='/api/customers/customer-one/contacts')data={items:[{id:'contact-one',first_name:'Alex',last_name:'Muster',job_title:'Projektleitung',email:'alex.muster@internationales-unternehmen.example.invalid',phone:'+41315551020',is_primary:true}]};
+   else if(p==='/api/customers/customer-one/activity')data={items:[]};
    else if(p==='/api/customers/customer-one/documents')data={items:[invoice,offer]};
    else {
     const [,,collection,id]=p.split('/');const rows=collections[collection];
@@ -98,7 +100,7 @@ try{
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
     console.log(`Route ${route}`);await page.goto(base+route);await page.waitForLoadState('networkidle');await page.locator('.app-session-loading').waitFor({state:'hidden'});
-    await page.locator('h1').filter({visible:true}).first().waitFor({state:'visible'});
+    try{await page.locator('h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
@@ -106,6 +108,11 @@ try{
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
+    if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.app-shell').count()&&!route.startsWith('/operator')&&!route.startsWith('/support/')){
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+      const header=await page.locator('.mobile-header').boundingBox();assert.ok(header&&header.y>=-1&&header.y<=1,`${route}: primary header stays visible while scrolling`);
+      await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
+    }
     if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
       assert.equal(await page.locator('.dashboard-summary .metric').count(),4);assert.equal(await page.locator('.dashboard-summary svg').count(),0,'KPIs have no decorative icons');assert.equal(await page.locator('.quick-grid').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=1100?2:4,'Quick actions retain the blueprint grid on narrow screens');
       const order=await page.evaluate(()=>['.dashboard-summary','.quick-section','.revenue-insight','.dashboard-grid'].map(selector=>document.querySelector(selector).getBoundingClientRect().top));assert.ok(order.every((top,i)=>i===0||top>order[i-1]),'Dashboard follows the blueprint hierarchy');
@@ -119,6 +126,7 @@ try{
     }
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
     if(width<=760&&!route.endsWith('/neu')&&!['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login'].includes(route)&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count())assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');}
     if(process.env.BINSO_UX_A11Y==='1'&&[375,1440].includes(width)){
       await page.addScriptTag({path:process.env.BINSO_AXE_MODULE});
@@ -127,7 +135,7 @@ try{
       const blocking=violations.filter(v=>['serious','critical'].includes(v.impact));
       if(blocking.length){accessibilityFailures.push({route,theme,width,violations:blocking});console.log('A11Y',route,JSON.stringify(blocking));}
     }
-    assert.deepEqual(errors,[],'Browser runtime errors');
+  assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await page.locator('nav.bottom-nav').screenshot({animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)});await hide.evaluate(el=>el.remove());}
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
@@ -186,7 +194,8 @@ try{
   await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.getByRole('button',{name:'Anwenden',exact:true}).click();
-  await page.locator('.finance-open-invoices').getByText('CHF 135.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.finance-open-invoices').getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.finance-open-invoices').getByText('Offen',{exact:true}).filter({visible:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 200.00',{exact:true}).waitFor();await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   assert.equal(await page.locator('.bo-metric-tiles .metric').count(),4,'Finance has exactly four compact metrics');
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();
@@ -272,10 +281,33 @@ try{
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-375-400-chat.png`)});await page.setViewportSize({width:430,height:900});
   failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await page.goto(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
   }
+  if(hasInteraction('customers')){
+   await page.setViewportSize({width:320,height:740});await page.goto(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
+   assert.equal(await page.locator('.customer-detail-workspace .surface .status').filter({hasText:/^Aktiv$/}).count(),0,'Customer status appears only in the header');
+   await page.getByRole('button',{name:'Kontakte',exact:true}).click();
+   const row=page.locator('.contact-list>div').first(),name=await row.locator('b').boundingBox(),menu=await row.getByRole('button',{name:'Alex Muster Aktionen'}).boundingBox();
+   assert.ok(menu.x>name.x&&menu.y<=name.y+name.height,'Contact action stays in the first line');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contacts-final.png`)});
+   await row.getByRole('button',{name:'Alex Muster Aktionen'}).click();await page.getByRole('button',{name:'Kontakt bearbeiten / Hauptkontakt festlegen'}).click();
+   const primary=page.getByRole('checkbox',{name:'Als Hauptkontakt festlegen'}),box=await primary.boundingBox();assert.ok(box.width<=24&&box.height<=24,'Primary contact checkbox stays compact');assert.equal(await primary.isChecked(),true,'Existing primary contact value is retained');assert.ok((await page.getByRole('dialog').boundingBox()).x>=0,'Contact sheet stays inside the viewport');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contact-form-final.png`)});await page.keyboard.press('Escape');
+   await page.getByRole('button',{name:'Finanzen',exact:true}).click();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-customer-finance-final.png`)});assert.equal(await page.locator('.mobile-record-list .document-summary-row').count(),2,'Offers and invoices share the same financial row');
+  }
+  if(hasInteraction('time')){
+   groupingFixture=true;   await page.setViewportSize({width:320,height:740});await page.goto(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
+   assert.equal(await page.locator('.time-group').count(),4,'Internal time and distinct customer/project identities remain four groups');assert.equal(await page.locator('.timer-card .section-title strong').innerText(),'40:45 h','Group total counts each entry once');
+   const group=page.locator('.time-group-head').first();assert.equal(await group.evaluate(el=>getComputedStyle(el).textAlign),'left','Time group does not inherit timer centering');
+   const customerBox=await group.locator('b').boundingBox(),duration=await group.locator('strong').boundingBox(),chevron=await group.locator('svg').boundingBox();assert.ok(customerBox.x<duration.x&&duration.x<chevron.x,'Group duration and chevron are right aligned');assert.ok((await group.boundingBox()).height<=76,'Collapsed group is compact');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-time-groups-final.png`)});
+   await page.getByRole('button',{name:'Manuell erfassen',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Zeit manuell erfassen'});assert.equal(await sheet.getByRole('button',{name:'Speichern',exact:true}).count(),1);
+   await page.setViewportSize({width:320,height:400});await sheet.getByLabel('Beschreibung',{exact:true}).focus();await sheet.getByLabel('Beschreibung',{exact:true}).scrollIntoViewIfNeeded();const footer=await sheet.locator('.filter-sheet-actions').boundingBox(),header=await sheet.locator('.sheet-header').boundingBox();assert.ok(header.y>=0&&footer.y+footer.height<=401&&footer.x+footer.width<=321,'Manual time sheet keeps header and footer visible at keyboard-sized height');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
+  }
   assert.deepEqual(errors,[],'Browser runtime errors');
   await context.close();context=null;await browser.close();browser=null;
  }
  assert.deepEqual(accessibilityFailures,[],'Blocking accessibility violations');
  await fs.writeFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',interactions:requestedInteractions,results,errors},null,2));
+ await fs.copyFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),path.join(output,`results-${process.env.BINSO_UX_BROWSER??'chromium'}-${process.env.BINSO_UX_THEMES??'light-dark'}.json`));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);
 }finally{await context?.close();await browser?.close();server?.kill();}

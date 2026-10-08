@@ -70,3 +70,21 @@ for(const path of ['app/api/expenses/route.ts','app/api/expenses/[id]/route.ts']
 }
 delete globalThis.__expenseWrites;
 console.log('Expense approval/rejection rejects unauthorized roles before either mutation writes.');
+
+// Related links consume the real AppShell access context; denied records remain
+// readable as text, while read-only users retain authorized read navigation.
+const React=await import('react');
+const {renderToStaticMarkup}=await import('react-dom/server');
+const {createRequire}=await import('node:module');
+const require=createRequire(import.meta.url);
+const contextExports={};
+Function('require','exports',ts.transpileModule(await fs.readFile('lib/client/page-access.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,contextExports);
+const uiSource=await fs.readFile('components/ui.tsx','utf8');
+const uiAst=ts.createSourceFile('ui.tsx',uiSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+const accessLinkSource=uiAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='AccessLink').getText(uiAst);
+const uiExports={};
+Function('require','exports','usePageAccess','Link',ts.transpileModule(accessLinkSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,uiExports,contextExports.usePageAccess,({href,children,className})=>React.createElement('a',{href,className},children));
+const related=allowed=>renderToStaticMarkup(React.createElement(contextExports.PageAccessContext.Provider,{value:{write:false,canOpen:()=>allowed}},React.createElement(uiExports.AccessLink,{href:'/kunden/related',fallback:'Kunde'},'Kunde')));
+assert.equal(related(false),'Kunde','Denied related record must not expose a navigation link');
+assert.equal(related(true),'<a href="/kunden/related">Kunde</a>','Authorized read navigation remains available without write access');
+console.log('Related-record links respect the AppShell context and retain a text fallback.');

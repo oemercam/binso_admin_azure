@@ -44,10 +44,10 @@ export function RowActions({ label = "Weitere Aktionen", onClick, disabled = fal
   return <button className="bo-row-actions" type="button" onClick={onClick} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></button>;
 }
 
-export function ActionSheet({label,description,open,onClose,children,busy=false,className=""}: {label:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string}) {
+export function ActionSheet({label,description,open,onClose,children,busy=false,className="",ariaLabel}: {label:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string}) {
   const dialog=useDialogFocus(open,()=>{if(!busy)onClose()});
   if(!open)return null;
-  return createPortal(<div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onClose()}}><section ref={dialog} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} role="dialog" aria-modal="true" aria-label={label}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{label}</h2>{description&&<p>{description}</p>}</div><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={onClose}><Icon name="close"/></button></header>{children}</section></div>,document.body);
+  return createPortal(<div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onClose()}}><section ref={dialog} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} role="dialog" aria-modal="true" aria-label={ariaLabel??label}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{label}</h2>{description&&<p>{description}</p>}</div><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={onClose}><Icon name="close"/></button></header>{children}</section></div>,document.body);
 }
 
 /** The same compact action sheet is used for entity editors on every viewport. */
