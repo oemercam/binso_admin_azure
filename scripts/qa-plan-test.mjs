@@ -12,3 +12,5 @@ assert.throws(()=>planChanges([],{level:'skip'}));
 console.log('QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.');
 
 assert.equal(planChanges(['app/styles/app.css','unmapped/custom-engine.ts'],{level:'standard'}).level,'full','A known global dependency cannot hide an unknown dependency');
+
+assert.deepEqual(planChanges(['components/pdf-preview.tsx'],{level:'fast'}).interactions,['documents'],'PDF renderer changes select document interactions');

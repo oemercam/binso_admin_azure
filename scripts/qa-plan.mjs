@@ -8,7 +8,7 @@ const groups={
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},
  customers:{match:/customer|kunden|contact/,routes:['/kunden','/kunden/customer-one','/kunden/neu'],interactions:['customers']},
  employees:{match:/employee|mitarbeiter|personal/,routes:['/mitarbeiter','/mitarbeiter/employee-one','/mitarbeiter/neu'],interactions:['employees']},
- documents:{match:/document|invoice|quote|qr-bill|rechnungen|angebote/,routes:['/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/angebote','/angebote/AN-TEST-1','/angebote/neu'],interactions:['documents']},
+ documents:{match:/document|invoice|quote|pdf|qr-bill|rechnungen|angebote/,routes:['/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/angebote','/angebote/AN-TEST-1','/angebote/neu'],interactions:['documents']},
  payments:{match:/payment|zahlungen/,routes:['/zahlungen','/zahlungen/payment-one','/zahlungen/neu'],interactions:[]},
  finance:{match:/finance|finanzen|dashboard|revenue/,routes:['/dashboard','/finanzen','/finanzen/analyse'],interactions:['finance']},
  time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu'],interactions:['time']},
