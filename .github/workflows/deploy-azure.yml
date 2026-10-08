@@ -17,6 +17,7 @@ permissions:
   id-token: write
 
 env:
+  BINSO_DEPLOY_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
   AZURE_WEBAPP_NAME: binso-admin-prod
   AZURE_RESOURCE_GROUP: rg-binso-admin-prod
   PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
@@ -251,7 +252,9 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
-          startup-command: node /home/site/wwwroot/server.js
+          # Each release is isolated from files left by earlier deployments.
+          target-path: /home/site/releases/${{ env.BINSO_DEPLOY_SHA }}
+          startup-command: node /home/site/releases/${{ env.BINSO_DEPLOY_SHA }}/server.js
 
       - name: Wait for deployed worker
         shell: bash
