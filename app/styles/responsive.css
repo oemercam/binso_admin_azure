@@ -3337,3 +3337,13 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bottom-sheet .sheet-menu b,.bottom-sheet .sheet-menu small{min-width:0;overflow-wrap:anywhere}
 .bottom-sheet input,.bottom-sheet select,.bottom-sheet textarea{max-width:100%;min-width:0}
 .bottom-sheet .sheet-header>div{min-width:0}
+
+/* Standardized heading and control sizing without changing navigation structure. */
+.page-head{min-width:0}
+.page-head>div{min-width:0}
+.page-head h1{overflow-wrap:anywhere}
+.page-head .page-actions{min-width:0;flex-shrink:0}
+.mobile-header-leading{min-width:0;overflow:hidden}
+.mobile-header-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mobile-header-actions,.mobile-detail-actions{flex-shrink:0}
+.bo-metric-tile strong{min-width:0}
