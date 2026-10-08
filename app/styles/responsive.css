@@ -3370,3 +3370,12 @@ input:not([type="checkbox"]):not([type="radio"]),
 .page-head .page-actions .button{white-space:nowrap}
 .bottom-sheet .sheet-menu{overflow-wrap:anywhere}
 .bottom-sheet .sheet-menu a:focus-visible,.bottom-sheet .sheet-menu button:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+
+/* Uniform metadata, status alignment and compact list density. */
+.record-main{min-width:0}
+.record-main b,.record-main small{max-width:100%}
+.record>.status{max-width:100%;text-align:center}
+.desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.bo-metric-tile{align-content:start}
+.bo-metric-tile span{line-height:1.35}
+.bo-metric-tile strong{line-height:1.2}
