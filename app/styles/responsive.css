@@ -464,7 +464,6 @@
   .page-head{margin-bottom:28px}
   .toolbar{flex-wrap:wrap;row-gap:8px}
   .toolbar .searchbox{flex:1 1 320px}
-  .toolbar .chips{flex:0 1 auto}
   .records{border-bottom:1px solid var(--color-line)}
   .record{padding-left:10px;padding-right:10px;border-radius:8px;transition:background-color var(--motion-fast) var(--motion-ease-standard)}
   .record-wrapper:hover .record{background:var(--color-subtle)}
@@ -484,7 +483,6 @@
   .page-head{
     min-height:auto;
     margin:0 0 22px;
-    padding:0;
     align-items:flex-start;
     border-bottom:0;
   }
@@ -515,7 +513,6 @@
     min-height:48px;
     margin-bottom:var(--heading-content-gap);
     padding-bottom:12px;
-    flex-wrap:nowrap;
     border-bottom:1px solid var(--color-line);
   }
   .toolbar .searchbox{max-width:520px;flex:1 1 360px}
@@ -1128,7 +1125,7 @@
   }
 
 
-  .toolbar .chips{min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
+  .toolbar .chips{max-width:100%;overflow-x:auto;scrollbar-width:none}
   .toolbar .chips::-webkit-scrollbar{display:none}
   .toolbar .chips > button{flex-shrink:0;white-space:nowrap}
 
@@ -1740,7 +1737,7 @@
   .form-section:first-child,
   .settings-form:first-child{padding-top:0}
   .form-grid,
-  .form-grid.two{grid-template-columns:1fr;gap:var(--field-group-gap)}
+  .form-grid.two{gap:var(--field-group-gap)}
   .form-grid input,
   .form-grid select,
   .form-grid textarea,
@@ -2065,7 +2062,7 @@
     width:100%;
     height:auto;
     min-height:0;
-    max-height:min(88dvh,760px);
+    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
     padding-top:6px;
     border:1px solid var(--color-line);
     border-bottom:0;
@@ -2446,7 +2443,7 @@
   .sheet-layer-navigation .bottom-sheet{
     width:100%;
     max-width:100%;
-    max-height:min(88dvh,760px);
+    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
     overflow-y:auto;
     overflow-x:hidden;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
@@ -2632,9 +2629,8 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .settings-choice-list>button,.settings-static-row{grid-template-columns:auto minmax(0,1fr) auto auto}
   .settings-choice-list :is(b,small){overflow:hidden;text-overflow:ellipsis}
 
-  .sheet-layer{height:100dvh}
   .bottom-sheet{
-    max-height:min(88dvh,760px);
+    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
     padding-bottom:max(calc(14px + var(--safe-bottom)),18px);
   }
   .bottom-sheet :is(input,select,textarea){font-size:16px}
@@ -2955,9 +2951,9 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 .operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
 
-.revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px;font-size:8px}.revenue-bars i{border-radius:3px 3px 1px 1px}
+.revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px}.revenue-bars i{border-radius:3px 3px 1px 1px}
 
-.revenue-bar-detail{min-height:30px;margin-top:12px;gap:6px;font-size:9px}.revenue-bar-detail b{font-size:10px}.revenue-bars{margin-top:4px;gap:4px}.revenue-bars button{font-size:7px}
+.revenue-bar-detail{min-height:30px;margin-top:12px;gap:6px;font-size:9px}.revenue-bar-detail b{font-size:10px}.revenue-bars{margin-top:4px;gap:4px}.revenue-bars button{font-size:var(--control-help-font)}
 
 .monitoring-latency-chart,.monitoring-health-chart,.operator-chart-card,.operator-selected-metric,.payment-donut-card,.finance-kpis{border:0;border-radius:0;background:transparent;box-shadow:none}
 
@@ -3100,9 +3096,9 @@ input:not([type="checkbox"]):not([type="radio"]),
     min-height:calc(var(--mobile-header-h) + var(--safe-top));
     align-items:center;
     border-bottom:1px solid var(--color-line);
-    background:color-mix(in srgb,var(--color-bg) 97%,transparent);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
+    background:var(--color-bg);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
   }
   .operator-header-brand>.logo{display:block;width:80px;height:auto}
   .operator-header-brand>span{
@@ -3247,7 +3243,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (max-width:389px){
 .metrics-grid,
   .metrics-grid.three,
-  .quick-grid,
   .support-summary{grid-template-columns:1fr}
 
 .mobile-header-detail{grid-template-columns:minmax(0,1fr) auto auto}
@@ -3312,8 +3307,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 .bo-metric-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
 
-.bo-list-search{display:flex;align-items:center;gap:10px;width:100%;min-width:0;border:1px solid var(--color-line,#d4d4d8);border-radius:10px;padding:0 12px;min-height:44px}
-.bo-list-search input{width:100%;min-width:0;border:0;background:transparent;color:inherit;outline:0;font:inherit}
 .bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
 
 
@@ -3327,12 +3320,10 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Shared mobile/desktop sheet content guards: prevent label and action collisions. */
 .bottom-sheet,.bottom-sheet *{box-sizing:border-box}
-.bottom-sheet{max-width:100%;overflow-x:hidden}
 .bottom-sheet .sheet-menu,.bottom-sheet .sheet-header{min-width:0}
 .bottom-sheet .sheet-menu a,.bottom-sheet .sheet-menu button{min-width:0;max-width:100%}
 .bottom-sheet .sheet-menu b,.bottom-sheet .sheet-menu small{min-width:0;overflow-wrap:anywhere}
 .bottom-sheet input,.bottom-sheet select,.bottom-sheet textarea{max-width:100%;min-width:0}
-.bottom-sheet .sheet-header>div{min-width:0}
 
 /* Standardized heading and control sizing without changing navigation structure. */
 .page-head{min-width:0}
@@ -3351,7 +3342,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .desktop-record-row>.table-status-cell{overflow:visible;white-space:normal}
 .desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible,.toolbar .filter-button select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.bo-list-search:focus-within{outline:2px solid currentColor;outline-offset:2px}
 
 /* Form sizing contract shared across sheets, create pages and detail editors. */
 .form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}

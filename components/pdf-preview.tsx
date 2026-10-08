@@ -44,7 +44,10 @@ export function PdfPreview({file}: {file:Blob}) {
   useEffect(()=>{
     let active=true;
     let task:ReturnType<typeof import("pdfjs-dist").getDocument>|undefined;
-    void import("pdfjs-dist").then(async engine=>{
+    // Load the self-contained ESM as a same-origin asset: PDF.js internal
+    // webpack bindings collide with eval-wrapped development modules.
+    const engineUrl=new URL("pdfjs-dist/build/pdf.mjs",import.meta.url).toString();
+    void import(/* webpackIgnore: true */ engineUrl).then(async (engine:typeof import("pdfjs-dist"))=>{
       if(!active)return;
       engine.GlobalWorkerOptions.workerSrc=new URL("pdfjs-dist/build/pdf.worker.min.mjs",import.meta.url).toString();
       const data=new Uint8Array(await file.arrayBuffer());

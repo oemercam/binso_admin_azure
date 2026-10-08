@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+pnpm start > /tmp/binso-next.log 2>&1 &
+APP_PID=$!
+trap 'kill $APP_PID 2>/dev/null || true' EXIT
+
+READY=0
+for attempt in {1..30}; do
+  if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+    READY=1
+    break
+  fi
+  sleep 1
+done
+
+if [ "$READY" -ne 1 ]; then
+  cat /tmp/binso-next.log
+  exit 1
+fi
+
+ROUTES=(
+  /
+  /produkt
+  /preise
+  /login
+  /registrieren
+  /portal
+  /portal/login
+  /portal/registrieren
+  /passwort-vergessen
+  /passwort-zuruecksetzen
+  /demo
+  /offline
+  /willkommen
+  /dashboard
+  /kunden
+  /kunden/acme
+  /kunden/neu
+  /angebote
+  /angebote/AN-2026-012
+  /angebote/neu
+  /rechnungen
+  /rechnungen/RE-2026-019
+  /rechnungen/neu
+  /zahlungen
+  /zahlungen/1
+  /zahlungen/neu
+  /produkte
+  /produkte/beratung
+  /produkte/neu
+  /mitarbeiter
+  /mitarbeiter/thomas
+  /mitarbeiter/neu
+  /spesen
+  /spesen/1
+  /spesen/neu
+  /support
+  /support/5832
+  /support/neu
+  /belege
+  /benachrichtigungen
+  /zeit
+  /einstellungen
+  /einstellungen/konto
+  /einstellungen/firma
+  /einstellungen/team
+  /einstellungen/abonnement
+  /einstellungen/benachrichtigungen
+  /einstellungen/sprache
+  /einstellungen/sicherheit
+  /einstellungen/darstellung
+  /operator
+  /operator/kunden
+  /operator/support
+  /operator/sicherheit
+  /operator/audit
+  /preview/dashboard
+  /preview/rechnungen
+  /preview/zeit
+)
+
+for route in "${ROUTES[@]}"; do
+  echo "Smoke: $route"
+  curl -fsS "http://127.0.0.1:3000$route" > /dev/null
+done
+
+BINSO_BASE_URL=http://127.0.0.1:3000 pnpm routes:css-check
+
+curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
+test "$(curl -sS -o /tmp/binso-ready.json -w '%{http_code}' http://127.0.0.1:3000/api/health/ready)" = "503"
+grep -q '"status":"not_ready"' /tmp/binso-ready.json
+echo "Smoke: unauthenticated session"
+curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"authenticated":false'
+echo "Smoke: demo session create"
+curl -fsS -c /tmp/binso-demo.cookies -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
+curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/demo/session | grep -q '"active":true'
+curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/auth/session | grep -q '"demo":true'
+curl -fsS -b /tmp/binso-demo.cookies -X DELETE -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"active":false'
+echo "Smoke: protected APIs"
+test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
+test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/notifications)" = "401"
+test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/auth/sessions)" = "401"
+test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
+test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
+test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
+test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/files)" = "403"
+echo "Smoke: security headers"
+curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
+curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
+curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
+curl -fsS http://127.0.0.1:3000/manifest.webmanifest | grep -q '"name":"Binso"'
+curl -fsS http://127.0.0.1:3000/manifest-app.webmanifest | grep -q '"name":"Binso One"'
+curl -fsS http://127.0.0.1:3000/manifest-admin.webmanifest | grep -q "One Admin"
+curl -fsS http://127.0.0.1:3000/brand/icon-black.svg | grep -q "viewBox=\\\"370 430 280 340\\\""

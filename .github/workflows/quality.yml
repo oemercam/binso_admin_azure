@@ -1,256 +1,199 @@
-# Runner recovery trigger: 2026-10-07
 name: Quality
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      level:
+        description: QA coverage
+        type: choice
+        options: [standard, full]
+        default: full
+  schedule:
+    - cron: '23 3 * * 0'
+  release:
+    types: [published]
 concurrency:
-  group: quality-${{ github.ref }}
+  group: quality-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
-
 env:
   BINSO_BUILD_SHA: ${{ github.sha }}
 jobs:
-  quality:
+  plan:
     runs-on: ubuntu-latest
+    outputs:
+      level: ${{ steps.scope.outputs.level }}
+      routes: ${{ steps.scope.outputs.routes }}
+      webkit_routes: ${{ steps.scope.outputs.webkit_routes }}
+      widths: ${{ steps.scope.outputs.widths }}
+      webkit_widths: ${{ steps.scope.outputs.webkit_widths }}
+      interactions: ${{ steps.scope.outputs.interactions }}
+      browser: ${{ steps.scope.outputs.browser }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Select conservative QA scope
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          FORCE_FULL: ${{ github.event_name == 'schedule' || github.event_name == 'release' || inputs.level == 'full' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          LEVEL=standard
+          if [ "$FORCE_FULL" = true ]; then LEVEL=full; fi
+          if [ -n "$BASE_SHA" ] && git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            node scripts/qa-plan.mjs --level "$LEVEL" --base "$BASE_SHA" | tee /tmp/qa-plan.json
+          else
+            node scripts/qa-plan.mjs --level full | tee /tmp/qa-plan.json
+          fi
+          cat /tmp/qa-plan.json >> "$GITHUB_STEP_SUMMARY"
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
       - run: pnpm lint
+      - run: pnpm css:check
+      - run: pnpm typecheck
       - run: pnpm security:scan
       - name: Full dependency audit including development tooling
         run: pnpm security:scan:all
-      - run: pnpm css:check
-      - run: pnpm typecheck
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - name: Restore Next compiler cache (never a completed build)
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml', 'next.config.*') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml', 'next.config.*') }}-
       - run: pnpm build
-      - name: Install isolated browser test tooling
+      - name: Runtime smoke test
+        run: bash scripts/runtime-smoke.sh
+      - name: Package production candidate
+        run: bash scripts/package-production.sh
+      - name: Smoke test exact production artifact
+        run: bash scripts/smoke-production-artifact.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binso-candidate-${{ github.sha }}
+          path: deploy/binso-one.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 2
+  browser:
+    needs: [plan, build]
+    if: needs.plan.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - uses: actions/download-artifact@v4
+        with:
+          name: binso-candidate-${{ github.sha }}
+          path: deploy
+      - name: Extract exact production candidate
         run: |
-          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
-          node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps chromium webkit
-      - name: Responsive UX browser regression
+          mkdir -p "$RUNNER_TEMP/binso-candidate"
+          unzip -q deploy/binso-one.zip -d "$RUNNER_TEMP/binso-candidate"
+      - name: Install one browser engine
+        env:
+          ENGINE: ${{ matrix.engine }}
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1 axe-core@4.11.0
+          if [ "$ENGINE" = chromium ]; then
+            node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
+          else
+            node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps webkit
+          fi
+      - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
-          BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser
-          BINSO_UX_CAPTURE_ALL: 1
+          BINSO_AXE_MODULE: ${{ runner.temp }}/binso-browser/node_modules/axe-core/axe.min.js
+          BINSO_UX_A11Y: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_UX_DEVICE: ${{ matrix.engine == 'webkit' && 'iPhone 13' || '' }}
+          BINSO_UX_ROUTES: ${{ matrix.engine == 'webkit' && needs.plan.outputs.webkit_routes || needs.plan.outputs.routes }}
+          BINSO_UX_WIDTHS: ${{ matrix.engine == 'webkit' && needs.plan.outputs.webkit_widths || needs.plan.outputs.widths }}
+          BINSO_UX_INTERACTIONS: ${{ needs.plan.outputs.interactions }}
+          BINSO_UX_SCREENSHOTS: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/ux-browser-test.mjs
-      - name: Safari engine mobile and tablet regression
+      - name: FULL PWA restart and offline regression
+        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
-          BINSO_UX_BROWSER: webkit
-          BINSO_UX_DEVICE: iPhone 13
-          BINSO_UX_WIDTHS: 375,430,820
-          BINSO_UX_ROUTES: /dashboard,/finanzen,/support/ticket-one,/rechnungen,/zeit,/mitarbeiter/neu,/mitarbeiter/employee-one,/projekte/neu,/rechnungen/RE-TEST-1,/kunden/neu,/produkte/neu,/spesen/neu,/angebote/neu,/zahlungen/neu
-          BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser/webkit
-        run: node scripts/ux-browser-test.mjs
-      - name: Upload responsive UX evidence
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+        run: node scripts/pwa-browser-test.mjs
+      - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ux-browser-${{ github.sha }}
-          path: ${{ runner.temp }}/binso-ux-browser
-          if-no-files-found: ignore
+          name: ux-browser-${{ matrix.engine }}-${{ github.sha }}
+          path: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
+          if-no-files-found: warn
           retention-days: 7
-      - name: Package verified production artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
+  quality:
+    # Keep the existing required job name. Failure, cancellation or an unexpected skip is blocking.
+    needs: [plan, checks, build, browser]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce every mandatory result
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+          BROWSER_REQUIRED: ${{ needs.plan.outputs.browser }}
         run: |
           set -euo pipefail
-          test -f .next/standalone/server.js
-          rm -rf deploy
-          mkdir -p deploy/app/.next
-          cp -R .next/standalone/. deploy/app/
-          # Install the locked production dependencies without pnpm symlinks.
-          # ZIP extraction and Azure startup must preserve module resolution.
-          rm -rf deploy/runtime
-          mkdir -p deploy/runtime
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml deploy/runtime/
-          pnpm --dir deploy/runtime install --prod --frozen-lockfile --config.node-linker=hoisted
-          rm -rf deploy/app/node_modules
-          mv deploy/runtime/node_modules deploy/app/node_modules
-          rm -rf deploy/runtime
-          (
-            cd deploy/app
-            node -e "require('next/dist/server/next.js'); require('@next/env'); require('@swc/helpers/_/_interop_require_default')"
-          )
-          cp -R .next/static deploy/app/.next/static
-          if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
-          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
-          cd deploy/app
-          zip -qr ../binso-one.zip .
-          cd ../..
-          test -s deploy/binso-one.zip
-          unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
-          grep -q 'server.js' /tmp/binso-zip-contents.txt
-      - name: Smoke test exact production artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/binso-production-artifact
-          mkdir -p /tmp/binso-production-artifact
-          unzip -q deploy/binso-one.zip -d /tmp/binso-production-artifact
-          test -f /tmp/binso-production-artifact/server.js
-          test -d /tmp/binso-production-artifact/node_modules
-          (
-            cd /tmp/binso-production-artifact
-            PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-artifact.log 2>&1 &
-            echo $! > /tmp/binso-artifact.pid
-          )
-          ARTIFACT_PID="$(cat /tmp/binso-artifact.pid)"
-          trap 'kill "$ARTIFACT_PID" 2>/dev/null || true' EXIT
-          READY=0
-          for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:3100/api/health > /tmp/binso-artifact-health.json; then
-              READY=1
-              break
-            fi
-            if ! kill -0 "$ARTIFACT_PID" 2>/dev/null; then
-              cat /tmp/binso-artifact.log
-              echo "::error::Packaged production server exited before becoming ready."
-              exit 1
-            fi
-            sleep 1
+          for result in "$PLAN_RESULT" "$CHECKS_RESULT" "$BUILD_RESULT"; do
+            if [ "$result" != success ]; then echo "::error::Required job ended with $result"; exit 1; fi
           done
-          if [ "$READY" -ne 1 ]; then
-            cat /tmp/binso-artifact.log
-            echo "::error::Packaged production artifact did not become ready."
-            exit 1
+          if [ "$BROWSER_REQUIRED" != true ] && [ "$BROWSER_REQUIRED" != false ]; then
+            echo "::error::Missing or invalid browser-scope output"; exit 1
           fi
-          grep -q "$GITHUB_SHA" /tmp/binso-production-artifact/public/deployment.json
-          grep -q '"status":"ok"' /tmp/binso-artifact-health.json
-          BINSO_BASE_URL=http://127.0.0.1:3100 node scripts/check-deployed-assets.mjs /tmp/binso-production-artifact
-          echo "Exact production ZIP starts successfully."
-      - name: Upload verified production artifact
+          if [ "$BROWSER_REQUIRED" = true ]; then
+            test "$BROWSER_RESULT" = success || { echo "::error::Browser checks: $BROWSER_RESULT"; exit 1; }
+          else
+            test "$BROWSER_RESULT" = skipped || { echo "::error::Unexpected browser result: $BROWSER_RESULT"; exit 1; }
+          fi
+      - name: Download fully verified production candidate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/download-artifact@v4
+        with:
+          name: binso-candidate-${{ github.sha }}
+          path: deploy
+      - name: Promote verified artifact for Azure (no rebuild)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: binso-one-${{ github.sha }}
           path: deploy/binso-one.zip
           if-no-files-found: error
+          compression-level: 0
           retention-days: 2
-      - name: Runtime smoke test
-        shell: bash
-        run: |
-          set -euo pipefail
-          pnpm start > /tmp/binso-next.log 2>&1 &
-          APP_PID=$!
-          trap 'kill $APP_PID 2>/dev/null || true' EXIT
-
-          READY=0
-          for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
-              READY=1
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$READY" -ne 1 ]; then
-            cat /tmp/binso-next.log
-            exit 1
-          fi
-
-          ROUTES=(
-            /
-            /produkt
-            /preise
-            /login
-            /registrieren
-            /portal
-            /portal/login
-            /portal/registrieren
-            /passwort-vergessen
-            /passwort-zuruecksetzen
-            /demo
-            /offline
-            /willkommen
-            /dashboard
-            /kunden
-            /kunden/acme
-            /kunden/neu
-            /angebote
-            /angebote/AN-2026-012
-            /angebote/neu
-            /rechnungen
-            /rechnungen/RE-2026-019
-            /rechnungen/neu
-            /zahlungen
-            /zahlungen/1
-            /zahlungen/neu
-            /produkte
-            /produkte/beratung
-            /produkte/neu
-            /mitarbeiter
-            /mitarbeiter/thomas
-            /mitarbeiter/neu
-            /spesen
-            /spesen/1
-            /spesen/neu
-            /support
-            /support/5832
-            /support/neu
-            /belege
-            /benachrichtigungen
-            /zeit
-            /einstellungen
-            /einstellungen/konto
-            /einstellungen/firma
-            /einstellungen/team
-            /einstellungen/abonnement
-            /einstellungen/benachrichtigungen
-            /einstellungen/sprache
-            /einstellungen/sicherheit
-            /einstellungen/darstellung
-            /operator
-            /operator/kunden
-            /operator/support
-            /operator/sicherheit
-            /operator/audit
-            /preview/dashboard
-            /preview/rechnungen
-            /preview/zeit
-          )
-
-          for route in "${ROUTES[@]}"; do
-            echo "Smoke: $route"
-            curl -fsS "http://127.0.0.1:3000$route" > /dev/null
-          done
-
-          BINSO_BASE_URL=http://127.0.0.1:3000 pnpm routes:css-check
-
-          curl -fsS http://127.0.0.1:3000/api/health | grep -q '"status":"ok"'
-          test "$(curl -sS -o /tmp/binso-ready.json -w '%{http_code}' http://127.0.0.1:3000/api/health/ready)" = "503"
-          grep -q '"status":"not_ready"' /tmp/binso-ready.json
-          echo "Smoke: unauthenticated session"
-          curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"authenticated":false'
-          echo "Smoke: demo session create"
-          curl -fsS -c /tmp/binso-demo.cookies -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
-          curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/demo/session | grep -q '"active":true'
-          curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/auth/session | grep -q '"demo":true'
-          curl -fsS -b /tmp/binso-demo.cookies -X DELETE -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"active":false'
-          echo "Smoke: protected APIs"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/notifications)" = "401"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/auth/sessions)" = "401"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
-          test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/files)" = "403"
-          echo "Smoke: security headers"
-          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"
-          curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "cache-control: private, no-store"
-          curl -fsSI http://127.0.0.1:3000/ | grep -qi "content-security-policy:"
-          curl -fsS http://127.0.0.1:3000/manifest.webmanifest | grep -q '"name":"Binso"'
-          curl -fsS http://127.0.0.1:3000/manifest-app.webmanifest | grep -q '"name":"Binso One"'
-          curl -fsS http://127.0.0.1:3000/manifest-admin.webmanifest | grep -q "One Admin"
-          curl -fsS http://127.0.0.1:3000/brand/icon-black.svg | grep -q "viewBox=\\\"370 430 280 340\\\""

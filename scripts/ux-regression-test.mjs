@@ -190,7 +190,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   const responsive=read("app/styles/responsive.css");
   assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared workspace.");
   assert(!pages.includes('className="customer-info-pane"'),"Customer details must not duplicate company facts in a separate pane.");
-  assert(pages.includes('aria-label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
+  assert(pages.includes('<ActionSheet label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
   assert(responsive.includes("grid-template-columns:minmax(0,1fr) minmax(240px,280px)"),"Wide customer details must use the shared main-content and action-rail proportions.");
   console.log("Customer details use company facts, active content and toolbox panes.");
 }
