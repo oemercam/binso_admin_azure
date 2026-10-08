@@ -3347,3 +3347,11 @@ input:not([type="checkbox"]):not([type="radio"]),
 .mobile-header-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mobile-header-actions,.mobile-detail-actions{flex-shrink:0}
 .bo-metric-tile strong{min-width:0}
+
+/* Accessible list controls and robust data-table cell sizing. */
+.desktop-record-table,.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
+.desktop-record-row>[role="cell"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desktop-record-row>.table-status-cell{overflow:visible;white-space:normal}
+.desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible,.toolbar .filter-button select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.bo-list-search:focus-within{outline:2px solid currentColor;outline-offset:2px}
