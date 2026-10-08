@@ -3300,7 +3300,9 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;overflow-wrap:anywhere}
 .bo-page-heading p,.bo-detail-heading p{margin:0;color:var(--color-muted, #71717a);font-size:.875rem}
 .bo-detail-heading-main .status{flex-shrink:0}
-.bo-create-action{width:44px;height:44px;flex:0 0 44px;border:0;border-radius:50%;background:#000;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.bo-create-action{width:44px;height:44px;flex:0 0 44px;border:0;border-radius:50%;background:#000;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+.bo-create-action:hover:not(:disabled){opacity:.85}
+.bo-create-action:active:not(:disabled){opacity:.7}
 .bo-create-action:disabled{opacity:.45;cursor:not-allowed}
 .bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .bo-metric-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,max(170px,calc((100% - 20px)/3))),1fr));gap:10px}
@@ -3320,3 +3322,9 @@ input:not([type="checkbox"]):not([type="radio"]),
 .toolbar .searchbox{min-width:0;max-width:100%}
 .toolbar .searchbox input{min-width:0;width:100%}
 .toolbar .chips{min-width:0}
+
+/* Keep common row action targets operable and visually consistent. */
+.bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
+.bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:10px}
+.bo-detail-heading-main{flex-wrap:wrap}
+.bo-detail-heading-main .status{margin-left:auto}
