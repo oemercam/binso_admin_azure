@@ -45,7 +45,7 @@ Weitere lokale Checks: `pnpm release:check`, `pnpm lint`, `pnpm typecheck`, `pnp
 
 `scripts/ux-browser-test.mjs` rendert alle 46 bestehenden/ergänzten Routen bei 375/430/820/1024/1440 px in Light/Dark (460 Kombinationen). WebKit prüft zusätzlich 14 betroffene Routen bei 375/430/820 px in beiden Themes (84 Kombinationen). Interaktionen prüfen Zeitraum-Anwenden und Verwerfen, periodenunabhängigen Bestand, Gruppenminuten, Formulare/Sheets bei 400/568 px Höhe, Chat mit 30 Nachrichten, Fehler/Retry/Doppelklick und echtes PDF-Zoom-Verhalten. Unbehandelte API-Fixtures schlagen geschlossen fehl; diese Läufe schreiben keine Produktionsdaten.
 
-Die isolierte Browser-Testversion ist auf Playwright 1.62.1 (WebKit 26.5) festgelegt und entspricht der lokal erfolgreich geprüften Version. Die bisherige CI-Version 1.56.1 meldete abgebrochene RSC-Vorladeanfragen beim harten Seitenwechsel als WebKit-Zugriffskontrollfehler. Es werden keine Browserfehler unterdrückt.
+Die isolierte Browser-Testversion ist auf Playwright 1.62.1 (WebKit 26.5) festgelegt. Jeder unabhängige Routenfall erhält eine eigene Seite: verspätete RSC-Vorladeanfragen der vorherigen Seite werden dadurch nicht bei einem harten Seitenwechsel abgebrochen. Wiederverwendete Seiten bleiben für die Navigations- und Geschäftsprozess-Interaktionen erhalten. Sämtliche Browserfehler werden weiterhin geprüft und nicht unterdrückt.
 
 Die Quality-Workflow-Matrix enthält Dashboard, Finanzübersicht und Chat jetzt auch in WebKit. Screenshots und JSON-Ergebnisse werden als Workflow-Artefakt hochgeladen. Browsergeräteemulation wird ausdrücklich nicht als physische Geräteprüfung gewertet.
 
