@@ -26,7 +26,7 @@ const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const browser=await browserType.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--single-process']}: {})});
 const customer={id:'customer-one',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
-const employee={id:'employee-one',first_name:'Test',last_name:'Person',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
+const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
 const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent'};
@@ -101,6 +101,7 @@ try{
       assert.equal(await page.locator('.bo-metric-tiles').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=760?2:4);
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/finanzen'){assert.equal(await page.locator('.finance-overview-chart button').count(),3);assert.ok(await page.locator('.finance-overview-chart .finance-bar-pair i').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Real finance values produce visible bars');}
+    if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect();return composer.bottom<=innerHeight&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays inside the viewport');

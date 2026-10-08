@@ -1680,6 +1680,7 @@
   .entity-hero h2{font-size:18px}
   .entity-hero p{font-size:11px}
   .detail-list>div{grid-template-columns:minmax(94px,31%) 1fr;gap:12px;padding:12px 0}
+  .detail-list>.employee-email{grid-template-columns:minmax(0,1fr);gap:var(--field-label-gap)}
 
   .form-page,
   .form-page.narrow,

@@ -750,14 +750,14 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
     </div>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
-      {!editingRecord?<dl className="detail-list">
-        {email&&<div><dt>E-Mail</dt><dd><a href={"mailto:"+email}>{email}</a></dd></div>}
+      {!editingRecord?<><SectionTitle title="Mitarbeiterdetails"/><dl className="detail-list">
+        <div className="employee-email"><dt>E-Mail</dt><dd>{email?<a href={"mailto:"+email}>{email}</a>:"Keine E-Mail hinterlegt"}</dd></div>
         {phone&&<div><dt>Telefon</dt><dd><a href={"tel:"+phone}>{phone}</a></dd></div>}
         {entryDate&&<div><dt>Eintritt</dt><dd>{swissDate(entryDate)}</dd></div>}
         <div><dt>Wochenstunden</dt><dd>{Number(weeklyHours).toLocaleString("de-CH")} h/Woche</dd></div>
         <div><dt>Ferientage / Jahr</dt><dd>{Number(vacationDays).toLocaleString("de-CH")} Tage/Jahr</dd></div>
         {address&&<div><dt>Adresse</dt><dd>{address}</dd></div>}
-      </dl>:<div className="form-grid two">
+      </dl></>:<div className="form-grid two">
         <Field label="Vorname"><input required autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input required autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
         <Field label="E-Mail"><input required autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
