@@ -253,8 +253,12 @@ jobs:
           DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
           VERSION_URL="$PRODUCTION_URL/api/health"
           CONSECUTIVE=0
+          # App Service may keep routing to the old worker until the new
+          # Node runtime and authentication sidecar finish warming up.
+          # Allow ten minutes, bounded by wall-clock time rather than retries.
+          DEADLINE=$((SECONDS + 600))
 
-          for attempt in {1..40}; do
+          for attempt in {1..120}; do
             code=$(curl -sS -o /tmp/binso-convergence.json -w "%{http_code}" --max-time 20 -H 'Cache-Control: no-cache' "$VERSION_URL?probe=$attempt" || true)
 
             if [ "$code" = "200" ] && grep -q "$DEPLOY_SHA" /tmp/binso-convergence.json; then
@@ -265,16 +269,16 @@ jobs:
               fi
             else
               CONSECUTIVE=0
-              echo "Waiting for all App Service workers to converge ($attempt/40)..."
+              echo "Waiting for all App Service workers to converge ($attempt/120)..."
             fi
 
-            if [ "$attempt" -eq 40 ]; then
+            if [ "$attempt" -eq 120 ] || [ "$SECONDS" -ge "$DEADLINE" ]; then
               echo "::error::Azure App Service did not converge on $DEPLOY_SHA."
               cat /tmp/binso-convergence.json 2>/dev/null || true
               exit 1
             fi
 
-            sleep 3
+            sleep 5
           done
 
       - name: Verify current production build and routes
