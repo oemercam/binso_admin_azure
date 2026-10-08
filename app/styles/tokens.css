@@ -1,4 +1,11 @@
 :root{
+  --stat-cell-min:120px;
+  --insight-panel-min:240px;
+  --operator-detail-panel-min:420px;
+  --operator-stat-min:72px;
+  --group-row-h:64px;
+  --check-size:18px;
+  --form-column-min:220px;
   --workspace-viewport-height:100dvh;
   --workspace-viewport-top:0px;
   --workspace-header-height:58px;

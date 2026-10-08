@@ -22,3 +22,15 @@ for(const route of routes){
  }
  console.log(`Verified deployed UI assets: /${route}`);
 }
+
+// File tracing may already create public/. Validate the actual merged public
+// payload as served bytes, not only Next's hashed stylesheets.
+for(const relative of ['sw.js','manifest-app.webmanifest','brand/pwa-icon-192.png','fonts/pdf/LiberationSans-Regular.ttf','fonts/pdf/LiberationSans-Bold.ttf']){
+ const expected=fs.readFileSync(path.join(artifact,'public',relative));
+ const url=new URL(base+'/'+relative);url.searchParams.set('release_verify',Date.now().toString());
+ const response=await fetch(url,{headers:{'cache-control':'no-cache, no-store'},signal:AbortSignal.timeout(30000)});
+ if(!response.ok)throw new Error(`/${relative}: HTTP ${response.status}`);
+ const actual=Buffer.from(await response.arrayBuffer());
+ if(!actual.equals(expected))throw new Error(`/${relative}: public bytes differ from verified artifact.`);
+ console.log(`Verified deployed public asset: /${relative}`);
+}

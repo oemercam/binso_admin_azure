@@ -99,6 +99,12 @@ export function Button({
   return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
 }
 
+/** Related-record navigation must consume access inside the AppShell provider. */
+export function AccessLink({href,children,fallback=null,className}:{href:string;children:React.ReactNode;fallback?:React.ReactNode;className?:string}){
+  const access=usePageAccess();
+  return access.canOpen(href)?<Link href={href} className={className}>{children}</Link>:<>{fallback}</>;
+}
+
 export function IconButton({ label, icon, onClick }: { label: string; icon: string; onClick?: () => void }) {
   return <button className="icon-button" type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></button>;
 }
@@ -114,7 +120,8 @@ export function SectionTitle({ title, action }: { title: string; action?: React.
 export function Field({ label, children, className = "",allowReadOnlyInput=false }: { label: string; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean }) {
   const access=usePageAccess();
   const fields=access.write||allowReadOnlyInput?children:Children.map(children,child=>isValidElement<Record<string,unknown>>(child)&&typeof child.type==='string'&&['input','select','textarea'].includes(child.type)?cloneElement(child,{disabled:true}):child);
-  return <label className={`form-field ${className}`.trim()}><span>{label}</span>{fields}</label>;
+  const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&child.type==='input'&&['checkbox','radio'].includes(String(child.props.type)));
+  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<span>{label}</span>}{inline?<span>{label}</span>:fields}</label>;
 }
 
 export function EmptyState({ icon = "file", title, text, action }: { icon?: string; title: string; text: string; action?: React.ReactNode }) {

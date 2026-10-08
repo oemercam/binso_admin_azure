@@ -430,6 +430,8 @@ try{
  const draftPdf=await documentPdf(pdfInvoice,company);
  const generatedPdf=await documentPdf({...pdfInvoice,status:'sent'},company);
  assert.ok(draftPdf.length<generatedPdf.length,'Draft PDF never exposes a payable QR code');
+ assert.ok(generatedPdf.toString('latin1').includes('/FontFile2'),'The real PDF embeds font outlines for consistent preview/download typography');
+ assert.ok(generatedPdf.toString('latin1').includes('+LiberationSans-Bold')&&generatedPdf.toString('latin1').includes('+LiberationSans'),'The PDF includes regular and bold faces');
  if(process.env.BINSO_PDF_QA_DIR){await fs.mkdir(process.env.BINSO_PDF_QA_DIR,{recursive:true});for(const [name,doc] of [['invoice',{...pdfInvoice,status:'sent'}],['partial',{...pdfInvoice,status:'partial',paid_amount:100}],['draft',pdfInvoice],['long',{...pdfInvoice,status:'sent',items:Array.from({length:75},(_,i)=>({...pdfInvoice.items[0],description:'Position '+(i+1)+' – professionelle Beratung und Implementation'}))}],['oversized',{...pdfInvoice,status:'sent',items:[{...pdfInvoice.items[0],description:'Lange Beschreibung mit vollständigem Inhalt. '.repeat(300)+'ENDMARKER'}]}]])await fs.writeFile(process.env.BINSO_PDF_QA_DIR+'/'+name+'.pdf',await documentPdf(doc,company));}
  assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 1'),'Compact invoice and QR slip share one A4 page');
  const cancelledPdf=await documentPdf((await listApiBusiness(client,session,'documents','number=eq.'+timeDraft.number))[0],company);assert.ok(cancelledPdf.length<generatedPdf.length,'Cancelled document has no payable QR code');

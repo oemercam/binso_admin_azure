@@ -227,6 +227,7 @@
     grid-template-columns:minmax(0,1fr);
     gap:var(--desktop-section-gap);
   }
+  .page-head-detail{margin-bottom:20px;position:sticky;top:var(--desktop-header-h);z-index:17;background:var(--color-bg)}
 }
 
 /* Medium desktop / split view */
@@ -422,8 +423,8 @@
     padding-right:0;
   }
 
-  .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid,
+  .form-grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(var(--form-column-min),calc((100% - var(--field-group-gap))/2))),1fr))}
   .document-line-items{min-width:0}
 }
 
@@ -802,7 +803,6 @@
   .desktop-detail-main,
   .entity-edit-main{min-width:0}
   .desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}
-  .page-head-detail{margin-bottom:20px}
   .page-head-detail + :is(.desktop-detail-workspace,.document-desktop-workspace,.desktop-detail-single,.entity-edit-workspace){margin-top:0}
   .employee-tab-panel{padding:0}
   .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
@@ -938,9 +938,9 @@
     justify-content:space-between;
     gap:12px;
     border-bottom:1px solid var(--color-line);
-    background:color-mix(in srgb,var(--color-bg) 96%,transparent);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
+    background:var(--color-bg);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
   }
   /* Authenticated web header contract: global search, running timer, notifications, account. */
   .desktop-appbar>.desktop-search{
@@ -1096,16 +1096,6 @@
   }
   .mobile-header-detail .mobile-header-leading{display:contents}
   .mobile-header-detail .mobile-back{grid-column:1;justify-self:start}
-  .mobile-header-detail .mobile-header-title{
-    grid-column:2;
-    min-width:0;
-    max-width:100%;
-    text-align:center;
-    padding-inline:6px;
-    filter:none;
-    opacity:1;
-    text-shadow:none;
-  }
   .mobile-header-detail .mobile-detail-actions{
     grid-column:3;
     width:auto;
@@ -1424,11 +1414,6 @@
   .mobile-header:not(.mobile-header-detail){position:sticky}
   .mobile-header:not(.mobile-header-detail) .header-timer{position:absolute;left:50%;transform:translateX(-50%);z-index:1}
   .mobile-header:not(.mobile-header-detail) .mobile-header-leading,.mobile-header:not(.mobile-header-detail) .mobile-header-actions{position:relative;z-index:2}
-  .mobile-header-detail{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto auto;
-    align-items:center;
-  }
   .mobile-header-detail>.header-timer{
     position:static;
     transform:none;
@@ -1446,15 +1431,6 @@
   }
   .mobile-header-detail .mobile-header-leading{width:100%;min-width:0;gap:0}
   .mobile-header-detail .mobile-header-actions{display:none}
-  .mobile-header-detail .mobile-header-title{
-    max-width:none;
-    min-width:0;
-    flex:1;
-    padding-right:8px;
-    font-size:15px;
-    font-weight:700;
-    text-align:center;
-  }
   .mobile-back{width:40px;height:40px;display:grid;place-items:center;margin-left:-8px}
   .mobile-detail-actions{display:flex;align-items:center;gap:2px;margin-left:auto}
   .mobile-detail-actions .document-header-icons{display:flex;gap:2px}
@@ -1486,7 +1462,6 @@
   .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
   .page-head h1{font-size:21px;line-height:1.12}
   .page-head p{max-width:34rem;margin-top:6px;font-size:11px}
-  .page-head-detail{display:none}
   .page-head-detail>div>h1,
   .page-head-detail>div>p,
   .page-head-detail .page-actions{display:none}
@@ -1943,10 +1918,8 @@
   /* Keep the final business rows fully clear of the floating PWA navigation. */
   .page-container{scroll-padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px)}
   .page-container> :last-child{margin-bottom:24px}
-  .time-groups{gap:14px}
-  .time-group{padding-bottom:14px}
-  .time-group-head{margin-bottom:4px}
-  .time-filter-toolbar + .chips{flex-wrap:wrap;overflow:visible}
+  .time-filter-toolbar + .chips{flex-wrap:nowrap;overflow-x:auto}
+  .time-filter-toolbar + .chips>button{flex-shrink:0}
   .finance-overview-months .finance-period-head,
   .finance-overview-months .finance-period-table>button{display:grid;grid-template-columns:54px repeat(3,minmax(0,1fr));gap:6px;min-width:0;min-height:46px;align-items:center;text-align:right;padding:8px 0}
   .finance-overview-months .finance-period-table{overflow:visible}
@@ -2521,26 +2494,12 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
     transform:none;
     backface-visibility:visible;
   }
-  .mobile-header-detail{
-    display:grid;
-    grid-template-columns:40px minmax(0,1fr) auto;
-    gap:4px;
-  }
   .mobile-header-detail .mobile-header-leading{
     display:contents;
   }
   .mobile-header-detail .mobile-back{
     grid-column:1;
     margin:0 0 0 -8px;
-  }
-  .mobile-header-detail .mobile-header-title{
-    grid-column:2;
-    width:100%;
-    min-width:0;
-    max-width:100%;
-    padding:0 4px;
-    text-align:center;
-    font-size:14px;
   }
   .mobile-header-detail .mobile-detail-actions{
     grid-column:3;
@@ -2658,7 +2617,6 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .mobile-back{
     width:44px;height:44px;min-width:44px;min-height:44px;
   }
-  .mobile-header-detail{grid-template-columns:minmax(0,1fr) auto auto}
   .mobile-detail-actions .icon-button{width:44px;height:44px;min-width:44px}
   .mobile-header-detail .mobile-back{margin-left:-10px}
 
@@ -2868,27 +2826,38 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-position-summary>svg{justify-self:end}
 
 .mobile-header-detail{
-    position:relative;
     display:grid;
     grid-template-columns:44px minmax(0,1fr) 44px;
     align-items:center;
     gap:0;
+    position:sticky;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
+    height:auto;
+    min-height:calc(var(--mobile-header-h) + var(--safe-top));
   }
   .mobile-header-detail .mobile-header-leading{display:contents}
   .mobile-header-detail .mobile-back{grid-column:1;margin:0;justify-self:start}
   .mobile-header-detail .mobile-header-title{
     grid-column:2;
     min-width:0;
-    padding:0 8px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    max-width:100%;
     text-align:center;
+    padding-inline:6px;
+    filter:none;
+    opacity:1;
+    text-shadow:none;
+    flex:1;
+    padding-right:8px;
     font-size:14px;
     font-weight:700;
+    width:100%;
+    padding:0 8px;
+    overflow:visible;
+    white-space:normal;
     line-height:1.2;
+    overflow-wrap:anywhere;
+    flex-wrap:wrap;
   }
   .mobile-header-detail .mobile-detail-actions{grid-column:3;min-width:44px;margin:0;justify-self:end}
   .mobile-header-detail:not(:has(.mobile-detail-actions))::after{content:"";grid-column:3;width:44px;height:44px}
@@ -3188,11 +3157,11 @@ input:not([type="checkbox"]):not([type="radio"]),
   .document-modal .qr-page-reference{margin-top:4%;font-size:inherit}
   .document-modal .paper-closing{font-size:inherit;margin-block:5%}
   .document-modal .paper-unit{font-size:inherit}
+  .page-head-detail{display:none}
 }
 
 /* Small mobile refinement */
 @media (max-width:640px){
-  .contact-list>div{flex-wrap:wrap;gap:8px}
   .contact-actions{margin-left:auto}
   .time-filter-toolbar .searchbox{flex-basis:auto;width:auto}
   .time-filter-toolbar .form-field{flex:1;min-width:0;width:auto}
@@ -3331,8 +3300,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 .page-head h1{overflow-wrap:anywhere}
 .page-head .page-actions{min-width:0;flex-shrink:0}
 .mobile-header-leading{min-width:0;overflow:hidden}
-.mobile-header-title{min-width:0;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;white-space:nowrap}
-.mobile-header-title>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.mobile-header-title{min-width:0;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;overflow:visible;white-space:normal}
+.mobile-header-title>span:first-child{min-width:0;overflow:visible;overflow-wrap:anywhere}
 .mobile-header-title>.status{flex:none;font-size:9px}
 .mobile-header-actions,.mobile-detail-actions{flex-shrink:0}
 
