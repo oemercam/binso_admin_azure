@@ -45,6 +45,8 @@ Weitere lokale Checks: `pnpm release:check`, `pnpm lint`, `pnpm typecheck`, `pnp
 
 `scripts/ux-browser-test.mjs` rendert alle 46 bestehenden/ergänzten Routen bei 375/430/820/1024/1440 px in Light/Dark (460 Kombinationen). WebKit prüft zusätzlich 14 betroffene Routen bei 375/430/820 px in beiden Themes (84 Kombinationen). Interaktionen prüfen Zeitraum-Anwenden und Verwerfen, periodenunabhängigen Bestand, Gruppenminuten, Formulare/Sheets bei 400/568 px Höhe, Chat mit 30 Nachrichten, Fehler/Retry/Doppelklick und echtes PDF-Zoom-Verhalten. Unbehandelte API-Fixtures schlagen geschlossen fehl; diese Läufe schreiben keine Produktionsdaten.
 
+Die isolierte Browser-Testversion ist auf Playwright 1.62.1 (WebKit 26.5) festgelegt und entspricht der lokal erfolgreich geprüften Version. Die bisherige CI-Version 1.56.1 meldete abgebrochene RSC-Vorladeanfragen beim harten Seitenwechsel als WebKit-Zugriffskontrollfehler. Es werden keine Browserfehler unterdrückt.
+
 Die Quality-Workflow-Matrix enthält Dashboard, Finanzübersicht und Chat jetzt auch in WebKit. Screenshots und JSON-Ergebnisse werden als Workflow-Artefakt hochgeladen. Browsergeräteemulation wird ausdrücklich nicht als physische Geräteprüfung gewertet.
 
 Für den Vorher-Build einen separaten Worktree am genannten Commit anlegen, den aktuellen Browser-Test kopieren und mit `BINSO_UX_BASELINE=1 BINSO_UX_MATRIX_ONLY=1` ausführen. Identische Fixture-Daten verwenden. `BINSO_UX_CAPTURE_ALL=1` erfasst zusätzliche Screenshots und neutrale Navigationsausschnitte. Bei 430 und 1440 px beide Themes erfassen für:
