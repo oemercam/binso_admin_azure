@@ -102,7 +102,7 @@ export function IconButton({ label, icon, onClick }: { label: string; icon: stri
   return <button className="icon-button" type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></button>;
 }
 
-export function Metric({ label, value, hint, icon }: { label: string; value: string; hint?: string; icon?: string }) {
+export function Metric({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: string; icon?: string }) {
   return <div className="metric"><div className="metric-top"><span>{label}</span>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small>{hint}</small>}</div>;
 }
 

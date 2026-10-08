@@ -5,6 +5,7 @@ import {matchesRecordChip} from "@/lib/list-filter";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Icon, Status } from "./ui";
+import { ListSearch } from "./binso-ux";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(status)) return "success";
@@ -82,11 +83,11 @@ export function RecordsView({
 
   const cycleSort=(index=firstSortIndex)=>{if(sortIndex!==index){setSortIndex(index);setSort("asc");return;}setSort(current=>current==="default"?"asc":current==="asc"?"desc":"default")};
   const hasFilters=query.trim().length>0 || activeChip!==(chips[0]??"Alle") || sort!=="default";
-  const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument"} as Record<string,string>)[countLabel]??countLabel;
+  const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;
 
   return <>
     <div className="toolbar">
-      <label className="searchbox"><Icon name="search"/><input aria-label={placeholder} value={query} onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/></label>
+      <ListSearch value={query} onChange={setQuery} placeholder={placeholder}/>
       <div className="chips">{chips.map((chip)=><button type="button" aria-pressed={chip===activeChip} onClick={()=>setActiveChip(chip)} className={chip===activeChip?"active":""} key={chip}>{chip}</button>)}</div>
       <label title={sort==="default"?"Sortieren":`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==="asc"?"↑":"↓"}`} className={`filter-button ${sort!=="default"?"active":""}`}><Icon name="filter" size={17}/><select aria-label="Sortierung" value={sort==="default"?"default":`${sortIndex}:${sort}`} onChange={e=>{if(e.target.value==="default"){setSort("default");setSortIndex(firstSortIndex)}else{const [index,direction]=e.target.value.split(":");setSortIndex(Number(index));setSort(direction as "asc"|"desc")}}}><option value="default">Sortieren</option>{(columns?.length?columns:[{label:"Name",index:firstSortIndex}]).flatMap(column=>[<option key={`${column.index}:asc`} value={`${column.index}:asc`}>{column.label} ↑</option>,<option key={`${column.index}:desc`} value={`${column.index}:desc`}>{column.label} ↓</option>])}</select></label>
       {(loading||visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${visible.length} ${visible.length===1?singularCountLabel:countLabel}`}</span>}

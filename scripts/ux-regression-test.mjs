@@ -76,7 +76,7 @@ console.log('Medium desktop uses the full content width and keeps create actions
 
 assert.ok(appCss.includes('.support-master-detail{'),'Support list must use the shared full-width workspace');
 assert.ok(appCss.includes('grid-template-columns:minmax(0,1fr);'),'Support list must not reserve an empty preview column');
-assert.ok(appCss.includes('.support-summary .metric+.metric{border-left:1px solid var(--color-line)}'),'Support summary must use the shared compact metric strip');
+assert.ok(!/\.metric(?:\+\.metric|:nth-child\([^)]*\))\{border-(?:left|top):1px/.test(appCss+responsiveCss),'Metrics must not have dividers between values');
 console.log('Support list uses the canonical full-width list and compact summary layout.');
 
 assert.ok(responsiveCss.includes('.plan-hero{'),'Subscription plan summary must use the shared flat desktop section');
@@ -312,7 +312,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
  const render=(chip='Alle',sort='default',sortIndex=1)=>{
   let hook=0;const states=['',chip,sort,sortIndex,true];const exports={};
-  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues);
+  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}));
   return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
@@ -371,4 +371,28 @@ console.log('Project-linked idle timer context survives synchronization without 
   };inspect(ast);
  }
  assert.ok(checked>=12);console.log('Unknown server failures stay errors across '+checked+' form, document, time and billing feedback paths.');
+}
+
+// Execute the actual expense/document handlers, including same-frame clicks and failure retries.
+{
+ const handler=(file,functionName,variable,scope)=>{
+  const ast=ts.createSourceFile(file,read(file)||'',ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+  const fn=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===functionName);
+  let initializer;
+  const inspect=node=>{if(ts.isVariableDeclaration(node)&&node.name.getText(ast)===variable)initializer=node.initializer;else ts.forEachChild(node,inspect)};
+  inspect(fn);assert.ok(initializer,'Actual mutation handler must exist');
+  const compiled=ts.transpileModule('const run='+initializer.getText(ast)+';', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+  return Function(...Object.keys(scope),compiled+'\nreturn run;')(...Object.values(scope));
+ };
+ const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1'}}),reject:()=>reject(new Error('offline'))}};
+ const noop=()=>{};
+ const docScope=()=>({documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
+ const expenseScope=()=>({expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
+ for(const [file,fn,scopeFactory] of [['components/documents.tsx','DocumentPage',docScope],['components/app-pages.tsx','ExpenseForm',expenseScope]]){
+  const pending=makeWrite();const scope=scopeFactory();scope.apiPost=pending.write;scope.apiPatch=pending.write;
+  const run=handler(file,fn,'save',scope);const first=run();await run();assert.equal(pending.calls(),1,fn+' rejects same-frame duplicate writes');pending.resolve();await first;await run();assert.equal(pending.calls(),1,fn+' stays locked until navigation');
+  const retry=makeWrite();const retryScope=scopeFactory();retryScope.apiPost=retry.write;retryScope.apiPatch=retry.write;
+  const retryRun=handler(file,fn,'save',retryScope);const failure=retryRun();retry.reject();await failure;const next=retryRun();assert.equal(retry.calls(),2,fn+' releases the lock after failure');retry.resolve();await next;
+ }
+ console.log('Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.');
 }

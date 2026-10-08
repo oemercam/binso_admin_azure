@@ -291,6 +291,7 @@
     right:28px;
   }
 
+  .operator-payment-insights{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
   .operator-sidebar{width:190px}
   .operator-main{margin-left:190px}
   .operator-grid.thirds{grid-template-columns:1fr 1fr}
@@ -505,7 +506,7 @@
     gap:var(--desktop-action-gap);
   }
   .desktop-page-actions:empty{display:none}
-  .page-container:has(>.desktop-page-actions:not(:empty)) .mobile-sticky-save{display:none}
+  .page-container:has(.bo-detail-heading .page-actions) .mobile-sticky-save{display:none}
   .desktop-page-actions .button{
     min-height:var(--desktop-action-h);
     height:var(--desktop-action-h);
@@ -571,7 +572,7 @@
   .activity-list>div,
   .activity-list>a{min-height:58px}
 
-  .metrics-grid{gap:0}
+  .metrics-grid{gap:10px}
   .metric{
     min-height:76px;
     padding:13px 16px;
@@ -1075,11 +1076,9 @@
   .form-grid{gap:var(--field-group-gap)}
 
   /* Dashboard: compact KPIs, useful content gets the space. */
-  .metrics-grid{gap:0;border:0}
-  .metric{min-height:96px;padding:14px 18px;border:0}
-  .metric:first-child{padding-left:0}
-  .metric+.metric{border-left:1px solid var(--color-line)}
-  .metric strong{margin:10px 0 4px;font-size:22px}
+  .metrics-grid{gap:10px;border:0}
+  .metric{min-height:74px;padding:12px 14px;border:0}
+  .metric strong{margin:7px 0 0;font-size:20px}
   .dashboard-grid,.detail-grid{gap:var(--desktop-workspace-gap);margin-top:var(--desktop-section-gap)}
   .quick-section{margin-top:var(--desktop-section-gap)}
   .quick-grid{gap:8px}
@@ -1110,7 +1109,7 @@
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
-    grid-template-columns:44px minmax(0,1fr) 44px;
+    grid-template-columns:44px minmax(0,1fr) auto;
     background:var(--color-bg);
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
@@ -1131,7 +1130,7 @@
   }
   .mobile-header-detail .mobile-detail-actions{
     grid-column:3;
-    width:44px;
+    width:auto;
     min-width:44px;
     margin:0;
     justify-self:end;
@@ -1585,11 +1584,8 @@
 
   .button{min-height:44px;height:44px;padding-inline:14px}
   .metrics-grid,
-  .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:0}
+  .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:0}
   .metric{min-height:76px;padding:12px 14px}
-  .metric:nth-child(odd){padding-left:0}
-  .metric:nth-child(even){border-left:1px solid var(--color-line)}
-  .metric:nth-child(n+3){border-top:1px solid var(--color-line)}
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
   .metrics-grid{border:0}
@@ -1611,7 +1607,7 @@
   .surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .quick-section{margin-top:var(--mobile-section-gap)}
   .quick-section>.section-title{margin-bottom:12px}
-  .quick-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .quick-grid .button{min-height:44px;height:44px;padding-inline:12px}
 
   .toolbar{
@@ -2945,7 +2941,7 @@ input:not([type="checkbox"]):not([type="radio"]),
     box-shadow:none;
   }
 
-.metric,.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
+.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
 
 .revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px;font-size:8px}.revenue-bars i{border-radius:3px 3px 1px 1px}
 
@@ -3053,8 +3049,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Hide the complete label box, including Button's wrapper, so the icon has one grid cell. */
   .responsive-create-action>span{display:none}
   .responsive-create-action>svg{display:block;grid-area:1 / 1;align-self:center;justify-self:center}
-  .mobile-header-detail .mobile-back{margin-inline-start:calc(var(--control-h-mobile) / -2)}
-  .mobile-header-detail .mobile-detail-actions{margin-inline-end:calc(var(--control-h-mobile) / -2)}
   .document-facts b{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
   .time-layout>.time-section{border-top:0}
   .time-layout>.timer-card>.tabs{border-top:0}
@@ -3164,14 +3158,12 @@ input:not([type="checkbox"]):not([type="radio"]),
   .operator-table-row>*:last-child:nth-child(odd){grid-column:1/-1}
   .operator-table-card{overflow:visible}
 
-  .finance-flow{
-    grid-template-columns:1fr;
-    gap:0;
-  }
+  .finance-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
   .finance-flow-primary,
-  .finance-flow-result{padding:18px 0}
-  .finance-flow-costs{grid-template-columns:1fr}
-  .finance-flow-costs>div{padding:12px 0}
+  .finance-flow-result{padding:12px 14px}
+  .finance-flow-result{grid-column:2;grid-row:1}
+  .finance-flow-costs{grid-column:1/-1;grid-row:2;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  .finance-flow-costs>div{padding:10px 14px}
   .finance-period-head,
   .finance-period-table>button{
     grid-template-columns:minmax(54px,.7fr) repeat(3,minmax(82px,1fr));
@@ -3251,8 +3243,8 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-header-detail .mobile-detail-actions .icon-button{width:36px;height:40px;min-width:36px}
   .mobile-header-title{font-size:13px}
   .record{grid-template-columns:34px minmax(0,1fr) auto 16px}
-  .record>.status{display:none}
-  .record>strong{grid-column:3}
+  .record>.status{grid-column:2 / 4;grid-row:auto;justify-self:start;max-width:100%;min-width:0}
+  .record>strong{grid-column:3;min-width:0}
   .record>svg:last-child{grid-column:4}
   .documents-summary{grid-template-columns:1fr}
   .document-line-items>.document-line-item{grid-template-columns:minmax(0,1fr) 84px}
@@ -3293,3 +3285,79 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 }
 
+
+/* Binso One shared page/detail UI primitives. */
+.bo-page-heading,.bo-detail-heading{display:grid;gap:6px;min-width:0;flex:1}
+.bo-page-heading-main,.bo-detail-heading-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;flex:1;overflow-wrap:anywhere}
+.bo-page-heading p,.bo-detail-heading p{margin:0;color:var(--color-muted, #71717a);font-size:.875rem}
+.bo-detail-heading-main .status{flex-shrink:0}
+.bo-create-action.button{width:44px;height:44px;flex:0 0 44px;min-width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+.bo-create-action:hover:not(:disabled){opacity:.85}
+.bo-create-action:active:not(:disabled){opacity:.7}
+.bo-create-action:disabled{opacity:.45;cursor:not-allowed}
+.bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
+.bo-metric-tiles{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}
+
+.bo-list-search{display:flex;align-items:center;gap:10px;width:100%;min-width:0;border:1px solid var(--color-line,#d4d4d8);border-radius:10px;padding:0 12px;min-height:44px}
+.bo-list-search input{width:100%;min-width:0;border:0;background:transparent;color:inherit;outline:0;font:inherit}
+.bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
+
+
+
+/* Keep common row action targets operable and visually consistent. */
+.bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
+.bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:10px}
+.bo-detail-heading-main{flex-wrap:wrap}
+.bo-detail-heading-main .status{margin-left:auto}
+.bo-detail-heading-main .page-actions{margin-left:auto;position:static;flex:none}
+
+/* Shared mobile/desktop sheet content guards: prevent label and action collisions. */
+.bottom-sheet,.bottom-sheet *{box-sizing:border-box}
+.bottom-sheet{max-width:100%;overflow-x:hidden}
+.bottom-sheet .sheet-menu,.bottom-sheet .sheet-header{min-width:0}
+.bottom-sheet .sheet-menu a,.bottom-sheet .sheet-menu button{min-width:0;max-width:100%}
+.bottom-sheet .sheet-menu b,.bottom-sheet .sheet-menu small{min-width:0;overflow-wrap:anywhere}
+.bottom-sheet input,.bottom-sheet select,.bottom-sheet textarea{max-width:100%;min-width:0}
+.bottom-sheet .sheet-header>div{min-width:0}
+
+/* Standardized heading and control sizing without changing navigation structure. */
+.page-head{min-width:0}
+.page-head>div{min-width:0}
+.page-head h1{overflow-wrap:anywhere}
+.page-head .page-actions{min-width:0;flex-shrink:0}
+.mobile-header-leading{min-width:0;overflow:hidden}
+.mobile-header-title{min-width:0;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;white-space:nowrap}
+.mobile-header-title>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.mobile-header-title>.status{flex:none;font-size:9px}
+.mobile-header-actions,.mobile-detail-actions{flex-shrink:0}
+
+/* Accessible list controls and robust data-table cell sizing. */
+.desktop-record-table,.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
+.desktop-record-row>[role="cell"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desktop-record-row>.table-status-cell{overflow:visible;white-space:normal}
+.desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible,.toolbar .filter-button select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.bo-list-search:focus-within{outline:2px solid currentColor;outline-offset:2px}
+
+/* Form sizing contract shared across sheets, create pages and detail editors. */
+.form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}
+.form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
+.form-field textarea{resize:vertical;overflow-wrap:anywhere}
+.form-field input:focus-visible,.form-field select:focus-visible,.form-field textarea:focus-visible{outline-offset:2px}
+.page-container form{min-width:0;max-width:100%}
+.page-container form button{max-width:100%}
+
+/* Predictable action spacing and scroll-safe detail content. */
+.page-container,.page-container>*,.page-container section{min-width:0}
+.page-head .page-actions{display:flex;align-items:center;gap:8px}
+.page-head .page-actions .button{white-space:nowrap}
+.bottom-sheet .sheet-menu{overflow-wrap:anywhere}
+.bottom-sheet .sheet-menu a:focus-visible,.bottom-sheet .sheet-menu button:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+
+/* Uniform metadata, status alignment and compact list density. */
+.record-main{min-width:0}
+.record-main b,.record-main small{max-width:100%}
+.record>.status{max-width:100%;text-align:center}
+.desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}

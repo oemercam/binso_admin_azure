@@ -21,6 +21,7 @@ import {buildFinanceMonths} from "@/lib/finance-periods";
 import {plans as subscriptionPlans} from '@/lib/plans';
 import {legalConfig} from '@/config/legal';
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
+import { ActionsMenu, CreateAction, MetricTiles, MetricTile } from "./binso-ux";
 
 function moneyChf(value:unknown){
   const amount=Number(value);
@@ -73,7 +74,7 @@ function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[])
   if(collection==="expenses") return items.map(item=>{
     const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
     const person=employee?[employee.first_name,employee.last_name].filter(Boolean).join(" "):"Nicht zugewiesen";
-    const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",rejected:"Abgelehnt"};
+    const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
     return [String(item.merchant??""),person,moneyChf(item.amount),String(item.id??""),statusMap[String(item.status)]??String(item.status??"")];
   });
   if(collection==="payments") return items.map(item=>{
@@ -243,7 +244,7 @@ export function FinanceAnalysisPage() {
 
 export function CustomersPage() {
   const {rows:customerRows,loading,error}=useDemoRows("customers",customers);
-  return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<Button href="/kunden/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neuer Kunde"><span className="create-action-label">Neuer Kunde</span></Button>}>
+  return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<CreateAction href="/kunden/neu" label="Neuer Kunde"/>}>
     <div className="customer-records-layout">
       <div>
         <RecordsView loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={[{label:"Kunde",index:0},{label:"Kontakt",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={[city,sector].filter(value=>value&&value!=="—").join(" · ")} status={status}/>}}</RecordsView>
@@ -329,14 +330,14 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     window.setTimeout(()=>setContactToast(null),2600);
   };
 
-      if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
+      if(loadError)return <AppShell title="Kunde" subtitle="Kundendaten nicht verfügbar" active="kunden" backHref={returnTo} backLabel="Kunden"><div role="alert"><EmptyState icon="users" title="Kunde konnte nicht geladen werden" text={loadError}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href={returnTo} variant="ghost">Zur Übersicht</Button></div></AppShell>;
   if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
   const sector=String(customer.sector??"");
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
-  return <AppShell title={name} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button variant="ghost" icon="more" ariaLabel="Kundenaktionen" onClick={()=>setCustomerActions(true)}/>} >
+  return <AppShell title={name} status={status==="inactive"?"Inaktiv":"Aktiv"} statusTone={status==="inactive"?"neutral":"success"} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button variant="ghost" icon="more" ariaLabel="Kundenaktionen" onClick={()=>setCustomerActions(true)}/>} >
     <div className="customer-detail-workspace">
 
       <div className="desktop-detail-main"><div className="tabs"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Finanzen</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></div>
@@ -420,14 +421,14 @@ function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"invoice";f
  const [items,setItems]=useState<DocumentListItem[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null);
  useEffect(()=>{apiGet<{items:DocumentListItem[]}>(isProductionBackendEnabled()?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`).then(data=>setItems(data.items.map(item=>({...item,kind})))).catch(e=>setError(e instanceof Error?e.message:"Finanzen konnten nicht geladen werden.")).finally(()=>setLoading(false));},[kind,forceDemo]);
  const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote";
- return <AppShell title={title} active={route} actions={<Button href={`/${route}/neu`} icon="plus" className="page-add-button responsive-create-action" ariaLabel={invoice?"Neue Rechnung":"Neues Angebot"}>{invoice?"Neue Rechnung":"Neues Angebot"}</Button>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error}/></AppShell>;
+ return <AppShell title={title} active={route} actions={<CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error}/></AppShell>;
 }
 export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="offer" forceDemo={forceDemo}/>;}
 export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="invoice" forceDemo={forceDemo}/>;}
 
 export function PaymentsPage() {
   const {rows:paymentRows,loading,error}=useDemoRows("payments",payments);
-  return <AppShell title="Zahlungen" subtitle="Erfasste Zahlungseingänge übersichtlich verwalten." active="zahlungen" actions={<Button href="/zahlungen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Zahlung erfassen"><span className="create-action-label">Zahlung erfassen</span></Button>}>
+  return <AppShell title="Zahlungen" subtitle="Erfasste Zahlungseingänge übersichtlich verwalten." active="zahlungen" actions={<CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/>}>
     <FinanceTabs/><RecordsView countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Storniert"]} columns={[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}]} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><RecordRow href={`/zahlungen/${id}`} icon="wallet" title={`${date} · ${name}`} meta={meta} value={amount} status={status}/>}</RecordsView>
   </AppShell>;
 }
@@ -517,7 +518,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle="Daten werden geladen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":"Daten werden geladen."} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><div role={paymentError?"alert":"status"}><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></div>{paymentError&&<Link className="button" href="/zahlungen">Zur Zahlungsübersicht</Link>}</AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;
@@ -535,8 +536,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
 
 export function ProductsPage() {
   const {rows:productRows,loading,error}=useDemoRows("products",products);
-  return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<Button href="/produkte/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Produkt"><span className="create-action-label">Neues Produkt</span></Button>}>
-    <RecordsView loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]} columns={[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
+  return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<CreateAction href="/produkte/neu" label="Neues Produkt"/>}>
+    <RecordsView countLabel="Produkte" loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]} columns={[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -558,11 +559,13 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const saveRecordPending=useRef(false);
   const [editedRecord,setEditedRecord]=useState(false);
   const [savedRecord,setSavedRecord]=useState(false);
+  const [editingRecord,setEditingRecord]=useState(!existing);
 
   useEffect(()=>{
-    if(!production||!existing||!productId) return;
-    apiGet<{item:Record<string,unknown>}>("/api/products/"+encodeURIComponent(productId)).then(payload=>{
-      const item=payload.item;
+    if(!existing||!productId) return;
+    apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?"/api/products/"+encodeURIComponent(productId):"/api/demo/data?collection=products&id="+encodeURIComponent(productId)).then(payload=>{
+      const item=payload.item??payload.items?.[0];
+      if(!item)throw new Error("Produkt wurde nicht gefunden.");
       queueMicrotask(()=>{
         setName(String(item.name??""));
         setType(item.kind==="product"?"Produkt":"Dienstleistung");
@@ -601,11 +604,16 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<p role="status">Produkt wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} subtitle={existing ? type+" · "+status : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={!existing?<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>:undefined}>
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<Button requiresWrite variant="ghost" icon="edit" onClick={()=>setEditingRecord(true)}>Bearbeiten</Button>}<Button href="/angebote/neu" variant="ghost" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="ghost" icon="receipt">Rechnung erstellen</Button></ActionsMenu>{editingRecord&&<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}</>:<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
-        <div className="form-grid two">
+        {!editingRecord?<dl className="detail-list">
+          <div><dt>Verkaufspreis</dt><dd>{formatCurrency(price,"CHF")} / {({hour:"Stunde",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[unit]??unit}</dd></div>
+          <div><dt>MwSt.</dt><dd>{vatRate}%</dd></div>
+          {sku&&<div><dt>Artikelnummer</dt><dd>{sku}</dd></div>}
+          {description&&<div><dt>Beschreibung</dt><dd>{description}</dd></div>}
+        </dl>:<div className="form-grid two">
           <Field label="Name"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
           <Field label="Typ"><select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></select></Field>
           <Field label="Artikelnummer"><input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
@@ -614,10 +622,10 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="MwSt."><select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></select></Field>
           <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
-        </div>
+        </div>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>In Angebot verwenden</b><small>Neues Angebot erstellen</small></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>In Rechnung verwenden</b><small>Neue Rechnung erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
-      <div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {editingRecord&&<div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>}
     </div>
     {toast&&<Toast title={toast} tone={toast==="Produkt gespeichert."?"success":"danger"}/>}
   </AppShell>;
@@ -625,8 +633,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
 
 export function EmployeesPage() {
   const {rows:employeeRows,loading,error}=useDemoRows("employees",employees);
-  return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<Button href="/mitarbeiter/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Mitarbeiter hinzufügen"><span className="create-action-label">Mitarbeiter hinzufügen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
+  return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<CreateAction href="/mitarbeiter/neu" label="Mitarbeiter hinzufügen"/>}>
+    <RecordsView countLabel="Mitarbeiter" loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -652,17 +660,35 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const saveRecordPending=useRef(false);
   const [editedRecord,setEditedRecord]=useState(false);
   const [savedRecord,setSavedRecord]=useState(false);
+  const [editingRecord,setEditingRecord]=useState(!existing);
 
+  const [ledgerLoading,setLedgerLoading]=useState(existing);
+  const [ledgerErrors,setLedgerErrors]=useState<Partial<Record<"times"|"expenses"|"files",string>>>({});
+  const [ledgerRetry,setLedgerRetry]=useState(0);
   const [ledger,setLedger]=useState<{times:Array<{id:string;started_at:string;duration_minutes:number;project_name:string}>;expenses:Array<{id:string;merchant:string;amount:number;expense_date:string}>;files:Array<{id:string;fileName:string}>}>({times:[],expenses:[],files:[]});
   useEffect(()=>{
-    if(!production||!existing||!employeeId)return;
+    if(!existing||!employeeId)return;
+    let active=true;
     const encoded=encodeURIComponent(employeeId);
-    Promise.all([apiGet<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string}>}>("/api/time-entries?employeeId="+encoded),apiGet<{items:Array<{id:string;merchant:string;amount:number;expense_date:string}>}>("/api/expenses?employeeId="+encoded),apiGet<{items:Array<{id:string;fileName:string}>}>("/api/files?employeeId="+encoded)]).then(([times,expenses,files])=>setLedger({times:times.items,expenses:expenses.items,files:files.items})).catch(()=>setToast("Mitarbeiterdaten konnten nicht vollständig geladen werden."));
-  },[production,existing,employeeId]);
+    queueMicrotask(()=>{if(active)setLedgerLoading(true)});
+    Promise.allSettled([
+      apiGet<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string}>}>("/api/time-entries?employeeId="+encoded),
+      apiGet<{items:Array<{id:string;merchant:string;amount:number;expense_date:string}>}>("/api/expenses?employeeId="+encoded),
+      apiGet<{items:Array<{id:string;fileName:string}>}>("/api/files?employeeId="+encoded),
+    ]).then(([times,expenses,files])=>{
+      if(!active)return;
+      setLedger({times:times.status==="fulfilled"?times.value.items:[],expenses:expenses.status==="fulfilled"?expenses.value.items:[],files:files.status==="fulfilled"?files.value.items:[]});
+      const errors:Partial<Record<"times"|"expenses"|"files",string>>={};
+      for(const [key,result] of [["times",times],["expenses",expenses],["files",files]] as const){if(result.status==="rejected")errors[key]=result.reason instanceof Error?result.reason.message:"Daten konnten nicht geladen werden.";}
+      setLedgerErrors(errors);setLedgerLoading(false);
+    });
+    return()=>{active=false};
+  },[production,existing,employeeId,ledgerRetry]);
   useEffect(()=>{
-    if(!production||!existing||!employeeId) return;
-    apiGet<{item:Record<string,unknown>}>("/api/employees/"+encodeURIComponent(employeeId)).then(payload=>{
-      const item=payload.item;
+    if(!existing||!employeeId) return;
+    apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?"/api/employees/"+encodeURIComponent(employeeId):"/api/demo/data?collection=employees&id="+encodeURIComponent(employeeId)).then(payload=>{
+      const item=payload.item??payload.items?.[0];
+      if(!item)throw new Error("Mitarbeiter wurde nicht gefunden.");
       queueMicrotask(()=>{
         setFirstName(String(item.first_name??""));
         setLastName(String(item.last_name??""));
@@ -702,8 +728,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" active="mitarbeiter" backHref="/mitarbeiter">{loadingRecord?<p role="status">Mitarbeiter wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? displayName : "Mitarbeiter hinzufügen"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={!existing?<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>:undefined}>
+  if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" subtitle={recordError?"Mitarbeiterdaten nicht verfügbar":"Daten werden geladen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter">{loadingRecord?<div role="status"><EmptyState icon="users" title="Mitarbeiter wird geladen" text="Die Mitarbeiterdaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="users" title="Mitarbeiter konnte nicht geladen werden" text={recordError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href="/mitarbeiter" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} subtitle={existing ? role+" · "+load+"%" : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<Button requiresWrite variant="ghost" icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}}>Bearbeiten</Button>}<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="ghost" icon="clock">Zeiterfassung öffnen</Button><Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="ghost" icon="card">Spese erfassen</Button></ActionsMenu>{editingRecord&&<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}</>:<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
@@ -714,7 +740,14 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
     </div>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
-      <div className="form-grid two">
+      {!editingRecord?<dl className="detail-list">
+        {email&&<div><dt>E-Mail</dt><dd><a href={"mailto:"+email}>{email}</a></dd></div>}
+        {phone&&<div><dt>Telefon</dt><dd><a href={"tel:"+phone}>{phone}</a></dd></div>}
+        {entryDate&&<div><dt>Eintritt</dt><dd>{swissDate(entryDate)}</dd></div>}
+        <div><dt>Wochenstunden</dt><dd>{weeklyHours} h</dd></div>
+        <div><dt>Ferientage / Jahr</dt><dd>{vacationDays}</dd></div>
+        {address&&<div><dt>Adresse</dt><dd>{address}</dd></div>}
+      </dl>:<div className="form-grid two">
         <Field label="Vorname"><input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
         <Field label="E-Mail"><input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
@@ -726,12 +759,12 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Ferientage / Jahr"><input inputMode="decimal" value={vacationDays} onChange={e=>setVacationDays(e.target.value)}/></Field>
         <Field label="Adresse" className="full"><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>
         <Field label="Status"><select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></select></Field>
-      </div>
-      <div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>
+      </div>}
+      {editingRecord&&<div className="mobile-sticky-save"><Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></div>}
     </div>}
-    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/><div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledger.times.length&&<EmptyState icon="clock" title="Keine Arbeitszeiten" text="Für diesen Mitarbeiter sind keine Einträge geladen."/>}</section>}
-    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/><div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledger.expenses.length&&<EmptyState icon="card" title="Keine Spesen" text="Für diesen Mitarbeiter sind keine Spesen geladen."/>}</section>}
-    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledger.files.length&&<EmptyState icon="file" title="Keine Dokumente" text="Für diesen Mitarbeiter sind keine Dokumente geladen."/>}</section>}
+    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/>{ledgerLoading?<p role="status">Arbeitszeiten werden geladen …</p>:ledgerErrors.times?<div role="alert"><p>{ledgerErrors.times}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div className="compact-list">{ledger.times.map(item=><div key={item.id}><b>{item.project_name}</b><span>{new Date(item.started_at).toLocaleDateString("de-CH")}</span><strong>{(Number(item.duration_minutes)/60).toLocaleString("de-CH",{maximumFractionDigits:2})} h</strong></div>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<p role="status">Keine Arbeitszeiten erfasst</p>}</section>}
+    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/>{ledgerLoading?<p role="status">Spesen werden geladen …</p>:ledgerErrors.expenses?<div role="alert"><p>{ledgerErrors.expenses}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div className="compact-list">{ledger.expenses.map(item=><Link key={item.id} href={"/spesen/"+item.id}><b>{item.merchant}</b><span>{new Date(item.expense_date).toLocaleDateString("de-CH")}</span><strong>{moneyChf(Number(item.amount))}</strong></Link>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<p role="status">Keine Spesen erfasst</p>}</section>}
+    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel">{ledgerLoading?<p role="status">Dokumente werden geladen …</p>:ledgerErrors.files?<div role="alert"><p>{ledgerErrors.files}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div className="compact-list">{ledger.files.map(item=><a key={item.id} href={"/api/files/"+item.id+"/download"}><b>{item.fileName}</b><Icon name="file"/></a>)}</div>{!ledgerLoading&&!ledgerErrors.files&&!ledger.files.length&&<p role="status">Keine Dokumente erfasst</p>}</section>}
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{employeeTab!=="time"&&<Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link>}{employeeTab!=="expenses"&&<Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link>}</section></aside>}
     </div>
@@ -741,8 +774,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 
 export function ExpensesPage() {
   const {rows:expenseRows,loading,error}=useDemoRows("expenses",expenses);
-  return <AppShell title="Spesen" subtitle="Quittungen erfassen, prüfen und freigeben." active="spesen" actions={<Button href="/spesen/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Spese erfassen"><span className="create-action-label">Spese erfassen</span></Button>}>
-    <RecordsView loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Entwurf","Eingereicht","Genehmigt","Abgelehnt"]} columns={[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
+  return <AppShell title="Spesen" subtitle="Quittungen erfassen, prüfen und freigeben." active="spesen" actions={<CreateAction href="/spesen/neu" label="Spese erfassen"/>}>
+    <RecordsView countLabel="Spesen" loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={["Alle","Entwurf","Eingereicht","Genehmigt","Verbucht","Abgelehnt"]} columns={[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -771,8 +804,14 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [invoicedId,setInvoicedId]=useState<string|null>(null),[canFinanceExpense,setCanFinanceExpense]=useState(false);
   const [createdExpenseId,setCreatedExpenseId]=useState(expenseId??"");
   const expenseRequestKey=useRef("");
+  const expenseMutationPending=useRef(false);
+  const receiptScanPending=useRef(false);
+  const [editedExpense,setEditedExpense]=useState(false);
+  const [savedExpense,setSavedExpense]=useState(false);
   const [expenseFiles,setExpenseFiles]=useState<Array<{id:string;fileName:string}>>([]);
   const [expenseBusy,setExpenseBusy]=useState(false),[reimbursementOpen,setReimbursementOpen]=useState(false);
+  const [loadingExpense,setLoadingExpense]=useState(existing);
+  const [expenseLoadError,setExpenseLoadError]=useState<string|null>(null);
   const reimbursementDialog=useDialogFocus(reimbursementOpen,()=>{if(!expenseBusy)setReimbursementOpen(false)});
   useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(s=>setCanFinanceExpense(["owner","admin","finance"].includes(s.tenant?.role??""))).catch(()=>{});apiGet<{items:Array<{id:string;name:string}>}>("/api/customers").then(s=>setExpenseCustomers(s.items)).catch(()=>{});},[]);
   const [persistedExpenseStatus,setPersistedExpenseStatus]=useState('');
@@ -784,9 +823,10 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   useEffect(()=>{apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?"/api/expenses/options":"/api/demo/data?collection=employees").then(data=>setAvailableEmployees(data.items)).catch(()=>setToast("Mitarbeiter konnten nicht geladen werden."));},[]);
 
   useEffect(()=>{
-    if(!production||!existing||!expenseId) return;
-    apiGet<{item:Record<string,unknown>}>("/api/expenses/"+encodeURIComponent(expenseId)).then(payload=>{
-      const item=payload.item;
+    if(!existing||!expenseId) return;
+    apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?"/api/expenses/"+encodeURIComponent(expenseId):"/api/demo/data?collection=expenses&id="+encodeURIComponent(expenseId)).then(payload=>{
+      const item=payload.item??payload.items?.[0];
+      if(!item)throw new Error("Spese wurde nicht gefunden.");
       queueMicrotask(()=>{
         setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??""));setExpenseCustomer(String(item.customer_id??""));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??""));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);
         setDate(String(item.expense_date??"").slice(0,10));
@@ -799,11 +839,12 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
       });
-    }).catch(error=>setToast(error instanceof Error?error.message:"Spese konnte nicht geladen werden."));
+    }).catch(error=>setExpenseLoadError(error instanceof Error?error.message:"Spese konnte nicht geladen werden.")).finally(()=>setLoadingExpense(false));
   },[production,existing,expenseId]);
 
   const scanReceipt=async(file:File|null)=>{
-    setReceiptFile(file);if(!file)return;setScanState("scanning");
+    if(receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file)return;
+    receiptScanPending.current=true;setEditedExpense(true);setReceiptFile(file);setScanState("scanning");
     try{
       if(production){
         const form=new FormData();form.append("file",file);
@@ -815,16 +856,16 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         const ext=(file.name.split(".").pop()||"jpg").toLowerCase();setReceiptFile(new File([file],`${new Date().toLocaleDateString("en-CA")}_SBB-CFF-FFS_89.00-CHF.${ext}`,{type:file.type,lastModified:file.lastModified}));
       }
       setScanState("done");
-    }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}
+    }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}finally{receiptScanPending.current=false;}
   };
 
   const save=async()=>{
-    if(expenseBusy||lockedExpense)return;
+    if(expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError)return;
     const value=Number(amount.replace(",","."));
     if(expenseBillable&&!expenseCustomer){setToast("Bitte einen Kunden für die Weiterverrechnung wählen.");return;}
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
     const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
-    setExpenseBusy(true);try{
+    expenseMutationPending.current=true;setExpenseBusy(true);try{
       const payload={customerId:expenseCustomer,billable:expenseBillable,employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:statusMap[status]??"submitted"};
       let targetExpenseId=expenseId??createdExpenseId;let receiptUploaded=false;
       if(production){
@@ -847,24 +888,27 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       }else if(!existing){
         appendDemoRow("expenses",[merchant.trim()||description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
+      setSavedExpense(true);
       setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");
       window.setTimeout(()=>router.push("/spesen"),700);
     }catch(error){
+      expenseMutationPending.current=false;setExpenseBusy(false);
       setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
       window.setTimeout(()=>setToast(null),2600);
-    }finally{setExpenseBusy(false);}
+    }
   };
 
-  const recordReimbursement=async()=>{if(expenseBusy||!expenseId)return;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{setExpenseBusy(false)}};
+  const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? [employeeLabel,status].join(" · ") : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Einreichen</Button>:undefined}>
-    <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref="/spesen" backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
+  return <AppShell unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}>Einreichen</Button>:undefined}>
+    <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"} onChangeCapture={()=>setEditedExpense(true)}>
 
-      {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
+      {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
       <div className="form-page">
         {expenseFiles.length>0&&<section><h2>Quittungen</h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
-        <fieldset disabled={lockedExpense||expenseBusy} className="form-grid two" style={{border:0,padding:0,margin:0}}>
+        <fieldset disabled={lockedExpense||expenseBusy||scanState==="scanning"} className="form-grid two" style={{border:0,padding:0,margin:0}}>
           <Field label="Händler / Firma"><input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><select value={person} onChange={e=>setPerson(e.target.value)}><option value="">Keine Zuordnung</option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</select></Field>
           <Field label="Datum"><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
@@ -877,7 +921,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           {expenseBillable&&<Field label="Kunde"><select value={expenseCustomer} onChange={e=>setExpenseCustomer(e.target.value)}><option value="">Kunde auswählen</option>{expenseCustomers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></Field>}
           <Field label="Beschreibung" className="full"><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </fieldset>
-        {!lockedExpense&&<div className="mobile-sticky-save"><Button requiresWrite disabled={expenseBusy} onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>}
+        {!lockedExpense&&<div className="mobile-sticky-save"><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></div>}
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{lockedExpense&&<p>Genehmigte Spesen sind gesperrt.</p>}{reimbursedAt?<p>Erstattet am {new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}>Erstattung erfassen</Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary">Weiterverrechnen</Button>}{invoicedId&&<p>Bereits einer Rechnung zugeordnet.</p>}<Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
@@ -1074,10 +1118,10 @@ function useSupportRows(){
 
 export function SupportPage() {
   const {rows:ticketRows,loading,error}=useSupportRows();
-  return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
-    <div className="support-summary"><Metric label="Offen" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="support"/><Metric label="Gelöst" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)} hint="geladene Tickets" icon="check"/></div>
+  return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<CreateAction href="/support/neu" label="Neues Ticket"/>}>
+    {!loading&&!error&&<MetricTiles><MetricTile label="Offene Tickets" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)}/><MetricTile label="Gelöste Tickets" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)}/></MetricTiles>}
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} statusGroups={{Offen:["Neu","Warten auf Kunde"]}} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView countLabel="Tickets" loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} statusGroups={{Offen:["Neu","Warten auf Kunde"]}} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={`Ticket ${id} · ${updated}`} status={status}/>}</RecordsView>
 
     </div>
   </AppShell>;
@@ -1087,16 +1131,21 @@ export function SupportTicketForm() {
   const router=useRouter();
   const [subject,setSubject]=useState("");
   const [saved,setSaved]=useState(false);
+  const [submitting,setSubmitting]=useState(false);
+  const submitPending=useRef(false);
   const [category,setCategory]=useState("Allgemeine Frage");
   const [message,setMessage]=useState("");
   const [attachment,setAttachment]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
   const save=async()=>{
+    if(submitPending.current||saved)return;
     if(!subject.trim()||!message.trim()){
       setToast("Betreff und Nachricht sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    submitPending.current=true;
+    setSubmitting(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
@@ -1117,9 +1166,12 @@ export function SupportTicketForm() {
     }catch(error){
       setToast(error instanceof Error?error.message:"Ticket konnte nicht erstellt werden.");
       window.setTimeout(()=>setToast(null),2600);
+    }finally{
+      submitPending.current=false;
+      setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save}>Ticket erstellen</Button>}>
+  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button>}>
     <div className="form-page narrow">
       <div className="form-grid">
         <Field label="Betreff" className="full"><input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
@@ -1128,31 +1180,41 @@ export function SupportTicketForm() {
       </div>
       <label className="attachment-button" htmlFor="support-file-upload"><Icon name="upload"/><span>{attachment?attachment.name:"Screenshot oder Datei hinzufügen"}</span></label><input id="support-file-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>setAttachment(e.target.files?.[0]??null)}/>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast==="Ticket erstellt."?"success":"danger"}/>}
   </AppShell>;
 }
 
 export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
+  const production=useBackendMode();
   const [draft,setDraft]=useState("");
+  const [ticketLoading,setTicketLoading]=useState(true);
+  const [ticketError,setTicketError]=useState<string|null>(null);
+  const [ticketRetry,setTicketRetry]=useState(0);
+  const [sending,setSending]=useState(false);
+  const sendPending=useRef(false);
+  const uploadPending=useRef(false);
+  const [uploading,setUploading]=useState(false);
   const [sent,setSent]=useState<string[]>([]);
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
   const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
-  const ticketSubject=ticket?.subject?.trim()||(!isProductionBackendEnabled()?"Frage zu einer Rechnung":"Support-Anfrage");
+  const ticketSubject=ticket?.subject?.trim()||(!production?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
   const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
   const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
-    if(!file)return;
+    if(!file||uploadPending.current||ticketLoading||ticketError)return;
     if(!isProductionBackendEnabled()){
       setToast("Datei im Demo-Modus nicht dauerhaft gespeichert.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    uploadPending.current=true;
+    setUploading(true);
     try{
       const form=new FormData();
       form.append("file",file);
@@ -1162,45 +1224,58 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       setToast("Datei angehängt.");
     }catch(error){
       setToast(error instanceof Error?error.message:"Datei konnte nicht angehängt werden.");
+    }finally{
+      uploadPending.current=false;
+      setUploading(false);
     }
     window.setTimeout(()=>setToast(null),2400);
   };
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()) return;
+    if(!isProductionBackendEnabled()){queueMicrotask(()=>setTicketLoading(false));return;}
+    let active=true;
+    queueMicrotask(()=>{if(active){setTicketLoading(true);setTicketError(null)}});
     Promise.all([
       apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets"),
       apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages"),
-    ]).then(([tickets,messages])=>queueMicrotask(()=>{
-      setTicket(tickets.items.find(item=>item.id===ticketId)??null);
-      setRemote(messages.items);
-    })).catch(()=>undefined);
-  },[ticketId]);
+    ]).then(([tickets,messages])=>{
+      if(!active)return;
+      const current=tickets.items.find(item=>item.id===ticketId);
+      if(!current)throw new Error("Ticket wurde nicht gefunden.");
+      setTicket(current);setRemote(messages.items);
+    }).catch(error=>{if(active)setTicketError(error instanceof Error?error.message:"Ticket konnte nicht geladen werden.")}).finally(()=>{if(active)setTicketLoading(false)});
+    return()=>{active=false};
+  },[ticketId,ticketRetry]);
 
   const send=async()=>{
     const value=draft.trim();
-    if(!value)return;
+    if(!value||sendPending.current||ticketLoading||ticketError)return;
+    sendPending.current=true;
+    setSending(true);
     setDraft("");
     if(isProductionBackendEnabled()){
       try{
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
         setRemote(current=>[...current,payload.item]);
       }catch(error){
-        setDraft(value);
+        setDraft(current=>current.trim()?`${value}\n${current}`:value);
         setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
         window.setTimeout(()=>setToast(null),2600);
       }
+      sendPending.current=false;
+      setSending(false);
       return;
     }
     setSent(current=>[...current,value]);
+    sendPending.current=false;
+    setSending(false);
   };
 
-  const production=useBackendMode();
-  return <AppShell title={ticketSubject} subtitle={ticketReference+" · "+(ticketStatusLabel[ticketStatus]??ticketStatus)} active="support" backHref="/support" backLabel="Support">
+  return <AppShell title={ticketSubject} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread">
-      <div className="thread-day">Heute</div>
+      {ticketLoading?<p role="status">Ticket wird geladen …</p>:ticketError?<div role="alert"><p>{ticketError}</p><Button variant="secondary" onClick={()=>setTicketRetry(value=>value+1)}>Erneut versuchen</Button></div>:<div className="thread-day">Heute</div>}
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
         <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
         <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
@@ -1208,8 +1283,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
         {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
       </>}
-      {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
-      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
+      {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
+      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></button></div>
     </div></div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="desktop-summary-facts"><span>Status <b>{ticketStatusLabel[ticketStatus]??ticketStatus}</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
@@ -1596,9 +1671,9 @@ export function FinancePage(){
  const [summary,setSummary]=useState<FinancialSummary|null>(null);
  const [items,setItems]=useState<DocumentListItem[]>([]),[time,setTime]=useState<Array<{hours:number}>>([]),[loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null);
  useEffect(()=>{apiGet<FinancialSummary>("/api/finance/overview").then(setSummary).catch(e=>setError(e.message));apiGet<{items:DocumentListItem[]}>(isProductionBackendEnabled()?"/api/documents":"/api/demo/data?collection=documents").then(data=>setItems(data.items)).catch(e=>setError(e instanceof Error?e.message:"Finanzen konnten nicht geladen werden.")).finally(()=>setLoading(false));apiGet<{items:Array<{hours:number}>}>("/api/time-entries/billing").then(data=>setTime(data.items)).catch(()=>undefined);},[]);
- const invoices=items.filter(item=>item.kind==='invoice'),open=invoices.filter(item=>['open','partial','overdue'].includes(financialStatus(item))),overdue=open.filter(item=>financialStatus(item)==='overdue'),drafts=items.filter(item=>financialStatus(item)==='draft');
+ const invoices=items.filter(item=>item.kind==='invoice'),open=invoices.filter(item=>['open','partial','overdue'].includes(financialStatus(item))),overdue=open.filter(item=>financialStatus(item)==='overdue');
  const currencies=summary?summary.invoices.map(item=>item.currency):[...new Set(invoices.map(item=>item.currency??'CHF'))];
- return <AppShell title="Finanzen" subtitle="Wo ist der nächste Schritt nötig?" active="finanzen"><FinanceTabs/>{loading?<p role="status">Finanzen werden geladen …</p>:error?<p role="alert">{error}</p>:<><div className="metrics-grid"><Metric label="Offene Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length)} hint="Offen und teilweise bezahlt" icon="receipt"/><Metric label="Überfällige Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.overdue_count,0)??overdue.length)} hint="Fälligkeit überschritten" icon="clock"/><Metric label="Entwürfe" value={String(summary?summary.invoices.reduce((sum,item)=>sum+item.draft_count,0)+(summary.offers?.draft_count??0):drafts.length)} hint="Angebote und Rechnungen" icon="file"/>{currencies.map(currency=><Metric key={currency} label={`Umsatz ${new Date().getFullYear()}`} value={formatCurrency(summary?.invoices.find(item=>item.currency===currency)?.revenue??invoices.filter(item=>item.currency===currency&&!['draft','cancelled'].includes(item.status??'')&&item.issue_date?.startsWith(String(new Date().getFullYear()))).reduce((sum,item)=>sum+Number(item.total),0),currency)} hint="Ausgestellte Rechnungen, inkl. MwSt." icon="wallet"/>)}</div><SectionTitle title="Nächste Schritte"/><div className="compact-list"><Link href="/rechnungen"><b>Offene Rechnungen prüfen</b><span>{(()=>{const count=summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length;return `${count} ${count===1?"Rechnung":"Rechnungen"}`})()}</span></Link><Link href="/angebote"><b>Angebote weiterführen</b><span>{(()=>{const count=summary?.offers?.actionable_count??items.filter(item=>item.kind==='offer'&&['draft','sent','accepted'].includes(financialStatus(item))).length;return `${count} ${count===1?"Angebot":"Angebote"}`})()}</span></Link>{summary?.time&&<Link href="/zeit"><b>Freigegebene Zeit verrechnen</b><span>{Number(summary?.time?.ready_hours??time.reduce((sum,item)=>sum+Number(item.hours),0)).toLocaleString('de-CH',{maximumFractionDigits:2})} h bereit zur Verrechnung</span></Link>}<Link href="/finanzen/analyse"><b>Einnahmen und Kosten analysieren</b></Link></div><SectionTitle title="Offene Rechnungen"/><DocumentList items={open} kind="invoice" outstanding/></>}</AppShell>;
+ return <AppShell title="Finanzen" subtitle="Wo ist der nächste Schritt nötig?" active="finanzen"><FinanceTabs/>{loading?<p role="status">Finanzen werden geladen …</p>:error?<p role="alert">{error}</p>:<><div className="metrics-grid"><Metric label="Offene Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length)} hint="Offen und teilweise bezahlt" icon="receipt"/><Metric label="Überfällige Rechnungen" value={String(summary?.invoices.reduce((sum,item)=>sum+item.overdue_count,0)??overdue.length)} hint="Fälligkeit überschritten" icon="clock"/>{currencies.map(currency=><Metric key={currency} label={`Umsatz ${new Date().getFullYear()}`} value={formatCurrency(summary?.invoices.find(item=>item.currency===currency)?.revenue??invoices.filter(item=>item.currency===currency&&!['draft','cancelled'].includes(item.status??'')&&item.issue_date?.startsWith(String(new Date().getFullYear()))).reduce((sum,item)=>sum+Number(item.total),0),currency)} hint="Ausgestellte Rechnungen, inkl. MwSt." icon="wallet"/>)}</div><SectionTitle title="Handlungsbedarf"/><div className="compact-list"><Link href="/rechnungen"><b>Offene Rechnungen prüfen</b><span>{(()=>{const count=summary?.invoices.reduce((sum,item)=>sum+item.open_count,0)??open.length;return `${count} ${count===1?"Rechnung":"Rechnungen"}`})()}</span></Link><Link href="/angebote"><b>Angebote weiterführen</b><span>{(()=>{const count=summary?.offers?.actionable_count??items.filter(item=>item.kind==='offer'&&['draft','sent','accepted'].includes(financialStatus(item))).length;return `${count} ${count===1?"Angebot":"Angebote"}`})()}</span></Link>{summary?.time&&<Link href="/zeit"><b>Freigegebene Zeit verrechnen</b><span>{Number(summary?.time?.ready_hours??time.reduce((sum,item)=>sum+Number(item.hours),0)).toLocaleString('de-CH',{maximumFractionDigits:2})} h bereit zur Verrechnung</span></Link>}<Link href="/finanzen/analyse"><b>Einnahmen und Kosten analysieren</b></Link></div><SectionTitle title="Offene Rechnungen"/><DocumentList items={open} kind="invoice" outstanding/></>}</AppShell>;
 }
 export function DocumentsHubPage(){return <FinancePage/>;}
 

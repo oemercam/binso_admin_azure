@@ -2,5 +2,5 @@ import { ProductForm } from "@/components/app-pages";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;
-  return <ProductForm existing productId={id}/>;
+  return <ProductForm key={id} existing productId={id}/>;
 }

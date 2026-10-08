@@ -11,7 +11,8 @@ import { useDialogFocus } from "./use-dialog-focus";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ConfirmDialog from "./confirm-dialog";
-import { Button, EmptyState, Icon, IconButton, Logo } from "./ui";
+import { PageHeading, DetailHeading } from "./binso-ux";
+import { Button, EmptyState, Icon, IconButton, Logo, Status } from "./ui";
 import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {cachedClientSession,invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
@@ -80,8 +81,12 @@ export function AppShell({
   preview = false,
   editing = false,
   unsavedChanges,
+  status,
+  statusTone,
 }: {
   title: string;
+  status?: React.ReactNode;
+  statusTone?: "neutral"|"success"|"warning"|"danger"|"info";
   subtitle?: string;
   active: string;
   children: React.ReactNode;
@@ -411,10 +416,10 @@ export function AppShell({
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
         <div className="mobile-header-leading">
           {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
-          {backHref && <span className="mobile-header-title">{title}</span>}
+          {backHref && <h1 className="mobile-header-title"><span>{title}</span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
         </div>
         {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
-        {backHref&&mobileActions&&<div className="mobile-detail-actions">{mobileActions}</div>}
+        {backHref&&(mobileActions||visibleActions)&&allowed&&<div className="mobile-detail-actions">{mobileActions??visibleActions}</div>}
         <div className="mobile-header-actions"><IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Icon name="user" size={18}/></button>
@@ -423,14 +428,8 @@ export function AppShell({
 
       <main className="page-container" data-section={active}>
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
-          <div>
-            {backHref && <Link className="desktop-back" href={backHref}><Icon name="back" size={16}/>{backLabel}</Link>}
-            <h1>{title}</h1>
-            {subtitle && <p>{subtitle}</p>}
-          </div>
-          {visibleActions&&allowed&&<div className="page-actions mobile-page-actions">{visibleActions}</div>}
+          {backHref ? <DetailHeading title={title} subtitle={subtitle} status={status} tone={statusTone} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/></Link>}/> : <PageHeading title={title} description={subtitle} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined}/> }
         </div>
-        {visibleActions&&allowed&&<div className="desktop-page-actions" aria-label="Seitenaktionen">{visibleActions}</div>}
         {!access&&!accessError?<div className="app-session-loading" role="status" aria-label="Binso One wird geladen"><span/></div>:accessError?<div role="alert"><p>{accessError}</p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}>Erneut versuchen</Button><Link className="button button-secondary" href="/login">Anmelden</Link></div></div>:allowed?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>
 
