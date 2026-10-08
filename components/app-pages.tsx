@@ -518,7 +518,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle="Daten werden geladen." active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":"Daten werden geladen."} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><div role={paymentError?"alert":"status"}><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></div>{paymentError&&<Link className="button" href="/zahlungen">Zur Zahlungsübersicht</Link>}</AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;
