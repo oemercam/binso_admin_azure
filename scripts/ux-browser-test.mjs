@@ -107,7 +107,7 @@ try{
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
     if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
-      assert.equal(await page.locator('.dashboard-summary .metric').count(),4);assert.equal(await page.locator('.dashboard-summary svg').count(),0,'KPIs have no decorative icons');
+      assert.equal(await page.locator('.dashboard-summary .metric').count(),4);assert.equal(await page.locator('.dashboard-summary svg').count(),0,'KPIs have no decorative icons');assert.equal(await page.locator('.quick-grid').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=760?2:4,'Quick actions retain the blueprint grid on narrow screens');
       const order=await page.evaluate(()=>['.dashboard-summary','.quick-section','.revenue-insight','.dashboard-grid'].map(selector=>document.querySelector(selector).getBoundingClientRect().top));assert.ok(order.every((top,i)=>i===0||top>order[i-1]),'Dashboard follows the blueprint hierarchy');
       assert.equal(await page.locator('.bo-metric-tiles').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=760?2:4);
     }

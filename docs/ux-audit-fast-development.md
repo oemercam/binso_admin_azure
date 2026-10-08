@@ -74,3 +74,5 @@ STANDARD lokal: 306,23 s, davon 35,37 s Build, 103,66 s Chromium (126 Fälle) un
 - PR 214 (CodeQL) ist separat offen; sein Sicherheitsworkflow wird nicht in diesen UX-PR kopiert oder stillschweigend ersetzt.
 
 Abschliessend: 28 gezielte Browser-/Theme-/Viewport-Fälle mit Accessibility-Prüfung und Kontaktformular bei 375×400 bestanden; PWA-/Offline-/Theme-Test bestanden. Zwei vergleichbare Bottom-Navigation-Bildausschnitte sind pixelidentisch. Die visuelle Prüfung fand zusätzlich einen widersprüchlichen <390-px-Schnellzugriff-Breakpoint und fehlenden Textumbruch in kompakten Listen; beide Ursachen wurden korrigiert.
+
+FAST über globale Styles fand zusätzlich eine PDF.js-/Webpack-Eval-Namenskollision im Entwicklungsmodus. Der Renderer lädt dieselbe lokale, selbstständige ESM-Datei nun als Same-Origin-Asset. Gezielter Dev-Browserlauf: Rechnungsvorschau mit allen Seiten, Zoom und Dokumentaktionen bestanden. Kein CSP-Abschwächen und kein Produktionsbuild für FAST erforderlich.
