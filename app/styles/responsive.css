@@ -3355,3 +3355,11 @@ input:not([type="checkbox"]):not([type="radio"]),
 .desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible,.toolbar .filter-button select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .bo-list-search:focus-within{outline:2px solid currentColor;outline-offset:2px}
+
+/* Form sizing contract shared across sheets, create pages and detail editors. */
+.form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}
+.form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
+.form-field textarea{resize:vertical;overflow-wrap:anywhere}
+.form-field input:focus-visible,.form-field select:focus-visible,.form-field textarea:focus-visible{outline-offset:2px}
+.page-container form{min-width:0;max-width:100%}
+.page-container form button{max-width:100%}
