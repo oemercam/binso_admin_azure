@@ -253,8 +253,8 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
           # Each release is isolated from files left by earlier deployments.
-          target-path: /home/site/releases/${{ env.BINSO_DEPLOY_SHA }}
-          startup-command: node /home/site/releases/${{ env.BINSO_DEPLOY_SHA }}/server.js
+          target-path: /home/site/wwwroot
+          startup-command: node /home/site/wwwroot/server.js
 
       - name: Wait for deployed worker
         shell: bash
