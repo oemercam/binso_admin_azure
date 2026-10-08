@@ -1,2 +1,2 @@
-import { ProductForm } from "@/components/app-pages";
+import { ProductForm } from "@/components/pages/products";
 export default function Page(){return <ProductForm/>;}

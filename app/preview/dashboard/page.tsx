@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DashboardPage } from "@/components/app-pages";
+import { DashboardPage } from "@/components/pages/dashboard";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

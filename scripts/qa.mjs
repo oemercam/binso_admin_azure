@@ -20,11 +20,15 @@ try{
   if(lintFiles.length)await run('changed-file lint','pnpm',['exec','eslint','--cache','--cache-location','node_modules/.cache/eslint-fast','--max-warnings=0',...lintFiles]);
   if(files.some(p=>/\.(ts|tsx)$|tsconfig|package\.json/.test(p)))await run('incremental typecheck','pnpm',['typecheck']);
   for(const suite of plan.suites)await run(suite,process.execPath,['scripts/'+suite+'.mjs']);
+ }else if(level==='integration'){
+  await run('typecheck','pnpm',['typecheck']);
+  for(const suite of plan.suites)await run(suite,process.execPath,['scripts/'+suite+'.mjs']);
+  await run('build','pnpm',['build']);
  }else{
   for(const script of ['release:check','test','lint','css:check','typecheck','security:scan','security:scan:all','build'])await run(script,'pnpm',[script]);
  }
  if(plan.routes.length&&!args.includes('--no-browser')){
-  const env={BINSO_UX_ROUTES:plan.routes.join(','),BINSO_UX_WIDTHS:plan.widths.join(','),BINSO_UX_THEMES:plan.themes.join(','),BINSO_UX_INTERACTIONS:plan.interactions.join(','),BINSO_UX_SCREENSHOTS:plan.level==='full'?'1':'0',BINSO_UX_OUTPUT:'/tmp/binso-qa-'+level,BINSO_UX_PORT:level==='fast'?'3300':'3200',BINSO_UX_A11Y:plan.level==='full'?'1':'0',BINSO_UX_SERVER_MODE:level==='fast'?'dev':'start',...(arg('--url')?{BINSO_BASE_URL:arg('--url')}:{})};
+  const env={BINSO_UX_ROUTES:plan.routes.join(','),BINSO_UX_WIDTHS:plan.widths.join(','),BINSO_UX_THEMES:plan.themes.join(','),BINSO_UX_INTERACTIONS:plan.interactions.join(','),BINSO_UX_SCREENSHOTS:'1',BINSO_UX_REFERENCE_WIDTH:level==='fast'?'390':'',BINSO_UX_OUTPUT:'/tmp/binso-qa-'+level,BINSO_UX_PORT:level==='fast'?'3300':'3200',BINSO_UX_A11Y:plan.level==='full'?'1':'0',BINSO_UX_SERVER_MODE:level==='fast'?'dev':'start',...(arg('--url')?{BINSO_BASE_URL:arg('--url')}:{})};
   await run('scoped Chromium browser',process.execPath,['scripts/ux-browser-test.mjs'],env);
   if(plan.level==='full')await run('PWA offline and restart',process.execPath,['scripts/pwa-browser-test.mjs'],arg('--url')?{BINSO_BASE_URL:arg('--url')}:{});
   if(level!=='fast')await run('scoped WebKit browser',process.execPath,['scripts/ux-browser-test.mjs'],{...env,BINSO_UX_BROWSER:'webkit',BINSO_UX_ROUTES:plan.webkitRoutes.join(','),BINSO_UX_WIDTHS:plan.webkitWidths.join(','),BINSO_UX_DEVICE:'iPhone 13'});

@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {partition,runShards} from './browser-shards.mjs';
+import {fullRoutes} from './qa-plan.mjs';
+const shards=partition(fullRoutes,2);
+assert.equal(new Set(shards.flat()).size,fullRoutes.length);
+assert.deepEqual(shards.flat().sort(),[...fullRoutes].sort());
+const directory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-shards-test-'));
+const script=path.join(directory,'fixture.mjs');
+await fs.writeFile(script,"import fs from 'node:fs/promises';await fs.mkdir(process.env.BINSO_UX_OUTPUT,{recursive:true});await fs.writeFile(process.env.BINSO_UX_OUTPUT+'/scope.json',JSON.stringify({routes:process.env.BINSO_UX_ROUTES,interactions:process.env.BINSO_UX_INTERACTIONS,port:process.env.BINSO_UX_PORT}));process.exit(process.env.BINSO_UX_ROUTES.includes('fail')?7:0);");
+await runShards({routes:['one','two','three'],interactions:['save','filter'],count:2,script,env:{...process.env,BINSO_UX_OUTPUT:directory,BINSO_UX_PORT:'3400'}});
+const actual=await Promise.all([0,1].map(i=>fs.readFile(path.join(directory,'shard-'+i,'scope.json'),'utf8').then(JSON.parse)));
+assert.deepEqual(actual.map(s=>s.port),['3400','3402']);assert.deepEqual(actual.map(s=>s.interactions),['save','filter']);
+await assert.rejects(runShards({routes:['one','fail'],interactions:[],count:2,script,env:{...process.env,BINSO_UX_OUTPUT:directory}}),/failed/);
+console.log('Browser sharding preserves full route/interaction coverage, isolated servers and blocking failure status.');

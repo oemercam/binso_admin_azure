@@ -1,2 +1,2 @@
-import { PaymentForm } from "@/components/app-pages";
+import { PaymentForm } from "@/components/pages/payments";
 export default function Page(){return <PaymentForm/>;}

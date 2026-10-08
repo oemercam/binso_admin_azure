@@ -1,2 +1,2 @@
-import { InvoiceEditor } from "@/components/app-pages";
+import { InvoiceEditor } from "@/components/documents";
 export default function Page(){return <InvoiceEditor/>;}

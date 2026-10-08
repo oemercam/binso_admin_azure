@@ -9,9 +9,9 @@ import { createQrBillData, invoicePaymentIssue, responsiveQrSvg } from "@/lib/qr
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
-import {ActionSheet} from "./binso-ux";
+import { ActionSheet, FormSheet } from "./binso-ux";
 import {PdfPreview} from "./pdf-preview";
-import { Button, EmptyState, Field, Icon, IconButton, Status, Toast } from "./ui";
+import { Button, EmptyState, Field, Icon, IconButton, Status, Toast, FormActions, Input, Select, Textarea } from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
@@ -357,7 +357,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         </div>
       : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
-    {editing&&<div className="mobile-sticky-save"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></div>}
+    {editing&&<FormActions ><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
     {preview&&<DocumentModal previewDraft={{...draft,kind}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="sheet-menu">
       <button type="button" onClick={()=>{setMoreOpen(false);setPreview(true)}}><Icon name="file"/><span>Vorschau</span></button>
@@ -367,7 +367,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><button type="button" disabled={actionBusy} onClick={()=>void processAction('accept')}><Icon name="check"/><span>Kundenannahme erfassen</span></button><button type="button" disabled={actionBusy} onClick={()=>void processAction('decline')}><Icon name="close"/><span>Kundenablehnung erfassen</span></button></>}
       {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('cancel')}><Icon name="close"/><span>Rechnung stornieren</span></button>}
       </div>{actionError&&<p role="alert">{actionError}</p>}</ActionSheet>
-    <ActionSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das ausgestellte Dokument wird als PDF versendet.</p>{actionError&&<p role="alert">{actionError}</p>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></ActionSheet>
+    <FormSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das ausgestellte Dokument wird als PDF versendet.</p>{actionError&&<p role="alert">{actionError}</p>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></FormSheet>
     {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
@@ -412,7 +412,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
         <strong>Total <b>{currency} {money(totals.total)}</b></strong>
       </div>
     </section>
-    {isInvoice&&!["paid","cancelled"].includes(displayStatus)&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand"><h2>Zahlungsstand</h2>
+    {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand"><h2>Zahlungsstand</h2>
       {Number(draft.paidAmount??0)>0&&<span>Bereits bezahlt <b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
       <span>Offener Betrag <b>{currency} {money(outstanding)}</b></span>
     </section>}
@@ -429,7 +429,6 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
   const [positionDraft,setPositionDraft]=useState<LineItem|null>(null);
   const closePosition=()=>{setMobilePositionId(null);setPositionDraft(null);};
-  const positionDialogRef=useDialogFocus(mobilePositionId!==null,closePosition);
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
@@ -455,21 +454,21 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
       <div className="form-section customer-form-section">
         <span className="compact-section-label">Kunde</span>
         <Field label="Kunde auswählen">
-          <select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value,customerId:undefined})}>
+          <Select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value,customerId:undefined})}>
             {names.map(name=><option key={name}>{name}</option>)}
-          </select>
+          </Select>
         </Field>
         {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
       </div>
       <div className="form-section">
         <h2>{type}details</h2>
         <div className="form-grid document-meta-grid">
-          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><input value={draft.number} placeholder="Wird beim Erstellen vergeben" readOnly aria-readonly="true"/></Field>
-          <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
+          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><Input value={draft.number} placeholder="Wird beim Erstellen vergeben" readOnly aria-readonly="true"/></Field>
+          <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><Input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
-            {type==="Rechnung" ? <select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></select> : <input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
+            {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field>
-          <Field label="MwSt."><select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></select></Field>
+          <Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></Select></Field>
         </div>
       </div>
       <div className="form-section">
@@ -483,10 +482,10 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
                 <span><b>{item.description}</b><small>{item.quantity} {({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
                 <strong>{draft.currency??"CHF"} {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
-              <label className="mobile-line-field description"><span>Beschreibung</span><input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
-              <label className="mobile-line-field"><span>Menge</span><input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
-              <label className="mobile-line-field"><span>Einheit</span><select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></select></label>
-              <label className="mobile-line-field"><span>Einzelpreis</span><input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
+              <label className="mobile-line-field description"><span>Beschreibung</span><Input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
+              <label className="mobile-line-field"><span>Menge</span><Input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
+              <label className="mobile-line-field"><span>Einheit</span><Select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></Select></label>
+              <label className="mobile-line-field"><span>Einzelpreis</span><Input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
               <div className="mobile-line-total"><span>Total</span><b>{money(lineTotal)}</b></div>
               <button className="line-remove" type="button" aria-label="Position entfernen" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}><Icon name="close" size={15}/></button>
             </div>;
@@ -494,8 +493,8 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </div>
         <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
       </div>
-      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)closePosition()}}><section ref={positionDialogRef} tabIndex={-1} className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>closePosition()}/></header><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></select></Field><Field label="Einzelpreis"><input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></section></div>})()}
-      <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
+      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></FormSheet>})()}
+      <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
   </div>;
 }

@@ -1,4 +1,4 @@
-import { EmployeeForm } from "@/components/app-pages";
+import { EmployeeForm } from "@/components/pages/employees";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;

@@ -253,21 +253,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .toolbar-reset{min-height:36px;cursor:pointer;border:0;background:transparent;color:var(--color-muted);font-size:11px}
 .records{width:100%;min-width:0;border-top:1px solid var(--color-line)}
 .record-wrapper{display:block}
-.record-wrapper:last-child .record{border-bottom:0}
-.record{
-  min-height:68px;
-  padding:11px 4px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border-bottom:1px solid var(--color-line);
-  background:var(--color-bg);
-}
-.record-main{min-width:0;flex:1;overflow:hidden}
-.record-main b,.record-main small{display:block}
-.record-main b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.record-main small,.record>small{margin-top:3px;color:var(--color-muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.record>strong{font-size:12px}
 .record-avatar{
   width:38px;
   height:38px;
@@ -1458,7 +1443,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 @keyframes app-launch-out{
   to{opacity:0;visibility:hidden}
 }
-.button,.icon-button,.record,.sheet-menu>a,.sheet-menu>button{
+.button,.icon-button,.sheet-menu>a,.sheet-menu>button{
   transition:transform var(--motion-fast) var(--motion-ease),background-color var(--motion-fast) ease,border-color var(--motion-fast) ease,opacity var(--motion-fast) ease;
 }
 .button:active,.icon-button:active,.sheet-menu>a:active,.sheet-menu>button:active{transform:scale(.975)}

@@ -1,2 +1,2 @@
-import { SimpleModule } from "@/components/app-pages";
-export default function Page(){return <SimpleModule kind="angebote"/>}
+import { OffersPage } from "@/components/pages/finance";
+export default function Page(){return <OffersPage/>}

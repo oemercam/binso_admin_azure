@@ -1,7 +1,8 @@
+import {readPageFile} from "./page-source.mjs";
 import fs from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const read=path=>fs.readFile(path,"utf8");
+const read=path=>readPageFile(path,"utf8");
 
 const [
   readme,

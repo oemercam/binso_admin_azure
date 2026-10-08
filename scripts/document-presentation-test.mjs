@@ -43,6 +43,10 @@ const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentRead
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1);
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');
 const openRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01'},directory}));assert.ok(openRead.includes('Offen'));assert.ok(openRead.includes('Fällig am'));assert.ok(openRead.includes('document-mobile-price'));assert.ok(openRead.includes('× CHF 100.00'));
+for(const status of ['draft','cancelled']){
+ const html=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status,total:216.2},directory}));
+ assert.ok(!html.includes('Zahlungsstand')&&!html.includes('Offener Betrag'),status+' must not demand payment');
+}
 assert.equal(financial.financialStatus({kind:'invoice',status:'sent',total:100,paid_amount:0,due_date:'2026-10-20'},'2026-10-07'),'open');
 assert.equal(financial.financialStatus({kind:'invoice',status:'partial',total:100,paid_amount:30,due_date:'2026-10-01'},'2026-10-07'),'overdue');
 assert.equal(financial.financialStatus({kind:'invoice',status:'sent',total:100,paid_amount:100,due_date:'2026-10-01'},'2026-10-07'),'paid');

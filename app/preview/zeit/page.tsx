@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TimePage } from "@/components/app-pages";
+import { TimePage } from "@/components/pages/time";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

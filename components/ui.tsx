@@ -110,18 +110,30 @@ export function IconButton({ label, icon, onClick }: { label: string; icon: stri
 }
 
 export function Metric({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: string; icon?: string }) {
-  return <div className="metric"><div className="metric-top"><span>{label}</span>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small>{hint}</small>}</div>;
+  return <div className="metric"><div className="metric-top"><FormLabel>{label}</FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small>{hint}</small>}</div>;
 }
 
 export function SectionTitle({ title, action }: { title: string; action?: React.ReactNode }) {
   return <div className="section-title"><h2>{title}</h2>{action}</div>;
 }
 
+/** Native controls keep browser autofill and validation, with one shared field contract. */
+export function Input(props:React.ComponentProps<"input">){return <input {...props}/>}
+export function Select(props:React.ComponentProps<"select">){return <select {...props}/>}
+export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props}/>}
+export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
+export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}
+export function TimeInput(props:React.ComponentProps<"input">){return <Input inputMode="text" placeholder="HH:MM" {...props}/>}
+export function CurrencyInput(props:React.ComponentProps<"input">){return <Input inputMode="decimal" {...props}/>}
+export function FormLabel({children}:{children:React.ReactNode}){return <span>{children}</span>}
+export function FormError({children}:{children?:React.ReactNode}){return children?<p role="alert">{children}</p>:null}
+export function FormActions({children,sheet=false}:{children:React.ReactNode;sheet?:boolean}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"}>{children}</div>}
+
 export function Field({ label, children, className = "",allowReadOnlyInput=false }: { label: string; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean }) {
   const access=usePageAccess();
-  const fields=access.write||allowReadOnlyInput?children:Children.map(children,child=>isValidElement<Record<string,unknown>>(child)&&typeof child.type==='string'&&['input','select','textarea'].includes(child.type)?cloneElement(child,{disabled:true}):child);
-  const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&child.type==='input'&&['checkbox','radio'].includes(String(child.props.type)));
-  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<span>{label}</span>}{inline?<span>{label}</span>:fields}</label>;
+  const fields=access.write||allowReadOnlyInput?children:Children.map(children,child=>isValidElement<Record<string,unknown>>(child)&&((typeof child.type==='string'&&['input','select','textarea'].includes(child.type))||[Input,Select,Textarea,Checkbox,DateInput,TimeInput,CurrencyInput].includes(child.type as typeof Input))?cloneElement(child,{disabled:true}):child);
+  const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&((child.type==='input'||child.type===Input)&&['checkbox','radio'].includes(String(child.props.type))||child.type===Checkbox));
+  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel>{label}</FormLabel>}{inline?<FormLabel>{label}</FormLabel>:fields}</label>;
 }
 
 export function EmptyState({ icon = "file", title, text, action }: { icon?: string; title: string; text: string; action?: React.ReactNode }) {
