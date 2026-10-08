@@ -199,7 +199,7 @@ try{
   await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.getByRole('button',{name:'Anwenden',exact:true}).click();
-  await page.locator('.finance-open-invoices').getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
   await page.locator('.finance-open-invoices').getByText('Offen',{exact:true}).filter({visible:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 200.00',{exact:true}).waitFor();await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   assert.equal(await page.locator('.bo-metric-tiles .metric').count(),4,'Finance has exactly four compact metrics');
