@@ -3313,3 +3313,10 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
 
 
+
+/* Canonical compact sort control shared by all record overviews. */
+.toolbar .filter-button{box-sizing:border-box;min-width:0;max-width:154px;flex:0 0 auto;justify-self:end}
+.toolbar .filter-button select{box-sizing:border-box;width:auto;max-width:122px;min-width:0;text-overflow:ellipsis;white-space:nowrap}
+.toolbar .searchbox{min-width:0;max-width:100%}
+.toolbar .searchbox input{min-width:0;width:100%}
+.toolbar .chips{min-width:0}
