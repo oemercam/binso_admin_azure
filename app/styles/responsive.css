@@ -1109,7 +1109,7 @@
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
-    grid-template-columns:44px minmax(0,1fr) 44px;
+    grid-template-columns:44px minmax(0,1fr) auto;
     background:var(--color-bg);
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
@@ -1130,7 +1130,7 @@
   }
   .mobile-header-detail .mobile-detail-actions{
     grid-column:3;
-    width:44px;
+    width:auto;
     min-width:44px;
     margin:0;
     justify-self:end;
@@ -3049,8 +3049,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Hide the complete label box, including Button's wrapper, so the icon has one grid cell. */
   .responsive-create-action>span{display:none}
   .responsive-create-action>svg{display:block;grid-area:1 / 1;align-self:center;justify-self:center}
-  .mobile-header-detail .mobile-back{margin-inline-start:calc(var(--control-h-mobile) / -2)}
-  .mobile-header-detail .mobile-detail-actions{margin-inline-end:calc(var(--control-h-mobile) / -2)}
   .document-facts b{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
   .time-layout>.time-section{border-top:0}
   .time-layout>.timer-card>.tabs{border-top:0}
