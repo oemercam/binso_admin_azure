@@ -330,7 +330,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     window.setTimeout(()=>setContactToast(null),2600);
   };
 
-      if(loadError)return <AppShell title="Kunde" active="kunden" backHref={returnTo}><p role="alert">{loadError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></AppShell>;
+      if(loadError)return <AppShell title="Kunde" subtitle="Kundendaten nicht verfügbar" active="kunden" backHref={returnTo} backLabel="Kunden"><div role="alert"><EmptyState icon="users" title="Kunde konnte nicht geladen werden" text={loadError}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href={returnTo} variant="ghost">Zur Übersicht</Button></div></AppShell>;
   if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
