@@ -35,7 +35,7 @@ export function MetricTile({ label, value }: { label: string; value: ReactNode }
 export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {
   value: string; onChange: (value: string) => void; placeholder?: string;
 }) {
-  return <label className="bo-list-search"><Icon name="search" size={19}/><input type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}/></label>;
+  return <label className="searchbox bo-list-search"><Icon name="search" size={19}/><input type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}/></label>;
 }
 
 export function RowActions({ label = "Weitere Aktionen", onClick }: { label?: string; onClick: () => void }) {
