@@ -38,6 +38,6 @@ export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {
   return <label className="searchbox bo-list-search"><Icon name="search" size={19}/><input type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}/></label>;
 }
 
-export function RowActions({ label = "Weitere Aktionen", onClick }: { label?: string; onClick: () => void }) {
-  return <button className="bo-row-actions" type="button" onClick={onClick} aria-label={label}><Icon name="more" size={20}/></button>;
+export function RowActions({ label = "Weitere Aktionen", onClick, disabled = false }: { label?: string; onClick: () => void; disabled?: boolean }) {
+  return <button className="bo-row-actions" type="button" onClick={onClick} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></button>;
 }
