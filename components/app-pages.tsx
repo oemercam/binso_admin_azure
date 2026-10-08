@@ -1088,16 +1088,21 @@ export function SupportTicketForm() {
   const router=useRouter();
   const [subject,setSubject]=useState("");
   const [saved,setSaved]=useState(false);
+  const [submitting,setSubmitting]=useState(false);
+  const submitPending=useRef(false);
   const [category,setCategory]=useState("Allgemeine Frage");
   const [message,setMessage]=useState("");
   const [attachment,setAttachment]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
   const save=async()=>{
+    if(submitPending.current||saved)return;
     if(!subject.trim()||!message.trim()){
       setToast("Betreff und Nachricht sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
+    submitPending.current=true;
+    setSubmitting(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
@@ -1118,9 +1123,12 @@ export function SupportTicketForm() {
     }catch(error){
       setToast(error instanceof Error?error.message:"Ticket konnte nicht erstellt werden.");
       window.setTimeout(()=>setToast(null),2600);
+    }finally{
+      submitPending.current=false;
+      setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save}>Ticket erstellen</Button>}>
+  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button>}>
     <div className="form-page narrow">
       <div className="form-grid">
         <Field label="Betreff" className="full"><input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
@@ -1129,7 +1137,7 @@ export function SupportTicketForm() {
       </div>
       <label className="attachment-button" htmlFor="support-file-upload"><Icon name="upload"/><span>{attachment?attachment.name:"Screenshot oder Datei hinzufügen"}</span></label><input id="support-file-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>setAttachment(e.target.files?.[0]??null)}/>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <div className="mobile-sticky-save"><Button onClick={save}>Ticket erstellen</Button></div>
+      <div className="mobile-sticky-save"><Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button></div>
     </div>
     {toast&&<Toast title={toast} tone={toast==="Ticket erstellt."?"success":"danger"}/>}
   </AppShell>;
