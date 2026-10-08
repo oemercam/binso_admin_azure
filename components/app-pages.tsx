@@ -1145,6 +1145,8 @@ export function SupportTicketForm() {
 
 export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [draft,setDraft]=useState("");
+  const [sending,setSending]=useState(false);
+  const sendPending=useRef(false);
   const [sent,setSent]=useState<string[]>([]);
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
@@ -1188,7 +1190,9 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   const send=async()=>{
     const value=draft.trim();
-    if(!value)return;
+    if(!value||sendPending.current)return;
+    sendPending.current=true;
+    setSending(true);
     setDraft("");
     if(isProductionBackendEnabled()){
       try{
@@ -1199,9 +1203,13 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
         window.setTimeout(()=>setToast(null),2600);
       }
+      sendPending.current=false;
+      setSending(false);
       return;
     }
     setSent(current=>[...current,value]);
+    sendPending.current=false;
+    setSending(false);
   };
 
   const production=useBackendMode();
@@ -1218,7 +1226,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
       </>}
       {production&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
-      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} aria-label="Senden"><Icon name="arrow"/></button></div>
+      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label="Datei anhängen"><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} disabled={sending||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></button></div>
     </div></div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="desktop-summary-facts"><span>Status <b>{ticketStatusLabel[ticketStatus]??ticketStatus}</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
