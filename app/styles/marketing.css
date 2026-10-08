@@ -351,12 +351,13 @@
   margin-inline:auto;
   padding:74px 28px;
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
   gap:24px;
 }
 .marketing-cta>div{min-width:0}
-.marketing-cta>div:last-child{display:flex;gap:8px}
+.marketing-cta>div:last-child{display:flex;flex-wrap:wrap;gap:8px}
 .marketing-cta h2{margin:8px 0 10px;font-size:34px;line-height:1.05;letter-spacing:-.04em}
 .marketing-cta p{margin:0;color:var(--color-muted);font-size:13px;line-height:1.55}
 .marketing-cta .hero-actions{margin:0}
