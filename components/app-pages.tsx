@@ -774,6 +774,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const expenseRequestKey=useRef("");
   const [expenseFiles,setExpenseFiles]=useState<Array<{id:string;fileName:string}>>([]);
   const [expenseBusy,setExpenseBusy]=useState(false),[reimbursementOpen,setReimbursementOpen]=useState(false);
+  const [loadingExpense,setLoadingExpense]=useState(existing);
+  const [expenseLoadError,setExpenseLoadError]=useState<string|null>(null);
   const reimbursementDialog=useDialogFocus(reimbursementOpen,()=>{if(!expenseBusy)setReimbursementOpen(false)});
   useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(s=>setCanFinanceExpense(["owner","admin","finance"].includes(s.tenant?.role??""))).catch(()=>{});apiGet<{items:Array<{id:string;name:string}>}>("/api/customers").then(s=>setExpenseCustomers(s.items)).catch(()=>{});},[]);
   const [persistedExpenseStatus,setPersistedExpenseStatus]=useState('');
@@ -800,7 +802,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
       });
-    }).catch(error=>setToast(error instanceof Error?error.message:"Spese konnte nicht geladen werden."));
+    }).catch(error=>setExpenseLoadError(error instanceof Error?error.message:"Spese konnte nicht geladen werden.")).finally(()=>setLoadingExpense(false));
   },[production,existing,expenseId]);
 
   const scanReceipt=async(file:File|null)=>{
@@ -859,6 +861,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const recordReimbursement=async()=>{if(expenseBusy||!expenseId)return;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref="/spesen" backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
   return <AppShell title={existing ? merchant||description||"Spese" : "Spese erfassen"} subtitle={existing ? [employeeLabel,status].join(" · ") : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen" actions={!existing?<Button requiresWrite onClick={()=>void save()}>Einreichen</Button>:undefined}>
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"}>
 
