@@ -213,24 +213,41 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .tabs button.active,
 .tabs a.active,
 .notification-center-tabs button.active{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
-.filter-button{
-  min-height:36px;
-  height:36px;
-  padding:0 10px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
+.toolbar .filter-button{
+  position:relative;
   border:1px solid var(--color-line);
   border-radius:9px;
   background:var(--color-bg);
   color:var(--color-fg);
-  font-size:11px;
-  font-weight:650;
-  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 40px;
+  width:40px;
+  min-width:40px;
+  max-width:40px;
+  height:40px;
+  min-height:40px;
+  padding:0;
+  overflow:hidden;
+  box-sizing:border-box;
 }
-.filter-button select{border:0;background:transparent;color:inherit;font:inherit;min-width:0;max-width:160px;height:100%;cursor:pointer}
-.filter-button.active{border-color:var(--color-fg)}
+.toolbar .filter-button > svg{flex:none;pointer-events:none}
+.toolbar .filter-button > select{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  min-height:0;
+  min-width:0;
+  max-width:100%;
+  margin:0;
+  padding:0;
+  opacity:0;
+  cursor:pointer;
+}
+.toolbar .filter-button:focus-within{outline:2px solid currentColor;outline-offset:2px}
+.toolbar .filter-button.active{border-color:var(--color-fg)}
 .records-count{margin-left:auto;color:var(--color-muted);font-size:11px;line-height:1.2}
 .toolbar-reset{min-height:36px;cursor:pointer;border:0;background:transparent;color:var(--color-muted);font-size:11px}
 .records{width:100%;min-width:0;border-top:1px solid var(--color-line)}
