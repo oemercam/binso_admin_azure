@@ -240,11 +240,18 @@ jobs:
           node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
           echo "Microsoft Graph client-credentials authentication passed."
 
+      - name: Inspect production startup entry point
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp config show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --query appCommandLine -o tsv
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
+          startup-command: node /home/site/wwwroot/server.js
 
       - name: Wait for deployed worker
         shell: bash
@@ -311,6 +318,8 @@ jobs:
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
           curl -fsS --max-time 20 "$PRODUCTION_URL/api/health/ready" | grep -q '"status":"ready"'
           echo "Binso One production health and readiness checks passed."
+
+          BINSO_BASE_URL="$PRODUCTION_URL" node scripts/check-deployed-assets.mjs /tmp/binso-artifact
 
           retry_curl() {
             local output="$1"
