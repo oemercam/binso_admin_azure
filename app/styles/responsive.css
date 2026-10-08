@@ -1108,6 +1108,81 @@
 
 /* Mobile / PWA */
 @media (max-width:760px){
+/* Binso mobile header and sorting refinements */
+
+  .mobile-header.mobile-header-detail{
+    grid-template-columns:44px minmax(0,1fr) 44px;
+    background:var(--color-bg);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    filter:none;
+    opacity:1;
+  }
+  .mobile-header-detail .mobile-header-leading{display:contents}
+  .mobile-header-detail .mobile-back{grid-column:1;justify-self:start}
+  .mobile-header-detail .mobile-header-title{
+    grid-column:2;
+    min-width:0;
+    max-width:100%;
+    text-align:center;
+    padding-inline:6px;
+    filter:none;
+    opacity:1;
+    text-shadow:none;
+  }
+  .mobile-header-detail .mobile-detail-actions{
+    grid-column:3;
+    width:44px;
+    min-width:44px;
+    margin:0;
+    justify-self:end;
+    justify-content:flex-end;
+    filter:none;
+    opacity:1;
+  }
+  .mobile-header-detail .mobile-detail-actions > :last-child{margin-right:0}
+  .mobile-header-detail .mobile-back,
+  .mobile-header-detail .mobile-detail-actions :is(button,a,svg){
+    filter:none;
+    opacity:1;
+    text-shadow:none;
+  }
+
+
+  .toolbar .filter-button{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 40px;
+    width:40px;
+    min-width:40px;
+    max-width:40px;
+    height:40px;
+    min-height:40px;
+    padding:0;
+    overflow:hidden;
+    box-sizing:border-box;
+  }
+  .toolbar .filter-button > svg{flex:none;pointer-events:none}
+  .toolbar .filter-button > select{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-width:0;
+    max-width:100%;
+    margin:0;
+    padding:0;
+    opacity:0;
+    cursor:pointer;
+  }
+  .toolbar .filter-button:focus-within{outline:2px solid currentColor;outline-offset:2px}
+  .toolbar .chips{min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
+  .toolbar .chips::-webkit-scrollbar{display:none}
+  .toolbar .chips > button{flex-shrink:0;white-space:nowrap}
+
+
 :root{
     --page-x:var(--mobile-page-x);
   }
@@ -3248,81 +3323,3 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 }
 
-/* Mobile detail header: crisp, opaque controls and right-aligned actions.
-   Scoped to detail headers; bottom navigation is intentionally untouched. */
-@media (max-width:760px){
-  .mobile-header.mobile-header-detail{
-    grid-template-columns:44px minmax(0,1fr) 44px;
-    background:var(--color-bg);
-    backdrop-filter:none;
-    -webkit-backdrop-filter:none;
-    filter:none;
-    opacity:1;
-  }
-  .mobile-header-detail .mobile-header-leading{display:contents}
-  .mobile-header-detail .mobile-back{grid-column:1;justify-self:start}
-  .mobile-header-detail .mobile-header-title{
-    grid-column:2;
-    min-width:0;
-    max-width:100%;
-    text-align:center;
-    padding-inline:6px;
-    filter:none;
-    opacity:1;
-    text-shadow:none;
-  }
-  .mobile-header-detail .mobile-detail-actions{
-    grid-column:3;
-    width:44px;
-    min-width:44px;
-    margin:0;
-    justify-self:end;
-    justify-content:flex-end;
-    filter:none;
-    opacity:1;
-  }
-  .mobile-header-detail .mobile-detail-actions > :last-child{margin-right:0}
-  .mobile-header-detail .mobile-back,
-  .mobile-header-detail .mobile-detail-actions :is(button,a,svg){
-    filter:none;
-    opacity:1;
-    text-shadow:none;
-  }
-}
-
-/* Shared mobile record toolbar: icon-sized native sort picker.
-   Keep the select interactive and accessible; reserve space for category tabs. */
-@media (max-width:760px){
-  .toolbar .filter-button{
-    position:relative;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    flex:0 0 40px;
-    width:40px;
-    min-width:40px;
-    max-width:40px;
-    height:40px;
-    min-height:40px;
-    padding:0;
-    overflow:hidden;
-    box-sizing:border-box;
-  }
-  .toolbar .filter-button > svg{flex:none;pointer-events:none}
-  .toolbar .filter-button > select{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    min-width:0;
-    max-width:100%;
-    margin:0;
-    padding:0;
-    opacity:0;
-    cursor:pointer;
-  }
-  .toolbar .filter-button:focus-within{outline:2px solid currentColor;outline-offset:2px}
-  .toolbar .chips{min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
-  .toolbar .chips::-webkit-scrollbar{display:none}
-  .toolbar .chips > button{flex-shrink:0;white-space:nowrap}
-}
