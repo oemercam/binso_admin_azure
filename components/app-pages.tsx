@@ -1076,9 +1076,9 @@ function useSupportRows(){
 export function SupportPage() {
   const {rows:ticketRows,loading,error}=useSupportRows();
   return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<Button href="/support/neu" icon="plus" className="page-add-button responsive-create-action" ariaLabel="Neues Ticket"><span className="create-action-label">Neues Ticket</span></Button>}>
-    <MetricTiles><MetricTile label="Offene Tickets" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)}/><MetricTile label="Gelöste Tickets" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)}/></MetricTiles>
+    {!loading&&!error&&<MetricTiles><MetricTile label="Offene Tickets" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)}/><MetricTile label="Gelöste Tickets" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)}/></MetricTiles>}
     <div className="tablet-master-detail support-master-detail">
-      <RecordsView loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} statusGroups={{Offen:["Neu","Warten auf Kunde"]}} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
+      <RecordsView countLabel="Tickets" loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} statusGroups={{Offen:["Neu","Warten auf Kunde"]}} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={updated} status={status}/>}</RecordsView>
 
     </div>
   </AppShell>;
