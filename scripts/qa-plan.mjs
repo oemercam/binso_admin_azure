@@ -2,7 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import fs from 'node:fs';
 
-export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu','/benachrichtigungen','/kunden/customer-one/bearbeiten','/einstellungen/konto','/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/benachrichtigungen','/einstellungen/sprache','/einstellungen/sicherheit','/einstellungen/datenschutz'];
+export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu','/benachrichtigungen','/kunden/customer-one/bearbeiten','/einstellungen/konto','/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/benachrichtigungen','/einstellungen/sprache','/einstellungen/sicherheit','/einstellungen/datenschutz','/einstellungen/zeiterfassung'];
 export const webkitFullRoutes=['/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 const groups={
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},
@@ -11,7 +11,7 @@ const groups={
  documents:{match:/document|invoice|quote|pdf|qr-bill|rechnungen|angebote/,routes:['/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/angebote','/angebote/AN-TEST-1','/angebote/neu'],interactions:['documents']},
  payments:{match:/payment|zahlungen/,routes:['/zahlungen','/zahlungen/payment-one','/zahlungen/neu'],interactions:[]},
  finance:{match:/finance|finanzen|dashboard|revenue/,routes:['/dashboard','/finanzen','/finanzen/analyse'],interactions:['finance']},
- time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu'],interactions:['time']},
+ time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu','/einstellungen/zeiterfassung'],interactions:['time']},
  expenses:{match:/expense|spesen/,routes:['/spesen','/spesen/expense-one','/spesen/neu'],interactions:['expenses']},
  chat:{match:/support|chat|ticket|workspace-viewport/,routes:['/support','/support/ticket-one','/support/neu'],interactions:['chat']},
  settings:{match:/setting|einstellungen/,routes:['/einstellungen','/einstellungen/darstellung','/benachrichtigungen'],interactions:[]},
@@ -21,27 +21,30 @@ const groups={
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
 const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat'];
 export function planChanges(files,{level='standard'}={}){
- if(!['fast','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
+ if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
- const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(app-pages|app-shell|ui|binso-ux|records|use-dialog-focus)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
+ const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|ui|binso-ux|records|use-dialog-focus)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
  const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
  const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);
  const infrastructure=paths.some(isInfrastructure);
  const matched=Object.values(groups).filter(g=>paths.some(p=>g.match.test(p)));
  const unknown=paths.some(p=>!/^(docs\/|README|\.gitignore|AGENTS\.md)/.test(p)&&!isGlobal(p)&&!isInfrastructure(p)&&!Object.values(groups).some(g=>g.match.test(p)));
- const full=level==='full'||level!=='fast'&&(infrastructure||unknown);
+ const full=level==='full'||level==='standard'&&(infrastructure||unknown);
  const broad=global||unknown||infrastructure;
- const routes=full?fullRoutes:broad?representative:[...new Set(matched.flatMap(g=>g.routes))];
+ const modulePaths=paths.filter(p=>p.startsWith('components/pages/')&&!p.endsWith('/shared.tsx'));
+ let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
+ const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
- if(global){suites.add('ux-regression-test');suites.add('theme-selfcheck');}
+ if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
+ if(global)suites.add('theme-selfcheck');
  if(paths.some(p=>/css|styles/.test(p)))suites.add('check-css-architecture');
  if(paths.some(p=>/document|invoice|qr|pdf/.test(p))){suites.add('document-presentation-test');suites.add('pwa-preview-test');}
  if(paths.some(p=>/session|auth/.test(p)))suites.add('client-session-test');
  if(paths.some(p=>/permission|role|page-access/.test(p)))suites.add('permission-selfcheck');
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
  if(infrastructure||unknown)suites.add('qa-plan-test');
- return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:level==='fast'?[375,1440]:[375,820,1440],webkitWidths:full?[320,375,390,430,768]:[375,820],themes:level==='fast'?['light']:['light','dark']};
+ return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:[390,768,1440],webkitWidths:full?[320,375,390,430,768]:[390,768],themes:level==='fast'?['light']:['light','dark']};
 }
 export function changedFiles(base){
  const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).split('\0').filter(Boolean);

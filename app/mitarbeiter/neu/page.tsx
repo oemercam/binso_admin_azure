@@ -1,2 +1,2 @@
-import { EmployeeForm } from "@/components/app-pages";
+import { EmployeeForm } from "@/components/pages/employees";
 export default function Page(){return <EmployeeForm/>;}

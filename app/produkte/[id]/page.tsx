@@ -1,4 +1,4 @@
-import { ProductForm } from "@/components/app-pages";
+import { ProductForm } from "@/components/pages/products";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;

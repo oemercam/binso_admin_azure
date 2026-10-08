@@ -1,2 +1,2 @@
-import { SubscriptionSettingsPage } from "@/components/app-pages";
+import { SubscriptionSettingsPage } from "@/components/pages/settings";
 export default function Page(){return <SubscriptionSettingsPage/>;}

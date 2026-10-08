@@ -1,2 +1,2 @@
-import { LanguageSettingsPage } from "@/components/app-pages";
+import { LanguageSettingsPage } from "@/components/pages/settings";
 export default function Page(){return <LanguageSettingsPage/>;}

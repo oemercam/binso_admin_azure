@@ -1,4 +1,4 @@
-import { ExpenseForm } from "@/components/app-pages";
+import { ExpenseForm } from "@/components/pages/expenses";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;

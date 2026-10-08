@@ -14,7 +14,7 @@
     "db:check": "node scripts/check-db.mjs",
     "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
     "permissions:test": "node scripts/permission-selfcheck.mjs",
-    "test": "node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs",
+    "test": "node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs",
     "tenant:test": "node scripts/migration-test.mjs",
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
@@ -32,7 +32,10 @@
     "qa:standard": "node scripts/qa.mjs standard",
     "qa:full": "node scripts/qa.mjs full",
     "qa:plan": "node scripts/qa-plan.mjs",
-    "qa:plan:test": "node scripts/qa-plan-test.mjs"
+    "qa:plan:test": "node scripts/qa-plan-test.mjs",
+    "ux:inventory": "node scripts/ux-inventory.mjs",
+    "qa:integration": "node scripts/qa.mjs integration",
+    "qa:release": "node scripts/qa.mjs full"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",

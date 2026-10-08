@@ -1,2 +1,2 @@
-import { AccountSettingsPage } from "@/components/app-pages";
+import { AccountSettingsPage } from "@/components/pages/settings";
 export default function Page(){return <AccountSettingsPage/>;}

@@ -3,7 +3,7 @@
 import {useEffect,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
 import {AppShell} from "./app-shell";
-import {Button,Field,SectionTitle,Status,Toast} from "./ui";
+import { Button, Field, SectionTitle, Status, Toast, Input } from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 
 type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
@@ -92,10 +92,10 @@ export function SecuritySettingsPage(){
         {!setup&&<Button onClick={()=>void startSetup()}>Authenticator einrichten</Button>}
       </>}
       {setup&&<div className="form-grid">
-        <Field label="Einrichtungsschlüssel"><input readOnly value={setup.secret}/></Field>
+        <Field label="Einrichtungsschlüssel"><Input readOnly value={setup.secret}/></Field>
         <p className="settings-note">Öffne deine Authenticator-App, füge ein neues Konto hinzu und gib den Schlüssel manuell ein. Alternativ kannst du auf einem unterstützten Gerät den folgenden Link öffnen.</p>
         <a className="text-action" href={setup.otpAuthUri}>In Authenticator-App öffnen</a>
-        <Field label="6-stelliger Authenticator-Code"><input value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></Field>
+        <Field label="6-stelliger Authenticator-Code"><Input value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></Field>
         <Button onClick={()=>void confirmSetup()} disabled={code.length!==6}>Authenticator bestätigen</Button>
       </div>}
       {recovery.length>0&&<div className="context-block"><Status tone="warning">Einmal anzeigen</Status><b>Recovery Codes sicher speichern</b><span>Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf.</span><pre>{recovery.join("\n")}</pre></div>}
@@ -124,9 +124,9 @@ export function SecuritySettingsPage(){
     <section className="surface security-card">
       <SectionTitle title="Passwort ändern"/>
       <div className="form-grid">
-        <Field label="Aktuelles Passwort"><input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
-        <Field label="Neues Passwort"><input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
-        <Field label="Neues Passwort bestätigen"><input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
+        <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
+        <Field label="Neues Passwort"><Input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
+        <Field label="Neues Passwort bestätigen"><Input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
       </div>
       <Button variant="secondary" onClick={()=>void changePassword()}>Passwort speichern</Button>
     </section>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { InvoicesPage } from "@/components/app-pages";
+import { InvoicesPage } from "@/components/pages/finance";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

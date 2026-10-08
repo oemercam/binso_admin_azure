@@ -43,6 +43,7 @@ const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['cus
 const hasInteraction=name=>requestedInteractions.includes(name);
 async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
+let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -59,12 +60,16 @@ try{
     if(p==='/api/support/tickets/ticket-one/messages'){messagePosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failSend?503:200,json:failSend?{message:'Fixture message offline'}:{item:{id:'sent-'+messagePosts,author_type:'customer',body:JSON.parse(req.postData()).body,created_at:'2026-10-08T10:00:00Z'}}});}
     if(p==='/api/expenses/scan-receipt'){await new Promise(resolve=>{releaseReceiptScan=resolve});return route.fulfill({json:{merchant:'SBB',total:89,currency:'CHF',date:'2026-10-08',confidence:0.95}});}
     if(p==='/api/files'){uploads++;return route.fulfill({json:{item:{id:'receipt-one'}}});}
+    if(p==='/api/settings/team/invitations'||p.startsWith('/api/settings/team/members/')){teamPosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failTeam?503:200,json:failTeam?{message:'Fixture team unavailable'}:{ok:true}});}
+    if(p==='/api/time-entries/policy'){policyPosts++;await new Promise(resolve=>setTimeout(resolve,150));if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});policyRequired=JSON.parse(req.postData()).required;return route.fulfill({json:{time_approval_required:policyRequired}});}
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
    let data;
-   if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:false}};
+   if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
+   else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:'member',created_at:'2026-10-08'}],invitations:[],userLimit:10,plan:'pro'};
    else if(p==='/api/notifications')data={items:[],unreadCount:0};
+   else if(p==='/api/time-entries/policy')data={time_approval_required:policyRequired};
    else if(p==='/api/time-tracker')data={tracker:null};
    else if(p==='/api/settings/profile')data={profile:{name:'Test Person',theme_mode:theme,email:'test@example.invalid'}};
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
@@ -194,8 +199,8 @@ try{
   await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.getByRole('button',{name:'Anwenden',exact:true}).click();
-  await page.locator('.finance-open-invoices').getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
-  await page.locator('.finance-open-invoices').getByText('Offen',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).getByText('Offen',{exact:true}).filter({visible:true}).waitFor();
   await page.locator('.bo-metric-tiles').getByText('CHF 200.00',{exact:true}).waitFor();await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   assert.equal(await page.locator('.bo-metric-tiles .metric').count(),4,'Finance has exactly four compact metrics');
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();
@@ -212,6 +217,13 @@ try{
   const searchRect=await page.locator('.time-filter-toolbar .searchbox').boundingBox(),filterRect=await page.getByRole('button',{name:'Zeitfilter'}).boundingBox();
   assert.ok(filterRect.x>searchRect.x&&Math.abs(filterRect.y-searchRect.y)<5,'Mobile filter follows search on the same row');
   }
+  if(hasInteraction('time')){
+   await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();let filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await page.keyboard.press('Escape');assert.equal(await page.locator('.time-group').count(),1,'Cancelling a filter preserves the applied range');
+   await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});assert.equal(await filter.getByLabel('Von',{exact:true}).inputValue(),'','Discarded range is not applied');await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await filter.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.time-group').count(),0,'Applying updates the entries');
+   policyPosts=0;policyRequired=true;failPolicy=true;await page.goto(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');const required=page.getByRole('checkbox',{name:'Freigabe erforderlich'});await required.uncheck();await page.getByRole('button',{name:'Speichern',exact:true}).dblclick();await page.getByRole('alert').filter({hasText:'Fixture policy unavailable'}).waitFor();assert.equal(policyPosts,1,'Policy rejects same-frame duplicate writes');assert.equal(await required.isChecked(),false,'Policy error preserves the chosen value');failPolicy=false;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Zeiterfassungseinstellung gespeichert.',{exact:true}).waitFor();assert.equal(policyRequired,false);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-time-settings.png`)});
+   policyRole='member';await page.goto(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');assert.equal(await page.getByRole('checkbox',{name:'Freigabe erforderlich'}).isEnabled(),false);assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).count(),0,'Member cannot change the organization policy');policyRole='owner';
+   teamPosts=0;failTeam=false;await page.goto(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Mitarbeiter einladen',exact:true}).filter({visible:true}).click();const invitation=page.getByRole('dialog',{name:'Einladung',exact:true});await invitation.getByLabel('E-Mail',{exact:true}).fill('invalid');await invitation.getByRole('button',{name:'Einladen',exact:true}).click();assert.equal(teamPosts,0,'Invalid invitations do not write');await invitation.getByLabel('E-Mail',{exact:true}).fill('team@example.invalid');failTeam=true;await invitation.getByRole('button',{name:'Einladen',exact:true}).dblclick();await page.getByText('Fixture team unavailable',{exact:true}).waitFor();assert.equal(teamPosts,1,'Invitation locks duplicate writes');assert.equal(await invitation.getByLabel('E-Mail',{exact:true}).inputValue(),'team@example.invalid');failTeam=false;await invitation.getByRole('button',{name:'Einladen',exact:true}).click();await invitation.waitFor({state:'hidden'});assert.equal(teamPosts,2,'Invitation failure can be retried');
+  }
   if(hasInteraction('documents')){
   await page.waitForLoadState("networkidle");await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
@@ -225,6 +237,9 @@ try{
   const zoom=await page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth,document:document.querySelector('.document-modal-body').scrollWidth}));
   assert.ok(zoom.page<=zoom.viewport+1&&zoom.document>zoom.viewport,'Zoom scrolls only inside the document area');
   await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
+  }
+  if(hasInteraction('documents')){
+   invoice.status='draft';await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
   }
   if(hasInteraction('employees')){
   employeeLedgerFixture=true;

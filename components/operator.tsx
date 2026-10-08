@@ -1,4 +1,5 @@
 "use client";
+import {ActionSheet,FormSheet} from "./binso-ux";
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -123,7 +124,6 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const [mobileMore,setMobileMore]=useState(false);
   const mobileMoreDialog=useDialogFocus(mobileMore,()=>setMobileMore(false));
   const [accountOpen,setAccountOpen]=useState(false);
-  const accountDialogRef=useDialogFocus(accountOpen,()=>setAccountOpen(false));
   const router=useRouter();
   const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
 
@@ -139,7 +139,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
       </header>
       <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)}/></div>
-      {accountOpen&&<div className="sheet-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setAccountOpen(false)}}><section ref={accountDialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Konto"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Konto</h2><p>Profil, Darstellung und Sitzung.</p></div><button className="icon-button" type="button" aria-label="Schliessen" onClick={()=>setAccountOpen(false)}><Icon name="close"/></button></header><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></section></div>}
+      {accountOpen&&<ActionSheet label={"Konto"} description={"Profil, Darstellung und Sitzung."} open={true} onClose={()=>setAccountOpen(false)} busy={false} className={""} layerClassName={""} ariaLabel={"Konto"}><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></ActionSheet>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}

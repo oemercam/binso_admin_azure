@@ -1,4 +1,4 @@
-import { InvoiceEditor } from "@/components/app-pages";
+import { InvoiceEditor } from "@/components/documents";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;

@@ -1,2 +1,2 @@
-import { CompanySettingsPage } from "@/components/app-pages";
+import { CompanySettingsPage } from "@/components/pages/settings";
 export default function Page(){return <CompanySettingsPage/>;}

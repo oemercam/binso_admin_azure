@@ -1,2 +1,2 @@
-import { ExpenseForm } from "@/components/app-pages";
+import { ExpenseForm } from "@/components/pages/expenses";
 export default function Page(){return <ExpenseForm/>;}

@@ -1,2 +1,2 @@
-import { SimpleModule } from "@/components/app-pages";
-export default function Page(){return <SimpleModule kind="einstellungen"/>}
+import { SettingsPage } from "@/components/pages/settings";
+export default function Page(){return <SettingsPage/>}

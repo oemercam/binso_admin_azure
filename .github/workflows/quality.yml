@@ -141,7 +141,7 @@ jobs:
           BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
-        run: node scripts/ux-browser-test.mjs
+        run: node scripts/browser-shards.mjs
       - name: FULL PWA restart and offline regression
         if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:

@@ -5,7 +5,7 @@ import {matchesRecordChip} from "@/lib/list-filter";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Icon, Status } from "./ui";
-import { ListSearch } from "./binso-ux";
+import { ListSearch, ListRow } from "./binso-ux";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(status)) return "success";
@@ -101,7 +101,6 @@ export function RecordsView({
 
 export function RecordRow({
   href,
-  icon,
   title,
   meta,
   value,
@@ -114,13 +113,5 @@ export function RecordRow({
   value?: string;
   status?: string;
 }) {
-  const body = <>
-    {icon ? <span className="activity-icon"><Icon name={icon}/></span> : <span className="record-avatar">{title[0]}</span>}
-    <div className="record-main"><b>{title}</b>{meta&&<small>{meta}</small>}</div>
-    {value&&<strong>{value}</strong>}
-    {status&&<Status tone={tone(status)}>{status}</Status>}
-    <Icon name="arrow" size={17}/>
-  </>;
-
-  return href ? <Link href={href} className="record">{body}</Link> : <div className="record">{body}</div>;
+  return <ListRow href={href} title={title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }

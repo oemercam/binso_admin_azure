@@ -1,3 +1,4 @@
+import {readPageFile} from "./page-source.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
@@ -7,14 +8,14 @@ import {renderToStaticMarkup} from 'react-dom/server';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const read=path=>requireReadCache.get(path)??'';
-const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await fs.readFile(path,'utf8')])));
-let source=await fs.readFile('lib/server/repositories/business-api.ts','utf8');
+const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await readPageFile(path,'utf8')])));
+let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',
  '@/lib/permissions':'export const ownRecordOnly=()=>false;export const tenantCan=()=>true;',
- '@/lib/financial-status':ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText,
+ '@/lib/financial-status':ts.transpileModule(await readPageFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText,
  '@/lib/qr-bill':'export const invoicePaymentIssue=()=>null;',
 };
 for(const [specifier,stub] of Object.entries(dependencies))source=source.replace(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub)));
@@ -38,7 +39,7 @@ await listApiBusiness(client,session,'customer_contacts','order=is_primary.desc,
 assert.match(calls[3].sql,/order by q\.is_primary desc,q\.created_at asc,q\.id desc/);
 console.log('Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.');
 
-const searchSource=await fs.readFile('lib/search.ts','utf8');
+const searchSource=await readPageFile('lib/search.ts','utf8');
 const {searchSources,searchItem}=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
 for(const source of searchSources){
  const result=searchItem(source,{id:'canonical-uuid',name:'Acme AG',number:source.table==='documents'?'AN-2026-000001':undefined,total:135.67,customer:{name:'Acme AG'}});
@@ -51,9 +52,9 @@ console.log('Search results use visible labels, canonical record IDs and existin
 
 
 const [tokensCss,baseCss,responsiveCss]=await Promise.all([
-  fs.readFile('app/styles/tokens.css','utf8'),
-  fs.readFile('app/styles/base.css','utf8'),
-  fs.readFile('app/styles/responsive.css','utf8'),
+  readPageFile('app/styles/tokens.css','utf8'),
+  readPageFile('app/styles/base.css','utf8'),
+  readPageFile('app/styles/responsive.css','utf8'),
 ]);
 for(const token of ['--desktop-section-y:24px','--desktop-surface-x:24px','--desktop-action-h:40px']){
   assert.ok(tokensCss.includes(token),'Missing canonical desktop layout token: '+token);
@@ -69,7 +70,7 @@ assert.ok(responsiveCss.includes('.tablet-master-detail:not(:has(>.tablet-detail
 assert.ok(responsiveCss.includes('grid-template-columns:minmax(220px,1fr) auto auto'),'Medium desktop toolbar must use the canonical responsive grid');
 assert.ok(responsiveCss.includes('grid-template-columns:minmax(0,1fr);\n    gap:var(--desktop-section-gap);'),'Medium desktop time tracking must collapse to one full-width column');
 assert.ok(responsiveCss.includes('grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr)'),'Wide desktop time tracking must use the canonical two-column workspace');
-const appCss=await fs.readFile('app/styles/app.css','utf8');
+const appCss=await readPageFile('app/styles/app.css','utf8');
 assert.ok(appCss.includes('.responsive-create-action{'),'Responsive create actions need a shared structural rule');
 assert.ok(appCss.includes('display:inline-flex'),'Responsive create actions must keep icon and label on one line outside mobile mode');
 console.log('Medium desktop uses the full content width and keeps create actions on one line.');
@@ -89,8 +90,8 @@ assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notifica
 assert.ok(responsiveCss.includes('.desktop-search-field kbd{display:none}'),'Medium desktop header must compact the inline search instead of removing account controls');
 console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
 
-const uiSource=await fs.readFile('components/ui.tsx','utf8');
-const baseCssSource=await fs.readFile('app/styles/base.css','utf8');
+const uiSource=await readPageFile('components/ui.tsx','utf8');
+const baseCssSource=await readPageFile('app/styles/base.css','utf8');
 assert.ok(uiSource.includes('strokeWidth: 2'),'Shared icons must use pixel-stable strokes');
 assert.ok(uiSource.includes('vectorEffect: "non-scaling-stroke"'),'Shared icons must keep stroke width stable while scaling');
 assert.ok(baseCssSource.includes('.desktop-notification-button>svg'),'Header icons must use a fixed integer SVG size');
@@ -104,7 +105,7 @@ assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer mus
 assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
 
-const appShellSource=await fs.readFile('components/app-shell.tsx','utf8');
+const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
 assert.ok(appShellSource.includes('className={"desktop-search "+(desktopSearchOpen?"is-open":"")}'),'Desktop search must be an inline header search');
 assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search keyboard shortcut must focus the inline field');
 assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
@@ -124,7 +125,7 @@ assert.ok(mediumDesktopBlock.includes('backdrop-filter:none'),'Medium desktop ap
 assert.ok(wideDesktopBlock.includes('backdrop-filter:none'),'Wide desktop appbar must avoid blur rasterization');
 console.log('Desktop header icons render on a non-rasterized, pixel-stable appbar.');
 
-const marketingCss=await fs.readFile('app/styles/marketing.css','utf8');
+const marketingCss=await readPageFile('app/styles/marketing.css','utf8');
 assert.ok(marketingCss.includes('.marketing-header{'),'Marketing header must exist');
 assert.ok(marketingCss.includes('-webkit-backdrop-filter:none'),'PWA entry headers must disable WebKit backdrop blur');
 assert.ok(marketingCss.includes('.portal-header{'),'Portal header must use the opaque header standard');
@@ -133,8 +134,8 @@ assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA header
 assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
 console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
 
-const manifestSource=await fs.readFile('app/manifest.ts','utf8');
-const layoutSource=await fs.readFile('app/layout.tsx','utf8');
+const manifestSource=await readPageFile('app/manifest.ts','utf8');
+const layoutSource=await readPageFile('app/layout.tsx','utf8');
 assert.ok(manifestSource.includes('/brand/pwa-icon-192.png'),'PWA manifest must expose the Binso One 192px icon');
 assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must expose the Binso One 512px icon');
 assert.ok(manifestSource.includes('/brand/pwa-icon-maskable-512.png'),'PWA manifest must expose a maskable Binso One icon');
@@ -221,8 +222,8 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 // Desktop process integrity: time tracking must persist explicit customer/project identity and customer detail has one info pane per path.
 {
  const pages=read("components/app-pages.tsx");
- const tracker=await fs.readFile("app/api/time-tracker/route.ts","utf8");
- const entries=await fs.readFile("app/api/time-entries/route.ts","utf8");
+ const tracker=await readPageFile("app/api/time-tracker/route.ts","utf8");
+ const entries=await readPageFile("app/api/time-entries/route.ts","utf8");
  assert(pages.includes("projectId:manualProject||null")&&pages.includes("customerId:manualCustomer||null"),"Manual time must submit canonical customer/project IDs.");
  assert(tracker.includes("project_customer_mismatch")&&entries.includes("project_customer_mismatch"),"Timer and manual time APIs must reject customer/project mismatches.");
  const demoCustomer=pages.slice(pages.indexOf('if(!production){\n    return <AppShell title="Acme AG"'),pages.indexOf('if(!customer) return'));
@@ -231,7 +232,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 }
 // Actual month calculations must respect partial and exclusive date bounds.
 {
- const source=await fs.readFile('lib/finance-periods.ts','utf8');
+ const source=await readPageFile('lib/finance-periods.ts','utf8');
  const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
  const {buildFinanceMonths,financeWindow}=await import(moduleUrl(js));
  const lastThree=financeWindow("three","","","2026-10-08");assert.equal(lastThree.start.toLocaleDateString("sv-SE"),"2026-07-01");assert.equal(lastThree.end.toLocaleDateString("sv-SE"),"2026-10-01");
@@ -251,7 +252,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 
 // Search and period bounds apply together before time totals are computed.
 {
- const source=await fs.readFile('lib/time-entry-filter.ts','utf8');
+ const source=await readPageFile('lib/time-entry-filter.ts','utf8');
  const {filterTimeEntries}=await import(moduleUrl(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
  const rows=[{customer_name:'Acme',description:'Beratung',started_at:'2026-10-01',billable:true,approved:true},{customer_name:'Acme',description:'Beratung',started_at:'2026-10-06',billable:true,approved:false},{customer_name:'Andere',started_at:'2026-10-06',billable:false}];
  assert.deepEqual(filterTimeEntries(rows,{query:'acme',from:'2026-10-06',to:'2026-10-06',status:'Zu prüfen'}),[rows[1]]);
@@ -266,9 +267,9 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 
 // Cross-device process parity: responsive UX may rearrange controls, but it must not fork business behavior.
 {
- const shell=await fs.readFile("components/app-shell.tsx","utf8");
+ const shell=await readPageFile("components/app-shell.tsx","utf8");
  const pages=read("components/app-pages.tsx");
- const records=await fs.readFile("components/records.tsx","utf8");
+ const records=await readPageFile("components/records.tsx","utf8");
  const responsive=read("app/styles/responsive.css");
  const mobileOnlyHandlers=[...pages.matchAll(/window\.innerWidth\s*[<>=!]+\s*\d+[\s\S]{0,180}?(api(?:Get|Post|Patch|Delete|Upload)|fetch)\s*\(/g)];
  assert.equal(mobileOnlyHandlers.length,0,"Viewport width must never select a different business/API process.");
@@ -281,7 +282,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  console.log("Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.");
 }
 
-const {matchesRecordChip}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/list-filter.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+const {matchesRecordChip}=await import(moduleUrl(ts.transpileModule(await readPageFile('lib/list-filter.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
 assert.equal(matchesRecordChip('Angebote','Angenommen','Angebot'),true);
 assert.equal(matchesRecordChip('Angebote','Bezahlt','Rechnung'),false);
 assert.equal(matchesRecordChip('Rechnungen','Bezahlt','Rechnung'),true);
@@ -290,7 +291,7 @@ assert.equal(matchesRecordChip('Offen','Teilweise bezahlt','Rechnung',{Offen:['T
 assert.equal(matchesRecordChip('Bezahlt','Offen','Rechnung'),false);
 console.log('Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.');
 
-const timerSource=await fs.readFile('lib/client/time-tracker.ts','utf8');
+const timerSource=await readPageFile('lib/client/time-tracker.ts','utf8');
 const timerAst=ts.createSourceFile('time-tracker.ts',timerSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
 const contextFunction=timerAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='withIdleTimerContext').getText(timerAst);
 const {withIdleTimerContext}=await import(moduleUrl(ts.transpileModule(contextFunction,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
@@ -303,12 +304,12 @@ console.log('Project-linked idle timer context survives synchronization without 
 
 // Exercise actual list rendering with status columns followed by metadata and hidden IDs.
 {
- const {compareRecordValues}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/record-sort.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+ const {compareRecordValues}=await import(moduleUrl(ts.transpileModule(await readPageFile('lib/record-sort.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
  assert.ok(compareRecordValues('CHF 900.00',"CHF 1’200.00")<0);
  assert.ok(compareRecordValues('31.12.2025','01.01.2026')<0);
  assert.ok(compareRecordValues('2026-10-02','2026-10-12')<0);
  assert.ok(compareRecordValues('RE-9','RE-10')<0);
- const list=await fs.readFile('components/records.tsx','utf8');
+ const list=await readPageFile('components/records.tsx','utf8');
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n');
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
@@ -325,17 +326,17 @@ console.log('Project-linked idle timer context survives synchronization without 
 
 // Exercise real mutation handlers, including two clicks before a React re-render.
 {
- const pages=await fs.readFile('components/app-pages.tsx','utf8');
+ const pages=await readPageFile('components/app-pages.tsx','utf8');
  const ast=ts.createSourceFile('pages.tsx',pages,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','RevenueInsight','moneyChf'].includes(node.name?.text));
- const compiled=ts.transpileModule((await fs.readFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  let values={},hook=0,calls=0,resolveSave,rejectSave;const scheduled=[];const navigations=[];
  const exports={};const Toast=()=>null;
  const write=()=>{++calls;return new Promise((resolve,reject)=>{resolveSave=resolve;rejectSave=reject});};
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07');
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children);
   for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},12]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
    const getSave=view=>{if(view?.props?.onClick&&view.props.children==='Speichern')return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
@@ -360,7 +361,7 @@ console.log('Project-linked idle timer context survives synchronization without 
 {
  let checked=0;
  for(const path of ['components/app-pages.tsx','components/documents.tsx']){
-  const source=await fs.readFile(path,'utf8');const ast=ts.createSourceFile(path,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+  const source=await readPageFile(path,'utf8');const ast=ts.createSourceFile(path,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
   const inspect=node=>{
    if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='Toast'){
     const title=node.attributes.properties.find(attribute=>attribute.name?.getText(ast)==='title');

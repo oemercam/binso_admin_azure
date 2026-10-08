@@ -1,7 +1,8 @@
 "use client";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
-import {Status} from "./ui";
+import {ListRow} from "./binso-ux";
+
 import {financialStatus,financialStatusLabels,documentDateLabel,openAmount,formatCurrency,formatDate,type FinancialDocument} from '@/lib/financial-status';
 import {RecordsView} from './records';
 export type DocumentListItem=FinancialDocument&{id?:string};
@@ -24,5 +25,5 @@ export function DocumentSummaryRow({item,customerHeading=false,compact=false}:{i
 }
 
 export function FinancialSummaryRow({href,title,status,tone='neutral',meta,amount,amountLabel,compact=false}:{href:string;title:string;status:string;tone?:'neutral'|'success'|'warning'|'danger'|'info';meta:string;amount:string;amountLabel?:string;compact?:boolean}){
- return <Link className={`document-summary-row${compact?' is-compact':''}`} href={href}><b>{title}</b><Status tone={tone}>{status}</Status><small>{meta}</small><span className="document-summary-amount">{amountLabel&&<small>{amountLabel}</small>}<strong>{amount}</strong></span></Link>;
+ return <ListRow href={href} title={title} meta={meta} status={status} tone={tone} value={amount} valueLabel={amountLabel} compact={compact}/>;
 }
