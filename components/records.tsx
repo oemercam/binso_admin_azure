@@ -82,7 +82,7 @@ export function RecordsView({
 
   const cycleSort=(index=firstSortIndex)=>{if(sortIndex!==index){setSortIndex(index);setSort("asc");return;}setSort(current=>current==="default"?"asc":current==="asc"?"desc":"default")};
   const hasFilters=query.trim().length>0 || activeChip!==(chips[0]??"Alle") || sort!=="default";
-  const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese"} as Record<string,string>)[countLabel]??countLabel;
+  const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;
 
   return <>
     <div className="toolbar">
