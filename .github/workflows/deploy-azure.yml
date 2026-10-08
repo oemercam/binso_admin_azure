@@ -90,8 +90,10 @@ jobs:
             cd deploy/app
             node -e "require('next/dist/server/next.js'); require('@next/env'); require('@swc/helpers/_/_interop_require_default')"
           )
-          cp -R .next/static deploy/app/.next/static
-          if [ -d public ]; then cp -R public deploy/app/public; else mkdir -p deploy/app/public; fi
+          mkdir -p deploy/app/.next/static
+          cp -R .next/static/. deploy/app/.next/static/
+          mkdir -p deploy/app/public
+          if [ -d public ]; then cp -R public/. deploy/app/public/; fi
           printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
           cd deploy/app
           zip -qr ../binso-one.zip .

@@ -5,6 +5,10 @@ mkdir -p /tmp/binso-production-artifact
 unzip -q deploy/binso-one.zip -d /tmp/binso-production-artifact
 test -f /tmp/binso-production-artifact/server.js
 test -d /tmp/binso-production-artifact/node_modules
+test ! -d /tmp/binso-production-artifact/public/public
+test ! -d /tmp/binso-production-artifact/.next/static/static
+test -f /tmp/binso-production-artifact/public/sw.js
+test -f /tmp/binso-production-artifact/public/manifest-app.webmanifest
 (
   cd /tmp/binso-production-artifact
   PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-artifact.log 2>&1 &
