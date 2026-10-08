@@ -425,9 +425,10 @@ textarea{
 .form-grid>label small{font-size:var(--control-help-font)}
 .form-field.full{grid-column:1/-1}
 .form-field,
-.form-grid>label{display:grid;align-content:start;gap:var(--field-label-gap);min-width:0;font-size:13px;font-weight:650}
+.form-grid>label{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:var(--field-label-gap);min-width:0;font-size:13px;font-weight:650}
 .form-grid textarea,
 .form-field textarea{min-height:110px}
+html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .optional-details{padding:0;border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
 .optional-details summary{min-height:52px;display:flex;align-items:center;font-size:12px;font-weight:700;cursor:pointer}
 .optional-details>div{padding:0 0 20px}
@@ -1727,3 +1728,24 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 
 .app-session-loading{min-height:48px;display:flex;align-items:center}
 .app-session-loading>span{width:28px;height:3px;background:var(--color-fg);border-radius:2px}
+
+/* Preview owns scrolling and zoom; document width cannot escape into the app. */
+.document-modal{display:flex;flex-direction:column;overflow:hidden;height:100dvh;padding-top:0}
+.document-modal>header{position:relative;flex:none;grid-template-columns:minmax(0,1fr) auto;height:calc(58px + var(--safe-top));padding-top:var(--safe-top)}
+.document-modal-header-spacer{display:none}
+.document-modal>header>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.document-modal-body{flex:1;min-height:0;max-width:none;width:100%;overflow:auto;overscroll-behavior:contain;padding-bottom:max(24px,var(--safe-bottom))}
+.document-modal .document-preview-content{max-width:760px;margin-inline:auto}
+.document-modal .document-preview-content.is-zoomed{max-width:none;width:1100px;margin-inline:0}
+.document-modal-header-actions button:disabled{opacity:.4}
+.sheet-layer{top:var(--dialog-viewport-top,0px);bottom:auto;height:var(--dialog-viewport-height,100dvh)}
+.sheet-layer>.bottom-sheet{max-height:calc(var(--dialog-viewport-height,100dvh) - 16px);display:flex;flex-direction:column;overflow:hidden}
+.employee-tab-panel .compact-list>:is(div,a){display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding-block:10px}
+.employee-tab-panel .compact-list>:is(div,a)>b{min-width:0;overflow-wrap:anywhere}
+.employee-tab-panel .compact-list>:is(div,a)>strong{grid-column:2;grid-row:1;white-space:nowrap}
+.employee-tab-panel .compact-list>:is(div,a)>span{font-size:11px}
+.employee-tab-panel .compact-list>:is(div,a)>.status{grid-column:2;justify-self:end}
+
+/* One form action at every viewport; labels may wrap in narrow grid columns. */
+.app-main:has(.mobile-sticky-save) .mobile-detail-actions>.button-primary,.page-container:has(.mobile-sticky-save) .page-head .page-actions>.button-primary{display:none}
+.form-field>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}

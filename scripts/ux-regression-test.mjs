@@ -325,7 +325,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const pages=await fs.readFile('components/app-pages.tsx','utf8');
  const ast=ts.createSourceFile('pages.tsx',pages,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','RevenueInsight','moneyChf'].includes(node.name?.text));
- const compiled=ts.transpileModule(nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const compiled=ts.transpileModule((await fs.readFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  let values={},hook=0,calls=0,resolveSave,rejectSave;const scheduled=[];const navigations=[];
  const exports={};const Toast=()=>null;
  const write=()=>{++calls;return new Promise((resolve,reject)=>{resolveSave=resolve;rejectSave=reject});};
@@ -333,15 +333,16 @@ console.log('Project-linked idle timer context survives synchronization without 
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
   Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07');
-  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',4:'ICT'},12]]){
+  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},12]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
-   const view=exports[name]({});const save=view.props.actions.props.onClick;
+   const getSave=view=>{if(view?.props?.onClick&&view.props.children==='Speichern')return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
+   const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
    const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
    values={...seeds,[toastIndex]:'Server nicht erreichbar.'};hook=0;
    const errorView=exports[name]({});assert.equal(errorView.props.children.find(child=>child?.type===Toast).props.tone,'danger',name+' must not render an error as success');
    values=seeds;hook=0;calls=0;
-   const retry=exports[name]({}).props.actions.props.onClick;
+   const retry=getSave(exports[name]({}));
    const failed=retry();rejectSave(new Error('offline'));await failed;const again=retry();assert.equal(calls,2,name+' can retry a failed mutation');resolveSave({ok:true});await again;
   }
   assert.ok(navigations.includes('/dashboard'),'Customer created from quick access returns to the dashboard');

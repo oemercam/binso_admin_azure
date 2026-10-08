@@ -18,6 +18,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
   const {row,kind}=await lockDocument(c,s,number);
   const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];
   if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}
+  if(row.status==='draft')throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');
   if(['cancelled','declined','expired'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];

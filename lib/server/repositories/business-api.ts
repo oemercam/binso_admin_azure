@@ -40,7 +40,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      coalesce((select sum(l.quantity*l.unit_price*l.vat_rate/100) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_amount,
      ${k==='invoice'?'d.total_amount':`coalesce((select sum(l.quantity*l.unit_price*(1+l.vat_rate/100)) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
-     json_build_object('name',c.name,'street',c.address,'postal_code',c.zip,'city',c.city) customer,
+     json_build_object('name',c.name,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country) customer,
      coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
      from ${t} d join customers c on c.id=d.customer_id and c.organization_id=d.organization_id where d.organization_id=$1 and d.archived_at is null`);
   }
@@ -70,7 +70,7 @@ export function translateBusinessWrite(table:string,data:Row,insert:boolean){
  if(table==='products'){target='products_services';Object.assign(out,{name:data.name,item_type:data.kind,sku:data.sku,unit:data.unit,unit_price:data.unit_price,vat_rate:data.vat_rate,description:data.description,status:data.status??'active'})}
  else if(table==='employees'){
   if(!data.email)throw new ApiError(400,'email_required','Bitte E-Mail-Adresse eingeben.');
-  Object.assign(out,{name:[data.first_name,data.last_name].join(' '),first_name:data.first_name,last_name:data.last_name,email:data.email,phone:data.phone,title:data.job_title,workload_percent:data.workload_percent,weekly_hours:data.weekly_hours,vacation_days:data.vacation_days,address:data.address,start_date:data.entry_date,active:data.status!=='inactive'});
+  Object.assign(out,{name:[data.first_name,data.last_name].join(' '),first_name:data.first_name,last_name:data.last_name,email:data.email,phone:data.phone,title:data.job_title,workload_percent:data.workload_percent,weekly_hours:data.weekly_hours,vacation_days:data.vacation_days,address:data.address,start_date:Object.hasOwn(data,'start_date')?data.start_date:data.entry_date,active:data.status!=='inactive'});
   if(insert)Object.assign(out,{role:'employee',employment_type:'salary'});
  }else if(table==='expenses'){
   const category=String(data.category??'other');

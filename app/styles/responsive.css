@@ -506,7 +506,6 @@
     gap:var(--desktop-action-gap);
   }
   .desktop-page-actions:empty{display:none}
-  .page-container:has(.bo-detail-heading .page-actions) .mobile-sticky-save{display:none}
   .desktop-page-actions .button{
     min-height:var(--desktop-action-h);
     height:var(--desktop-action-h);
@@ -1765,7 +1764,7 @@
     padding:8px 0;
     background:var(--color-bg);
   }
-  .mobile-sticky-save{display:block}
+  .mobile-sticky-save{display:block;position:static}
   .mobile-sticky-save .button{width:100%;min-height:48px;height:48px}
   .mobile-document-bar{display:grid;grid-template-columns:1fr 1.35fr;gap:8px}
   .mobile-document-bar .button{width:100%;min-height:48px;height:48px}
@@ -2793,8 +2792,9 @@ input:not([type="checkbox"]):not([type="radio"]),
     overflow:hidden;
   }
   .document-modal-body{
-    position:absolute;
-    inset:58px 0 0;
+    position:relative;
+    inset:auto;
+    flex:1;
     box-sizing:border-box;
     height:auto;
     min-height:0;

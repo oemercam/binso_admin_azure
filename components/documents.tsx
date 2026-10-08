@@ -359,16 +359,16 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
-    {preview&&<DocumentModal pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
+    {preview&&<DocumentModal previewDraft={{...draft,kind}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="sheet-menu">
       <button type="button" onClick={()=>{setMoreOpen(false);setPreview(true)}}><Icon name="file"/><span>Vorschau</span></button>
       <a href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"}><Icon name="file"/><span>PDF herunterladen</span></a>
-      {canWrite&&!['cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}
+      {canWrite&&!['draft','cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}
       {canWrite&&draft.status==='draft'&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('issue')}><Icon name="check"/><span>{kind==='Rechnung'?'Rechnung stellen':'Als versendet erfassen'}</span></button>}
       {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><button type="button" disabled={actionBusy} onClick={()=>void processAction('accept')}><Icon name="check"/><span>Kundenannahme erfassen</span></button><button type="button" disabled={actionBusy} onClick={()=>void processAction('decline')}><Icon name="close"/><span>Kundenablehnung erfassen</span></button></>}
       {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('cancel')}><Icon name="close"/><span>Rechnung stornieren</span></button>}
       </div>{actionError&&<p role="alert">{actionError}</p>}</ActionSheet>
-    {sendOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget&&!actionBusy)setSendOpen(false)}}><section ref={sendDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Dokument senden"><header className="sheet-header"><div><h2>{kind} als PDF senden</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setSendOpen(false)}/></header><Field label="Empfänger"><input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das Dokument wird als PDF versendet. Ein Entwurf wird danach ausgestellt und ist nicht mehr bearbeitbar.</p>{actionError&&<p role="alert">{actionError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></section></div>}
+    {sendOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget&&!actionBusy)setSendOpen(false)}}><section ref={sendDialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label="Dokument senden"><header className="sheet-header"><div><h2>{kind} als PDF senden</h2><p>{draft.number}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>setSendOpen(false)}/></header><Field label="Empfänger"><input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das ausgestellte Dokument wird als PDF versendet.</p>{actionError&&<p role="alert">{actionError}</p>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></section></div>}
     {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
@@ -500,40 +500,26 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   </div>;
 }
 
-function DocumentModal({ title, onClose, children, pdfNumber }: { title:string; onClose:()=>void; children:React.ReactNode;pdfNumber?:string }) {
+function DocumentModal({ title, onClose, pdfNumber, previewDraft }: { title:string; onClose:()=>void; pdfNumber?:string;previewDraft?:DocumentDraft&{kind:DocumentKind} }) {
   const [pdfBlob,setPdfBlob]=useState<Blob|null>(null);
   const [pdfError,setPdfError]=useState<string|null>(null);
   const pdfFile=useRef<File|null>(null);
+  const previewJson=JSON.stringify(previewDraft);
   useEffect(()=>{
-    if(!pdfNumber)return;
     let active=true;
-    fetch("/api/documents/"+encodeURIComponent(pdfNumber)+"/pdf").then(async response=>{if(!response.ok)throw new Error("PDF konnte nicht geladen werden.");return response.blob()}).then(blob=>{if(!active)return;pdfFile.current=new File([blob],pdfNumber+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(reason=>{if(active)setPdfError(reason instanceof Error?reason.message:"PDF konnte nicht geladen werden.")});
+    fetch(pdfNumber?"/api/documents/"+encodeURIComponent(pdfNumber)+"/pdf":"/api/documents/preview",pdfNumber?undefined:{method:"POST",headers:{"Content-Type":"application/json"},body:previewJson}).then(async response=>{if(!response.ok)throw new Error("PDF konnte nicht geladen werden.");return response.blob()}).then(blob=>{if(!active)return;pdfFile.current=new File([blob],(pdfNumber||"Entwurf")+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(reason=>{if(active)setPdfError(reason instanceof Error?reason.message:"PDF konnte nicht geladen werden.")});
     return()=>{active=false;pdfFile.current=null};
-  },[pdfNumber]);
+  },[pdfNumber,previewJson]);
   const [zoomed,setZoomed]=useState(false);
-  useEffect(()=>{
-    const previous=document.body.style.overflow;
-    document.body.style.overflow="hidden";
-    return()=>{document.body.style.overflow=previous};
-  },[]);
-  useEffect(()=>{
-    const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose()};
-    window.addEventListener("keydown",close);
-    return()=>window.removeEventListener("keydown",close);
-  },[onClose]);
+  const modalDialog=useDialogFocus(true,onClose);
   const share=async()=>{
     if(pdfFile.current&&navigator.canShare?.({files:[pdfFile.current]})){try{await navigator.share({title,files:[pdfFile.current]})}catch{/* share dialog closed */}return;}
-    const url=window.location.href;
-    if(navigator.share){
-      try{await navigator.share({title,url});}catch{/* share dialog closed */}
-      return;
-    }
-    try{await navigator.clipboard.writeText(url);}catch{/* clipboard unavailable */}
+    if(pdfBlob){const url=URL.createObjectURL(pdfBlob);const link=document.createElement("a");link.href=url;link.download=(pdfNumber||"Entwurf")+".pdf";link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
   };
-  return <div className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
-    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></button><button type="button" aria-label="Teilen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
-    <div className="document-modal-body"><div className={zoomed?"document-preview-content is-zoomed":"document-preview-content"}>{pdfNumber?pdfError?<p role="alert">{pdfError}</p>:pdfBlob?<PdfPreview file={pdfBlob}/>:<p role="status">PDF wird geladen …</p>:children}</div></div>
-  </div>;
+  return <section ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></button><button type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
+    <div className="document-modal-body"><div className={zoomed?"document-preview-content is-zoomed":"document-preview-content"}>{pdfError?<p role="alert">{pdfError}</p>:pdfBlob?<PdfPreview file={pdfBlob}/>:<p role="status">PDF wird geladen …</p>}</div></div>
+  </section>;
 }
 
 function useDocumentCompany(){
@@ -558,7 +544,7 @@ export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-
   const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
   const due=invoiceDueDate(draft.date,draft.due);
   const balance=draft.status==='paid'||draft.status==='cancelled'?0:Math.max(0,totals.total-Number(draft.paidAmount??0));
-  const payment=useMemo(()=>{if(balance===0)return {svg:'',issue:null};try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:balance,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,balance]);
+  const payment=useMemo(()=>{if(draft.status==='draft')return {svg:'',issue:'Entwurf – kein zahlbarer QR-Zahlteil.'};if(balance===0)return {svg:'',issue:null};try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:balance,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,draft.status,balance]);
 
   if(company.loading)return <p role="status">Rechnungsvorschau wird geladen …</p>;
   if(company.error)return <p role="alert">{company.error}</p>;

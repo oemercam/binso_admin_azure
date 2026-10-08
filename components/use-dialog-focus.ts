@@ -27,6 +27,14 @@ export function useDialogFocus(open: boolean, onClose: () => void) {
     const previousRootOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
+    const viewport=window.visualViewport;
+    const resize=()=>{
+      document.documentElement.style.setProperty("--dialog-viewport-height",`${viewport?.height??window.innerHeight}px`);
+      document.documentElement.style.setProperty("--dialog-viewport-top",`${viewport?.offsetTop??0}px`);
+      const focused=document.activeElement;
+      if(focused instanceof HTMLElement&&dialog.contains(focused))focused.scrollIntoView({block:"nearest"});
+    };
+    resize();viewport?.addEventListener("resize",resize);viewport?.addEventListener("scroll",resize);
     const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(
       'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
     )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert]'));
@@ -49,6 +57,8 @@ export function useDialogFocus(open: boolean, onClose: () => void) {
     document.addEventListener("keydown", onKey);
     document.addEventListener("focusin", onFocus);
     return () => {
+      viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
+      document.documentElement.style.removeProperty("--dialog-viewport-height");document.documentElement.style.removeProperty("--dialog-viewport-top");
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("focusin", onFocus);
       document.body.style.overflow = previousOverflow;

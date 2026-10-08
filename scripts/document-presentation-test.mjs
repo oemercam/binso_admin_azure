@@ -61,3 +61,15 @@ const outstandingList=listExports.DocumentList({items:[],kind:'invoice',outstand
 assert.deepEqual(outstandingList.props.chips,['Alle','Überfällig']);assert.equal(outstandingList.props.emptyLabel('Alle'),'Keine offenen Rechnungen');
 assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt']);
 console.log('Finance overview filters describe its outstanding invoice subset; the full invoice list retains all main filters.');
+
+const debtorData=qr.createQrBillData(company.raw,{number:'RE-QR-QA',total:116.20,currency:'CHF',debtor:{name:'Empfänger AG',street:'Bahnhofstrasse 24',postal_code:'8001',city:'Zürich'}});
+assert.equal(debtorData.amount,116.20);assert.equal(debtorData.debtor.address,'Bahnhofstrasse');assert.equal(debtorData.debtor.buildingNumber,'24');
+assert.equal(qr.createQrBillData(company.raw,{number:'RE-SCOR',total:100,reference:'RF18539007547034'}).reference,'RF18539007547034');
+assert.throws(()=>qr.createQrBillData(company.raw,{number:'RE-SCOR',total:100,reference:'RF00539007547034'}));
+assert.throws(()=>qr.createQrBillData({...company.raw,iban:'CH0000000000000000000'},{number:'RE-invalid',total:100}));
+const employeeJs=ts.transpileModule(await fs.readFile('lib/employee-validation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const {employeeInputIssue}=await import('data:text/javascript;base64,'+Buffer.from(employeeJs).toString('base64'));
+const employeeInput={email:'qa@example.invalid',entryDate:'2026-10-08',workloadPercent:80,weeklyHours:42,vacationDays:25};
+assert.equal(employeeInputIssue(employeeInput),null);
+for(const invalid of [{email:'invalid'},{entryDate:'2026-02-30'},{workloadPercent:101},{weeklyHours:0},{weeklyHours:81},{vacationDays:-1}])assert.ok(employeeInputIssue({...employeeInput,...invalid}));
+console.log('QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.');

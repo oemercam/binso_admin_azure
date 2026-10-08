@@ -89,6 +89,8 @@
   --control-x:11px;
   --control-radius:var(--radius-md);
 
+  --dialog-viewport-height:100dvh;
+  --dialog-viewport-top:0px;
   --safe-top:0px;
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
