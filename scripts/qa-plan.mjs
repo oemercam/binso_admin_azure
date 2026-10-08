@@ -23,11 +23,13 @@ const allInteractions=['customers','products','employees','documents','finance',
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
- const global=paths.some(p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(app-pages|app-shell|ui|binso-ux|records|use-dialog-focus)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p));
+ const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(app-pages|app-shell|ui|binso-ux|records|use-dialog-focus)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
+ const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
- const infrastructure=paths.some(p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p));
+ const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);
+ const infrastructure=paths.some(isInfrastructure);
  const matched=Object.values(groups).filter(g=>paths.some(p=>g.match.test(p)));
- const unknown=paths.some(p=>!/^(docs\/|README|\.gitignore|AGENTS\.md)/.test(p)&&!global&&!infrastructure&&!Object.values(groups).some(g=>g.match.test(p)));
+ const unknown=paths.some(p=>!/^(docs\/|README|\.gitignore|AGENTS\.md)/.test(p)&&!isGlobal(p)&&!isInfrastructure(p)&&!Object.values(groups).some(g=>g.match.test(p)));
  const full=level==='full'||level!=='fast'&&(infrastructure||unknown);
  const broad=global||unknown||infrastructure;
  const routes=full?fullRoutes:broad?representative:[...new Set(matched.flatMap(g=>g.routes))];

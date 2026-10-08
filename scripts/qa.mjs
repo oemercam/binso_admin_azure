@@ -24,9 +24,9 @@ try{
   for(const script of ['release:check','test','lint','css:check','typecheck','security:scan','security:scan:all','build'])await run(script,'pnpm',[script]);
  }
  if(plan.routes.length&&!args.includes('--no-browser')){
-  const env={BINSO_UX_ROUTES:plan.routes.join(','),BINSO_UX_WIDTHS:plan.widths.join(','),BINSO_UX_THEMES:plan.themes.join(','),BINSO_UX_INTERACTIONS:plan.interactions.join(','),BINSO_UX_SCREENSHOTS:level==='full'?'1':'0',BINSO_UX_OUTPUT:'/tmp/binso-qa-'+level,BINSO_UX_PORT:level==='fast'?'3300':'3200',BINSO_UX_A11Y:level==='full'?'1':'0',BINSO_UX_SERVER_MODE:level==='fast'?'dev':'start',...(arg('--url')?{BINSO_BASE_URL:arg('--url')}:{})};
+  const env={BINSO_UX_ROUTES:plan.routes.join(','),BINSO_UX_WIDTHS:plan.widths.join(','),BINSO_UX_THEMES:plan.themes.join(','),BINSO_UX_INTERACTIONS:plan.interactions.join(','),BINSO_UX_SCREENSHOTS:plan.level==='full'?'1':'0',BINSO_UX_OUTPUT:'/tmp/binso-qa-'+level,BINSO_UX_PORT:level==='fast'?'3300':'3200',BINSO_UX_A11Y:plan.level==='full'?'1':'0',BINSO_UX_SERVER_MODE:level==='fast'?'dev':'start',...(arg('--url')?{BINSO_BASE_URL:arg('--url')}:{})};
   await run('scoped Chromium browser',process.execPath,['scripts/ux-browser-test.mjs'],env);
-  if(level==='full')await run('PWA offline and restart',process.execPath,['scripts/pwa-browser-test.mjs'],arg('--url')?{BINSO_BASE_URL:arg('--url')}:{});
+  if(plan.level==='full')await run('PWA offline and restart',process.execPath,['scripts/pwa-browser-test.mjs'],arg('--url')?{BINSO_BASE_URL:arg('--url')}:{});
   if(level!=='fast')await run('scoped WebKit browser',process.execPath,['scripts/ux-browser-test.mjs'],{...env,BINSO_UX_BROWSER:'webkit',BINSO_UX_ROUTES:plan.webkitRoutes.join(','),BINSO_UX_WIDTHS:plan.webkitWidths.join(','),BINSO_UX_DEVICE:'iPhone 13'});
  }
  const report={level,effectiveCoverage:plan.level,browserExecuted:plan.routes.length>0&&!args.includes('--no-browser'),scope:plan,seconds:Number(((performance.now()-started)/1000).toFixed(2)),timings,passed:true};

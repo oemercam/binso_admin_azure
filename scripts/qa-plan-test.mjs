@@ -10,3 +10,5 @@ assert.equal(planChanges([],{level:'full'}).routes.length,57);
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');
 assert.throws(()=>planChanges([],{level:'skip'}));
 console.log('QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.');
+
+assert.equal(planChanges(['app/styles/app.css','unmapped/custom-engine.ts'],{level:'standard'}).level,'full','A known global dependency cannot hide an unknown dependency');
