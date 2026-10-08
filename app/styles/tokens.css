@@ -81,6 +81,10 @@
   --control-font:13px;
   --control-font-mobile:16px;
   --control-label-font:14px;
+  --heading-content-gap:12px;
+  --field-label-gap:6px;
+  --field-group-gap:14px;
+  --sheet-row-gap:10px;
   --control-help-font:10px;
   --control-x:11px;
   --control-radius:var(--radius-md);
