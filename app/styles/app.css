@@ -162,7 +162,7 @@
 .activity-list small{margin-top:3px;color:var(--color-muted);font-size:11px}
 .quick-section{margin-top:22px}
 .quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.quick-grid .button{width:100%;justify-content:flex-start}
+.quick-grid .button{width:100%;min-width:0;white-space:normal;text-align:left;justify-content:flex-start}
 
 /* Lists and filtering */
 .toolbar{min-height:42px;margin-bottom:16px;display:flex;align-items:center;gap:10px 12px}

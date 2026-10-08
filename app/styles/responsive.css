@@ -1607,7 +1607,7 @@
   .surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .quick-section{margin-top:var(--mobile-section-gap)}
   .quick-section>.section-title{margin-bottom:12px}
-  .quick-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .quick-grid .button{min-height:44px;height:44px;padding-inline:12px}
 
   .toolbar{

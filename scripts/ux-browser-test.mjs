@@ -74,7 +74,8 @@ try{
   });
   const page=await context.newPage();page.on('pageerror',error=>errors.push(page.url()+': '+error.message));
   const routes=['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu'];
-  for(const width of (process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375])){
+  await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
+   const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
    await page.setViewportSize({width,height:1000});
    console.log(`Checking ${theme} ${width}px`);
    for(const route of (process.env.BINSO_UX_ROUTES?.split(",")??routes)){
@@ -86,10 +87,13 @@ try{
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
     if(width<=760&&!route.endsWith('/neu')&&!['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login'].includes(route)&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
     if([1440,430].includes(width)&&['/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen/analyse'].includes(route))await page.screenshot({path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
    }
-  }
+   await page.close();
+  }));
+  await page.goto(base+'/produkte');
   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});
   await page.goto(base+'/produkte');await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('not-present');
