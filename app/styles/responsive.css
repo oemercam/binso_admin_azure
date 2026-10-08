@@ -3328,3 +3328,12 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:10px}
 .bo-detail-heading-main{flex-wrap:wrap}
 .bo-detail-heading-main .status{margin-left:auto}
+
+/* Shared mobile/desktop sheet content guards: prevent label and action collisions. */
+.bottom-sheet,.bottom-sheet *{box-sizing:border-box}
+.bottom-sheet{max-width:100%;overflow-x:hidden}
+.bottom-sheet .sheet-menu,.bottom-sheet .sheet-header{min-width:0}
+.bottom-sheet .sheet-menu a,.bottom-sheet .sheet-menu button{min-width:0;max-width:100%}
+.bottom-sheet .sheet-menu b,.bottom-sheet .sheet-menu small{min-width:0;overflow-wrap:anywhere}
+.bottom-sheet input,.bottom-sheet select,.bottom-sheet textarea{max-width:100%;min-width:0}
+.bottom-sheet .sheet-header>div{min-width:0}
