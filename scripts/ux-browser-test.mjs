@@ -41,6 +41,7 @@ try{
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
    if(req.method()!=='GET'){
+    if(p==='/api/demo/session')return route.fulfill({json:{ok:true,databaseBacked:true,expiresIn:86400}});
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
     if(p==='/api/support/tickets/ticket-one/messages'){messagePosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failSend?503:200,json:failSend?{message:'Fixture message offline'}:{item:{id:'sent-'+messagePosts,author_type:'customer',body:JSON.parse(req.postData()).body,created_at:'2026-10-08T10:00:00Z'}}});}
     if(p==='/api/expenses/scan-receipt'){await new Promise(resolve=>{releaseReceiptScan=resolve});return route.fulfill({json:{merchant:'SBB',total:89,currency:'CHF',date:'2026-10-08',confidence:0.95}});}
@@ -89,6 +90,7 @@ try{
     if([1440,430].includes(width)&&['/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen/analyse'].includes(route))await page.screenshot({path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
    }
   }
+  await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});
   await page.goto(base+'/produkte');await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('not-present');
   await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
