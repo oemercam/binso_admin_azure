@@ -1199,7 +1199,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
         setRemote(current=>[...current,payload.item]);
       }catch(error){
-        setDraft(value);
+        setDraft(current=>current.trim()?`${value}\n${current}`:value);
         setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
         window.setTimeout(()=>setToast(null),2600);
       }
