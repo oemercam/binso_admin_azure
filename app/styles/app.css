@@ -1657,7 +1657,23 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .time-group{min-width:0;border-bottom:1px solid var(--color-line);padding-bottom:18px}
 .time-group:last-child{border-bottom:0;padding-bottom:0}
 .time-group-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:8px}
-.time-group-head>div{display:grid;gap:3px}
+.time-group-head>div{display:grid;gap:3px;min-width:0;flex:1}
+.time-group-head{cursor:pointer;list-style:none;padding:10px 0}
+.time-group-head::-webkit-details-marker{display:none}
+.time-group-head strong{white-space:nowrap}
+.time-group[open]>.time-group-head>svg{transform:rotate(180deg)}
+.finance-overview-toolbar{display:flex;align-items:center;gap:12px}
+.finance-overview-toolbar select{width:auto;max-width:calc(100% - 56px);min-height:42px;background:var(--color-bg);color:var(--color-fg);border:1px solid var(--color-line);border-radius:10px;padding:8px 12px}
+.timer-display{display:grid;place-items:center;margin:18px auto;text-align:center}
+.timer-display>div{display:grid;gap:6px}
+.timer-display strong{font-size:32px;font-variant-numeric:tabular-nums}
+.timer-display small,.timer-display span{font-size:12px;color:var(--color-muted)}
+.pdf-pages{display:grid;gap:16px;width:100%}
+.pdf-page{min-width:0;background:white;color:black}
+.pdf-page canvas{display:block;max-width:100%}
+.time-filter-toolbar>.icon-button{flex:none}
+.timer-actions .button{flex:1;max-width:200px}
+.time-entry-list input[type="checkbox"]{margin-right:8px}
 .time-group-head small{color:var(--color-muted);font-size:11px}
 .time-entry-list>div{grid-template-columns:24px minmax(0,1fr) auto auto;align-items:center}
 .time-entry-list input[type="checkbox"]{width:16px;height:16px;margin:0}

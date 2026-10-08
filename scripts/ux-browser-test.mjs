@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
+import PDFDocument from 'pdfkit';
 import {pathToFileURL} from 'node:url';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
@@ -25,12 +26,13 @@ const customer={id:'customer-one',name:'Prüffirma AG',city:'Bern',status:'activ
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
-const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:0,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
+const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent'};
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
+const fixturePdf=await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const results=[];const errors=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,releaseReceiptScan;
 let context;
 try{
@@ -62,7 +64,8 @@ try{
    else if(p==='/api/support/tickets/ticket-one/messages')data={items:[{id:'message-one',author_type:'customer',body:'Testnachricht',created_at:'2026-10-08T10:00:00Z'}]};
    else if(p==='/api/expenses/options')data={items:[employee]};
    else if(p==='/api/files')data={items:[]};
-   else if(p==='/api/time-entries')data={items:[]};
+   else if(p==='/api/time-entries')data={items:url.searchParams.has('employeeId')?[]:[{id:'time-one',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:90,started_at:'2026-10-08T09:00:00Z',billable:true,approved:true},{id:'time-two',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:45,started_at:'2026-10-08T11:00:00Z',billable:true,approved:true}]};
+   else if(p.endsWith('/pdf'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});
    else if(p==='/api/customers/customer-one/contacts'||p==='/api/customers/customer-one/activity')data={items:[]};
    else if(p==='/api/customers/customer-one/documents')data={items:[invoice,offer]};
    else {
@@ -89,10 +92,32 @@ try{
     if(width<=760&&!route.endsWith('/neu')&&!['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login'].includes(route)&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
-    if([1440,430].includes(width)&&['/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen/analyse'].includes(route))await page.screenshot({path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
+    if([1440,430].includes(width)&&['/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse'].includes(route))await page.screenshot({path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
    }
    await page.close();
   }));
+  await page.setViewportSize({width:430,height:900});
+  await page.goto(base+'/finanzen');
+  await page.locator('.finance-open-invoices').getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
+  assert.equal(await page.locator('.bo-metric-tiles .metric').count(),4,'Finance has exactly four compact metrics');
+  await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();
+  await page.getByRole('dialog',{name:'Finanzfilter'}).waitFor();await page.keyboard.press('Escape');
+  await page.goto(base+'/zeit');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
+  const group=page.locator('details.time-group').first();await group.waitFor();
+  assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
+  assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
+  await group.locator('summary').click();await group.locator('.time-entry-list').waitFor();
+  assert.equal(await group.locator('.time-entry-list>div').count(),2,'Expansion shows both entries');
+  const searchRect=await page.locator('.time-filter-toolbar .searchbox').boundingBox(),filterRect=await page.getByRole('button',{name:'Zeitfilter'}).boundingBox();
+  assert.ok(filterRect.x>searchRect.x&&Math.abs(filterRect.y-searchRect.y)<5,'Mobile filter follows search on the same row');
+  await page.goto(base+'/rechnungen/RE-TEST-1');
+  await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
+  try{await page.locator('.pdf-page canvas').nth(1).waitFor()}catch(error){console.log('PDF dialog diagnostics',await page.getByRole('dialog').innerText());await page.screenshot({path:path.join(output,'pdf-error.png')});throw error;}
+  await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-page canvas')].every(canvas=>canvas.width>300&&canvas.height>400));
+  assert.equal(await page.locator('.pdf-page').count(),2,'Actual generated PDF renders every page');
+  await page.screenshot({path:path.join(output,`${theme}-430-pdf-preview.png`),fullPage:true});
+  await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   await page.goto(base+'/produkte');
   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});
