@@ -15100,8 +15100,7 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
-        "components/ui.tsx#FormActions",
-        "components/ui.tsx#Toast"
+        "components/ui.tsx#FormActions"
       ],
       "cssRules": [
         13,
@@ -15224,7 +15223,6 @@
         756,
         759,
         773,
-        774,
         775,
         776,
         783,
@@ -47354,7 +47352,6 @@
         "/einstellungen/konto",
         "/einstellungen/sicherheit",
         "/einstellungen/team",
-        "/einstellungen/zeiterfassung",
         "/kunden/[id]/bearbeiten",
         "/kunden/[id]",
         "/kunden/neu",
