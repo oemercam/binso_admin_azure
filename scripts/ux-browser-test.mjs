@@ -31,7 +31,7 @@ const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
-const results=[];const errors=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0;
+const results=[];const errors=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,releaseReceiptScan;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -43,7 +43,7 @@ try{
    if(req.method()!=='GET'){
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
     if(p==='/api/support/tickets/ticket-one/messages'){messagePosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failSend?503:200,json:failSend?{message:'Fixture message offline'}:{item:{id:'sent-'+messagePosts,author_type:'customer',body:JSON.parse(req.postData()).body,created_at:'2026-10-08T10:00:00Z'}}});}
-    if(p==='/api/expenses/scan-receipt'){await new Promise(resolve=>setTimeout(resolve,300));return route.fulfill({json:{merchant:'SBB',total:89,currency:'CHF',date:'2026-10-08',confidence:0.95}});}
+    if(p==='/api/expenses/scan-receipt'){await new Promise(resolve=>{releaseReceiptScan=resolve});return route.fulfill({json:{merchant:'SBB',total:89,currency:'CHF',date:'2026-10-08',confidence:0.95}});}
     if(p==='/api/files'){uploads++;return route.fulfill({json:{item:{id:'receipt-one'}}});}
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
@@ -103,7 +103,9 @@ try{
   failMutation=true;posts=0;uploads=0;
   await page.goto(base+'/spesen/neu');await page.getByLabel('Händler / Firma',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');
   await page.locator('#expense-receipt-upload').setInputFiles({name:'receipt.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64')});
+  await page.waitForFunction(()=>[...document.querySelectorAll('button')].some(button=>button.textContent==='Einreichen'&&button.disabled));
   assert.equal(await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().isEnabled(),false,'Cannot submit while receipt recognition is running');
+  while(!releaseReceiptScan)await new Promise(resolve=>setTimeout(resolve,10));releaseReceiptScan();releaseReceiptScan=undefined;
   await page.getByText(/Erkannt.*Angaben prüfen/).waitFor();
   await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().dblclick();
   await page.getByText('Fixture offline',{exact:true}).waitFor();assert.equal(posts,1,'Two rapid clicks must issue one expense write');
