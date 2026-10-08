@@ -97,6 +97,9 @@
   --control-x:11px;
   --control-radius:var(--radius-md);
 
+  --dialog-edge-gap:16px;
+  --sheet-max-width:560px;
+  --layer-sheet:80;
   --dialog-viewport-height:100dvh;
   --dialog-viewport-top:0px;
   --safe-top:0px;

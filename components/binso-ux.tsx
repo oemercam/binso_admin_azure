@@ -37,17 +37,17 @@ export function MetricTile({ label, value, hint }: { label: string; value: React
 export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {
   value: string; onChange: (value: string) => void; placeholder?: string;
 }) {
-  return <label className="searchbox bo-list-search"><Icon name="search" size={19}/><input type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}/></label>;
+  return <label className="searchbox"><Icon name="search" size={19}/><input type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={placeholder}/></label>;
 }
 
 export function RowActions({ label = "Weitere Aktionen", onClick, disabled = false }: { label?: string; onClick: () => void; disabled?: boolean }) {
   return <button className="bo-row-actions" type="button" onClick={onClick} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></button>;
 }
 
-export function ActionSheet({label,open,onClose,children,busy=false}: {label:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean}) {
+export function ActionSheet({label,description,open,onClose,children,busy=false,className=""}: {label:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string}) {
   const dialog=useDialogFocus(open,()=>{if(!busy)onClose()});
   if(!open)return null;
-  return createPortal(<div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onClose()}}><section ref={dialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={label}><div className="sheet-handle"/><header className="sheet-header"><h2>{label}</h2><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={onClose}><Icon name="close"/></button></header>{children}</section></div>,document.body);
+  return createPortal(<div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onClose()}}><section ref={dialog} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} role="dialog" aria-modal="true" aria-label={label}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{label}</h2>{description&&<p>{description}</p>}</div><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={onClose}><Icon name="close"/></button></header>{children}</section></div>,document.body);
 }
 
 /** The same compact action sheet is used for entity editors on every viewport. */
