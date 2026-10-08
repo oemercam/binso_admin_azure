@@ -291,6 +291,7 @@
     right:28px;
   }
 
+  .operator-payment-insights{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
   .operator-sidebar{width:190px}
   .operator-main{margin-left:190px}
   .operator-grid.thirds{grid-template-columns:1fr 1fr}
@@ -505,7 +506,7 @@
     gap:var(--desktop-action-gap);
   }
   .desktop-page-actions:empty{display:none}
-  .page-container:has(>.desktop-page-actions:not(:empty)) .mobile-sticky-save{display:none}
+  .page-container:has(.bo-detail-heading .page-actions) .mobile-sticky-save{display:none}
   .desktop-page-actions .button{
     min-height:var(--desktop-action-h);
     height:var(--desktop-action-h);
@@ -571,7 +572,7 @@
   .activity-list>div,
   .activity-list>a{min-height:58px}
 
-  .metrics-grid{gap:0}
+  .metrics-grid{gap:10px}
   .metric{
     min-height:76px;
     padding:13px 16px;
@@ -1075,11 +1076,9 @@
   .form-grid{gap:var(--field-group-gap)}
 
   /* Dashboard: compact KPIs, useful content gets the space. */
-  .metrics-grid{gap:0;border:0}
-  .metric{min-height:96px;padding:14px 18px;border:0}
-  .metric:first-child{padding-left:0}
-  .metric+.metric{border-left:1px solid var(--color-line)}
-  .metric strong{margin:10px 0 4px;font-size:22px}
+  .metrics-grid{gap:10px;border:0}
+  .metric{min-height:74px;padding:12px 14px;border:0}
+  .metric strong{margin:7px 0 0;font-size:20px}
   .dashboard-grid,.detail-grid{gap:var(--desktop-workspace-gap);margin-top:var(--desktop-section-gap)}
   .quick-section{margin-top:var(--desktop-section-gap)}
   .quick-grid{gap:8px}
@@ -1585,11 +1584,8 @@
 
   .button{min-height:44px;height:44px;padding-inline:14px}
   .metrics-grid,
-  .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:0}
+  .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:0}
   .metric{min-height:76px;padding:12px 14px}
-  .metric:nth-child(odd){padding-left:0}
-  .metric:nth-child(even){border-left:1px solid var(--color-line)}
-  .metric:nth-child(n+3){border-top:1px solid var(--color-line)}
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
   .metrics-grid{border:0}
@@ -2945,7 +2941,7 @@ input:not([type="checkbox"]):not([type="radio"]),
     box-shadow:none;
   }
 
-.metric,.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
+.operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
 
 .revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px;font-size:8px}.revenue-bars i{border-radius:3px 3px 1px 1px}
 
@@ -3295,20 +3291,18 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 
 /* Binso One shared page/detail UI primitives. */
-.bo-page-heading,.bo-detail-heading{display:grid;gap:6px;min-width:0}
+.bo-page-heading,.bo-detail-heading{display:grid;gap:6px;min-width:0;flex:1}
 .bo-page-heading-main,.bo-detail-heading-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
-.bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;overflow-wrap:anywhere}
+.bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;flex:1;overflow-wrap:anywhere}
 .bo-page-heading p,.bo-detail-heading p{margin:0;color:var(--color-muted, #71717a);font-size:.875rem}
 .bo-detail-heading-main .status{flex-shrink:0}
-.bo-create-action{width:44px;height:44px;flex:0 0 44px;border:0;border-radius:50%;background:#000;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+.bo-create-action.button{width:44px;height:44px;flex:0 0 44px;min-width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
 .bo-create-action:hover:not(:disabled){opacity:.85}
 .bo-create-action:active:not(:disabled){opacity:.7}
 .bo-create-action:disabled{opacity:.45;cursor:not-allowed}
 .bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-.bo-metric-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,max(170px,calc((100% - 20px)/3))),1fr));gap:10px}
-.bo-metric-tile{background:var(--color-subtle, #f4f4f5);border:0;box-shadow:none;border-radius:12px;padding:12px;min-width:0;display:grid;gap:5px}
-.bo-metric-tile span{font-size:.75rem;color:var(--color-muted,#71717a)}
-.bo-metric-tile strong{font-size:clamp(1rem,2.5vw,1.3rem);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+
+.bo-metric-tiles{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}
 
 .bo-list-search{display:flex;align-items:center;gap:10px;width:100%;min-width:0;border:1px solid var(--color-line,#d4d4d8);border-radius:10px;padding:0 12px;min-height:44px}
 .bo-list-search input{width:100%;min-width:0;border:0;background:transparent;color:inherit;outline:0;font:inherit}
@@ -3316,18 +3310,12 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 
 
-/* Canonical compact sort control shared by all record overviews. */
-.toolbar .filter-button{box-sizing:border-box;min-width:0;max-width:154px;flex:0 0 auto;justify-self:end}
-.toolbar .filter-button select{box-sizing:border-box;width:auto;max-width:122px;min-width:0;text-overflow:ellipsis;white-space:nowrap}
-.toolbar .searchbox{min-width:0;max-width:100%}
-.toolbar .searchbox input{min-width:0;width:100%}
-.toolbar .chips{min-width:0}
-
 /* Keep common row action targets operable and visually consistent. */
 .bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:10px}
 .bo-detail-heading-main{flex-wrap:wrap}
 .bo-detail-heading-main .status{margin-left:auto}
+.bo-detail-heading-main .page-actions{margin-left:auto;position:static;flex:none}
 
 /* Shared mobile/desktop sheet content guards: prevent label and action collisions. */
 .bottom-sheet,.bottom-sheet *{box-sizing:border-box}
@@ -3344,9 +3332,10 @@ input:not([type="checkbox"]):not([type="radio"]),
 .page-head h1{overflow-wrap:anywhere}
 .page-head .page-actions{min-width:0;flex-shrink:0}
 .mobile-header-leading{min-width:0;overflow:hidden}
-.mobile-header-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mobile-header-title{min-width:0;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;white-space:nowrap}
+.mobile-header-title>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.mobile-header-title>.status{flex:none;font-size:9px}
 .mobile-header-actions,.mobile-detail-actions{flex-shrink:0}
-.bo-metric-tile strong{min-width:0}
 
 /* Accessible list controls and robust data-table cell sizing. */
 .desktop-record-table,.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
@@ -3376,6 +3365,3 @@ input:not([type="checkbox"]):not([type="radio"]),
 .record-main b,.record-main small{max-width:100%}
 .record>.status{max-width:100%;text-align:center}
 .desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
-.bo-metric-tile{align-content:start}
-.bo-metric-tile span{line-height:1.35}
-.bo-metric-tile strong{line-height:1.2}

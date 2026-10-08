@@ -232,8 +232,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const production=useBackendMode();
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
+  const documentActionPending=useRef(false);
   const [moreOpen,setMoreOpen]=useState(false);
-  const moreDialog=useDialogFocus(moreOpen,()=>setMoreOpen(false));
+  const moreDialog=useDialogFocus(moreOpen,()=>{if(!documentActionPending.current)setMoreOpen(false)});
   const [documentRole,setDocumentRole]=useState("");
   const [demoDocument,setDemoDocument]=useState(true);
   const [documentReadOnly,setDocumentReadOnly]=useState(true);
@@ -244,6 +245,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   useEffect(()=>{apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(s=>{setDocumentRole(s.tenant?.role??"");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch(()=>{});},[]);
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
+  const documentSavePending=useRef(false);
   const [dirty,setDirty]=useState(false);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const {directory,loading:customersLoading,error:customersError}=useCustomerDirectory();
@@ -299,10 +301,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
-    if(saving||companyPending)return;
+    if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError)return;
     if(isProductionBackendEnabled()&&!draft.customer){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(paymentIssue){show(paymentIssue);return;}
-    setSaving(true);
+    documentSavePending.current=true;setSaving(true);
     let savedNumber=draft.number;
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
@@ -314,17 +316,18 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       }
       setDirty(false);
       show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
-      if(existing)setEditing(false);
+      if(existing){documentSavePending.current=false;setEditing(false);}
       else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
     }catch(error){
+      documentSavePending.current=false;
       show(error instanceof Error?error.message:`${kind} konnte nicht gespeichert werden.`);
-    }finally{setSaving(false);}
+    }finally{if(!documentSavePending.current)setSaving(false);}
   };
 
   const canWrite=!documentReadOnly&&tenantCan(documentRole,kind==="Rechnung"?"invoices:write":"sales:write");
   const canEdit=canWrite&&(!existing||draft.status==="draft");
-  const processAction=async(action:string)=>{if(actionBusy)return;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/status",{action});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setMoreOpen(false);show("Status aktualisiert.")}catch(e){setActionError(e instanceof Error?e.message:"Status konnte nicht geändert werden.")}finally{setActionBusy(false)}};
-  const sendDocument=async()=>{if(actionBusy)return;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show("Dokument als PDF versendet.")}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{setActionBusy(false)}};
+  const processAction=async(action:string)=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/status",{action});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setMoreOpen(false);show("Status aktualisiert.")}catch(e){setActionError(e instanceof Error?e.message:"Status konnte nicht geändert werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
+  const sendDocument=async()=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show("Dokument als PDF versendet.")}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
   const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&Number(draft.total??0)>Number(draft.paidAmount??0);
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
@@ -356,7 +359,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
     {editing&&<div className="mobile-document-bar single-action"><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{existing?"Speichern":kind+" erstellen"}</Button></div>}
     {preview&&<DocumentModal title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}>{kind==="Angebot"?<OfferPreview draft={draft} directory={directory}/>:<InvoicePreview draft={draft} directory={directory}/>}</DocumentModal>}
-    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget)setMoreOpen(false)}}><section ref={moreDialog} tabIndex={-1} className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle" aria-hidden="true"/><header className="sheet-header"><h2>Weitere Aktionen</h2><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">
+    {moreOpen&&<div className="sheet-layer" onMouseDown={e=>{if(e.target===e.currentTarget&&!documentActionPending.current)setMoreOpen(false)}}><section ref={moreDialog} tabIndex={-1} className="bottom-sheet document-more-sheet" role="dialog" aria-modal="true" aria-label="Weitere Aktionen"><div className="sheet-handle" aria-hidden="true"/><header className="sheet-header"><h2>Weitere Aktionen</h2><IconButton label="Schliessen" icon="close" onClick={()=>setMoreOpen(false)}/></header><div className="sheet-menu">
       <button type="button" onClick={()=>{setMoreOpen(false);setPreview(true)}}><Icon name="file"/><span>Vorschau</span></button>
       <a href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"}><Icon name="file"/><span>PDF herunterladen</span></a>
       {canWrite&&!['cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}

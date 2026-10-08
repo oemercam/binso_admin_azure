@@ -2,5 +2,5 @@ import { ExpenseForm } from "@/components/app-pages";
 
 export default async function Page({params}:{params:Promise<{id:string}>}){
   const {id}=await params;
-  return <ExpenseForm existing expenseId={id}/>;
+  return <ExpenseForm key={id} existing expenseId={id}/>;
 }
