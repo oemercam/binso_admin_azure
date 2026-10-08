@@ -2,7 +2,7 @@
 import {tenantCan} from "@/lib/permissions";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {employeeInputIssue} from "@/lib/employee-validation";
-import {DocumentList,FinanceTabs,type DocumentListItem} from "./document-list";
+import {DocumentList,DocumentSummaryRow,FinanceTabs,type DocumentListItem} from "./document-list";
 import {financialStatus,openAmount,formatCurrency,businessDate} from "@/lib/financial-status";
 
 import Link from "next/link";
@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import {filterTimeEntries} from "@/lib/time-entry-filter";
 import { readTimer, changeTimer, withIdleTimerContext, type TimerState } from "@/lib/client/time-tracker";
 import ConfirmDialog from "./confirm-dialog";
+import {useWorkspaceViewport} from "./use-workspace-viewport";
 import {useDialogFocus} from "./use-dialog-focus";
 import { AppShell, SheetLink, SheetButton } from "./app-shell";
 import { RecordRow, RecordsView } from "./records";
@@ -20,7 +21,7 @@ export { InvoiceEditor, OfferEditor } from "./documents";
 import { customers, employees, expenses, invoices, offers, payments, products } from "@/lib/demo-data";
 import { appendDemoRow, type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiDelete, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {buildFinanceMonths} from "@/lib/finance-periods";
+import {buildFinanceMonths,financeWindow} from "@/lib/finance-periods";
 import {plans as subscriptionPlans} from '@/lib/plans';
 import {legalConfig} from '@/config/legal';
 import { Button, EmptyState, Field, Icon, Metric, SectionTitle, Status, Toast, Toggle } from "./ui";
@@ -82,9 +83,9 @@ function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[])
   });
   if(collection==="payments") return items.map(item=>{
     const customer=item.customer as {name?:string}|null|undefined;
-    const invoice=item.invoice as {number?:string}|null|undefined;
+    const invoice=item.invoice as {number?:string;currency?:string}|null|undefined;
     const statusMap:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
-    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,paymentMethodLabel(item.method)].filter(Boolean).join(" · "),formatCurrency(item.amount,String(item.currency??"CHF")),statusMap[String(item.status)]??String(item.status??"")];
+    return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,paymentMethodLabel(item.method)].filter(Boolean).join(" · "),formatCurrency(item.amount,String(item.currency??invoice?.currency??"CHF")),statusMap[String(item.status)]??String(item.status??"")];
   });
   return [];
 }
@@ -117,15 +118,15 @@ function useDemoRows(collection:DemoCollection, defaults:string[][]) {
 function formatSwissPhone(value:unknown){const raw=String(value??"").trim();const digits=raw.replace(/\D/g,"");if(digits.startsWith("41")&&digits.length===11)return `+41 ${digits.slice(2,4)} ${digits.slice(4,7)} ${digits.slice(7,9)} ${digits.slice(9,11)}`;if(digits.startsWith("0")&&digits.length===10)return `${digits.slice(0,3)} ${digits.slice(3,6)} ${digits.slice(6,8)} ${digits.slice(8,10)}`;return raw;}
 function formatSwissUid(value:unknown){const raw=String(value??"").trim().toUpperCase();const digits=raw.replace(/\D/g,"");if(digits.length===9)return `CHE-${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}`;return raw;}
 
-function RevenueInsight({invoices,demo=false,onMonthChange}:{invoices?:Array<Record<string,unknown>>;demo?:boolean;onMonthChange?:(month:number)=>void}) {
+function RevenueInsight({invoices,onMonthChange}:{invoices?:Array<Record<string,unknown>>;onMonthChange?:(month:number)=>void}) {
   const [activeMonth,setActiveMonth]=useState(()=>Number(businessDate().slice(5,7))-1);
-  const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=[7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400], previous=[3600,5400,6200,9300,7700,8500,11900,10800,9400,13600,12600,16500];
-  if(!demo){current.fill(0);previous.fill(0);const year=Number(businessDate().slice(0,4));for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===year) current[date.getMonth()]+=amount;else if(date.getFullYear()===year-1) previous[date.getMonth()]+=amount;}}
+  const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=Array<number>(12).fill(0), previous=Array<number>(12).fill(0);
+  {const year=Number(businessDate().slice(0,4));for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===year) current[date.getMonth()]+=amount;else if(date.getFullYear()===year-1) previous[date.getMonth()]+=amount;}}
   const currentMonth=Number(businessDate().slice(5,7))-1;
   const total=current.reduce((a,b)=>a+b,0), comparableTotal=current.slice(0,currentMonth).reduce((a,b)=>a+b,0), previousTotal=previous.slice(0,currentMonth).reduce((a,b)=>a+b,0), change=previousTotal?((comparableTotal-previousTotal)/previousTotal*100):null, max=Math.max(1,...current,...previous);
   const activeChange=activeMonth<currentMonth&&previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
   return <section className="surface revenue-insight">
-    <div className="revenue-insight-head"><div><span className="eyebrow">FINANZEN</span><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div>{change!==null&&<p className={change<0?"trend-negative":"trend-positive"}>{change<0?"↘":"↗"} {change.toFixed(1)} % <span>Jan–{months[currentMonth-1]} zum Vorjahr</span></p>}</div><span className="revenue-period">{businessDate().slice(0,4)}</span></div>
+    <div className="revenue-insight-head"><div><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div>{change!==null&&<p className={change<0?"trend-negative":"trend-positive"}>{change<0?"↘":"↗"} {change.toFixed(1)} % <span>Jan–{months[currentMonth-1]} zum Vorjahr</span></p>}</div><span className="revenue-period">{businessDate().slice(0,4)}</span></div>
     <div className="revenue-bar-detail" aria-live="polite"><><b>{months[activeMonth]} · {moneyChf(current[activeMonth])}</b><span>{activeMonth===currentMonth?"Laufender Monat":activeMonth>currentMonth?"Künftiger Monat":activeChange===null?"Kein Vorjahreswert":`${activeChange>=0?"+":""}${activeChange.toFixed(1)} % zum Vorjahr`}</span></></div>
     <div className="revenue-bars" aria-label="Monatsumsatz im laufenden Jahr">
       {current.map((value,index)=>{const delta=index<currentMonth&&previous[index]>0?(value-previous[index])/previous[index]:null;const direction=delta===null?"neutral":delta>=0?"up":"down";return <button type="button" key={months[index]} className={`${direction} ${activeMonth===index?"active":""}`} onClick={()=>{setActiveMonth(index);onMonthChange?.(index)}} aria-pressed={activeMonth===index} aria-label={`${months[index]} ${moneyChf(value)}`}><i style={{height:`${value>0?Math.max(18,value/max*100):0}%`}}/><span>{months[index]}</span></button>})}
@@ -138,23 +139,16 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [data,setData]=useState<{canInvoices?:boolean;canPayments?:boolean;stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState<string|null>(null);
-  const [dashboardMonth,setDashboardMonth]=useState(()=>new Date().getMonth());
+  const [dashboardMonth,setDashboardMonth]=useState(()=>Number(businessDate().slice(5,7))-1);
 
   useEffect(()=>{
-    if(forceDemo) return;
     let active=true;
-    apiGet<typeof data>(isProductionBackendEnabled()?"/api/dashboard":"/api/demo/dashboard")
+    apiGet<typeof data>(isProductionBackendEnabled()&&!forceDemo?"/api/dashboard":"/api/demo/dashboard")
       .then(payload=>{if(active){setData(payload);setError(null);}})
       .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"Übersicht konnte nicht geladen werden.");})
       .finally(()=>{if(active)setLoading(false);});
     return()=>{active=false;};
   },[production,forceDemo]);
-
-  if(forceDemo) return <AppShell title="Guten Morgen, Thomas" subtitle="Hier ist die Übersicht zu deinem Unternehmen." active="dashboard" preview={forceDemo}>
-    <div className="metrics-grid"><Metric label="Umsatz im Monat" value={moneyChf([7800,11200,10100,14500,12700,16200,18100,15900,16600,19800,20100,23400][dashboardMonth])} hint="Rechnungsvolumen" icon="chart"/><Metric label="Rechnungen" value={String([4,5,5,7,6,8,9,8,8,10,10,12][dashboardMonth])} hint="In diesem Monat" icon="receipt"/><Metric label="Zahlungseingänge" value={moneyChf([6900,9800,9400,13100,11800,14900,16500,15100,15400,18100,18900,21600][dashboardMonth])} hint="Verbucht im Monat" icon="wallet"/><Metric label="Neue Kunden" value={String([1,2,1,3,2,2,3,1,2,3,2,4][dashboardMonth])} hint="In diesem Monat" icon="users"/></div>
-    <RevenueInsight demo onMonthChange={setDashboardMonth}/><div className="dashboard-grid"><section className="surface"><SectionTitle title="Letzte Aktivitäten" action={<Link href="/benachrichtigungen">Alle anzeigen</Link>}/><div className="activity-list">{[["Rechnung bezahlt","Acme AG · CHF 4’346.40","receipt","/rechnungen/RE-2026-019"],["Neuer Kunde","Berger Bau AG","users","/kunden/berger-bau"],["Angebot angenommen","Müller GmbH · CHF 3’200.00","file","/angebote/AN-2026-012"],["Zeit erfasst","Website Redesign · 4:30 h","clock","/zeit"]].map(([a,b,icon,href])=><Link href={href} key={a}><span className="activity-icon"><Icon name={icon}/></span><div><b>{a}</b><small>{b}</small></div><Icon name="arrow" size={16}/></Link>)}</div></section></div>
-    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
-  </AppShell>;
 
   if(loading||error)return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
     {loading?<p role="status">Übersicht wird geladen …</p>:<div role="alert"><p>{error}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}
@@ -164,33 +158,34 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const paymentsData=data.payments??[];
   const analyticsInvoices=data.analyticsInvoices??[];
   const analyticsPayments=data.analyticsPayments??[];
-  const selectedYear=new Date().getFullYear();
+  const selectedYear=Number(businessDate().slice(0,4));
   const monthInvoices=analyticsInvoices.filter(item=>{const d=new Date(String(item.issue_date??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
   const monthPayments=analyticsPayments.filter(item=>{const d=new Date(String(item.paid_on??item.created_at??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
   const monthRevenue=monthInvoices.reduce((sum,item)=>sum+Number(item.total??0),0);
   const monthPaid=monthPayments.reduce((sum,item)=>sum+Number(item.amount??0),0);
-  const monthCustomers=monthInvoices.reduce((sum,item)=>sum+Number(item.customer_count??0),0);
+  const customerCount=Number(data.stats?.customer_count??0);
   const monthInvoiceCount=monthInvoices.reduce((sum,item)=>sum+Number(item.invoice_count??1),0);
 
   return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
-    {data.canInvoices!==false&&data.canPayments!==false&&<div className="metrics-grid">
-      <Metric label="Umsatz im Monat" value={moneyChf(monthRevenue)} hint="Rechnungsvolumen" icon="chart"/>
-      <Metric label="Rechnungen" value={String(monthInvoiceCount)} hint="In diesem Monat" icon="receipt"/>
-      <Metric label="Zahlungseingänge" value={moneyChf(monthPaid)} hint="Verbucht im Monat" icon="wallet"/>
-      <Metric label="Kunden" value={String(monthCustomers)} hint="Mit Rechnungen im Monat" icon="users"/>
-    </div>}
+    {data.canInvoices!==false&&data.canPayments!==false&&<section className="dashboard-summary"><SectionTitle title="Auf einen Blick" action={<span>{new Date(selectedYear,dashboardMonth,1).toLocaleDateString("de-CH",{month:"long",year:"numeric"})}</span>}/><MetricTiles>
+      <MetricTile label="Monatsumsatz" value={moneyChf(monthRevenue)} hint="Im Monat"/>
+      <MetricTile label="Zahlungen" value={moneyChf(monthPaid)} hint="Im Monat"/>
+      <MetricTile label="Rechnungen" value={String(monthInvoiceCount)} hint="Im Monat"/>
+      <MetricTile label="Kunden" value={String(customerCount)} hint="Gesamt"/>
+    </MetricTiles></section>}
+    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="plus">Kunde</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="plus">Angebot</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="plus">Rechnung</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="plus">Zeit</Button></div></section>
     {data.canInvoices!==false&&data.canPayments!==false&&<RevenueInsight invoices={analyticsInvoices} onMonthChange={setDashboardMonth}/>}
     <div className="dashboard-grid">
       {data.canInvoices!==false&&<section className="surface">
-        <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle Rechnungen</Link>}/>
-        {invoices.length?<div className="recent-invoices">{invoices.map(item=>{const customer=item.customer as {name?:string}|undefined;return <Link href={"/rechnungen/"+encodeURIComponent(String(item.number))} key={String(item.id)}><b>{customer?.name??"Kunde"}</b><span>{String(item.number)}</span></Link>})}</div>:<p>Keine Rechnungen erfasst.</p>}
+        <SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/>
+        {invoices.length?<div className="recent-invoices">{invoices.map(item=><DocumentSummaryRow key={String(item.id)} item={item as DocumentListItem} customerHeading compact/>)}</div>:<p>Keine Rechnungen erfasst.</p>}
       </section>}
       {data.canPayments!==false&&<section className="surface">
-        <SectionTitle title="Letzte Zahlungen" action={<Link href="/zahlungen">Alle Zahlungen</Link>}/>
-        {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>{moneyChf(item.amount)}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<p>Keine Zahlungen erfasst.</p>}
+        <SectionTitle title="Letzte Zahlungen" action={<Link href="/zahlungen">Alle anzeigen</Link>}/>
+        {paymentsData.length?<div className="activity-list">{paymentsData.map(item=>{const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string;currency?:string}|undefined;return <Link href={"/zahlungen/"+String(item.id)} key={String(item.id)}><div><b>{formatCurrency(Number(item.amount),String(item.currency??invoice?.currency??"CHF"))}</b><small>{[customer?.name,invoice?.number,swissDate(item.paid_on)].filter(Boolean).join(" · ")}</small></div><Icon name="arrow" size={16}/></Link>})}</div>:<p>Keine Zahlungen erfasst.</p>}
       </section>}
     </div>
-    <section className="quick-section"><SectionTitle title="Schnellzugriff"/><div className="quick-grid"><Button href="/kunden/neu?returnTo=/dashboard" variant="secondary" icon="users">Kunde erfassen</Button><Button href="/angebote/neu?returnTo=/dashboard" variant="secondary" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu?returnTo=/dashboard" variant="secondary" icon="receipt">Rechnung erstellen</Button><Button href="/zeit?returnTo=/dashboard" variant="secondary" icon="clock">Zeit erfassen</Button></div></section>
+
   </AppShell>;
 }
 
@@ -759,8 +754,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         {email&&<div><dt>E-Mail</dt><dd><a href={"mailto:"+email}>{email}</a></dd></div>}
         {phone&&<div><dt>Telefon</dt><dd><a href={"tel:"+phone}>{phone}</a></dd></div>}
         {entryDate&&<div><dt>Eintritt</dt><dd>{swissDate(entryDate)}</dd></div>}
-        <div><dt>Wochenstunden</dt><dd>{weeklyHours} h</dd></div>
-        <div><dt>Ferientage / Jahr</dt><dd>{vacationDays}</dd></div>
+        <div><dt>Wochenstunden</dt><dd>{Number(weeklyHours).toLocaleString("de-CH")} h/Woche</dd></div>
+        <div><dt>Ferientage / Jahr</dt><dd>{Number(vacationDays).toLocaleString("de-CH")} Tage/Jahr</dd></div>
         {address&&<div><dt>Adresse</dt><dd>{address}</dd></div>}
       </dl>:<div className="form-grid two">
         <Field label="Vorname"><input required autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
@@ -1005,7 +1000,6 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   },[]);
 
   useEffect(()=>{
-    if(forceDemo) return;
     apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""):"/api/demo/data?collection=time_entries")
       .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
       .catch(error=>setEntriesError(error instanceof Error?error.message:"Zeiteinträge konnten nicht geladen werden.")).finally(()=>setEntriesLoading(false));
@@ -1068,7 +1062,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const submitTime=async(id:string)=>{try{const data=await apiPatch<{item:{submitted_at:string}}>("/api/time-entries/"+encodeURIComponent(id),{action:"submit"});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,submitted_at:data.item.submitted_at}:item));}catch(e){setToast(e instanceof Error?e.message:"Zeit konnte nicht eingereicht werden.")}};
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const today=businessDate();
-  const visibleEntries=filterTimeEntries(remoteEntries,{projectId:projectFilter,customerId:searchParams.has("invoice")?searchParams.get("customerId"):null,query:timeTab==="entries"?entryQuery:"",from:timeTab==="timer"?today:entryFrom,to:timeTab==="timer"?today:entryTo,status:timeTab==="entries"?entryFilter:"Alle"});
+  const visibleEntries=filterTimeEntries(remoteEntries,{projectId:timeTab==="timer"?timerProjectId:projectFilter,customerId:timeTab==="timer"?timerCustomer||null:searchParams.has("invoice")?searchParams.get("customerId"):null,query:timeTab==="entries"?entryQuery:"",from:timeTab==="timer"?today:entryFrom,to:timeTab==="timer"?today:entryTo,status:timeTab==="entries"?entryFilter:"Alle"}).filter(item=>timeTab!=="timer"||((timerCustomer||(!item.customer_id&&!item.billable))&&(timerProjectId||["Arbeitszeit","Interne Planung"].includes(timerProject)||item.project_name===timerProject)));
   const billableSelection=visibleEntries.filter(item=>selectedTimeIds.includes(item.id)&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id);
   const mixedCustomers=new Set(billableSelection.map(item=>item.customer_id)).size>1;
   const remoteTotal=visibleEntries.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0);
@@ -1086,7 +1080,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     <ActionSheet label="Zeitfilter" open={timeFilterOpen} onClose={()=>setTimeFilterOpen(false)}><div className="sheet-body form-grid two"><Field allowReadOnlyInput label="Von"><input type="date" value={entryFrom} max={entryTo||undefined} onChange={e=>setEntryFrom(e.target.value)}/></Field><Field allowReadOnlyInput label="Bis"><input type="date" value={entryTo} min={entryFrom||undefined} onChange={e=>setEntryTo(e.target.value)}/></Field></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>{setEntryQuery("");setEntryFrom("");setEntryTo("");setEntryFilter("Alle");setSelectedTimeIds([]);setTimeFilterOpen(false)}}>Zurücksetzen</Button><Button disabled={!!entryFrom&&!!entryTo&&entryFrom>entryTo} onClick={()=>setTimeFilterOpen(false)}>Anwenden</Button></div></ActionSheet>
     {timeTab==="entries"&&<div className="chips" aria-label="Zeitstatus">{["Alle","Erfasst","Zur Prüfung","Freigegeben","Verrechnet","Intern"].map(filter=><button type="button" key={filter} aria-pressed={entryFilter===filter} className={entryFilter===filter?"active":""} onClick={()=>setEntryFilter(filter)}>{filter}</button>)}</div>}
     {mixedCustomers&&<p role="alert">Bitte nur Zeiten eines Kunden für eine Rechnung auswählen.</p>}
-    {timeTab==="timer"&&canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}
+
     <div className="time-layout">
       <section className="time-section timer-card">
         {timeTab==="timer"?<>
@@ -1094,13 +1088,13 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
           <div className={`timer-display ${running?"is-running":"is-paused"}`}><div><small>{running?"Läuft":seconds>0?"Pausiert":"Bereit"}</small><strong>{formatted}</strong><span>{timerProject}</span></div></div>
           <div className="timer-actions"><Button requiresWrite disabled={timeSaving} onClick={toggleTimer} icon={running?"pause":"clock"}>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</Button>{(running||seconds>0)&&<Button requiresWrite variant="secondary" icon="stop" onClick={()=>void stop()} disabled={timeSaving}>Stoppen</Button>}</div>
         </>:<>
-          <SectionTitle title={!forceDemo?"Einträge":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
+          <SectionTitle title={!forceDemo?"Gesamtzeit":"Heutige Einträge"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</strong>}/>
           {!forceDemo?productionEntries:demoEntries}
           <div className="time-entry-actions"><Button requiresWrite variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>{canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt">Verrechnen ({billableSelection.length})</Button>}</div>
         </>}
       </section>
       {timeTab==="timer"&&<section className="time-section time-overview-section">
-        <SectionTitle title={!forceDemo?(entryFrom||entryTo?"Ausgewählter Zeitraum":"Heute"):timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
+        <SectionTitle title={!forceDemo?("Heute"):timeTab==="timer"?"Heute":"Diese Woche"} action={<strong>{!forceDemo?formatMinutes(remoteTotal)+" h":timeTab==="timer"?"4:28 h":"28:15 h"}</strong>}/>
         {!forceDemo?productionEntries:timeTab==="timer"?demoEntries:<div className="time-summary-row"><div><small>Montag</small><b>7:42 h</b></div><div><small>Dienstag</small><b>8:05 h</b></div><div><small>Heute</small><b>4:28 h</b></div></div>}
         {timeTab==="timer"&&<Button variant="secondary" icon="plus" className="full-button" onClick={()=>setManualOpen(true)}>Manuell erfassen</Button>}
       </section>}
@@ -1204,6 +1198,8 @@ export function SupportTicketForm() {
 }
 
 export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
+  useWorkspaceViewport();
+  const messagesRef=useRef<HTMLDivElement>(null);
   const production=useBackendMode();
   const [draft,setDraft]=useState("");
   const [ticketLoading,setTicketLoading]=useState(true);
@@ -1217,6 +1213,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
+  useEffect(()=>{const list=messagesRef.current;if(list)list.scrollTop=list.scrollHeight},[remote,sent]);
   const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
   const ticketSubject=ticket?.subject?.trim()||(!production?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
@@ -1288,10 +1285,10 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     setSending(false);
   };
 
-  return <AppShell title={ticketSubject} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
+  return <AppShell title="Support-Chat" actions={<ActionsMenu label="Chataktionen"><Button href="/support" variant="ghost" icon="support">Alle Tickets</Button><Button href="/support/neu" variant="ghost" icon="plus">Neues Ticket</Button></ActionsMenu>} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="support-thread">
+      <div className="desktop-detail-main"><div className="support-thread"><div className="thread-messages" ref={messagesRef} aria-label="Nachrichtenverlauf">
       {ticketLoading?<p role="status">Ticket wird geladen …</p>:ticketError?<div role="alert"><p>{ticketError}</p><Button variant="secondary" onClick={()=>setTicketRetry(value=>value+1)}>Erneut versuchen</Button></div>:<div className="thread-day">Heute</div>}
       {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
         <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
@@ -1301,7 +1298,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
       </>}
       {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
-      <div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></button></div>
+      </div><div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="upload"/></label><input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><input aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></button></div>
     </div></div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Ticket</span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="desktop-summary-facts"><span>Status <b>{ticketStatusLabel[ticketStatus]??ticketStatus}</b></span><span>Nachrichten <b>{production?remote.length:4+sent.length}</b></span></div></section><section className="desktop-toolbox"><Link href="/support"><Icon name="support"/><span><b>Alle Tickets</b><small>Zur Supportübersicht</small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b>Neues Ticket</b><small>Weitere Anfrage erstellen</small></span><Icon name="arrow" size={15}/></Link></section></aside>
     </div>
@@ -1691,6 +1688,8 @@ export function FinancePage(){
  const [loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null);
  const [range,setRange]=useState("three"),[filterOpen,setFilterOpen]=useState(false);
  const [from,setFrom]=useState(""),[to,setTo]=useState("");
+ const [pendingRange,setPendingRange]=useState("three"),[pendingFrom,setPendingFrom]=useState(""),[pendingTo,setPendingTo]=useState("");
+ const openPeriod=()=>{setPendingRange(range);setPendingFrom(from);setPendingTo(to);setFilterOpen(true)};
  useEffect(()=>{
    let active=true;
    Promise.all([apiGet<FinancialSummary>("/api/finance/overview"),apiGet<{items:DocumentListItem[]}>(isProductionBackendEnabled()?"/api/documents":"/api/demo/data?collection=documents"),apiGet<Parameters<typeof buildFinanceMonths>[0]>(isProductionBackendEnabled()?"/api/finance":"/api/demo/finance")])
@@ -1699,10 +1698,9 @@ export function FinancePage(){
      .finally(()=>{if(active)setLoading(false)});
    return()=>{active=false};
  },[]);
- const now=new Date(businessDate()+"T12:00:00");
- const end=range==="last"?new Date(now.getFullYear(),now.getMonth(),1):range==="custom"?new Date(to+"T00:00:00"):new Date(now.getFullYear(),now.getMonth()+1,1);
- if(range==="custom")end.setDate(end.getDate()+1);
- const start=range==="custom"?new Date(from+"T00:00:00"):new Date(end.getFullYear(),end.getMonth()-({month:1,last:1,three:3,year:12}[range]??3),1);
+ const {start,end}=financeWindow(range,from,to,businessDate());
+ const pending=financeWindow(pendingRange,pendingFrom,pendingTo,businessDate());
+ const pendingValid=Number.isFinite(pending.start.getTime())&&Number.isFinite(pending.end.getTime())&&pending.end>pending.start;
  const valid=Number.isFinite(start.getTime())&&Number.isFinite(end.getTime())&&end>start;
  const months=buildFinanceMonths(data,{start,end});
  const inPeriod=(value:unknown)=>{const date=new Date(String(value??""));return date>=start&&date<end};
@@ -1710,16 +1708,16 @@ export function FinancePage(){
  const income=sum(data.payments,"payment_date","amount"),costs=sum(data.expenses,"expense_date","amount")+sum(data.operatingCosts,"cost_date","amount")+sum(data.payroll,"period","gross_amount");
  const open=items.filter(item=>item.kind==='invoice'&&['open','partial','overdue'].includes(financialStatus(item)));
  const currencies=[...new Set(open.map(item=>item.currency??'CHF'))];
- const labels:Record<string,string>={month:"Dieser Monat",last:"Letzter Monat",three:"Letzte 3 Monate",year:"Letzte 12 Monate",custom:"Eigener Zeitraum"};
+ const labels:Record<string,string>={month:"Dieser Monat",last:"Letzter Monat",three:"Letzte 3 Monate",six:"Letzte 6 Monate",year:"Dieses Jahr",custom:"Eigener Zeitraum"};
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>
-   <div className="toolbar finance-overview-toolbar"><select aria-label="Zeitraum" value={range} onChange={event=>{setRange(event.target.value);if(event.target.value==="custom")setFilterOpen(true)}}>{Object.entries(labels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select><button type="button" className="icon-button" aria-label="Finanzfilter" onClick={()=>setFilterOpen(true)}><Icon name="filter"/></button></div>
+   <div className="toolbar finance-overview-toolbar"><button type="button" className="period-trigger" aria-label="Zeitraum auswählen" onClick={openPeriod}><Icon name="calendar"/><span>{labels[range]}</span><Icon name="down"/></button><button type="button" className="icon-button" aria-label="Finanzfilter" onClick={openPeriod}><Icon name="filter"/></button></div>
    {loading?<p role="status">Finanzen werden geladen …</p>:error?<p role="alert">{error}</p>:!valid?<p role="alert">Bitte einen gültigen Zeitraum wählen.</p>:<>
-     <MetricTiles><MetricTile label="Einnahmen" value={moneyChf(income)}/><MetricTile label="Ausgaben" value={moneyChf(costs)}/><MetricTile label="Ergebnis" value={moneyChf(income-costs)}/><MetricTile label="Offene Rechnungen" value={currencies.length?currencies.map(currency=><span key={currency}>{formatCurrency(open.filter(item=>(item.currency??'CHF')===currency).reduce((sum,item)=>sum+openAmount(item),0),currency)} </span>):moneyChf(0)}/></MetricTiles>
-     <section className="finance-analysis finance-overview-months"><SectionTitle title="Monatsentwicklung · CHF"/><div className="finance-period-table" role="table" aria-label="Monatsentwicklung"><div className="finance-period-head" role="row"><span>Monat</span><span>Einnahmen</span><span>Kosten</span><span>Ergebnis</span></div>{months.items.map(item=><button type="button" role="row" key={item.key} onClick={()=>{setFrom(item.key+"-01");setTo(businessMonthEnd(item.key));setRange("custom")}}><b>{item.label}</b><span>{item.income.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span>{item.costs.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><strong>{item.result.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></button>)}</div>{months.truncated&&<p>Monatsentwicklung: letzte 24 Monate.</p>}</section>
-     <SectionTitle title="Offene Rechnungen"/><div className="finance-open-invoices"><DocumentList items={open} kind="invoice" outstanding/></div>
-     <SectionTitle title="Handlungsbedarf"/><div className="compact-list"><Link href="/rechnungen"><b>Überfällige Rechnungen</b><span>{open.filter(item=>financialStatus(item)==='overdue').length}</span><Icon name="arrow" size={16}/></Link><Link href="/angebote"><b>Angebote weiterführen</b><span>{summary?.offers?.actionable_count??0}</span><Icon name="arrow" size={16}/></Link>{summary?.time&&<Link href="/zeit"><b>Freigegebene Zeit verrechnen</b><span>{Number(summary.time.ready_hours).toLocaleString('de-CH',{maximumFractionDigits:2})} h</span><Icon name="arrow" size={16}/></Link>}<Link href="/finanzen/analyse"><b>Weitere Finanzinformationen</b><Icon name="arrow" size={16}/></Link></div>
+     <MetricTiles><MetricTile label="Einnahmen" value={moneyChf(income)} hint="Im Zeitraum"/><MetricTile label="Ausgaben" value={moneyChf(costs)} hint="Im Zeitraum"/><MetricTile label="Ergebnis" value={moneyChf(income-costs)} hint="Im Zeitraum"/><MetricTile label="Offene Rechnungen" hint="Aktuell offen" value={currencies.length?currencies.map(currency=><span key={currency}>{formatCurrency(open.filter(item=>(item.currency??'CHF')===currency).reduce((sum,item)=>sum+openAmount(item),0),currency)} </span>):moneyChf(0)}/></MetricTiles>
+     <section className="finance-analysis finance-overview-months"><SectionTitle title="Monatsentwicklung" action={<span>{months.items[0]?.label}–{months.items.at(-1)?.label}</span>}/><div className="finance-overview-chart" aria-label="Monatsentwicklung: Einnahmen und Ausgaben">{months.items.map(item=>{const max=Math.max(1,...months.items.flatMap(month=>[month.income,month.costs]));return <button type="button" key={item.key} aria-label={`${item.label}: Einnahmen ${moneyChf(item.income)}, Ausgaben ${moneyChf(item.costs)}`} onClick={()=>{setFrom(item.key+"-01");setTo(businessMonthEnd(item.key));setRange("custom")}}><span className="finance-bar-pair"><i style={{height:`${Math.max(0,item.income)/max*100}%`}}/><i style={{height:`${Math.max(0,item.costs)/max*100}%`}}/></span><small>{item.label}</small></button>})}</div><p className="chart-legend">Einnahmen · Ausgaben (schraffiert)</p>{months.truncated&&<p>Monatsentwicklung: letzte 24 Monate.</p>}</section>
+     <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div className="finance-open-invoices">{items.filter(item=>item.kind==='invoice'&&inPeriod(item.issue_date)).sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date))).slice(0,5).map(item=><DocumentSummaryRow key={item.number} item={item} compact/>)}{!items.some(item=>item.kind==='invoice'&&inPeriod(item.issue_date))&&<p>Keine Rechnungen im Zeitraum</p>}</div>
+     <SectionTitle title="Handlungsbedarf"/><div className="compact-list"><Link href="/rechnungen"><b>Offene Rechnungen prüfen</b><span>{open.length}</span><Icon name="arrow" size={16}/></Link><Link href="/angebote"><b>Angebote weiterführen</b><span>{summary?.offers?.actionable_count??0}</span><Icon name="arrow" size={16}/></Link>{summary?.time&&<Link href="/zeit"><b>Freigegebene Zeit verrechnen</b><span>{Math.floor(Math.round(Number(summary.time.ready_hours)*60)/60)}:{String(Math.round(Number(summary.time.ready_hours)*60)%60).padStart(2,'0')} h</span><Icon name="arrow" size={16}/></Link>}<Link href="/finanzen/analyse"><b>Weitere Finanzinformationen</b><Icon name="arrow" size={16}/></Link></div>
    </>}
-   <ActionSheet label="Finanzfilter" open={filterOpen} onClose={()=>setFilterOpen(false)}><div className="sheet-body"><Field allowReadOnlyInput label="Zeitraum"><select value={range} onChange={event=>setRange(event.target.value)}>{Object.entries(labels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></Field>{range==="custom"&&<div className="form-grid two"><Field allowReadOnlyInput label="Von"><input type="date" value={from} max={to||undefined} onChange={event=>setFrom(event.target.value)}/></Field><Field allowReadOnlyInput label="Bis"><input type="date" value={to} min={from||undefined} onChange={event=>setTo(event.target.value)}/></Field></div>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>{setRange("three");setFrom("");setTo("");setFilterOpen(false)}}>Zurücksetzen</Button><Button disabled={!valid} onClick={()=>setFilterOpen(false)}>Anwenden</Button></div></ActionSheet>
+   <ActionSheet label="Zeitraum auswählen" open={filterOpen} onClose={()=>setFilterOpen(false)}><div className="sheet-body"><div className="period-options">{Object.entries(labels).map(([key,label])=><label key={key}><input type="radio" name="finance-period" value={key} checked={pendingRange===key} onChange={()=>setPendingRange(key)}/><span>{label}</span></label>)}</div>{pendingRange==="custom"&&<div className="form-grid two"><Field allowReadOnlyInput label="Von"><input type="date" value={pendingFrom} max={pendingTo||undefined} onChange={event=>setPendingFrom(event.target.value)}/></Field><Field allowReadOnlyInput label="Bis"><input type="date" value={pendingTo} min={pendingFrom||undefined} onChange={event=>setPendingTo(event.target.value)}/></Field></div>}</div><div className="filter-sheet-actions"><Button disabled={!pendingValid} onClick={()=>{setRange(pendingRange);setFrom(pendingFrom);setTo(pendingTo);setFilterOpen(false)}}>Anwenden</Button></div></ActionSheet>
  </AppShell>;
 }
 function businessMonthEnd(key:string){const [year,month]=key.split("-").map(Number);return key+"-"+String(new Date(year,month,0).getDate()).padStart(2,"0")}

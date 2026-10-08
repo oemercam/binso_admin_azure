@@ -41,6 +41,7 @@ jobs:
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser
+          BINSO_UX_CAPTURE_ALL: 1
         run: node scripts/ux-browser-test.mjs
       - name: Safari engine mobile and tablet regression
         env:
@@ -48,7 +49,7 @@ jobs:
           BINSO_UX_BROWSER: webkit
           BINSO_UX_DEVICE: iPhone 13
           BINSO_UX_WIDTHS: 375,430,820
-          BINSO_UX_ROUTES: /zeit,/mitarbeiter/neu,/mitarbeiter/employee-one,/projekte/neu,/rechnungen/RE-TEST-1,/kunden/neu,/produkte/neu,/spesen/neu,/angebote/neu,/zahlungen/neu
+          BINSO_UX_ROUTES: /dashboard,/finanzen,/support/ticket-one,/rechnungen,/zeit,/mitarbeiter/neu,/mitarbeiter/employee-one,/projekte/neu,/rechnungen/RE-TEST-1,/kunden/neu,/produkte/neu,/spesen/neu,/angebote/neu,/zahlungen/neu
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-browser/webkit
         run: node scripts/ux-browser-test.mjs
       - name: Upload responsive UX evidence

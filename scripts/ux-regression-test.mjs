@@ -233,7 +233,10 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 {
  const source=await fs.readFile('lib/finance-periods.ts','utf8');
  const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
- const {buildFinanceMonths}=await import(moduleUrl(js));
+ const {buildFinanceMonths,financeWindow}=await import(moduleUrl(js));
+ const lastThree=financeWindow("three","","","2026-10-08");assert.equal(lastThree.start.toLocaleDateString("sv-SE"),"2026-07-01");assert.equal(lastThree.end.toLocaleDateString("sv-SE"),"2026-10-01");
+ const calendarYear=financeWindow("year","","","2026-10-08");assert.equal(calendarYear.start.getMonth(),0);assert.equal(calendarYear.end.getFullYear(),2027);
+ const custom=financeWindow("custom","2026-02-28","2026-02-28","2026-10-08");assert.equal((custom.end-custom.start)/86400000,1);
  const data={payments:[{payment_date:'2026-09-01',amount:900},{payment_date:'2026-10-01',amount:50},{payment_date:'2026-10-06',amount:70},{payment_date:'2026-10-07',amount:800}],expenses:[{expense_date:'2026-10-06',amount:20}]};
  const partial=buildFinanceMonths(data,{start:new Date(2026,9,2),end:new Date(2026,9,7)});
  assert.deepEqual(partial.items.map(row=>[row.key,row.income,row.costs,row.result]),[['2026-10',70,20,50]]);

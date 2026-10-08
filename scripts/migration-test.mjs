@@ -92,6 +92,7 @@ try{
  const october=analytics.analyticsInvoices.find(row=>new Date(row.issue_date).toISOString().startsWith('2026-10'));
  assert.ok(october&&Number(october.invoice_count)>=1&&Number(october.customer_count)>=1);
  assert.ok(analytics.analyticsPayments.length>12);
+ assert.equal(analytics.customerCount,Number((await db.query('select count(*) count from customers where organization_id=$1 and archived_at is null',[demo])).rows[0].count),'Dashboard counts all current customers, independently of month invoices');
  const fixtureSource=(await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http));
  const {seedDatabaseDemo}=await import(dataModule(fixtureSource));
  const sandbox='00000000-0000-4000-8000-000000000098';

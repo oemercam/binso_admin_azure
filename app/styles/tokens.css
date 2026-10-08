@@ -1,4 +1,12 @@
 :root{
+  --workspace-viewport-height:100dvh;
+  --workspace-viewport-top:0px;
+  --workspace-header-height:58px;
+  --chart-compact-height:130px;
+  --kpi-surface:color-mix(in srgb,var(--color-fg) 4%,var(--color-bg));
+  --kpi-padding:14px;
+  --action-row-height:48px;
+  --section-title-font:18px;
   --sheet-available-height:100dvh;
   --sheet-keyboard-offset:0px;
   color-scheme:light;

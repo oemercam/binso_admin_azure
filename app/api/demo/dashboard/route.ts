@@ -7,7 +7,8 @@ export async function GET(){
   return json(await withDemo(async(c,s)=>{
    const invoices=await listApiBusiness(c,s,'documents','kind=eq.invoice');
    const payments=await listApiBusiness(c,s,'payments','status=eq.booked');
-   return {stats:{},invoices:invoices.slice(0,5),payments:payments.slice(0,5),...await dashboardAnalytics(c,s.organizationId),demo:true};
+   const analytics=await dashboardAnalytics(c,s.organizationId);
+   return {stats:{customer_count:analytics.customerCount},invoices:invoices.slice(0,5),payments:payments.slice(0,5),...analytics,demo:true};
   }));
  }catch(e){return apiError(e)}
 }

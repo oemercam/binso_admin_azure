@@ -393,26 +393,27 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
       <div><small>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</small><b>{isoToSwiss(draft.date)}</b></div>
       {type==="Angebot"
         ? <div><small>Gültig bis</small><b>{draft.due&&isoToSwiss(draft.due)}</b></div>
-        : <><div><small>Zahlungsfrist</small><b>{draft.due&&draft.due+" Tage"}</b></div>{displayStatus==="paid"?(draft.paidOn&&<div><small>Bezahlt am</small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small>Fällig am</small><b>{dueDate}</b></div>}</>}
+        : <>{displayStatus==="paid"?(draft.paidOn&&<div><small>Bezahlt am</small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small>Fällig am</small><b>{dueDate}</b></div>}</>}
     </section>
+    {isInvoice&&draft.due&&<p className="document-payment-term">Zahlungsfrist: {draft.due} Tage</p>}
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2>Positionen</h2></div>
       <div className="document-read-table">
         <div className="document-read-head" aria-hidden="true"><span>Bezeichnung</span><span>Menge / Einheit</span><span>Einzelpreis</span><span>Betrag</span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
           <b>{item.description}</b>
-          <span>{item.quantity} {item.unit??"Stück"}<small className="document-mobile-price"> · {currency} {money(numberValue(item.price))} / {item.unit??"Stück"}</small></span>
+          <span>{item.quantity} {({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}<small className="document-mobile-price"> × {currency} {money(numberValue(item.price))}</small></span>
           <span>{currency} {money(numberValue(item.price))}</span>
           <strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
         </div>)}
       </div>
       <div className="invoice-totals">
         <span>Zwischentotal <b>{currency} {money(totals.subtotal)}</b></span>
-        <span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{currency} {money(totals.vat)}</b></span>
+        <span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{currency} {money(totals.vat)}</b></span>
         <strong>Total <b>{currency} {money(totals.total)}</b></strong>
       </div>
     </section>
-    {isInvoice&&!["paid","cancelled"].includes(displayStatus)&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand">
+    {isInvoice&&!["paid","cancelled"].includes(displayStatus)&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand"><h2>Zahlungsstand</h2>
       {Number(draft.paidAmount??0)>0&&<span>Bereits bezahlt <b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
       <span>Offener Betrag <b>{currency} {money(outstanding)}</b></span>
     </section>}
@@ -480,7 +481,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
               <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
-                <span><b>{item.description}</b><small>{item.quantity} {item.unit??"Stück"} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
+                <span><b>{item.description}</b><small>{item.quantity} {({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
                 <strong>{draft.currency??"CHF"} {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
               <label className="mobile-line-field description"><span>Beschreibung</span><input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
@@ -492,7 +493,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
             </div>;
           })}
         </div>
-        <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toFixed(2)} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+        <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
       </div>
       {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <div className="sheet-layer mobile-position-layer" onMouseDown={event=>{if(event.target===event.currentTarget)closePosition()}}><section ref={positionDialogRef} tabIndex={-1} className="bottom-sheet mobile-position-sheet" role="dialog" aria-modal="true" aria-label="Position bearbeiten"><div className="sheet-handle"/><header className="sheet-header"><div><h2>Position bearbeiten</h2><p>{item.description}</p></div><IconButton label="Schliessen" icon="close" onClick={()=>closePosition()}/></header><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></select></Field><Field label="Einzelpreis"><input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></section></div>})()}
       <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>

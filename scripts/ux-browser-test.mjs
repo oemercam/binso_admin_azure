@@ -60,11 +60,12 @@ try{
    else if(p==='/api/settings/profile')data={profile:{name:'Test Person',theme_mode:theme,email:'test@example.invalid'}};
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
    else if(p==='/api/finance/overview')data=summary;
-   else if(p==='/api/finance')data={payments:[],expenses:[],payroll:[],operatingCosts:[]};
-   else if(p==='/api/demo/data')data={items:collections[url.searchParams.get('collection')]??[]};
-   else if(p==='/api/dashboard')data={invoices:[],offers:[],payments:[],expenses:[],activities:[],stats:{}};
+   else if(p==='/api/finance')data={payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
+   else if(p==='/api/demo/data')data={items:(collections[url.searchParams.get('collection')]??[]).filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
+   else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
+   else if(p==='/api/dashboard'||p==='/api/demo/dashboard')data={invoices:[invoice],payments:[payment],stats:{customer_count:2},analyticsInvoices:[{issue_date:'2026-10-01',total:135.13,invoice_count:1}],analyticsPayments:[{paid_on:'2026-10-01',amount:100}]};
    else if(p==='/api/support/tickets')data={items:[ticket]};
-   else if(p==='/api/support/tickets/ticket-one/messages')data={items:[{id:'message-one',author_type:'customer',body:'Testnachricht',created_at:'2026-10-08T10:00:00Z'}]};
+   else if(p==='/api/support/tickets/ticket-one/messages')data={items:Array.from({length:30},(_,i)=>({id:'message-'+i,author_type:i%2?'support':'customer',body:'Testnachricht '+(i+1)+' – Prüfung des scrollbareren Nachrichtenverlaufs.',created_at:'2026-10-08T10:00:00Z'}))};
    else if(p==='/api/expenses/options')data={items:[employee]};
    else if(p==='/api/files')data={items:[]};
    else if(p==='/api/time-entries')data={items:url.searchParams.has('employeeId')?(employeeLedgerFixture?[{id:'employee-time',description:'Modern Workplace',project_name:'Modern Workplace',duration_minutes:450,started_at:'2026-10-08T09:00:00Z',approved:true,billable:true}]:[]):[{id:'time-one',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:90,started_at:'2026-10-08T09:00:00Z',billable:true,approved:true},{id:'time-two',customer_id:customer.id,customer_name:customer.name,project_name:'Projektprüfung',employee_name:'Test Person',duration_minutes:45,started_at:'2026-10-08T11:00:00Z',billable:true,approved:true}]};
@@ -79,7 +80,7 @@ try{
    return route.fulfill({status:data?200:503,json:data??{message:'UI fixture unavailable'}});
   });
   const page=await context.newPage();page.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(page.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)page.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));
-  const routes=['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu'];
+  const routes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu'];
   await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
    const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
    await page.setViewportSize({width,height:1000});
@@ -93,11 +94,23 @@ try{
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
+    if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
+    if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
+      assert.equal(await page.locator('.dashboard-summary .metric').count(),4);assert.equal(await page.locator('.dashboard-summary svg').count(),0,'KPIs have no decorative icons');
+      const order=await page.evaluate(()=>['.dashboard-summary','.quick-section','.revenue-insight','.dashboard-grid'].map(selector=>document.querySelector(selector).getBoundingClientRect().top));assert.ok(order.every((top,i)=>i===0||top>order[i-1]),'Dashboard follows the blueprint hierarchy');
+      assert.equal(await page.locator('.bo-metric-tiles').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=760?2:4);
+    }
+    if(!process.env.BINSO_UX_BASELINE&&route==='/finanzen'){assert.equal(await page.locator('.finance-overview-chart button').count(),3);assert.ok(await page.locator('.finance-overview-chart .finance-bar-pair i').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Real finance values produce visible bars');}
+    if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
+      const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
+      const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect();return composer.bottom<=innerHeight&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays inside the viewport');
+    }
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
     if(width<=760&&!route.endsWith('/neu')&&!['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login'].includes(route)&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
-    if([1440,430].includes(width)&&['/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await page.screenshot({animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await page.locator('nav.bottom-nav').screenshot({animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)});await hide.evaluate(el=>el.remove());}
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await page.screenshot({animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
    }
    await page.close();
   }));
@@ -126,16 +139,23 @@ try{
   }
   await page.setViewportSize({width:430,height:900});
   await page.waitForLoadState("networkidle");await page.goto(base+'/finanzen');await page.waitForLoadState('networkidle');
-  await page.locator('.finance-open-invoices').getByText('CHF 35.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.keyboard.press('Escape');
+  await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
+  await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.getByRole('button',{name:'Anwenden',exact:true}).click();
+  await page.locator('.finance-open-invoices').getByText('CHF 135.13',{exact:true}).filter({visible:true}).waitFor();
+  await page.locator('.bo-metric-tiles').getByText('CHF 200.00',{exact:true}).waitFor();await page.locator('.bo-metric-tiles').getByText('CHF 35.13',{exact:true}).waitFor();
   assert.equal(await page.locator('.bo-metric-tiles .metric').count(),4,'Finance has exactly four compact metrics');
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();
-  await page.getByRole('dialog',{name:'Finanzfilter'}).waitFor();await page.keyboard.press('Escape');
+  await page.getByRole('dialog',{name:'Zeitraum auswählen'}).waitFor();await page.screenshot({animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});await page.keyboard.press('Escape');
   await page.waitForLoadState("networkidle");await page.goto(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
   const group=page.locator('details.time-group').first();await group.waitFor();
   assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
   assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
   await group.locator('summary').click();await group.locator('.time-entry-list').waitFor();
   assert.equal(await group.locator('.time-entry-list>div').count(),2,'Expansion shows both entries');
+  await page.screenshot({animations:'disabled',path:path.join(output,`${theme}-430-time-entries.png`),fullPage:true});
   const searchRect=await page.locator('.time-filter-toolbar .searchbox').boundingBox(),filterRect=await page.getByRole('button',{name:'Zeitfilter'}).boundingBox();
   assert.ok(filterRect.x>searchRect.x&&Math.abs(filterRect.y-searchRect.y)<5,'Mobile filter follows search on the same row');
   await page.waitForLoadState("networkidle");await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
@@ -169,7 +189,7 @@ try{
   await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('Beratung');
   await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();
   await page.waitForLoadState("networkidle");await page.goto(base+'/produkte/product-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();
-  const dialog=page.getByRole('dialog',{name:'Produktaktionen'});await dialog.waitFor();
+  const dialog=page.getByRole('dialog',{name:'Produktaktionen'});await dialog.waitFor();await page.screenshot({animations:'disabled',path:path.join(output,`${theme}-430-action-sheet.png`)});
   assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Opening the sheet moves focus inside');
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Produktaktionen','Sheet restores trigger focus');
@@ -191,10 +211,13 @@ try{
   failLedger=true;await page.waitForLoadState("networkidle");await page.goto(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();
   await page.getByText('Fixture ledger unavailable',{exact:true}).waitFor();assert.equal(await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).count(),0,'Failed ledger must not look empty');failLedger=false;
   await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).waitFor();
+  await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await page.goto(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
+  await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
+  await page.screenshot({animations:'disabled',path:path.join(output,`${theme}-375-400-chat.png`)});await page.setViewportSize({width:430,height:900});
   failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await page.goto(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
   assert.deepEqual(errors,[],'Browser runtime errors');
   await context.close();context=null;
  }
- await fs.writeFile(path.join(output,'results.json'),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',results,errors},null,2));
+ await fs.writeFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',results,errors},null,2));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations plus search, action sheet focus/Escape, failed save/retry/double click and ledger failures. Artifacts: ${output}`);
 }finally{await context?.close();await browser.close();server?.kill();}
