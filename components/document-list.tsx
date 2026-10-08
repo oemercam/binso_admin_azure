@@ -1,11 +1,11 @@
 "use client";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
-import {financialStatus,financialStatusLabels,documentDateLabel,formatCurrency,type FinancialDocument} from '@/lib/financial-status';
+import {financialStatus,financialStatusLabels,documentDateLabel,openAmount,formatCurrency,type FinancialDocument} from '@/lib/financial-status';
 import {RecordsView,RecordRow} from './records';
 export type DocumentListItem=FinancialDocument&{id?:string};
 export function DocumentList({items,kind,loading=false,error=null,outstanding=false,context='default'}:{items:DocumentListItem[];kind?:'offer'|'invoice';loading?:boolean;error?:string|null;outstanding?:boolean;context?:'default'|'customer'}){
- const rows=items.filter(item=>!kind||item.kind===kind).map(item=>[item.number??'',item.customer?.name??'',documentDateLabel(item),formatCurrency(item.total,item.currency),item.kind==='offer'?'Angebot':'Rechnung',financialStatusLabels[financialStatus(item)]??item.status??'',(['open','partial','overdue'].includes(financialStatus(item))?item.due_date:item.issue_date)??'']);
+ const rows=items.filter(item=>!kind||item.kind===kind).map(item=>[item.number??'',item.customer?.name??'',documentDateLabel(item),formatCurrency(outstanding?openAmount(item):item.total,item.currency),item.kind==='offer'?'Angebot':'Rechnung',financialStatusLabels[financialStatus(item)]??item.status??'',(['open','partial','overdue'].includes(financialStatus(item))?item.due_date:item.issue_date)??'']);
  const href=(row:string[])=>`${row[4]==='Angebot'?'/angebote/':'/rechnungen/'}${encodeURIComponent(row[0])}`;
  const label=kind==='invoice'?'Rechnungen':kind==='offer'?'Angebote':context==='customer'?'Einträge':'Finanzen';
  const placeholder=context==='customer'?'Angebote und Rechnungen suchen...':`${label} suchen...`;

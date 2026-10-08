@@ -44,6 +44,12 @@ export function RowActions({ label = "Weitere Aktionen", onClick, disabled = fal
   return <button className="bo-row-actions" type="button" onClick={onClick} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></button>;
 }
 
+export function ActionSheet({label,open,onClose,children,busy=false}: {label:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean}) {
+  const dialog=useDialogFocus(open,()=>{if(!busy)onClose()});
+  if(!open)return null;
+  return createPortal(<div className="sheet-layer" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onClose()}}><section ref={dialog} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={label}><div className="sheet-handle"/><header className="sheet-header"><h2>{label}</h2><button type="button" className="icon-button" aria-label="Schliessen" disabled={busy} onClick={onClose}><Icon name="close"/></button></header>{children}</section></div>,document.body);
+}
+
 /** The same compact action sheet is used for entity editors on every viewport. */
 export function ActionsMenu({label, children, busy=false}: {label:string;children:ReactNode;busy?:boolean}) {
   const [open,setOpen]=useState(false);
