@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./binso-ui.css";
+import "./binso-ux-standards.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import {initializeTheme} from "@/lib/theme";
