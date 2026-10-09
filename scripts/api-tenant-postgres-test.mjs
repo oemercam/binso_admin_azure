@@ -99,6 +99,46 @@ try{
   }
   assert.ok(covered.has(api.path)||publicEntries.has(api.path),'Uncovered authenticated GET contract: '+api.path);
  }
+ const write=async(method,path,body,role)=>{
+  const response=await fetch(base+path,{method,headers:{cookie:cookies.get('0:'+role),origin:base,'Content-Type':'application/json','Idempotency-Key':'v215-'+role+'-'+path.replaceAll('/','-')},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
+  return {status:response.status,data:await response.json()};
+ };
+ // Valid independent synthetic payloads exercise successful persistence, not just
+ // validation errors. Rejected roles must not change either tenant's row count.
+ const customerWriters=['owner','admin','finance','project_manager','manager'];
+ const projectWriters=['owner','admin','project_manager','manager'];
+ const writeContracts=[
+  ['/api/customers','customers',customerWriters,role=>({name:'Write contract '+role,email:role+'@write.invalid'})],
+  ['/api/employees','employees',['owner','admin','hr'],role=>({firstName:'Write',lastName:role,jobTitle:'Synthetic ICT',workloadPercent:80,email:role+'@employee-write.invalid',weeklyHours:42,vacationDays:25})],
+  ['/api/products','products_services',['owner','admin'],role=>({name:'Synthetic product '+role,kind:'service',unit:'hour',unitPrice:125,vatRate:8.1})],
+  ['/api/projects','projects',projectWriters,role=>({name:'Synthetic project '+role,customerId:customer.id})],
+  ['/api/time-entries','time_entries',[...projectWriters,'member'],role=>({projectId:null,projectName:'Internal '+role,durationMinutes:60,startedAt:'2026-10-09',billable:false})],
+  ['/api/expenses','expenses',[...customerWriters,'member'],role=>({merchant:'Synthetic expense '+role,expenseDate:'2026-10-09',amount:10,currency:'CHF',vatRate:8.1,status:'draft'})],
+  ['/api/support/tickets','support_cases',roles,role=>({subject:'Synthetic support '+role,message:'Isolated role contract message'})],
+  ['/api/documents','quotes',projectWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
+ ];
+ let writeCases=0;
+ for(const [path,table,allowed,payload] of writeContracts)for(const role of roles){
+  const count=async org=>(await pool.query('select count(*)::int n from '+table+' where organization_id=$1',[org])).rows[0].n;
+  const before=await count(organizations[0]),otherBefore=await count(organizations[1]);
+  const result=await write('POST',path,payload(role),role);
+  assert.equal(result.status,allowed.includes(role)?201:403,role+' valid write contract '+path+' '+JSON.stringify(result.data));
+  assert.equal(await count(organizations[0]),before+(allowed.includes(role)?1:0),role+' persistence/denial '+path);
+  assert.equal(await count(organizations[1]),otherBefore,'Other tenant unchanged '+path);
+  if(allowed.includes(role)){assert.ok(result.data.item?.id,role+' persisted identity '+path);const saved=(await pool.query('select organization_id from '+table+' where id=$1',[result.data.item.id])).rows[0];assert.equal(saved.organization_id,organizations[0]);}
+  writeCases++;
+ }
+ for(const role of roles){
+  const original=(await pool.query('select name from customers where organization_id=$1 and id=$2',[organizations[1],(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id])).rows[0].name;
+  const foreignCustomer=(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id;
+  const result=await write('PATCH','/api/customers/'+foreignCustomer,{name:'Forbidden overwrite'},role);
+  assert.equal(result.status,customerWriters.includes(role)?404:403,role+' foreign customer write');
+  assert.equal((await pool.query('select name from customers where id=$1',[foreignCustomer])).rows[0].name,original,'Cross-tenant write cannot mutate the object');
+  const removed=await write('DELETE','/api/customers/'+foreignCustomer,{},role);
+  assert.equal(removed.status,['owner','admin'].includes(role)?404:403,role+' foreign customer delete');
+  assert.equal((await pool.query('select name from customers where id=$1 and archived_at is null',[foreignCustomer])).rows[0].name,original);
+ }
+ console.log('Authenticated valid write-role contract: '+writeCases+' actual create/persistence cases across all eight roles for customers, employees, products, projects, internal time, expenses, support and offers; foreign customer PATCH/DELETE blocked with unchanged rows. Other write/status/operator contracts remain explicitly outside this coverage.');
  console.log('Authenticated read-role contract: every inventoried private GET route across all eight tenant roles, including binary PDF/files, own-record expense filtering, every operator/demo boundary; public/token entry points explicitly excluded. Write-role coverage is separate and incomplete.');
  for(const [role,allowed] of [['owner',true],['admin',true],['finance',true],['hr',false],['project_manager',false],['manager',false],['member',false],['reader',false]])assert.equal((await get('/api/payments',cookies.get('0:'+role))).status,allowed?200:403,role+' payment read policy');
  for(const role of roles)assert.equal((await get('/api/operator/dashboard',cookies.get('0:'+role))).status,401,'Tenant '+role+' cannot gain operator access');

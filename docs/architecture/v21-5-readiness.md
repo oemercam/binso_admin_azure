@@ -65,3 +65,20 @@ Kein blindes CSS-Löschen: unterschiedliche deklarierte Werte und wiederholte Me
 V21.5 fügt keine neue Migration hinzu. Die gestapelte V21.3-Basis enthält additive nullable Migration0046 für sichere Datei-Zuordnungen; diese ist isoliert getestet, aber noch nicht produktiv angewendet. Keine produktiven Daten wurden geschrieben, gelöscht, zurückgesetzt oder umnummeriert. Synthetische DB-Tests lehnen nichtlokale/nichtleere Testdatenbanken ab.
 
 **Release noch nicht empfehlen.** Kandidaten-CI, vollständige noch offene Prozess-/Schreibrollen-/visuelle Abnahme, eindeutiger V21.2-/V21.4-Abgleich, physische PWA- und freigegebene Azure-Kandidatenprüfung fehlen. Keine Merge-/Deployfreigabe wird aus einem früheren Run abgeleitet. Erst belegte Aufrufermigration + tatsächliche relevante Tests + visueller Scope erlauben den jeweiligen Status Geprüft und bestanden. Diese Matrix meldet keinen Gesamterfolg.
+
+## Ergänztes HTTP-Schreibrollenpaket (noch nicht bestanden gemeldet)
+
+`api-tenant-postgres-test.mjs` führt 64 gültige POSTs über acht echte synthetische Tenant-Sessions aus. Erwartete Rollen sind unabhängig von tenantCan festgelegt. Zugelassene Requests müssen 201, eine persistierte ID im eigenen Mandanten und exakt einen zusätzlichen Datensatz ergeben; verbotene Requests 403 und keine Datenänderung. Auch der andere Mandant muss unverändert bleiben. Fremde Kunden-IDs werden zusätzlich mit PATCH und DELETE über alle acht Rollen geprüft (404/403, ursprünglicher Datensatz bleibt unverändert).
+
+| Erfassung | Zugelassene Rollen | Persistenzbeleg |
+| --- | --- | --- |
+| Kunde | owner/admin/finance/project_manager/manager | customers |
+| Mitarbeiter | owner/admin/hr | employees |
+| Produkt | owner/admin | products_services |
+| Projekt | owner/admin/project_manager/manager | projects |
+| Interne Zeit | owner/admin/project_manager/manager/member | time_entries |
+| Spese als Entwurf | owner/admin/finance/project_manager/manager/member | expenses |
+| Support-Ticket | alle acht Tenant-Rollen | support_cases |
+| Angebot | owner/admin/project_manager/manager | quotes |
+
+Status: **Implementiert, nicht geprüft** bis der echte isolierte HTTP/PostgreSQL-CI-Lauf bestanden ist. Lokale synthetische Repository-Tests ersetzen diesen Nachweis nicht. Die übrigen Statuswechsel-/Versand-/Einladungs-/Datei-/Operator-/Finanzschreibverträge sind nicht damit automatisch vollständig abgedeckt. Tests verweigern bestehende oder produktive Datenbanken und löschen keine Geschäftsdatensätze.
