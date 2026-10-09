@@ -43,9 +43,8 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
 }
 
 export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
-  const [pageNumber,setPageNumber]=useState(1);
-  const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null);
-  const [error,setError]=useState<string|null>(null);
+  const [loaded,setLoaded]=useState<{file:Blob;pdf:PDFDocumentProxy}|null>(null);
+  const [error,setError]=useState<{file:Blob;message:string}|null>(null);
   useEffect(()=>{
     let active=true;
     let task:ReturnType<typeof import("pdfjs-dist").getDocument>|undefined;
@@ -59,11 +58,16 @@ export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boole
       if(!active)return;
       task=engine.getDocument({data,isEvalSupported:false});
       const document=await task.promise;
-      if(active)setPdf(document);
-    }).catch(()=>{if(active)setError("PDF konnte nicht angezeigt werden.")});
+      if(active)setLoaded({file,pdf:document});
+    }).catch(()=>{if(active)setError({file,message:"PDF konnte nicht angezeigt werden."})});
     return()=>{active=false;void task?.destroy()};
   },[file]);
-  if(error)return <p role="alert">{error}</p>;
-  if(!pdf)return <p role="status">PDF wird angezeigt …</p>;
+  if(error?.file===file)return <p role="alert">{error.message}</p>;
+  if(loaded?.file!==file)return <p role="status">PDF wird angezeigt …</p>;
+  return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoomed={zoomed}/>;
+}
+
+function DocumentPages({pdf,zoomed}:{pdf:PDFDocumentProxy;zoomed:boolean}){
+  const [pageNumber,setPageNumber]=useState(1);
   return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><nav className="document-page-navigation" aria-label="Dokumentseiten"><button type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></button><span role="status" aria-live="polite">Seite {pageNumber} von {pdf.numPages}</span><button type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></button></nav></div>;
 }

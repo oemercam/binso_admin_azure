@@ -167,6 +167,13 @@ jobs:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/pwa-browser-test.mjs
+      - name: Startup, session and persistent navigation regression
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_LOADING_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/loading
+        run: node scripts/loading-browser-test.mjs
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4

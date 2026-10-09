@@ -1,4 +1,4 @@
-const CACHE = "binso-one-shell-v5";
+const CACHE = "binso-one-shell-v6";
 const OFFLINE_URL = "/offline";
 const SHELL_ASSETS = [
   OFFLINE_URL,
@@ -13,7 +13,6 @@ self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE)
       .then(cache => cache.addAll(SHELL_ASSETS))
-      .then(() => self.skipWaiting())
   );
 });
 
@@ -59,3 +58,5 @@ self.addEventListener("fetch", event => {
     );
   }
 });
+
+self.addEventListener("message",event=>{if(event.data?.type==="SKIP_WAITING")self.skipWaiting();});

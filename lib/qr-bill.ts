@@ -2,6 +2,7 @@ import type { Data } from "swissqrbill/types";
 import { isQRReferenceValid, isSCORReferenceValid, isIBANValid, isQRIBAN } from "swissqrbill/utils";
 
 export function normalizeIban(value:unknown):string{return String(value??"").replace(/\s/g,"").toUpperCase();}
+export function qrPaymentAccount(company:Record<string,unknown>,currency='CHF'){return normalizeIban(currency==='EUR'?(company.iban||company.qr_iban):(company.qr_iban||company.iban));}
 export function validSwissIban(value:unknown):boolean{
  const iban=normalizeIban(value);
  return /^(CH|LI)\d{2}[A-Z0-9]{17}$/.test(iban)&&isIBANValid(iban);
@@ -19,7 +20,9 @@ export function invoicePaymentIssue(company:Record<string,unknown>):string|null{
 }
 export function createQrBillData(company:Record<string,unknown>,document:{reference?:string;number:string;total:number;currency?:string;debtor?:Record<string,unknown>}):Data{
  const issue=invoicePaymentIssue(company);if(issue)throw new Error(issue);
- const account=normalizeIban(company.qr_iban||company.iban);
+ const account=qrPaymentAccount(company,document.currency);
+ if(!validSwissIban(account))throw new Error('Bitte eine gültige IBAN für die Zahlungswährung erfassen.');
+ if(document.currency==='EUR'&&isQRIBAN(account))throw new Error('Für EUR bitte eine reguläre IBAN statt einer QR-IBAN verwenden.');
  let reference:string|undefined;
  if(isQRIBAN(account)){
   if(!document.reference||!isQRReferenceValid(document.reference))throw new Error("Die QR-Referenz ist erst nach dem Speichern der Rechnung verfügbar.");

@@ -16,8 +16,14 @@ try{
    const probe='00000000-0000-4000-8000-000000000077';
    if(presentation)await db.query("insert into organizations(id,name,legal_name,slug,is_demo) values($1,'Binso Demo AG','Binso Demo AG','presentation-production-probe',false)",[probe]);
    if(presentation)await db.query("select set_config('app.organization_id',$1,true)",[demo]);
+   const snapshotMigration=file==='0045_document_snapshots.sql';
+   const snapshotBefore=snapshotMigration?(await db.query("select to_jsonb(i)-'issuer_snapshot'-'customer_snapshot'-'payment_snapshot'-'document_snapshot' data from invoices i order by id")).rows:null;
    const before=presentation?(await db.query('select id,organization_id,customer_id,subtotal,vat_amount,total_amount,paid_amount from invoices order by id')).rows:null;
    await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
+   if(snapshotMigration){
+    assert.deepEqual((await db.query("select to_jsonb(i)-'issuer_snapshot'-'customer_snapshot'-'payment_snapshot'-'document_snapshot' data from invoices i order by id")).rows,snapshotBefore,'Snapshot migration must preserve every other persisted invoice field');
+    assert.equal((await db.query("select count(*)::int n from invoices where not document_snapshot ? 'version'")).rows[0].n,0,'Legacy invoices are frozen with explicit provenance');
+   }
    if(presentation){
     assert.deepEqual((await db.query('select id,organization_id,customer_id,subtotal,vat_amount,total_amount,paid_amount from invoices order by id')).rows,before,'Demo presentation migration must preserve IDs, links and financial amounts');
     assert.equal((await db.query('select name from organizations where id=$1',[probe])).rows[0].name,'Binso Demo AG','Non-demo organizations must remain untouched');
@@ -67,6 +73,26 @@ try{
  await assert.rejects(()=>mutateApiBusiness(client,session,'create_document_atomic',documentArgs),e=>e.code==='invoice_payment_setup_required');
  await db.query('update organizations set iban=$2 where id=$1',[demo,company.iban]);
  const document=await mutateApiBusiness(client,session,'create_document_atomic',documentArgs);
+ // Real trigger tests: template inheritance, explicit replacement, all write
+ // paths, issue snapshots, later company changes and frozen historical texts.
+ await db.query("update organizations set invoice_intro_text='Invoice original',invoice_footer_text='Invoice closing',quote_intro_text='Offer original',quote_footer_text='Offer closing' where id=$1",[demo]);
+ const snapshotInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'SNAPSHOT-INVOICE',p_note:''});
+ const snapshotOffer=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'SNAPSHOT-OFFER',p_valid_until:'2026-11-04',p_note:''});
+ assert.equal(snapshotInvoice.document_snapshot.intro,'Invoice original');assert.equal(snapshotInvoice.document_snapshot.closing,'Invoice closing');
+ assert.equal(snapshotOffer.document_snapshot.intro,'Offer original');assert.equal(snapshotOffer.document_snapshot.closing,'Offer closing');
+ await db.query("update invoices set note='Individual replacement' where id=$1",[snapshotInvoice.id]);
+ assert.equal((await listApiBusiness(client,session,'documents','id=eq.'+snapshotInvoice.id))[0].document_snapshot.intro,'Individual replacement');
+ await db.query("update invoices set note='' where id=$1",[snapshotInvoice.id]);
+ await db.query("update organizations set invoice_intro_text='Invoice newer',invoice_footer_text='New closing',quote_intro_text='Offer newer' where id=$1",[demo]);
+ await db.query("update invoices set status='sent' where id=$1",[snapshotInvoice.id]);await db.query("update quotes set status='sent' where id=$1",[snapshotOffer.id]);
+ const frozenInvoice=(await listApiBusiness(client,session,'documents','id=eq.'+snapshotInvoice.id))[0];
+ assert.equal(frozenInvoice.document_snapshot.intro,'Invoice original');assert.equal(frozenInvoice.document_snapshot.closing,'Invoice closing');assert.equal(frozenInvoice.payment_snapshot.iban,company.iban);
+ await db.query("update invoices set document_snapshot='{\"intro\":\"tampered\"}',paid_amount=20 where id=$1",[snapshotInvoice.id]);
+ assert.deepEqual((await listApiBusiness(client,session,'documents','id=eq.'+snapshotInvoice.id))[0].document_snapshot,frozenInvoice.document_snapshot,'Issued snapshots cannot be rewritten by a payment or alternate write');
+ const newer=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'SNAPSHOT-NEWER',p_valid_until:'2026-11-04',p_note:''});assert.equal(newer.document_snapshot.intro,'Offer newer');
+ assert.equal((await listApiBusiness(client,session,'documents','id=eq.'+snapshotOffer.id))[0].document_snapshot.intro,'Offer original');
+ await db.query('update organizations set invoice_intro_text=$2,invoice_footer_text=$3,quote_intro_text=$4,quote_footer_text=$5 where id=$1',[demo,company.invoice_intro_text,company.invoice_footer_text,company.quote_intro_text,company.quote_footer_text]);
+ console.log('Document snapshots: creation defaults, individual replacement/reset, later template changes, invoice/offer issue and immutable payment/history passed.');
  assert.equal(document.issue_date,'2026-10-04');assert.equal(document.due_date,'2026-11-04');assert.equal(document.status,'draft');
  const {createQrBillData,validSwissIban}=await import(qrModule);
  assert.equal(validSwissIban('CH9300762011623852958'),false);
@@ -433,9 +459,9 @@ try{
  assert.ok(generatedPdf.toString('latin1').includes('/FontFile2'),'The real PDF embeds font outlines for consistent preview/download typography');
  assert.ok(generatedPdf.toString('latin1').includes('+LiberationSans-Bold')&&generatedPdf.toString('latin1').includes('+LiberationSans'),'The PDF includes regular and bold faces');
  if(process.env.BINSO_PDF_QA_DIR){await fs.mkdir(process.env.BINSO_PDF_QA_DIR,{recursive:true});for(const [name,doc] of [['invoice',{...pdfInvoice,status:'sent'}],['partial',{...pdfInvoice,status:'partial',paid_amount:100}],['draft',pdfInvoice],['long',{...pdfInvoice,status:'sent',items:Array.from({length:75},(_,i)=>({...pdfInvoice.items[0],description:'Position '+(i+1)+' – professionelle Beratung und Implementation'}))}],['oversized',{...pdfInvoice,status:'sent',items:[{...pdfInvoice.items[0],description:'Lange Beschreibung mit vollständigem Inhalt. '.repeat(300)+'ENDMARKER'}]}]])await fs.writeFile(process.env.BINSO_PDF_QA_DIR+'/'+name+'.pdf',await documentPdf(doc,company));}
- assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 1'),'Compact invoice and QR slip share one A4 page');
+ assert.equal(generatedPdf.subarray(0,4).toString(),'%PDF');assert.ok(generatedPdf.length>10000);assert.ok(generatedPdf.toString('latin1').includes('/Count 2'),'Payable invoice and QR slip occupy separate A4 pages');
  const cancelledPdf=await documentPdf((await listApiBusiness(client,session,'documents','number=eq.'+timeDraft.number))[0],company);assert.ok(cancelledPdf.length<generatedPdf.length,'Cancelled document has no payable QR code');
- const previewSource=(await fs.readFile('app/api/documents/preview/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule));
+ const previewSource=(await fs.readFile('app/api/documents/preview/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule)).replace('"@/lib/server/document-logo"',JSON.stringify(dataModule('export async function documentLogo(){return undefined}')));
  const previewRoute=await import(dataModule(previewSource));
  const previewBody={kind:'Rechnung',customerId:documentArgs.p_customer_id,number:'PREVIEW',date:'2026-10-08',due:'30',currency:'CHF',positions:[{description:'Draft preview',quantity:2,price:100,vatRate:8.1}]};
  const beforePreview=Number((await db.query('select count(*) n from invoices where organization_id=$1',[demo])).rows[0].n);
@@ -445,7 +471,7 @@ try{
  assert.equal((await previewRoute.POST({body:{...previewBody,positions:[{quantity:-1,price:100}]}})).status,400);
  globalThis.__sendCount=0;globalThis.__sendFail=false;
  const mailFixture=dataModule(`export const mailLayout=(title,body)=>title+body;export async function sendMail(mail){globalThis.__sendCount++;if(!mail.attachments[0].content.subarray(0,4).toString().includes('%PDF'))throw Error('Missing PDF');if(globalThis.__sendFail)throw Error('Fixture provider failure');return {delivered:true}}`);
- const sendSource=(await fs.readFile('app/api/documents/[number]/send/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/document-process"',JSON.stringify(dataModule(processSource))).replace('"@/lib/server/repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule)).replace('"@/lib/server/email"',JSON.stringify(mailFixture)).replace('"@/lib/server/audit"',JSON.stringify(audit));
+ const sendSource=(await fs.readFile('app/api/documents/[number]/send/route.ts','utf8')).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/document-process"',JSON.stringify(dataModule(processSource))).replace('"@/lib/server/repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"@/lib/server/document-pdf"',JSON.stringify(pdfModule)).replace('"@/lib/server/document-logo"',JSON.stringify(dataModule('export async function documentLogo(){return undefined}'))).replace('"@/lib/server/email"',JSON.stringify(mailFixture)).replace('"@/lib/server/audit"',JSON.stringify(audit));
  const sender=await import(dataModule(sendSource));
  const sendInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-SEND'});
  const sendRequest={body:{recipient:'fixture@example.invalid',requestKey:'send-success'}};

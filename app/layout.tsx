@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./binso-ui.css";
+import {AppShellLayout} from "@/components/app-shell";
 import { PwaRegister } from "@/components/pwa-register";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import {initializeTheme} from "@/lib/theme";
@@ -68,7 +69,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
       <body>
         <ThemeRuntime />
-        {children}
+        <AppShellLayout>{children}</AppShellLayout>
         <PrivacyConsent />
         <PwaRegister />
         <WebVitalsReporter />

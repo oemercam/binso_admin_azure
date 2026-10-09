@@ -1,5 +1,6 @@
 /* Authenticated Binso One application */
 
+.app-root[hidden]{display:none}
 .app-root{
   min-height:100dvh;
   background:var(--color-bg);
@@ -1284,38 +1285,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 
 /* Native-feeling application motion */
-.app-launch{
-  position:fixed;
-  inset:0;
-  z-index:1000;
-  display:grid;
-  place-items:center;
-  background:var(--color-bg);
-  pointer-events:none;
-  animation:app-launch-out 220ms var(--motion-ease) 680ms both;
-}
-.app-launch span{
-  width:72px;
-  height:72px;
-  display:grid;
-  place-items:center;
-  overflow:hidden;
-}
-.app-launch img{
-  width:58px;
-  height:58px;
-  object-fit:contain;
-  clip-path:inset(100% 0 0);
-  animation:app-logo-build 520ms var(--motion-ease) 80ms forwards;
-}
-html[data-theme="dark"] .app-launch img{filter:invert(1)}
-@keyframes app-logo-build{
-  from{clip-path:inset(100% 0 0);transform:translateY(8px);opacity:.35}
-  to{clip-path:inset(0 0 0);transform:translateY(0);opacity:1}
-}
-@keyframes app-launch-out{
-  to{opacity:0;visibility:hidden}
-}
 .button,.icon-button,.sheet-menu>a,.sheet-menu>button{
   transition:transform var(--motion-fast) var(--motion-ease),background-color var(--motion-fast) ease,border-color var(--motion-fast) ease,opacity var(--motion-fast) ease;
 }
@@ -1573,8 +1542,6 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 
 .document-mobile-price{display:none}
 
-.app-session-loading{min-height:48px;display:flex;align-items:center}
-.app-session-loading>span{width:28px;height:3px;background:var(--color-fg);border-radius:2px}
 
 /* Preview owns scrolling and zoom; document width cannot escape into the app. */
 .document-modal-header-spacer{display:none}
