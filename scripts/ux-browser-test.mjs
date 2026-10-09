@@ -135,7 +135,7 @@ try{
     if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count())assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');}
     if(!process.env.BINSO_UX_BASELINE&&width<=760){
-     for(const row of await page.locator('.document-summary-row').filter({visible:true}).all()){
+     for(const row of await page.locator('.document-summary-row.has-value').filter({visible:true}).all()){
       const title=await row.locator(':scope>b').boundingBox(),meta=await row.locator(':scope>small').boundingBox(),amount=await row.locator('.document-summary-amount').boundingBox();
       if(amount)assert.ok(meta.y>=title.y+title.height-1&&amount.y>=meta.y+meta.height-1,'Financial row has distinct title, metadata and amount lines');
      }

@@ -39,7 +39,7 @@ Es werden die geeigneten bestehenden Implementierungen weiterverwendet. Verantwo
 | StatusBadge | `Status` | Ton/Label fachlich abgeleitet; keine zusätzliche Dokumentbadge im Body. |
 | CompactKpiGroup | `MetricTiles` / `Metric` | Gemeinsame Tokens, 2×2 mobile; drei vorhandene Kundenzahlen bleiben drei Werte. Operator-Monitoring hat fachliche Charts. |
 | ActionBottomSheet / FormBottomSheet / FilterBottomSheet | `ActionSheet` / `FormSheet` / `FilterSheet` über `Sheet` | Gemeinsames Layer, Fokus, Header, Scroll-Body und FormActions-Footer. Bestehende AppShell-Navigationssheets bleiben geschützt. |
-| Aktionszeile | vorhandene `choice-list` in `ActionSheet` | Gleiche zentrale Action-Zeilenstile; lokale Callbacks/Berechtigungen. |
+| Aktionszeile | vorhandene `SheetButton` / `SheetLink`, `Button` im `ActionsMenu`; gemeinsame `sheet-menu`- und `choice-list`-Tokens | Vorhandene geeignete Aktionskomponenten und gemeinsame Zeilenbasis; Auswahlzeilen behalten Beschreibung/Selektionsstatus. Lokale Callbacks und Berechtigungen bleiben erhalten. |
 | FormField / FormActions | `Field`, `Input`, `Select`, `Textarea`, `FormActions` | Bereits zentrale Felder und Aktionsleisten. Spezialisierte Date-/Currency-Eingaben behalten Fachverhalten. |
 | EmptyState | `EmptyState` | Vorhandene gemeinsame Implementierung. |
 | DocumentPageViewer | `DocumentPageViewer` innerhalb `DocumentModal` | Ein Blatt; tatsächliche PDF-Seitenanzahl, ein Blob für Vorschau/Download. |
@@ -177,3 +177,7 @@ Alle benutzen `app/operator/[...section]/page.tsx → OperatorPage → OperatorS
 | /operator/abonnemente | OperatorPage / OperatorShell | Bestehende Operator-Grundlage | — | Kein bestätigter Widerspruch | Beibehalten | 7 Breiten × 2 Themes bestanden |
 | /operator/sperrungen | OperatorPage / OperatorShell | Bestehende Operator-Grundlage | — | Kein bestätigter Widerspruch | Beibehalten | 7 Breiten × 2 Themes bestanden |
 | /operator/ankuendigungen | OperatorPage / OperatorShell | Bestehende Operator-Grundlage | — | Kein bestätigter Widerspruch | Beibehalten | 7 Breiten × 2 Themes bestanden |
+
+## Release-Nachprüfung
+
+Der erste GitHub-Browserlauf fand einen Fehler in der zusätzlichen Testassertion: Die Betragsprüfung wartete auch bei generischen Kunden-/Mitarbeiterzeilen ohne Betrag auf `.document-summary-amount`. Sie prüft jetzt ausschliesslich die ausdrücklich mit `has-value` gekennzeichneten Zeilen. Routen-/Overflow-/Header-/A11y-/Funktionsprüfungen bleiben unverändert verpflichtend. Dieser Befund betrifft den Test, keine produktive Layoutkorrektur.
