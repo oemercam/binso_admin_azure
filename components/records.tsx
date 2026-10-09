@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { EmptyState, Icon, Status } from "./ui";
 import { ListSearch, ListRow } from "./binso-ux";
+import {Avatar} from "./avatar";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst","Verrechnet","Freigegeben"].includes(status)) return "success";
@@ -105,6 +106,7 @@ export function RecordRow({
   meta,
   value,
   status,
+  personIdentity,
 }: {
   href?: string;
   icon?: string;
@@ -112,8 +114,9 @@ export function RecordRow({
   meta: string;
   value?: string;
   status?: string;
+  personIdentity?:string;
 }) {
-  return <ListRow href={href} title={title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */

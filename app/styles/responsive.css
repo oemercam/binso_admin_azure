@@ -248,13 +248,6 @@
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
   }
-  .desktop-search{
-    width:min(48vw,360px);
-    min-width:180px;
-  }
-  .desktop-search-field{height:36px}
-  .desktop-search-field input{height:34px;font-size:11px}
-  .desktop-search-field kbd{display:none}
   .desktop-appbar-actions{
     flex:0 0 auto;
     display:flex;
@@ -447,8 +440,6 @@
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
   }
-  .desktop-search{width:min(100%,440px)}
-  .desktop-search-field{height:38px}
   .desktop-appbar-actions{display:flex;align-items:center;gap:6px}
   .page-container{padding-top:28px;padding-left:clamp(32px,3vw,48px);padding-right:clamp(32px,3vw,48px)}
   .page-head{margin-bottom:28px}
@@ -495,7 +486,6 @@
 
   .desktop-appbar{padding-left:var(--page-x);padding-right:var(--page-x)}
   .desktop-appbar-actions{gap:10px}
-  .desktop-search{width:min(42vw,520px)}
 
   .toolbar{
     min-height:48px;
@@ -894,11 +884,6 @@
     -webkit-backdrop-filter:none;
   }
   /* Authenticated web header contract: global search, running timer, notifications, account. */
-  .desktop-appbar>.desktop-search{
-    display:block;
-    width:min(42vw,520px);
-    min-width:240px;
-  }
   .desktop-appbar .desktop-header-timer{display:flex}
   .desktop-appbar .app-demo-badge{display:none}
   .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -1027,7 +1012,7 @@
 }
 
 /* Mobile / PWA */
-@media (max-width:760px){
+@media (max-width:760px){.preference-row{grid-template-columns:minmax(0,1fr);gap:12px}.header-panel-layer{padding:0;justify-content:stretch}.header-panel{width:100%;max-height:calc(var(--dialog-viewport-height,100dvh) - var(--header-panel-top));border-radius:0 0 14px 14px;padding:0 max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}.header-panel-search{height:calc(var(--dialog-viewport-height,100dvh) - var(--header-panel-top))}
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
@@ -1632,7 +1617,6 @@
   .employee-tab-panel .section-title .button{min-height:40px;height:40px;padding-inline:11px;font-size:11px}
   .security-row{align-items:start}
   .security-row>.button{width:100%;margin-top:10px}
-  .preference-row{min-height:64px}
   .danger-zone{padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .form-section,
   .form-section.clean,
@@ -1848,16 +1832,13 @@
   .subscription-panel .button{width:100%;margin-top:14px}
   .settings-profile,
   .company-logo-card{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px}
-  .plan-hero{grid-template-columns:1fr;gap:12px;padding:18px}
+  .plan-hero{grid-template-columns:1fr;gap:12px;padding:16px 0}
   .plan-hero .button{width:100%}
   .subscription-detail-grid,
   .documents-hub-grid{grid-template-columns:1fr}
   .preference-head,
   .preference-row{grid-template-columns:minmax(0,1fr) 58px 58px;gap:8px}
   .preference-head{min-height:34px}
-  .preference-row{min-height:68px;padding:8px 0}
-  .preference-row b{font-size:12px}
-  .preference-row small{font-size:10px;line-height:1.35}
   .choice-list{max-width:none;border-top:0}
   .choice-list button{min-height:64px}
   .choice-list button:first-child{border-top:0}
@@ -2191,63 +2172,6 @@
     min-width:0;
     max-width:100%;
     overflow-x:hidden;
-  }
-  .search-sheet{
-    height:auto;
-    min-height:min(46dvh,420px);
-    max-height:min(76dvh,680px);
-  }
-  .search-sheet .sheet-header{flex:0 0 auto}
-  .search-sheet .global-search{
-    min-height:0;
-    flex:1 1 auto;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-  }
-  .search-sheet .searchbox{
-    flex:0 0 auto;
-    width:100%;
-    max-width:100%;
-    min-width:0;
-    height:48px;
-    margin:4px 0 0;
-    padding:0 12px;
-    gap:10px;
-    border:0;
-    border-bottom:1px solid var(--color-line);
-    border-radius:0;
-    background:transparent;
-  }
-  .search-sheet .searchbox:focus-within{border-bottom-color:var(--color-fg);background:transparent}
-  .search-sheet .searchbox>svg{flex:0 0 auto;color:var(--color-muted)}
-  .search-sheet .search-clear{
-    width:32px;
-    height:32px;
-    flex:0 0 32px;
-    display:grid;
-    place-items:center;
-    padding:0;
-    border:0;
-    border-radius:8px;
-    background:transparent;
-    color:var(--color-fg);
-  }
-  .search-sheet .searchbox input{
-    width:100%;
-    min-width:0;
-    font-size:16px;
-  }
-  .search-sheet .search-results{
-    min-height:96px;
-    margin-top:12px;
-    border-top:0;
-    flex:1 1 auto;
-    overflow-y:auto;
-    overflow-x:hidden;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:calc(12px + var(--safe-bottom));
   }
   .search-results>a{
     width:100%;
@@ -2864,9 +2788,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   .finance-period-table{overflow-x:auto}
 
 @supports (height:100svh){
-  .search-sheet{
-        max-height:min(76dvh,680px);
-      }
   }
   .page-head-detail{display:none}
 }

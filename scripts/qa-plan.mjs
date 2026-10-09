@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu','/benachrichtigungen','/kunden/customer-one/bearbeiten','/einstellungen/konto','/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/benachrichtigungen','/einstellungen/sprache','/einstellungen/sicherheit','/einstellungen/datenschutz','/einstellungen/zeiterfassung'];
 // Include every page file, redirect, read-only preview and operator section.
-fullRoutes.push('/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
+fullRoutes.push('/dev/ux-lab','/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
 export const webkitFullRoutes=['/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 const groups={
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},
@@ -21,11 +21,11 @@ const groups={
  public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public\//,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo'],interactions:[]},
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
-const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing'];
+const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing','header'];
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
- const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|ui|binso-ux|records|use-dialog-focus)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
+ const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
  const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
  const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);
@@ -46,7 +46,7 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/permission|role|page-access/.test(p)))suites.add('permission-selfcheck');
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
  if(infrastructure||unknown)suites.add('qa-plan-test');
- return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:[390,768,1440],webkitWidths:full?[320,375,390,430,768]:[390,768],themes:level==='fast'?['light']:['light','dark']};
+ return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,768]:[390,768],themes:level==='fast'?['light']:['light','dark']};
 }
 export function changedFiles(base){
  const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).split('\0').filter(Boolean);

@@ -17,6 +17,6 @@ assert.equal(planChanges(['app/styles/app.css','unmapped/custom-engine.ts'],{lev
 
 assert.deepEqual(planChanges(['components/pdf-preview.tsx'],{level:'fast'}).interactions,['documents'],'PDF renderer changes select document interactions');
 
-assert.deepEqual(planChanges(['components/pages/products.tsx'],{level:'fast'}).widths,[390,768,1440]);
+assert.deepEqual(planChanges(['components/pages/products.tsx'],{level:'fast'}).widths,[390]);
 assert(!planChanges(['components/pages/products.tsx'],{level:'fast'}).routes.includes('/zeit'),'Product-only changes do not rebuild a cross-module browser scope');
 assert.equal(planChanges(['scripts/qa.mjs'],{level:'integration'}).level,'integration','Local integration uses representative coverage while required CI remains full');

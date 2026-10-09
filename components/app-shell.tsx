@@ -9,13 +9,17 @@ import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
 import { useDialogFocus } from "./use-dialog-focus";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 import { PageHeading, DetailHeading } from "./binso-ux";
 import { Button, EmptyState, Icon, IconButton, Logo, Status } from "./ui";
-import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {cachedClientSession,invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
+import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
+import {HeaderPanel} from "./header-panel";
+import {Avatar} from "./avatar";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -36,36 +40,7 @@ const desktopNavGroups = [
   {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen"]},
 ];
 
-const searchItems:SearchItem[] = [
-  { type: "Kunde", title: "Acme AG", meta: "Zürich · Aktiv", href: "/kunden/acme", icon: "users" },
-  { type: "Rechnung", title: "RE-2026-019", meta: "Acme AG · CHF 4’346.40", href: "/rechnungen/RE-2026-019", icon: "receipt" },
-  { type: "Angebot", title: "AN-2026-012", meta: "Acme AG · CHF 7’264.32", href: "/angebote/AN-2026-012", icon: "file" },
-  { type: "Ticket", title: "#5832 · Frage zur Rechnung", meta: "Offen", href: "/support/5832", icon: "support" },
-];
-
-type NotificationItem={
-  id:string;
-  kind:string;
-  title:string;
-  body:string;
-  href?:string|null;
-  read_at?:string|null;
-  created_at:string;
-};
-
-function notificationIcon(kind:string){
-  if(kind==="support") return "support";
-  if(kind==="payment"||kind==="billing") return "wallet";
-  if(kind==="document") return "file";
-  if(kind==="announcement") return "bell";
-  return "bell";
-}
-
-function notificationTime(value:string){
-  const date=new Date(value);
-  if(Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
-}
+type NotificationItem=PanelNotification;
 
 function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true}:null;}
 
@@ -123,15 +98,14 @@ export function AppShell({
 
   const canOpen=(href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));};
   const accessModule=moduleForPath(pathname);
-  const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente'].includes(pathname)?'organization:write':'organization:read';
-  const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement'].includes(pathname);
+  const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
+  const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);
   const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write');
   const visibleActions=actions;
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
   const shellRef=useRef<HTMLDivElement>(null);
   const dirty=unsavedChanges??formDirty;
-  const allowLeave=useRef(false);
   useEffect(()=>{
     if(!formActive)return;
     const root=shellRef.current;
@@ -143,9 +117,9 @@ export function AppShell({
     return()=>{root?.removeEventListener('input',changed);root?.removeEventListener('change',changed);};
   },[formActive]);
   const [leaveHref,setLeaveHref]=useState<string|null>(null);
+  const leaveBack=useBrowserBackGuard(dirty,()=>setLeaveHref("browser-back"));
   useEffect(()=>{
     if(!dirty)return;
-    const beforeUnload=(event:BeforeUnloadEvent)=>{if(allowLeave.current)return;event.preventDefault();event.returnValue="";};
     const navigate=(event:MouseEvent)=>{
       if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
       const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>("a[href]"):null;
@@ -154,21 +128,18 @@ export function AppShell({
       if(url.href===window.location.href||url.hash&&url.pathname===pathname)return;
       event.preventDefault();event.stopPropagation();setLeaveHref(url.href);
     };
-    window.addEventListener("beforeunload",beforeUnload);
     document.addEventListener("click",navigate,true);
-    return()=>{window.removeEventListener("beforeunload",beforeUnload);document.removeEventListener("click",navigate,true);};
+    return()=>{document.removeEventListener("click",navigate,true);};
   },[dirty,pathname]);
   const [logoutBusy,setLogoutBusy]=useState(false);
   const logoutBusyRef=useRef(false);
   const [confirmLogout,setConfirmLogout]=useState(false);
   const [logoutError,setLogoutError]=useState<string|null>(null);
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
-  const dialogRef = useDialogFocus(sheet !== null, () => setSheet(null));
+  const headerPanel=sheet==="search"||sheet==="notifications"||sheet==="account";
+  const dialogRef = useDialogFocus(sheet !== null&&!headerPanel, () => setSheet(null));
   const production=useBackendMode();
   const [query, setQuery] = useState("");
-  const [desktopSearchOpen,setDesktopSearchOpen]=useState(false);
-  const desktopSearchRef=useRef<HTMLDivElement|null>(null);
-  const desktopSearchInputRef=useRef<HTMLInputElement|null>(null);
   const [remoteSearch,setRemoteSearch]=useState<{query:string;items:SearchItem[];loading:boolean;error:string|null}>({query:"",items:[],loading:false,error:null});
   const [timerRunning, setTimerRunning] = useState(false);
   const [dark, setDark] = useState(false);
@@ -180,6 +151,8 @@ export function AppShell({
   const [notifications,setNotifications]=useState<NotificationItem[]>([]);
   const [notificationsLoading,setNotificationsLoading]=useState(false);
   const [notificationsError,setNotificationsError]=useState<string|null>(null);
+  const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
+  const [profile,setProfile]=useState<{name:string;identity:string;avatar:string}>({name:"",identity:"",avatar:""});
   const [navCompact,setNavCompact]=useState(false);
   const [showLaunch,setShowLaunch]=useState(false);
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
@@ -251,31 +224,15 @@ export function AppShell({
     const onKeyDown=(event:KeyboardEvent)=>{
       if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k"){
         event.preventDefault();
-        if(window.innerWidth>=761){
-          setSheet(null);
-          setDesktopSearchOpen(true);
-          window.setTimeout(()=>desktopSearchInputRef.current?.focus(),0);
-        }else{
-          setSheet("search");
-        }
+        setSheet("search");
       }
       if(event.key==="Escape"){
-        setDesktopSearchOpen(false);
         setSheet(null);
       }
     };
     window.addEventListener("keydown",onKeyDown);
     return()=>window.removeEventListener("keydown",onKeyDown);
   }, []);
-
-  useEffect(()=>{
-    if(!desktopSearchOpen)return;
-    const onPointerDown=(event:PointerEvent)=>{
-      if(desktopSearchRef.current&&!desktopSearchRef.current.contains(event.target as Node))setDesktopSearchOpen(false);
-    };
-    document.addEventListener("pointerdown",onPointerDown);
-    return()=>document.removeEventListener("pointerdown",onPointerDown);
-  },[desktopSearchOpen]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -334,17 +291,17 @@ export function AppShell({
     }
   }
 
-  const unreadNotifications=production?notifications.filter(item=>!item.read_at).length:1;
+  const unreadNotifications=notifications.filter(item=>!item.read_at).length;
 
-  const filtered = useMemo(() => {
-    if(production){
-      if(!query.trim()) return [];
-      return remoteSearch.query===query.trim()?remoteSearch.items:[];
-    }
-    if (!query.trim()) return searchItems;
-    const q = query.toLowerCase();
-    return searchItems.filter(item => `${item.type} ${item.title} ${item.meta}`.toLowerCase().includes(q));
-  }, [production,query,remoteSearch]);
+  const filtered=production&&query.trim().length>=2&&remoteSearch.query===query.trim()?remoteSearch.items.filter(item=>canOpen(item.href)):[];
+  async function markAllRead(){try{await apiPatch("/api/notifications",{all:true});await loadNotifications();}catch{setNotificationsError("Benachrichtigungen konnten nicht als gelesen markiert werden.");}}
+  useEffect(()=>{
+    if(!production)return;
+    let active=true;
+    const refresh=()=>apiGet<{item?:Record<string,unknown>|null;email?:string}>("/api/settings/profile").then(({item,email})=>{if(active)setProfile({name:String(item?.display_name||[item?.first_name,item?.last_name].filter(Boolean).join(" ")||""),identity:String(email||""),avatar:String(item?.avatar_url||"")})}).catch(()=>undefined);
+    void refresh();window.addEventListener("binso-profile-changed",refresh);
+    return()=>{active=false;window.removeEventListener("binso-profile-changed",refresh)};
+  },[production]);
 
   useEffect(()=>{
     const listener=(event:Event)=>setDark((event as CustomEvent<{resolved:string}>).detail.resolved==="dark");
@@ -365,7 +322,7 @@ export function AppShell({
     if(logoutBusyRef.current)return;
     if(dirty&&!confirmed){setSheet(null);setConfirmLogout(true);return;}
     logoutBusyRef.current=true;setLogoutBusy(true);setLogoutError(null);
-    try{await logoutClientSession();allowLeave.current=true;window.location.replace("/login");}
+    try{await logoutClientSession();allowDraftNavigation();window.location.replace("/login");}
     catch(error){setConfirmLogout(false);setLogoutError(error instanceof Error?error.message:"Abmelden ist fehlgeschlagen. Bitte erneut versuchen.");logoutBusyRef.current=false;setLogoutBusy(false);}
   }
 
@@ -373,7 +330,7 @@ export function AppShell({
 
   return <PageAccessContext.Provider value={{write:canWrite,canOpen}}><div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
-    <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowLeave.current=true;const url=new URL(href);if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
+    <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span>{logoutError}</span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}>Erneut versuchen</button></div>}
     {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
@@ -390,28 +347,10 @@ export function AppShell({
 
     <div className="app-main">
       <div className="desktop-appbar">
-        <div ref={desktopSearchRef} className={"desktop-search "+(desktopSearchOpen?"is-open":"")}>
-          <div className="desktop-search-field" role="search">
-            <Icon name="search" size={18}/>
-            <input ref={desktopSearchInputRef} aria-label="Globale Suche" value={query} onFocus={()=>setDesktopSearchOpen(true)} onChange={(e)=>{setQuery(e.target.value);setDesktopSearchOpen(true)}} placeholder="Suchen…"/>
-            {query?<button className="desktop-search-clear" type="button" aria-label="Suche löschen" onClick={()=>{setQuery("");desktopSearchInputRef.current?.focus()}}><Icon name="close" size={15}/></button>:<kbd>⌘ K</kbd>}
-          </div>
-          {desktopSearchOpen&&<div className="desktop-search-results" role="region" aria-label="Suchergebnisse">
-            {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
-            {searchLoading&&<p className="technical-hint" role="status">Suche läuft …</p>}
-            {production&&query.trim().length>=2&&!searchLoading&&searchError&&<p className="technical-hint" role="alert">{searchError}</p>}
-            {production&&query.trim().length>=2&&!searchLoading&&!searchError&&filtered.length===0&&<p className="technical-hint" role="status">Keine Treffer gefunden.</p>}
-            {!production&&!query.trim()&&<p className="desktop-search-hint">Kunden, Rechnungen, Angebote und Tickets durchsuchen.</p>}
-            {filtered.map(item=><Link key={item.href} href={item.href} onClick={()=>setDesktopSearchOpen(false)}>
-              <span className="activity-icon"><Icon name={item.icon}/></span>
-              <div><small>{item.type}</small><b>{item.title}</b><span>{item.meta}</span></div>
-              <Icon name="arrow" size={16}/>
-            </Link>)}
-          </div>}
-        </div>
-        <div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Icon name="user" size={18}/></button>
-        </div>
+        {!formActive&&<IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>}
+        {!formActive&&<div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<button className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>9?"9+":unreadNotifications}</i>}</button>
+          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></button>
+        </div>}
       </div>
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
         <div className="mobile-header-leading">
@@ -422,7 +361,7 @@ export function AppShell({
         {backHref&&(mobileActions||visibleActions)&&allowed&&<div className="mobile-detail-actions">{mobileActions??visibleActions}</div>}
         <div className="mobile-header-actions"><IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
           <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Icon name="user" size={18}/></button>
+          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></button>
         </div>
       </header>
 
@@ -443,15 +382,19 @@ export function AppShell({
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
       </nav>}
 
-      {sheet && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
-        <section ref={dialogRef} tabIndex={-1} className={sheet === "search" ? "bottom-sheet search-sheet" : "bottom-sheet"} role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}>
+      {headerPanel&&<HeaderPanel key={sheet} kind={sheet} label={sheet==="search"?"Suche":sheet==="account"?"Konto":"Benachrichtigungen"} onClose={()=>setSheet(null)}>
+        {sheet==="search"&&<SearchPanel query={query} onQuery={setQuery} items={filtered} loading={searchLoading} error={searchError} onClose={()=>setSheet(null)}/>}
+        {sheet==="notifications"&&<NotificationPanel items={notifications} loading={notificationsLoading} error={notificationsError} filter={notificationFilter} onFilter={setNotificationFilter} onRead={id=>void markNotificationRead(id)} onReadAll={()=>void markAllRead()} onRetry={()=>void loadNotifications()} onClose={()=>setSheet(null)}/>}
+        {sheet==="account"&&<AccountPanel profile={profile} demo={demoSession} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
+      </HeaderPanel>}
+      {sheet&&!headerPanel && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
+        <section ref={dialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "quick" ? "Erstellen" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">
             <div>
-              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "search" ? "Suche" : sheet === "quick" ? "Erstellen" : sheet === "account" ? "Konto" : "Benachrichtigungen"}</h2>
+              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "quick" ? "Erstellen" : "Benachrichtigungen"}</h2>
               {sheet === "docs" && <p>Dokumente und Zahlungen direkt öffnen.</p>}
               {sheet === "quick" && <p>Häufige Aufgaben ohne Umweg starten.</p>}
-              {sheet === "account" && <p>Profil, Darstellung und Sitzung.</p>}
             </div>
             <IconButton label="Schliessen" icon="close" onClick={() => setSheet(null)}/>
           </header>
@@ -473,7 +416,6 @@ export function AppShell({
               <SheetLink href="/einstellungen" icon="settings" title="Einstellungen" text="Alle Einstellungen" onSelect={() => setSheet(null)}/>
             </div>
             <div className="sheet-secondary">
-              <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
               <button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button>
             </div>
           </>}
@@ -487,52 +429,7 @@ export function AppShell({
             <SheetLink href="/mitarbeiter/neu" icon="users" title="Mitarbeiter" text="Teammitglied hinzufügen" onSelect={() => setSheet(null)}/>
           </div>}
 
-          {sheet === "account" && <div className="account-sheet">
-            <div className="account-sheet-profile"><span className="avatar avatar-large"><Icon name="user" size={22}/></span><div><b>Mein Binso One</b><small>Persönliche Einstellungen</small></div></div>
-            <div className="sheet-menu">
-              <SheetLink href="/einstellungen/konto" icon="user" title="Persönliche Daten" text="Profil und Sprache" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/einstellungen/sicherheit" icon="lock" title="Sicherheit" text="Passwort und Sitzungen" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/einstellungen/abonnement" icon="card" title="Abonnement" text="Plan und Abrechnung" onSelect={() => setSheet(null)}/>
-              {demoSession&&<SheetLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" text="Demo verlassen und mit eigenem Konto starten" onSelect={() => setSheet(null)}/>}
-            </div>
-            <div className="sheet-secondary">
-              <button type="button" onClick={toggleTheme}><Icon name={dark ? "sun" : "moon"}/><span>{dark ? "Helle Darstellung" : "Dunkle Darstellung"}</span></button>
-              <button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button>
-            </div>
-          </div>}
 
-          {sheet === "search" && <div className="global-search">
-            <div className="searchbox large" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Suchen..."/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>setQuery("")}><Icon name="close" size={15}/></button>}</div>
-            <div className="search-results">
-              {production&&query.trim().length<2&&<p className="technical-hint">Mindestens zwei Zeichen eingeben.</p>}
-              {searchLoading&&<p className="technical-hint" role="status">Suche läuft …</p>}
-              {production&&query.trim().length>=2&&!searchLoading&&searchError&&<p className="technical-hint" role="alert">{searchError}</p>}
-              {production&&query.trim().length>=2&&!searchLoading&&!searchError&&filtered.length===0&&<p className="technical-hint" role="status">Keine Treffer gefunden.</p>}
-              {filtered.map(item => <Link key={item.href} href={item.href} onClick={() => setSheet(null)}>
-                <span className="activity-icon"><Icon name={item.icon}/></span>
-                <div><small>{item.type}</small><b>{item.title}</b><span>{item.meta}</span></div>
-                <Icon name="arrow" size={16}/>
-              </Link>)}
-            </div>
-          </div>}
-
-          {sheet === "notifications" && <div className="notification-list">
-            {production ? <>
-              {notificationsLoading&&notifications.length===0&&<EmptyState icon="bell" title="Benachrichtigungen werden geladen" text="Aktuelle Aktivitäten werden abgerufen."/>}
-              {notificationsError&&<EmptyState icon="bell" title="Benachrichtigungen nicht verfügbar" text={notificationsError} action={<Button variant="secondary" onClick={()=>void loadNotifications()}>Erneut laden</Button>}/>}
-              {!notificationsLoading&&!notificationsError&&notifications.length===0&&<EmptyState icon="bell" title="Keine Benachrichtigungen" text="Neue Aktivitäten erscheinen hier automatisch."/>}
-              {!notificationsError&&notifications.slice(0,5).map(item=><Link href={item.href||"/benachrichtigungen"} key={item.id} onClick={()=>{void markNotificationRead(item.id);setSheet(null)}}>
-                <span className="activity-icon"><Icon name={notificationIcon(item.kind)}/></span>
-                <div><b>{item.title}</b><p>{item.body}</p><small>{notificationTime(item.created_at)}</small></div>
-                {!item.read_at&&<i className="unread-dot"/>}
-              </Link>)}
-            </> : <>
-              <Link href="/rechnungen/RE-2026-019" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="wallet"/></span><div><b>Rechnung bezahlt</b><p>Acme AG · CHF 4’346.40</p><small>vor 12 Minuten</small></div></Link>
-              <Link href="/support/5832" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="support"/></span><div><b>Neue Support-Antwort</b><p>Ticket #5832 wurde beantwortet.</p><small>vor 1 Stunde</small></div><i className="unread-dot"/></Link>
-              <Link href="/angebote/AN-2026-012" onClick={() => setSheet(null)}><span className="activity-icon"><Icon name="file"/></span><div><b>Angebot angenommen</b><p>Acme AG · AN-2026-012</p><small>heute</small></div></Link>
-            </>}
-            <Link className="notification-settings-link" href="/benachrichtigungen" onClick={() => setSheet(null)}><span>Alle Benachrichtigungen</span><Icon name="arrow" size={15}/></Link>
-          </div>}
         </section>
       </div>}
     </div>

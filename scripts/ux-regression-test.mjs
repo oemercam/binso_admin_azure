@@ -87,7 +87,7 @@ assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing histo
 console.log('Subscription settings use flat separators instead of legacy cards.');
 
 assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
-assert.ok(responsiveCss.includes('.desktop-search-field kbd{display:none}'),'Medium desktop header must compact the inline search instead of removing account controls');
+assert.ok(appCss.includes('.header-panel{'),'Shared header panels must define one anchored layout contract');
 console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
 
 const uiSource=await readPageFile('components/ui.tsx','utf8');
@@ -106,15 +106,10 @@ assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
 
 const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
-assert.ok(appShellSource.includes('className={"desktop-search "+(desktopSearchOpen?"is-open":"")}'),'Desktop search must be an inline header search');
-assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search keyboard shortcut must focus the inline field');
-assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
-assert.ok(appCss.includes('.desktop-search-results{'),'Desktop search results must render as an anchored dropdown');
-assert.ok(!responsiveCss.includes('.desktop-search-trigger'),'Responsive CSS must not retain obsolete popup-search trigger rules');
-const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(match=>match[1].replace(/\s+/g,' ').replace(/\(\s*/g,'(').replace(/\s*\)/g,')').replace(/\s*:\s*/g,':').trim());
-assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
-assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
-console.log('Desktop global search stays inline with anchored results and no modal trigger.');
+assert.ok(appShellSource.includes('<HeaderPanel key={sheet} kind={sheet}'),'Search, account and notifications must share HeaderPanel');
+assert.ok(!appShellSource.includes('desktopSearchOpen'),'No parallel desktop search state machine');
+assert.ok(!appCss.includes('.desktop-search-results{'),'Remove confirmed obsolete desktop dropdown CSS');
+console.log('Global header interactions share one anchored modal contract on every viewport.');
 
 assert.ok(appCss.includes('.desktop-appbar-actions svg{'),'Desktop header icons must use explicit integer geometry');
 assert.ok(appCss.includes('width:20px;'),'Desktop header icons must use a fixed integer size');
@@ -340,10 +335,10 @@ console.log('Project-linked idle timer context survives synchronization without 
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children);
-  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},12]]){
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null);
+  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
-   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
+   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
    const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
