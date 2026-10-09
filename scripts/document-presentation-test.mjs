@@ -5,7 +5,6 @@ import {pathToFileURL} from 'node:url';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
-import {SwissQRBill} from 'swissqrbill/svg';
 
 const require=createRequire(import.meta.url);
 const qrSource=(await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/utils')).href));
@@ -13,24 +12,27 @@ const qrCompiled=ts.transpileModule(qrSource,{compilerOptions:{module:ts.ModuleK
 const qr=await import('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'));
 const source=await fs.readFile('components/documents.tsx','utf8');
 const ast=ts.createSourceFile('documents.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
-const selected=new Set(['InvoicePreview','OfferPreview','DocumentTotals','DocumentText','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate']);
-const fragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&selected.has(node.name?.text)).map(node=>node.getText(ast)).join('\n');
-const compiled=ts.transpileModule(fragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-const company={loading:false,error:null,name:'Alpenblick Digital AG',street:'Seefeldstrasse 73',city:'8008 Zürich',footer:'Alpenblick Digital AG',raw:{name:'Alpenblick Digital AG',street:'Seefeldstrasse',building_number:'73',postal_code:'8008',city:'Zürich',iban:'CH9300762011623852957',invoice_intro_text:'Individuelle Rechnungseinleitung',invoice_footer_text:'Individueller Rechnungsabschluss',quote_intro_text:'Individuelle Angebotseinleitung',quote_footer_text:'Individueller Angebotsabschluss',is_demo:true}};
-const exports={};
-Function('require','exports','useMemo','useDocumentCompany','SwissQRBill','createQrBillData','responsiveQrSvg','createInitialDraft','customerData',compiled)(require,exports,callback=>callback(),()=>company,SwissQRBill,qr.createQrBillData,qr.responsiveQrSvg,()=>null,{});
+const company={raw:{name:'Alpenblick Digital AG',street:'Seefeldstrasse',building_number:'73',postal_code:'8008',city:'Zürich',iban:'CH9300762011623852957',invoice_intro_text:'Individuelle Rechnungseinleitung',invoice_footer_text:'Individueller Rechnungsabschluss',quote_intro_text:'Individuelle Angebotseinleitung',quote_footer_text:'Individueller Angebotsabschluss',is_demo:true}};
 const draft={number:'RE-2026-019',customer:'Acme AG',date:'2026-10-01',due:'30',vatRate:'8.1',currency:'CHF',note:'',status:'sent',positions:[{id:'one',description:'IT-Beratung',quantity:'2',price:'100',unit:'Stunde',vatRate:'8.1'}]};
 const directory={'Acme AG':{address:'Bahnhofstrasse 123',zip:'8001',city:'Zürich'}};
-const invoice=renderToStaticMarkup(React.createElement(exports.InvoicePreview,{draft,directory}));
-assert.ok(!/Demo-Rechnung|Demo-Zahlteil|Nicht bezahlen|Beispielkonto/.test(invoice));
-for(const value of ['Individuelle Rechnungseinleitung','Individueller Rechnungsabschluss','Seefeldstrasse 73','31.10.2026','216.20','Stunde','viewBox='])assert.ok(invoice.includes(value),value);
-assert.equal((invoice.match(/class="sender-line"/g)||[]).length,1);
-const paid=renderToStaticMarkup(React.createElement(exports.InvoicePreview,{draft:{...draft,status:'paid'},directory}));
-assert.ok(paid.includes('vollständig beglichen'));assert.ok(!paid.includes('Bitte überweisen'));assert.ok(!paid.includes('qr-payment-slip'),'Paid invoice must not expose a payable QR slip');
-const offer=renderToStaticMarkup(React.createElement(exports.OfferPreview,{draft:{...draft,number:'AN-2026-012',title:'Modern Workplace Erweiterung',due:'2026-10-31',currency:'EUR'},directory}));
-for(const value of ['Modern Workplace Erweiterung','Individuelle Angebotseinleitung','Individueller Angebotsabschluss','Seefeldstrasse 73','31.10.2026','Gesamtbetrag EUR'])assert.ok(offer.includes(value),value);
-assert.ok(!offer.includes('in CHF'));
-console.log('Invoice and offer markup: company texts, address, units, dates, currency, paid status and unmarked demo documents passed.');
+// The retired HTML templates had no runtime consumers. Preserve their business
+// assertions against the actual PDF used by preview, download and mail instead.
+const moduleUrl=code=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(code,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
+const pdfSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href)).replace('"@/lib/qr-bill"',JSON.stringify(moduleUrl(qrSource)));
+const {documentPdf}=await import(moduleUrl(pdfSource));
+const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
+async function inspectPdf(document){const bytes=await documentPdf(document,company.raw);const task=getDocument({data:new Uint8Array(bytes),isEvalSupported:false});const pdf=await task.promise;const pages=[];for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),viewport=page.getViewport({scale:1});assert.ok(Math.abs(viewport.height/viewport.width-Math.sqrt(2))<0.001);const content=await page.getTextContent();pages.push(content.items.map(item=>item.str).join(' '));}await task.destroy();return {bytes,pages,text:pages.join(' ')};}
+const document={number:draft.number,kind:'invoice',status:'sent',currency:'CHF',issue_date:draft.date,due_date:'2026-10-31',subtotal:200,vat:16.2,total:216.2,customer:{name:'Acme AG',street:directory['Acme AG'].address,postal_code:'8001',city:'Zürich'},items:[{description:'IT-Beratung',quantity:2,unit:'Stunde',unit_price:100,vat_rate:8.1}]};
+const invoice=await inspectPdf(document);
+for(const value of ['Individuelle Rechnungseinleitung','Individueller Rechnungsabschluss','Seefeldstrasse 73','31.10.2026','216.20','Stunde','Empfangsschein','Zahlteil'])assert.ok(invoice.text.includes(value),value);
+assert.ok(!/Demo-Rechnung|Demo-Zahlteil|Nicht bezahlen|Beispielkonto/.test(invoice.text));
+for(const status of ['paid','cancelled','draft']){const result=await inspectPdf({...document,status,paid_amount:status==='paid'?216.2:0});assert.ok(!result.text.includes('Empfangsschein'),status+' has no payable QR slip');assert.ok(result.text.includes(status==='draft'?'ENTWURF':status==='cancelled'?'STORNIERT':'Vollständig bezahlt'));}
+const offer=await inspectPdf({...document,kind:'offer',number:'AN-2026-012',currency:'EUR',valid_until:'2026-10-31'});
+for(const value of ['Individuelle Angebotseinleitung','Individueller Angebotsabschluss','31.10.2026','Total EUR'])assert.ok(offer.text.includes(value),value);
+const partial=await inspectPdf({...document,paid_amount:100});assert.ok(partial.text.includes('Restzahlungsanforderung'));assert.ok(partial.text.includes('116.20'));
+const multi=await inspectPdf({...document,items:Array.from({length:25},(_,i)=>({...document.items[0],description:'Position '+(i+1)}))});assert.ok(multi.pages.length>1);assert.ok(multi.pages.every(text=>text.trim().length>20),'No unintended blank PDF page');assert.ok(multi.text.includes('Position 25')&&multi.text.includes('Zahlteil'));
+if(process.env.BINSO_UX_PDF_OUTPUT){await fs.writeFile(process.env.BINSO_UX_PDF_OUTPUT,multi.bytes);console.log('Actual QR fixture PDF pages:',multi.pages.length);}
+console.log('Actual PDF: company texts, addresses, units, dates, currency, paid/cancelled/draft guards, partial balance, pagination and complete QR payment part passed.');
 
 const financialJs=ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const financial=await import('data:text/javascript;base64,'+Buffer.from(financialJs).toString('base64'));
@@ -77,3 +79,14 @@ const employeeInput={email:'qa@example.invalid',entryDate:'2026-10-08',workloadP
 assert.equal(employeeInputIssue(employeeInput),null);
 for(const invalid of [{email:'invalid'},{entryDate:'2026-02-30'},{workloadPercent:101},{weeklyHours:0},{weeklyHours:81},{vacationDays:-1}])assert.ok(employeeInputIssue({...employeeInput,...invalid}));
 console.log('QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.');
+
+
+// Guard the central PDF viewer against regressing to an endless multi-page list.
+const pdfViewerSource=await fs.readFile('components/pdf-preview.tsx','utf8');
+assert.match(pdfViewerSource,/data-viewer-mode="single-page"/,'Viewer must explicitly declare single-page mode');
+assert.match(pdfViewerSource,/<PdfPage key=\{current\} pdf=\{pdf\} pageNumber=\{current\} zoomed=\{zoomed\}\/>/,'Exactly the selected PDF page is mounted');
+assert.doesNotMatch(pdfViewerSource,/Array\.from\(\{length:pdf\.numPages\}/,'Do not render every PDF page simultaneously');
+for(const label of ['Vorherige Seite','Nächste Seite','PDF-Seitennavigation'])assert.ok(pdfViewerSource.includes(label),label);
+assert.match(pdfViewerSource,/disabled=\{current<=1\}/,'Previous page is disabled at first page');
+assert.match(pdfViewerSource,/disabled=\{current>=pdf\.numPages\}/,'Next page is disabled at last page');
+console.log('Single-page PDF viewer source contract and bounded navigation passed.');

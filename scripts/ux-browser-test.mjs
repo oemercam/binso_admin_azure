@@ -5,6 +5,7 @@ import {spawn} from 'node:child_process';
 import PDFDocument from 'pdfkit';
 import {pathToFileURL} from 'node:url';
 import {fullRoutes} from './qa-plan.mjs';
+import {captureUxDom} from './ux-dom-audit.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -41,7 +42,7 @@ const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_c
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat'];
 const hasInteraction=name=>requestedInteractions.includes(name);
-async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);}
+async function capture(page,options){if(process.env.BINSO_UX_AUDIT==='1')await fs.writeFile(options.path.replace(/\.png$/,'-dom.json'),JSON.stringify(await captureUxDom(page,page.url()),null,2));if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
 let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let context;
@@ -105,7 +106,7 @@ try{
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
     console.log(`Route ${route}`);await page.goto(base+route);await page.waitForLoadState('networkidle');await page.locator('.app-session-loading').waitFor({state:'hidden'});
-    try{await page.locator('h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
+    try{if(await page.locator('.app-preview').count())await page.locator('.app-preview .page-container').waitFor({state:'visible'});else await page.locator('h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
@@ -113,7 +114,7 @@ try{
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
-    if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.app-shell').count()&&!route.startsWith('/operator')&&!route.startsWith('/support/')){
+    if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.app-root:not(.app-preview)').count()&&!route.startsWith('/operator')&&!route.startsWith('/support/')){
       await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
       const header=await page.locator('.mobile-header').boundingBox();assert.ok(header&&header.y>=-1&&header.y<=1,`${route}: primary header stays visible while scrolling`);
       await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
@@ -130,7 +131,7 @@ try{
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect();return composer.bottom<=innerHeight&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays inside the viewport');
     }
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
-    if(width<=760&&!route.endsWith('/neu')&&!['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login'].includes(route)&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    if(width<=760&&!route.endsWith('/neu')&&await page.locator('.app-root:not(.app-preview)').count()&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count())assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');}
     if(process.env.BINSO_UX_A11Y==='1'&&[375,1440].includes(width)){
@@ -141,6 +142,17 @@ try{
       if(blocking.length){accessibilityFailures.push({route,theme,width,violations:blocking});console.log('A11Y',route,JSON.stringify(blocking));}
     }
   assert.deepEqual(errors,[],'Browser runtime errors');
+    if(process.env.BINSO_UX_AUDIT==='1'&&theme==='light'&&width===390)await fs.writeFile(path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-dom.json`),JSON.stringify(await captureUxDom(page,route),null,2));
+    if(width<=760){
+      const detail=page.locator('.mobile-header-detail').filter({visible:true});
+      if(await detail.count()){
+        const actions=detail.locator('.mobile-detail-actions button').filter({visible:true});
+        if(await actions.count()===1){const button=await actions.boundingBox(),h=await detail.evaluate(el=>({right:el.getBoundingClientRect().right,padding:parseFloat(getComputedStyle(el).paddingRight)}));assert.ok(Math.abs(button.x+button.width-(h.right-h.padding))<12,'Single detail menu is at the right header edge without legacy reserved icon columns');}
+      }
+      for(const row of await page.locator('.document-summary-row.has-value-label').all()){
+       const label=await row.locator('.document-summary-value-label').boundingBox(),amount=await row.locator('.document-summary-amount').boundingBox(),meta=await row.locator(':scope>small').boundingBox();assert.ok(label.x<amount.x&&Math.abs(label.y-amount.y)<3&&meta.y+meta.height<=label.y+1,'Document metadata and labelled amount use separate rows');
+      }
+    }
     results.push({theme,width,route,passed:true});
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await page.locator('nav.bottom-nav').screenshot({animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)});await hide.evaluate(el=>el.remove());}
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
@@ -229,13 +241,31 @@ try{
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
   const expectedPdfPages=Number(process.env.BINSO_UX_PDF_PAGES||2);
-  try{await page.locator('.pdf-page canvas').nth(expectedPdfPages-1).waitFor()}catch(error){console.log('PDF dialog diagnostics',await page.getByRole('dialog').innerText());await capture(page,{animations:"disabled",path:path.join(output,'pdf-error.png')});throw error;}
-  await page.waitForFunction(()=>[...document.querySelectorAll('.pdf-page canvas')].every(canvas=>canvas.width>300&&canvas.height>400));
-  assert.equal(await page.locator('.pdf-page').count(),expectedPdfPages,'Actual generated PDF renders every page');
+  await page.locator('.pdf-page canvas').waitFor();
+  await page.locator('.pdf-page canvas[data-rendered-page="1"]').waitFor();
+  assert.equal(await page.locator('.pdf-page').count(),1,'Only one actual PDF page is mounted');
+  const previous=page.getByRole('button',{name:'Vorherige Seite',exact:true}),next=page.getByRole('button',{name:'Nächste Seite',exact:true});
+  assert.equal(await previous.isDisabled(),true);assert.equal(await next.isDisabled(),expectedPdfPages===1);
+  await page.getByText(`Seite 1 von ${expectedPdfPages}`,{exact:true}).waitFor();
+  const geometry=await page.evaluate(()=>{const canvas=document.querySelector('.pdf-page canvas').getBoundingClientRect(),footer=document.querySelector('.pdf-page-navigation').getBoundingClientRect(),header=document.querySelector('.document-modal>header').getBoundingClientRect();return {canvas:{top:canvas.top,bottom:canvas.bottom,left:canvas.left,right:canvas.right,width:canvas.width,height:canvas.height},footer:{top:footer.top,bottom:footer.bottom},headerBottom:header.bottom,height:innerHeight,width:innerWidth}});
+  assert.ok(geometry.canvas.top>=geometry.headerBottom&&geometry.canvas.bottom<=geometry.footer.top+1&&geometry.canvas.left>=0&&geometry.canvas.right<=geometry.width+1,'Entire page fits between fixed header and page navigation');
+  assert.ok(Math.abs(geometry.canvas.height/geometry.canvas.width-Math.sqrt(2))<0.01,'A4 page ratio is preserved');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-pdf-preview.png`),fullPage:true});
+  if(expectedPdfPages>1){
+   for(let i=2;i<=expectedPdfPages;i++){await next.click();await page.getByText(`Seite ${i} von ${expectedPdfPages}`,{exact:true}).waitFor();await page.locator(`.pdf-page canvas[data-rendered-page="${i}"]`).waitFor();assert.equal(await page.locator('.pdf-page').count(),1);}
+   assert.equal(await next.isDisabled(),true);assert.equal(await previous.isDisabled(),false);
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-pdf-last-page.png`)});
+   await previous.click();await page.getByText(`Seite ${expectedPdfPages-1} von ${expectedPdfPages}`,{exact:true}).waitFor();
+  }
+  const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).click();const downloaded=await downloadEvent;const bytes=await fs.readFile(await downloaded.path());assert.deepEqual(bytes,fixturePdf,'Download uses exactly the PDF bytes displayed by the viewer');
   await page.getByRole('button',{name:'Vorschau vergrössern',exact:true}).click();
-  const zoom=await page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth,document:document.querySelector('.document-modal-body').scrollWidth}));
-  assert.ok(zoom.page<=zoom.viewport+1&&zoom.document>zoom.viewport,'Zoom scrolls only inside the document area');
+  await page.waitForFunction(()=>{const el=document.querySelector('.pdf-page');return el.scrollWidth>el.clientWidth});
+  const zoom=await page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth,document:document.querySelector('.pdf-page').scrollWidth}));
+  assert.ok(zoom.page<=zoom.viewport+1&&zoom.document>zoom.viewport,'Zoom scrolls only inside the document page');
+  await page.getByRole('button',{name:'Auf Bildschirm einpassen',exact:true}).click();
+  await page.setViewportSize({width:320,height:400});
+  await page.waitForFunction(()=>{const c=document.querySelector('.pdf-page canvas').getBoundingClientRect(),nav=document.querySelector('.pdf-page-navigation').getBoundingClientRect();return c.bottom<=nav.top+1&&nav.bottom<=innerHeight+1});
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-pdf-preview.png`)});
   await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   }
   if(hasInteraction('documents')){
@@ -300,6 +330,7 @@ try{
    await page.setViewportSize({width:320,height:740});await page.goto(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
    assert.equal(await page.locator('.customer-detail-workspace .surface .status').filter({hasText:/^Aktiv$/}).count(),0,'Customer status appears only in the header');
    await page.getByRole('button',{name:'Kontakte',exact:true}).click();
+   const contactName=await page.locator('.contact-heading>b').first().boundingBox(),contactMenu=await page.locator('.contact-heading .contact-actions button').first().boundingBox();assert.ok(Math.abs(contactName.y+contactName.height/2-(contactMenu.y+contactMenu.height/2))<3,'Contact name and menu share the first line');
    const row=page.locator('.contact-list>div').first(),name=await row.locator('b').boundingBox(),menu=await row.getByRole('button',{name:'Alex Muster Aktionen'}).boundingBox();
    assert.ok(menu.x>name.x&&menu.y<=name.y+name.height,'Contact action stays in the first line');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contacts-final.png`)});
