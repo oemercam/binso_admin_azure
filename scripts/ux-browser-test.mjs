@@ -71,6 +71,7 @@ let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer';
+let incompleteProductResponse=false;
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
 let context;
@@ -85,6 +86,7 @@ try{
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
    if(req.method()!=='GET'){
+    if(p==='/api/products'&&incompleteProductResponse)return route.fulfill({status:201,json:{ok:true}});
     if(req.method()==='PATCH'&&p==='/api/operator/accounts/tenant-one'){const body=JSON.parse(req.postData());if(body.plan)operatorAccount.plan=body.plan;if(body.userLimit)operatorAccount.user_limit=body.userLimit;if(body.subscriptionStatus)operatorAccount.subscription_status=body.subscriptionStatus;return route.fulfill({json:{item:operatorAccount}});}
     if(customerIdentityMode&&req.method()==='PATCH'&&p.startsWith('/api/customers/')){const item=collections.customers.find(item=>item.id===p.split('/')[3]);Object.assign(item,JSON.parse(req.postData()));return route.fulfill({json:{item}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
@@ -403,6 +405,10 @@ try{
   employeeLedgerFixture=false;
   }
   if(hasInteraction('products')){
+   await navigate(base+'/produkte/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Name',{exact:true}).fill('Unconfirmed synthetic product');await page.getByLabel('Verkaufspreis (CHF)',{exact:true}).fill('125');incompleteProductResponse=true;
+   await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).click();await page.getByText('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(await page.getByText('Produkt gespeichert.',{exact:true}).count(),0,'Unconfirmed ordinary create cannot show success');assert.equal(new URL(page.url()).pathname,'/produkte/neu');assert.equal(await page.getByLabel('Name',{exact:true}).inputValue(),'Unconfirmed synthetic product','Unconfirmed create preserves the draft');incompleteProductResponse=false;
+   await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).click();await page.getByText('Produkt gespeichert.',{exact:true}).waitFor();await page.waitForURL(base+'/produkte');
+
   await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');
   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});

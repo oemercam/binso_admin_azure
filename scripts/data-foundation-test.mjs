@@ -56,6 +56,25 @@ try{
   globalThis.fetch=async()=>new Response(JSON.stringify(payload));await assert.rejects(()=>backend.apiPost('/api/documents',{}),error=>error.code==='invalid_response');assert.equal(events.dataRevision(paths),committed,'Incomplete document confirmation cannot broadcast success');
  }
  globalThis.fetch=async()=>new Response(JSON.stringify({item:{id:'document',number:'RE-2026-1'}}));await backend.apiPost('/api/documents',{});
+ for(const path of ['/api/customers','/api/employees','/api/products','/api/projects','/api/expenses','/api/time-entries','/api/support/tickets','/api/files']){
+  const beforeBusiness=events.dataRevision([path]);
+  for(const payload of [null,{}, {ok:true},{item:{}},{item:{id:''}}]){
+   globalThis.fetch=async()=>new Response(JSON.stringify(payload),{status:201});
+   await assert.rejects(()=>backend.apiPost(path,{}),error=>error.code==='invalid_response',path+' requires persisted identity');
+   assert.equal(events.dataRevision([path]),beforeBusiness,'Unconfirmed '+path+' cannot invalidate consumers');
+  }
+  globalThis.fetch=async()=>new Response(JSON.stringify({item:{id:'confirmed-business-record'}}),{status:201});
+  await backend.apiPost(path,{});assert.notEqual(events.dataRevision([path]),beforeBusiness,path+' confirmed persistence invalidates consumers');
+ }
+
+
+ for(const path of ['/api/customers/customer-one','/api/employees/employee-one','/api/products/product-one','/api/expenses/expense-one']){
+  const beforeEdit=events.dataRevision([path]);
+  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));
+  await assert.rejects(()=>backend.apiPatch(path,{}),error=>error.code==='invalid_response',path+' edit requires persisted identity');assert.equal(events.dataRevision([path]),beforeEdit);
+  globalThis.fetch=async()=>new Response(JSON.stringify({item:{id:'confirmed-edit'}}));await backend.apiPatch(path,{});assert.notEqual(events.dataRevision([path]),beforeEdit);
+  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.apiDelete(path);
+ }
  let reads=0,resolveRead;
  globalThis.fetch=()=>{reads++;return new Promise(resolve=>{resolveRead=resolve})};
  const a=backend.apiGet('/api/documents'),b=backend.apiGet('/api/documents');

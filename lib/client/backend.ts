@@ -106,15 +106,18 @@ async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   return payload as T;
 }
 
-async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string){
+async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string,method:"POST"|"PATCH"|"DELETE"){
   const result=await parseResponse<T>(response,fallback);
   if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.","session_changed",401);
-  // Critical creates need their persisted identity before any success broadcast.
+  // Business creates need their persisted identity before any success broadcast.
   // An unreadable or incomplete response can follow a committed transaction;
   // leave the caller's idempotency key intact for its explicit retry.
-  if(path==="/api/payments"||path==="/api/documents"){
+  const endpoint=path.split("?")[0];
+  const createsRecord=method==="POST"&&/^\/api\/(customers|employees|products|projects|expenses|time-entries|support\/tickets|files|payments|documents)$/.test(endpoint);
+  const editsRecord=method==="PATCH"&&/^\/api\/(customers|employees|products|expenses)\/[^/]+$/.test(endpoint);
+  if(createsRecord||editsRecord){
     const item=(result as {item?:{id?:unknown;number?:unknown}}|null)?.item;
-    if(typeof item?.id!=="string"||!item.id.trim()||path==="/api/documents"&&(typeof item.number!=="string"||!item.number.trim())){
+    if(typeof item?.id!=="string"||!item.id.trim()||endpoint==="/api/documents"&&(typeof item.number!=="string"||!item.number.trim())){
       throw new ClientApiError("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);
     }
   }
@@ -132,7 +135,7 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
     },
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision);
+  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision,"POST");
 }
 
 const pendingGets=new Map<string,Promise<unknown>>();
@@ -159,17 +162,17 @@ export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision);
+  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH");
 }
 
 export async function apiDelete<T>(path:string):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{method:"DELETE"});
-  return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision);
+  return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
 }
 
 export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{method:"POST",body:form});
-  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision);
+  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST");
 }
