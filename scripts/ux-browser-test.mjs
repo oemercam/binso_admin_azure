@@ -43,7 +43,7 @@ const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',statu
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
-const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
+const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','remediation'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 let captureQueue=Promise.resolve();
 async function capture(page,options,target=page){
@@ -74,6 +74,7 @@ let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Syntheti
 let incompleteProductResponse=false;
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
+let customerWizardFixture=false,customerWizardWrites=0,failCustomerWizard=false;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -91,6 +92,7 @@ try{
     if(customerIdentityMode&&req.method()==='PATCH'&&p.startsWith('/api/customers/')){const item=collections.customers.find(item=>item.id===p.split('/')[3]);Object.assign(item,JSON.parse(req.postData()));return route.fulfill({json:{item}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
+    if(p==='/api/customers'&&customerWizardFixture){customerWizardWrites++;await new Promise(resolve=>setTimeout(resolve,100));return route.fulfill({status:failCustomerWizard?503:201,json:failCustomerWizard?{message:'Synthetic customer unavailable'}:{item:{...customer,id:'wizard-customer',...JSON.parse(req.postData())}}});}
     if(p==='/api/documents/preview')return route.fulfill({body:fixturePdf,contentType:'application/pdf'});
     if(p==='/api/demo/session')return route.fulfill({json:{ok:true,databaseBacked:true,expiresIn:86400}});
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
@@ -245,6 +247,41 @@ try{
   if(process.env.BINSO_UX_MATRIX_ONLY==="1"){await context.close();context=null;await browser.close();browser=null;continue;}
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
+  if(hasInteraction('remediation')){
+   customerWizardFixture=true;customerWizardWrites=0;
+   for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:740});await navigate(base+'/kunden/neu');await page.getByRole('button',{name:'Weiter',exact:true}).waitFor();
+    await page.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal(await page.getByRole('status').filter({hasText:'Schritt 1 von 2'}).count(),1,'Required customer fields block forward navigation');assert.equal(customerWizardWrites,0,'Validation never creates a partial customer');
+    await page.getByLabel('Firmenname',{exact:true}).fill('V21.7 Customer');await page.getByLabel('Ort',{exact:true}).fill('Bern');await page.getByLabel('E-Mail',{exact:true}).fill('invalid');
+    await page.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal(await page.getByRole('status').filter({hasText:'Schritt 1 von 2'}).count(),1,'Invalid email blocks the customer step');
+    await page.getByLabel('E-Mail',{exact:true}).fill('wizard@example.invalid');
+    const before=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.getByLabel('UID',{exact:true}).fill('CHE-173.401.068');
+    const after=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(before.y-after.y)<1,'Customer wizard footer remains stable');
+    assert.equal(await page.locator('.optional-details').count(),0,'The retired customer form is absent');
+    await page.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await page.getByLabel('Firmenname',{exact:true}).inputValue(),'V21.7 Customer');
+    await page.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal(await page.getByLabel('UID',{exact:true}).inputValue(),'CHE-173.401.068');
+    await page.setViewportSize({width,height:400});await page.getByLabel('Interne Notiz',{exact:true}).focus();
+    const footer=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(footer.y>=0&&footer.y+footer.height<=401,'Customer actions fit a keyboard-sized viewport');
+    try{await page.waitForFunction(()=>{const input=document.activeElement,content=document.querySelector('.wizard-content');if(!input?.matches('input')||!content)return false;const field=input.getBoundingClientRect(),box=content.getBoundingClientRect();return field.top>=box.top-1&&field.bottom<=box.bottom+1});}catch(error){console.log('Active-field geometry',width,await page.evaluate(()=>{const box=selector=>document.querySelector(selector)?.getBoundingClientRect().toJSON();return {active:document.activeElement?.outerHTML,field:document.activeElement?.getBoundingClientRect().toJSON(),content:box('.wizard-content'),wizard:box('.form-wizard'),footer:box('.mobile-sticky-save'),height:innerHeight,scrollY,visualHeight:visualViewport?.height}}));await capture(page,{path:path.join(output,'active-field-error.png')});throw error;}
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Customer process has no page overflow');
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-400-customer-wizard.png`)});
+    await page.getByRole('button',{name:'Zurück',exact:true}).click();await page.getByRole('link',{name:'Abbrechen',exact:true}).click();await page.getByRole('alertdialog').waitFor();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Firmenname',{exact:true}).inputValue(),'V21.7 Customer');
+    await page.getByRole('link',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/kunden');
+   }
+   await page.setViewportSize({width:390,height:740});await navigate(base+'/kunden/neu');await page.getByLabel('Firmenname',{exact:true}).fill('Optional fields skipped');await page.getByLabel('Ort',{exact:true}).fill('Bern');await page.getByRole('button',{name:'Weiter',exact:true}).click();
+   failCustomerWizard=true;await page.getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer unavailable',{exact:true}).waitFor();assert.equal(customerWizardWrites,1);assert.equal(await page.getByText('Kunde gespeichert.',{exact:true}).count(),0,'Failed creation cannot show success');
+   failCustomerWizard=false;await page.getByRole('button',{name:'Kunde speichern',exact:true}).dblclick();await page.waitForURL(base+'/kunden');assert.equal(customerWizardWrites,2,'Retry permits exactly one mutation');customerWizardFixture=false;
+   await navigate(base+'/mitarbeiter/employee-one');await page.getByRole('button',{name:'Mitarbeiteraktionen',exact:true}).filter({visible:true}).click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).click();
+   for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:740});
+    const fields=await page.locator('.form-field').filter({visible:true}).evaluateAll(nodes=>nodes.map(el=>{const label=el.querySelector(':scope>span').getBoundingClientRect(),control=el.querySelector('input,select').getBoundingClientRect();return {gap:control.top-label.bottom,height:control.height}}));
+    for(const field of fields){assert.ok(field.gap>=6&&field.gap<=8,'Employee labels use the shared field gap');assert.equal(field.height,width<=760?44:40,'Employee control height is canonical');}
+    assert.equal(await page.locator('.form-section').filter({visible:true}).count(),2,'Employee editing renders shared logical sections');
+    await page.getByRole('button',{name:'Speichern',exact:true}).scrollIntoViewIfNeeded();const save=await page.getByRole('button',{name:'Speichern',exact:true}).boundingBox();assert.ok(save.y>=0&&save.y+save.height<=741,'Last employee action is reachable');assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.evaluate(()=>scrollTo(0,0));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-employee-edit.png`),fullPage:true});
+   }
+   await page.setViewportSize({width:390,height:400});await page.getByLabel('Status',{exact:true}).scrollIntoViewIfNeeded();await page.getByRole('button',{name:'Speichern',exact:true}).scrollIntoViewIfNeeded();const save=await page.getByRole('button',{name:'Speichern',exact:true}).boundingBox();assert.ok(save.y+save.height<=401,'Employee save remains reachable at reduced height');
+  }
   if(hasInteraction('customers')){
     await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
     await page.getByRole('button',{name:'Kundenaktionen',exact:true}).filter({visible:true}).click();
