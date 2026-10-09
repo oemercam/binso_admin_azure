@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 
 /** Keep modal keyboard navigation inside the dialog and restore its trigger. */
 const modalStack:HTMLElement[]=[];
+/** Header shortcuts never stack a second panel over an active non-header modal. */
+export function hasBlockingModal(){return modalStack.some(dialog=>dialog.isConnected&&!dialog.matches(".header-panel"));}
 let savedOverflow="",savedRootOverflow="",savedScrollX=0,savedScrollY=0;
 
 export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=false, headerSelector=".mobile-header,.desktop-appbar") {

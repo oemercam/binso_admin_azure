@@ -34,6 +34,7 @@
     "qa:plan": "node scripts/qa-plan.mjs",
     "qa:plan:test": "node scripts/qa-plan-test.mjs",
     "ux:inventory": "node scripts/ux-inventory.mjs",
+    "ux:lab": "node scripts/ux-lab-test.mjs",
     "qa:integration": "node scripts/qa.mjs integration",
     "qa:release": "node scripts/qa.mjs full"
   },

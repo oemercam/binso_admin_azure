@@ -25,7 +25,7 @@ import { useDemoRows, swissDate, formatMinutes } from "./shared";
 export function EmployeesPage() {
   const {rows:employeeRows,loading,error}=useDemoRows("employees",employees);
   return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<CreateAction href="/mitarbeiter/neu" label="Mitarbeiter hinzufügen"/>}>
-    <RecordsView countLabel="Mitarbeiter" loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow personIdentity={id} href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
+    <RecordsView countLabel="Mitarbeiter" loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0,render:row=><span className="person-record"><Avatar name={row[0]} identity={row[4]?row[3]:row[0]}/><span>{row[0]}</span></span>},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow personIdentity={id} href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -146,7 +146,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     </DetailTabs>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
       {!editingRecord?<><div className="settings-profile"><Avatar name={displayName} identity={employeeId} size="large"/><span>{role}</span></div><SectionTitle title="Mitarbeiterdetails"/><dl className="detail-list">
-        <div className="employee-email"><dt>E-Mail</dt><dd>{email?<a href={"mailto:"+email}>{email}</a>:"Keine E-Mail hinterlegt"}</dd></div>
+        <div className="detail-list-stacked"><dt>E-Mail</dt><dd>{email?<a href={"mailto:"+email}>{email}</a>:"Keine E-Mail hinterlegt"}</dd></div>
         {phone&&<div><dt>Telefon</dt><dd><a href={"tel:"+phone}>{phone}</a></dd></div>}
         {entryDate&&<div><dt>Eintritt</dt><dd>{swissDate(entryDate)}</dd></div>}
         <div><dt>Wochenstunden</dt><dd>{formatQuantity(weeklyHours,"h/Woche")}</dd></div>

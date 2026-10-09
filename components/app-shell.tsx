@@ -7,7 +7,7 @@ import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import Image from "next/image";
-import { useDialogFocus } from "./use-dialog-focus";
+import { hasBlockingModal, useDialogFocus } from "./use-dialog-focus";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
@@ -105,12 +105,17 @@ export function AppShell({
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
   const shellRef=useRef<HTMLDivElement>(null);
+  const formBaseline=useRef("");
+  const touchedRef=useRef(false);
+  const formValues=()=>JSON.stringify(Array.from(shellRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('.form-field input,.form-field select,.form-field textarea,.mobile-line-field input,.mobile-line-field select,input[type=file]')??[]).map(el=>el instanceof HTMLInputElement&&['checkbox','radio'].includes(el.type)?el.checked:el.value));
+  // Hydrated backend values become the baseline until the first genuine edit.
+  useEffect(()=>{if(!formActive&&touchedRef.current){touchedRef.current=false;queueMicrotask(()=>{setFormDirty(false)})}if(formActive&&!touchedRef.current)formBaseline.current=formValues()});
   const dirty=unsavedChanges??formDirty;
   useEffect(()=>{
     if(!formActive)return;
     const root=shellRef.current;
     const changed=(event:Event)=>{
-      if(event.target instanceof Element&&event.target.closest('.form-field,.mobile-line-field'))setFormDirty(true);
+      if(event.target instanceof Element&&(event.target.closest('.form-field,.mobile-line-field')||event.target.matches('input[type=file]'))){touchedRef.current=true;setFormDirty(formValues()!==formBaseline.current);}
     };
     root?.addEventListener('input',changed);
     root?.addEventListener('change',changed);
@@ -224,15 +229,13 @@ export function AppShell({
     const onKeyDown=(event:KeyboardEvent)=>{
       if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k"){
         event.preventDefault();
+        if(formActive||hasBlockingModal())return;
         setSheet("search");
-      }
-      if(event.key==="Escape"){
-        setSheet(null);
       }
     };
     window.addEventListener("keydown",onKeyDown);
     return()=>window.removeEventListener("keydown",onKeyDown);
-  }, []);
+  }, [formActive]);
 
   useEffect(() => {
     if (!timerRunning) return;

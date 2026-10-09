@@ -1,0 +1,57 @@
+{
+  "level": "fast",
+  "effectiveCoverage": "fast",
+  "browserExecuted": false,
+  "scope": {
+    "level": "fast",
+    "files": [
+      "components/pages/products.tsx"
+    ],
+    "global": false,
+    "reason": "Changed modules only",
+    "routes": [
+      "/produkte/product-one",
+      "/produkte/neu",
+      "/produkte"
+    ],
+    "webkitRoutes": [
+      "/produkte/product-one",
+      "/produkte/neu",
+      "/produkte"
+    ],
+    "interactions": [
+      "products"
+    ],
+    "suites": [
+      "ux-regression-test"
+    ],
+    "widths": [
+      390,
+      768,
+      1440
+    ],
+    "webkitWidths": [
+      390,
+      768
+    ],
+    "themes": [
+      "light"
+    ]
+  },
+  "seconds": 6.29,
+  "timings": [
+    {
+      "label": "changed-file lint",
+      "seconds": 2.03
+    },
+    {
+      "label": "incremental typecheck",
+      "seconds": 3.28
+    },
+    {
+      "label": "ux-regression-test",
+      "seconds": 0.99
+    }
+  ],
+  "passed": true
+}
