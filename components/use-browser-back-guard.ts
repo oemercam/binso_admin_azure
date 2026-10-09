@@ -40,7 +40,15 @@ export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void){
   if(!dirty)return;
   const guard:DraftGuard={blocked:()=>blocked.current()};guards.add(guard);
   if(!boundary)boundary=armBoundary();
-  return()=>{guards.delete(guard);if(!guards.size){boundary?.cleanup();boundary=null}};
+  return()=>{
+   guards.delete(guard);
+   if(!guards.size){
+    const retiring=boundary;
+    // React cleans the closed sheet before registering its newly dirty parent.
+    // Keep that same history boundary until this commit's effect setups finish.
+    queueMicrotask(()=>{if(!guards.size&&boundary===retiring){boundary=null;retiring?.cleanup()}});
+   }
+  };
  },[dirty]);
  return ()=>boundary?.release();
 }

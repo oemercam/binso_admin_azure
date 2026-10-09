@@ -112,6 +112,7 @@
   --header-panel-top:64px;
   --header-panel-right:16px;
   --dialog-viewport-height:100dvh;
+  --dialog-available-height:min(var(--dialog-viewport-height),100dvh);
   --dialog-viewport-top:0px;
   --safe-top:0px;
   --safe-right:env(safe-area-inset-right,0px);

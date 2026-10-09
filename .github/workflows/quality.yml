@@ -117,8 +117,9 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/binso-candidate"
           unzip -q deploy/binso-one.zip -d "$RUNNER_TEMP/binso-candidate"
-      - name: Cache pinned browser binaries
-        uses: actions/cache@v4
+      - name: Restore pinned browser binaries
+        id: browser-cache
+        uses: actions/cache/restore@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-1.62.1-${{ matrix.engine }}
@@ -132,6 +133,12 @@ jobs:
           else
             node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps webkit
           fi
+      - name: Save installed browser binaries
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-1.62.1-${{ matrix.engine }}
       - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs

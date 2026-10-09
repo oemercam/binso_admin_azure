@@ -1012,7 +1012,7 @@
 }
 
 /* Mobile / PWA */
-@media (max-width:760px){.preference-row{grid-template-columns:minmax(0,1fr);gap:12px}.header-panel-layer{padding:0;justify-content:stretch}.header-panel{width:100%;max-height:calc(var(--dialog-viewport-height,100dvh) - var(--header-panel-top));border-radius:0 0 14px 14px;padding:0 max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}.header-panel-search{height:calc(var(--dialog-viewport-height,100dvh) - var(--header-panel-top))}
+@media (max-width:760px){.header-panel-layer{padding:0;justify-content:stretch}.header-panel{width:100%;max-height:calc(var(--dialog-available-height) - var(--header-panel-top));border-radius:0 0 14px 14px;padding:0 max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}.header-panel-search{height:calc(var(--dialog-available-height) - var(--header-panel-top))}
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
@@ -1836,9 +1836,7 @@
   .plan-hero .button{width:100%}
   .subscription-detail-grid,
   .documents-hub-grid{grid-template-columns:1fr}
-  .preference-head,
-  .preference-row{grid-template-columns:minmax(0,1fr) 58px 58px;gap:8px}
-  .preference-head{min-height:34px}
+  .preference-row{grid-template-columns:minmax(0,1fr);gap:12px}
   .choice-list{max-width:none;border-top:0}
   .choice-list button{min-height:64px}
   .choice-list button:first-child{border-top:0}
@@ -1878,7 +1876,7 @@
     width:100%;
     height:auto;
     min-height:0;
-    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
+    max-height:min(88dvh,760px,calc(var(--dialog-available-height) - var(--dialog-edge-gap)));
     padding-top:6px;
     border:1px solid var(--color-line);
     border-bottom:0;
@@ -2187,7 +2185,7 @@
   .sheet-layer-navigation .bottom-sheet{
     width:100%;
     max-width:100%;
-    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
+    max-height:min(88dvh,760px,calc(var(--dialog-available-height) - var(--dialog-edge-gap)));
     overflow-y:auto;
     overflow-x:hidden;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
@@ -2357,7 +2355,7 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .settings-choice-list :is(b,small){overflow:hidden;text-overflow:ellipsis}
 
   .bottom-sheet{
-    max-height:min(88dvh,760px,calc(var(--dialog-viewport-height) - var(--dialog-edge-gap)));
+    max-height:min(88dvh,760px,calc(var(--dialog-available-height) - var(--dialog-edge-gap)));
     padding-bottom:max(calc(14px + var(--safe-bottom)),18px);
   }
   .bottom-sheet :is(input,select,textarea){font-size:16px}

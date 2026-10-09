@@ -321,7 +321,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   gap:12px;
   border-bottom:1px solid var(--color-line);
 }
-.detail-list dt{color:var(--color-muted);font-size:12px}
+.detail-list dt{min-width:0;overflow-wrap:anywhere;color:var(--color-muted);font-size:12px}
 .detail-list dd{margin:0;font-size:12px;font-weight:550;overflow-wrap:anywhere}
 .detail-list>div:last-child,
 .operator-detail-list>div:last-child,
@@ -768,7 +768,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .ux-lab{padding:16px;max-width:100%;overflow-wrap:anywhere}
 .ux-lab>section{padding:20px 0;border-bottom:1px solid var(--color-line)}
 .ux-lab-viewer{height:600px;display:flex;flex-direction:column;min-width:0}
-.bottom-sheet[data-wizard]{height:calc(var(--dialog-viewport-height) - var(--dialog-edge-gap))}
+.bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
 .bottom-sheet[data-wizard] .form-wizard{min-height:0;display:flex;flex-direction:column;flex:1}
 .bottom-sheet[data-wizard] .wizard-content{min-height:0;flex:1;overflow:auto}
@@ -859,7 +859,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .danger-zone p{margin:4px 0 0;color:var(--color-muted);font-size:11px}
 
 .preference-table{max-width:820px;border-top:1px solid var(--color-line)}
-.preference-head,
 .preference-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,240px);align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--color-line)}
 .preference-channels{display:grid;gap:10px}
 .preference-channels>label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px}
@@ -993,7 +992,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 /* Sheets and overlays */
 .header-panel-layer{position:fixed;inset:var(--header-panel-top) 0 0;z-index:var(--layer-sheet);display:flex;align-items:flex-start;justify-content:flex-end;padding:8px var(--header-panel-right) 12px 16px;background:rgba(0,0,0,.24);overflow:hidden}
-.header-panel{display:flex;flex-direction:column;min-width:0;width:min(420px,100%);max-height:calc(var(--dialog-viewport-height,100dvh) - var(--header-panel-top) - 20px);padding:0 16px 16px;background:var(--color-bg);border-radius:12px;box-shadow:var(--shadow-modal);overflow:hidden;color:var(--color-fg)}
+.header-panel{display:flex;flex-direction:column;min-width:0;width:min(420px,100%);max-height:calc(var(--dialog-available-height) - var(--header-panel-top) - 20px);padding:0 16px 16px;background:var(--color-bg);border-radius:12px;box-shadow:var(--shadow-modal);overflow:hidden;color:var(--color-fg)}
 .header-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;min-height:48px;background:var(--color-bg)}
 .header-panel-heading h2{font-size:14px;margin:0;font-weight:600}
 .header-panel-heading .icon-button{width:40px;height:40px}
@@ -1520,7 +1519,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .timer-display small,.timer-display span{font-size:12px;color:var(--color-muted)}
 .pdf-page{min-width:0;background:white;color:black}
 .pdf-page canvas{display:block;max-width:100%}
-.document-modal{position:fixed;top:var(--dialog-viewport-top);left:0;right:0;z-index:100;display:flex;flex-direction:column;height:var(--dialog-viewport-height);overflow:hidden;background:var(--color-bg)}
+.document-modal{position:fixed;top:var(--dialog-viewport-top);left:0;right:0;z-index:100;display:flex;flex-direction:column;height:var(--dialog-available-height);overflow:hidden;background:var(--color-bg)}
 .document-modal>header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);flex:none;height:calc(58px + var(--safe-top));padding:var(--safe-top) max(14px,var(--safe-right)) 0 max(14px,var(--safe-left));border-bottom:1px solid var(--color-line)}
 .document-modal-body{display:flex;flex:1;min-height:0;min-width:0;overflow:hidden}
 .document-page-viewer{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0}
@@ -1582,8 +1581,8 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .document-modal-header-spacer{display:none}
 .document-modal>header>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .document-modal-header-actions button:disabled{opacity:.4}
-.sheet-layer{top:var(--dialog-viewport-top);bottom:auto;height:var(--dialog-viewport-height)}
-.sheet-layer>.bottom-sheet{max-height:calc(var(--dialog-viewport-height) - var(--dialog-edge-gap));display:flex;flex-direction:column;overflow:hidden}
+.sheet-layer{top:var(--dialog-viewport-top);bottom:auto;height:var(--dialog-available-height)}
+.sheet-layer>.bottom-sheet{max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap));display:flex;flex-direction:column;overflow:hidden}
 
 /* One form action at every viewport; labels may wrap in narrow grid columns. */
 .form-field>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}

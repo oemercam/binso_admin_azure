@@ -15,7 +15,7 @@ export function Avatar({name="",identity,src,size="medium"}:{name?:string;identi
  const [failed,setFailed]=useState<string|null>(null);
  const {initials,tone}=avatarIdentity(name,identity??name);
  const image=src&&src!==failed&&(/^(\/[^/]|https:\/\/)/.test(src));
- return <span className={`person-avatar person-avatar-${size} person-avatar-tone-${tone}`} aria-label={name||"Person"}>
+ return <span className={`person-avatar person-avatar-${size} person-avatar-tone-${tone}`} role="img" aria-label={name||"Person"}>
   {image?<img src={src} alt="" onError={()=>setFailed(src)}/>:initials||<Icon name="user" size={size==="large"?22:16}/>}
  </span>;
 }

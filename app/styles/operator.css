@@ -191,8 +191,9 @@
 .service-list{margin-top:12px}
 .service-list>div,
 .mini-stat{min-height:48px;padding:11px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--color-line);font-size:11px}
-.notice{margin-top:14px;padding:14px 0;border-top:1px solid var(--color-line);border-bottom:0}
-.notice span{color:var(--color-muted);font-size:10px}
+.notice{display:grid;gap:8px;min-width:0;margin-top:14px;padding:14px 0;border-top:1px solid var(--color-line);border-bottom:0}
+.notice>span:not(.status){color:var(--color-muted);font-size:10px;overflow-wrap:anywhere}
+.notice>.status,.notice>.button{justify-self:start}
 
 .operator-root .priority{
   width:7px;

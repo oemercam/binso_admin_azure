@@ -36,11 +36,11 @@ const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_
 const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent'};
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
-const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z'};
+const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
-const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator'];
+const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);if(process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));}
 async function actionEvidence(page,name,theme){
@@ -56,6 +56,7 @@ async function actionEvidence(page,name,theme){
 }
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
 let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
+let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -74,10 +75,13 @@ try{
     if(p==='/api/files'){uploads++;return route.fulfill({json:{item:{id:'receipt-one'}}});}
     if(p==='/api/settings/team/invitations'||p.startsWith('/api/settings/team/members/')){teamPosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failTeam?503:200,json:failTeam?{message:'Fixture team unavailable'}:{ok:true}});}
     if(p==='/api/time-entries/policy'){policyPosts++;await new Promise(resolve=>setTimeout(resolve,150));if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});policyRequired=JSON.parse(req.postData()).required;return route.fulfill({json:{time_approval_required:policyRequired}});}
+    if(p==='/api/settings/notifications'){notificationWrites++;await new Promise(resolve=>setTimeout(resolve,100));return route.fulfill({status:failNotificationWrite?503:200,json:failNotificationWrite?{message:'Fixture notification unavailable'}:{ok:true}});}
+    if(p.startsWith('/api/auth/sessions')){sessionDeletes++;return route.fulfill({json:{ok:true,revoked:1}});}
     if(p==='/api/operator/logout')return route.fulfill({status:503,json:{message:'Fixture logout unavailable'}});
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
+   if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
    let data;
    if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
    else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:'member',created_at:'2026-10-08'}],invitations:[],userLimit:10,plan:'pro'};
@@ -88,8 +92,15 @@ try{
    else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
    else if(p==='/api/settings/notifications')data={items:[{kind:'Rechnungen',email:true,push:false}]};
    else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>setTimeout(resolve,450));data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
+   else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
+   else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
+   else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
+   else if(p==='/api/billing/catalog')data={live:false,demo:false,automaticTax:false,items:[]};
+   else if(p==='/api/auth/mfa')data={enabled:true,required:true,role:'owner'};
+   else if(p==='/api/auth/sessions')data={items:[{id:'session-current',current:true,userAgent:'Mozilla/5.0 (iPhone) Version/17.0 Mobile Safari/605.1.15',lastSeenAt:'2026-10-09T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'},{id:'session-other',current:false,userAgent:'Mozilla/5.0 (Windows) Chrome/130.0',lastSeenAt:'2026-10-08T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'}]};
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
    else if(p==='/api/finance/overview')data=summary;
+   else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
    else if(p==='/api/demo/data')data={items:(collections[url.searchParams.get('collection')]??[]).filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
@@ -272,6 +283,13 @@ try{
    teamPosts=0;failTeam=false;await navigate(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Mitarbeiter einladen',exact:true}).filter({visible:true}).click();const invitation=page.getByRole('dialog',{name:'Einladung',exact:true});await invitation.getByLabel('E-Mail',{exact:true}).fill('invalid');await invitation.getByRole('button',{name:'Einladen',exact:true}).click();assert.equal(teamPosts,0,'Invalid invitations do not write');await invitation.getByLabel('E-Mail',{exact:true}).fill('team@example.invalid');failTeam=true;await invitation.getByRole('button',{name:'Einladen',exact:true}).dblclick();await page.getByText('Fixture team unavailable',{exact:true}).waitFor();assert.equal(teamPosts,1,'Invitation locks duplicate writes');assert.equal(await invitation.getByLabel('E-Mail',{exact:true}).inputValue(),'team@example.invalid');failTeam=false;await invitation.getByRole('button',{name:'Einladen',exact:true}).click();await invitation.waitFor({state:'hidden'});assert.equal(teamPosts,2,'Invitation failure can be retried');
   }
   if(hasInteraction('documents')){
+  await navigate(base+'/rechnungen');await page.waitForLoadState('networkidle');await page.locator('a[href="/rechnungen/neu"]').filter({visible:true}).first().click();await page.waitForURL(base+'/rechnungen/neu');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.locator('.mobile-position-summary').first().click();
+  const appliedPosition=page.getByRole('dialog',{name:'Position bearbeiten',exact:true});await appliedPosition.getByLabel('Beschreibung',{exact:true}).fill('Übernommener Entwurf');await appliedPosition.getByRole('button',{name:'Übernehmen',exact:true}).click();await appliedPosition.waitFor({state:'hidden'});
+  await page.evaluate(()=>history.back());
+  const parentDiscard=page.getByRole('alertdialog');try{await parentDiscard.waitFor()}catch(error){console.log('Draft-transfer diagnostics',page.url(),await page.evaluate(()=>history.state));throw error;}
+  await parentDiscard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.locator('.mobile-position-summary').first().innerText().then(text=>text.includes('Übernommener Entwurf')),true,'Applying a child sheet preserves the parent draft and its back guard');
+  await page.evaluate(()=>history.back());await parentDiscard.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/rechnungen');
   await navigate(base+'/rechnungen/neu');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Weiter',exact:true}).click();
   await page.locator('.mobile-position-summary').first().click();
@@ -409,7 +427,9 @@ try{
     await panel.getByLabel('Suchen',{exact:true}).fill('old');await page.waitForTimeout(220);await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
     await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();await page.waitForTimeout(500);assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-search.png`)});
-    await page.setViewportSize({width,height:400});assert.ok((await panel.boundingBox()).y+(await panel.boundingBox()).height<=401,'Search remains bounded with keyboard-sized viewport');
+    await page.setViewportSize({width,height:400});
+    const keyboardGeometry=await panel.evaluate(el=>{const root=document.documentElement,previous=root.style.getPropertyValue('--dialog-viewport-height');root.style.setProperty('--dialog-viewport-height','740px');const box=el.getBoundingClientRect();root.style.setProperty('--dialog-viewport-height',previous);return {top:box.top,bottom:box.bottom,height:innerHeight}});
+    assert.ok(keyboardGeometry.bottom<=401,'Search remains bounded even while the VisualViewport callback is pending: '+JSON.stringify(keyboardGeometry));
     await page.setViewportSize({width,height:740});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
     assert.equal(await page.evaluate(()=>scrollY),scroll,'Closing panel retains document scroll position');
     await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();
@@ -437,7 +457,24 @@ try{
    const field=page.getByLabel(scenario.field,{exact:true});const original=await field.inputValue();await field.fill(original+' geändert');await field.fill(original);await page.waitForTimeout(100);
    await page.locator('.mobile-back').click();await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
+  if(hasInteraction('settings')){
+   await page.setViewportSize({width:320,height:740});await navigate(base+'/einstellungen/benachrichtigungen');await page.waitForLoadState('networkidle');
+   for(const row of await page.locator('.preference-row').all()){
+    const geometry=await row.evaluate(el=>{const description=el.firstElementChild.getBoundingClientRect(),channels=el.querySelector('.preference-channels').getBoundingClientRect(),label=el.querySelector('.preference-channels label span').getBoundingClientRect();return {description,channels,label}});
+    assert.ok(geometry.channels.y>=geometry.description.bottom,'Mobile notification channels follow the category');assert.ok(geometry.channels.width>=geometry.description.width-1,'Channels use the entire row width');assert.ok(geometry.label.height<=22,'E-Mail stays on one line');
+   }
+   notificationWrites=0;failNotificationWrite=true;const emailPreference=page.getByRole('switch',{name:'E-Mail Rechnungen',exact:true});await emailPreference.dblclick();await page.getByRole('alert').filter({hasText:'Einstellung konnte nicht gespeichert werden.'}).waitFor();assert.equal(notificationWrites,1,'Notification writes lock repeated clicks');assert.equal(await emailPreference.getAttribute('aria-checked'),'true','Failed optimistic preference returns to saved value');failNotificationWrite=false;await emailPreference.click();await page.getByRole('alert').filter({hasText:'Einstellung konnte nicht gespeichert werden.'}).waitFor({state:'hidden'});assert.equal(await emailPreference.getAttribute('aria-checked'),'false');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-notification-preferences.png`)});
+   await navigate(base+'/einstellungen/dokumente');await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();const documentGeometry=await page.evaluate(()=>({header:document.querySelector('.mobile-header').getBoundingClientRect().height,rows:[...document.querySelectorAll('.detail-list>div')].map(row=>({label:row.querySelector('dt').getBoundingClientRect().toJSON(),value:row.querySelector('dd').getBoundingClientRect().toJSON(),labelOverflow:row.querySelector('dt').scrollWidth-row.querySelector('dt').clientWidth}))}));assert.ok(documentGeometry.header<=64,'Long settings title keeps a compact header');for(const row of documentGeometry.rows){assert.ok(row.label.right<=row.value.left,'Detail labels cannot collide with values');assert.ok(row.labelOverflow<=1,'Detail labels wrap within their column')}
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-document-settings.png`)});
+   await navigate(base+'/einstellungen/sicherheit');await page.getByText('Safari · iPhone',{exact:true}).waitFor();await page.getByText('Chrome · Windows',{exact:true}).waitFor();
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-security-settings.png`)});
+   sessionDeletes=0;await page.getByRole('button',{name:'Abmelden',exact:true}).click();const revoke=page.getByRole('alertdialog');await revoke.waitFor();assert.equal(sessionDeletes,0,'Opening session confirmation does not revoke');await revoke.getByRole('button',{name:'Abbrechen',exact:true}).click();assert.equal(sessionDeletes,0);await page.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.waitFor({state:'hidden'});assert.equal(sessionDeletes,1);await page.getByText('Dieses Gerät',{exact:false}).waitFor();
+   securityUnavailable=true;await navigate(base+'/einstellungen/sicherheit');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).waitFor();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).waitFor();assert.equal(await page.getByText('Keine aktive Sitzung gefunden.',{exact:true}).count(),0,'Failed session load is not an empty session list');assert.equal(await page.getByText('Sicherheitsstatus wird geladen…',{exact:true}).count(),0,'Failed security load is not perpetual loading');securityUnavailable=false;await page.getByLabel('Neues Passwort',{exact:true}).fill('Draft retained through retry');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Safari · iPhone',{exact:true}).waitFor();assert.equal(await page.getByLabel('Neues Passwort',{exact:true}).inputValue(),'Draft retained through retry','Retry preserves unsaved security inputs');
+   await navigate(base+'/einstellungen/abonnement');await page.getByText('Nutzung',{exact:true}).waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-subscription-settings.png`)});
+  }
   if(hasInteraction('operator')){
+   await page.setViewportSize({width:320,height:740});await navigate(base+'/operator/sperrungen');await page.waitForLoadState('networkidle');const notice=await page.locator('.notice').evaluate(el=>[...el.children].map(child=>child.getBoundingClientRect().toJSON()));for(let i=1;i<notice.length;i++)assert.ok(notice[i].top>=notice[i-1].bottom+7,'Restriction details occupy separated rows');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-operator-restrictions.png`)});
    await navigate(base+'/operator');await page.waitForLoadState('networkidle');
    await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
    const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();
