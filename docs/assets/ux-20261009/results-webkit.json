@@ -1,0 +1,859 @@
+{
+  "browser": "webkit",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "customers",
+    "products",
+    "employees",
+    "documents",
+    "finance",
+    "time",
+    "expenses",
+    "chat",
+    "billing"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/support/ticket-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/zeit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/mitarbeiter/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/mitarbeiter/employee-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/projekte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/kunden/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/produkte/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/zahlungen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/spesen/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/angebote/neu",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/zahlungen/neu",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

@@ -10,7 +10,7 @@ import { AppShell } from "../app-shell";
 import { customers } from "@/lib/demo-data";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, Field, Icon, SectionTitle, Status, Toast, Input, Select } from "../ui";
-import { ActionSheet, FormSheet, FilterSheet } from "../binso-ux";
+import { DetailTabs, ActionSheet, FormSheet, FilterSheet } from "../binso-ux";
 import { formatMinutes, swissDate } from "./shared";
 
 export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
@@ -142,7 +142,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   return <AppShell title="Zeiterfassung" subtitle="Arbeitszeit einfach und präzise erfassen." active="zeit" backHref={returnTo} backLabel="Übersicht">
 
     {searchParams.get("projectId")&&availableProjects.filter(project=>project.id===searchParams.get("projectId")).map(project=><section className="surface" key={project.id}><SectionTitle title={project.name}/><p>{availableCustomers.find(customer=>customer.id===project.customer_id)?.name??'Intern'} · {({planned:'Geplant',active:'Aktiv',in_progress:'Aktiv',blocked:'Blockiert',completed:'Abgeschlossen',cancelled:'Storniert'} as Record<string,string>)[project.status??'']??project.status}</p><p>{Number(project.hours??0).toLocaleString('de-CH',{maximumFractionDigits:2})} h erfasst · {Number(project.invoiced_hours??0).toLocaleString('de-CH',{maximumFractionDigits:2})} h verrechnet</p>{project.invoice_numbers?.map(number=><Link key={number} href={'/rechnungen/'+encodeURIComponent(number)}>{number}</Link>)}</section>)}
-    <div className="tabs" role="tablist" aria-label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></div>
+    <DetailTabs role="tablist" label="Zeiterfassung"><button role="tab" aria-selected={timeTab==="timer"} className={timeTab==="timer"?"active":""} onClick={()=>setTimeTab("timer")}>Timer</button><button role="tab" aria-selected={timeTab==="entries"} className={timeTab==="entries"?"active":""} onClick={()=>setTimeTab("entries")}>Einträge</button></DetailTabs>
     {canApprove&&timeTab==="entries"&&<Button className="time-project-create" variant="secondary" href="/projekte/neu" icon="plus">Auftrag / Projekt starten</Button>}
     {employeeFilter&&<p role="status">Arbeitszeiten des ausgewählten Mitarbeiters · <Link href="/zeit">Alle anzeigen</Link></p>}
     {timeTab==="entries"&&<div className="toolbar time-filter-toolbar"><label className="searchbox"><Icon name="search"/><Input aria-label="Zeiteinträge suchen" placeholder="Kunde, Mitarbeiter oder Tätigkeit suchen" value={entryQuery} onChange={e=>setEntryQuery(e.target.value)}/></label><button type="button" className="icon-button" aria-label="Zeitfilter" onClick={()=>{setPendingFrom(entryFrom);setPendingTo(entryTo);setTimeFilterOpen(true)}}><Icon name="filter"/></button></div>}

@@ -1,0 +1,565 @@
+{
+  "url": "http://127.0.0.1:3620/kunden/customer-one",
+  "viewport": {
+    "width": 320,
+    "height": 740
+  },
+  "documentWidth": 320,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Prüffirma AGAktivBernÜbersichtKontakteFinanzenAktivitätKontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20HauptkontaktÜbersichtKontakte 1A",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 52,
+        "width": 320,
+        "height": 385
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "385px",
+        "min-height": "0px",
+        "padding": "14px 16px 104px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "(min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "(max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-header",
+      "tag": "HEADER",
+      "classes": "mobile-header mobile-header-detail",
+      "text": "Prüffirma AGAktiv",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 52
+      },
+      "computed": {
+        "display": "grid",
+        "position": "sticky",
+        "height": "52px",
+        "min-height": "52px",
+        "padding": "0px 16px",
+        "margin": "0px",
+        "gap": "0px",
+        "grid-template-columns": "44px 197px 47px",
+        "grid-template-rows": "51px",
+        "align-items": "center",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bottom-nav, .desktop-appbar, .mobile-header",
+          "css": "display: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header.mobile-header-detail",
+          "css": "grid-template-columns: 44px minmax(0px, 1fr) auto; background: var(--color-bg); backdrop-filter: none; filter: none; opacity: 1;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header",
+          "css": "position: sticky; top: 0px; z-index: 20; height: calc(var(--mobile-header-h) + var(--safe-top)); min-height: calc(var(--mobile-header-h) + var(--safe-top)); padding-top: var(--safe-top); padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header",
+          "css": "width: 100%; max-width: 100%; isolation: isolate; background: var(--color-bg); backdrop-filter: none; opacity: 1;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header-detail",
+          "css": "display: grid; grid-template-columns: 44px minmax(0px, 1fr) 44px; align-items: center; gap: 0px; position: sticky; padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); height: auto; min-height: calc(var(--mobile-header-h) + var(--safe-top));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtKontakteFinanzenAktivität",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 66,
+        "width": 304,
+        "height": 45
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "height": "45px",
+        "min-height": "0px",
+        "padding": "0px 0px 10px 16px",
+        "margin": "0px 0px 16px -16px",
+        "gap": "6px",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".desktop-detail-main > .tabs",
+          "css": "margin-top: 0px; margin-bottom: 20px; padding-bottom: 10px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-detail-main",
+      "tag": "DIV",
+      "classes": "desktop-detail-main",
+      "text": "ÜbersichtKontakteFinanzenAktivitätKontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 16,
+        "y": 66,
+        "width": 288,
+        "height": 243
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "243px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".desktop-detail-main, .entity-edit-main",
+          "css": "min-width: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".customer-tab-panel",
+      "tag": "SECTION",
+      "classes": "customer-tab-panel",
+      "text": "KontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 16,
+        "y": 127,
+        "width": 288,
+        "height": 182
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "182px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".account-sheet, .customer-tab-panel, .employee-tab-panel, .global-search, .invoice-master-detail, .notification-center-list, .quick-create-menu",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".customer-tab-panel, .dashboard-grid > .surface, .detail-card, .detail-grid > .surface, .documents-hub-grid > .surface, .employee-tab-panel, .settings-detail-grid > .surface",
+          "css": "padding: var(--desktop-section-y) 0; border-left: 0px; border-right: 0px; border-radius: 0px; box-shadow: none; background: transparent;",
+          "contexts": [
+            "(min-width: 761px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".customer-tab-panel, .dashboard-grid > .surface, .detail-card, .detail-grid > .surface, .documents-hub-grid > .surface, .employee-tab-panel, .settings-detail-grid > .surface",
+          "css": "border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "(min-width: 761px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".customer-tab-panel",
+          "css": "max-width: none;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".customer-tab-panel, .detail-card, .employee-tab-panel, .form-page, .form-page.narrow, .settings-detail-grid",
+          "css": "width: 100%; max-width: none;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".customer-tab-panel, .detail-card, .employee-tab-panel, .security-card, .settings-detail-grid > .surface, .subscription-detail-grid > .surface",
+          "css": "margin: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".customer-tab-panel, .employee-tab-panel, .tabs + .detail-grid > .surface:first-child, .tabs + .surface",
+          "css": "border-top: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".customer-tab-panel, .employee-tab-panel",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".contact-list>div",
+      "tag": "DIV",
+      "classes": "",
+      "text": "AMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 16,
+        "y": 179,
+        "width": 288,
+        "height": 130
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "height": "130px",
+        "min-height": "62px",
+        "padding": "10px 0px",
+        "margin": "0px",
+        "gap": "12px",
+        "grid-template-columns": "38px 190px 36px",
+        "grid-template-rows": "110px",
+        "align-items": "start",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".compact-list > a:last-child, .compact-list > div:last-child, .contact-list > div:last-child, .detail-list > div:last-child, .operator-detail-list > div:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".contact-list > div",
+          "css": "min-height: 62px; padding: 10px 0px; display: grid; grid-template-columns: 38px minmax(0px, 1fr) auto; gap: 12px; align-items: start; border-bottom: 1px solid var(--color-line);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".contact-list > div",
+          "css": "min-height: 56px; padding: 8px 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".customer-tab-panel .compact-list > a:last-child, .customer-tab-panel .contact-list > div:last-child, .customer-tab-panel .timeline > div:last-child, .employee-tab-panel .compact-list > a:last-child, .employee-tab-panel .detail-list > div:last-child, .surface > .activity-list:last-child > a:last-child, .surface > .compact-list:last-child > a:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".contact-main",
+      "tag": "DIV",
+      "classes": "contact-main",
+      "text": "Alex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 66,
+        "y": 189,
+        "width": 190,
+        "height": 110
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "110px",
+        "min-height": "auto",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".contact-main",
+          "css": "min-width: 0px; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

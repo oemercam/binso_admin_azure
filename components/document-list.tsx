@@ -1,7 +1,7 @@
 "use client";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
-import {ListRow} from "./binso-ux";
+import {ListRow,DetailTabs} from "./binso-ux";
 
 import {financialStatus,financialStatusLabels,documentDateLabel,openAmount,formatCurrency,formatDate,type FinancialDocument} from '@/lib/financial-status';
 import {RecordsView} from './records';
@@ -13,7 +13,7 @@ export function DocumentList({items,kind,loading=false,error=null,outstanding=fa
  const placeholder=context==='customer'?'Angebote und Rechnungen suchen...':`${label} suchen...`;
  return <RecordsView items={rows} typeIndex={4} loading={loading} error={error} placeholder={placeholder} countLabel={label} sortValue={(row,index)=>index===2?row[6]:row[index]} chips={outstanding?['Alle','Überfällig']:kind==='invoice'?['Alle','Entwurf','Offen','Überfällig','Bezahlt']:kind==='offer'?['Alle','Entwurf','Versendet','Angenommen','Abgelehnt','Abgelaufen']:['Alle','Angebote','Rechnungen']} statusGroups={{Offen:['Teilweise bezahlt','Überfällig']}} emptyLabel={chip=>chip==='Alle'&&outstanding?'Keine offenen Rechnungen':chip==='Alle'?`Keine ${context==='customer'?'Angebote oder Rechnungen':label} erfasst`:kind==='invoice'?`Keine ${({'Entwurf':'Rechnungsentwürfe','Offen':'offenen Rechnungen','Überfällig':'überfälligen Rechnungen','Bezahlt':'bezahlten Rechnungen'} as Record<string,string>)[chip]??'Rechnungen'}`:kind==='offer'?({'Entwurf':'Keine Angebotsentwürfe','Versendet':'Keine versendeten Angebote','Angenommen':'Keine angenommenen Angebote','Abgelehnt':'Keine abgelehnten Angebote','Abgelaufen':'Keine abgelaufenen Angebote'} as Record<string,string>)[chip]??'Keine Angebote':`Keine ${chip} erfasst`} columns={[{label:'Nummer',index:0},{label:'Kunde',index:1},{label:'Datum / Fälligkeit',index:2},{label:'Betrag',index:3,align:'right'},{label:'Status',index:5,status:true}]} rowHref={href}>{row=><DocumentSummaryRow item={items.find(item=>item.number===row[0]&&item.kind===(row[4]==='Rechnung'?'invoice':'offer'))!}/>}</RecordsView>;
 }
-export function FinanceTabs(){const path=usePathname();return <nav className="tabs" aria-label="Finanzen"><Link href="/finanzen" className={path==="/finanzen"?"active":""} aria-current={path==="/finanzen"?"page":undefined}>Übersicht</Link><Link href="/angebote" className={path==="/angebote"?"active":""} aria-current={path==="/angebote"?"page":undefined}>Angebote</Link><Link href="/rechnungen" className={path==="/rechnungen"?"active":""} aria-current={path==="/rechnungen"?"page":undefined}>Rechnungen</Link><Link href="/zahlungen" className={path==="/zahlungen"?"active":""} aria-current={path==="/zahlungen"?"page":undefined}>Zahlungen</Link></nav>;}
+export function FinanceTabs(){const path=usePathname();return <DetailTabs label="Finanzen"><Link href="/finanzen" className={path==="/finanzen"?"active":""} aria-current={path==="/finanzen"?"page":undefined}>Übersicht</Link><Link href="/angebote" className={path==="/angebote"?"active":""} aria-current={path==="/angebote"?"page":undefined}>Angebote</Link><Link href="/rechnungen" className={path==="/rechnungen"?"active":""} aria-current={path==="/rechnungen"?"page":undefined}>Rechnungen</Link><Link href="/zahlungen" className={path==="/zahlungen"?"active":""} aria-current={path==="/zahlungen"?"page":undefined}>Zahlungen</Link></DetailTabs>;}
 
 /** One document row, compact in summaries and with a labelled balance in lists. */
 export function DocumentSummaryRow({item,customerHeading=false,compact=false}:{item:DocumentListItem;customerHeading?:boolean;compact?:boolean}){

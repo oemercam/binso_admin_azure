@@ -6,7 +6,9 @@ for(const path of ['app/styles/app.css','components/ui.tsx','components/records.
 for(const path of ['.github/workflows/quality.yml','database/migrations/new.sql','app/api/auth/session/route.ts','components/unmapped.tsx'])assert.deepEqual(planChanges([path]).routes,fullRoutes,path);
 assert.deepEqual(planChanges(['docs/readme.md']).routes,[]);
 assert.deepEqual(planChanges(['components/documents.tsx']).interactions,['documents']);
-assert.equal(planChanges([],{level:'full'}).routes.length,58);
+assert.equal(planChanges([],{level:'full'}).routes.length,fullRoutes.length);
+const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('docs/architecture/ux-inventory.json','utf8'));
+for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[id\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');
 assert.throws(()=>planChanges([],{level:'skip'}));
 console.log('QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.');

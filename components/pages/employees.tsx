@@ -1,4 +1,5 @@
 "use client";
+import {DetailTabs} from "../binso-ux";
 
 import { tenantCan } from "@/lib/permissions";
 import { limitsConfig, megabytes } from "@/config/limits";
@@ -129,12 +130,12 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
-    {existing && <div className="tabs" role="tablist" aria-label="Mitarbeiterbereiche">
+    {existing && <DetailTabs role="tablist" label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}>Übersicht</button>
       <button role="tab" aria-selected={employeeTab==="time"} className={employeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}>Arbeitszeit</button>
       <button role="tab" aria-selected={employeeTab==="expenses"} className={employeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}>Spesen</button>
       <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}>Dokumente</button>
-    </div>}
+    </DetailTabs>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
       {!editingRecord?<><SectionTitle title="Mitarbeiterdetails"/><dl className="detail-list">
         <div className="employee-email"><dt>E-Mail</dt><dd>{email?<a href={"mailto:"+email}>{email}</a>:"Keine E-Mail hinterlegt"}</dd></div>

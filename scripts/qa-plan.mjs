@@ -3,6 +3,8 @@ import {fileURLToPath} from 'node:url';
 import fs from 'node:fs';
 
 export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu','/benachrichtigungen','/kunden/customer-one/bearbeiten','/einstellungen/konto','/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/benachrichtigungen','/einstellungen/sprache','/einstellungen/sicherheit','/einstellungen/datenschutz','/einstellungen/zeiterfassung'];
+// Include every page file, redirect, read-only preview and operator section.
+fullRoutes.push('/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
 export const webkitFullRoutes=['/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 const groups={
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},
@@ -14,12 +16,12 @@ const groups={
  time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu','/einstellungen/zeiterfassung'],interactions:['time']},
  expenses:{match:/expense|spesen/,routes:['/spesen','/spesen/expense-one','/spesen/neu'],interactions:['expenses']},
  chat:{match:/support|chat|ticket|workspace-viewport/,routes:['/support','/support/ticket-one','/support/neu'],interactions:['chat']},
- settings:{match:/setting|einstellungen/,routes:['/einstellungen','/einstellungen/darstellung','/benachrichtigungen'],interactions:[]},
+ settings:{match:/setting|einstellungen/,routes:['/einstellungen','/einstellungen/darstellung','/benachrichtigungen','/einstellungen/abonnement'],interactions:['billing']},
  operator:{match:/operator/,routes:fullRoutes.filter(r=>r.startsWith('/operator')),interactions:[]},
  public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public\//,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo'],interactions:[]},
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
-const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat'];
+const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing'];
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();

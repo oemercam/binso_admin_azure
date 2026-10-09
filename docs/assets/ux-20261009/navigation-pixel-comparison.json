@@ -1,0 +1,47 @@
+[
+  {
+    "file": "light-430-_finanzen-nav.png",
+    "size": [
+      406,
+      69
+    ],
+    "excluded": [
+      0,
+      16,
+      66,
+      69
+    ],
+    "exclusionReason": "Next.js development indicator overlaid on baseline, not navigation markup",
+    "differenceOutsideOverlay": null
+  },
+  {
+    "file": "light-430-_rechnungen_RE-TEST-1-nav.png",
+    "size": [
+      406,
+      69
+    ],
+    "excluded": [
+      0,
+      16,
+      66,
+      69
+    ],
+    "exclusionReason": "Next.js development indicator overlaid on baseline, not navigation markup",
+    "differenceOutsideOverlay": null
+  },
+  {
+    "file": "light-430-_kunden_customer-one-nav.png",
+    "size": [
+      406,
+      69
+    ],
+    "excluded": [
+      0,
+      16,
+      66,
+      69
+    ],
+    "exclusionReason": "Next.js development indicator overlaid on baseline, not navigation markup",
+    "differenceOutsideOverlay": null
+  }
+]

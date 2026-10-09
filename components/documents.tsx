@@ -4,14 +4,13 @@ import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {tenantCan} from "@/lib/permissions";
-import { SwissQRBill } from "swissqrbill/svg";
-import { createQrBillData, invoicePaymentIssue, responsiveQrSvg } from "@/lib/qr-bill";
+import { invoicePaymentIssue } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
 import { ActionSheet, FormSheet } from "./binso-ux";
-import {PdfPreview} from "./pdf-preview";
-import { Button, EmptyState, Field, Icon, IconButton, Status, Toast, FormActions, Input, Select, Textarea } from "./ui";
+import {DocumentPageViewer} from "./pdf-preview";
+import { Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea } from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
@@ -329,13 +328,14 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const processAction=async(action:string)=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/status",{action});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setMoreOpen(false);show("Status aktualisiert.")}catch(e){setActionError(e instanceof Error?e.message:"Status konnte nicht geändert werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
   const sendDocument=async()=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show("Dokument als PDF versendet.")}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
   const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&Number(draft.total??0)>Number(draft.paidAmount??0);
+  const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
     ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/></div>;
   const desktopActions=headerActions;
 
-  return <AppShell title={title} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
+  return <AppShell title={title} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
     {actionError&&!moreOpen&&!sendOpen&&<p role="alert">{actionError}</p>}
     {editing&&companyPending&&<p role="status">Firmendaten werden geladen …</p>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
@@ -372,6 +372,15 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   </AppShell>;
 }
 
+function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number){
+  const isInvoice=type==="Rechnung";
+  const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
+  const displayStatus=financialStatus({kind:isInvoice?"invoice":"offer",status:draft.status,total,paid_amount:draft.paidAmount,due_date:dueDate?dueDate.split(".").reverse().join("-"):null,valid_until:isInvoice?null:draft.due});
+  const statusLabel=financialStatusLabels[displayStatus]??({draft:"Entwurf",sent:type==="Angebot"?"Versendet":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
+  const statusTone: "success"|"danger"|"warning"|"neutral"=displayStatus==="paid"||displayStatus==="accepted"?"success":displayStatus==="overdue"||displayStatus==="cancelled"||displayStatus==="declined"||displayStatus==="expired"?"danger":["open","partial","sent"].includes(displayStatus)?"warning":"neutral";
+  return {displayStatus,statusLabel,statusTone,dueDate};
+}
+
 function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
   const totals=useDocumentTotals(draft);
   const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
@@ -379,13 +388,11 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const outstanding=Math.max(0,totals.total-Number(draft.paidAmount??0));
-  const displayStatus=financialStatus({kind:isInvoice?"invoice":"offer",status:draft.status,total:totals.total,paid_amount:draft.paidAmount,due_date:dueDate?dueDate.split(".").reverse().join("-"):null,valid_until:isInvoice?null:draft.due});
-  const statusLabel=financialStatusLabels[displayStatus]??({draft:"Entwurf",sent:type==="Angebot"?"Versendet":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
-  const statusTone=displayStatus==="paid"||displayStatus==="accepted"?"success":displayStatus==="overdue"||displayStatus==="cancelled"||displayStatus==="declined"||displayStatus==="expired"?"danger":["open","partial","sent"].includes(displayStatus)?"warning":"neutral";
+  const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
       <span className="eyebrow">KUNDE</span>
-      <div className="document-customer-heading"><h2>{draft.customer}</h2>{draft.status&&<Status tone={statusTone}>{statusLabel}</Status>}</div>
+      <div className="document-customer-heading"><h2>{draft.customer}</h2></div>
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
     </section>
     <section className="document-facts">
@@ -499,16 +506,16 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
   </div>;
 }
 
-function DocumentModal({ title, onClose, pdfNumber, previewDraft }: { title:string; onClose:()=>void; pdfNumber?:string;previewDraft?:DocumentDraft&{kind:DocumentKind} }) {
+export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl }: { title:string; onClose:()=>void; pdfNumber?:string;previewDraft?:DocumentDraft&{kind:DocumentKind};fileUrl?:string }) {
   const [pdfBlob,setPdfBlob]=useState<Blob|null>(null);
   const [pdfError,setPdfError]=useState<string|null>(null);
   const pdfFile=useRef<File|null>(null);
   const previewJson=JSON.stringify(previewDraft);
   useEffect(()=>{
     let active=true;
-    fetch(pdfNumber?"/api/documents/"+encodeURIComponent(pdfNumber)+"/pdf":"/api/documents/preview",pdfNumber?undefined:{method:"POST",headers:{"Content-Type":"application/json"},body:previewJson}).then(async response=>{if(!response.ok)throw new Error("PDF konnte nicht geladen werden.");return response.blob()}).then(blob=>{if(!active)return;pdfFile.current=new File([blob],(pdfNumber||"Entwurf")+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(reason=>{if(active)setPdfError(reason instanceof Error?reason.message:"PDF konnte nicht geladen werden.")});
+    fetch(fileUrl??(pdfNumber?"/api/documents/"+encodeURIComponent(pdfNumber)+"/pdf":"/api/documents/preview"),fileUrl||pdfNumber?undefined:{method:"POST",headers:{"Content-Type":"application/json"},body:previewJson}).then(async response=>{if(!response.ok)throw new Error("PDF konnte nicht geladen werden.");return response.blob()}).then(blob=>{if(!active)return;pdfFile.current=new File([blob],(pdfNumber||"Entwurf")+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(reason=>{if(active)setPdfError(reason instanceof Error?reason.message:"PDF konnte nicht geladen werden.")});
     return()=>{active=false;pdfFile.current=null};
-  },[pdfNumber,previewJson]);
+  },[pdfNumber,previewJson,fileUrl]);
   const [zoomed,setZoomed]=useState(false);
   const modalDialog=useDialogFocus(true,onClose);
   const share=async()=>{
@@ -517,7 +524,7 @@ function DocumentModal({ title, onClose, pdfNumber, previewDraft }: { title:stri
   };
   return <section ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
     <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></button><button type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
-    <div className="document-modal-body"><div className={zoomed?"document-preview-content is-zoomed":"document-preview-content"}>{pdfError?<p role="alert">{pdfError}</p>:pdfBlob?<PdfPreview file={pdfBlob}/>:<p role="status">PDF wird geladen …</p>}</div></div>
+    <div className="document-modal-body">{pdfError?<p role="alert">{pdfError}</p>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<p role="status">PDF wird geladen …</p>}</div>
   </section>;
 }
 
@@ -535,70 +542,4 @@ function useDocumentCompany(){
    return()=>{active=false;};
  },[]);
  return {loading,error,raw:company,name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.legal_name||company.name,company.vat_number||company.uid,company.email,company.phone,company.website].filter(Boolean).join(' · ')};
-}
-
-export function InvoicePreview({ draft = createInitialDraft("Rechnung","RE-2026-019"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
-  const totals=useDocumentTotals(draft);
-  const company=useDocumentCompany();
-  const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
-  const due=invoiceDueDate(draft.date,draft.due);
-  const balance=draft.status==='paid'||draft.status==='cancelled'?0:Math.max(0,totals.total-Number(draft.paidAmount??0));
-  const payment=useMemo(()=>{if(draft.status==='draft')return {svg:'',issue:'Entwurf – kein zahlbarer QR-Zahlteil.'};if(balance===0)return {svg:'',issue:null};try{return {svg:responsiveQrSvg(new SwissQRBill(createQrBillData(company.raw,{reference:draft.reference,number:draft.number,total:balance,currency:draft.currency}),{language:"DE"}).toString()),issue:null};}catch(error){return {svg:"",issue:error instanceof Error?error.message:"Zahlungsinformationen konnten nicht erstellt werden."};}},[company.raw,draft.reference,draft.number,draft.currency,draft.status,balance]);
-
-  if(company.loading)return <p role="status">Rechnungsvorschau wird geladen …</p>;
-  if(company.error)return <p role="alert">{company.error}</p>;
-
-  return <div className="document-pages invoice-pages">
-    <section className="paper invoice-paper invoice-page" aria-label="Rechnung Seite 1 von 2">
-      <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>RECHNUNG</span></div>
-      <div className="sender-line">{[company.name,company.street,company.city].filter(Boolean).join(" · ")}</div>
-    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Rechnungsnummer</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b>{Boolean(company.raw.vat_number||company.raw.uid)&&<><small>MWST / UID</small><b>{String(company.raw.vat_number||company.raw.uid)}</b></>}<small>Zahlbar bis</small><b>{due}</b></div></div>
-      <div className="paper-intro">{draft.title&&<h2>{draft.title}</h2>}<p>{draft.note || String(company.raw.invoice_intro_text||"Für die erbrachten Leistungen stellen wir Ihnen folgende Rechnung.")}</p></div>
-      <table><thead><tr><th>Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Betrag</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{numberValue(item.quantity).toLocaleString("de-CH",{maximumFractionDigits:3})}{item.unit&&<small className="paper-unit">{item.unit}</small>}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-      <DocumentTotals draft={draft} totals={totals}/>
-      <section className="paper-closing invoice-payment-intro"><p>{draft.status==="cancelled"?"Diese Rechnung wurde storniert. Es ist keine Zahlung erforderlich.":draft.status==="paid"?"Der Rechnungsbetrag wurde vollständig beglichen. Vielen Dank für Ihre Zahlung.":`Bitte überweisen Sie den Rechnungsbetrag${due?" bis zum "+due:""} mit dem QR-Zahlteil auf der folgenden Seite.`}</p><DocumentText text={String(company.raw.invoice_footer_text||"Vielen Dank für Ihr Vertrauen. Bei Fragen zu dieser Rechnung stehen wir Ihnen gerne zur Verfügung.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
-      <footer>{company.footer}</footer>
-    </section>
-    <section className="paper invoice-paper invoice-page qr-invoice-page" aria-label="Rechnung Seite 2 von 2: Zahlungsinformationen">
-      <div className="qr-page-heading"><b>{company.name}</b><span>ZAHLUNGSINFORMATIONEN</span></div><div className="qr-page-reference"><span>Rechnung {draft.number}</span><b>{draft.currency??"CHF"} {money(balance)}</b></div>
-      <div className="qr-page-spacer" aria-hidden="true"/>
-      {balance===0?<p>{draft.status==="cancelled"?"Storniert – keine Zahlung erforderlich.":"Vollständig bezahlt – keine weitere Zahlung erforderlich."}</p>:payment.svg?<div className="qr-payment-slip" dangerouslySetInnerHTML={{__html:payment.svg}}/>:<div className="payment-setup-notice"><b>QR-Zahlteil noch nicht verfügbar</b><p>{payment.issue}</p></div>}
-    </section>
-  </div>;
-}
-
-export function OfferPreview({ draft = createInitialDraft("Angebot","AN-2026-012"), directory = customerData }: { draft?:DocumentDraft; directory?:CustomerDirectory }) {
-  const totals=useDocumentTotals(draft);
-  const company=useDocumentCompany();
-  const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
-
-  if(company.loading)return <p role="status">Angebotsvorschau wird geladen …</p>;
-  if(company.error)return <p role="alert">{company.error}</p>;
-  return <div className="document-pages"><section className="paper">
-    <div className="paper-brand">{company.logo?<img src={company.logo} alt={company.name}/>:<b>{company.name}</b>}<span>ANGEBOT</span></div>
-    <div className="sender-line">{[company.name,company.street,company.city].filter(Boolean).join(" · ")}</div>
-    <div className="paper-meta"><div><b>{draft.customer}</b><span>{customer.address}</span><span>{customer.zip} {customer.city}</span></div><div><small>Angebotsnummer</small><b>{draft.number}</b><small>Datum</small><b>{isoToSwiss(draft.date)}</b>{Boolean(company.raw.vat_number||company.raw.uid)&&<><small>MWST / UID</small><b>{String(company.raw.vat_number||company.raw.uid)}</b></>}<small>Gültig bis</small><b>{isoToSwiss(draft.due)}</b></div></div>
-    <div className="paper-intro"><h2>{draft.title||"Ihr Angebot"}</h2><p>{draft.note || String(company.raw.quote_intro_text||"Vielen Dank für Ihre Anfrage. Gerne offerieren wir Ihnen die folgenden Leistungen.")}</p></div>
-    <table><thead><tr><th>Leistung</th><th>Menge</th><th>Einzelpreis</th><th>Betrag</th></tr></thead><tbody>{draft.positions.map(item=><tr key={item.id}><td>{item.description}</td><td>{numberValue(item.quantity).toLocaleString("de-CH",{maximumFractionDigits:3})}{item.unit&&<small className="paper-unit">{item.unit}</small>}</td><td>{money(numberValue(item.price))}</td><td>{money(numberValue(item.quantity)*numberValue(item.price))}</td></tr>)}</tbody></table>
-    <DocumentTotals draft={draft} totals={totals}/>
-    <section className="paper-closing"><b>Konditionen</b><p>{draft.due?`Dieses Angebot ist bis zum ${isoToSwiss(draft.due)} gültig. `:""}Alle Beträge sind in {draft.currency??"CHF"} ausgewiesen; die MWST ist im Gesamtbetrag enthalten.</p><DocumentText text={String(company.raw.quote_footer_text||"Die Umsetzung erfolgt nach Ihrer schriftlichen Auftragsbestätigung. Zusätzliche Leistungen stimmen wir vorab mit Ihnen ab. Wir freuen uns auf die Zusammenarbeit.")}/><p>Freundliche Grüsse<br/>{company.name}</p></section>
-    <footer>{company.footer}</footer>
-  </section></div>;
-}
-
-function DocumentText({text}:{text:string}){
-  return <>{text.split(/\n\s*\n/).filter(Boolean).map((paragraph,index)=><p className="paper-text" key={index}>{paragraph}</p>)}</>;
-}
-function DocumentTotals({draft,totals}:{draft:DocumentDraft;totals:{subtotal:number;vat:number;total:number}}){
-  const taxes=new Map<number,number>();
-  for(const item of draft.positions){
-    const rate=numberValue(item.vatRate??draft.vatRate);
-    taxes.set(rate,(taxes.get(rate)??0)+numberValue(item.quantity)*numberValue(item.price)*rate/100);
-  }
-  const groups=[...taxes].sort(([a],[b])=>b-a);
-  const displayed=groups.map(([rate,amount],index)=>{
-    const rounded=index===groups.length-1?Math.round(totals.vat*100)/100-groups.slice(0,index).reduce((sum,[,value])=>sum+Math.round(value*100)/100,0):Math.round(amount*100)/100;
-    return [rate,rounded];
-  });
-  return <div className="paper-total"><span>Nettobetrag <b>{money(totals.subtotal)}</b></span>{displayed.map(([rate,amount])=><span key={rate}>MWST {rate.toFixed(2)} % <b>{money(amount)}</b></span>)}<strong>Gesamtbetrag {draft.currency??"CHF"} <b>{money(totals.total)}</b></strong></div>;
 }

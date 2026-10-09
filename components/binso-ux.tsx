@@ -35,6 +35,11 @@ export function MetricTile({ label, value, hint }: { label: string; value: React
   return <Metric label={label} value={value} hint={hint}/>;
 }
 
+/** Route links and local detail tabs keep their behavior and share one container. */
+export function DetailTabs({children,label,role="navigation"}:{children:ReactNode;label:string;role?:"navigation"|"tablist"}){
+ return <div className="tabs" role={role} aria-label={label}>{children}</div>;
+}
+
 export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {
   value: string; onChange: (value: string) => void; placeholder?: string;
 }) {
@@ -71,6 +76,6 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,title,meta,value,valueLabel,status,tone="neutral",compact=false}:{href?:string;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean}){
  const content=<><b>{title}</b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small>{valueLabel}</small>}<strong>{value}</strong></span>}</>;
- const className=`document-summary-row${compact?" is-compact":""}`;
+ const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
  return href?<Link href={href} className={className}>{content}</Link>:<div className={className}>{content}</div>;
 }

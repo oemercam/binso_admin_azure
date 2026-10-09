@@ -1,0 +1,413 @@
+{
+  "url": "http://127.0.0.1:3301/rechnungen/RE-TEST-1",
+  "viewport": {
+    "width": 430,
+    "height": 900
+  },
+  "documentWidth": 430,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Rechnung RE-TEST-1KUNDEPrüffirma AGTeilweise bezahltTeststrasse 1 · 3000 BernRechnungsdatum08.10.2026Fällig am08.11.2026Zahlungsfrist: 31 TagePositionenBezeichnungMenge / EinheitEinzelpreisBetragBerat",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 569.234375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "569.234px",
+        "min-height": "0px",
+        "padding": "18px 19.565px 24px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::before, ::after",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "(min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".app-preview .page-container",
+          "css": "padding-top: 18px; padding-bottom: 24px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding-top: var(--mobile-page-top); padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "(max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container, .page-container > *, .page-container section",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal",
+      "tag": "SECTION",
+      "classes": "document-modal",
+      "text": "Rechnungsvorschau",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 900
+      },
+      "computed": {
+        "display": "flex",
+        "position": "fixed",
+        "height": "900px",
+        "min-height": "900px",
+        "padding": "0px",
+        "margin": "0px 0px 24px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::before, ::after",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal",
+          "css": "position: fixed; inset: 0px; z-index: 100; overflow: auto; background: var(--color-bg);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal",
+          "css": "display: flex; flex-direction: column; overflow: hidden; height: 100dvh; padding-top: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container > section, .page-container > .surface, .page-container > .dashboard-grid, .page-container > .detail-grid, .page-container > .quick-section, .page-container > .finance-analysis, .page-container > .finance-breakdown",
+          "css": "margin-top: var(--desktop-section-gap);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container > :last-child",
+          "css": "margin-bottom: 24px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".document-modal",
+          "css": "overflow: hidden;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".document-modal",
+          "css": "height: 100dvh; min-height: 100dvh; overflow: hidden;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container > *, .page-container section",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal-body",
+      "tag": "DIV",
+      "classes": "document-modal-body",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 58,
+        "width": 430,
+        "height": 842
+      },
+      "computed": {
+        "display": "block",
+        "position": "relative",
+        "height": "842px",
+        "min-height": "0px",
+        "padding": "12px 10px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "hidden",
+        "overflow-y": "auto",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::before, ::after",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "max-width: 800px; margin: auto; padding: 24px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "width: min(100%, 800px);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "flex: 1 1 0%; min-height: 0px; max-width: none; width: 100%; overflow: auto; overscroll-behavior: contain; padding-bottom: max(24px,var(--safe-bottom));",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "width: 100%; max-width: 100%; padding: 14px max(var(--mobile-page-x),var(--safe-left)) calc(24px + var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-right)); overflow-x: hidden;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "height: calc(100dvh - 58px - var(--safe-top)); width: 100%; max-width: none; margin: 0px; padding: 12px max(10px,var(--safe-right)) calc(18px + var(--safe-bottom)) max(10px,var(--safe-left)); overflow: hidden auto; background: var(--color-subtle); scroll-snap-type: y; overscroll-behavior-y: contain;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "position: relative; inset: auto; flex: 1 1 0%; box-sizing: border-box; height: auto; min-height: 0px; margin: 0px; padding: 12px max(10px,var(--safe-right)) max(12px,var(--safe-bottom)) max(10px,var(--safe-left)); overflow-y: auto; overscroll-behavior-y: contain; background: var(--color-subtle);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".pdf-page",
+      "tag": "SECTION",
+      "classes": "pdf-page",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 10,
+        "y": 70,
+        "width": 410,
+        "height": 579
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "579px",
+        "min-height": "auto",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::before, ::after",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".pdf-page",
+          "css": "min-width: 0px; background: white; color: black;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container > *, .page-container section",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".pdf-page",
+      "tag": "SECTION",
+      "classes": "pdf-page",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 10,
+        "y": 665,
+        "width": 410,
+        "height": 579
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "579px",
+        "min-height": "auto",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::before, ::after",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".pdf-page",
+          "css": "min-width: 0px; background: white; color: black;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container > *, .page-container section",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}
