@@ -1,0 +1,9 @@
+Node 24.19.0; pnpm 10.17.1
+Frozen install, full lint/typecheck/build, css:check, release:check, existing full test suite: PASS
+Navigation contract and navigation foundation: PASS
+Production dependency audit: no High/Critical findings
+Full audit: existing accepted dev-tool advisory GHSA-VFJ7-8CJW-P6XM only
+WebKit production targeted: PASS (light,dark; remediation,customers,employees,documents,time,header)
+Route/CSS standalone HTTP probe: NOT VERIFIED (server unreachable from separate call)
+Local Chromium/PWA: NOT VERIFIED (browser download failed)
+Physical iOS/Android/PWA/keyboard/provider acceptance: NOT VERIFIED

@@ -383,6 +383,8 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .responsive-create-action .create-action-label{display:inline;white-space:nowrap}
 .form-page{width:100%;max-width:900px;border-top:1px solid var(--color-line)}
 .form-page.narrow{max-width:700px}
+/* Capture pages have no bottom navigation; reserve only the shared section/safe inset. */
+.app-editing .page-container{padding-bottom:calc(var(--desktop-section-y) + var(--safe-bottom))}
 .form-section,
 .settings-form{padding:20px 0;border-bottom:1px solid var(--color-line);background:transparent}
 .form-section.clean{padding:20px 0}
@@ -390,6 +392,9 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .settings-form:first-child{padding-top:0}
 .form-section h2{margin:0 0 var(--heading-content-gap);font-size:15px}
 .form-section .section-title h2,.settings-form .section-title h2{margin:0}
+.form-section>.section-title{margin-bottom:var(--heading-content-gap)}
+.form-section>p{margin:0 0 var(--field-group-gap);color:var(--color-muted);font-size:var(--control-label-font)}
+.form-section[hidden]{display:none}
 .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--field-group-gap)}
 .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 input:not([type="checkbox"]):not([type="radio"]),
@@ -422,9 +427,6 @@ textarea{
 .form-field>.form-error{color:var(--status-danger-fg);font-size:var(--control-help-font);font-weight:400;line-height:1.4}
 .form-field :is(input,select,textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
 html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.optional-details{padding:0;border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
-.optional-details summary{min-height:52px;display:flex;align-items:center;font-size:12px;font-weight:700;cursor:pointer}
-.optional-details>div{padding:0 0 20px}
 .select-card{
   min-height:56px;
   padding:12px;
@@ -784,9 +786,9 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bottom-sheet[data-wizard] .form-wizard[data-guided]{height:auto}
 .wizard-progress{position:sticky;top:var(--desktop-header-h);z-index:10;padding:12px 0;background:var(--color-bg);border-bottom:1px solid var(--color-line);font-size:12px}
 .form-wizard .wizard-content [hidden]{display:none}
-.wizard-content{min-width:0;padding-top:16px}
-.form-wizard .mobile-sticky-save{display:flex;gap:12px;position:static;flex:none;background:var(--color-bg);padding-top:16px}
-.form-wizard .mobile-sticky-save>.button{flex:1;width:0;min-height:48px;height:48px}
+.wizard-content{min-width:0;padding-top:var(--field-group-gap)}
+.form-wizard .mobile-sticky-save{display:flex;gap:var(--field-group-gap);position:static;flex:none;background:var(--color-bg);margin-top:0;padding-block:var(--field-group-gap) 0}
+.form-wizard .mobile-sticky-save>.button{flex:1;width:0;min-height:var(--process-action-h);height:var(--process-action-h)}
 .person-record{display:flex;align-items:center;gap:10px;min-width:0}
 .person-record>span:last-child{min-width:0;overflow-wrap:anywhere}
 .person-avatar{width:36px;height:36px;flex:none;display:inline-grid;place-items:center;overflow:hidden;border-radius:50%;font-size:13px;font-weight:600;color:#fff;line-height:1}
@@ -1028,14 +1030,16 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   width:min(100%,var(--sheet-max-width));
   min-width:0;
   max-width:100%;
-  max-height:82dvh;
-  overflow:auto;
   padding:8px 18px calc(18px + var(--safe-bottom));
   border:1px solid var(--color-line);
   border-bottom:0;
   border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;
   background:var(--color-bg);
   box-shadow:0 -18px 60px rgba(0,0,0,.08);
+  max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap));
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 .sheet-handle{width:38px;height:4px;margin:0 auto 10px;border-radius:99px;background:#d9d9d6}
 .sheet-header{
@@ -1552,7 +1556,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .document-modal>header>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .document-modal-header-actions button:disabled{opacity:.4}
 .sheet-layer{top:var(--dialog-viewport-top);bottom:auto;height:var(--dialog-available-height)}
-.sheet-layer>.bottom-sheet{max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap));display:flex;flex-direction:column;overflow:hidden}
 
 /* One form action at every viewport; labels may wrap in narrow grid columns. */
 .form-field>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}

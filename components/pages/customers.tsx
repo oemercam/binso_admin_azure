@@ -1,4 +1,5 @@
 "use client";
+import {FormWizard} from "../form-wizard";
 import {EntityFiles} from "../entity-files";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
@@ -14,7 +15,7 @@ import { RecordRow, RecordsView } from "../records";
 import { customers, invoices } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormActions, LoadingState, ErrorState} from "../ui";
+import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormSection, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, FilterSheet, CreateAction, MetricTiles, MetricTile, DetailTabs } from "../binso-ux";
 import { useDemoRows, formatMinutes, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
@@ -109,10 +110,10 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 
       <div className="desktop-detail-main"><DetailTabs label="Kundenbereiche"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Finanzen</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></DetailTabs>
     {tab==="overview"&&<><MetricTiles>{customerSummary?.invoices.map(item=><MetricTile key={item.currency} label="Offene Rechnungen" value={formatCurrency(item.open_amount,item.currency)}/>)}{customerSummary?.invoices.map(item=><MetricTile key={'revenue-'+item.currency} label={'Umsatz '+new Date().getFullYear()} value={formatCurrency(item.revenue,item.currency)} hint="Rechnungen inkl. MWST"/>)}{customerSummary?.time&&<MetricTile label="Erfasste Zeit" value={formatMinutes(Math.round(Number(customerSummary.time.hours)*60))+' h'} hint={formatMinutes(Math.round(Number(customerSummary.time.invoiced_hours)*60))+' h verrechnet'}/>}</MetricTiles><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list">{[['Firma',name],['Hauptkontakt',contacts.filter(contact=>contact.is_primary).map(contact=>[contact.first_name,contact.last_name].filter(Boolean).join(' ')).join(', ')],['E-Mail',customer.email],['Telefon',formatSwissPhone(customer.phone)],['Adresse',[customer.street,[customer.postal_code,city].filter(Boolean).join(' ')].filter(Boolean).join(', ')],['UID',formatSwissUid(customer.uid)]].filter(([,value])=>Boolean(value)).map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{String(value)}</dd></div>)}</dl>{(!customer.email||!customer.phone||!customer.street)&&<Button href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'} variant="secondary">Kundendaten vervollständigen</Button>}</section></>}
-    {tab==="contacts"&&<section className="customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");return <div key={String(contact.id)} role="button" tabIndex={0} onClick={()=>openContact(contact)} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openContact(contact)}}}><Avatar name={fullName} identity={String(contact.id)}/><div className="contact-main"><b>{fullName}</b>{[contact.job_title,contact.email,formatSwissPhone(contact.phone)].filter(Boolean).map((value,index)=><small key={index}>{String(value)}</small>)}{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div><div className="contact-actions" onClick={e=>e.stopPropagation()}><Button variant="ghost" icon="more" ariaLabel={fullName+" Aktionen"} onClick={()=>setContactMenu(contact)}/></div></div>})}</div>:<p>Keine Kontakte erfasst</p>}</section>}
+    {tab==="contacts"&&<section className="customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");return <div key={String(contact.id)} role="button" tabIndex={0} onClick={()=>openContact(contact)} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openContact(contact)}}}><Avatar name={fullName} identity={String(contact.id)}/><div className="contact-main"><b>{fullName}</b>{[contact.job_title,contact.email,formatSwissPhone(contact.phone)].filter(Boolean).map((value,index)=><small key={index}>{String(value)}</small>)}{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div><div className="contact-actions" onClick={e=>e.stopPropagation()}><Button variant="ghost" icon="more" ariaLabel={fullName+" Aktionen"} onClick={()=>setContactMenu(contact)}/></div></div>})}</div>:<EmptyState compact title="Keine Kontakte erfasst" text=""/>}</section>}
     {tab==="docs"&&<EntityFiles purpose="customer_document" entityId={customerId}/>}
     {tab==="docs"&&<section className="customer-tab-panel"><SectionTitle title="Finanzen"/><DocumentList items={customerDocuments as DocumentListItem[]} error={customerDocumentsError} context="customer"/></section>}
-    {tab==="activity"&&<section className="customer-tab-panel"><SectionTitle title="Aktivität"/>{customerActivity.length?<div className="timeline">{customerActivity.map((item,index)=><div key={item.at+index}><i/><div><b>{item.title}</b><small>{swissDate(item.at)} · {item.detail}</small></div></div>)}</div>:<p>Keine Geschäftsaktivität vorhanden</p>}</section>}</div>
+    {tab==="activity"&&<section className="customer-tab-panel"><SectionTitle title="Aktivität"/>{customerActivity.length?<div className="timeline">{customerActivity.map((item,index)=><div key={item.at+index}><i/><div><b>{item.title}</b><small>{swissDate(item.at)} · {item.detail}</small></div></div>)}</div>:<EmptyState compact title="Keine Geschäftsaktivität vorhanden" text=""/>}</section>}</div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Angebote / Rechnungen <b>{customerDocuments.length}</b></span></div></section></aside>
     </div>
     <ActionSheet label="Kundenaktionen" description={name} open={customerActions} onClose={()=>setCustomerActions(false)}><div className="action-list"><ActionRow href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'} icon="edit" title="Kunde bearbeiten" onClick={()=>setCustomerActions(false)}/><ActionRow requiresWrite navigation icon="plus" title="Kontakt hinzufügen" onClick={()=>{setCustomerActions(false);openContact()}}/><ActionRow href={'/angebote/neu?customerId='+encodeURIComponent(customerId)} icon="file" title="Angebot erstellen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/rechnungen/neu?customerId='+encodeURIComponent(customerId)} icon="receipt" title="Rechnung erstellen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/zeit?customerId='+encodeURIComponent(customerId)} icon="clock" title="Zeit erfassen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/projekte/neu?customerId='+encodeURIComponent(customerId)} icon="box" title="Auftrag / Projekt starten" onClick={()=>setCustomerActions(false)}/></div></ActionSheet>
@@ -139,6 +140,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [customerStatus,setCustomerStatus]=useState("active");
   const [toast,setToast]=useState<string|null>(null);
   const recordQuery=useApiQuery<{item:Record<string,unknown>}>(customerId?"/api/customers/"+encodeURIComponent(customerId):null);
+  const [wizardStep,setWizardStep]=useState(0);
   const hydratedCustomer=useRef<string|null>(null);
   const loadingRecord=recordQuery.loading;
   const recordError=recordQuery.error;
@@ -170,18 +172,27 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
   return <AppShell editing={true} unsavedChanges={dirty&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
     <div className="form-page" inert={savingRecord}>
-      <section className="form-section clean">
-        <h2>Grundangaben</h2>
-        <div className="form-grid two">
-          <Field label="Firmenname"><Input autoFocus value={company} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
-          <Field label="E-Mail"><Input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
-          <Field label="Telefon"><Input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
-          <Field label="Ort"><Input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
-          <Field label="Status"><Select value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></Field><Field label="Branche"><Select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></Select></Field>
-        </div>
-      </section>
-      <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><Input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><Input inputMode="numeric" value={postalCode} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field><Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><Input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field></div></details>
-      <FormActions ><Button requiresWrite disabled={savingRecord} onClick={save}>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</Button></FormActions>
+      <FormWizard guided={!customerId} labels={["Grundangaben","Weitere Angaben (optional)"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} cancelAction={<Button variant="secondary" href={returnTo} disabled={savingRecord}>Abbrechen</Button>} action={<Button requiresWrite disabled={savingRecord} onClick={save}>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</Button>}>
+        <FormSection title="Grundangaben" hidden={!customerId&&wizardStep!==0}>
+          <div className="form-grid two">
+            <Field label="Firmenname"><Input required autoFocus autoComplete="organization" value={company} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
+            <Field label="E-Mail"><Input type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
+            <Field label="Telefon"><Input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
+            <Field label="Ort"><Input required autoComplete="address-level2" value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
+            <Field label="Status"><Select value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></Field>
+            <Field label="Branche"><Select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></Select></Field>
+          </div>
+        </FormSection>
+        <FormSection title="Weitere Angaben" hidden={!customerId&&wizardStep!==1}>
+          <p>Diese Angaben sind optional und können später ergänzt werden.</p>
+          <div className="form-grid two">
+            <Field label="Adresse"><Input autoComplete="street-address" value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field>
+            <Field label="PLZ"><Input inputMode="numeric" autoComplete="postal-code" value={postalCode} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field>
+            <Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field>
+            <Field label="Interne Notiz"><Input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field>
+          </div>
+        </FormSection>
+      </FormWizard>
     </div>
     {toast&&<Toast title={toast} tone={toast==="Kunde gespeichert."?"success":"danger"}/>}
   </AppShell>;
