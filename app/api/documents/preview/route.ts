@@ -1,3 +1,4 @@
+import {documentTotals,roundMoney} from "@/lib/money";
 import {NextRequest} from "next/server";
 import {ApiError,apiError,assertSameOrigin,readJson,cleanText} from "@/lib/server/http";
 import {requireSession} from "@/lib/server/session";
@@ -12,8 +13,8 @@ export async function POST(request:NextRequest){try{
  assertSameOrigin(request);const s=await requireSession(),body=await readJson<Body>(request,262144);
  const invoice=body.kind==='Rechnung';authorize(s,invoice?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,invoice?'rechnungen':'offerten');
  if(!Array.isArray(body.positions)||body.positions.length>500)throw new ApiError(400,'positions_invalid','Bitte gültige Positionen erfassen.');
- const items=body.positions.map(item=>{const quantity=Number(item.quantity),unit_price=Number(item.price),vat_rate=Number(item.vatRate||0);if(![quantity,unit_price,vat_rate].every(Number.isFinite)||quantity<0||unit_price<0||quantity>1e9||unit_price>999999999.99||quantity*unit_price>999999999.99||vat_rate<0||vat_rate>100)throw new ApiError(400,'position_invalid','Bitte Menge, Preis und MWST prüfen.');return {description:cleanText(item.description,5000),quantity,unit_price,line_total:quantity*unit_price,vat_rate,unit:cleanText(item.unit,40)};});
- const subtotal=items.reduce((sum,i)=>sum+i.quantity*i.unit_price,0),vat=items.reduce((sum,i)=>sum+i.quantity*i.unit_price*i.vat_rate/100,0);
+ const items=body.positions.map(item=>{const quantity=Number(item.quantity),unit_price=Number(item.price),vat_rate=Number(item.vatRate||0);if(![quantity,unit_price,vat_rate].every(Number.isFinite)||quantity<0||unit_price<0||quantity>1e9||unit_price>999999999.99||quantity*unit_price>999999999.99||vat_rate<0||vat_rate>100)throw new ApiError(400,'position_invalid','Bitte Menge, Preis und MWST prüfen.');return {description:cleanText(item.description,5000),quantity:roundMoney(quantity),unit_price:roundMoney(unit_price),line_total:documentTotals([{quantity,unit_price,vat_rate:0}]).subtotal,vat_rate:roundMoney(vat_rate),unit:cleanText(item.unit,40)};});
+ const {subtotal,vat,total}=documentTotals(items);
  if(!Number.isFinite(subtotal+vat)||subtotal+vat>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');
  const issue=cleanText(body.date,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(issue)||!Number.isFinite(Date.parse(issue))||new Date(issue).toISOString().slice(0,10)!==issue)throw new ApiError(400,'date_invalid','Bitte ein gültiges Datum erfassen.');
  const due=invoice?new Date(Date.parse(issue)+Math.min(365,Math.max(0,Number(body.due)||0))*86400000).toISOString().slice(0,10):cleanText(body.due,10);
@@ -24,7 +25,7 @@ export async function POST(request:NextRequest){try{
   const saved=body.sourceNumber?(await c.query(`select document_snapshot,intro_text from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`,[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;
   if(body.sourceNumber&&!saved)throw new ApiError(404,'draft_missing','Entwurf wurde nicht gefunden.');
   const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;
-  const document={document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,subtotal,vat_amount:vat,total:Math.round((subtotal+vat)*100)/100};
+  const document={document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,subtotal,vat_amount:vat,total};
   return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));
  });
  return new Response(new Uint8Array(pdf),{headers:{'Content-Type':'application/pdf','Cache-Control':'private, no-store'}});

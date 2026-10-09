@@ -23,7 +23,8 @@ export async function POST(request:NextRequest){
     const body=await readJson<DocumentBody>(request,65536);
     const kind=body.kind==="offer"?"offer":body.kind==="invoice"?"invoice":"";
     const customerName=cleanText(body.customerName,200);
-    const number=cleanText(body.number,80);
+    const requestKey=request.headers.get("idempotency-key")?.trim()??"";
+    if(requestKey.length<8||requestKey.length>128)return json({error:"idempotency_required",message:"Idempotency-Key fehlt oder ist ungültig."},400);
     const issueDate=cleanText(body.issueDate,20);
     const rawItems=Array.isArray(body.items)?body.items as Line[]:[];
     if(!kind||(!customerName&&!body.customerId)||!issueDate||rawItems.length===0||rawItems.length>100) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
@@ -49,7 +50,7 @@ export async function POST(request:NextRequest){
       p_source_offer:cleanText(body.sourceOffer,80)||null,
       p_customer_id:customer.id,
       p_kind:kind,
-      p_number:number,
+      p_idempotency_key:requestKey,
       p_issue_date:issueDate,
       p_due_date:kind==="invoice"?(cleanText(body.dueDate,20)||null):null,
       p_valid_until:kind==="offer"?(cleanText(body.validUntil,20)||null):null,

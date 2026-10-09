@@ -40,8 +40,9 @@ export async function withTransaction<T>(fn:(client:PoolClient)=>Promise<T>):Pro
   }
 }
 
-export async function withTenant<T>(organizationId:string,userId:string,fn:(client:PoolClient)=>Promise<T>):Promise<T>{
+export async function withTenant<T>(organizationId:string,userId:string,fn:(client:PoolClient)=>Promise<T>,options:{snapshot?:boolean}={}):Promise<T>{
   return withTransaction(async client=>{
+    if(options.snapshot)await client.query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY");
     await client.query("SELECT set_config('app.organization_id',$1,true)",[organizationId]);
     await client.query("SELECT set_config('app.user_id',$1,true)",[userId]);
     return fn(client);
