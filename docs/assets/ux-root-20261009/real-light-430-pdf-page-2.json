@@ -1,0 +1,600 @@
+{
+  "url": "http://127.0.0.1:3342/rechnungen/RE-TEST-1",
+  "viewport": {
+    "width": 430,
+    "height": 900
+  },
+  "documentWidth": 430,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Rechnung RE-TEST-1Teilweise bezahltKUNDEPrüffirma AGTeststrasse 1 · 3000 BernRechnungsdatum08.10.2026Fällig am08.11.2026Zahlungsfrist: 31 TagePositionenBezeichnungMenge / EinheitEinzelpreisBetragBerat",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 568.234375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "430px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "568.234px",
+        "min-height": "0px",
+        "padding": "18px 19.565px 24px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 12,
+          "order": 350,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 24,
+          "order": 1388,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 6,
+          "order": 1425,
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 14,
+          "order": 1433,
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 136,
+          "order": 1555,
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 124,
+          "order": 1726,
+          "selector": ".app-preview .page-container",
+          "css": "padding-top: 18px; padding-bottom: 24px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 126,
+          "order": 1728,
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 329,
+          "order": 1931,
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 531,
+          "order": 2133,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 550,
+          "order": 2152,
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 3,
+          "order": 2442,
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "media (max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 63,
+          "order": 2489,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal",
+      "tag": "SECTION",
+      "classes": "document-modal",
+      "text": "RechnungsvorschauSeite 2 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 900
+      },
+      "computed": {
+        "display": "flex",
+        "position": "fixed",
+        "width": "430px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "900px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px 0px 24px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "100",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 642,
+          "order": 975,
+          "selector": ".document-modal",
+          "css": "position: fixed; top: var(--dialog-viewport-top); left: 0px; right: 0px; z-index: 100; display: flex; flex-direction: column; height: var(--dialog-viewport-height); overflow: hidden; background: var(--color-bg);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 144,
+          "order": 1563,
+          "selector": ".page-container > .dashboard-grid, .page-container > .detail-grid, .page-container > .finance-analysis, .page-container > .finance-breakdown, .page-container > .quick-section, .page-container > .surface, .page-container > section",
+          "css": "margin-top: var(--desktop-section-gap);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 330,
+          "order": 1932,
+          "selector": ".page-container > :last-child",
+          "css": "margin-bottom: 24px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 63,
+          "order": 2489,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal-body",
+      "tag": "DIV",
+      "classes": "document-modal-body",
+      "text": "Seite 2 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 58,
+        "width": 430,
+        "height": 842
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "430px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "842px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "1 1 0%",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 644,
+          "order": 977,
+          "selector": ".document-modal-body",
+          "css": "display: flex; flex: 1 1 0%; min-height: 0px; min-width: 0px; overflow: hidden;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-page-viewer",
+      "tag": "DIV",
+      "classes": "document-page-viewer",
+      "text": "Seite 2 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 58,
+        "width": 430,
+        "height": 842
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "430px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "842px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "1 1 0%",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 645,
+          "order": 978,
+          "selector": ".document-page-viewer",
+          "css": "flex-direction: column;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 646,
+          "order": 979,
+          "selector": ".document-page-stage, .document-page-viewer",
+          "css": "display: flex; flex: 1 1 0%; min-width: 0px; min-height: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".pdf-page",
+      "tag": "SECTION",
+      "classes": "pdf-page",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 12,
+        "y": 167.90625,
+        "width": 406,
+        "height": 574.1875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "406px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "574.188px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "109.906px 12px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 640,
+          "order": 973,
+          "selector": ".pdf-page",
+          "css": "min-width: 0px; background: white; color: black;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 648,
+          "order": 981,
+          "selector": ".document-page-stage > .pdf-page",
+          "css": "flex: 0 0 auto; margin: auto; width: max-content;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 63,
+          "order": 2489,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-page-navigation",
+      "tag": "NAV",
+      "classes": "document-page-navigation",
+      "text": "Seite 2 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 852,
+        "width": 430,
+        "height": 48
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "430px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "48px",
+        "min-height": "48px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "1px 0px 0px",
+        "margin": "0px",
+        "gap": "14px",
+        "flex": "0 0 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "center",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/517e5fc96ef5306d.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/95a46b97bf6ee23a.css",
+          "index": 649,
+          "order": 982,
+          "selector": ".document-page-navigation",
+          "css": "display: flex; align-items: center; justify-content: center; gap: var(--field-group-gap); flex: 0 0 auto; min-height: calc(var(--action-row-height) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); border-top: 1px solid var(--color-line); font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3342/_next/static/css/73c8d3913d38dad4.css",
+          "index": 86,
+          "order": 1505,
+          "selector": ".document-page-navigation",
+          "css": "min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 14px; border-top: 1px solid var(--color-line); font-size: 11px; font-weight: 700;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+curl: (7) Failed to connect to 127.0.0.1 port 3100 after 0 ms: Couldn't connect to server
+Verified deployed UI assets: /kunden
+Verified deployed UI assets: /produkte
+Verified deployed UI assets: /angebote
+Verified deployed UI assets: /rechnungen
+Verified deployed UI assets: /zahlungen
+Verified deployed UI assets: /zeit
+Verified deployed public asset: /sw.js
+Verified deployed public asset: /manifest-app.webmanifest
+Verified deployed public asset: /brand/pwa-icon-192.png
+Verified deployed public asset: /fonts/pdf/LiberationSans-Regular.ttf
+Verified deployed public asset: /fonts/pdf/LiberationSans-Bold.ttf
+Exact production ZIP starts successfully.
