@@ -1,7 +1,7 @@
 import {resetClientData,dataRevision,subscribeClientData} from "./data-events";
 import type {PlanId} from "@/config/plan-access";
 
-export type ClientSession={authenticated:boolean;demo?:boolean;tenant?:{id?:string;role?:string;plan?:PlanId;readOnly?:boolean}};
+export type ClientSession={authenticated:boolean;user?:{id?:string};demo?:boolean;tenant?:{id?:string;role?:string;plan?:PlanId;readOnly?:boolean}};
 let cached:ClientSession|null=null;
 let validUntil=0;
 let pending:Promise<ClientSession>|null=null;
@@ -25,7 +25,7 @@ export function readClientSession():Promise<ClientSession>{
     if(!response.ok)throw new Error(typeof payload.message==="string"?payload.message:"Zugang konnte nicht geprüft werden.");
     if(typeof payload.authenticated!=="boolean")throw new Error("Zugang konnte nicht geprüft werden.");
     if(startedRevision!==revision)throw new Error("Die Sitzung wurde geändert. Bitte erneut versuchen.");
-    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);
+    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.user?.id,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);
     if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);
     lastIdentity=identity;
     cached=payload;validUntil=Date.now()+30000;

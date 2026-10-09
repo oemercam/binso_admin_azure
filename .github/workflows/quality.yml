@@ -87,6 +87,17 @@ jobs:
         run: pnpm security:scan:all
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_v213_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_v213_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -99,6 +110,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml', 'next.config.*') }}-
       - run: pnpm build
+      - name: Authenticated tenant, role and session HTTP gate
+        env:
+          BINSO_DB_PARALLEL_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_v213_test
+        run: node scripts/api-tenant-postgres-test.mjs
+      - name: Anonymous API authorization surface
+        run: node scripts/api-auth-surface-test.mjs
       - name: Runtime smoke test
         run: bash scripts/runtime-smoke.sh
       - name: Package production candidate

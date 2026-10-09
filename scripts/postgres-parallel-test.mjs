@@ -46,5 +46,16 @@ try{
  assert.equal(competing.filter(result=>result.status==='fulfilled').length,1);assert.equal(competing.filter(result=>result.status==='rejected'&&result.reason.code==='payment_exceeds_balance').length,1);
  saved=(await pool.query('select total_amount,paid_amount,status from invoices where id=$1',[invoice.id])).rows[0];assert.equal(Number(saved.paid_amount),2561.97);assert.equal(saved.status,'paid');
  assert.equal((await pool.query('select count(*)::int n from payments where invoice_id=$1',[invoice.id])).rows[0].n,2);
+ // Two synthetic devices execute the real timer route over independent clients.
+ globalThis.__parallelTimerSession={...session,email:'timer@fixture.invalid'};
+ const timerHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=data=>data;export const apiError=e=>{throw e}');
+ const timer=await import(await compile('app/api/time-tracker/route.ts',{'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelTimerSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':timerHttp}));
+ const baseline=(await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n;
+ await Promise.all([0,1].map(()=>timer.POST({body:{action:'start',project:'Interne Planung',customerId:null,projectId:null}})));
+ assert.equal((await pool.query('select count(*)::int n from active_time_trackers where organization_id=$1 and user_id=$2',[organizationId,session.userId])).rows[0].n,1,'Concurrent devices share exactly one timer');
+ await pool.query("update active_time_trackers set active_since=now()-interval '75 seconds' where organization_id=$1 and user_id=$2",[organizationId,session.userId]);
+ const finishes=await Promise.all([0,1].map(()=>timer.POST({body:{action:'finish'}})));assert.equal(finishes.filter(result=>result.item).length,1);
+ assert.equal((await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n,baseline+1,'Concurrent stop stores one time entry');assert.equal((await timer.GET()).tracker,null);delete globalThis.__parallelTimerSession;
+ console.log('Real PostgreSQL: concurrent device timer start/stop yields one tracker and one time entry.');
  console.log('Real PostgreSQL: ten parallel numbers, concurrent document/payment replay and competing final payments passed across independent connections. Synthetic disposable database only.');
 }finally{delete globalThis.__binsoParallelPool;await pool.end();}

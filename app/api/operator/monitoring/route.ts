@@ -14,11 +14,12 @@ export async function GET(){
   const started=performance.now();
   try{const session=await requireOperatorSession();authorizeOperator(session,"platform:read");
     const dbStarted=performance.now();
-    const {incidents,vitals,billingEvents}=await withPlatform(async c=>{
+    const {incidents,vitals,billingEvents,mailQueue}=await withPlatform(async c=>{
       const incidents=await c.query("select id,title,status,started_at,resolved_at,public_message note,'Plattform' service from platform_incidents where status<>'resolved' order by started_at desc limit 100");
       const vitals=await c.query<{metric:string;value:number;rating:string;route:string;created_at:string}>("select metric,value,rating,route,created_at from web_vitals where created_at>=now()-interval '7 days' order by created_at desc limit 2000");
       const billing=await c.query("select external_event_id event_id,event_type,status,processed_at from billing_webhook_events order by received_at desc limit 25");
-      return {incidents:incidents.rows,vitals:vitals.rows,billingEvents:billing.rows};
+      const queue=await c.query("select status,count(*)::int count,min(updated_at) oldest from mail_outbox where status in ('queued','failed','uncertain') or status='sending' and updated_at<now()-interval '5 minutes' group by status order by status");
+      return {incidents:incidents.rows,vitals:vitals.rows,billingEvents:billing.rows,mailQueue:queue.rows};
     });
     const databaseLatencyMs=Math.round(performance.now()-dbStarted);
     const integrations=await getOperationalIntegrationStatus();
@@ -38,6 +39,7 @@ export async function GET(){
       ],
       webVitals,
       billingEvents,
+      mailQueue,
       incidents,
     });
   }catch(error){return apiError(error);}

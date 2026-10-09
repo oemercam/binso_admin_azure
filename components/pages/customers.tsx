@@ -1,5 +1,6 @@
 "use client";
-import {useDataRevision} from "@/lib/client/use-api-query";
+import {EntityFiles} from "../entity-files";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {Avatar} from "../avatar";
 
@@ -12,7 +13,7 @@ import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView } from "../records";
 import { customers, invoices } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
-import { apiGet, apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormActions, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, FilterSheet, CreateAction, MetricTiles, MetricTile, DetailTabs } from "../binso-ux";
 import { useDemoRows, formatMinutes, swissDate } from "./shared";
@@ -36,7 +37,7 @@ export function CustomersPage() {
 
 export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const production=useBackendMode();
-  const dataRevision=useDataRevision(["/api/customers","/api/finance/overview"]);
+  const workspace=useApiQuery<{item:Record<string,unknown>;contacts:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;summary:FinancialSummary;activity:Array<{at:string;title:string;detail:string}>}>(production?"/api/customers/"+encodeURIComponent(customerId)+"?include=workspace":null);
   const searchParams=useSearchParams();
   const requestedReturnTo=searchParams.get("returnTo");
   const returnTo=requestedReturnTo==="/dashboard"?"/dashboard":"/kunden";
@@ -48,38 +49,22 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const contactBusy=useRef(false);
   const [removeContact,setRemoveContact]=useState<string|null>(null);
   const [contactToast,setContactToast]=useState<string|null>(null);
-  const [loadError,setLoadError]=useState<string|null>(null);
-  const [customer,setCustomer]=useState<Record<string,unknown>|null>(null);
+  const loadError=workspace.error;
+  const customer=workspace.data?.item;
   const [contacts,setContacts]=useState<Array<Record<string,unknown>>>([]);
-  const [customerActivity,setCustomerActivity]=useState<Array<{at:string;title:string;detail:string}>>([]);
-  const [customerSummary,setCustomerSummary]=useState<FinancialSummary|null>(null);
+  const customerActivity=workspace.data?.activity??[];
+  const customerSummary=workspace.data?.summary;
   const [customerActions,setCustomerActions]=useState(false);
   const [contactMenu,setContactMenu]=useState<Record<string,unknown>|null>(null);
-  const [customerDocumentsError,setCustomerDocumentsError]=useState<string|null>(null);
-  const [customerDocuments,setCustomerDocuments]=useState<Array<Record<string,unknown>>>([]);
+  const customerDocumentsError=workspace.error;
+  const customerDocuments=workspace.data?.documents??[];
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
   const [contactEmail,setContactEmail]=useState("");
   const [contactPhone,setContactPhone]=useState("");
   const [contactRole,setContactRole]=useState("");
 
-  useEffect(()=>{
-    if(!production) return;
-    let active=true;
-    apiGet<{items:typeof customerActivity}>("/api/customers/"+encodeURIComponent(customerId)+"/activity").then(data=>{if(active)setCustomerActivity(data.items)}).catch(()=>undefined);
-    apiGet<FinancialSummary>("/api/finance/overview?customerId="+encodeURIComponent(customerId)).then(data=>{if(active)setCustomerSummary(data)}).catch(()=>undefined);
-    Promise.all([
-      apiGet<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)),
-      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts"),
-      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/documents").catch(e=>{if(active)setCustomerDocumentsError(e.message);return {items:[]}}),
-    ]).then(([customerPayload,contactPayload,documentPayload])=>queueMicrotask(()=>{
-      if(!active)return;setLoadError(null);
-      setCustomer(customerPayload.item);
-      setContacts(contactPayload.items);
-      setCustomerDocuments(documentPayload.items);
-    })).catch(error=>{if(active)setLoadError(error instanceof Error?error.message:"Kunde konnte nicht geladen werden.");});
-    return()=>{active=false};
-  },[production,customerId,dataRevision]);
+  useEffect(()=>{if(workspace.data)queueMicrotask(()=>setContacts(workspace.data!.contacts));},[workspace.data]);
 
   const openContact=(contact?:Record<string,unknown>)=>{
     setContactId(contact?String(contact.id):null);
@@ -112,7 +97,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     window.setTimeout(()=>setContactToast(null),2600);
   };
 
-      if(loadError)return <AppShell title="Kunde" subtitle="Kundendaten nicht verfügbar" active="kunden" backHref={returnTo} backLabel="Kunden"><div role="alert"><EmptyState icon="users" title="Kunde konnte nicht geladen werden" text={loadError}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href={returnTo} variant="ghost">Zur Übersicht</Button></div></AppShell>;
+      if(loadError)return <AppShell title="Kunde" subtitle="Kundendaten nicht verfügbar" active="kunden" backHref={returnTo} backLabel="Kunden"><div role="alert"><EmptyState icon="users" title="Kunde konnte nicht geladen werden" text={loadError}/></div><div className="page-actions"><Button onClick={workspace.refresh}>Erneut versuchen</Button><Button href={returnTo} variant="ghost">Zur Übersicht</Button></div></AppShell>;
   if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><EmptyState icon="users" title="Kunde wird geladen" text="Die Kundendaten werden abgerufen."/></AppShell>;
 
   const name=String(customer.name??"Kunde");
@@ -125,6 +110,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
       <div className="desktop-detail-main"><DetailTabs label="Kundenbereiche"><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}>Übersicht</button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}>Kontakte</button><button className={tab==="docs"?"active":""} onClick={()=>setTab("docs")}>Finanzen</button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}>Aktivität</button></DetailTabs>
     {tab==="overview"&&<><MetricTiles>{customerSummary?.invoices.map(item=><MetricTile key={item.currency} label="Offene Rechnungen" value={formatCurrency(item.open_amount,item.currency)}/>)}{customerSummary?.invoices.map(item=><MetricTile key={'revenue-'+item.currency} label={'Umsatz '+new Date().getFullYear()} value={formatCurrency(item.revenue,item.currency)} hint="Rechnungen inkl. MWST"/>)}{customerSummary?.time&&<MetricTile label="Erfasste Zeit" value={formatMinutes(Math.round(Number(customerSummary.time.hours)*60))+' h'} hint={formatMinutes(Math.round(Number(customerSummary.time.invoiced_hours)*60))+' h verrechnet'}/>}</MetricTiles><section className="surface"><SectionTitle title="Kundendetails"/><dl className="detail-list">{[['Firma',name],['Hauptkontakt',contacts.filter(contact=>contact.is_primary).map(contact=>[contact.first_name,contact.last_name].filter(Boolean).join(' ')).join(', ')],['E-Mail',customer.email],['Telefon',formatSwissPhone(customer.phone)],['Adresse',[customer.street,[customer.postal_code,city].filter(Boolean).join(' ')].filter(Boolean).join(', ')],['UID',formatSwissUid(customer.uid)]].filter(([,value])=>Boolean(value)).map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{String(value)}</dd></div>)}</dl>{(!customer.email||!customer.phone||!customer.street)&&<Button href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'} variant="secondary">Kundendaten vervollständigen</Button>}</section></>}
     {tab==="contacts"&&<section className="customer-tab-panel"><SectionTitle title="Kontakte" action={<Button variant="secondary" icon="plus" requiresWrite onClick={()=>openContact()}>Kontakt</Button>}/>{contacts.length?<div className="contact-list">{contacts.map(contact=>{const fullName=[contact.first_name,contact.last_name].filter(Boolean).join(" ");return <div key={String(contact.id)} role="button" tabIndex={0} onClick={()=>openContact(contact)} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openContact(contact)}}}><Avatar name={fullName} identity={String(contact.id)}/><div className="contact-main"><b>{fullName}</b>{[contact.job_title,contact.email,formatSwissPhone(contact.phone)].filter(Boolean).map((value,index)=><small key={index}>{String(value)}</small>)}{contact.is_primary===true&&<Status tone="success">Hauptkontakt</Status>}</div><div className="contact-actions" onClick={e=>e.stopPropagation()}><Button variant="ghost" icon="more" ariaLabel={fullName+" Aktionen"} onClick={()=>setContactMenu(contact)}/></div></div>})}</div>:<p>Keine Kontakte erfasst</p>}</section>}
+    {tab==="docs"&&<EntityFiles purpose="customer_document" entityId={customerId}/>}
     {tab==="docs"&&<section className="customer-tab-panel"><SectionTitle title="Finanzen"/><DocumentList items={customerDocuments as DocumentListItem[]} error={customerDocumentsError} context="customer"/></section>}
     {tab==="activity"&&<section className="customer-tab-panel"><SectionTitle title="Aktivität"/>{customerActivity.length?<div className="timeline">{customerActivity.map((item,index)=><div key={item.at+index}><i/><div><b>{item.title}</b><small>{swissDate(item.at)} · {item.detail}</small></div></div>)}</div>:<p>Keine Geschäftsaktivität vorhanden</p>}</section>}</div>
       <aside className="desktop-context-rail"><section className="desktop-summary-card"><span className="compact-section-label">Übersicht</span><div className="desktop-summary-facts"><span>Kontakte <b>{contacts.length}</b></span><span>Angebote / Rechnungen <b>{customerDocuments.length}</b></span></div></section></aside>
@@ -152,13 +138,15 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [notes,setNotes]=useState("");
   const [customerStatus,setCustomerStatus]=useState("active");
   const [toast,setToast]=useState<string|null>(null);
-  const [loadingRecord,setLoadingRecord]=useState(!!customerId);
-  const [recordError,setRecordError]=useState<string|null>(null);
+  const recordQuery=useApiQuery<{item:Record<string,unknown>}>(customerId?"/api/customers/"+encodeURIComponent(customerId):null);
+  const hydratedCustomer=useRef<string|null>(null);
+  const loadingRecord=recordQuery.loading;
+  const recordError=recordQuery.error;
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
   const {dirty,markPristine}=useDirtySnapshot([company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus]);
   const [savedRecord,setSavedRecord]=useState(false);
-  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);}).catch(e=>setRecordError(e instanceof Error?e.message:"Kunde konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));},[customerId,markPristine]);
+  useEffect(()=>{if(!customerId||!recordQuery.data||hydratedCustomer.current===customerId)return;hydratedCustomer.current=customerId;const {item}=recordQuery.data;queueMicrotask(()=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);});},[customerId,recordQuery.data,markPristine]);
   const save=async()=>{
     if(saveRecordPending.current||loadingRecord||recordError)return;
     if(!company.trim() || !city.trim()){
@@ -179,7 +167,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
+  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
   return <AppShell editing={true} unsavedChanges={dirty&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
     <div className="form-page" inert={savingRecord}>
       <section className="form-section clean">

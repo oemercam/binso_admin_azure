@@ -1,3 +1,4 @@
+import {SessionDataBoundary} from "./session-data-boundary";
 import type { Metadata } from "next";
 
 export const metadata:Metadata={
@@ -9,5 +10,5 @@ export const metadata:Metadata={
 };
 
 export default function CustomerAppLayout({children}:{children:React.ReactNode}){
-  return children;
+  return <SessionDataBoundary>{children}</SessionDataBoundary>;
 }

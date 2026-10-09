@@ -12,7 +12,24 @@ if(!process.env.BINSO_BASE_URL){
 const browser=await chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--single-process']}: {})});
 try{
  const context=await browser.newContext({viewport:{width:375,height:812},colorScheme:'light',serviceWorkers:'allow'});
- await context.route('**/api/**',route=>route.fulfill({status:401,json:{authenticated:false}}));
+ let authenticated=false,tracker=null,startedAt=0,mutations=0,entries=[];
+ const savedTracker=()=>tracker?{...tracker,seconds:tracker.seconds+(tracker.state==='running'?Math.floor((Date.now()-startedAt)/1000):0)}:null;
+ await context.route('**/api/**',async route=>{
+  const request=route.request(),pathname=new URL(request.url()).pathname;
+  if(!authenticated)return route.fulfill({status:401,json:{authenticated:false}});
+  if(pathname==='/api/auth/session')return route.fulfill({json:{authenticated:true,tenant:{id:'pwa-synthetic',role:'owner',plan:'pro',readOnly:false}}});
+  if(pathname==='/api/time-tracker'){
+   if(request.method()==='POST'){
+    mutations++;const {action}=JSON.parse(request.postData());const current=savedTracker();
+    if(action==='finish'){if(current)entries.push({id:'pwa-time',duration_minutes:Math.max(1,current.seconds/60),started_at:new Date().toISOString(),description:'PWA Timer',project_name:'Arbeitszeit',billable:false});tracker=null;}
+    else {tracker={state:action==='start'?'running':'paused',seconds:current?.seconds??61,project_label:'Arbeitszeit',project_id:null,customer_id:null};startedAt=Date.now();}
+   }
+   return route.fulfill({json:{tracker:savedTracker()}});
+  }
+  if(pathname==='/api/time-entries')return route.fulfill({json:{items:entries}});
+  if(pathname==='/api/settings/profile')return route.fulfill({json:{item:{display_name:'PWA Test'},email:'pwa@fixture.invalid'}});
+  return route.fulfill({json:{items:[],item:{},time_approval_required:false}});
+ });
  let page=await context.newPage();
  await page.goto(base+'/login');
  await page.evaluate(()=>{localStorage.setItem('binso.theme.mode','dark');localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))});
@@ -30,5 +47,16 @@ try{
  await context.setOffline(false);
  const cached=await page.evaluate(async()=>{const keys=await caches.keys();return (await Promise.all(keys.map(async key=>(await (await caches.open(key)).keys()).map(r=>new URL(r.url).pathname)))).flat()});
  assert(cached.includes('/offline'));assert(!cached.some(path=>path.startsWith('/api/')||path==='/dashboard'),'PWA never caches authenticated business data');
+ // The same server fixture survives page destruction. No timer state is stored in
+ // localStorage; actual TimePage/readTimer must recover it from the API.
+ authenticated=true;await context.addCookies([{name:'binso_demo',value:'1',url:base}]);
+ await page.goto(base+'/zeit');await page.getByRole('button',{name:'Starten',exact:true}).click();await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1);
+ await page.goto(base+'/kunden');await page.goto(base+'/zeit');await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1,'Navigation never starts another timer');
+ await page.close();page=await context.newPage();await page.goto(base+'/zeit');await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1,'PWA page restart restores the running server tracker');
+ const other=await context.newPage();await other.goto(base+'/zeit');await other.getByRole('button',{name:'Pause',exact:true}).waitFor();await page.getByRole('button',{name:'Pause',exact:true}).click();await page.getByRole('button',{name:'Fortsetzen',exact:true}).waitFor();await other.getByRole('button',{name:'Fortsetzen',exact:true}).waitFor();assert.equal(mutations,2,'Pause propagates to another mounted tab');
+ const pausedSeconds=tracker.seconds;await page.close();page=await context.newPage();await page.goto(base+'/zeit');await page.getByRole('button',{name:'Fortsetzen',exact:true}).waitFor();assert.equal(tracker.seconds,pausedSeconds,'Paused time survives restart');
+ await page.getByRole('button',{name:'Fortsetzen',exact:true}).click();await page.getByRole('button',{name:'Pause',exact:true}).waitFor();await page.getByRole('button',{name:'Stoppen',exact:true}).click();await page.getByRole('button',{name:'Starten',exact:true}).waitFor();assert.equal(entries.length,1,'Stopping stores one confirmed time entry');await other.getByRole('button',{name:'Starten',exact:true}).waitFor();await other.close();
+ authenticated=false;await page.reload();await page.getByRole('link',{name:'Anmelden',exact:true}).filter({visible:true}).waitFor();assert.equal(await page.getByRole('button',{name:'Pause',exact:true}).count(),0,'Expired session cannot expose a private timer');
+ console.log('Actual TimePage: navigation, page restart, paused restart, cross-tab pause/stop and expired session passed with a synthetic server ledger.');
  await context.close();console.log('PWA service worker, offline fallback, manifest integrity and page-restart theme persistence passed (browser emulation, not physical installation).');
 }finally{await browser.close();server?.kill();}

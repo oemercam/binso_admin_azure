@@ -653,7 +653,7 @@ function MonitoringCockpit({services,api,database,errorRate,incidents}:{services
 function MonitoringView() {
   const production=useBackendMode();
   const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
+  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;mailQueue?:Array<{status:string;count:number;oldest:string}>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
   const [toast,setToast]=useState<string|null>(null);
 
   useEffect(()=>{
@@ -691,6 +691,7 @@ function MonitoringView() {
       <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
       <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
     </div>
+    {!!data.mailQueue?.length&&<section className="surface"><SectionTitle title="Ausstehender E-Mail-Versand"/><p>Unklarer oder unterbrochener Versand muss beim Anbieter geprüft werden, bevor er erneut ausgelöst wird.</p><dl className="detail-list">{data.mailQueue.map(item=><div key={item.status}><dt>{{queued:"Wartend",failed:"Fehlgeschlagen",uncertain:"Zustellung unklar",sending:"Versand unterbrochen"}[item.status]??item.status}</dt><dd>{item.count} · seit {new Date(item.oldest).toLocaleString("de-CH")}</dd></div>)}</dl></section>}
     <section className="surface incident-history">
       <SectionTitle title="Ereignisse"/>
       {incidents.length?incidents.map(item=><div className="incident-row" key={String(item.id)}><span className={"incident-dot "+(String(item.status)==="resolved"?"resolved":"maintenance")}/><div><b>{String(item.title??"Ereignis")}</b><small>{String(item.service??"")} · {new Date(String(item.started_at)).toLocaleString("de-CH")}</small></div><Status tone={String(item.status)==="resolved"?"success":"warning"}>{operatorStatus(String(item.status))}</Status></div>):<EmptyState icon="chart" title="Keine Ereignisse" text="Es sind keine Plattform-Ereignisse erfasst."/>}

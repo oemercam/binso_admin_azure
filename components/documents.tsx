@@ -1,4 +1,6 @@
 "use client";
+import {EntityFiles} from "./entity-files";
+import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
 import {documentTotals} from "@/lib/money";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {FormWizard} from "./form-wizard";
@@ -53,11 +55,10 @@ type DocumentDraft = {
   positions: LineItem[];
 };
 
-type CustomerDirectory = Record<string,{id?:string;sector:string;city:string;address:string;zip:string}>;
 
 function useCustomerDirectory() {
   const {data,loading,error}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers");
-  const directory=useMemo(()=>{const next:CustomerDirectory={};for(const item of data?.items??[])next[item.name]={id:item.id,sector:item.sector??"",city:item.city??"",address:item.street??"",zip:item.postal_code??""};return next;},[data]);
+  const directory=useMemo(()=>{return customerDirectory(data?.items??[]);},[data]);
   return {directory,loading,error};
 }
 
@@ -243,9 +244,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const companyPending=kind==="Rechnung"&&company.loading;
   const paymentIssue=kind==="Rechnung"&&!company.loading?(company.error||invoicePaymentIssue(company.raw)):null;
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft,editing);
-  useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
+  useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer})))},[existing,directory,setDraft]);
   const selectedCustomerId=!existing?searchParams.get("customerId"):null;
-  useEffect(()=>{if(!selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer)setDraft(current=>({...current,customer:customer[0],customerId:selectedCustomerId}));},[selectedCustomerId,directory,setDraft]);
+  const initializedCustomer=useRef<string|null>(null);
+  useEffect(()=>{if(!selectedCustomerId||initializedCustomer.current===selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer){initializedCustomer.current=selectedCustomerId;setDraft(current=>({...current,customer:customer[1].name??customer[0],customerId:selectedCustomerId}));}},[selectedCustomerId,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
   const sourceTimeEntriesParam=kind==="Rechnung"?(searchParams.get("timeEntries")??""):"";
 
@@ -286,21 +288,22 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
-    const names=Object.keys(directory);
-    if(names.length&&(!draft.customer||!directory[draft.customer])) queueMicrotask(()=>setDraft(current=>({...current,customer:names[0]})));
-  },[existing,directory,draft.customer,setDraft]);
+    const selected=resolveCustomer({customer:draft.customer,customerId:draft.customerId},directory),first=Object.values(directory)[0];
+    if(selected&&((selected.name??draft.customer)!==draft.customer||selected.id!==draft.customerId))queueMicrotask(()=>setDraft(current=>({...current,customer:selected.name??current.customer,customerId:selected.id})));
+    else if(!draft.customer&&!draft.customerId&&first)queueMicrotask(()=>setDraft(current=>current.customer||current.customerId?current:{...current,customer:first.name??'',customerId:first.id}));
+  },[existing,directory,draft.customer,draft.customerId,setDraft]);
 
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
     if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError)return;
-    if(isProductionBackendEnabled()&&!draft.customer){show("Bitte zuerst einen Kunden erfassen.");return;}
+    if(isProductionBackendEnabled()&&!resolveCustomer(draft,directory)){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(paymentIssue){show(paymentIssue);return;}
     documentSavePending.current=true;setSaving(true);
     let savedNumber=draft.number;
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:directory[draft.customer]?.id??draft.customerId};
+        const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:resolveCustomer(draft,directory)?.id??draft.customerId};
         const requestBody=JSON.stringify(payload);
         if(!existing&&createRequest.current?.body!==requestBody)createRequest.current={body:requestBody,key:crypto.randomUUID()};
         const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload,{idempotencyKey:createRequest.current?.key});
@@ -338,6 +341,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory}/>
+            {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id}/>}
           </div>
           {(kind==="Angebot"&&draft.status==="accepted"&&(tenantCan(documentRole,"invoices:write")||tenantCan(documentRole,"projects:write"))||canRecordPayment)&&<aside className="document-desktop-rail">
             <section className="document-toolbox" aria-label="Dokumentaktionen">
@@ -377,7 +381,7 @@ function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number
 
 function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
   const totals=useDocumentTotals(draft);
-  const customer=directory[draft.customer]??{sector:"",city:"",address:"",zip:""};
+  const customer=resolveCustomer(draft,directory)??{sector:"",city:"",address:"",zip:""};
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
@@ -430,7 +434,7 @@ function DocumentEditor({ type, draft, onChange, directory, step }: { type:Docum
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
   const [positionDraft,setPositionDraft]=useState<LineItem|null>(null);
   const closePosition=()=>{setMobilePositionId(null);setPositionDraft(null);};
-  const customer=directory[draft.customer] ?? {sector:"",city:"",address:"",zip:""};
+  const customer=resolveCustomer(draft,directory) ?? {sector:"",city:"",address:"",zip:""};
 
   const updatePosition=(id:string,patch:Partial<LineItem>)=>{
     onChange({...draft,positions:draft.positions.map(item=>item.id===id?{...item,...patch}:item)});
@@ -455,8 +459,9 @@ function DocumentEditor({ type, draft, onChange, directory, step }: { type:Docum
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
         <span className="compact-section-label">Kunde</span>
         <Field label="Kunde auswählen">
-          <Select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value,customerId:undefined})}>
-            {names.map(name=><option key={name}>{name}</option>)}
+          <Select value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id})}}>
+            {!resolveCustomer(draft,directory)&&<option value="">Kunde auswählen</option>}
+            {names.map(key=><option key={key} value={key}>{directory[key].name??key}{directory[key].city?' · '+directory[key].city:''}</option>)}
           </Select>
         </Field>
         {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}

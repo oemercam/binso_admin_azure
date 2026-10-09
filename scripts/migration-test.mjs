@@ -559,7 +559,7 @@ try{
  console.log('Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.');
 
  // Full business process and short paths use actual handlers against isolated PostgreSQL fixtures.
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/permissions':permissions})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const projectHandler=await loadProcessRoute('app/api/projects/route.ts');
  globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
  const projectCreated=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
@@ -591,6 +591,10 @@ try{
  reloaded=(await listApiBusiness(client,session,'documents','id=eq.'+timeInvoice.id))[0];assert.equal(reloaded.payment_status,'paid');assert.equal(reloaded.paid_on,'2026-10-06','Completion date comes from chronologically accumulated actual payments');
  await assert.rejects(()=>atomic('create_payment_idempotent',{...finalArgs,p_idempotency_key:'process-paid-duplicate',p_amount:1}),e=>e.code==='payment_exceeds_balance');
  assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,404,'Invoiced time is locked');
+ const notificationRoute=await loadProcessRoute('app/api/notifications/route.ts');
+ const notificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,$2,'system','Synthetic notification','No personal data') returning id",[demo,session.userId])).rows[0].id;
+ const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
+ assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await db.query('select read_at from in_app_notifications where id=$1',[notificationId])).rows[0].read_at);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
  const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,200);
  const immediate=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.data.item.approved,true);
  const internalProcessTime=await manualTimeHandler.POST({body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
@@ -604,7 +608,22 @@ try{
  const {financialSummary}=await import(dataModule(summarySource));
  const ownerSummary=await financialSummary(client,session,documentArgs.p_customer_id);assert.ok(ownerSummary.invoices.length);assert.ok(Number(ownerSummary.time.ready_hours)>=1);
  const restrictedSummary=await financialSummary(client,{...session,role:'member'},documentArgs.p_customer_id);assert.equal(restrictedSummary.invoices.length,0);assert.equal(restrictedSummary.offers,null,'A shared workspace cannot expose restricted finance data');
- const activity=await loadProcessRoute('app/api/customers/[id]/activity/route.ts');
+ const activitySource=(await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions));
+ const activityModule=dataModule(activitySource);
+ const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule(summarySource))).replace('"./customer-activity"',JSON.stringify(activityModule));
+ const {customerWorkspace}=await import(dataModule(workspaceSource));
+ const workspace=await customerWorkspace(client,session,documentArgs.p_customer_id);assert.equal(workspace.item.id,documentArgs.p_customer_id);assert.deepEqual(workspace.summary,ownerSummary);assert.ok(workspace.documents.some(item=>item.id===timeInvoice.id));assert.ok(workspace.activity.some(item=>item.title==='Zahlung erhalten'));
+ for(const table of ['customers','customer_contacts','documents','payments','products','employees','expenses','projects','time_entries','support_tickets']){
+  const ownRows=await listApiBusiness(client,session,table,'');assert.ok(ownRows.length,table+' positive tenant fixture exists');
+  const foreignRows=await listApiBusiness(client,{...session,organizationId:sandbox,userId:'sandbox-user'},table,'id=eq.'+encodeURIComponent(String(ownRows[0].id)));assert.equal(foreignRows.length,0,table+' rejects a foreign direct ID in the canonical repository');
+ }
+ console.log('All ten canonical business repository sources reject foreign direct IDs with positive source fixtures.');
+ const restrictedWorkspace=await customerWorkspace(client,{...session,role:'member'},documentArgs.p_customer_id);assert.equal(restrictedWorkspace.documents.length,0);assert.equal(restrictedWorkspace.summary.invoices.length,0);assert.ok(!restrictedWorkspace.activity.some(item=>item.title==='Zahlung erhalten'));
+ await assert.rejects(()=>customerWorkspace(client,{...session,organizationId:sandbox},documentArgs.p_customer_id),e=>e.code==='not_found');
+ const activityRouteSource=(await fs.readFile('app/api/customers/[id]/activity/route.ts','utf8')).replace("'@/lib/server/repositories/customer-activity'",JSON.stringify(activityModule));
+ let compiledActivity=activityRouteSource;for(const [specifier,url] of Object.entries({'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac})){compiledActivity=compiledActivity.replaceAll("'"+specifier+"'",JSON.stringify(url));}
+ const activity=await import(dataModule(compiledActivity));
+
  const customerEvents=await activity.GET({}, {params:Promise.resolve({id:documentArgs.p_customer_id})});assert.equal(customerEvents.status,200,JSON.stringify(customerEvents));for(const title of ['Rechnung erstellt','Angebot angenommen','Zahlung erhalten','Projekt erstellt','Arbeitszeit erfasst'])assert.ok(customerEvents.data.items.some(item=>item.title===title),title);
  // Document retry replay, payload conflict and central counter behavior.
  const retryArgs={...documentArgs,p_idempotency_key:'document-repeat-fixture'};
@@ -633,7 +652,7 @@ try{
  function financialOpen(row){return Math.max(0,Math.round(Number(row.total)*100)-Math.round(Number(row.paid_amount)*100))/100;}
  console.log('V21.3 document idempotency/payload conflict, immutable server numbers, transaction/counter rollback, quote precision and cash/open-balance parity passed.');
  // Real upload/download handlers share tenant relations and enforce purpose permissions.
- const fileRelations=dataModule(await fs.readFile('lib/server/file-relations.ts','utf8'));
+ const fileRelations=dataModule(await fs.readFile('lib/file-associations.ts','utf8'));
  const validation=dataModule((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(processHttp)));
  const limits=dataModule(await fs.readFile('config/limits.ts','utf8'));
  const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};

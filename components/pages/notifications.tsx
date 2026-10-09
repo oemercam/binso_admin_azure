@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {useApiQuery} from "@/lib/client/use-api-query";
+import { useState } from "react";
 import { AppShell } from "../app-shell";
-import { apiGet, apiPatch, useBackendMode } from "@/lib/client/backend";
+import { apiPatch, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Icon } from "../ui";
 
 export type NotificationRecord={
@@ -32,9 +33,11 @@ export function NotificationsPage() {
   const production=useBackendMode();
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
   const [view,setView]=useState<"all"|"unread">("all");
-  const [remoteItems,setRemoteItems]=useState<NotificationRecord[]>([]);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
+  const query=useApiQuery<{items:NotificationRecord[]}>(production?"/api/notifications":null);
+  const remoteItems=query.data?.items??[];
+  const loading=query.loading;
+  const [mutationError,setMutationError]=useState<string|null>(null);
+  const error=mutationError??query.error;
   const items=[
     ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
     ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
@@ -42,43 +45,14 @@ export function NotificationsPage() {
     ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
   ];
 
-  const load=async()=>{
-    if(!production) return;
-    setLoading(true);
-    setError(null);
-    try{
-      const payload=await apiGet<{items:NotificationRecord[]}>("/api/notifications");
-      setRemoteItems(payload.items);
-    }catch(err){
-      setError(err instanceof Error?err.message:"Benachrichtigungen konnten nicht geladen werden.");
-    }finally{
-      setLoading(false);
-    }
-  };
-
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:NotificationRecord[]}>("/api/notifications")
-      .then(payload=>queueMicrotask(()=>{setRemoteItems(payload.items);setLoading(false);}))
-      .catch(err=>queueMicrotask(()=>{setError(err instanceof Error?err.message:"Benachrichtigungen konnten nicht geladen werden.");setLoading(false);}));
-  },[production]);
-
+  const load=()=>{setMutationError(null);query.refresh();};
   const markRead=async(id:string)=>{
-    setRemoteItems(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
-    try{
-      await apiPatch("/api/notifications/"+encodeURIComponent(id),{});
-    }catch{
-      void load();
-    }
+    try{await apiPatch("/api/notifications/"+encodeURIComponent(id),{});setMutationError(null);}
+    catch(err){setMutationError(err instanceof Error?err.message:"Benachrichtigung konnte nicht aktualisiert werden.");}
   };
-
   const markAll=async()=>{
-    setRemoteItems(current=>current.map(item=>({...item,read_at:item.read_at??new Date().toISOString()})));
-    try{
-      await apiPatch("/api/notifications",{action:"read_all"});
-    }catch{
-      void load();
-    }
+    try{await apiPatch("/api/notifications",{all:true});setMutationError(null);}
+    catch(err){setMutationError(err instanceof Error?err.message:"Benachrichtigungen konnten nicht aktualisiert werden.");}
   };
 
   if(production){

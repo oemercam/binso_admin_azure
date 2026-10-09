@@ -1,4 +1,5 @@
 "use client";
+import {useDataRevision} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
@@ -40,6 +41,7 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
+  const dataRevision=useDataRevision(["/api/settings/profile"]);
   const [loading,setLoading]=useState(true);
   const [loadError,setLoadError]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
@@ -51,6 +53,7 @@ export function AccountSettingsPage() {
   const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
 
   useEffect(()=>{
+    if(editing)return;
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
     apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
       .then(payload=>{
@@ -65,7 +68,7 @@ export function AccountSettingsPage() {
           setJobTitle(String(item.job_title??""));
         });
       }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[]);
+  },[editing,dataRevision]);
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
@@ -114,6 +117,7 @@ export function CompanySettingsPage() {
   const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
+  const dataRevision=useDataRevision(["/api/settings/company"]);
   const [loading,setLoading]=useState(true);
   const [loadError,setLoadError]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
@@ -128,6 +132,7 @@ export function CompanySettingsPage() {
   const uploadLogo=(file:File|undefined)=>{if(!file)return;if(!["image/png","image/jpeg","image/webp"].includes(file.type)){setToast("Bitte PNG, JPEG oder WebP auswählen.");return;}setPendingLogo(file);setLogoPreview(URL.createObjectURL(file))};
 
   useEffect(()=>{
+    if(editing)return;
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
     apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
       const item=payload.item;
@@ -142,7 +147,7 @@ export function CompanySettingsPage() {
         setPhone(String(item.phone??""));
       });
     }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[]);
+  },[editing,dataRevision]);
 
   const save=async(message="Firmendaten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);

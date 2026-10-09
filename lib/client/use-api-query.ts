@@ -14,6 +14,11 @@ export function useApiQuery<T>(path:string|null){
  const [retry,setRetry]=useState(0);
  useEffect(()=>{
   if(!path)return;
+  const interval=window.setInterval(()=>{if(document.visibilityState==='visible'&&navigator.onLine)setRetry(value=>value+1)},60000);
+  return()=>window.clearInterval(interval);
+ },[path]);
+ useEffect(()=>{
+  if(!path)return;
   let active=true;
   const session=dataRevision([]);
   apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch(error=>{if(active)setState({path,revision,session,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});});

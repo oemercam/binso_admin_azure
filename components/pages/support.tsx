@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
@@ -17,19 +18,11 @@ export function supportReference(id:string,caseNumber?:string|null){
 }
 
 export function useSupportRows(){
-  const [rows,setRows]=useState<string[][]>([]);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
-  useEffect(()=>{
-    apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?"/api/support/tickets":"/api/demo/data?collection=support_tickets")
-      .then(payload=>{
-        const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
-        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));
-      })
-      .catch(error=>setError(error instanceof Error?error.message:"Tickets konnten nicht geladen werden."))
-      .finally(()=>setLoading(false));
-  },[]);
-  return {rows,loading,error};
+  const production=useBackendMode();
+  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(production?"/api/support/tickets":"/api/demo/data?collection=support_tickets");
+  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
+  return {rows,loading:query.loading,error:query.error};
 }
 
 export function SupportPage() {
@@ -110,6 +103,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [ticketLoading,setTicketLoading]=useState(true);
   const [ticketError,setTicketError]=useState<string|null>(null);
   const [ticketRetry,setTicketRetry]=useState(0);
+  const revision=useDataRevision(["/api/support/tickets"]);
   const [sending,setSending]=useState(false);
   const sendPending=useRef(false);
   const uploadPending=useRef(false);
@@ -153,7 +147,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   useEffect(()=>{
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setTicketLoading(false));return;}
     let active=true;
-    queueMicrotask(()=>{if(active){setTicketLoading(true);setTicketError(null)}});
+    queueMicrotask(()=>{if(active){setTicketError(null)}});
     Promise.all([
       apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets"),
       apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages"),
@@ -164,7 +158,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       setTicket(current);setRemote(messages.items);
     }).catch(error=>{if(active)setTicketError(error instanceof Error?error.message:"Ticket konnte nicht geladen werden.")}).finally(()=>{if(active)setTicketLoading(false)});
     return()=>{active=false};
-  },[ticketId,ticketRetry]);
+  },[ticketId,ticketRetry,revision]);
 
   const send=async()=>{
     const value=draft.trim();
@@ -175,7 +169,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     if(isProductionBackendEnabled()){
       try{
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
-        setRemote(current=>[...current,payload.item]);
+        setRemote(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
       }catch(error){
         setDraft(current=>current.trim()?`${value}\n${current}`:value);
         setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");

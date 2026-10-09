@@ -13,7 +13,7 @@ export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>
   const length=Number(request.headers.get("content-length") ?? "0");
   if(length && length>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
   const raw=await request.text();
-  if(raw.length>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
+  if(Buffer.byteLength(raw,"utf8")>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
   try { return JSON.parse(raw) as T; }
   catch { throw new ApiError(400,"invalid_json","Ungültige Anfrage."); }
 }
@@ -48,7 +48,10 @@ export class ApiError extends Error {
 }
 
 export function apiError(error:unknown){
-  if(error instanceof Response) return json({error:error.status===403?"forbidden":"request_failed",message:error.status===403?"Keine Berechtigung.":"Die Anfrage konnte nicht verarbeitet werden."},error.status);
+  if(error instanceof Response){
+    const meaning:Record<number,{error:string;message:string}>={401:{error:"not_authenticated",message:"Bitte erneut anmelden."},403:{error:"forbidden",message:"Keine Berechtigung."},404:{error:"not_found",message:"Datensatz wurde nicht gefunden."},409:{error:"conflict",message:"Der Vorgang steht im Konflikt mit dem aktuellen Stand."},429:{error:"rate_limited",message:"Zu viele Anfragen. Bitte später erneut versuchen."},503:{error:"service_unavailable",message:"Der Dienst ist momentan nicht verfügbar."}};
+    return json(meaning[error.status]??{error:"request_failed",message:"Die Anfrage konnte nicht verarbeitet werden."},error.status);
+  }
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
   const databaseErrors:Record<string,{status:number;code:string;message:string}>={

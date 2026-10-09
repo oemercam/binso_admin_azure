@@ -1,4 +1,4 @@
-import {financialModuleUrl,moneyModuleUrl} from "./data-test-modules.mjs";
+import {financialModuleUrl,moneyModuleUrl,moduleUrl} from "./data-test-modules.mjs";
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createRequire} from 'node:module';
@@ -73,7 +73,7 @@ const readNodes=new Set(['DocumentReadView','useDocumentTotals','numberValue','m
 const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView};';
 const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const readExports={};
-Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels','documentTotals','openAmount',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels,documentTotals,financial.openAmount);
+Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels','documentTotals','openAmount','resolveCustomer',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels,documentTotals,financial.openAmount,(await import(moduleUrl(await fs.readFile('lib/customer-identity.ts','utf8')))).resolveCustomer);
 const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,0);
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');

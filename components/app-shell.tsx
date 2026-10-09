@@ -14,6 +14,7 @@ import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard
 import ConfirmDialog from "./confirm-dialog";
 import { PageHeading, DetailHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState} from "./ui";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
@@ -74,6 +75,7 @@ function AppShellFrame({
   unsavedChanges?: boolean;
 }) {
   const pathname=usePathname();
+  const identityRevision=useDataRevision(["/api/auth/session"]);
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
   const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
@@ -94,7 +96,7 @@ function AppShellFrame({
     window.addEventListener('binso-session-invalid',refresh);
     window.addEventListener('storage',storage);window.addEventListener('pageshow',resume);
     return()=>{active=false;window.removeEventListener('focus',refresh);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
-  },[pathname,accessRetry]);
+  },[pathname,accessRetry,identityRevision]);
 
   const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));},[access]);
   const accessModule=moduleForPath(pathname);
@@ -154,11 +156,15 @@ function AppShellFrame({
   const [timerNow, setTimerNow] = useState(0);
   const [timerProjectLabel,setTimerProjectLabel]=useState("");
   const [demoSession,setDemoSession]=useState(false);
-  const [notifications,setNotifications]=useState<NotificationItem[]>([]);
-  const [notificationsLoading,setNotificationsLoading]=useState(false);
-  const [notificationsError,setNotificationsError]=useState<string|null>(null);
+  const notificationQuery=useApiQuery<{items:NotificationItem[]}>(production?"/api/notifications":null);
+  const notifications=notificationQuery.data?.items??[];
+  const notificationsLoading=notificationQuery.loading;
+  const [notificationMutationError,setNotificationsError]=useState<string|null>(null);
+  const notificationsError=notificationMutationError??notificationQuery.error;
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
-  const [profile,setProfile]=useState<{name:string;identity:string;avatar:string}>({name:"",identity:"",avatar:""});
+  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(production?"/api/settings/profile":null);
+  const profileItem=profileQuery.data?.item;
+  const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [navCompact,setNavCompact]=useState(false);
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
@@ -250,26 +256,7 @@ function AppShellFrame({
   const searchLoading=production&&query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
   const searchError=remoteSearch.query===query.trim()?remoteSearch.error:null;
 
-  async function loadNotifications(){
-    if(!production) return;
-    setNotificationsLoading(true);
-    setNotificationsError(null);
-    try{
-      const payload=await apiGet<{items:NotificationItem[]}>("/api/notifications");
-      setNotifications(payload.items);
-    }catch(error){
-      setNotificationsError(error instanceof Error?error.message:"Benachrichtigungen konnten nicht geladen werden.");
-    }finally{
-      setNotificationsLoading(false);
-    }
-  }
-
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:NotificationItem[]}>("/api/notifications")
-      .then(payload=>queueMicrotask(()=>setNotifications(payload.items)))
-      .catch(()=>undefined);
-  },[production]);
+  function loadNotifications(){setNotificationsError(null);notificationQuery.refresh();}
 
   function openNotifications(){
     setSheet("notifications");
@@ -277,11 +264,10 @@ function AppShellFrame({
   }
 
   async function markNotificationRead(id:string){
-    setNotifications(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
     try{
       await apiPatch("/api/notifications/"+encodeURIComponent(id),{});
     }catch{
-      void loadNotifications();
+      setNotificationsError("Benachrichtigung konnte nicht aktualisiert werden.");
     }
   }
 
@@ -289,13 +275,7 @@ function AppShellFrame({
 
   const filtered=production&&query.trim().length>=2&&remoteSearch.query===query.trim()?remoteSearch.items.filter(item=>canOpen(item.href)):[];
   async function markAllRead(){try{await apiPatch("/api/notifications",{all:true});await loadNotifications();}catch{setNotificationsError("Benachrichtigungen konnten nicht als gelesen markiert werden.");}}
-  useEffect(()=>{
-    if(!production)return;
-    let active=true;
-    const refresh=()=>apiGet<{item?:Record<string,unknown>|null;email?:string}>("/api/settings/profile").then(({item,email})=>{if(active)setProfile({name:String(item?.display_name||[item?.first_name,item?.last_name].filter(Boolean).join(" ")||""),identity:String(email||""),avatar:String(item?.avatar_url||"")})}).catch(()=>undefined);
-    void refresh();window.addEventListener("binso-profile-changed",refresh);
-    return()=>{active=false;window.removeEventListener("binso-profile-changed",refresh)};
-  },[production]);
+
 
   useEffect(()=>{
     const listener=(event:Event)=>setDark((event as CustomEvent<{resolved:string}>).detail.resolved==="dark");
