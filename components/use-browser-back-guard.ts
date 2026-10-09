@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useRef} from "react";
+import {useLayoutEffect,useRef} from "react";
 
 type DraftGuard={blocked:()=>void};
 const guards=new Set<DraftGuard>();
@@ -34,9 +34,10 @@ function armBoundary(){
 }
 
 export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void){
+ // Register before paint: browser back may follow the input commit before passive effects run.
  const blocked=useRef(onBlocked);
- useEffect(()=>{blocked.current=onBlocked},[onBlocked]);
- useEffect(()=>{
+ useLayoutEffect(()=>{blocked.current=onBlocked},[onBlocked]);
+ useLayoutEffect(()=>{
   if(!dirty)return;
   const guard:DraftGuard={blocked:()=>blocked.current()};guards.add(guard);
   if(!boundary)boundary=armBoundary();

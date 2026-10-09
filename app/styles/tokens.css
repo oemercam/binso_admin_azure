@@ -103,6 +103,9 @@
   --control-help-font:10px;
   --control-x:11px;
   --control-radius:var(--radius-md);
+  --control-textarea-min:110px;
+  --control-disabled-opacity:.45;
+  --control-border:#d9d9d6;
 
   --dialog-edge-gap:16px;
   --sheet-max-width:560px;
@@ -134,6 +137,7 @@
 }
 
 html[data-theme="dark"]{
+  --control-border:#333;
   color-scheme:dark;
   --color-bg:#000;
   --color-fg:#fff;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 import {useState} from "react";
-import {Button,Logo} from "@/components/ui";
+import {Button, Logo, ErrorState} from "@/components/ui";
 
 export default function OperatorLogin(){
   const search=useSearchParams();
@@ -37,7 +37,7 @@ export default function OperatorLogin(){
     <p>Interner Zugang für Binso-Mitarbeitende über Microsoft Entra ID.</p>
     <Button onClick={startMicrosoft}>Mit Microsoft anmelden</Button>
     <p className="operator-login-note">Microsoft verwaltet Anmeldung, Microsoft Authenticator/MFA und Kontosicherheit. Zugriff erhalten nur im Binso-Entra-Tenant autorisierte Personen mit einer zugewiesenen Binso-One-App-Rolle.</p>
-    {(denied||error)&&<p className="auth-error" role="alert">{error||"Microsoft-Anmeldung erfolgreich, aber deinem Konto ist keine gültige Binso-One-Adminrolle zugewiesen."}</p>}
+    {(denied||error)&&<ErrorState className="auth-error">{error||"Microsoft-Anmeldung erfolgreich, aber deinem Konto ist keine gültige Binso-One-Adminrolle zugewiesen."}</ErrorState>}
     <div className="auth-divider"><span>Demo</span></div>
     <Button onClick={()=>void startDemo()} disabled={loading} variant="secondary">{loading?"Demo wird geöffnet…":"Admin Demo öffnen"}</Button>
     <p className="auth-bottom"><Link href="/">Zurück zu Binso One</Link></p>

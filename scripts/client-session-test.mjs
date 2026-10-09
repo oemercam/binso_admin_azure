@@ -1,14 +1,18 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import ts from 'typescript';
-const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
+const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2020}}).outputText).toString('base64');
 const makeStorage=()=>{const values=new Map();return {getItem:key=>values.get(key)??null,setItem:(key,value)=>{values.set(key,value)},removeItem:key=>values.delete(key)};};
 const local=makeStorage(),session=makeStorage();
 globalThis.window={localStorage:local,sessionStorage:session,dispatchEvent(){},location:{pathname:'/dashboard'}};
-globalThis.document={querySelector:()=>null};
+globalThis.document={querySelector:()=>null,addEventListener(){},visibilityState:'visible'};
+window.addEventListener=()=>{};
+const originalBroadcastChannel=globalThis.BroadcastChannel;globalThis.BroadcastChannel=undefined;
 const originalFetch=globalThis.fetch;
 try{
- const cacheUrl=moduleUrl(await fs.readFile('lib/client/session-cache.ts','utf8'));
+ const draftUrl=moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8'));
+ const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)));
+ const cacheUrl=moduleUrl((await fs.readFile('lib/client/session-cache.ts','utf8')).replace('"./data-events"',JSON.stringify(eventsUrl)));
  const cache=await import(cacheUrl);
  let resolveSession;let reads=0;
  globalThis.fetch=()=>{++reads;return new Promise(resolve=>{resolveSession=resolve});};
@@ -21,7 +25,7 @@ try{
  globalThis.fetch=async()=>{++reads;throw new Error('offline')};await assert.rejects(cache.readClientSession());
  globalThis.fetch=async()=>{throw new DOMException('timeout','TimeoutError')};await assert.rejects(cache.readClientSession(),/Sitzungsprüfung dauert zu lange/);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:false}));assert.equal((await cache.readClientSession()).authenticated,false,'A failed check must be retryable');
- const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl));
+ const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl)).replace('"./data-events"',JSON.stringify(eventsUrl));
  const backend=await import(moduleUrl(backendSource));
  globalThis.fetch=async()=>{throw new Error('offline')};
  await assert.rejects(backend.startDemoClientSession());assert.equal(local.getItem('binso.demo.session'),null,'Offline demo startup must not leave a fake active session');
@@ -35,6 +39,15 @@ try{
  await assert.rejects(backend.logoutClientSession(),/erneut/);assert.equal(local.getItem('binso.demo.session'),'1','Failed logout must preserve the current session state');
  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(local.getItem('binso.demo.session'),null);assert.equal(local.getItem('binso.theme.mode'),'light');assert.equal(cache.cachedClientSession(),null);
  console.log('Demo start deduplication, offline failure, session-cache isolation and confirmed logout with retry passed.');
+ local.setItem('binso.demo.session','1');
+ globalThis.fetch=async()=>new Response(JSON.stringify({ok:false}));
+ await assert.rejects(backend.logoutOperatorClientSession(),/bestätigt/);assert.equal(local.getItem('binso.demo.session'),'1','Unconfirmed operator logout cannot erase session state');
+ let resolveOperator;let operatorLogouts=0;
+ globalThis.fetch=()=>{operatorLogouts++;return new Promise(resolve=>{resolveOperator=resolve})};
+ const operatorLogout=backend.logoutOperatorClientSession();assert.equal(backend.logoutOperatorClientSession(),operatorLogout);assert.equal(operatorLogouts,1,'Concurrent operator logout is deduplicated');
+ resolveOperator(new Response(JSON.stringify({ok:true,microsoftLogoutUrl:null})));await operatorLogout;
+ assert.equal(local.getItem('binso.demo.session'),null);assert.equal(cache.cachedClientSession(),null);assert.equal(local.getItem('binso.theme.mode'),'light');
+ console.log('Confirmed operator logout clears the shared private session fence; unconfirmed logout preserves state and simultaneous clicks share one request.');
  const route=ts.createSourceFile('session.ts',await fs.readFile('app/api/auth/session/route.ts','utf8'),ts.ScriptTarget.Latest,true);
  const get=route.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='GET').getText(route);
  const compiled=ts.transpileModule(get,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
@@ -43,4 +56,4 @@ try{
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).tenant.readOnly,true,'A static preview is explicitly read-only');
  console.log('Expired database demo is unauthenticated; static cookie preview remains read-only.');
-}finally{globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}
+}finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

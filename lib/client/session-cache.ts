@@ -1,15 +1,20 @@
+import {resetClientData,dataRevision,subscribeClientData} from "./data-events";
 import type {PlanId} from "@/config/plan-access";
 
-export type ClientSession={authenticated:boolean;demo?:boolean;tenant?:{id?:string;role?:string;plan?:PlanId;readOnly?:boolean}};
+export type ClientSession={authenticated:boolean;user?:{id?:string};demo?:boolean;tenant?:{id?:string;role?:string;plan?:PlanId;readOnly?:boolean}};
 let cached:ClientSession|null=null;
 let validUntil=0;
 let pending:Promise<ClientSession>|null=null;
 let revision=0;
+let lastIdentity:string|null=null;
+let observedSessionRevision="",listening=false;
+function observeSession(){if(listening||typeof window==="undefined")return;listening=true;observedSessionRevision=dataRevision(['/api/auth/session']);subscribeClientData(()=>{const next=dataRevision(['/api/auth/session']);if(next!==observedSessionRevision){observedSessionRevision=next;invalidateClientSession(false);}});}
 
 /** Only retain permissions in memory; cookies and API authorization remain authoritative. */
 export function cachedClientSession(){return typeof window!=="undefined"&&Date.now()<validUntil?cached:null;}
-export function invalidateClientSession(){++revision;cached=null;validUntil=0;pending=null;}
+export function invalidateClientSession(notify=true){++revision;cached=null;validUntil=0;pending=null;if(notify)resetClientData();}
 export function readClientSession():Promise<ClientSession>{
+  observeSession();
   const saved=cachedClientSession();
   if(saved)return Promise.resolve(saved);
   if(pending)return pending;
@@ -20,6 +25,9 @@ export function readClientSession():Promise<ClientSession>{
     if(!response.ok)throw new Error(typeof payload.message==="string"?payload.message:"Zugang konnte nicht geprüft werden.");
     if(typeof payload.authenticated!=="boolean")throw new Error("Zugang konnte nicht geprüft werden.");
     if(startedRevision!==revision)throw new Error("Die Sitzung wurde geändert. Bitte erneut versuchen.");
+    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.user?.id,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);
+    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);
+    lastIdentity=identity;
     cached=payload;validUntil=Date.now()+30000;
     return payload as ClientSession;
   })();

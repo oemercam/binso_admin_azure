@@ -4,7 +4,7 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
 import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
-import { Button, Field, SectionTitle, Status, Toast, Input } from "./ui";
+import {Button, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 
 type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
@@ -109,7 +109,7 @@ export function SecuritySettingsPage(){
     </section>
     <section className="surface security-card">
       <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
-      {!mfa?mfaError?<div role="alert"><p>{mfaError}</p><Button variant="secondary" onClick={()=>{setMfaError("");void loadMfa()}}>Erneut versuchen</Button></div>:<p role="status">Sicherheitsstatus wird geladen…</p>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
+      {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen">{mfaError}</ErrorState>:<LoadingState>Sicherheitsstatus wird geladen…</LoadingState>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
         <div className="context-block"><Status tone={mfa.required?"warning":"info"}>{mfa.required?"Erforderlich":"Empfohlen"}</Status><b>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</b><span>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</span></div>
         {!setup&&<Button onClick={()=>void startSetup()}>Authenticator einrichten</Button>}
       </>}
@@ -131,7 +131,7 @@ export function SecuritySettingsPage(){
 
     <section className="surface security-card">
       <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}>Alle anderen abmelden</Button>:undefined}/>
-      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessionsError?<div role="alert"><p>{sessionsError}</p><Button variant="secondary" onClick={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}}>Erneut versuchen</Button></div>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
+      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen">{sessionsError}</ErrorState>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>

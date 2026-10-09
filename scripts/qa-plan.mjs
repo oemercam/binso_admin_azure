@@ -11,7 +11,7 @@ const groups={
  customers:{match:/customer|kunden|contact/,routes:['/kunden','/kunden/customer-one','/kunden/neu'],interactions:['customers']},
  employees:{match:/employee|mitarbeiter|personal/,routes:['/mitarbeiter','/mitarbeiter/employee-one','/mitarbeiter/neu'],interactions:['employees']},
  documents:{match:/document|invoice|quote|pdf|qr-bill|rechnungen|angebote/,routes:['/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/angebote','/angebote/AN-TEST-1','/angebote/neu'],interactions:['documents']},
- payments:{match:/payment|zahlungen/,routes:['/zahlungen','/zahlungen/payment-one','/zahlungen/neu'],interactions:[]},
+ payments:{match:/payment|zahlungen/,routes:['/zahlungen','/zahlungen/payment-one','/zahlungen/neu'],interactions:['data']},
  finance:{match:/finance|finanzen|dashboard|revenue/,routes:['/dashboard','/finanzen','/finanzen/analyse'],interactions:['finance']},
  time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu','/einstellungen/zeiterfassung'],interactions:['time']},
  expenses:{match:/expense|spesen/,routes:['/spesen','/spesen/expense-one','/spesen/neu'],interactions:['expenses']},
@@ -21,7 +21,7 @@ const groups={
  public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public\//,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo'],interactions:[]},
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
-const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
+const allInteractions=['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
@@ -38,8 +38,12 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
  if(global)suites.add('theme-selfcheck');
+ if(paths.some(p=>/^(components\/(ui|binso-ux|form-wizard|ux-lab)|scripts\/(eslint\/central-ui|ui-foundation-test))/.test(p)))suites.add('ui-foundation-test');
+ if(paths.some(p=>/^lib\/(client\/|money\.|financial-status\.|finance-periods\.)|^scripts\/data-foundation-test/.test(p)))suites.add('data-foundation-test');
+ if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/styles\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');
  if(paths.some(p=>/css|styles/.test(p)))suites.add('check-css-architecture');
  if(paths.some(p=>/document|invoice|qr|pdf/.test(p))){suites.add('document-presentation-test');suites.add('pwa-preview-test');}
  if(paths.some(p=>/session|auth/.test(p)))suites.add('client-session-test');

@@ -13,5 +13,5 @@ export async function withDemo<T>(fn:(c:PoolClient,s:SessionUser)=>Promise<T>){
   const found=await c.query('select id from organizations where id=$1 and is_demo=true',[current.organizationId]);
   if(!found.rowCount)throw new ApiError(503,'demo_unavailable','Demo-Daten sind noch nicht verfügbar.');
   return fn(c,current);
- });
+ },{snapshot:true});
 }

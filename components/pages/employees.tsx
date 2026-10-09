@@ -1,4 +1,5 @@
 "use client";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {FormWizard} from "../form-wizard";
 import {Avatar} from "../avatar";
@@ -18,7 +19,7 @@ import { RecordRow, RecordsView, TimeEntryRow } from "../records";
 import { employees, expenses } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select } from "../ui";
+import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
 import { useDemoRows, swissDate, formatMinutes } from "./shared";
 
@@ -46,14 +47,16 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [wizardStep,setWizardStep]=useState(0);
   const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
-  const [loadingRecord,setLoadingRecord]=useState(existing);
-  const [recordError,setRecordError]=useState<string|null>(null);
+  const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&employeeId?(production?"/api/employees/"+encodeURIComponent(employeeId):"/api/demo/data?collection=employees&id="+encodeURIComponent(employeeId)):null);
+  const loadingRecord=recordQuery.loading;
+  const recordError=recordQuery.error??(existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length?"Mitarbeiter wurde nicht gefunden.":null);
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
   const {dirty,markPristine}=useDirtySnapshot([firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
 
+  const ledgerRevision=useDataRevision(["/api/employees","/api/time-entries","/api/expenses","/api/files"]);
   const [canAddDocument,setCanAddDocument]=useState(false),[uploadingDocument,setUploadingDocument]=useState(false);
   const documentUploadBusy=useRef(false);
   useEffect(()=>{apiGet<{tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??"reader","employees:write"))).catch(()=>undefined)},[]);
@@ -85,12 +88,11 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       setLedgerErrors(errors);setLedgerLoading(false);
     });
     return()=>{active=false};
-  },[production,existing,employeeId,ledgerRetry]);
+  },[production,existing,employeeId,ledgerRetry,ledgerRevision]);
   useEffect(()=>{
-    if(!existing||!employeeId) return;
-    apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?"/api/employees/"+encodeURIComponent(employeeId):"/api/demo/data?collection=employees&id="+encodeURIComponent(employeeId)).then(payload=>{
-      const item=payload.item??payload.items?.[0];
-      if(!item)throw new Error("Mitarbeiter wurde nicht gefunden.");
+    if(!recordQuery.data||editingRecord)return;
+      const item=recordQuery.data.item??recordQuery.data.items?.[0];
+      if(!item)return;
       queueMicrotask(()=>{
         setFirstName(String(item.first_name??""));
         setLastName(String(item.last_name??""));
@@ -105,8 +107,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
         markPristine([String(item.first_name??""),String(item.last_name??""),String(item.email??""),String(item.phone??""),String(item.job_title??""),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??"").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??""),item.status==="inactive"?"Inaktiv":"Aktiv"]);
       });
-    }).catch(error=>setRecordError(error instanceof Error?error.message:"Mitarbeiter konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));
-  },[production,existing,employeeId,markPristine]);
+  },[recordQuery.data,editingRecord,markPristine]);
 
   const save=async()=>{
     if(saveRecordPending.current||loadingRecord||recordError)return;
@@ -133,7 +134,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
-  if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" subtitle={recordError?"Mitarbeiterdaten nicht verfügbar":"Daten werden geladen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter">{loadingRecord?<div role="status"><EmptyState icon="users" title="Mitarbeiter wird geladen" text="Die Mitarbeiterdaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="users" title="Mitarbeiter konnte nicht geladen werden" text={recordError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href="/mitarbeiter" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
+  if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" subtitle={recordError?"Mitarbeiterdaten nicht verfügbar":"Daten werden geladen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter">{loadingRecord?<div role="status"><EmptyState icon="users" title="Mitarbeiter wird geladen" text="Die Mitarbeiterdaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="users" title="Mitarbeiter konnte nicht geladen werden" text={recordError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={recordQuery.refresh}>Erneut versuchen</Button><Button href="/mitarbeiter" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
   return <AppShell unsavedChanges={dirty&&!savedRecord} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? role+" · "+formatQuantity(load,"%") : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}} title="Bearbeiten" navigation/>}<ActionRow href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} icon="clock" title="Zeiterfassung öffnen" navigation/><ActionRow href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} icon="card" title="Spese erfassen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
@@ -152,7 +153,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <div><dt>Wochenstunden</dt><dd>{formatQuantity(weeklyHours,"h/Woche")}</dd></div>
         <div><dt>Ferientage / Jahr</dt><dd>{formatQuantity(vacationDays,"Tage/Jahr")}</dd></div>
         {address&&<div><dt>Adresse</dt><dd>{address}</dd></div>}
-      </dl></>:<FormWizard guided={!existing} labels={["Persönliche Daten","Arbeitsverhältnis"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} action={<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}><div className="form-grid two" hidden={!existing&&wizardStep!==0}>
+      </dl></>:<FormWizard cancelAction={<Button variant="secondary" href="/mitarbeiter" disabled={savingRecord}>Abbrechen</Button>} guided={!existing} labels={["Persönliche Daten","Arbeitsverhältnis"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} action={<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}><div className="form-grid two" hidden={!existing&&wizardStep!==0}>
         <Field label="Vorname"><Input required autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><Input required autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
         <Field label="E-Mail"><Input required autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
@@ -167,9 +168,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></Select></Field>
       </div></FormWizard>}
     </div>}
-    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/>{ledgerLoading?<p role="status">Arbeitszeiten werden geladen …</p>:ledgerErrors.times?<div role="alert"><p>{ledgerErrors.times}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div>{ledger.times.map(item=><TimeEntryRow key={item.id} title={item.description||item.project_name||"Zeiteintrag"} meta={timeMetadata(item.description||item.project_name,item.project_name,undefined,swissDate(item.started_at))} value={formatMinutes(Number(item.duration_minutes))+" h"} status={item.invoiced_invoice_id?"Verrechnet":item.approved?"Freigegeben":item.billable===false?"Intern":"Erfasst"}/>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<EmptyState compact title="Keine Arbeitszeiten erfasst" text=""/>}</section>}
-    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/>{ledgerLoading?<p role="status">Spesen werden geladen …</p>:ledgerErrors.expenses?<div role="alert"><p>{ledgerErrors.expenses}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div>{ledger.expenses.map(item=><RecordRow key={item.id} href={"/spesen/"+item.id} title={item.merchant} meta={swissDate(item.expense_date)} value={formatCurrency(item.amount,item.currency??"CHF")} status={({submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",draft:"Entwurf",rejected:"Abgelehnt"} as Record<string,string>)[item.status??""]??item.status}/>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<EmptyState compact title="Keine Spesen erfasst" text=""/>}</section>}
-    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><SectionTitle title="Dokumente" action={canAddDocument?<><Button variant="secondary" disabled={uploadingDocument} onClick={()=>document.getElementById("employee-document-upload")?.click()}>{uploadingDocument?"Wird hochgeladen…":"Dokument hinzufügen"}</Button><Input id="employee-document-upload" hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" onChange={e=>{void addDocument(e.target.files?.[0]);e.target.value=""}}/></>:undefined}/>{ledgerLoading?<p role="status">Dokumente werden geladen …</p>:ledgerErrors.files?<div role="alert"><p>{ledgerErrors.files}</p><Button variant="secondary" onClick={()=>setLedgerRetry(value=>value+1)}>Erneut versuchen</Button></div>:null}<div>{ledger.files.map(item=><RecordRow key={item.id} href={"/api/files/"+item.id+"/download"} title={item.fileName} meta=""/>)}</div>{!ledgerLoading&&!ledgerErrors.files&&!ledger.files.length&&<EmptyState compact title="Keine Dokumente erfasst" text=""/>}</section>}
+    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/>{ledgerLoading?<LoadingState>Arbeitszeiten werden geladen …</LoadingState>:ledgerErrors.times?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.times}</ErrorState>:null}<div>{ledger.times.map(item=><TimeEntryRow key={item.id} title={item.description||item.project_name||"Zeiteintrag"} meta={timeMetadata(item.description||item.project_name,item.project_name,undefined,swissDate(item.started_at))} value={formatMinutes(Number(item.duration_minutes))+" h"} status={item.invoiced_invoice_id?"Verrechnet":item.approved?"Freigegeben":item.billable===false?"Intern":"Erfasst"}/>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<EmptyState compact title="Keine Arbeitszeiten erfasst" text=""/>}</section>}
+    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/>{ledgerLoading?<LoadingState>Spesen werden geladen …</LoadingState>:ledgerErrors.expenses?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.expenses}</ErrorState>:null}<div>{ledger.expenses.map(item=><RecordRow key={item.id} href={"/spesen/"+item.id} title={item.merchant} meta={swissDate(item.expense_date)} value={formatCurrency(item.amount,item.currency??"CHF")} status={({submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",draft:"Entwurf",rejected:"Abgelehnt"} as Record<string,string>)[item.status??""]??item.status}/>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<EmptyState compact title="Keine Spesen erfasst" text=""/>}</section>}
+    {existing&&employeeTab==="documents"&&<section className="surface employee-tab-panel"><SectionTitle title="Dokumente" action={canAddDocument?<><Button variant="secondary" disabled={uploadingDocument} onClick={()=>document.getElementById("employee-document-upload")?.click()}>{uploadingDocument?"Wird hochgeladen…":"Dokument hinzufügen"}</Button><Input id="employee-document-upload" hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" onChange={e=>{void addDocument(e.target.files?.[0]);e.target.value=""}}/></>:undefined}/>{ledgerLoading?<LoadingState>Dokumente werden geladen …</LoadingState>:ledgerErrors.files?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.files}</ErrorState>:null}<div>{ledger.files.map(item=><RecordRow key={item.id} href={"/api/files/"+item.id+"/download"} title={item.fileName} meta=""/>)}</div>{!ledgerLoading&&!ledgerErrors.files&&!ledger.files.length&&<EmptyState compact title="Keine Dokumente erfasst" text=""/>}</section>}
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{employeeTab!=="time"&&<Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="clock"/><span><b>Zeiterfassung</b><small>Arbeitszeiten öffnen</small></span><Icon name="arrow" size={15}/></Link>}{employeeTab!=="expenses"&&<Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="card"/><span><b>Spese erfassen</b><small>Neue Ausgabe hinzufügen</small></span><Icon name="arrow" size={15}/></Link>}</section></aside>}
     </div>

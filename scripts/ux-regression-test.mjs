@@ -1,3 +1,4 @@
+import {financialModuleUrl,moneyModuleUrl} from "./data-test-modules.mjs";
 import {readPageFile} from "./page-source.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -12,10 +13,11 @@ const requireReadCache=new Map(await Promise.all(['components/documents.tsx','co
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
+ '../business-idempotency':'export async function idempotentBusiness(c,input,write){return write()}',
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',
  '@/lib/permissions':'export const ownRecordOnly=()=>false;export const tenantCan=()=>true;',
- '@/lib/financial-status':ts.transpileModule(await readPageFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText,
+ '@/lib/financial-status':`export * from ${JSON.stringify(financialModuleUrl)}`,
  '@/lib/qr-bill':'export const invoicePaymentIssue=()=>null;',
 };
 for(const [specifier,stub] of Object.entries(dependencies))source=source.replace(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub)));
@@ -123,7 +125,8 @@ console.log('Desktop header icons render on a non-rasterized, pixel-stable appba
 const marketingCss=await readPageFile('app/styles/marketing.css','utf8');
 assert.ok(marketingCss.includes('.marketing-header{'),'Marketing header must exist');
 assert.ok(marketingCss.includes('-webkit-backdrop-filter:none'),'PWA entry headers must disable WebKit backdrop blur');
-assert.ok(marketingCss.includes('.portal-header{'),'Portal header must use the opaque header standard');
+for(const [file,target] of [['app/portal/page.tsx','/login'],['app/portal/login/page.tsx','/login'],['app/portal/registrieren/page.tsx','/registrieren']])assert.ok((await readPageFile(file,'utf8')).includes('redirect(\"'+target+'\")'),'Portal aliases preserve the canonical authentication route');
+assert.ok(!marketingCss.includes('.portal-'),'Unrendered legacy portal selectors must not return');
 assert.ok(marketingCss.includes('.demo-onboarding-header{'),'Demo onboarding header must use the opaque header standard');
 assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA headers must not render dimming pseudo overlays');
 assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
@@ -228,7 +231,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 }
 // Actual month calculations must respect partial and exclusive date bounds.
 {
- const source=await readPageFile('lib/finance-periods.ts','utf8');
+ const source=(await readPageFile('lib/finance-periods.ts','utf8')).replace('"./money"',JSON.stringify(moneyModuleUrl));
  const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
  const {buildFinanceMonths,financeWindow}=await import(moduleUrl(js));
  const lastThree=financeWindow("three","","","2026-10-08");assert.equal(lastThree.start.toLocaleDateString("sv-SE"),"2026-07-01");assert.equal(lastThree.end.toLocaleDateString("sv-SE"),"2026-10-01");
@@ -310,12 +313,12 @@ console.log('Project-linked idle timer context survives synchronization without 
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
  const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
- const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
  const render=(chip='Alle',sort='default',sortIndex=1)=>{
   let hook=0;const states=['',chip,sort,sortIndex,true];const exports={};
-  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}));
+  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch','Children','cloneElement','isValidElement',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}),React.Children,React.cloneElement,React.isValidElement);
   return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
@@ -336,7 +339,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}});
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}));
   for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
    const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
@@ -391,7 +394,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  };
  const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1'}}),reject:()=>reject(new Error('offline'))}};
  const noop=()=>{};
- const docScope=()=>({draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
+ const docScope=()=>({billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
  const expenseScope=()=>({expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
  for(const [file,fn,scopeFactory] of [['components/documents.tsx','DocumentPage',docScope],['components/app-pages.tsx','ExpenseForm',expenseScope]]){
   const pending=makeWrite();const scope=scopeFactory();scope.apiPost=pending.write;scope.apiPatch=pending.write;

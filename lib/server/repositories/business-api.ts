@@ -1,5 +1,6 @@
+import {idempotentBusiness} from "../business-idempotency";
 import "server-only";
-import {financialStatus,openAmount,paymentStatus} from "@/lib/financial-status";
+import {businessDate,financialStatus,openAmount,paymentStatus} from "@/lib/financial-status";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { audit } from "../audit";
@@ -36,9 +37,9 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      ${k==='invoice'?`(select q.quote_no from quotes q where q.id=d.source_quote_id and q.organization_id=d.organization_id)`:'null::text'} source_offer,
      ${k==='offer'?`(select i.invoice_no from invoices i where i.source_quote_id=d.id and i.organization_id=d.organization_id and i.archived_at is null and i.status<>'cancelled' limit 1)`:'null::text'} invoice_number,
      ${k==='offer'?`(select p.id from projects p where p.source_quote_id=d.id and p.organization_id=d.organization_id and p.archived_at is null limit 1)`:'null::uuid'} project_id,
-     coalesce((select sum(l.quantity*l.unit_price) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) subtotal,
-     coalesce((select sum(l.quantity*l.unit_price*l.vat_rate/100) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_amount,
-     ${k==='invoice'?'d.total_amount':`coalesce((select sum(l.quantity*l.unit_price*(1+l.vat_rate/100)) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
+     ${k==='invoice'?'d.subtotal':`coalesce((select round(sum(l.quantity*l.unit_price),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} subtotal,
+     ${k==='invoice'?'d.vat_amount':`coalesce((select round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} vat_amount,
+     ${k==='invoice'?'d.total_amount':`coalesce((select round(sum(l.quantity*l.unit_price),2)+round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
      json_build_object('name',c.name,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country) customer,
      coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
@@ -84,6 +85,13 @@ export function translateBusinessWrite(table:string,data:Row,insert:boolean){
  return {target,data:out};
 }
 export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:string,args:Row):Promise<unknown>{
+ if(operation!=='create_document_atomic')return executeBusinessMutation(c,s,operation,{...args});
+ if(!['invoice','offer'].includes(String(args.p_kind)))throw new ApiError(400,'kind_invalid','Ungültiger Dokumenttyp.');
+ if(!tenantCan(s.role,args.p_kind==='invoice'?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
+ const body={...args};delete body.p_idempotency_key;delete body.p_number;
+ return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.create.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,{...args}));
+}
+async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:string,args:Row):Promise<unknown>{
  if(operation==='create_payment_idempotent'){
   if(!tenantCan(s.role,'payments:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
   const key=String(args.p_idempotency_key);const hash=JSON.stringify(args);
@@ -112,9 +120,11 @@ export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:str
   const company=(await c.query('select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[s.organizationId])).rows[0];
   const issue=invoicePaymentIssue(company??{});if(issue)throw new ApiError(409,'invoice_payment_setup_required',issue);
  }
- if(!args.p_number&&operation==='create_document_atomic'){
-  const year=String(new Date().getFullYear());
-  const sequence=await c.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[s.organizationId,invoice?'invoice':'quote',year]);
+ if(operation==='create_document_atomic'){
+  const year=businessDate().slice(0,4);
+  const numberingTable=invoice?'invoices':'quotes',numberingColumn=invoice?'invoice_no':'quote_no';
+  const pattern=(invoice?'RE-':'AN-')+year+'-([0-9]{6})$';
+  const sequence=await c.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,coalesce((select max(substring(${numberingColumn} from $4)::integer) from ${numberingTable} where organization_id=$1),0)+2) on conflict(organization_id,kind,period) do update set next_value=greatest(business_document_counters.next_value+1,excluded.next_value) returning next_value-1 number`,[s.organizationId,invoice?'invoice':'quote',year,'^'+pattern]);
   args.p_number=(invoice?'RE-':'AN-')+year+'-'+String(sequence.rows[0].number).padStart(6,'0');
  }
  const table=invoice?'invoices':'quotes',numberColumn=invoice?'invoice_no':'quote_no',lineTable=invoice?'invoice_lines':'quote_lines',parentColumn=invoice?'invoice_id':'quote_id';
@@ -132,6 +142,7 @@ export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:str
  let id:string;
  if(operation==='update_document_atomic'){
   const existing=await c.query(`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`,[args.p_current_number,s.organizationId]);
+  if(args.p_number!==args.p_current_number)throw new ApiError(409,'number_immutable','Die bestehende Dokumentnummer kann nicht geändert werden.');
   const row=existing.rows[0];if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
   if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');

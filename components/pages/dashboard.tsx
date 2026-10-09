@@ -3,20 +3,22 @@
 import { DocumentSummaryRow, FinancialSummaryRow, type DocumentListItem } from "../document-list";
 import { formatCurrency, businessDate } from "@/lib/financial-status";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {sumMoney} from "@/lib/money";
+import { useState } from "react";
 import { AppShell } from "../app-shell";
 import { invoices, payments } from "@/lib/demo-data";
-import { apiGet, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, SectionTitle } from "../ui";
+import { isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import {useApiQuery} from "@/lib/client/use-api-query";
+import {Button, SectionTitle, LoadingState, ErrorState} from "../ui";
 import { MetricTiles, MetricTile } from "../binso-ux";
 import { moneyChf, swissDate, paymentMethodLabel } from "./shared";
 
 export function RevenueInsight({invoices,onMonthChange}:{invoices?:Array<Record<string,unknown>>;onMonthChange?:(month:number)=>void}) {
   const [activeMonth,setActiveMonth]=useState(()=>Number(businessDate().slice(5,7))-1);
   const months=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"], current=Array<number>(12).fill(0), previous=Array<number>(12).fill(0);
-  {const year=Number(businessDate().slice(0,4));for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===year) current[date.getMonth()]+=amount;else if(date.getFullYear()===year-1) previous[date.getMonth()]+=amount;}}
+  {const year=Number(businessDate().slice(0,4));for(const invoice of invoices??[]){const date=new Date(String(invoice.issue_date??""));if(Number.isNaN(date.getTime())) continue;const amount=Number(invoice.total??0);if(date.getFullYear()===year) current[date.getMonth()]=sumMoney([current[date.getMonth()],amount]);else if(date.getFullYear()===year-1) previous[date.getMonth()]=sumMoney([previous[date.getMonth()],amount]);}}
   const currentMonth=Number(businessDate().slice(5,7))-1;
-  const total=current.reduce((a,b)=>a+b,0), comparableTotal=current.slice(0,currentMonth).reduce((a,b)=>a+b,0), previousTotal=previous.slice(0,currentMonth).reduce((a,b)=>a+b,0), change=previousTotal?((comparableTotal-previousTotal)/previousTotal*100):null, max=Math.max(1,...current,...previous);
+  const total=sumMoney(current), comparableTotal=sumMoney(current.slice(0,currentMonth)), previousTotal=sumMoney(previous.slice(0,currentMonth)), change=previousTotal?((comparableTotal-previousTotal)/previousTotal*100):null, max=Math.max(1,...current,...previous);
   const activeChange=activeMonth<currentMonth&&previous[activeMonth]>0?((current[activeMonth]-previous[activeMonth])/previous[activeMonth])*100:null;
   return <section className="surface revenue-insight">
     <div className="revenue-insight-head"><div><h2>Umsatzentwicklung</h2><div className="revenue-total">{moneyChf(total)}</div>{change!==null&&<p className={change<0?"trend-negative":"trend-positive"}>{change<0?"↘":"↗"} {change.toFixed(1)} % <span>Jan–{months[currentMonth-1]} zum Vorjahr</span></p>}</div><span className="revenue-period">{businessDate().slice(0,4)}</span></div>
@@ -29,22 +31,12 @@ export function RevenueInsight({invoices,onMonthChange}:{invoices?:Array<Record<
 
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const production=useBackendMode()&&!forceDemo;
-  const [data,setData]=useState<{canInvoices?:boolean;canPayments?:boolean;stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>({});
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
+  const query=useApiQuery<{canInvoices?:boolean;canPayments?:boolean;stats?:Record<string,unknown>;invoices?:Array<Record<string,unknown>>;payments?:Array<Record<string,unknown>>;analyticsPayments?:Array<Record<string,unknown>>;analyticsInvoices?:Array<Record<string,unknown>>}>(isProductionBackendEnabled()&&production?"/api/dashboard":"/api/demo/dashboard");
+  const data=query.data??{},{loading,error,refresh}=query;
   const [dashboardMonth,setDashboardMonth]=useState(()=>Number(businessDate().slice(5,7))-1);
 
-  useEffect(()=>{
-    let active=true;
-    apiGet<typeof data>(isProductionBackendEnabled()&&!forceDemo?"/api/dashboard":"/api/demo/dashboard")
-      .then(payload=>{if(active){setData(payload);setError(null);}})
-      .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"Übersicht konnte nicht geladen werden.");})
-      .finally(()=>{if(active)setLoading(false);});
-    return()=>{active=false;};
-  },[production,forceDemo]);
-
   if(loading||error)return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
-    {loading?<p role="status">Übersicht wird geladen …</p>:<div role="alert"><p>{error}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}
+    {loading?<LoadingState>Übersicht wird geladen …</LoadingState>:<ErrorState onRetry={refresh} retryLabel="Erneut versuchen">{error}</ErrorState>}
   </AppShell>;
 
   const invoices=data.invoices??[];
@@ -54,8 +46,8 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const selectedYear=Number(businessDate().slice(0,4));
   const monthInvoices=analyticsInvoices.filter(item=>{const d=new Date(String(item.issue_date??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
   const monthPayments=analyticsPayments.filter(item=>{const d=new Date(String(item.paid_on??item.created_at??""));return !Number.isNaN(d.getTime())&&d.getFullYear()===selectedYear&&d.getMonth()===dashboardMonth;});
-  const monthRevenue=monthInvoices.reduce((sum,item)=>sum+Number(item.total??0),0);
-  const monthPaid=monthPayments.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const monthRevenue=sumMoney(monthInvoices.map(item=>item.total??0));
+  const monthPaid=sumMoney(monthPayments.map(item=>item.amount??0));
   const customerCount=Number(data.stats?.customer_count??0);
   const monthInvoiceCount=monthInvoices.reduce((sum,item)=>sum+Number(item.invoice_count??1),0);
 

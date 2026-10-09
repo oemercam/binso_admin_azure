@@ -1,3 +1,4 @@
+import {fileRelations} from "@/lib/server/file-relations";
 import { apiError } from "@/lib/server/http";
 import { requireSession } from "@/lib/server/session";
 import { authorize } from "@/lib/server/rbac";
@@ -16,8 +17,9 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
       [id,s.organizationId]
     )).rows[0]);
     if(!row)return new Response("Nicht gefunden.",{status:404});
-    if(row.purpose==='employee_document')authorize(s,'employees:read');
-    if(row.purpose==='expense_receipt'){authorize(s,'expenses:read');if(s.role==='member'&&row.expenseOwner!==s.userId)return new Response("Nicht gefunden.",{status:404});}
+    const relation=fileRelations[row.purpose];
+    if(relation)authorize(s,relation.read);
+    if(row.purpose==='expense_receipt'&&s.role==='member'&&row.expenseOwner!==s.userId)return new Response("Nicht gefunden.",{status:404});
     const blob=row.body?{body:new Uint8Array(row.body),contentType:row.mimeType}:row.storagePath?await getBlobByUrl(row.storagePath):null;
     if(!blob)return new Response("Dateiinhalt nicht verfügbar.",{status:404});
     return new Response(blob.body,{headers:{"content-type":blob.contentType,"content-disposition":`attachment; filename*=UTF-8''${encodeURIComponent(row.fileName)}`,"cache-control":"private, no-store","x-content-type-options":"nosniff"}});

@@ -1,4 +1,5 @@
 "use client";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
@@ -12,7 +13,7 @@ import { AppShell } from "../app-shell";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { plans as subscriptionPlans } from "@/lib/plans";
 import { legalConfig } from "@/config/legal";
-import { Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select } from "../ui";
+import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select, LoadingState, ErrorState} from "../ui";
 import { moneyChf } from "./shared";
 
 export function SettingsPage() {
@@ -32,6 +33,7 @@ function SettingsNavigation(){
 }
 
 export function AccountSettingsPage() {
+  const production=useBackendMode();
   const [profileName,setProfileName]=useState("");
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
@@ -40,8 +42,8 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const [loading,setLoading]=useState(true);
-  const [loadError,setLoadError]=useState<string|null>(null);
+  const query=useApiQuery<{item?:Record<string,unknown>|null;email?:string|null}>(production?"/api/settings/profile":null);
+  const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
@@ -51,21 +53,15 @@ export function AccountSettingsPage() {
   const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
-    apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
-      .then(payload=>{
-        const item=payload.item??{};
-        queueMicrotask(()=>{
-          setProfileName(String(item.display_name??""));
-          setFirstName(String(item.first_name??""));
-          setLastName(String(item.last_name??""));
-          setEmail(payload.email??"");
-          setPhone(String(item.phone??""));
-          setAvatarUrl(String(item.avatar_url??""));
-          setJobTitle(String(item.job_title??""));
-        });
-      }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[]);
+    if(editing||!query.data)return;
+    const payload=query.data,item=payload.item??{};
+    let active=true;
+    queueMicrotask(()=>{if(!active)return;
+      setProfileName(String(item.display_name??""));setFirstName(String(item.first_name??""));setLastName(String(item.last_name??""));
+      setEmail(payload.email??"");setPhone(String(item.phone??""));setAvatarUrl(String(item.avatar_url??""));setJobTitle(String(item.job_title??""));
+    });
+    return()=>{active=false};
+  },[editing,query.data]);
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
@@ -84,7 +80,7 @@ export function AccountSettingsPage() {
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||profileName||"Benutzer";
   return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
@@ -104,6 +100,7 @@ export function AccountSettingsPage() {
 }
 
 export function CompanySettingsPage() {
+  const production=useBackendMode();
   const [name,setName]=useState("");
   const [uid,setUid]=useState("");
   const [logoUrl,setLogoUrl]=useState("");
@@ -114,8 +111,8 @@ export function CompanySettingsPage() {
   const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const [loading,setLoading]=useState(true);
-  const [loadError,setLoadError]=useState<string|null>(null);
+  const query=useApiQuery<{item:Record<string,unknown>}>(production?"/api/settings/company":null);
+  const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
@@ -128,21 +125,14 @@ export function CompanySettingsPage() {
   const uploadLogo=(file:File|undefined)=>{if(!file)return;if(!["image/png","image/jpeg","image/webp"].includes(file.type)){setToast("Bitte PNG, JPEG oder WebP auswählen.");return;}setPendingLogo(file);setLogoPreview(URL.createObjectURL(file))};
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
-    apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
-      const item=payload.item;
-      queueMicrotask(()=>{
-        setName(String(item.name??""));
-        setUid(String(item.uid??""));
-        setLogoUrl(String(item.logo_url??""));
-        setStreet(String(item.street??""));
-        setPostalCode(String(item.postal_code??""));
-        setCity(String(item.city??""));
-        setEmail(String(item.email??""));
-        setPhone(String(item.phone??""));
-      });
-    }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[]);
+    if(editing||!query.data)return;
+    const item=query.data.item;let active=true;
+    queueMicrotask(()=>{if(!active)return;
+      setName(String(item.name??""));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));
+      setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));
+    });
+    return()=>{active=false};
+  },[editing,query.data]);
 
   const save=async(message="Firmendaten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
@@ -161,7 +151,7 @@ export function CompanySettingsPage() {
   };
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing&&(currentValues!==baseline||pendingLogo!==null)} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface company-logo-card">{(logoPreview||logoUrl)?<img src={logoPreview||logoUrl} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><Input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
@@ -346,8 +336,8 @@ export function NotificationSettingsPage() {
     finally{pending.current.delete(key);setSaving([...pending.current]);}
   };
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    {error&&<p role="alert">{error}</p>}
-    {!ready&&!error&&<p role="status">Einstellungen werden geladen …</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
+    {!ready&&!error&&<LoadingState>Einstellungen werden geladen …</LoadingState>}
     <section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span>{channel==="email"?"E-Mail":"Push"}</span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section>
   </AppShell>;
 }
@@ -360,7 +350,7 @@ export function LanguageSettingsPage() {
   const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache der Benutzeroberfläche." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} disabled={code!=="de-CH"} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{code!=="de-CH"?"Noch nicht vollständig verfügbar":language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
-    {error&&<p role="alert">{error}</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
     <p className="settings-note">Die Oberfläche ist derzeit vollständig auf Deutsch verfügbar. Weitere Sprachen werden erst nach vollständiger Übersetzung freigeschaltet.</p>
   </AppShell>;
 }
@@ -381,7 +371,7 @@ export function AppearanceSettingsPage() {
   useEffect(()=>{void loadTheme().then(mode=>{if(mode)setTheme(mode)}).catch(()=>setError("Darstellung konnte nicht geladen werden."));},[]);
   const choose=async(next:"light"|"dark"|"system")=>{try{await saveTheme(next);setTheme(next);setError("");}catch{setError("Darstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    {error&&<p role="alert">{error}</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
     <Link className="text-action" href="/einstellungen/sprache">Sprache wählen</Link>
     <div className="appearance-grid">
       <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>void choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>

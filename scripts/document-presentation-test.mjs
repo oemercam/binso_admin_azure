@@ -1,3 +1,4 @@
+import {financialModuleUrl,moneyModuleUrl,moduleUrl} from "./data-test-modules.mjs";
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createRequire} from 'node:module';
@@ -18,7 +19,7 @@ const company={raw:{name:'Alpenblick Digital AG',street:'Seefeldstrasse',buildin
 assert.ok(!/export function (InvoicePreview|OfferPreview)/.test(source),'Unused HTML renderers must not reintroduce a second preview');
 
 // Execute the production renderer used by the HTTP PDF endpoints; no alternative calculation.
-const pdfFinancial='data:text/javascript;base64,'+Buffer.from(ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
+const pdfFinancial=financialModuleUrl;
 const pdfModuleSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"@/lib/qr-bill"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'))).replace('"@/lib/financial-status"',JSON.stringify(pdfFinancial)).replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href));
 const pdfModuleJs=ts.transpileModule(pdfModuleSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const {documentPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
@@ -66,13 +67,13 @@ if(process.env.BINSO_BILLING_SAMPLE_DIR){
  for(const month of ['09','10']){const bytes=await documentPdf({...data,number:'BO-2026-'+month,status:'paid',total:49,subtotal:49,vat_amount:0,paid_amount:49,issue_date:'2026-'+month+'-01',customer:{name:'Musterwerk AG',city:'Bern'},items:[{description:'Binso One Business · Demo-Abonnement',quantity:1,unit:'Monat',unit_price:49,line_total:49,vat_rate:0}]},billingCompany);await fs.writeFile(process.env.BINSO_BILLING_SAMPLE_DIR+'/billing-2026-'+month+'.pdf',bytes);}
 }
 
-const financialJs=ts.transpileModule(await fs.readFile('lib/financial-status.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
-const financial=await import('data:text/javascript;base64,'+Buffer.from(financialJs).toString('base64'));
+const financial=await import(financialModuleUrl);
+const {documentTotals}=await import(moneyModuleUrl);
 const readNodes=new Set(['DocumentReadView','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate','documentPresentation']);
 const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView};';
 const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const readExports={};
-Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels);
+Function('require','exports','useMemo','Status','Link','financialStatus','financialStatusLabels','documentTotals','openAmount','resolveCustomer',readCompiled)(require,readExports,callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels,documentTotals,financial.openAmount,(await import(moduleUrl(await fs.readFile('lib/customer-identity.ts','utf8')))).resolveCustomer);
 const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,0);
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');

@@ -1,0 +1,42 @@
+{
+  "baseline": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+  "scope": "All matching baseline/final visible navigation cases. Different pixels can originate from changed content under translucent chrome; markup/geometry/computed CSS contracts are compared separately.",
+  "cases": [
+    {
+      "case": "dark-390-_operator_sperrungen.json",
+      "selector": ".operator-mobile-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": false
+    },
+    {
+      "case": "dark-390-_einstellungen_dokumente.json",
+      "selector": ".bottom-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": true
+    },
+    {
+      "case": "dark-390-_operator_tickets.json",
+      "selector": ".operator-mobile-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": true
+    },
+    {
+      "case": "light-390-_operator_tickets.json",
+      "selector": ".operator-mobile-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": true
+    },
+    {
+      "case": "light-390-_operator_sperrungen.json",
+      "selector": ".operator-mobile-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": false
+    },
+    {
+      "case": "light-390-_einstellungen_dokumente.json",
+      "selector": ".bottom-nav",
+      "same_geometry_text_classes_css": true,
+      "same_cropped_pixels": true
+    }
+  ]
+}

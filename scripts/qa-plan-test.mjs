@@ -20,3 +20,6 @@ assert.deepEqual(planChanges(['components/pdf-preview.tsx'],{level:'fast'}).inte
 assert.deepEqual(planChanges(['components/pages/products.tsx'],{level:'fast'}).widths,[390]);
 assert(!planChanges(['components/pages/products.tsx'],{level:'fast'}).routes.includes('/zeit'),'Product-only changes do not rebuild a cross-module browser scope');
 assert.equal(planChanges(['scripts/qa.mjs'],{level:'integration'}).level,'integration','Local integration uses representative coverage while required CI remains full');
+for(const path of ['components/form-wizard.tsx','components/ui.tsx','scripts/eslint/central-ui.mjs'])assert.ok(planChanges([path],{level:'fast'}).suites.includes('ui-foundation-test'),'FAST executes actual canonical-owner fixtures for '+path);
+for(const path of ['lib/client/backend.ts','lib/client/use-api-query.ts','lib/money.ts','lib/financial-status.ts','lib/finance-periods.ts'])assert.ok(planChanges([path],{level:'fast'}).suites.includes('data-foundation-test'),'FAST executes data/financial contracts for '+path);
+for(const path of ['app/styles/tokens.css','components/app-shell.tsx','components/operator.tsx'])assert.ok(planChanges([path],{level:'fast'}).suites.includes('navigation-foundation-test'),'FAST retains frozen-navigation contract for '+path);

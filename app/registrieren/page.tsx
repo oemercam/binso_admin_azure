@@ -6,7 +6,7 @@ import {FormEvent,useEffect,useMemo,useState} from "react";
 import {Eye,EyeOff} from "lucide-react";
 import {useBrowserBackGuard,allowDraftNavigation} from "@/components/use-browser-back-guard";
 import ConfirmDialog from "@/components/confirm-dialog";
-import {Button,Logo} from "@/components/ui";
+import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {billingCycles,domainConfig,planIds,type BillingCycle,type PlanId} from "@/config/domain";
 import {plans} from "@/lib/plans";
@@ -77,8 +77,8 @@ export default function Register(){
     <Logo/><h1>E-Mail bestätigen</h1>
     <p>Wir haben einen 6-stelligen Code an <b>{email}</b> gesendet. Erst nach der Bestätigung wird dein Testkonto freigeschaltet.</p>
     <form onSubmit={verify}>
-      <label>Bestätigungscode<input required autoFocus value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></label>
-      {error&&<p className="auth-error" role="alert">{error}</p>}
+      <Field label="Bestätigungscode"><Input required autoFocus value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></Field>
+      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
       <Button type="submit" disabled={loading||code.length!==6}>{loading?"Code wird geprüft…":"E-Mail bestätigen"}</Button>
     </form>
     <button type="button" className="auth-inline-action" onClick={()=>void resendVerification()}>Code erneut senden</button>
@@ -91,11 +91,11 @@ export default function Register(){
     <h1>Konto erstellen</h1><p>{domainConfig.trialDays} Tage kostenlos testen. Keine Kreditkarte erforderlich.</p>
     <div className="auth-plan-summary"><b>{plan.name}</b><span>{billingCycle==="yearly"?`CHF ${plan.yearly} / Jahr`:`CHF ${plan.monthly} / Monat`} nach Aktivierung</span><small>Ohne Abo nach der Testphase: Nur-Lesen, Daten bleiben erhalten.</small></div>
     <form onSubmit={submit}>
-      <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
-      <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
-      <label>Passwort<div className="password-field"><input required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 12 Zeichen"/><button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button></div><small className="password-hint">Mindestens 12 Zeichen.</small></label>
-      <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/><span>Ich akzeptiere die <Link href="/agb" target="_blank" rel="noopener noreferrer">AGB</Link> für Binso One und habe die <Link href="/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</Link> sowie die <Link href="/auftragsbearbeitung" target="_blank" rel="noopener noreferrer">Vereinbarung zur Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label>
-      {error&&<p className="auth-error" role="alert">{error}</p>}
+      <Field label="Firmenname"><Input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></Field>
+      <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
+      <Field label="Passwort"><div className="password-field"><Input required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 12 Zeichen"/><button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button></div><small className="password-hint">Mindestens 12 Zeichen.</small></Field>
+      <Field label={<><span>Ich akzeptiere die <Link href="/agb" target="_blank" rel="noopener noreferrer">AGB</Link> für Binso One und habe die <Link href="/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</Link> sowie die <Link href="/auftragsbearbeitung" target="_blank" rel="noopener noreferrer">Vereinbarung zur Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></>}><Input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/></Field>
+      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
       <Button type="submit" disabled={loading||!acceptedTerms}>{loading?"Account wird erstellt…":"Account erstellen"}</Button>
     </form>
     <div className="auth-after-submit"><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>

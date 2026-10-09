@@ -105,6 +105,7 @@
   min-height:30px;
   margin-bottom:var(--heading-content-gap);
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
   gap:12px;
@@ -323,7 +324,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   border-bottom:1px solid var(--color-line);
 }
 .detail-list dt{min-width:0;color:var(--color-muted);font-size:12px;overflow-wrap:anywhere;line-height:1.5}
-.detail-list dd{margin:0;font-size:12px;font-weight:550;overflow-wrap:anywhere}
+.detail-list dd{margin:0;font-size:12px;font-weight:550}
 .detail-list>div:last-child,
 .operator-detail-list>div:last-child,
 .compact-list>div:last-child,
@@ -415,8 +416,11 @@ textarea{
 .form-grid .full,.form-field.full{grid-column:1/-1}
 .form-field,
 .form-grid>label{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:var(--field-label-gap);min-width:0;font-size:var(--control-label-font);font-weight:var(--control-label-weight)}
-.form-grid textarea,
-.form-field textarea{min-height:110px;padding:var(--control-x);border-radius:var(--control-radius)}
+/* Native validation and read-only fields share semantic, theme-aware states. */
+.form-textarea{min-height:var(--control-textarea-min);padding:var(--control-x);border-radius:var(--control-radius);resize:vertical;overflow-wrap:anywhere}
+.form-control:disabled,.form-textarea:disabled,.form-check>input:disabled,.toggle:disabled{opacity:var(--control-disabled-opacity);cursor:not-allowed}
+.form-field>.form-error{color:var(--status-danger-fg);font-size:var(--control-help-font);font-weight:400;line-height:1.4}
+.form-field :is(input,select,textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
 html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .optional-details{padding:0;border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
 .optional-details summary{min-height:52px;display:flex;align-items:center;font-size:12px;font-weight:700;cursor:pointer}
@@ -532,7 +536,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .line-items>div:last-child,
 .document-line-items>div:last-child{border-bottom:0}
 .line-head{color:var(--color-muted);font-size:10px}
-.line-items input,.line-items select{height:36px;min-width:0;border-color:transparent;padding:0 5px;box-shadow:none;background:transparent}.document-line-item>.mobile-line-field:nth-of-type(n+2) input,.document-line-item>.mobile-line-field:nth-of-type(n+2) select{text-align:right;font-variant-numeric:tabular-nums}.line-head span:nth-child(n+2){text-align:right}
+.line-items input,.line-items select{min-width:0;border-color:transparent;padding:0 5px;box-shadow:none;background:transparent}.document-line-item>.mobile-line-field:nth-of-type(n+2) input,.document-line-item>.mobile-line-field:nth-of-type(n+2) select{text-align:right;font-variant-numeric:tabular-nums}.line-head span:nth-child(n+2){text-align:right}
 .line-remove{width:32px;height:32px;display:grid;place-items:center;border:0;background:transparent}
 .invoice-totals{width:min(100%,330px);margin:18px 0 0 auto}
 .invoice-totals>div,
@@ -689,9 +693,9 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .message>div{padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.5}
 .message small{display:block;margin-top:4px;color:var(--color-muted);font-size:9px}
 .message>span{display:block;margin:0 0 4px 4px;color:var(--color-muted);font-size:10px}
-.message-user{align-self:flex-end;text-align:right}
+.message-user{margin-left:auto;align-self:flex-end;text-align:right}
 .message-user>div{background:var(--color-inverse-bg);color:var(--color-inverse-fg);text-align:left;border-bottom-right-radius:4px}
-.message-support{align-self:flex-start}
+.message-support{margin-right:auto;align-self:flex-start}
 .message-support>div{background:var(--color-subtle);color:var(--color-fg);border-bottom-left-radius:4px}
 .thread-composer{
   position:static;
@@ -765,7 +769,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 }
 .settings-profile .button,
 .company-logo-card .button{margin-left:auto}
-.detail-list dd{min-width:0;overflow-wrap:anywhere}
 .ux-lab{padding:16px;max-width:100%;overflow-wrap:anywhere}
 .ux-lab>section{padding:20px 0;border-bottom:1px solid var(--color-line)}
 .ux-lab-viewer{height:600px;display:flex;flex-direction:column;min-width:0}
@@ -915,7 +918,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .session-list>div{
   min-height:64px;
   display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr) auto;
   gap:11px;
   align-items:center;
   border-bottom:1px solid var(--color-line);
@@ -1346,7 +1349,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .payment-donut-wrap{width:150px;flex:0 0 auto}
 .payment-donut-wrap .payment-donut{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:none;display:grid;place-items:center}
 .donut-ring{position:absolute;inset:0;border-radius:50%}
-.donut-center{position:relative;z-index:2;width:68%;aspect-ratio:1;border-radius:50%;background:var(--color-bg);display:grid;place-content:center;text-align:center;pointer-events:none}
+.donut-center{position:relative;z-index:2;width:68%;aspect-ratio:1;border-radius:50%;display:grid;place-content:center;text-align:center;pointer-events:none}
 .donut-center b{font-size:15px}.donut-center span{font-size:10px;color:var(--color-muted)}
 .donut-hit{position:absolute;z-index:3;border:0;background:transparent;padding:0;cursor:pointer}
 .paid-hit{inset:0 42% 0 0}.open-hit{inset:0 0 50% 42%}.overdue-hit{inset:50% 0 0 42%}
@@ -1528,7 +1531,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .contact-main{min-width:0;overflow-wrap:anywhere}
 .contact-main>.status{margin-top:var(--field-label-gap)}
 .contact-actions{align-self:start}
-.form-field.form-check{display:flex;align-items:center;gap:var(--field-label-gap);min-height:var(--control-h)}
+.form-field.form-check{display:flex;flex-wrap:wrap;align-items:center;gap:var(--field-label-gap);min-height:var(--control-h)}
+.form-check>.form-error,.form-check>small{flex-basis:100%}
 .form-check>input{width:var(--check-size);height:var(--check-size);min-height:var(--check-size);flex:0 0 var(--check-size);margin:0;accent-color:var(--color-fg)}
 .time-filter-toolbar{align-items:end;flex-wrap:wrap}
 .time-filter-toolbar .form-field{min-width:140px;width:160px}

@@ -1,0 +1,1988 @@
+{
+  "main": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+  "foundationHead": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+  "prs": [
+    {
+      "number": 229,
+      "title": "V21.3: Zentrales Datenfundament, Finanzkonsistenz und Prozessintegrität",
+      "state": "open",
+      "draft": true,
+      "merged": null,
+      "head": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+      "branch": "refactor/v21-3-central-data-foundation-20261009"
+    },
+    {
+      "number": 228,
+      "title": "V21.1: central UI ownership, shared operator controls/dialogs and complete route audit",
+      "state": "open",
+      "draft": true,
+      "merged": null,
+      "head": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
+      "branch": "refactor/v21-1-central-ui-foundation-20261009"
+    },
+    {
+      "number": 227,
+      "title": "Standardize business PDFs and Swiss QR pages; preserve app shell during navigation",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-09T16:45:18Z",
+      "head": "ca7ea9c184d3606d009ec70a24a1f7b76dffc90f",
+      "branch": "fix/pdf-loading-standard-20261009"
+    },
+    {
+      "number": 226,
+      "title": "fix(ux): preserve account avatar spacing in shared header panels",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-09T13:17:23Z",
+      "head": "bc0e4b4bebcd77e080bc269e46f127fde40e1e37",
+      "branch": "fix/avatar-panel-layout-20261009"
+    },
+    {
+      "number": 225,
+      "title": "BINSO ONE: enforce central UX architecture and guarded interactions",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-09T12:29:51Z",
+      "head": "2933dbf1c499483a4550caef390307ce4088cf19",
+      "branch": "fix/final-central-ux-20261009"
+    },
+    {
+      "number": 224,
+      "title": "Enforce shared UX contracts and document all-route acceptance",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-09T09:24:17Z",
+      "head": "036d65eecbda5309215307977aa857f2c7a16df9",
+      "branch": "fix/root-ux-standard-enforcement-20261009"
+    },
+    {
+      "number": 223,
+      "title": "Deep UX audit: shared layout corrections and single-page PDF viewer",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-09T01:09:43Z",
+      "head": "799097e04b8f8f4f01594f0d5aacef7f6c5d12cb",
+      "branch": "fix/deep-ux-page-viewer-20261009"
+    },
+    {
+      "number": 222,
+      "title": "Central UX correction and single-page PDF viewer with rendered DOM audit",
+      "state": "open",
+      "draft": false,
+      "merged": null,
+      "head": "75d5aa04bebfdbc0ea81ff82373d8cdaf2fc5510",
+      "branch": "fix/pdf-single-page-viewer-20261009"
+    },
+    {
+      "number": 221,
+      "title": "Central UX architecture: isolated modules, shared sheets/rows and faster scoped QA",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-08T23:40:21Z",
+      "head": "d5bf81a9eeb5ab94b8ea0bb2873878e400d5e6c6",
+      "branch": "refactor/central-ux-architecture"
+    },
+    {
+      "number": 220,
+      "title": "fix: finale UX-Regressionskorrekturen für Kunden, Zeit und Finanzen",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-08T22:15:20Z",
+      "head": "2cba2c8c55d5839a6c92726c9a1ffd63a6b1b24e",
+      "branch": "fix/final-ux-regressions"
+    },
+    {
+      "number": 219,
+      "title": "UX audit: shared sheets, responsive fixes and scoped quality pipeline",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-08T20:22:40Z",
+      "head": "c8ce610bb695b529dcde6267eaaa367119707b87",
+      "branch": "feat/ux-audit-fast-development"
+    },
+    {
+      "number": 218,
+      "title": "test: isolate WebKit route cases before production deployment",
+      "state": "closed",
+      "draft": false,
+      "merged": "2026-10-08T19:00:43Z",
+      "head": "2cda9ffa2cc1aae739ab1979fbbe0613024b0641",
+      "branch": "fix/webkit-route-isolation"
+    }
+  ],
+  "runs": [
+    {
+      "id": 37989005761,
+      "name": "Quality",
+      "sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "in_progress",
+      "conclusion": null,
+      "created": "2026-10-09T20:44:35Z",
+      "updated": "2026-10-09T20:46:45Z"
+    },
+    {
+      "id": 37987478360,
+      "name": "Quality",
+      "sha": "023b21085f783092cab6cfb34ed12b900e153c30",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "failure",
+      "created": "2026-10-09T20:30:40Z",
+      "updated": "2026-10-09T20:42:43Z"
+    },
+    {
+      "id": 37986795907,
+      "name": "Quality",
+      "sha": "18b78349479cb419595dd8af50cad30dd43b50af",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created": "2026-10-09T20:24:39Z",
+      "updated": "2026-10-09T20:32:13Z"
+    },
+    {
+      "id": 37986369072,
+      "name": "Quality",
+      "sha": "fea9bcb76b9fcaeefce5cf0813eae17f58ef03b9",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created": "2026-10-09T20:20:54Z",
+      "updated": "2026-10-09T20:26:09Z"
+    },
+    {
+      "id": 37985911992,
+      "name": "Quality",
+      "sha": "249cd5486edbd7799be9b72525286b45a3c6f2c2",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "failure",
+      "created": "2026-10-09T20:16:51Z",
+      "updated": "2026-10-09T20:18:16Z"
+    },
+    {
+      "id": 37980706257,
+      "name": "Quality",
+      "sha": "0350f46aa07c61ebd83323b39b913a010b190350",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "failure",
+      "created": "2026-10-09T19:30:36Z",
+      "updated": "2026-10-09T19:40:09Z"
+    },
+    {
+      "id": 37980327118,
+      "name": "Quality",
+      "sha": "876941f7180a164add10dd1b48924482ad578f2d",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created": "2026-10-09T19:27:16Z",
+      "updated": "2026-10-09T19:31:37Z"
+    },
+    {
+      "id": 37979771072,
+      "name": "Quality",
+      "sha": "9bab314325a67cdb88e875f651a44e93a66bd8e9",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created": "2026-10-09T19:22:20Z",
+      "updated": "2026-10-09T19:28:13Z"
+    },
+    {
+      "id": 37978353753,
+      "name": "Quality",
+      "sha": "447b0ae5db240ca4320b384f0e85729fa4203c31",
+      "branch": "refactor/v21-3-central-data-foundation-20261009",
+      "status": "completed",
+      "conclusion": "failure",
+      "created": "2026-10-09T19:10:05Z",
+      "updated": "2026-10-09T19:20:21Z"
+    },
+    {
+      "id": 37972538262,
+      "name": "Quality",
+      "sha": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
+      "branch": "refactor/v21-1-central-ui-foundation-20261009",
+      "status": "completed",
+      "conclusion": "success",
+      "created": "2026-10-09T18:20:04Z",
+      "updated": "2026-10-09T18:29:17Z"
+    },
+    {
+      "id": 37962814471,
+      "name": "Deploy Azure App Service",
+      "sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+      "branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created": "2026-10-09T16:57:27Z",
+      "updated": "2026-10-09T17:05:10Z"
+    },
+    {
+      "id": 37961392051,
+      "name": "Quality",
+      "sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+      "branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created": "2026-10-09T16:45:21Z",
+      "updated": "2026-10-09T16:57:24Z"
+    },
+    {
+      "id": 37941886968,
+      "name": "Quality",
+      "sha": "ca7ea9c184d3606d009ec70a24a1f7b76dffc90f",
+      "branch": "fix/pdf-loading-standard-20261009",
+      "status": "completed",
+      "conclusion": "success",
+      "created": "2026-10-09T14:07:49Z",
+      "updated": "2026-10-09T14:19:46Z"
+    },
+    {
+      "id": 37940855609,
+      "name": "Quality",
+      "sha": "082d27651651aabee7fd87a3dce8d87fea4ca88a",
+      "branch": "fix/pdf-loading-standard-20261009",
+      "status": "completed",
+      "conclusion": "failure",
+      "created": "2026-10-09T13:59:35Z",
+      "updated": "2026-10-09T14:06:19Z"
+    },
+    {
+      "id": 37937190272,
+      "name": "Deploy Azure App Service",
+      "sha": "87fcfc2f9ac5f354696d9be9ceb9b7d0bb278406",
+      "branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created": "2026-10-09T13:29:21Z",
+      "updated": "2026-10-09T13:37:38Z"
+    }
+  ],
+  "health": {
+    "checkedAt": "2026-10-09T20:57:21.116Z",
+    "sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+    "status": "ok",
+    "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/api/health"
+  },
+  "timings": [
+    [
+      {
+        "id": 113924817535,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahnLCfw",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113924817535",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113924817535",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:45:21Z",
+        "started_at": "2026-10-09T16:45:23Z",
+        "completed_at": "2026-10-09T16:46:14Z",
+        "name": "checks",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:45:24Z",
+            "completed_at": "2026-10-09T16:45:25Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:45:25Z",
+            "completed_at": "2026-10-09T16:45:27Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:45:27Z",
+            "completed_at": "2026-10-09T16:45:36Z"
+          },
+          {
+            "name": "Run pnpm release:check",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:45:36Z",
+            "completed_at": "2026-10-09T16:45:36Z"
+          },
+          {
+            "name": "Run pnpm test",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:45:36Z",
+            "completed_at": "2026-10-09T16:45:49Z"
+          },
+          {
+            "name": "Run pnpm lint",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T16:45:49Z",
+            "completed_at": "2026-10-09T16:46:00Z"
+          },
+          {
+            "name": "Run pnpm css:check",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:46:00Z",
+            "completed_at": "2026-10-09T16:46:00Z"
+          },
+          {
+            "name": "Run pnpm typecheck",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T16:46:00Z",
+            "completed_at": "2026-10-09T16:46:06Z"
+          },
+          {
+            "name": "Run pnpm security:scan",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:46:06Z",
+            "completed_at": "2026-10-09T16:46:06Z"
+          },
+          {
+            "name": "Full dependency audit including development tooling",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T16:46:06Z",
+            "completed_at": "2026-10-09T16:46:07Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 19,
+            "started_at": "2026-10-09T16:46:07Z",
+            "completed_at": "2026-10-09T16:46:11Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 20,
+            "started_at": "2026-10-09T16:46:11Z",
+            "completed_at": "2026-10-09T16:46:11Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 21,
+            "started_at": "2026-10-09T16:46:11Z",
+            "completed_at": "2026-10-09T16:46:11Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113924817535",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002809,
+        "runner_name": "GitHub Actions 1000002809",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 113924817769,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahnLDaQ",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113924817769",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113924817769",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:45:21Z",
+        "started_at": "2026-10-09T16:45:24Z",
+        "completed_at": "2026-10-09T16:45:35Z",
+        "name": "plan",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:45:25Z",
+            "completed_at": "2026-10-09T16:45:26Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:45:26Z",
+            "completed_at": "2026-10-09T16:45:30Z"
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:45:30Z",
+            "completed_at": "2026-10-09T16:45:31Z"
+          },
+          {
+            "name": "Select conservative QA scope",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:45:31Z",
+            "completed_at": "2026-10-09T16:45:31Z"
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:45:31Z",
+            "completed_at": "2026-10-09T16:45:31Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T16:45:31Z",
+            "completed_at": "2026-10-09T16:45:32Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:45:32Z",
+            "completed_at": "2026-10-09T16:45:32Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113924817769",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002807,
+        "runner_name": "GitHub Actions 1000002807",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 113924817816,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahnLDmA",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113924817816",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113924817816",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:45:21Z",
+        "started_at": "2026-10-09T16:45:24Z",
+        "completed_at": "2026-10-09T16:47:13Z",
+        "name": "build",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:45:24Z",
+            "completed_at": "2026-10-09T16:45:25Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:45:25Z",
+            "completed_at": "2026-10-09T16:45:28Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:45:28Z",
+            "completed_at": "2026-10-09T16:45:37Z"
+          },
+          {
+            "name": "Restore Next compiler cache (never a completed build)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:45:37Z",
+            "completed_at": "2026-10-09T16:45:37Z"
+          },
+          {
+            "name": "Run pnpm build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:45:37Z",
+            "completed_at": "2026-10-09T16:46:28Z"
+          },
+          {
+            "name": "Runtime smoke test",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T16:46:28Z",
+            "completed_at": "2026-10-09T16:46:31Z"
+          },
+          {
+            "name": "Package production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:46:31Z",
+            "completed_at": "2026-10-09T16:46:57Z"
+          },
+          {
+            "name": "Smoke test exact production artifact",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T16:46:57Z",
+            "completed_at": "2026-10-09T16:47:03Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:47:03Z",
+            "completed_at": "2026-10-09T16:47:06Z"
+          },
+          {
+            "name": "Post Restore Next compiler cache (never a completed build)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-10-09T16:47:06Z",
+            "completed_at": "2026-10-09T16:47:08Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-10-09T16:47:08Z",
+            "completed_at": "2026-10-09T16:47:10Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 18,
+            "started_at": "2026-10-09T16:47:10Z",
+            "completed_at": "2026-10-09T16:47:11Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 19,
+            "started_at": "2026-10-09T16:47:11Z",
+            "completed_at": "2026-10-09T16:47:11Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113924817816",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002808,
+        "runner_name": "GitHub Actions 1000002808",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 113925570436,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahn4_hA",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113925570436",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113925570436",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:47:13Z",
+        "started_at": "2026-10-09T16:47:15Z",
+        "completed_at": "2026-10-09T16:57:14Z",
+        "name": "browser (chromium)",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:47:15Z",
+            "completed_at": "2026-10-09T16:47:16Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:47:16Z",
+            "completed_at": "2026-10-09T16:47:18Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:47:18Z",
+            "completed_at": "2026-10-09T16:47:25Z"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:47:25Z",
+            "completed_at": "2026-10-09T16:47:28Z"
+          },
+          {
+            "name": "Extract exact production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:47:28Z",
+            "completed_at": "2026-10-09T16:47:33Z"
+          },
+          {
+            "name": "Restore pinned browser binaries",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T16:47:33Z",
+            "completed_at": "2026-10-09T16:47:35Z"
+          },
+          {
+            "name": "Install one browser engine",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:47:35Z",
+            "completed_at": "2026-10-09T16:47:50Z"
+          },
+          {
+            "name": "Save installed browser binaries",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-10-09T16:47:50Z",
+            "completed_at": "2026-10-09T16:47:50Z"
+          },
+          {
+            "name": "Scoped responsive UX and process regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:47:50Z",
+            "completed_at": "2026-10-09T16:56:16Z"
+          },
+          {
+            "name": "Development-only shared component reference regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T16:56:16Z",
+            "completed_at": "2026-10-09T16:56:37Z"
+          },
+          {
+            "name": "FULL PWA restart and offline regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-09T16:56:37Z",
+            "completed_at": "2026-10-09T16:56:39Z"
+          },
+          {
+            "name": "Startup, session and persistent navigation regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T16:56:39Z",
+            "completed_at": "2026-10-09T16:57:05Z"
+          },
+          {
+            "name": "Upload browser evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-09T16:57:05Z",
+            "completed_at": "2026-10-09T16:57:11Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T16:57:11Z",
+            "completed_at": "2026-10-09T16:57:11Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26,
+            "started_at": "2026-10-09T16:57:11Z",
+            "completed_at": "2026-10-09T16:57:11Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27,
+            "started_at": "2026-10-09T16:57:11Z",
+            "completed_at": "2026-10-09T16:57:11Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113925570436",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002810,
+        "runner_name": "GitHub Actions 1000002810",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 113925570523,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahn4_2w",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113925570523",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113925570523",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:47:13Z",
+        "started_at": "2026-10-09T16:47:15Z",
+        "completed_at": "2026-10-09T16:54:13Z",
+        "name": "browser (webkit)",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:47:16Z",
+            "completed_at": "2026-10-09T16:47:17Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:47:17Z",
+            "completed_at": "2026-10-09T16:47:19Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:47:19Z",
+            "completed_at": "2026-10-09T16:47:27Z"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:47:27Z",
+            "completed_at": "2026-10-09T16:47:31Z"
+          },
+          {
+            "name": "Extract exact production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:47:31Z",
+            "completed_at": "2026-10-09T16:47:36Z"
+          },
+          {
+            "name": "Restore pinned browser binaries",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T16:47:36Z",
+            "completed_at": "2026-10-09T16:47:38Z"
+          },
+          {
+            "name": "Install one browser engine",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:47:38Z",
+            "completed_at": "2026-10-09T16:48:06Z"
+          },
+          {
+            "name": "Save installed browser binaries",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-10-09T16:48:06Z",
+            "completed_at": "2026-10-09T16:48:06Z"
+          },
+          {
+            "name": "Scoped responsive UX and process regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:48:06Z",
+            "completed_at": "2026-10-09T16:53:39Z"
+          },
+          {
+            "name": "Development-only shared component reference regression",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 10,
+            "started_at": "2026-10-09T16:53:39Z",
+            "completed_at": "2026-10-09T16:53:39Z"
+          },
+          {
+            "name": "FULL PWA restart and offline regression",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11,
+            "started_at": "2026-10-09T16:53:39Z",
+            "completed_at": "2026-10-09T16:53:39Z"
+          },
+          {
+            "name": "Startup, session and persistent navigation regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T16:53:39Z",
+            "completed_at": "2026-10-09T16:54:07Z"
+          },
+          {
+            "name": "Upload browser evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-09T16:54:07Z",
+            "completed_at": "2026-10-09T16:54:10Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T16:54:10Z",
+            "completed_at": "2026-10-09T16:54:10Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26,
+            "started_at": "2026-10-09T16:54:10Z",
+            "completed_at": "2026-10-09T16:54:10Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27,
+            "started_at": "2026-10-09T16:54:10Z",
+            "completed_at": "2026-10-09T16:54:10Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113925570523",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002811,
+        "runner_name": "GitHub Actions 1000002811",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 113929571497,
+        "run_id": 37961392051,
+        "workflow_name": "Quality",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37961392051",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahrtMqQ",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113929571497",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37961392051/job/113929571497",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:57:14Z",
+        "started_at": "2026-10-09T16:57:16Z",
+        "completed_at": "2026-10-09T16:57:23Z",
+        "name": "quality",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:57:16Z",
+            "completed_at": "2026-10-09T16:57:17Z"
+          },
+          {
+            "name": "Enforce every mandatory result",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:57:17Z",
+            "completed_at": "2026-10-09T16:57:17Z"
+          },
+          {
+            "name": "Download fully verified production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:57:17Z",
+            "completed_at": "2026-10-09T16:57:20Z"
+          },
+          {
+            "name": "Promote verified artifact for Azure (no rebuild)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:57:20Z",
+            "completed_at": "2026-10-09T16:57:22Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:57:22Z",
+            "completed_at": "2026-10-09T16:57:22Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113929571497",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002812,
+        "runner_name": "GitHub Actions 1000002812",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ],
+    [
+      {
+        "id": 113929657244,
+        "run_id": 37962814471,
+        "workflow_name": "Deploy Azure App Service",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37962814471",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAahrybnA",
+        "head_sha": "1eef9fb1d005d4752f12a9dd5c0e620decca4444",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/113929657244",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37962814471/job/113929657244",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T16:57:27Z",
+        "started_at": "2026-10-09T16:57:30Z",
+        "completed_at": "2026-10-09T17:05:10Z",
+        "name": "deploy",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T16:57:30Z",
+            "completed_at": "2026-10-09T16:57:33Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T16:57:33Z",
+            "completed_at": "2026-10-09T16:57:35Z"
+          },
+          {
+            "name": "Download Quality-verified production artifact",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T16:57:35Z",
+            "completed_at": "2026-10-09T16:57:39Z"
+          },
+          {
+            "name": "Run pnpm/action-setup@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T16:57:39Z",
+            "completed_at": "2026-10-09T16:57:40Z"
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T16:57:40Z",
+            "completed_at": "2026-10-09T16:57:43Z"
+          },
+          {
+            "name": "Install migration tooling",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T16:57:43Z",
+            "completed_at": "2026-10-09T16:57:46Z"
+          },
+          {
+            "name": "Validate and migrate Azure PostgreSQL",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T16:57:46Z",
+            "completed_at": "2026-10-09T16:57:59Z"
+          },
+          {
+            "name": "Build artifact for manual deployment",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-10-09T16:57:59Z",
+            "completed_at": "2026-10-09T16:57:59Z"
+          },
+          {
+            "name": "Validate deploy artifact",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T16:57:59Z",
+            "completed_at": "2026-10-09T16:58:04Z"
+          },
+          {
+            "name": "Azure login (OIDC)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T16:58:04Z",
+            "completed_at": "2026-10-09T16:58:07Z"
+          },
+          {
+            "name": "Ensure production security and mail settings",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-09T16:58:07Z",
+            "completed_at": "2026-10-09T16:58:13Z"
+          },
+          {
+            "name": "Inspect production startup entry point",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T16:58:13Z",
+            "completed_at": "2026-10-09T16:58:14Z"
+          },
+          {
+            "name": "Deploy to Azure App Service",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-09T16:58:14Z",
+            "completed_at": "2026-10-09T17:02:36Z"
+          },
+          {
+            "name": "Wait for deployed worker",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-10-09T17:02:36Z",
+            "completed_at": "2026-10-09T17:04:14Z"
+          },
+          {
+            "name": "Verify current production build and routes",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-10-09T17:04:14Z",
+            "completed_at": "2026-10-09T17:05:06Z"
+          },
+          {
+            "name": "Capture Azure diagnostics on deployment failure",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 16,
+            "started_at": "2026-10-09T17:05:06Z",
+            "completed_at": "2026-10-09T17:05:06Z"
+          },
+          {
+            "name": "Post Azure login (OIDC)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 29,
+            "started_at": "2026-10-09T17:05:06Z",
+            "completed_at": "2026-10-09T17:05:06Z"
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 30,
+            "started_at": "2026-10-09T17:05:06Z",
+            "completed_at": "2026-10-09T17:05:06Z"
+          },
+          {
+            "name": "Post Run pnpm/action-setup@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 31,
+            "started_at": "2026-10-09T17:05:06Z",
+            "completed_at": "2026-10-09T17:05:06Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32,
+            "started_at": "2026-10-09T17:05:06Z",
+            "completed_at": "2026-10-09T17:05:07Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 33,
+            "started_at": "2026-10-09T17:05:07Z",
+            "completed_at": "2026-10-09T17:05:07Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/113929657244",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002813,
+        "runner_name": "GitHub Actions 1000002813",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ],
+    [
+      {
+        "id": 114018097577,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajAIZqQ",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114018097577",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114018097577",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:44:36Z",
+        "started_at": "2026-10-09T20:44:38Z",
+        "completed_at": "2026-10-09T20:45:52Z",
+        "name": "checks",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:44:38Z",
+            "completed_at": "2026-10-09T20:44:39Z"
+          },
+          {
+            "name": "Initialize containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:44:39Z",
+            "completed_at": "2026-10-09T20:44:52Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T20:44:52Z",
+            "completed_at": "2026-10-09T20:44:54Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T20:44:54Z",
+            "completed_at": "2026-10-09T20:45:01Z"
+          },
+          {
+            "name": "Run pnpm release:check",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T20:45:01Z",
+            "completed_at": "2026-10-09T20:45:02Z"
+          },
+          {
+            "name": "Run pnpm test",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T20:45:02Z",
+            "completed_at": "2026-10-09T20:45:24Z"
+          },
+          {
+            "name": "Real isolated PostgreSQL parallel process gate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T20:45:24Z",
+            "completed_at": "2026-10-09T20:45:25Z"
+          },
+          {
+            "name": "Run pnpm lint",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T20:45:25Z",
+            "completed_at": "2026-10-09T20:45:40Z"
+          },
+          {
+            "name": "Run pnpm css:check",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T20:45:40Z",
+            "completed_at": "2026-10-09T20:45:41Z"
+          },
+          {
+            "name": "Run pnpm typecheck",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T20:45:41Z",
+            "completed_at": "2026-10-09T20:45:48Z"
+          },
+          {
+            "name": "Run pnpm security:scan",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-09T20:45:48Z",
+            "completed_at": "2026-10-09T20:45:49Z"
+          },
+          {
+            "name": "Full dependency audit including development tooling",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T20:45:49Z",
+            "completed_at": "2026-10-09T20:45:50Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 22,
+            "started_at": "2026-10-09T20:45:50Z",
+            "completed_at": "2026-10-09T20:45:50Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 23,
+            "started_at": "2026-10-09T20:45:50Z",
+            "completed_at": "2026-10-09T20:45:51Z"
+          },
+          {
+            "name": "Stop containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 24,
+            "started_at": "2026-10-09T20:45:51Z",
+            "completed_at": "2026-10-09T20:45:51Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T20:45:51Z",
+            "completed_at": "2026-10-09T20:45:51Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114018097577",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002868,
+        "runner_name": "GitHub Actions 1000002868",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 114018097812,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajAIalA",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114018097812",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114018097812",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:44:36Z",
+        "started_at": "2026-10-09T20:44:38Z",
+        "completed_at": "2026-10-09T20:44:48Z",
+        "name": "plan",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:44:38Z",
+            "completed_at": "2026-10-09T20:44:39Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:44:39Z",
+            "completed_at": "2026-10-09T20:44:45Z"
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T20:44:45Z",
+            "completed_at": "2026-10-09T20:44:46Z"
+          },
+          {
+            "name": "Select conservative QA scope",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T20:44:46Z",
+            "completed_at": "2026-10-09T20:44:46Z"
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T20:44:46Z",
+            "completed_at": "2026-10-09T20:44:46Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T20:44:46Z",
+            "completed_at": "2026-10-09T20:44:46Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T20:44:46Z",
+            "completed_at": "2026-10-09T20:44:46Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114018097812",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002867,
+        "runner_name": "GitHub Actions 1000002867",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 114018097844,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajAIatA",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114018097844",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114018097844",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:44:36Z",
+        "started_at": "2026-10-09T20:44:38Z",
+        "completed_at": "2026-10-09T20:46:42Z",
+        "name": "build",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:44:39Z",
+            "completed_at": "2026-10-09T20:44:40Z"
+          },
+          {
+            "name": "Initialize containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:44:40Z",
+            "completed_at": "2026-10-09T20:45:00Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T20:45:00Z",
+            "completed_at": "2026-10-09T20:45:03Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T20:45:03Z",
+            "completed_at": "2026-10-09T20:45:10Z"
+          },
+          {
+            "name": "Restore Next compiler cache (never a completed build)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T20:45:10Z",
+            "completed_at": "2026-10-09T20:45:12Z"
+          },
+          {
+            "name": "Run pnpm build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T20:45:12Z",
+            "completed_at": "2026-10-09T20:45:52Z"
+          },
+          {
+            "name": "Authenticated tenant, role and session HTTP gate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T20:45:52Z",
+            "completed_at": "2026-10-09T20:45:57Z"
+          },
+          {
+            "name": "Anonymous API authorization surface",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-09T20:45:57Z",
+            "completed_at": "2026-10-09T20:45:58Z"
+          },
+          {
+            "name": "Runtime smoke test",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T20:45:58Z",
+            "completed_at": "2026-10-09T20:46:00Z"
+          },
+          {
+            "name": "Package production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T20:46:00Z",
+            "completed_at": "2026-10-09T20:46:24Z"
+          },
+          {
+            "name": "Smoke test exact production artifact",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-09T20:46:24Z",
+            "completed_at": "2026-10-09T20:46:30Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T20:46:30Z",
+            "completed_at": "2026-10-09T20:46:33Z"
+          },
+          {
+            "name": "Post Restore Next compiler cache (never a completed build)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 21,
+            "started_at": "2026-10-09T20:46:33Z",
+            "completed_at": "2026-10-09T20:46:35Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 22,
+            "started_at": "2026-10-09T20:46:35Z",
+            "completed_at": "2026-10-09T20:46:35Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 23,
+            "started_at": "2026-10-09T20:46:35Z",
+            "completed_at": "2026-10-09T20:46:35Z"
+          },
+          {
+            "name": "Stop containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 24,
+            "started_at": "2026-10-09T20:46:35Z",
+            "completed_at": "2026-10-09T20:46:40Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T20:46:40Z",
+            "completed_at": "2026-10-09T20:46:40Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114018097844",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002866,
+        "runner_name": "GitHub Actions 1000002866",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 114018875970,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajA36Qg",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114018875970",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114018875970",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:46:42Z",
+        "started_at": "2026-10-09T20:46:45Z",
+        "completed_at": "2026-10-09T20:55:10Z",
+        "name": "browser (webkit)",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:46:46Z",
+            "completed_at": "2026-10-09T20:46:47Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:46:47Z",
+            "completed_at": "2026-10-09T20:46:50Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T20:46:50Z",
+            "completed_at": "2026-10-09T20:47:00Z"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T20:47:00Z",
+            "completed_at": "2026-10-09T20:47:05Z"
+          },
+          {
+            "name": "Extract exact production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T20:47:05Z",
+            "completed_at": "2026-10-09T20:47:10Z"
+          },
+          {
+            "name": "Restore pinned browser binaries",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T20:47:10Z",
+            "completed_at": "2026-10-09T20:47:13Z"
+          },
+          {
+            "name": "Install one browser engine",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T20:47:13Z",
+            "completed_at": "2026-10-09T20:47:51Z"
+          },
+          {
+            "name": "Save installed browser binaries",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-10-09T20:47:51Z",
+            "completed_at": "2026-10-09T20:47:51Z"
+          },
+          {
+            "name": "Scoped responsive UX and process regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T20:47:51Z",
+            "completed_at": "2026-10-09T20:54:35Z"
+          },
+          {
+            "name": "Development-only shared component reference regression",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 10,
+            "started_at": "2026-10-09T20:54:35Z",
+            "completed_at": "2026-10-09T20:54:35Z"
+          },
+          {
+            "name": "FULL PWA restart and offline regression",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11,
+            "started_at": "2026-10-09T20:54:35Z",
+            "completed_at": "2026-10-09T20:54:35Z"
+          },
+          {
+            "name": "Startup, session and persistent navigation regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T20:54:35Z",
+            "completed_at": "2026-10-09T20:55:04Z"
+          },
+          {
+            "name": "Upload browser evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-09T20:55:04Z",
+            "completed_at": "2026-10-09T20:55:07Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T20:55:07Z",
+            "completed_at": "2026-10-09T20:55:07Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26,
+            "started_at": "2026-10-09T20:55:07Z",
+            "completed_at": "2026-10-09T20:55:07Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27,
+            "started_at": "2026-10-09T20:55:07Z",
+            "completed_at": "2026-10-09T20:55:07Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114018875970",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002870,
+        "runner_name": "GitHub Actions 1000002870",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 114018876092,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajA36vA",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114018876092",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114018876092",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:46:42Z",
+        "started_at": "2026-10-09T20:46:44Z",
+        "completed_at": "2026-10-09T20:54:48Z",
+        "name": "browser (chromium)",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:46:45Z",
+            "completed_at": "2026-10-09T20:46:46Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:46:46Z",
+            "completed_at": "2026-10-09T20:46:48Z"
+          },
+          {
+            "name": "Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-09T20:46:48Z",
+            "completed_at": "2026-10-09T20:46:55Z"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-09T20:46:55Z",
+            "completed_at": "2026-10-09T20:46:58Z"
+          },
+          {
+            "name": "Extract exact production candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T20:46:58Z",
+            "completed_at": "2026-10-09T20:47:02Z"
+          },
+          {
+            "name": "Restore pinned browser binaries",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-09T20:47:02Z",
+            "completed_at": "2026-10-09T20:47:04Z"
+          },
+          {
+            "name": "Install one browser engine",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-09T20:47:04Z",
+            "completed_at": "2026-10-09T20:47:18Z"
+          },
+          {
+            "name": "Save installed browser binaries",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-10-09T20:47:18Z",
+            "completed_at": "2026-10-09T20:47:18Z"
+          },
+          {
+            "name": "Scoped responsive UX and process regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-09T20:47:18Z",
+            "completed_at": "2026-10-09T20:53:54Z"
+          },
+          {
+            "name": "Development-only shared component reference regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-09T20:53:54Z",
+            "completed_at": "2026-10-09T20:54:12Z"
+          },
+          {
+            "name": "FULL PWA restart and offline regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-09T20:54:12Z",
+            "completed_at": "2026-10-09T20:54:15Z"
+          },
+          {
+            "name": "Startup, session and persistent navigation regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-09T20:54:15Z",
+            "completed_at": "2026-10-09T20:54:41Z"
+          },
+          {
+            "name": "Upload browser evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-09T20:54:41Z",
+            "completed_at": "2026-10-09T20:54:45Z"
+          },
+          {
+            "name": "Post Run ./.github/actions/setup-node",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-09T20:54:45Z",
+            "completed_at": "2026-10-09T20:54:45Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26,
+            "started_at": "2026-10-09T20:54:45Z",
+            "completed_at": "2026-10-09T20:54:45Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27,
+            "started_at": "2026-10-09T20:54:45Z",
+            "completed_at": "2026-10-09T20:54:45Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114018876092",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002869,
+        "runner_name": "GitHub Actions 1000002869",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 114021971334,
+        "run_id": 37989005761,
+        "workflow_name": "Quality",
+        "head_branch": "refactor/v21-3-central-data-foundation-20261009",
+        "run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/runs/37989005761",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUjZYz88AAAAajD01hg",
+        "head_sha": "d1a9e4165f1401f85d394adba6fe9d39ba91bf9a",
+        "url": "https://api.github.com/repos/oemercam/binso_admin_azure/actions/jobs/114021971334",
+        "html_url": "https://github.com/oemercam/binso_admin_azure/actions/runs/37989005761/job/114021971334",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-09T20:55:10Z",
+        "started_at": "2026-10-09T20:55:12Z",
+        "completed_at": "2026-10-09T20:55:17Z",
+        "name": "quality",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-09T20:55:13Z",
+            "completed_at": "2026-10-09T20:55:15Z"
+          },
+          {
+            "name": "Enforce every mandatory result",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-09T20:55:15Z",
+            "completed_at": "2026-10-09T20:55:15Z"
+          },
+          {
+            "name": "Download fully verified production candidate",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 3,
+            "started_at": "2026-10-09T20:55:15Z",
+            "completed_at": "2026-10-09T20:55:15Z"
+          },
+          {
+            "name": "Promote verified artifact for Azure (no rebuild)",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 4,
+            "started_at": "2026-10-09T20:55:15Z",
+            "completed_at": "2026-10-09T20:55:15Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-09T20:55:15Z",
+            "completed_at": "2026-10-09T20:55:15Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/oemercam/binso_admin_azure/check-runs/114021971334",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002871,
+        "runner_name": "GitHub Actions 1000002871",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  ]
+}

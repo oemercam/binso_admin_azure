@@ -1,0 +1,120 @@
+{
+  "browser": "webkit",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "operator",
+    "settings"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/einstellungen/sicherheit",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/operator/tickets/8421",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/operator/abonnemente",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

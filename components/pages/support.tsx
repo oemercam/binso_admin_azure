@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView } from "../records";
 import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
+import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction, MetricTiles, MetricTile } from "../binso-ux";
 
 export function supportReference(id:string,caseNumber?:string|null){
@@ -17,19 +18,11 @@ export function supportReference(id:string,caseNumber?:string|null){
 }
 
 export function useSupportRows(){
-  const [rows,setRows]=useState<string[][]>([]);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
-  useEffect(()=>{
-    apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?"/api/support/tickets":"/api/demo/data?collection=support_tickets")
-      .then(payload=>{
-        const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
-        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));
-      })
-      .catch(error=>setError(error instanceof Error?error.message:"Tickets konnten nicht geladen werden."))
-      .finally(()=>setLoading(false));
-  },[]);
-  return {rows,loading,error};
+  const production=useBackendMode();
+  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(production?"/api/support/tickets":"/api/demo/data?collection=support_tickets");
+  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
+  return {rows,loading:query.loading,error:query.error};
 }
 
 export function SupportPage() {
@@ -110,6 +103,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [ticketLoading,setTicketLoading]=useState(true);
   const [ticketError,setTicketError]=useState<string|null>(null);
   const [ticketRetry,setTicketRetry]=useState(0);
+  const revision=useDataRevision(["/api/support/tickets"]);
   const [sending,setSending]=useState(false);
   const sendPending=useRef(false);
   const uploadPending=useRef(false);
@@ -153,7 +147,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   useEffect(()=>{
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setTicketLoading(false));return;}
     let active=true;
-    queueMicrotask(()=>{if(active){setTicketLoading(true);setTicketError(null)}});
+    queueMicrotask(()=>{if(active){setTicketError(null)}});
     Promise.all([
       apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets"),
       apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages"),
@@ -164,7 +158,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       setTicket(current);setRemote(messages.items);
     }).catch(error=>{if(active)setTicketError(error instanceof Error?error.message:"Ticket konnte nicht geladen werden.")}).finally(()=>{if(active)setTicketLoading(false)});
     return()=>{active=false};
-  },[ticketId,ticketRetry]);
+  },[ticketId,ticketRetry,revision]);
 
   const send=async()=>{
     const value=draft.trim();
@@ -175,7 +169,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     if(isProductionBackendEnabled()){
       try{
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
-        setRemote(current=>[...current,payload.item]);
+        setRemote(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
       }catch(error){
         setDraft(current=>current.trim()?`${value}\n${current}`:value);
         setToast(error instanceof Error?error.message:"Nachricht konnte nicht gesendet werden.");
@@ -194,13 +188,13 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread"><div className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
-      {ticketLoading?<p role="status">Ticket wird geladen …</p>:ticketError?<div role="alert"><p>{ticketError}</p><Button variant="secondary" onClick={()=>setTicketRetry(value=>value+1)}>Erneut versuchen</Button></div>:<div className="thread-day">Heute</div>}
-      {production ? remote.map(message=><article className={message.author_type==="customer"?"message message-user":"message message-support"} key={message.id}>{message.author_type!=="customer"&&<span>Binso Support</span>}<div>{message.body}</div><small>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</small></article>) : <>
-        <article className="message message-user"><div>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</div><small>10:24</small></article>
-        <article className="message message-support"><span>Binso Support</span><div>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</div><small>10:37</small></article>
-        <article className="message message-user"><div>Es geht um die Rechnung RE-2026-019 von Acme AG.</div><small>10:41</small></article>
-        <article className="message message-support"><span>Binso Support</span><div>Super, ich schaue das gerne für dich nach.</div><small>10:42</small></article>
-        {sent.map((text,i)=><article className="message message-user" key={text+"-"+i}><div>{text}</div><small>jetzt</small></article>)}
+      {ticketLoading?<LoadingState>Ticket wird geladen …</LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen">{ticketError}</ErrorState>:<div className="thread-day">Heute</div>}
+      {production ? remote.map(message=><MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined} key={message.id}>{message.body}</MessageBubble>) : <>
+        <MessageBubble outgoing={true} time={<>10:24</>}>Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?</MessageBubble>
+        <MessageBubble outgoing={false} time={<>10:37</>} author={<>Binso Support</>}>Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?</MessageBubble>
+        <MessageBubble outgoing={true} time={<>10:41</>}>Es geht um die Rechnung RE-2026-019 von Acme AG.</MessageBubble>
+        <MessageBubble outgoing={false} time={<>10:42</>} author={<>Binso Support</>}>Super, ich schaue das gerne für dich nach.</MessageBubble>
+        {sent.map((text,i)=><MessageBubble outgoing={true} time={<>jetzt</>} key={text+"-"+i}>{text}</MessageBubble>)}
       </>}
       {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
       </div><div className="thread-composer"><label className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="upload"/></label><Input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><Input aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><button type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></button></div>

@@ -13,7 +13,7 @@ export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>
   const length=Number(request.headers.get("content-length") ?? "0");
   if(length && length>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
   const raw=await request.text();
-  if(raw.length>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
+  if(Buffer.byteLength(raw,"utf8")>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
   try { return JSON.parse(raw) as T; }
   catch { throw new ApiError(400,"invalid_json","Ungültige Anfrage."); }
 }
@@ -48,8 +48,24 @@ export class ApiError extends Error {
 }
 
 export function apiError(error:unknown){
-  if(error instanceof Response) return json({error:error.status===403?"forbidden":"request_failed",message:error.status===403?"Keine Berechtigung.":"Die Anfrage konnte nicht verarbeitet werden."},error.status);
+  if(error instanceof Response){
+    const meaning:Record<number,{error:string;message:string}>={401:{error:"not_authenticated",message:"Bitte erneut anmelden."},403:{error:"forbidden",message:"Keine Berechtigung."},404:{error:"not_found",message:"Datensatz wurde nicht gefunden."},409:{error:"conflict",message:"Der Vorgang steht im Konflikt mit dem aktuellen Stand."},429:{error:"rate_limited",message:"Zu viele Anfragen. Bitte später erneut versuchen."},503:{error:"service_unavailable",message:"Der Dienst ist momentan nicht verfügbar."}};
+    return json(meaning[error.status]??{error:"request_failed",message:"Die Anfrage konnte nicht verarbeitet werden."},error.status);
+  }
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
+  const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
+  const databaseErrors:Record<string,{status:number;code:string;message:string}>={
+    '23505':{status:409,code:'duplicate_record',message:'Dieser Datensatz besteht bereits.'},
+    '23503':{status:409,code:'relation_conflict',message:'Die Verknüpfung ist nicht mehr verfügbar. Bitte die Daten aktualisieren.'},
+    '23514':{status:400,code:'validation_failed',message:'Die Angaben sind fachlich ungültig.'},
+    '22P02':{status:400,code:'invalid_value',message:'Eine Angabe ist ungültig.'},
+    '22003':{status:400,code:'amount_out_of_range',message:'Ein Betrag überschreitet den zulässigen Bereich.'},
+    '40001':{status:409,code:'concurrent_change',message:'Die Daten wurden gleichzeitig geändert. Bitte den aktuellen Stand prüfen und erneut versuchen.'},
+    '40P01':{status:409,code:'concurrent_change',message:'Die Daten wurden gleichzeitig geändert. Bitte den aktuellen Stand prüfen und erneut versuchen.'},
+    '57014':{status:503,code:'request_timeout',message:'Die Verarbeitung dauert zu lange. Bitte den gespeicherten Stand vor einer Wiederholung prüfen.'},
+  };
+  const mapped=databaseErrors[code];
+  if(mapped)return json({error:mapped.code,message:mapped.message},mapped.status);
   console.error("Unhandled API error",error instanceof Error ? error.message : "unknown");
   return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden."},500);
 }

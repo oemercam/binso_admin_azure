@@ -3,10 +3,25 @@ import {compareRecordValues} from "@/lib/record-sort";
 import {matchesRecordChip} from "@/lib/list-filter";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { EmptyState, Icon, Status } from "./ui";
+import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, type ReactNode, type CSSProperties } from "react";
+import {EmptyState, Icon, Status, LoadingState, ErrorState} from "./ui";
 import { ListSearch, ListRow } from "./binso-ux";
 import {Avatar} from "./avatar";
+
+/** Domain columns differ; table/row/cell semantics and ownership stay central. */
+export function DataTable({children,label,variant="records"}:{children:ReactNode;label:string;variant?:"records"|"operator"}){
+ return <div className={variant==="operator"?"operator-table":"desktop-record-table"} role="table" aria-label={label}>{children}</div>;
+}
+function tableCells(children:ReactNode,header=false){
+ return Children.map(children,child=>isValidElement<{role?:string}>(child)&&child.type==='span'&&!child.props.role?cloneElement(child,{role:header?'columnheader':'cell'}):child);
+}
+export function DataTableHead({children,className="desktop-record-head",style}:{children:ReactNode;className?:string;style?:CSSProperties}){
+ return <div className={className} role="row" style={style}>{tableCells(children,true)}</div>;
+}
+export function DataTableRow({children,href,onClick,className="desktop-record-row",style}:{children:ReactNode;href?:string;onClick?:()=>void;className?:string;style?:CSSProperties}){
+ const cells=tableCells(children);
+ return href?<Link href={href} className={className} role="row" style={style}>{cells}</Link>:onClick?<button type="button" onClick={onClick} className={className} role="row" style={style}>{cells}</button>:<div className={className} role="row" style={style}>{cells}</div>;
+}
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst","Verrechnet","Freigegeben"].includes(status)) return "success";
@@ -95,7 +110,7 @@ export function RecordsView({
       {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
     </div>
 
-    {loading?<p role="status">Einträge werden geladen …</p>:error?<p role="alert">{error}</p>:visible.length ? <><div className="desktop-record-table" role="table" aria-label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<div className="desktop-record-head" role="row" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><button type="button" role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label} onClick={()=>cycleSort(col.index)}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</button>)}<span aria-hidden="true"/></div>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<Link href={href} className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</Link>:<div className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</div>})}</div><div className="records mobile-record-list">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
+    {loading?<LoadingState>Einträge werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:visible.length ? <><DataTable label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><button type="button" role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label} onClick={()=>cycleSort(col.index)}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</button>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
       <EmptyState compact text="" title={query.trim()?"Keine Treffer für diese Suche":emptyLabel?.(activeChip)??(activeChip==="Inaktiv"?"Keine inaktiven "+countLabel:activeChip==="Aktiv"?"Keine aktiven "+countLabel:"Keine "+countLabel+" erfasst")}/>}
   </>;
 }
