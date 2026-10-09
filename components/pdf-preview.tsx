@@ -2,7 +2,7 @@
 
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
-import {Icon} from "./ui";
+import {Icon, ErrorState, LoadingState} from "./ui";
 
 function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:number;zoomed:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
@@ -39,7 +39,7 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
     observer.observe(element.closest(".document-page-stage")??element);
     return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
   },[pdf,pageNumber,zoomed]);
-  return <section className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
+  return <section className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<ErrorState>{error}</ErrorState>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
 }
 
 export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
@@ -62,8 +62,8 @@ export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boole
     }).catch(()=>{if(active)setError({file,message:"PDF konnte nicht angezeigt werden."})});
     return()=>{active=false;void task?.destroy()};
   },[file]);
-  if(error?.file===file)return <p role="alert">{error.message}</p>;
-  if(loaded?.file!==file)return <p role="status">PDF wird angezeigt …</p>;
+  if(error?.file===file)return <ErrorState>{error.message}</ErrorState>;
+  if(loaded?.file!==file)return <LoadingState>PDF wird angezeigt …</LoadingState>;
   return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoomed={zoomed}/>;
 }
 

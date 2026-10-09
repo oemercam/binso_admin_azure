@@ -128,12 +128,7 @@
   box-shadow:none;
 }
 .operator-ticket-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px}
-.operator-message{max-width:78%;margin:8px 0}
-.operator-message p{margin:0;padding:10px 12px;border:1px solid var(--color-line);border-radius:10px;font-size:11px;line-height:1.5}
-.operator-message.support{margin-left:auto}
-.operator-message.support p{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg)}
 .operator-reply{margin-top:14px;padding-top:12px;border-top:1px solid var(--color-line)}
-.operator-reply textarea{width:100%;min-height:100px;padding:10px 12px;border:1px solid #d9d9d6;border-radius:10px}
 
 .context-block{display:grid;gap:5px;padding:14px 0;border-top:1px solid var(--color-line)}
 .context-block small,.context-block span{color:var(--color-muted);font-size:10px}
@@ -144,14 +139,9 @@
 .subscription-card h2{margin:0;font-size:22px}
 .subscription-card>strong{font-size:15px}
 .subscription-card .button{margin-top:12px}
-.subscription-detail-modal{width:min(100%,560px)}
 
 .restriction-form{max-width:760px}
 .restriction-form .form-grid{margin:18px 0}
-.restriction-form label{display:grid;gap:6px;font-size:11px;font-weight:700}
-.restriction-form input,
-.restriction-form select{height:42px;padding:0 10px;border:1px solid var(--color-line);border-radius:9px;background:var(--color-bg)}
-.restriction-form textarea{min-height:100px;padding:10px;border:1px solid var(--color-line);border-radius:9px}
 
 .monitoring-panel{
   padding:24px;
@@ -207,28 +197,6 @@
 }
 .operator-root .priority.high{background:#c43b32}
 
-.operator-modal-layer{
-  position:fixed;
-  inset:0;
-  z-index:150;
-  padding:20px;
-  display:grid;
-  place-items:center;
-  background:rgba(0,0,0,.48);
-}
-.operator-confirm{
-  width:min(100%,430px);
-  padding:24px;
-  border-radius:16px;
-  background:var(--color-bg);
-  color:var(--color-fg);
-  box-shadow:var(--shadow-modal);
-}
-.confirm-icon{width:44px;height:44px;margin-bottom:16px;display:grid;place-items:center;border-radius:12px;background:var(--color-bg)}
-.operator-confirm h2{margin:0 0 8px;font-size:20px}
-.operator-confirm p{margin:0;color:var(--color-muted);font-size:12px;line-height:1.55}
-.operator-confirm>div{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
 .ticket-meta-bar{
   margin-bottom:12px;
   padding-bottom:16px;
@@ -237,8 +205,6 @@
   gap:8px;
   border-bottom:1px solid var(--color-line);
 }
-.ticket-meta-bar label{display:grid;gap:5px;color:var(--color-muted);font-size:9px;font-weight:700}
-.ticket-meta-bar select{height:38px;padding:0 9px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-bg);color:var(--color-fg);font-size:11px}
 .internal-note{
   margin-top:18px;
   padding:10px;
@@ -287,8 +253,8 @@
 .operator-category-bars{display:grid;gap:14px;margin-top:12px}.operator-category-bars a{display:grid;grid-template-columns:minmax(130px,1fr) 1.2fr 28px;gap:10px;align-items:center}.operator-category-bars i{height:8px;background:var(--color-line);border-radius:99px;overflow:hidden}.operator-category-bars b{display:block;height:100%;background:#5897f7;border-radius:99px}.operator-category-bars strong{text-align:right}
 .operator-selected-metric{display:flex;align-items:baseline;gap:12px}.operator-selected-metric strong{font-size:24px}.operator-selected-metric small{margin-left:auto;color:var(--color-muted)}
 
-.operator-app-header{height:64px;min-height:64px;margin-bottom:28px;padding:0 clamp(32px,3vw,48px);border-bottom:1px solid var(--color-line);background:var(--color-bg)}
-.operator-header-brand{display:flex;align-items:center;gap:16px;min-width:0}.operator-header-brand>.logo{display:none}
+.operator-app-header{margin-bottom:28px;padding:0 clamp(32px,3vw,48px)}
+.operator-header-brand{gap:16px;min-width:0}.operator-header-brand>.logo{display:none}
 .operator-home-link{display:inline-flex}
 .monitoring-cockpit{display:grid;gap:14px;margin-bottom:16px}.monitoring-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.monitoring-kpis section{display:grid;gap:5px;padding:16px;border:1px solid var(--color-line);border-radius:16px;background:var(--color-bg)}.monitoring-kpis span,.monitoring-kpis small{color:var(--color-muted);font-size:11px}.monitoring-kpis strong{font-size:25px}
 .monitoring-visual-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.75fr);gap:14px}.monitoring-latency-chart,.monitoring-health-chart{padding:18px}.monitoring-chart-head{display:flex;align-items:end;justify-content:space-between;margin:14px 0 8px}.monitoring-chart-head div{display:grid}.monitoring-chart-head strong{font-size:28px}.monitoring-chart-head span,.monitoring-chart-head small{color:var(--color-muted);font-size:11px}

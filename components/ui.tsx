@@ -1,6 +1,6 @@
 "use client";
 import {usePageAccess} from "@/lib/client/page-access";
-import {Children,cloneElement,isValidElement} from "react";
+import {Children,cloneElement,isValidElement,useId} from "react";
 import Link from "next/link";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
@@ -124,20 +124,32 @@ export function Input(props:React.ComponentProps<"input">){
  return <input {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
 }
 export function Select(props:React.ComponentProps<"select">){return <select {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
-export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props}/>}
+export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props} className={[props.className,'form-textarea'].filter(Boolean).join(' ')}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}
 export function TimeInput(props:React.ComponentProps<"input">){return <Input inputMode="text" placeholder="HH:MM" {...props}/>}
 export function CurrencyInput(props:React.ComponentProps<"input">){return <Input inputMode="decimal" {...props}/>}
-export function FormLabel({children}:{children:React.ReactNode}){return <span>{children}</span>}
-export function FormError({children}:{children?:React.ReactNode}){return children?<p role="alert">{children}</p>:null}
+export function FormLabel({children,id}:{children:React.ReactNode;id?:string}){return <span id={id}>{children}</span>}
+export function FormError({children,id}:{children?:React.ReactNode;id?:string}){return children?<span className="form-error" id={id} role="alert">{children}</span>:null}
 export function FormActions({children,sheet=false}:{children:React.ReactNode;sheet?:boolean}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"}>{children}</div>}
 
-export function Field({ label, children, className = "",allowReadOnlyInput=false }: { label: string; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean }) {
+export function Field({ label, children, className = "",allowReadOnlyInput=false,error,hint }: { label: React.ReactNode; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean;error?:string;hint?:string }) {
   const access=usePageAccess();
-  const fields=access.write||allowReadOnlyInput?children:Children.map(children,child=>isValidElement<Record<string,unknown>>(child)&&((typeof child.type==='string'&&['input','select','textarea'].includes(child.type))||[Input,Select,Textarea,Checkbox,DateInput,TimeInput,CurrencyInput].includes(child.type as typeof Input))?cloneElement(child,{disabled:true}):child);
+  const id=useId();
+  const decorate=(nodes:React.ReactNode):React.ReactNode=>Children.map(nodes,child=>{
+    const control=isValidElement<Record<string,unknown>>(child)&&((typeof child.type==='string'&&['input','select','textarea'].includes(child.type))||[Input,Select,Textarea,Checkbox,DateInput,TimeInput,CurrencyInput].includes(child.type as typeof Input));
+    if(!control)return isValidElement<{children?:React.ReactNode}>(child)&&typeof child.type==='string'&&child.props.children?cloneElement(child,{children:decorate(child.props.children)}):child;
+    const descriptions=[child.props['aria-describedby'],hint?`${id}-hint`:undefined,error?`${id}-error`:undefined].filter(Boolean).join(' ');
+    return cloneElement(child,{
+      ...(!access.write&&!allowReadOnlyInput?{disabled:true}:{}),
+      ...(!child.props['aria-label']&&!child.props['aria-labelledby']?{'aria-labelledby':`${id}-label`}:{}),
+      ...(error?{'aria-invalid':true}:{}),
+      ...(descriptions?{'aria-describedby':descriptions}:{}),
+    });
+  });
+  const fields=decorate(children);
   const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&((child.type==='input'||child.type===Input)&&['checkbox','radio'].includes(String(child.props.type))||child.type===Checkbox));
-  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel>{label}</FormLabel>}{inline?<FormLabel>{label}</FormLabel>:fields}</label>;
+  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel id={`${id}-label`}>{label}</FormLabel>}{inline?<FormLabel id={`${id}-label`}>{label}</FormLabel>:fields}{hint&&<small id={`${id}-hint`}>{hint}</small>}<FormError id={`${id}-error`}>{error}</FormError></label>;
 }
 
 export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
@@ -162,4 +174,19 @@ export function Toast({ title, text, tone = "success" }: { title: string; text?:
 
 export function Skeleton({ className = "" }: { className?: string }) {
   return <span className={`skeleton ${className}`.trim()} aria-hidden="true"/>;
+}
+
+/** Content loading keeps the current shell and never starts a second splash. */
+export function LoadingState({children="Daten werden geladen …",className}:{children?:React.ReactNode;className?:string}){
+  return <p role="status" className={className}>{children}</p>;
+}
+
+/** Retry remains local to the owning data source; callers retain their error text. */
+export function ErrorState({children,onRetry,retryLabel="Erneut versuchen",className}:{children:React.ReactNode;onRetry?:()=>void;retryLabel?:string;className?:string}){
+  return onRetry?<div role="alert" className={className}><p>{children}</p><Button variant="secondary" onClick={onRetry}>{retryLabel}</Button></div>:<p role="alert" className={className}>{children}</p>;
+}
+
+/** Customer and operator conversations share one bubble; direction is contextual. */
+export function MessageBubble({children,author,time,outgoing=false,internal=false}:{children:React.ReactNode;author?:React.ReactNode;time:React.ReactNode;outgoing?:boolean;internal?:boolean}){
+  return <article className={outgoing?"message message-user":"message message-support"}>{author&&<span>{author}</span>}<div>{children}</div><small>{time}{internal&&<> · <Status>Intern</Status></>}</small></article>;
 }

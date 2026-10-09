@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { Button, Logo } from "@/components/ui";
+import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
 
 export default function Page() {
   const [email,setEmail]=useState("");
@@ -30,8 +30,8 @@ export default function Page() {
       {sent?<><p>Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir einen Link zum Zurücksetzen gesendet.</p><Button href="/login">Zur Anmeldung</Button></>:<>
         <p>Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.</p>
         <form onSubmit={submit}>
-          <label>E-Mail<input required autoFocus value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
-          {error&&<p className="auth-error" role="alert">{error}</p>}
+          <Field label="E-Mail"><Input required autoFocus value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
+          {error&&<ErrorState className="auth-error">{error}</ErrorState>}
           <Button type="submit">{loading?"Wird gesendet…":"Link senden"}</Button>
         </form>
         <p className="auth-bottom"><Link href="/login">Zurück zur Anmeldung</Link></p>

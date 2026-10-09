@@ -12,7 +12,7 @@ import { RecordRow, RecordsView } from "../records";
 import { products } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
+import {Button, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
 import { useDemoRows } from "./shared";
 
@@ -85,7 +85,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<p role="status">Produkt wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
+  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<LoadingState>Produkt wird geladen …</LoadingState>:<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
   return <AppShell unsavedChanges={dirty&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 

@@ -12,5 +12,4 @@ export { TimePage } from "./pages/time";
 export { SupportPage, SupportTicketForm, SupportChat } from "./pages/support";
 export { SettingsPage, AccountSettingsPage, CompanySettingsPage, SubscriptionSettingsPage, NotificationSettingsPage, LanguageSettingsPage, AppearanceSettingsPage } from "./pages/settings";
 export { NotificationsPage } from "./pages/notifications";
-export { SimpleModule, EmptyDemoPage } from "./pages/compatibility";
 export { InvoiceEditor, OfferEditor } from "./documents";

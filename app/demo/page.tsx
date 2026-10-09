@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { startDemoClientSession } from "@/lib/client/backend";
-import { Logo } from "@/components/ui";
+import {Logo, ErrorState} from "@/components/ui";
 
 export default function Demo(){
   const [error,setError]=useState("");
@@ -31,7 +31,7 @@ export default function Demo(){
     <button className="app-launch-brand" type="button" disabled={opening} onClick={()=>void openDemo()} aria-label="Binso One erneut öffnen">
       <Logo compact/>
     </button>
-    {error&&<p className="app-launch-error" role="alert">{error}</p>}
+    {error&&<ErrorState className="app-launch-error">{error}</ErrorState>}
     <span className="sr-only">Binso One wird vorbereitet.</span>
   </main>;
 }

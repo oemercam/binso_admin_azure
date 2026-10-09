@@ -13,7 +13,7 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 import { PageHeading, DetailHeading } from "./binso-ux";
-import { Button, EmptyState, Icon, IconButton, Logo, Status } from "./ui";
+import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState} from "./ui";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
@@ -463,5 +463,5 @@ export function AppShellLayout({children}:{children:React.ReactNode}){
 /** Root suspense sits inside the persistent frame on an app route. */
 export function RouteLoading(){
  const inShell=useContext(ShellRegistration);
- return inShell?<p role="status" aria-live="polite">Inhalt wird geladen …</p>:<AppStart/>;
+ return inShell?<LoadingState aria-live="polite">Inhalt wird geladen …</LoadingState>:<AppStart/>;
 }

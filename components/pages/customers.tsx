@@ -12,7 +12,7 @@ import { RecordRow, RecordsView } from "../records";
 import { customers, invoices } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormActions } from "../ui";
+import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormActions, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, FilterSheet, CreateAction, MetricTiles, MetricTile, DetailTabs } from "../binso-ux";
 import { useDemoRows, formatMinutes, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
@@ -174,7 +174,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<p role="status">Kunde wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
+  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
   return <AppShell editing={true} unsavedChanges={dirty&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
     <div className="form-page" inert={savingRecord}>
       <section className="form-section clean">

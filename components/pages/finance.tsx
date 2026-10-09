@@ -8,7 +8,7 @@ import { AppShell } from "../app-shell";
 import { expenses, invoices, offers, payments } from "@/lib/demo-data";
 import { apiGet, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { buildFinanceMonths, financeWindow } from "@/lib/finance-periods";
-import { Button, Field, Icon, Metric, SectionTitle, Input } from "../ui";
+import {Button, Field, Icon, Metric, SectionTitle, Input, LoadingState, ErrorState} from "../ui";
 import { ActionSheet, FormSheet, FilterSheet, CreateAction, MetricTiles, MetricTile } from "../binso-ux";
 import { moneyChf, formatMinutes } from "./shared";
 
@@ -40,8 +40,8 @@ export function FinanceAnalysisPage() {
   const singlePeriod=monthly.length===1||focusMonth!==null;
   const customInvalid=range==="custom"&&(!customFrom||!customTo||customFrom>customTo);
   return <AppShell title="Finanzen" subtitle="Einnahmen, Kosten und Ergebnis nach Zeitraum." active="finanzen">
-    {loading&&<p role="status">Finanzdaten werden geladen …</p>}
-    {error&&<p role="alert">{error}</p>}
+    {loading&&<LoadingState>Finanzdaten werden geladen …</LoadingState>}
+    {error&&<ErrorState>{error}</ErrorState>}
     <div className="finance-range" aria-label="Zeitraum">{Object.entries(ranges).map(([key,item])=><button type="button" className={range===key&&!focusMonth?"active":""} key={key} onClick={()=>{setRange(key);setFocusMonth(null)}}>{item.label}</button>)}<button type="button" className={range==="custom"&&!focusMonth?"active":""} onClick={()=>{setRange("custom");setFocusMonth(null)}}>Zeitraum wählen</button></div>
     {range==="custom"&&<div className="finance-custom-range"><Field label="Von"><Input type="date" value={customFrom} onChange={e=>{setCustomFrom(e.target.value);setFocusMonth(null)}}/></Field><Field label="Bis"><Input type="date" value={customTo} min={customFrom||undefined} onChange={e=>{setCustomTo(e.target.value);setFocusMonth(null)}}/></Field>{customInvalid&&<small>Bitte einen gültigen Zeitraum von–bis wählen.</small>}</div>}
     {!loading&&!error&&!customInvalid&&<>
@@ -107,7 +107,7 @@ export function FinancePage(){
  const labels:Record<string,string>={month:"Dieser Monat",last:"Letzter Monat",three:"Letzte 3 Monate",six:"Letzte 6 Monate",year:"Dieses Jahr",custom:"Eigener Zeitraum"};
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>
    <div className="toolbar finance-overview-toolbar"><button type="button" className="period-trigger" aria-label="Zeitraum auswählen" onClick={openPeriod}><Icon name="calendar"/><span>{labels[range]}</span><Icon name="down"/></button><button type="button" className="icon-button" aria-label="Finanzfilter" onClick={openPeriod}><Icon name="filter"/></button></div>
-   {loading?<p role="status">Finanzen werden geladen …</p>:error?<p role="alert">{error}</p>:!valid?<p role="alert">Bitte einen gültigen Zeitraum wählen.</p>:<>
+   {loading?<LoadingState>Finanzen werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:!valid?<ErrorState>Bitte einen gültigen Zeitraum wählen.</ErrorState>:<>
      <MetricTiles><MetricTile label="Einnahmen" value={moneyChf(income)} hint="Im Zeitraum"/><MetricTile label="Ausgaben" value={moneyChf(costs)} hint="Im Zeitraum"/><MetricTile label="Ergebnis" value={moneyChf(income-costs)} hint="Im Zeitraum"/><MetricTile label="Offene Rechnungen" hint="Aktuell offen" value={currencies.length?currencies.map(currency=><span key={currency}>{formatCurrency(open.filter(item=>(item.currency??'CHF')===currency).reduce((sum,item)=>sum+openAmount(item),0),currency)} </span>):moneyChf(0)}/></MetricTiles>
      <section className="finance-analysis finance-overview-months"><SectionTitle title="Monatsentwicklung" action={<span>{months.items[0]?.label}–{months.items.at(-1)?.label}</span>}/><div className="finance-overview-chart" aria-label="Monatsentwicklung: Einnahmen und Ausgaben">{months.items.map(item=>{const max=Math.max(1,...months.items.flatMap(month=>[month.income,month.costs]));return <button type="button" key={item.key} aria-label={`${item.label}: Einnahmen ${moneyChf(item.income)}, Ausgaben ${moneyChf(item.costs)}`} onFocus={()=>setChartDetail(`${item.label}: Einnahmen ${moneyChf(item.income)} · Ausgaben ${moneyChf(item.costs)}`)} onMouseEnter={()=>setChartDetail(`${item.label}: Einnahmen ${moneyChf(item.income)} · Ausgaben ${moneyChf(item.costs)}`)} onClick={()=>{setFrom(item.key+"-01");setTo(businessMonthEnd(item.key));setRange("custom")}}><span className="finance-bar-pair"><i style={{height:`${Math.max(0,item.income)/max*100}%`}}/><i style={{height:`${Math.max(0,item.costs)/max*100}%`}}/></span><small>{item.label}</small></button>})}</div><p className="chart-legend"><span>Einnahmen: gefüllt</span> · <span>Ausgaben: umrandet</span></p>{chartDetail&&<p className="chart-legend" role="status">{chartDetail}</p>}{months.truncated&&<p>Monatsentwicklung: letzte 24 Monate.</p>}</section>
      <SectionTitle title="Rechnungen" action={<Link href="/rechnungen">Alle anzeigen</Link>}/><div>{items.filter(item=>item.kind==='invoice'&&inPeriod(item.issue_date)).sort((a,b)=>String(b.issue_date).localeCompare(String(a.issue_date))).slice(0,5).map(item=><DocumentSummaryRow key={item.number} item={item} compact/>)}{!items.some(item=>item.kind==='invoice'&&inPeriod(item.issue_date))&&<p>Keine Rechnungen im Zeitraum</p>}</div>

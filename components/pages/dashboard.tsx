@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "../app-shell";
 import { invoices, payments } from "@/lib/demo-data";
 import { apiGet, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, SectionTitle } from "../ui";
+import {Button, SectionTitle, LoadingState, ErrorState} from "../ui";
 import { MetricTiles, MetricTile } from "../binso-ux";
 import { moneyChf, swissDate, paymentMethodLabel } from "./shared";
 
@@ -44,7 +44,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}) {
   },[production,forceDemo]);
 
   if(loading||error)return <AppShell title="Übersicht" subtitle="Dein Unternehmen auf einen Blick." active="dashboard">
-    {loading?<p role="status">Übersicht wird geladen …</p>:<div role="alert"><p>{error}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}
+    {loading?<LoadingState>Übersicht wird geladen …</LoadingState>:<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{error}</ErrorState>}
   </AppShell>;
 
   const invoices=data.invoices??[];

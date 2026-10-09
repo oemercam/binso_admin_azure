@@ -12,7 +12,7 @@ import { AppShell } from "../app-shell";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { plans as subscriptionPlans } from "@/lib/plans";
 import { legalConfig } from "@/config/legal";
-import { Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select } from "../ui";
+import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select, LoadingState, ErrorState} from "../ui";
 import { moneyChf } from "./shared";
 
 export function SettingsPage() {
@@ -84,7 +84,7 @@ export function AccountSettingsPage() {
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||profileName||"Benutzer";
   return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
@@ -161,7 +161,7 @@ export function CompanySettingsPage() {
   };
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing&&(currentValues!==baseline||pendingLogo!==null)} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface company-logo-card">{(logoPreview||logoUrl)?<img src={logoPreview||logoUrl} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><Input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
@@ -346,8 +346,8 @@ export function NotificationSettingsPage() {
     finally{pending.current.delete(key);setSaving([...pending.current]);}
   };
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    {error&&<p role="alert">{error}</p>}
-    {!ready&&!error&&<p role="status">Einstellungen werden geladen …</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
+    {!ready&&!error&&<LoadingState>Einstellungen werden geladen …</LoadingState>}
     <section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span>{channel==="email"?"E-Mail":"Push"}</span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section>
   </AppShell>;
 }
@@ -360,7 +360,7 @@ export function LanguageSettingsPage() {
   const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
   return <AppShell title="Sprache" subtitle="Sprache der Benutzeroberfläche." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} disabled={code!=="de-CH"} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{code!=="de-CH"?"Noch nicht vollständig verfügbar":language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
-    {error&&<p role="alert">{error}</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
     <p className="settings-note">Die Oberfläche ist derzeit vollständig auf Deutsch verfügbar. Weitere Sprachen werden erst nach vollständiger Übersetzung freigeschaltet.</p>
   </AppShell>;
 }
@@ -381,7 +381,7 @@ export function AppearanceSettingsPage() {
   useEffect(()=>{void loadTheme().then(mode=>{if(mode)setTheme(mode)}).catch(()=>setError("Darstellung konnte nicht geladen werden."));},[]);
   const choose=async(next:"light"|"dark"|"system")=>{try{await saveTheme(next);setTheme(next);setError("");}catch{setError("Darstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    {error&&<p role="alert">{error}</p>}
+    {error&&<ErrorState>{error}</ErrorState>}
     <Link className="text-action" href="/einstellungen/sprache">Sprache wählen</Link>
     <div className="appearance-grid">
       <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>void choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {FormEvent,useState} from "react";
-import {Button,Icon,Logo} from "@/components/ui";
+import {Button, Icon, Logo, Input, Field, ErrorState} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 
 type Stage="credentials"|"email"|"totp"|"verify";
@@ -71,8 +71,8 @@ export default function Login(){
     <Logo/><h1>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</h1>
     <p>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</p>
     <form onSubmit={submitCode}>
-      <label>{stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}<input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></label>
-      {error&&<p className="auth-error" role="alert">{error}</p>}
+      <Field label={stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></Field>
+      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
       <Button type="submit" disabled={loading||!code.trim()}>{loading?"Wird geprüft…":"Anmeldung abschliessen"}</Button>
     </form>
     {stage!=="totp"&&<button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}>Code erneut senden</button>}
@@ -82,10 +82,10 @@ export default function Login(){
   return <main className="auth-page"><section className="auth-card">
     <Logo/><h1>Willkommen zurück</h1><p>Melde dich sicher in deinem Binso One Konto an.</p>
     <form onSubmit={submitCredentials}>
-      <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
-      <label>Passwort<div className="password-field"><input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button></div></label>
+      <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
+      <Field label="Passwort"><div className="password-field"><Input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button></div></Field>
       <div className="form-link"><Link href="/passwort-vergessen">Passwort vergessen?</Link></div>
-      {error&&<p className="auth-error" role="alert">{error}</p>}
+      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
       <Button type="submit" disabled={loading}>{loading?"Anmeldung läuft…":"Weiter"}</Button>
     </form>
     <div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button>
