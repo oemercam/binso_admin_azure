@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-pnpm start > /tmp/binso-next.log 2>&1 &
+pnpm start --hostname 127.0.0.1 > /tmp/binso-next.log 2>&1 &
 APP_PID=$!
 trap 'kill $APP_PID 2>/dev/null || true' EXIT
 

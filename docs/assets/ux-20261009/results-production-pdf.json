@@ -1,0 +1,83 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "documents"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/angebote/AN-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/angebote/AN-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/rechnungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/angebote/AN-TEST-1",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/angebote/AN-TEST-1",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

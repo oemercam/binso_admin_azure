@@ -1,0 +1,414 @@
+{
+  "url": "http://127.0.0.1:3647/rechnungen/RE-TEST-1",
+  "viewport": {
+    "width": 430,
+    "height": 900
+  },
+  "documentWidth": 430,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Rechnung RE-TEST-1Teilweise bezahltKUNDEPrüffirma AGTeststrasse 1 · 3000 BernRechnungsdatum08.10.2026Fällig am08.11.2026Zahlungsfrist: 31 TagePositionenBezeichnungMenge / EinheitEinzelpreisBetragBerat",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 569.234375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "569.234px",
+        "min-height": "0px",
+        "padding": "18px 19.565px 24px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "(min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".app-preview .page-container",
+          "css": "padding-top: 18px; padding-bottom: 24px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "(max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal",
+      "tag": "SECTION",
+      "classes": "document-modal",
+      "text": "RechnungsvorschauSeite 1 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 900
+      },
+      "computed": {
+        "display": "flex",
+        "position": "fixed",
+        "height": "900px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px 0px 24px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal",
+          "css": "position: fixed; top: var(--dialog-viewport-top); left: 0px; right: 0px; z-index: 100; display: flex; flex-direction: column; height: var(--dialog-viewport-height); overflow: hidden; background: var(--color-bg);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container > .dashboard-grid, .page-container > .detail-grid, .page-container > .finance-analysis, .page-container > .finance-breakdown, .page-container > .quick-section, .page-container > .surface, .page-container > section",
+          "css": "margin-top: var(--desktop-section-gap);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container > :last-child",
+          "css": "margin-bottom: 24px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-modal-body",
+      "tag": "DIV",
+      "classes": "document-modal-body",
+      "text": "Seite 1 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 58,
+        "width": 430,
+        "height": 842
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "height": "842px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-modal-body",
+          "css": "display: flex; flex: 1 1 0%; min-height: 0px; min-width: 0px; overflow: hidden;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-page-viewer",
+      "tag": "DIV",
+      "classes": "document-page-viewer",
+      "text": "Seite 1 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 58,
+        "width": 430,
+        "height": 842
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "height": "842px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-page-viewer",
+          "css": "flex-direction: column;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-page-stage, .document-page-viewer",
+          "css": "display: flex; flex: 1 1 0%; min-width: 0px; min-height: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".pdf-page",
+      "tag": "SECTION",
+      "classes": "pdf-page",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 12,
+        "y": 167.90625,
+        "width": 406,
+        "height": 574.1875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "574.188px",
+        "min-height": "auto",
+        "padding": "0px",
+        "margin": "109.906px 12px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".pdf-page",
+          "css": "min-width: 0px; background: white; color: black;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-page-stage > .pdf-page",
+          "css": "flex: 0 0 auto; margin: auto; width: max-content;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-page-navigation",
+      "tag": "NAV",
+      "classes": "document-page-navigation",
+      "text": "Seite 1 von 2",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 852,
+        "width": 430,
+        "height": 48
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "height": "48px",
+        "min-height": "48px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "14px",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "14px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-page-navigation",
+          "css": "display: flex; align-items: center; justify-content: center; gap: var(--field-group-gap); flex: 0 0 auto; min-height: calc(var(--action-row-height) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); border-top: 1px solid var(--color-line); font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".document-page-navigation",
+          "css": "min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 14px; border-top: 1px solid var(--color-line); font-size: 11px; font-weight: 700;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    }
+  ]
+}

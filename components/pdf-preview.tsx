@@ -2,43 +2,48 @@
 
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
+import {Icon} from "./ui";
 
-function PdfPage({pdf,pageNumber}: {pdf:PDFDocumentProxy;pageNumber:number}) {
+function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:number;zoomed:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
     const element=canvas.current;
     if(!element)return;
     let active=true;
-    let lastWidth=0;
+    let lastSize="";
     let renderTask:ReturnType<Awaited<ReturnType<PDFDocumentProxy['getPage']>>['render']>|undefined;
     let frame=0;
     const draw=()=>{
-      const width=element.parentElement?.clientWidth??0;
-      if(width<=0||width===lastWidth)return;
-      lastWidth=width;
+      const stage=element.closest(".document-page-stage");
+      const width=stage?.clientWidth??0,height=stage?.clientHeight??0;
+      const size=`${width}:${height}`;
+      if(width<=0||height<=0||size===lastSize)return;
+      lastSize=size;
       renderTask?.cancel();
       void pdf.getPage(pageNumber).then(page=>{
-        if(!active||width!==lastWidth)return;
+        if(!active||size!==lastSize)return;
         const base=page.getViewport({scale:1});
-        const viewport=page.getViewport({scale:width/base.width});
+        const scale=Math.min((width-24)/base.width,(height-24)/base.height);
+        const viewport=page.getViewport({scale:Math.max(scale,.01)*(zoomed?2.5:1)});
         const ratio=Math.min(window.devicePixelRatio||1,2);
         element.width=Math.floor(viewport.width*ratio);
         element.height=Math.floor(viewport.height*ratio);
-        element.style.width="100%";
-        element.style.height="auto";
+        element.style.width=`${viewport.width}px`;
+        element.style.height=`${viewport.height}px`;
         renderTask=page.render({canvas:element,viewport,transform:ratio===1?undefined:[ratio,0,0,ratio,0,0]});
-        return renderTask.promise;
+        return renderTask.promise.then(()=>{if(active&&size===lastSize)element.dataset.renderedPage=String(pageNumber)});
       }).catch(reason=>{if(active&&reason?.name!=="RenderingCancelledException")setError("PDF-Seite konnte nicht angezeigt werden.")});
     };
     const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw)});
-    observer.observe(element.parentElement??element);
+    observer.observe(element.closest(".document-page-stage")??element);
     return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
-  },[pdf,pageNumber]);
-  return <section className="pdf-page" aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
+  },[pdf,pageNumber,zoomed]);
+  return <section className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
 }
 
-export function PdfPreview({file}: {file:Blob}) {
+export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
+  const [pageNumber,setPageNumber]=useState(1);
   const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null);
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
@@ -60,5 +65,5 @@ export function PdfPreview({file}: {file:Blob}) {
   },[file]);
   if(error)return <p role="alert">{error}</p>;
   if(!pdf)return <p role="status">PDF wird angezeigt …</p>;
-  return <div className="pdf-pages">{Array.from({length:pdf.numPages},(_,index)=><PdfPage key={index} pdf={pdf} pageNumber={index+1}/>)}</div>;
+  return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><nav className="document-page-navigation" aria-label="Dokumentseiten"><button type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></button><span role="status" aria-live="polite">Seite {pageNumber} von {pdf.numPages}</span><button type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></button></nav></div>;
 }

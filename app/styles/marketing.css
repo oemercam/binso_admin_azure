@@ -693,7 +693,7 @@
 
 
 /* Legal */
-.legal-page{width:100%;max-width:980px;margin:auto;padding:72px 28px 84px}
+.legal-page{width:100%;max-width:980px;margin:auto;padding:72px 28px 84px;overflow-wrap:anywhere}
 .legal-hero{max-width:760px;margin-bottom:44px}
 .legal-hero h1{margin:0 0 14px;font-size:46px;line-height:1;letter-spacing:-.045em}
 .legal-hero p{margin:0;color:var(--color-muted);font-size:14px;line-height:1.6}

@@ -1,0 +1,692 @@
+{
+  "url": "http://127.0.0.1:3645/kunden/customer-one",
+  "viewport": {
+    "width": 430,
+    "height": 1000
+  },
+  "documentWidth": 430,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Prüffirma AGAktivBernÜbersichtKontakteFinanzenAktivitätOffene RechnungenCHF 35.13Umsatz 2026CHF 135.13Rechnungen inkl. MWSTErfasste Zeit2:15 h0:00 h verrechnetKundendetailsFirmaPrüffirma AGHauptkontak",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 52,
+        "width": 430,
+        "height": 691.453125
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "691.453px",
+        "min-height": "0px",
+        "padding": "14px 19.565px 105.46px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "(min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "(max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-header",
+      "tag": "HEADER",
+      "classes": "mobile-header mobile-header-detail",
+      "text": "Prüffirma AGAktiv",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 430,
+        "height": 52
+      },
+      "computed": {
+        "display": "grid",
+        "position": "sticky",
+        "height": "52px",
+        "min-height": "52px",
+        "padding": "0px 19.565px",
+        "margin": "0px",
+        "gap": "0px",
+        "grid-template-columns": "44px 299.875px 47px",
+        "grid-template-rows": "51px",
+        "align-items": "center",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgb(255, 255, 255)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bottom-nav, .desktop-appbar, .mobile-header",
+          "css": "display: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header.mobile-header-detail",
+          "css": "grid-template-columns: 44px minmax(0px, 1fr) auto; background: var(--color-bg); backdrop-filter: none; filter: none; opacity: 1;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header",
+          "css": "position: sticky; top: 0px; z-index: 20; height: calc(var(--mobile-header-h) + var(--safe-top)); min-height: calc(var(--mobile-header-h) + var(--safe-top)); padding-top: var(--safe-top); padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header",
+          "css": "width: 100%; max-width: 100%; isolation: isolate; background: var(--color-bg); backdrop-filter: none; opacity: 1;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".mobile-header-detail",
+          "css": "display: grid; grid-template-columns: 44px minmax(0px, 1fr) 44px; align-items: center; gap: 0px; position: sticky; padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); height: auto; min-height: calc(var(--mobile-header-h) + var(--safe-top));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtKontakteFinanzenAktivität",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 66,
+        "width": 410.4375,
+        "height": 45
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "height": "45px",
+        "min-height": "0px",
+        "padding": "0px 0px 10px 19.565px",
+        "margin": "0px 0px 16px -19.565px",
+        "gap": "6px",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".desktop-detail-main > .tabs",
+          "css": "margin-top: 0px; margin-bottom: 20px; padding-bottom: 10px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-detail-main",
+      "tag": "DIV",
+      "classes": "desktop-detail-main",
+      "text": "ÜbersichtKontakteFinanzenAktivitätOffene RechnungenCHF 35.13Umsatz 2026CHF 135.13Rechnungen inkl. MWSTErfasste Zeit2:15 h0:00 h verrechnetKundendetailsFirmaPrüffirma AGHauptkontaktAlex MusterE-Mailtes",
+      "inline": null,
+      "rect": {
+        "x": 19.5625,
+        "y": 66,
+        "width": 390.875,
+        "height": 548
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "548px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".desktop-detail-main, .entity-edit-main",
+          "css": "min-width: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".bo-metric-tiles",
+      "tag": "DIV",
+      "classes": "metrics-grid bo-metric-tiles",
+      "text": "Offene RechnungenCHF 35.13Umsatz 2026CHF 135.13Rechnungen inkl. MWSTErfasste Zeit2:15 h0:00 h verrechnet",
+      "inline": null,
+      "rect": {
+        "x": 19.5625,
+        "y": 127,
+        "width": 390.875,
+        "height": 187
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "height": "187px",
+        "min-height": "0px",
+        "padding": "0px",
+        "margin": "0px",
+        "gap": "10px",
+        "grid-template-columns": "190.438px 190.438px",
+        "grid-template-rows": "88.5px 88.5px",
+        "align-items": "start",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid",
+          "css": "display: grid; grid-template-columns: repeat(4, minmax(0px, 1fr)); gap: 10px; border: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bo-metric-tiles",
+          "css": "background: transparent; align-items: start;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr));",
+          "contexts": [
+            "(min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metrics-grid",
+          "css": "gap: 10px; border: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metrics-grid, .metrics-grid.three",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr)); gap: 10px; border: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid.bo-metric-tiles",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr));",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid",
+          "css": "border: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid, .metrics-grid.three, .support-summary",
+          "css": "grid-template-columns: 1fr;",
+          "contexts": [
+            "(max-width: 389px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".bo-metric-tiles",
+          "css": "grid-template-columns: repeat(4, minmax(0px, 1fr));",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".metric",
+      "tag": "DIV",
+      "classes": "metric",
+      "text": "Offene RechnungenCHF 35.13",
+      "inline": null,
+      "rect": {
+        "x": 19.5625,
+        "y": 127,
+        "width": 190.4375,
+        "height": 69.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "69.5px",
+        "min-height": "0px",
+        "padding": "14px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-width: 0px; min-height: 74px; padding: 12px 14px; border: 0px; border-radius: 10px; background: var(--color-subtle); box-shadow: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bo-metric-tiles .metric",
+          "css": "padding: var(--field-group-gap) var(--kpi-padding); min-width: 0px; min-height: 0px; background: transparent;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 13px 16px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 74px; padding: 12px 14px; border: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 12px 14px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid .metric:first-child, .metrics-grid .metric:nth-child(2n+1)",
+          "css": "border-left: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".metric",
+      "tag": "DIV",
+      "classes": "metric",
+      "text": "Umsatz 2026CHF 135.13Rechnungen inkl. MWST",
+      "inline": null,
+      "rect": {
+        "x": 220,
+        "y": 127,
+        "width": 190.4375,
+        "height": 88.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "88.5px",
+        "min-height": "0px",
+        "padding": "14px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-width: 0px; min-height: 74px; padding: 12px 14px; border: 0px; border-radius: 10px; background: var(--color-subtle); box-shadow: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bo-metric-tiles .metric",
+          "css": "padding: var(--field-group-gap) var(--kpi-padding); min-width: 0px; min-height: 0px; background: transparent;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 13px 16px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 74px; padding: 12px 14px; border: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 12px 14px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".metric",
+      "tag": "DIV",
+      "classes": "metric",
+      "text": "Erfasste Zeit2:15 h0:00 h verrechnet",
+      "inline": null,
+      "rect": {
+        "x": 19.5625,
+        "y": 225.5,
+        "width": 190.4375,
+        "height": 88.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "height": "88.5px",
+        "min-height": "0px",
+        "padding": "14px",
+        "margin": "0px",
+        "gap": "normal",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "font-size": "16px",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-width: 0px; min-height: 74px; padding: 12px 14px; border: 0px; border-radius: 10px; background: var(--color-subtle); box-shadow: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".bo-metric-tiles .metric",
+          "css": "padding: var(--field-group-gap) var(--kpi-padding); min-width: 0px; min-height: 0px; background: transparent;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 13px 16px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 74px; padding: 12px 14px; border: 0px;",
+          "contexts": [
+            "(min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 12px 14px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "selector": ".metrics-grid .metric:first-child, .metrics-grid .metric:nth-child(2n+1)",
+          "css": "border-left: 0px;",
+          "contexts": [
+            "(max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

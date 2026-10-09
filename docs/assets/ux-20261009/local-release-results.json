@@ -1,0 +1,38 @@
+{
+  "baseSha": "a6c07b233cd9dc71eeee0beacbb0fa1d8c67b79b",
+  "pages": 70,
+  "routeVariants": 79,
+  "chromiumCases": 1106,
+  "webkitCases": 140,
+  "realPdfCases": 12,
+  "comparisonCases": 3,
+  "interactions": [
+    "customers",
+    "products",
+    "employees",
+    "documents",
+    "finance",
+    "time",
+    "expenses",
+    "chat",
+    "billing"
+  ],
+  "pwa": "Browser emulation passed; no physical installation",
+  "gates": {
+    "test": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "css": "passed",
+    "release": "passed",
+    "docs": "passed",
+    "repository": "passed",
+    "runtime-smoke": "passed",
+    "exact-zip-smoke": "passed",
+    "security-prod": "passed",
+    "security-all": "passed"
+  },
+  "securityAllException": "Existing accepted dev-tool advisory GHSA-VFJ7-8CJW-P6XM; policy unchanged",
+  "navigationDigest": "aa85bddbeda0c9cb3349f3592857675a6cab219ac95f462eee250927bad8dfd1",
+  "deployment": "Pending GitHub Quality and Azure; local evidence is not live acceptance"
+}
