@@ -443,8 +443,38 @@ try{
  assert.equal((await reimburse.POST({body:{reference:'another-transfer'}},{params:Promise.resolve({id:expenseId})})).status,409);
  // The real team GET must read the entitlement/subscription tables and return names.
  globalThis.__processSession=session;
- const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(dataModule('export async function inviteUser(){}')));
+ const invitePasswords=dataModule((await fs.readFile('lib/server/password.ts','utf8')).replace('import "server-only";',''));
+ const inviteMail=dataModule('export function mailLayout(title,body,cta){return body+cta.url} export async function sendMail(mail){globalThis.__invitationMails.push(mail);if(globalThis.__invitationMailMode==="uncertain")throw new Error("ambiguous transport");return {delivered:globalThis.__invitationMailMode!=="unavailable"}}');
+ let invitationServiceSource=(await fs.readFile('lib/server/invitations.ts','utf8')).replace('import "server-only";','');
+ for(const [specifier,url] of Object.entries({'./http':processHttp,'./db':processDb,'./password':invitePasswords,'./email':inviteMail,'./env':dataModule('export const env={appUrl:"https://fixture.invalid"}'),'./rbac':processRbac,'./audit':audit,'./business-idempotency':idempotencyModule})){invitationServiceSource=invitationServiceSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url));}
+ const invitationService=dataModule(invitationServiceSource);
+ globalThis.__invitationMails=[];globalThis.__invitationMailMode='accepted';
+ const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(invitationService));
  const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.ok(teamResult.data.userLimit>0);assert.ok(teamResult.data.plan);
+ await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ await globalThis.__processTransaction(demo,c=>c.query("insert into organization_entitlements(organization_id,max_users) values($1,50) on conflict(organization_id) do update set max_users=50",[demo]));
+ const inviteRequest=(email,role,key)=>({body:{email,role},headers:new Headers({'Idempotency-Key':key})});
+ const atomicInvite=await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'));assert.equal(atomicInvite.status,201,JSON.stringify(atomicInvite));
+ assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'))).data.id,atomicInvite.data.id);assert.equal(globalThis.__invitationMails.length,1,'A timeout replay does not send twice');
+ assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','reader','invitation-atomic-fixture'))).status,409,'A changed role cannot reuse a replay key');
+ assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-other-key'))).status,409,'A fresh key cannot duplicate a pending invitation');
+ globalThis.__invitationMailMode='unavailable';
+ const unavailableInvite=await team.POST(inviteRequest('retry-invite@fixture.invalid','reader','invitation-retry-fixture'));assert.equal(unavailableInvite.status,503);
+ const persistedInvite=(await db.query("select i.id,m.role,m.status,o.status delivery,t.metadata from organization_invitations i join mail_outbox o on o.entity_id=i.id::text and o.organization_id=i.organization_id join app_users u on u.email=i.email join organization_memberships m on m.user_id=u.id and m.organization_id=i.organization_id join auth_tokens t on t.user_id=u.id and t.organization_id=i.organization_id and t.metadata->>'invitation_id'=i.id::text where i.organization_id=$1 and i.email='retry-invite@fixture.invalid'",[demo])).rows[0];
+ assert.equal(persistedInvite.delivery,'failed');assert.equal(persistedInvite.role,'reader');assert.equal(persistedInvite.status,'invited');assert.equal(persistedInvite.metadata.invitation_id,persistedInvite.id);
+ globalThis.__invitationMailMode='accepted';assert.equal((await team.POST(inviteRequest('retry-invite@fixture.invalid','reader','invitation-retry-fixture'))).data.id,persistedInvite.id);
+ globalThis.__invitationMailMode='uncertain';assert.equal((await team.POST(inviteRequest('uncertain-invite@fixture.invalid','member','invitation-uncertain-fixture'))).status,503);const attempts=globalThis.__invitationMails.length;
+ globalThis.__invitationMailMode='accepted';assert.equal((await team.POST(inviteRequest('uncertain-invite@fixture.invalid','member','invitation-uncertain-fixture'))).status,409);assert.equal(globalThis.__invitationMails.length,attempts,'Ambiguous mail is never blindly sent again');
+ globalThis.__processSession={...session,role:'member'};assert.equal((await team.POST(inviteRequest('forbidden-invite@fixture.invalid','admin','invitation-forbidden-fixture'))).status,403);globalThis.__processSession=session;
+ // A database failure at the final outbox step rolls back identity, membership,
+ // invitation and token. It must not leave a partially invited business user.
+ await db.exec("create function reject_fixture_mail() returns trigger language plpgsql as $$ begin if new.recipient='rollback-invite@fixture.invalid' then raise exception 'synthetic outbox failure'; end if; return new; end $$; create trigger reject_fixture_mail before insert on mail_outbox for each row execute function reject_fixture_mail()");
+ assert.equal((await team.POST(inviteRequest('rollback-invite@fixture.invalid','member','invitation-rollback-fixture'))).status,500);
+ assert.equal((await db.query("select count(*)::int n from app_users where email='rollback-invite@fixture.invalid'")).rows[0].n,0);assert.equal((await db.query("select count(*)::int n from organization_invitations where email='rollback-invite@fixture.invalid'")).rows[0].n,0);
+ await db.exec('drop trigger reject_fixture_mail on mail_outbox;drop function reject_fixture_mail()');
+ delete globalThis.__invitationMails;delete globalThis.__invitationMailMode;
+ console.log('Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.');
+
  for(const table of ['organization_invitations','document_deliveries']){await db.exec('set role tenant_probe');await db.query("select set_config('app.platform_operator','',false)");await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);assert.equal((await db.query('select * from '+table+' where organization_id=$1',[demo])).rows.length,0);await db.exec('reset role');}
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
 
