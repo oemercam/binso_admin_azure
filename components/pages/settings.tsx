@@ -1,5 +1,5 @@
 "use client";
-import {useDataRevision} from "@/lib/client/use-api-query";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
@@ -33,6 +33,7 @@ function SettingsNavigation(){
 }
 
 export function AccountSettingsPage() {
+  const production=useBackendMode();
   const [profileName,setProfileName]=useState("");
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
@@ -41,9 +42,8 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const dataRevision=useDataRevision(["/api/settings/profile"]);
-  const [loading,setLoading]=useState(true);
-  const [loadError,setLoadError]=useState<string|null>(null);
+  const query=useApiQuery<{item?:Record<string,unknown>|null;email?:string|null}>(production?"/api/settings/profile":null);
+  const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
@@ -53,22 +53,15 @@ export function AccountSettingsPage() {
   const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
 
   useEffect(()=>{
-    if(editing)return;
-    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
-    apiGet<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile")
-      .then(payload=>{
-        const item=payload.item??{};
-        queueMicrotask(()=>{
-          setProfileName(String(item.display_name??""));
-          setFirstName(String(item.first_name??""));
-          setLastName(String(item.last_name??""));
-          setEmail(payload.email??"");
-          setPhone(String(item.phone??""));
-          setAvatarUrl(String(item.avatar_url??""));
-          setJobTitle(String(item.job_title??""));
-        });
-      }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[editing,dataRevision]);
+    if(editing||!query.data)return;
+    const payload=query.data,item=payload.item??{};
+    let active=true;
+    queueMicrotask(()=>{if(!active)return;
+      setProfileName(String(item.display_name??""));setFirstName(String(item.first_name??""));setLastName(String(item.last_name??""));
+      setEmail(payload.email??"");setPhone(String(item.phone??""));setAvatarUrl(String(item.avatar_url??""));setJobTitle(String(item.job_title??""));
+    });
+    return()=>{active=false};
+  },[editing,query.data]);
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
@@ -87,7 +80,7 @@ export function AccountSettingsPage() {
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||profileName||"Benutzer";
   return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
@@ -107,6 +100,7 @@ export function AccountSettingsPage() {
 }
 
 export function CompanySettingsPage() {
+  const production=useBackendMode();
   const [name,setName]=useState("");
   const [uid,setUid]=useState("");
   const [logoUrl,setLogoUrl]=useState("");
@@ -117,9 +111,8 @@ export function CompanySettingsPage() {
   const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const dataRevision=useDataRevision(["/api/settings/company"]);
-  const [loading,setLoading]=useState(true);
-  const [loadError,setLoadError]=useState<string|null>(null);
+  const query=useApiQuery<{item:Record<string,unknown>}>(production?"/api/settings/company":null);
+  const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
@@ -132,22 +125,14 @@ export function CompanySettingsPage() {
   const uploadLogo=(file:File|undefined)=>{if(!file)return;if(!["image/png","image/jpeg","image/webp"].includes(file.type)){setToast("Bitte PNG, JPEG oder WebP auswählen.");return;}setPendingLogo(file);setLogoPreview(URL.createObjectURL(file))};
 
   useEffect(()=>{
-    if(editing)return;
-    if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
-    apiGet<{item:Record<string,unknown>}>("/api/settings/company").then(payload=>{
-      const item=payload.item;
-      queueMicrotask(()=>{
-        setName(String(item.name??""));
-        setUid(String(item.uid??""));
-        setLogoUrl(String(item.logo_url??""));
-        setStreet(String(item.street??""));
-        setPostalCode(String(item.postal_code??""));
-        setCity(String(item.city??""));
-        setEmail(String(item.email??""));
-        setPhone(String(item.phone??""));
-      });
-    }).catch(e=>setLoadError(e instanceof Error?e.message:"Einstellungen konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[editing,dataRevision]);
+    if(editing||!query.data)return;
+    const item=query.data.item;let active=true;
+    queueMicrotask(()=>{if(!active)return;
+      setName(String(item.name??""));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));
+      setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));
+    });
+    return()=>{active=false};
+  },[editing,query.data]);
 
   const save=async(message="Firmendaten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
@@ -166,7 +151,7 @@ export function CompanySettingsPage() {
   };
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing&&(currentValues!==baseline||pendingLogo!==null)} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
-    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
+    {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface company-logo-card">{(logoPreview||logoUrl)?<img src={logoPreview||logoUrl} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><Input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
         <div className="form-grid two">

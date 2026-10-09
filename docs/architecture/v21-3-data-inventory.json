@@ -5029,36 +5029,15 @@
       "file": "components/document-settings.tsx",
       "calls": [
         {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then(({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})).catch(e=>setError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 17,
+          "callee": "useApiQuery",
+          "line": 9,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then(({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})).catch",
-          "line": 17,
-          "arguments": [
-            "e=>setError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then",
-          "line": 17,
-          "arguments": [
-            "({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 17,
-          "arguments": [
-            "\"/api/settings/documents\""
+            "production?\"/api/settings/documents\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 18,
+          "line": 20,
           "arguments": [
             "\"/api/settings/documents\"",
             "{vatRate:Number(vatRate),paymentTermsDays:Number(terms),iban,qrIban,invoiceIntroText:invoiceIntro,invoiceFooterText:invoiceFooter,quoteIntroText:quoteIntro,quoteFooterText:quoteFooter}"
@@ -5903,148 +5882,50 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 19,
+          "line": 20,
           "arguments": [
             "\"expenses\"",
             "expenses"
           ]
         },
         {
-          "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then(data=>setCanApproveExpense([\"owner\",\"admin\",\"project_manager\",\"manager\"].includes(data.tenant?.role??\"\"))).catch",
-          "line": 42,
+          "callee": "useApiQuery",
+          "line": 31,
           "arguments": [
-            "()=>undefined"
+            "production?\"/api/expenses/options\":\"/api/demo/data?collection=employees\""
           ]
         },
         {
-          "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then",
-          "line": 42,
-          "arguments": [
-            "data=>setCanApproveExpense([\"owner\",\"admin\",\"project_manager\",\"manager\"].includes(data.tenant?.role??\"\"))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 42,
+          "callee": "useApiQuery",
+          "line": 43,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
-          "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then(s=>setCanFinanceExpense([\"owner\",\"admin\",\"finance\"].includes(s.tenant?.role??\"\"))).catch",
-          "line": 58,
-          "arguments": [
-            "()=>{}"
-          ]
-        },
-        {
-          "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then",
-          "line": 58,
-          "arguments": [
-            "s=>setCanFinanceExpense([\"owner\",\"admin\",\"finance\"].includes(s.tenant?.role??\"\"))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 58,
-          "arguments": [
-            "\"/api/auth/session\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<{id:string;name:string}>}>(\"/api/customers\").then(s=>setExpenseCustomers(s.items)).catch",
-          "line": 58,
-          "arguments": [
-            "()=>{}"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<{id:string;name:string}>}>(\"/api/customers\").then",
-          "line": 58,
-          "arguments": [
-            "s=>setExpenseCustomers(s.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 58,
+          "callee": "useApiQuery",
+          "line": 48,
           "arguments": [
             "\"/api/customers\""
           ]
         },
         {
-          "callee": "apiGet<{items:typeof expenseFiles}>(\"/api/files?expenseId=\"+encodeURIComponent(expenseId)).then(s=>setExpenseFiles(s.items)).catch",
-          "line": 63,
+          "callee": "useApiQuery",
+          "line": 59,
           "arguments": [
-            "()=>setToast('Quittungen konnten nicht geladen werden.')"
+            "expenseId?\"/api/files?expenseId=\"+encodeURIComponent(expenseId):null"
           ]
         },
         {
-          "callee": "apiGet<{items:typeof expenseFiles}>(\"/api/files?expenseId=\"+encodeURIComponent(expenseId)).then",
-          "line": 63,
+          "callee": "useApiQuery",
+          "line": 62,
           "arguments": [
-            "s=>setExpenseFiles(s.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 63,
-          "arguments": [
-            "\"/api/files?expenseId=\"+encodeURIComponent(expenseId)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?\"/api/expenses/options\":\"/api/demo/data?collection=employees\").then(data=>setAvailableEmployees(data.items)).catch",
-          "line": 65,
-          "arguments": [
-            "()=>setToast(\"Mitarbeiter konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?\"/api/expenses/options\":\"/api/demo/data?collection=employees\").then",
-          "line": 65,
-          "arguments": [
-            "data=>setAvailableEmployees(data.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 65,
-          "arguments": [
-            "isProductionBackendEnabled()?\"/api/expenses/options\":\"/api/demo/data?collection=employees\""
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Spese wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??\"\"));setExpenseCustomer(String(item.customer_id??\"\"));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??\"\"));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);\n        setDate(String(item.expense_date??\"\").slice(0,10));\n        setCategory(({travel:\"Reise\",expense:\"Verpflegung\",material:\"Material\",other:\"Sonstiges\"} as Record<string,string>)[String(item.category)]??String(item.category??\"Reise\"));\n        setAmount(Number(item.amount??0).toFixed(2));\n        setCurrency(String(item.currency??\"CHF\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setMerchant(String(item.merchant??\"\"));\n        setDescription(String(item.description??\"\"));\n        const map:Record<string,string>={draft:\"Entwurf\",submitted:\"Eingereicht\",approved:\"Genehmigt\",posted:\"Verbucht\",rejected:\"Abgelehnt\"};\n        setStatus(map[String(item.status)]??\"Eingereicht\");\n      });\n    }).catch(error=>setExpenseLoadError(error instanceof Error?error.message:\"Spese konnte nicht geladen werden.\")).finally",
-          "line": 69,
-          "arguments": [
-            "()=>setLoadingExpense(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Spese wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??\"\"));setExpenseCustomer(String(item.customer_id??\"\"));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??\"\"));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);\n        setDate(String(item.expense_date??\"\").slice(0,10));\n        setCategory(({travel:\"Reise\",expense:\"Verpflegung\",material:\"Material\",other:\"Sonstiges\"} as Record<string,string>)[String(item.category)]??String(item.category??\"Reise\"));\n        setAmount(Number(item.amount??0).toFixed(2));\n        setCurrency(String(item.currency??\"CHF\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setMerchant(String(item.merchant??\"\"));\n        setDescription(String(item.description??\"\"));\n        const map:Record<string,string>={draft:\"Entwurf\",submitted:\"Eingereicht\",approved:\"Genehmigt\",posted:\"Verbucht\",rejected:\"Abgelehnt\"};\n        setStatus(map[String(item.status)]??\"Eingereicht\");\n      });\n    }).catch",
-          "line": 69,
-          "arguments": [
-            "error=>setExpenseLoadError(error instanceof Error?error.message:\"Spese konnte nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)).then",
-          "line": 69,
-          "arguments": [
-            "payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Spese wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??\"\"));setExpenseCustomer(String(item.customer_id??\"\"));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??\"\"));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);\n        setDate(String(item.expense_date??\"\").slice(0,10));\n        setCategory(({travel:\"Reise\",expense:\"Verpflegung\",material:\"Material\",other:\"Sonstiges\"} as Record<string,string>)[String(item.category)]??String(item.category??\"Reise\"));\n        setAmount(Number(item.amount??0).toFixed(2));\n        setCurrency(String(item.currency??\"CHF\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setMerchant(String(item.merchant??\"\"));\n        setDescription(String(item.description??\"\"));\n        const map:Record<string,string>={draft:\"Entwurf\",submitted:\"Eingereicht\",approved:\"Genehmigt\",posted:\"Verbucht\",rejected:\"Abgelehnt\"};\n        setStatus(map[String(item.status)]??\"Eingereicht\");\n      });\n    }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 69,
-          "arguments": [
-            "isProductionBackendEnabled()?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)"
+            "existing&&expenseId?(production?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)):null"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 93,
+          "line": 92,
           "arguments": [
             "\"/api/expenses/scan-receipt\"",
             "form"
@@ -6052,7 +5933,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 115,
+          "line": 114,
           "arguments": [
             "'/api/files'",
             "form"
@@ -6060,7 +5941,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 116,
+          "line": 115,
           "arguments": [
             "\"/api/expenses/\"+encodeURIComponent(targetExpenseId)",
             "payload"
@@ -6068,7 +5949,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 120,
+          "line": 119,
           "arguments": [
             "\"/api/expenses\"",
             "payload",
@@ -6077,7 +5958,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 128,
+          "line": 127,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6085,7 +5966,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 143,
+          "line": 142,
           "arguments": [
             "'/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement'",
             "{reference:reimbursementRef}"
@@ -6253,6 +6134,13 @@
       "file": "components/pages/settings.tsx",
       "calls": [
         {
+          "callee": "useApiQuery",
+          "line": 45,
+          "arguments": [
+            "production?\"/api/settings/profile\":null"
+          ]
+        },
+        {
           "callee": "apiUpload",
           "line": 53,
           "arguments": [
@@ -6261,72 +6149,23 @@
           ]
         },
         {
-          "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then(payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }).catch(e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 58,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then(payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }).catch",
-          "line": 58,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then",
-          "line": 58,
-          "arguments": [
-            "payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 58,
-          "arguments": [
-            "\"/api/settings/profile\""
-          ]
-        },
-        {
           "callee": "apiPatch",
-          "line": 77,
+          "line": 70,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
           ]
         },
         {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then(payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }).catch(e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 137,
+          "callee": "useApiQuery",
+          "line": 114,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then(payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }).catch",
-          "line": 137,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then",
-          "line": 137,
-          "arguments": [
-            "payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 137,
-          "arguments": [
-            "\"/api/settings/company\""
+            "production?\"/api/settings/company\":null"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 157,
+          "line": 142,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6334,7 +6173,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 158,
+          "line": 143,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,postalCode,city,email,phone}"
@@ -6342,35 +6181,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 219,
+          "line": 204,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 220,
+          "line": 205,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 221,
+          "line": 206,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 235,
+          "line": 220,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 254,
+          "line": 239,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -6378,7 +6217,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 266,
+          "line": 251,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -6386,35 +6225,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 341,
+          "line": 326,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 341,
+          "line": 326,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 341,
+          "line": 326,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 341,
+          "line": 326,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 349,
+          "line": 334,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -6422,28 +6261,28 @@
         },
         {
           "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then(data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}).catch",
-          "line": 363,
+          "line": 348,
           "arguments": [
             "()=>setError(\"Sprache konnte nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then",
-          "line": 363,
+          "line": 348,
           "arguments": [
             "data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 363,
+          "line": 348,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 364,
+          "line": 349,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:code}"
@@ -9471,7 +9310,7 @@
           "callee": "apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch",
           "line": 24,
           "arguments": [
-            "error=>{if(active)setState({path,revision,session,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});}"
+            "error=>{if(active)setState(previous=>({path,revision,session,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));}"
           ]
         },
         {

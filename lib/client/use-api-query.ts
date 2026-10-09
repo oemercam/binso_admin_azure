@@ -21,7 +21,7 @@ export function useApiQuery<T>(path:string|null){
   if(!path)return;
   let active=true;
   const session=dataRevision([]);
-  apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch(error=>{if(active)setState({path,revision,session,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});});
+  apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch(error=>{if(active)setState(previous=>({path,revision,session,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
   return()=>{active=false;};
  },[path,revision,retry]);
  const current=state.path===path&&state.revision===revision;

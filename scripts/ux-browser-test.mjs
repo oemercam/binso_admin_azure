@@ -502,6 +502,19 @@ try{
    await page.locator('.mobile-back').click();await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
   if(hasInteraction('settings')){
+   let failDocumentSettings=true;
+   const settingsFailure=async route=>{if(failDocumentSettings&&route.request().method()==='GET')return route.fulfill({status:503,json:{message:'Synthetic document settings unavailable'}});return route.fallback()};
+   await context.route('**/api/settings/documents',settingsFailure);
+   await navigate(base+'/einstellungen/dokumente');await page.getByText('Synthetic document settings unavailable',{exact:true}).waitFor();
+   await page.evaluate(()=>{window.__settingsRetryMarker='same-document'});failDocumentSettings=false;
+   await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();
+   assert.equal(await page.evaluate(()=>window.__settingsRetryMarker),'same-document','Settings retry refetches the resource without reloading the app');
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();
+   await page.getByLabel('Rechnung – Einleitung',{exact:true}).fill('Unsaved settings survive revalidation');
+   const settingsRead=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/settings/documents');
+   await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await settingsRead;await page.waitForLoadState('networkidle');
+   assert.equal(await page.getByLabel('Rechnung – Einleitung',{exact:true}).inputValue(),'Unsaved settings survive revalidation','Background settings data cannot overwrite an edited form');
+   await context.unroute('**/api/settings/documents',settingsFailure);
    await page.setViewportSize({width:320,height:740});await navigate(base+'/einstellungen/benachrichtigungen');await page.waitForLoadState('networkidle');
    for(const row of await page.locator('.preference-row').all()){
     const geometry=await row.evaluate(el=>{const description=el.firstElementChild.getBoundingClientRect(),channels=el.querySelector('.preference-channels').getBoundingClientRect(),label=el.querySelector('.preference-channels label span').getBoundingClientRect();return {description,channels,label}});

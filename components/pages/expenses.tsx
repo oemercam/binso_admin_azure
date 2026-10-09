@@ -1,4 +1,5 @@
 "use client";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionSheet,FormSheet} from "../binso-ux";
 
 import { businessDate } from "@/lib/financial-status";
@@ -27,7 +28,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const searchParams=useSearchParams();
   const production=useBackendMode();
   const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
-  const [availableEmployees,setAvailableEmployees]=useState<Array<{id:string;first_name:string;last_name:string}>>([]);
+  const employeesQuery=useApiQuery<{items:Array<{id:string;first_name:string;last_name:string}>}>(production?"/api/expenses/options":"/api/demo/data?collection=employees");
+  const availableEmployees=employeesQuery.data?.items??[];
   const [date,setDate]=useState(()=>businessDate());
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState("");
@@ -38,38 +40,36 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [scanState,setScanState]=useState<"idle"|"scanning"|"done"|"error">("idle");
   const [scanConfidence,setScanConfidence]=useState<number|null>(null);
   const [status,setStatus]=useState(existing?"Eingereicht":"Eingereicht");
-  const [canApproveExpense,setCanApproveExpense]=useState(false);
-  useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(data=>setCanApproveExpense(["owner","admin","project_manager","manager"].includes(data.tenant?.role??""))).catch(()=>undefined);},[]);
+  const sessionQuery=useApiQuery<{tenant?:{role?:string}}>("/api/auth/session");
+  const role=sessionQuery.data?.tenant?.role??"";
+  const canApproveExpense=["owner","admin","project_manager","manager"].includes(role);
   const [expenseCustomer,setExpenseCustomer]=useState("");
   const [expenseBillable,setExpenseBillable]=useState(false);
-  const [expenseCustomers,setExpenseCustomers]=useState<Array<{id:string;name:string}>>([]);
+  const customersQuery=useApiQuery<{items:Array<{id:string;name:string}>}>("/api/customers");
+  const expenseCustomers=customersQuery.data?.items??[];
   const [reimbursedAt,setReimbursedAt]=useState<string|null>(null),[reimbursementRef,setReimbursementRef]=useState("");
-  const [invoicedId,setInvoicedId]=useState<string|null>(null),[canFinanceExpense,setCanFinanceExpense]=useState(false);
+  const [invoicedId,setInvoicedId]=useState<string|null>(null);
+  const canFinanceExpense=["owner","admin","finance"].includes(role);
   const [createdExpenseId,setCreatedExpenseId]=useState(expenseId??"");
   const expenseRequestKey=useRef("");
   const expenseMutationPending=useRef(false);
   const receiptScanPending=useRef(false);
   const [editedExpense,setEditedExpense]=useState(false);
   const [savedExpense,setSavedExpense]=useState(false);
-  const [expenseFiles,setExpenseFiles]=useState<Array<{id:string;fileName:string}>>([]);
+  const filesQuery=useApiQuery<{items:Array<{id:string;fileName:string}>}>(expenseId?"/api/files?expenseId="+encodeURIComponent(expenseId):null);
+  const expenseFiles=filesQuery.data?.items??[];
   const [expenseBusy,setExpenseBusy]=useState(false),[reimbursementOpen,setReimbursementOpen]=useState(false);
-  const [loadingExpense,setLoadingExpense]=useState(existing);
-  const [expenseLoadError,setExpenseLoadError]=useState<string|null>(null);
-  useEffect(()=>{apiGet<{tenant?:{role?:string}}>("/api/auth/session").then(s=>setCanFinanceExpense(["owner","admin","finance"].includes(s.tenant?.role??""))).catch(()=>{});apiGet<{items:Array<{id:string;name:string}>}>("/api/customers").then(s=>setExpenseCustomers(s.items)).catch(()=>{});},[]);
+  const expenseQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&expenseId?(production?"/api/expenses/"+encodeURIComponent(expenseId):"/api/demo/data?collection=expenses&id="+encodeURIComponent(expenseId)):null);
+  const loadingExpense=expenseQuery.loading;
+  const expenseLoadError=expenseQuery.error??(existing&&expenseQuery.data&&!expenseQuery.data.item&&!expenseQuery.data.items?.[0]?"Spese wurde nicht gefunden.":null);
   const [persistedExpenseStatus,setPersistedExpenseStatus]=useState('');
   const lockedExpense=['approved','posted'].includes(persistedExpenseStatus);
   const [receiptFile,setReceiptFile]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(!expenseId)return;apiGet<{items:typeof expenseFiles}>("/api/files?expenseId="+encodeURIComponent(expenseId)).then(s=>setExpenseFiles(s.items)).catch(()=>setToast('Quittungen konnten nicht geladen werden.'));},[expenseId]);
-
-  useEffect(()=>{apiGet<{items:typeof availableEmployees}>(isProductionBackendEnabled()?"/api/expenses/options":"/api/demo/data?collection=employees").then(data=>setAvailableEmployees(data.items)).catch(()=>setToast("Mitarbeiter konnten nicht geladen werden."));},[]);
-
   useEffect(()=>{
-    if(!existing||!expenseId) return;
-    apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?"/api/expenses/"+encodeURIComponent(expenseId):"/api/demo/data?collection=expenses&id="+encodeURIComponent(expenseId)).then(payload=>{
-      const item=payload.item??payload.items?.[0];
-      if(!item)throw new Error("Spese wurde nicht gefunden.");
-      queueMicrotask(()=>{
+    if(editedExpense||!expenseQuery.data)return;
+    const item=expenseQuery.data.item??expenseQuery.data.items?.[0];if(!item)return;
+    let active=true;queueMicrotask(()=>{if(!active)return;
         setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??""));setExpenseCustomer(String(item.customer_id??""));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??""));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);
         setDate(String(item.expense_date??"").slice(0,10));
         setCategory(({travel:"Reise",expense:"Verpflegung",material:"Material",other:"Sonstiges"} as Record<string,string>)[String(item.category)]??String(item.category??"Reise"));
@@ -80,9 +80,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         setDescription(String(item.description??""));
         const map:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
         setStatus(map[String(item.status)]??"Eingereicht");
-      });
-    }).catch(error=>setExpenseLoadError(error instanceof Error?error.message:"Spese konnte nicht geladen werden.")).finally(()=>setLoadingExpense(false));
-  },[production,existing,expenseId]);
+    });return()=>{active=false};
+  },[editedExpense,expenseQuery.data]);
 
   const scanReceipt=async(file:File|null)=>{
     if(receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file)return;
@@ -143,8 +142,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref="/spesen" backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref="/spesen" backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
   return <AppShell editing={!lockedExpense} unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen">
+    {(employeesQuery.error||customersQuery.error||filesQuery.error)&&<div role="alert">{employeesQuery.error||customersQuery.error||filesQuery.error}<Button variant="ghost" onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}>Erneut versuchen</Button></div>}
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"} onChangeCapture={()=>setEditedExpense(true)}>
 
       {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
