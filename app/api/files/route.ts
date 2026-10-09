@@ -1,3 +1,5 @@
+import {fileRelations} from "@/lib/server/file-relations";
+import {validateFileContent} from "@/lib/server/file-validation";
 import {createHash,randomUUID} from "node:crypto";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {NextRequest} from "next/server";
@@ -9,14 +11,13 @@ import {ApiError,apiError,assertSameOrigin,json} from "@/lib/server/http";
 export const runtime="nodejs";
 const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
 
-const relations:Record<string,{table:string;column:string;permission:'expenses:write'|'support:write'|'employees:write'}>={expense_receipt:{table:'expenses',column:'expense_id',permission:'expenses:write'},support_attachment:{table:'support_cases',column:'support_case_id',permission:'support:write'},employee_document:{table:'employees',column:'employee_id',permission:'employees:write'}};
-const fileFields=`id,purpose,expense_id,support_case_id,employee_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
+const relations=fileRelations;
+const fileFields=`id,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'documents:read');
  const filters=new URLSearchParams(request.nextUrl.search);const where=['organization_id=$1'];const values:unknown[]=[s.organizationId];
- for(const [key,column,permission] of [['expenseId','expense_id','expenses:read'],['ticketId','support_case_id','support:read'],['employeeId','employee_id','employees:read']] as const){const value=filters.get(key);if(value){authorize(s,permission);values.push(value);where.push(column+'::text=$'+values.length);}}
- if(!tenantCan(s.role,'employees:read'))where.push("purpose<>'employee_document'");
- if(!tenantCan(s.role,'expenses:read'))where.push("purpose<>'expense_receipt'");
+ for(const relation of Object.values(relations)){const value=filters.get(relation.filter);if(value){authorize(s,relation.read);values.push(value);where.push(relation.column+'::text=$'+values.length);}}
+ for(const [purpose,relation] of Object.entries(relations)){if(!tenantCan(s.role,relation.read)){values.push(purpose);where.push('purpose<>$'+values.length);}}
  if(s.role==='member'){values.push(s.userId);where.push("(purpose<>'expense_receipt' or exists(select 1 from expenses e where e.id=file_objects.expense_id and e.organization_id=file_objects.organization_id and e.created_by_user_id=$"+values.length+"))");}
  const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select ${fileFields} from file_objects where ${where.join(' and ')} order by created_at desc limit 500`,values)).rows);
  return json({items});
@@ -32,7 +33,7 @@ export async function POST(request:NextRequest){
   if(purpose==='document')authorize(s,'documents:write');
   if(!relation&&!['document','company_logo','profile_avatar'].includes(purpose))throw new ApiError(400,'purpose_invalid','Ungültiger Dateizweck.');
   if(relation){
-   authorize(s,relation.permission);
+   authorize(s,relation.write);
    if(!/^[0-9a-f-]{36}$/i.test(entityId))throw new ApiError(400,'entity_required','Eine gültige Zuordnung ist erforderlich.');
    const found=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select id from ${relation.table} where id=$1 and organization_id=$2${purpose==='expense_receipt'&&s.role==='member'?' and created_by_user_id=$3':''}`,purpose==='expense_receipt'&&s.role==='member'?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId])).rows[0]);
    if(!found)throw new ApiError(404,'entity_not_found','Zuordnung wurde nicht gefunden.');
@@ -40,6 +41,7 @@ export async function POST(request:NextRequest){
   if(['company_logo','profile_avatar'].includes(purpose)){if(purpose==='company_logo')authorize(s,'organization:write');if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new ApiError(400,'logo_type_invalid','Bitte eine Bilddatei auswählen.');}
   const id=randomUUID(),ext=(file.name.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'').slice(0,8),objectKey=`${s.organizationId}/files/${id}.${ext}`,buffer=Buffer.from(await file.arrayBuffer());
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
+  validateFileContent(buffer,file.type);
   const sha256=createHash('sha256').update(buffer).digest('hex');
   const item=await withTenant(s.organizationId,s.userId,async c=>{
    if(purpose==='expense_receipt'){
@@ -47,8 +49,8 @@ export async function POST(request:NextRequest){
     if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
     if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');
    }
-   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id)
-    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null]);
+   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)
+    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
    if(purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
    if(purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
