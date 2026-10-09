@@ -169,7 +169,6 @@
   .mobile-record-list{display:none}
 .sheet-layer{align-items:center;padding:24px}
   .bottom-sheet{
-    max-height:calc(100dvh - 48px);
     padding:18px 24px 24px;
     border:1px solid var(--color-line);
     border-radius:var(--radius-md);
@@ -1819,7 +1818,6 @@
   .bottom-sheet{
     width:100%;
     max-width:none;
-    max-height:min(82dvh,720px);
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
     touch-action:pan-y;
@@ -2110,10 +2108,6 @@
   .bottom-sheet{
     box-sizing:border-box;
     max-width:100%;
-    max-height:min(82dvh,var(--sheet-available-height,82dvh),720px);
-    overflow:auto;
-    display:flex;
-    flex-direction:column;
     padding-left:max(var(--mobile-page-x),var(--safe-left));
     padding-right:max(var(--mobile-page-x),var(--safe-right));
   }
@@ -2306,7 +2300,6 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .settings-choice-list :is(b,small){overflow:hidden;text-overflow:ellipsis}
 
   .bottom-sheet{
-    max-height:min(88dvh,760px,calc(var(--dialog-available-height) - var(--dialog-edge-gap)));
     padding-bottom:max(calc(14px + var(--safe-bottom)),18px);
   }
   .bottom-sheet :is(input,select,textarea){font-size:16px}
@@ -2626,7 +2619,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
   .bottom-sheet>.form-grid{min-height:0;overflow-y:auto}
   .app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}
-  .app-editing .page-container{padding-bottom:calc(24px + var(--safe-bottom))}
   .bottom-sheet>.filter-sheet-actions{position:static;bottom:auto;margin-top:var(--heading-content-gap);padding-bottom:0}
   .bottom-sheet .form-grid{grid-template-columns:minmax(0,1fr)}
   .form-field>input::-webkit-date-and-time-value{min-width:0;text-align:left}
@@ -2634,7 +2626,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .form-section,.settings-form{padding-block:var(--mobile-section-gap)}
   .form-grid,.form-grid.two{grid-template-columns:minmax(0,1fr);gap:var(--field-group-gap)}
   .form-field>span{font-size:var(--control-label-font);line-height:1.4}
-  .optional-details>div{padding-top:8px}
   .detail-list>div{grid-template-columns:minmax(0,.4fr) minmax(0,1fr);gap:12px}
   .detail-list dd{min-width:0;overflow-wrap:anywhere;line-height:1.5}
   .time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
@@ -2813,7 +2804,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 :root{--mobile-nav-h:54px;--mobile-nav-bottom:6px}
   .bottom-nav{height:54px;min-height:54px}
   .bottom-nav span{display:none}
-  .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
+  .app-root:not(.app-editing) .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
 }
 
 /* Fine pointer enhancements */

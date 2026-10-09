@@ -13,7 +13,6 @@
   --kpi-padding:14px;
   --action-row-height:48px;
   --section-title-font:18px;
-  --sheet-available-height:100dvh;
   --sheet-keyboard-offset:0px;
   color-scheme:light;
   --color-bg:#fff;
@@ -112,6 +111,7 @@
   --layer-sheet:80;
   --layer-confirm:190;
   --wizard-height:auto;
+  --process-action-h:48px;
   --header-panel-top:64px;
   --header-panel-right:16px;
   --dialog-viewport-height:100dvh;
