@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 /** Read the rendered CSSOM, including inactive media and overridden candidates. */
 export async function saveDomEvidence(page, filename) {
  const evidence=await page.evaluate(()=>{
-  const properties=['display','position','width','min-width','max-width','height','min-height','padding','margin','gap','flex','grid','grid-template-columns','grid-template-rows','align-items','align-content','justify-content','text-align','font-size','font-weight','line-height','overflow','overflow-x','overflow-y','z-index','transform','opacity','backdrop-filter','background-color','white-space'];
+  const properties=['display','position','width','min-width','max-width','height','min-height','padding','border-radius','border-width','margin','gap','flex','grid','grid-template-columns','grid-template-rows','align-items','align-content','justify-content','text-align','font-size','font-weight','line-height','overflow','overflow-x','overflow-y','z-index','transform','opacity','backdrop-filter','background-color','white-space'];
   const selectors=['.page-container','.mobile-header','.bo-detail-heading','.tabs','.desktop-detail-main','.customer-tab-panel','.bo-metric-tiles','.metric','.contact-list>div','.contact-main','.document-summary-row','.document-summary-amount','.sheet-header','.sheet-body','.filter-sheet-actions','.document-modal','.document-modal-body','.document-page-viewer','.pdf-page','.document-page-navigation'];
   selectors.push('.action-row','.action-row>span','.sheet-menu>a','.sheet-menu>button','.form-field','.form-field>span','.form-field>input','.form-field>select','.mobile-sticky-save','.record-controls');
   const rules=[];

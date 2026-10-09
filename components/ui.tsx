@@ -119,8 +119,11 @@ export function SectionTitle({ title, action }: { title: string; action?: React.
 }
 
 /** Native controls keep browser autofill and validation, with one shared field contract. */
-export function Input(props:React.ComponentProps<"input">){return <input {...props}/>}
-export function Select(props:React.ComponentProps<"select">){return <select {...props}/>}
+export function Input(props:React.ComponentProps<"input">){
+ const sized=!props.hidden&&!['checkbox','radio','file','hidden','range','color','button','submit','reset','image'].includes(props.type??'text');
+ return <input {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
+}
+export function Select(props:React.ComponentProps<"select">){return <select {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
 export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}

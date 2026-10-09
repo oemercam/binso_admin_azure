@@ -1726,10 +1726,6 @@
   .invoice-form .form-section:first-child{padding-top:0}
   .invoice-form .form-section>h2,
   .invoice-form .section-title h2{font-size:15px;letter-spacing:-.01em}
-  .invoice-form .form-field,
-  .invoice-form .form-grid>label{gap:var(--field-label-gap);font-size:12px}
-  .invoice-form :is(input,select,textarea){min-height:46px;border-radius:12px}
-  .invoice-form textarea{min-height:104px;padding-block:12px}
   .document-customer-hint{margin:8px 0 0;font-size:11px}
   .document-customer-hint b,.document-customer-hint span{display:block}
   .document-customer-hint span{margin-top:2px}
@@ -2501,11 +2497,6 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
   .invoice-form .section-title h2{margin:0}
   .invoice-form .form-grid{gap:var(--field-group-gap)}
   .invoice-form .form-field{gap:var(--field-label-gap)}
-  .invoice-form .form-field>span{font-size:9px}
-  .invoice-form input,
-  .invoice-form select,
-  .invoice-form textarea{min-height:42px;padding:0 11px}
-  .invoice-form textarea{min-height:88px;padding-block:10px}
   .customer-form-section .document-customer-hint{margin-top:5px}
   .document-line-items{margin-top:2px}
   .document-line-items .line-head{display:none}
@@ -2533,17 +2524,15 @@ html{scroll-padding-top:calc(var(--mobile-header-h) + var(--safe-top) + 8px)}
 input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea{font-size:var(--control-font-mobile)}
+  .form-control,
   .form-field input:not([type="checkbox"]):not([type="radio"]),
   .form-field select,
   .form-grid>label input:not([type="checkbox"]):not([type="radio"]),
-  .form-grid>label select{min-height:var(--control-h-mobile)}
+  .form-grid>label select{height:var(--control-h-mobile);min-height:var(--control-h-mobile)}
   .form-field>span,
   .form-grid>label>span{font-size:var(--control-label-font)}
   .form-field small,
   .form-grid>label small{font-size:var(--control-help-font)}
-  .invoice-form input,
-  .invoice-form select{min-height:var(--control-h-mobile)}
-  .invoice-form .form-field>span{font-size:var(--control-label-font)}
 
 .revenue-insight{padding:16px;margin-top:12px}
   .revenue-insight-head h2{font-size:18px}.revenue-total{font-size:28px}.revenue-period{padding:7px 9px}
@@ -2567,7 +2556,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 .invoice-form .form-grid.document-meta-grid{grid-template-columns:1fr}
   .invoice-form .form-grid.document-meta-grid .form-field{width:100%;max-width:none}
-  .invoice-form .form-grid.document-meta-grid :is(input,select){width:100%;height:var(--control-h-mobile);min-height:var(--control-h-mobile);box-sizing:border-box;padding-inline:var(--control-x);border-radius:var(--control-radius);text-align:left}
   .invoice-form .form-grid.document-meta-grid input[type="date"]{text-align:left}
   .invoice-form .document-meta-grid-create .document-number-field{display:none}
   .document-line-items>.document-line-item{width:100%;box-sizing:border-box}
