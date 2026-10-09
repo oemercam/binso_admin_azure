@@ -1,0 +1,4199 @@
+{
+  "url": "http://127.0.0.1:3200/mitarbeiter/employee-one",
+  "viewport": {
+    "width": 390,
+    "height": 740
+  },
+  "documentWidth": 390,
+  "elements": [
+    {
+      "selector": ".mobile-back",
+      "tag": "A",
+      "classes": "mobile-back",
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 3.5,
+        "width": 44,
+        "height": 44
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "44px",
+        "min-width": "44px",
+        "max-width": "none",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "44px / 44px / none / row / auto / auto",
+        "grid-template-columns": "44px",
+        "grid-template-rows": "44px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 8,
+          "order": 9,
+          "selector": "a",
+          "css": "color: inherit; text-decoration: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 715,
+          "order": 1017,
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 716,
+          "order": 1018,
+          "selector": ".mobile-header .avatar-button, .mobile-header .icon-button, .mobile-header .logo, .mobile-header .mobile-back, .mobile-header .mobile-notification-button, .mobile-header svg",
+          "css": "opacity: 1;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 7,
+          "order": 1585,
+          "selector": ".mobile-header-detail .mobile-back, .mobile-header-detail .mobile-detail-actions :is(button, a, svg)",
+          "css": "filter: none; opacity: 1; text-shadow: none;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 108,
+          "order": 1686,
+          "selector": ".mobile-back",
+          "css": "width: 40px; height: 40px; display: grid; place-items: center; margin-left: -8px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 520,
+          "order": 2098,
+          "selector": ".mobile-header-detail .mobile-back",
+          "css": "margin: 0px 0px 0px -8px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 559,
+          "order": 2137,
+          "selector": ".mobile-back, .mobile-header .avatar-button, .mobile-header .icon-button, .mobile-header .mobile-notification-button",
+          "css": "width: 44px; height: 44px; min-width: 44px; min-height: 44px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 561,
+          "order": 2139,
+          "selector": ".mobile-header-detail .mobile-back",
+          "css": "margin-left: -10px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 653,
+          "order": 2231,
+          "selector": ".mobile-header-detail .mobile-back",
+          "css": "grid-column-start: 1; grid-column-end: auto; margin: 0px; justify-self: start;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-back svg",
+      "tag": "svg",
+      "classes": {},
+      "text": "",
+      "inline": null,
+      "rect": {
+        "x": 29.734375,
+        "y": 15.5,
+        "width": 20,
+        "height": 20
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "20px",
+        "min-width": "auto",
+        "max-width": "100%",
+        "height": "20px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 11,
+          "order": 12,
+          "selector": "img, svg",
+          "css": "max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 12,
+          "order": 13,
+          "selector": "svg",
+          "css": "display: block; flex: 0 0 auto; shape-rendering: geometricprecision;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 715,
+          "order": 1017,
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 716,
+          "order": 1018,
+          "selector": ".mobile-header .avatar-button, .mobile-header .icon-button, .mobile-header .logo, .mobile-header .mobile-back, .mobile-header .mobile-notification-button, .mobile-header svg",
+          "css": "opacity: 1;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "Test PersonAktivICT · 80 %ÜbersichtArbeitszeitSpesenDokumentePersönliche Daten VornameNachnameE-MailTelefonFunktionPensum (%)Arbeitsverhältnis EintrittWochenstunden (h/Woche)Ferientage / JahrAdresseSt",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 52,
+        "width": 390,
+        "height": 1231.53125
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "390px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "1231.53125px",
+        "min-height": "0px",
+        "padding": "14px 17.745001px 24px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 13,
+          "order": 318,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 121,
+          "order": 425,
+          "selector": ".app-editing .page-container",
+          "css": "padding-bottom: calc(var(--desktop-section-y) + var(--safe-bottom));",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 20,
+          "order": 1369,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 4,
+          "order": 1404,
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 12,
+          "order": 1412,
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 131,
+          "order": 1531,
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 120,
+          "order": 1698,
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 322,
+          "order": 1900,
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 505,
+          "order": 2083,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 524,
+          "order": 2102,
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 63,
+          "order": 2435,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-header",
+      "tag": "HEADER",
+      "classes": "mobile-header mobile-header-detail",
+      "text": "Test PersonAktiv1TP",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 52
+      },
+      "computed": {
+        "display": "grid",
+        "position": "sticky",
+        "width": "390px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "52px",
+        "min-height": "52px",
+        "padding": "0px 17.745001px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px",
+        "gap": "0px",
+        "flex": "0 1 auto",
+        "grid": "51px / 44px 266.53125px 44px / none / row / auto / auto",
+        "grid-template-columns": "44px 266.53125px 44px",
+        "grid-template-rows": "51px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "space-between",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "20",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 12,
+          "order": 317,
+          "selector": ".bottom-nav, .desktop-appbar, .mobile-header",
+          "css": "display: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 715,
+          "order": 1017,
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 4,
+          "order": 1582,
+          "selector": ".mobile-header.mobile-header-detail",
+          "css": "grid-template-columns: 44px minmax(0px, 1fr) auto; background: var(--color-bg); backdrop-filter: none; -webkit-backdrop-filter: none; filter: none; opacity: 1;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 99,
+          "order": 1677,
+          "selector": ".mobile-header",
+          "css": "position: sticky; top: 0px; z-index: 20; height: calc(var(--mobile-header-h) + var(--safe-top)); min-height: calc(var(--mobile-header-h) + var(--safe-top)); padding-top: var(--safe-top); padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 505,
+          "order": 2083,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 517,
+          "order": 2095,
+          "selector": ".mobile-header",
+          "css": "width: 100%; max-width: 100%; isolation: isolate; background: var(--color-bg); -webkit-backdrop-filter: none; backdrop-filter: none; opacity: 1;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 651,
+          "order": 2229,
+          "selector": ".mobile-header-detail",
+          "css": "display: grid; grid-template-columns: 44px minmax(0px, 1fr) 44px; align-items: center; gap: 0px; position: sticky; padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); height: auto; min-height: calc(var(--mobile-header-h) + var(--safe-top));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtArbeitszeitSpesenDokumente",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 66,
+        "width": 372.265625,
+        "height": 45
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "372.265625px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "45px",
+        "min-height": "0px",
+        "padding": "0px 0px 10px 17.745001px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px 0px 16px -17.734375px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "auto",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 59,
+          "order": 363,
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 98,
+          "order": 402,
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 96,
+          "order": 1496,
+          "selector": ".desktop-detail-main > .tabs",
+          "css": "margin-top: 0px; margin-bottom: 20px; padding-bottom: 10px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 158,
+          "order": 1558,
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 163,
+          "order": 1741,
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-detail-main",
+      "tag": "DIV",
+      "classes": "desktop-detail-main",
+      "text": "ÜbersichtArbeitszeitSpesenDokumentePersönliche Daten VornameNachnameE-MailTelefonFunktionPensum (%)Arbeitsverhältnis EintrittWochenstunden (h/Woche)Ferientage / JahrAdresseStatusAktivInaktivSpeichern",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 66,
+        "width": 354.53125,
+        "height": 1169.53125
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "1169.53125px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 95,
+          "order": 1495,
+          "selector": ".desktop-detail-main, .entity-edit-main",
+          "css": "min-width: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".form-wizard",
+      "tag": "DIV",
+      "classes": "form-wizard",
+      "text": "Persönliche Daten VornameNachnameE-MailTelefonFunktionPensum (%)Arbeitsverhältnis EintrittWochenstunden (h/Woche)Ferientage / JahrAdresseStatusAktivInaktivSpeichern",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 128,
+        "width": 354.53125,
+        "height": 1107.53125
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "1107.53125px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 258,
+          "order": 561,
+          "selector": ".form-wizard",
+          "css": "min-width: 0px; scroll-margin-top: 80px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".wizard-content",
+      "tag": "DIV",
+      "classes": "wizard-content",
+      "text": "Persönliche Daten VornameNachnameE-MailTelefonFunktionPensum (%)Arbeitsverhältnis EintrittWochenstunden (h/Woche)Ferientage / JahrAdresseStatusAktivInaktiv",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 128,
+        "width": 354.53125,
+        "height": 1045.53125
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "1045.53125px",
+        "min-height": "0px",
+        "padding": "14px 0px 0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 265,
+          "order": 568,
+          "selector": ".wizard-content",
+          "css": "min-width: 0px; padding-top: var(--field-group-gap);",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Vorname",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 184,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Nachname",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 267.59375,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "E-Mail",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 351.1875,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Telefon",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 434.78125,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Funktion",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 518.375,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Pensum (%)",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 601.96875,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Eintritt",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 750.5625,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Wochenstunden (h/Woche)",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 834.15625,
+        "width": 354.53125,
+        "height": 69.59375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "69.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "19.59375px 44px / 354.53125px / none / row / auto / auto",
+        "grid-template-columns": "354.53125px",
+        "grid-template-rows": "19.59375px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 137,
+          "order": 441,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 643,
+          "order": 945,
+          "selector": ".form-field",
+          "css": "grid-template-columns: minmax(0px, 1fr);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 57,
+          "order": 2429,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Vorname",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 184,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Nachname",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 267.59375,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "E-Mail",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 351.1875,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Telefon",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 434.78125,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Funktion",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 518.375,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Pensum (%)",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 601.96875,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Eintritt",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 750.5625,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Wochenstunden (h/Woche)",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 834.15625,
+        "width": 354.53125,
+        "height": 19.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19.59375px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 134,
+          "order": 438,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 721,
+          "order": 1023,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 600,
+          "order": 2178,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 754,
+          "order": 2332,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 209.59375,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 293.1875,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 376.78125,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 460.375,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 543.96875,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 627.5625,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 776.15625,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "left",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 39,
+          "order": 40,
+          "selector": "input[type=\"date\"], input[type=\"time\"]",
+          "css": "text-align: left; appearance: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 640,
+          "order": 942,
+          "selector": ".form-field > input[type=\"date\"], .form-field > input[type=\"time\"]",
+          "css": "display: block; width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 17.734375,
+        "y": 859.75,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>select",
+      "tag": "SELECT",
+      "classes": "form-control",
+      "text": "AktivInaktiv",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 1110.53125,
+        "width": 354.53125,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 28px 0px 11px",
+        "border-radius": "10px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "pre"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-width: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 36,
+          "order": 37,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 38,
+          "order": 39,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 132,
+          "order": 436,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant-caps: inherit; font-width: inherit; line-height: inherit; font-family: inherit; font-size-adjust: inherit; font-kerning: inherit; font-variant-alternates: inherit; font-variant-ligatures: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-feature-settings: inherit; font-optical-sizing: inherit; font-variation-settings: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 133,
+          "order": 437,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 142,
+          "order": 446,
+          "selector": "html[data-theme] .form-field select",
+          "css": "appearance: none; padding-right: 28px; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 10px center;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 639,
+          "order": 941,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 644,
+          "order": 946,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 199,
+          "order": 1777,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 514,
+          "order": 2092,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 515,
+          "order": 2093,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 598,
+          "order": 2176,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 599,
+          "order": 2177,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 58,
+          "order": 2430,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-sticky-save",
+      "tag": "DIV",
+      "classes": "mobile-sticky-save",
+      "text": "Speichern",
+      "inline": null,
+      "rect": {
+        "x": 17.734375,
+        "y": 1173.53125,
+        "width": 354.53125,
+        "height": 62
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "354.53125px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "62px",
+        "min-height": "0px",
+        "padding": "14px 0px 0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "14px",
+        "flex": "0 0 auto",
+        "grid": "none / none / none / normal / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "12",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(255, 255, 255)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/44664218b8a47c4f.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/a58695801cb74567.css",
+          "index": 266,
+          "order": 569,
+          "selector": ".form-wizard .mobile-sticky-save",
+          "css": "display: flex; gap: var(--field-group-gap); position: static; flex: 0 0 auto; background: var(--color-bg); margin-top: 0px; padding-block: var(--field-group-gap) 0;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 200,
+          "order": 1778,
+          "selector": ".mobile-document-bar, .mobile-sticky-save",
+          "css": "position: sticky; bottom: calc(var(--mobile-nav-h) + var(--safe-bottom) + 10px); z-index: 12; margin-top: var(--mobile-section-gap); padding: 8px 0px; background: var(--color-bg);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/6b51a27ad6131d6d.css",
+          "index": 201,
+          "order": 1779,
+          "selector": ".mobile-sticky-save",
+          "css": "display: block; position: static;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

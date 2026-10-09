@@ -21,7 +21,7 @@ Für Sheets wurden fünf verdrängte Höhenregeln und ein verdrängter Scroll/Fl
 - Vollständiges bestehendes Testpaket, darunter echte Handler-Doppelsende-/Retry-Tests, PostgreSQL/PGlite-Rollen-/Prozess-/Zahlungsintegration, PDF/QR- und Prozess-Draft-Tests.
 - Beide Navigation-Vertragstests: Quellmarkup, Klick-/Scroll-/Berechtigungslogik, Styles und transitive Tokens unverändert.
 - Gezieltes WebKit-Paket: fünf Routen plus neue remediation-Szenarien. Pflichtvalidierung, ungültige E-Mail, Schrittwechsel, optionale Details, Datenverlustschutz, Fehler/Retry und Doppelklick; Feldgeometrie/erreichbare Schlussaktion bei 320/390/768/1440px und 400px reduzierter Höhe.
-- Breites Produktionspaket Light/Dark, 320/768/1440px und alle Katalogadressen: läuft. Ergebnis wird separat aktualisiert, nicht vorweg als PASS markiert.
+- Gezieltes Produktionspaket nach der Landscape-Korrektur: **PASS** in Light/Dark für remediation, customers, employees, documents, time und header; 10 zusätzliche Routen-/Theme-Kombinationen. Aktive Controls und Footer passen nun vollständig bei 768×400px und den anderen geprüften Breiten. Nachweise: `docs/assets/v21-7/`. Breites Produktionspaket Light/Dark, 320/768/1440px und alle Katalogadressen: läuft; nicht pauschal PASS.
 - Produktionsabhängigkeiten: keine High/Critical-Funde. Vollständiger Audit akzeptiert ausschliesslich den bereits dokumentierten temporären Dev-Tool-Advisory GHSA-VFJ7-8CJW-P6XM.
 
 ## Grenzen und offene Abnahme
