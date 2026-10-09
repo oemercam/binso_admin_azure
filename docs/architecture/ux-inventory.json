@@ -79560,7 +79560,7 @@
       "elements": [
         {
           "tag": "div",
-          "line": 24,
+          "line": 31,
           "props": [
             "ref={rootRef}",
             "className=\"form-wizard\"",
@@ -79570,7 +79570,7 @@
         },
         {
           "tag": "div",
-          "line": 25,
+          "line": 32,
           "props": [
             "className=\"wizard-progress\"",
             "role=\"status\""
@@ -79578,19 +79578,19 @@
         },
         {
           "tag": "div",
-          "line": 26,
+          "line": 33,
           "props": [
             "className=\"wizard-content\""
           ]
         },
         {
           "tag": "FormActions",
-          "line": 27,
+          "line": 34,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 27,
+          "line": 34,
           "props": [
             "variant=\"secondary\"",
             "disabled={step===0||busy}",
@@ -79599,7 +79599,7 @@
         },
         {
           "tag": "Button",
-          "line": 27,
+          "line": 34,
           "props": [
             "disabled={busy}",
             "onClick={()=>go(step+1)}"
@@ -79612,23 +79612,35 @@
           "expression": "!guided||!root||root.closest('.bottom-sheet')"
         },
         {
-          "line": 13,
+          "line": 12,
           "expression": "window.innerWidth<=760"
         },
         {
-          "line": 21,
+          "line": 16,
+          "expression": "!root.getClientRects().length"
+        },
+        {
+          "line": 23,
+          "expression": "root.parentElement"
+        },
+        {
+          "line": 23,
+          "expression": "header"
+        },
+        {
+          "line": 28,
           "expression": "next>step"
         },
         {
-          "line": 21,
+          "line": 28,
           "expression": "invalid"
         },
         {
-          "line": 24,
+          "line": 31,
           "expression": "guided"
         },
         {
-          "line": 27,
+          "line": 34,
           "expression": "!guided||step===labels.length-1"
         }
       ]
