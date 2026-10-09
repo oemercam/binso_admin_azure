@@ -1,0 +1,205 @@
+{
+  "baseline": true,
+  "browser": "webkit",
+  "syntheticAuthDelayMs": 350,
+  "results": [
+    {
+      "theme": "light",
+      "label": "cold",
+      "firstMeaningfulMs": 1166,
+      "contentReadyMs": 659,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-session-loading,.app-launch,.app-root",
+        ".app-launch,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 548,
+        ".app-launch": 892
+      }
+    },
+    {
+      "theme": "light",
+      "label": "refresh",
+      "firstMeaningfulMs": 508,
+      "contentReadyMs": 508,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 412
+      }
+    },
+    {
+      "theme": "light",
+      "label": "navigation",
+      "ms": 337,
+      "shellPreserved": false,
+      "navigationPreserved": false,
+      "phases": [
+        ".app-root",
+        ".app-launch-screen"
+      ],
+      "authRequests": 0
+    },
+    {
+      "theme": "light",
+      "label": "reopen",
+      "firstMeaningfulMs": 1154,
+      "contentReadyMs": 660,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-session-loading,.app-launch,.app-root",
+        ".app-launch,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 537,
+        ".app-launch": 860
+      }
+    },
+    {
+      "theme": "light",
+      "label": "slow-refresh",
+      "firstMeaningfulMs": 1349,
+      "contentReadyMs": 1349,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 1267
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "cold",
+      "firstMeaningfulMs": 618,
+      "contentReadyMs": 618,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 505
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "refresh",
+      "firstMeaningfulMs": 468,
+      "contentReadyMs": 468,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 415
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "navigation",
+      "ms": 317,
+      "shellPreserved": false,
+      "navigationPreserved": false,
+      "phases": [
+        ".app-root"
+      ],
+      "authRequests": 0
+    },
+    {
+      "theme": "dark",
+      "label": "reopen",
+      "firstMeaningfulMs": 619,
+      "contentReadyMs": 619,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 511
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "slow-refresh",
+      "firstMeaningfulMs": 1356,
+      "contentReadyMs": 1356,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-session-loading,.app-root",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-session-loading": 1280
+      }
+    }
+  ],
+  "physicalPwa": false
+}

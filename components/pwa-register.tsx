@@ -11,9 +11,11 @@ export function PwaRegister() {
     if (!("serviceWorker" in navigator) || process.env.NODE_ENV !== "production") return;
 
     let active=true;
+    let hadController=Boolean(navigator.serviceWorker.controller);
 
     const handleControllerChange=()=>{
       if(!active) return;
+      if(!hadController){hadController=true;return;}
       if(sessionStorage.getItem(reloadKey)==="1") return;
       sessionStorage.setItem(reloadKey,"1");
       window.location.reload();
@@ -22,6 +24,7 @@ export function PwaRegister() {
     navigator.serviceWorker.addEventListener("controllerchange",handleControllerChange);
 
     navigator.serviceWorker.register("/sw.js",{updateViaCache:"none"}).then(registration=>{
+      if(registration.waiting)setUpdateAvailable(true);
       registration.update().catch(()=>undefined);
 
       registration.addEventListener("updatefound",()=>{
@@ -48,10 +51,6 @@ export function PwaRegister() {
     };
   }, []);
 
-  useEffect(()=>{
-    if(!updateAvailable) sessionStorage.removeItem(reloadKey);
-  },[updateAvailable]);
-
   if(!updateAvailable)return null;
 
   return <div className="pwa-update" role="status">
@@ -63,8 +62,8 @@ export function PwaRegister() {
       type="button"
       onClick={async()=>{
         const registration=await navigator.serviceWorker.getRegistration();
-        registration?.waiting?.postMessage({type:"SKIP_WAITING"});
-        window.location.reload();
+        if(registration?.waiting){sessionStorage.removeItem(reloadKey);registration.waiting.postMessage({type:"SKIP_WAITING"});}
+        // controllerchange reloads once when the requested worker is active.
       }}
     >
       Aktualisieren

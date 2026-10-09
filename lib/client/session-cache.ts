@@ -15,7 +15,7 @@ export function readClientSession():Promise<ClientSession>{
   if(pending)return pending;
   const startedRevision=revision;
   const request=(async()=>{
-    const response=await fetch("/api/auth/session",{cache:"no-store"});
+    const response=await fetch("/api/auth/session",{cache:"no-store",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&["TimeoutError","AbortError"].includes(error.name))throw new Error("Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.");throw error;});
     const payload=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(typeof payload.message==="string"?payload.message:"Zugang konnte nicht geprüft werden.");
     if(typeof payload.authenticated!=="boolean")throw new Error("Zugang konnte nicht geprüft werden.");

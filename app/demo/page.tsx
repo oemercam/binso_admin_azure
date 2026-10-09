@@ -30,7 +30,6 @@ export default function Demo(){
   return <main className="app-launch-screen" aria-live="polite">
     <button className="app-launch-brand" type="button" disabled={opening} onClick={()=>void openDemo()} aria-label="Binso One erneut öffnen">
       <Logo compact/>
-      <span className="app-launch-pulse" aria-hidden="true"/>
     </button>
     {error&&<p className="app-launch-error" role="alert">{error}</p>}
     <span className="sr-only">Binso One wird vorbereitet.</span>

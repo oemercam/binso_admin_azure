@@ -9,13 +9,20 @@ export function FormWizard({labels,step,onStep,children,action,busy=false,guided
  useEffect(()=>{
   const root=rootRef.current;if(!guided||!root||root.closest('.bottom-sheet'))return;
   const viewport=window.visualViewport;
+  const header=document.querySelector(window.innerWidth<=760?'.mobile-header':'.desktop-appbar');
   const update=()=>{
-   const header=document.querySelector(window.innerWidth<=760?'.mobile-header':'.desktop-appbar');
+   // Session initialization mounts forms before the frame becomes visible.
+   // A hidden rectangle cannot define the available viewport height.
+   if(!root.getClientRects().length)return;
    const top=Math.max(root.getBoundingClientRect().top,header?.getBoundingClientRect().bottom??0);
    root.style.setProperty('--wizard-height',`${Math.max(120,(viewport?.height??window.innerHeight)+(viewport?.offsetTop??0)-top-20)}px`);
   };
-  update();window.addEventListener('resize',update);viewport?.addEventListener('resize',update);
-  return()=>{window.removeEventListener('resize',update);viewport?.removeEventListener('resize',update);root.style.removeProperty('--wizard-height')};
+  let frame=0;
+  const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(update)};
+  const observer=new ResizeObserver(schedule);
+  observer.observe(root);if(root.parentElement)observer.observe(root.parentElement);if(header)observer.observe(header);
+  update();window.addEventListener('resize',schedule);viewport?.addEventListener('resize',schedule);viewport?.addEventListener('scroll',schedule);
+  return()=>{observer.disconnect();cancelAnimationFrame(frame);window.removeEventListener('resize',schedule);viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);root.style.removeProperty('--wizard-height')};
  },[guided]);
  const go=(next:number)=>{
   if(next>step){const invalid=Array.from(rootRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')??[]).find(el=>el.getClientRects().length&&!el.disabled&&!el.checkValidity());if(invalid){invalid.reportValidity();return;}}

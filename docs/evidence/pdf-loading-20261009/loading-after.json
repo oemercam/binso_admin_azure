@@ -1,0 +1,276 @@
+{
+  "baseline": false,
+  "browser": "webkit",
+  "syntheticAuthDelayMs": 350,
+  "results": [
+    {
+      "theme": "light",
+      "label": "cold",
+      "firstMeaningfulMs": 636,
+      "contentReadyMs": 395,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 571
+      },
+      "startup": {
+        "at": 65,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "binso-start"
+      }
+    },
+    {
+      "theme": "light",
+      "label": "refresh",
+      "firstMeaningfulMs": 498,
+      "contentReadyMs": 333,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 409
+      },
+      "startup": {
+        "at": 89,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "binso-start"
+      }
+    },
+    {
+      "theme": "light",
+      "label": "navigation",
+      "ms": 839,
+      "shellPreserved": true,
+      "navigationPreserved": true,
+      "phases": [
+        ".app-root"
+      ],
+      "authRequests": 0,
+      "requests": {
+        "/api/products": 1
+      }
+    },
+    {
+      "theme": "light",
+      "label": "reopen",
+      "firstMeaningfulMs": 674,
+      "contentReadyMs": 391,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 598
+      },
+      "startup": {
+        "at": 76,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "binso-start"
+      }
+    },
+    {
+      "theme": "light",
+      "label": "slow-refresh",
+      "firstMeaningfulMs": 1325,
+      "contentReadyMs": 303,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 1255
+      },
+      "startup": {
+        "at": 70,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "binso-start"
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "cold",
+      "firstMeaningfulMs": 659,
+      "contentReadyMs": 399,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 564
+      },
+      "startup": {
+        "at": 95,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "none"
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "refresh",
+      "firstMeaningfulMs": 448,
+      "contentReadyMs": 270,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 393
+      },
+      "startup": {
+        "at": 55,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "none"
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "navigation",
+      "ms": 327,
+      "shellPreserved": true,
+      "navigationPreserved": true,
+      "phases": [
+        ".app-root"
+      ],
+      "authRequests": 0,
+      "requests": {
+        "/api/products": 1
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "reopen",
+      "firstMeaningfulMs": 579,
+      "contentReadyMs": 342,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 515
+      },
+      "startup": {
+        "at": 64,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "none"
+      }
+    },
+    {
+      "theme": "dark",
+      "label": "slow-refresh",
+      "firstMeaningfulMs": 1298,
+      "contentReadyMs": 265,
+      "authRequests": 1,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/time-tracker": 1,
+        "/api/notifications": 1,
+        "/api/settings/profile": 2,
+        "/api/customers": 1
+      },
+      "phases": [
+        ".app-launch-screen",
+        ".app-root"
+      ],
+      "loaderDurationMs": {
+        ".app-launch-screen": 1244
+      },
+      "startup": {
+        "at": 54,
+        "phase": [
+          ".app-launch-screen"
+        ],
+        "content": "KundenSortierenKunde ↑Kunde ↓Kontakt ↑Kontakt ↓Ort ↑Ort ↓Status ↑Status ↓AlleAktivInaktivWird geladen…Einträge werden geladen …",
+        "iconWidth": 72,
+        "iconAnimation": "none"
+      }
+    }
+  ],
+  "physicalPwa": false
+}

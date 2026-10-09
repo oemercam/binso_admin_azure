@@ -6,16 +6,16 @@ import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
-import Image from "next/image";
+import {AppStart} from "./app-start";
 import { hasBlockingModal, useDialogFocus } from "./use-dialog-focus";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 import { PageHeading, DetailHeading } from "./binso-ux";
 import { Button, EmptyState, Icon, IconButton, Logo, Status } from "./ui";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {cachedClientSession,invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
+import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
 import {HeaderPanel} from "./header-panel";
@@ -44,7 +44,7 @@ type NotificationItem=PanelNotification;
 
 function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true}:null;}
 
-export function AppShell({
+function AppShellFrame({
   title,
   subtitle,
   active,
@@ -76,7 +76,7 @@ export function AppShell({
   const pathname=usePathname();
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
-  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(()=>accessFromSession(cachedClientSession()));
+  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
@@ -96,11 +96,12 @@ export function AppShell({
     return()=>{active=false;window.removeEventListener('focus',refresh);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
   },[pathname,accessRetry]);
 
-  const canOpen=(href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));};
+  const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));},[access]);
   const accessModule=moduleForPath(pathname);
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
   const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);
   const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write');
+  const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
   const visibleActions=actions;
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
@@ -159,7 +160,6 @@ export function AppShell({
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
   const [profile,setProfile]=useState<{name:string;identity:string;avatar:string}>({name:"",identity:"",avatar:""});
   const [navCompact,setNavCompact]=useState(false);
-  const [showLaunch,setShowLaunch]=useState(false);
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
   useEffect(() => {
@@ -184,19 +184,10 @@ export function AppShell({
     return()=>window.removeEventListener("binso-timer-change",syncTimer);
   }, [preview]);
 
-  useEffect(()=>{
-    if(preview||window.sessionStorage.getItem("binso.launch.seen")==="1") return;
-    const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.sessionStorage.setItem("binso.launch.seen","1");
-    if(reduceMotion) return;
-    queueMicrotask(()=>setShowLaunch(true));
-    const timer=window.setTimeout(()=>setShowLaunch(false),900);
-    return()=>window.clearTimeout(timer);
-  },[preview]);
-
-
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
+    touchedRef.current=false;
+    queueMicrotask(()=>{setFormDirty(false);setSheet(null);setNavCompact(false)});
   }, [pathname]);
 
   useEffect(() => {
@@ -331,11 +322,12 @@ export function AppShell({
 
   const formattedTimer = [Math.floor(timerSeconds / 3600), Math.floor((timerSeconds % 3600) / 60), timerSeconds % 60].map(value => String(value).padStart(2, "0")).join(":");
 
-  return <PageAccessContext.Provider value={{write:canWrite,canOpen}}><div ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+  return <PageAccessContext.Provider value={pageAccess}>
+    {!access&&!accessError&&<AppStart/>}
+    <div hidden={!access&&!accessError} ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span>{logoutError}</span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}>Erneut versuchen</button></div>}
-    {showLaunch&&<div className="app-launch" aria-hidden="true"><span><Image src="/brand/icon-black.svg" alt="" width={58} height={58} priority/></span></div>}
     <aside className="app-sidebar">
       <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
       <nav>
@@ -372,7 +364,7 @@ export function AppShell({
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
           {backHref ? <DetailHeading title={title} subtitle={subtitle} status={status} tone={statusTone} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/></Link>}/> : <PageHeading title={title} description={subtitle} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined}/> }
         </div>
-        {!access&&!accessError?<div className="app-session-loading" role="status" aria-label="Binso One wird geladen"><span/></div>:accessError?<div role="alert"><p>{accessError}</p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}>Erneut versuchen</Button><Link className="button button-secondary" href="/login">Anmelden</Link></div></div>:allowed?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        {accessError?<div role="alert"><p>{accessError}</p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}>Erneut versuchen</Button><Link className="button button-secondary" href="/login">Anmelden</Link></div></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
@@ -443,4 +435,33 @@ export function SheetLink({ href, icon, title, text, onSelect }: { href: string;
   const access=usePageAccess();
   if(!access.canOpen(href))return null;
   return <Link href={href} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b>{title}</b>{text&&<small>{text}</small>}</div><Icon name="arrow" size={17}/></Link>;
+}
+
+
+type ShellProps=Parameters<typeof AppShellFrame>[0];
+type ShellConfiguration=Omit<ShellProps,"children"> & {pathname:string};
+const ShellRegistration=createContext<((configuration:ShellConfiguration)=>void)|null>(null);
+
+/** Route components register their existing heading/actions; the layout owns
+ * the mounted frame, navigation, session and timer across route transitions. */
+export function AppShell(props:ShellProps){
+ const register=useContext(ShellRegistration),pathname=usePathname();
+ const {title,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone}=props;
+ useLayoutEffect(()=>{
+  register?.({pathname,title,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone});
+ },[register,pathname,title,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
+ return register?props.children:<AppShellFrame {...props}/>;
+}
+const appSections:Record<string,string>={dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
+export function AppShellLayout({children}:{children:React.ReactNode}){
+ const pathname=usePathname(),section=pathname.split("/")[1];
+ const [configuration,setConfiguration]=useState<ShellConfiguration|null>(null);
+ if(!Object.hasOwn(appSections,section))return children;
+ const props=configuration?.pathname===pathname?configuration:{title:appSections[section],active:section};
+ return <ShellRegistration.Provider value={setConfiguration}><AppShellFrame {...props}>{children}</AppShellFrame></ShellRegistration.Provider>;
+}
+/** Root suspense sits inside the persistent frame on an app route. */
+export function RouteLoading(){
+ const inShell=useContext(ShellRegistration);
+ return inShell?<p role="status" aria-live="polite">Inhalt wird geladen …</p>:<AppStart/>;
 }

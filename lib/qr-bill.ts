@@ -2,6 +2,7 @@ import type { Data } from "swissqrbill/types";
 import { isQRReferenceValid, isSCORReferenceValid, isIBANValid, isQRIBAN } from "swissqrbill/utils";
 
 export function normalizeIban(value:unknown):string{return String(value??"").replace(/\s/g,"").toUpperCase();}
+export function qrPaymentAccount(company:Record<string,unknown>,currency='CHF'){return normalizeIban(currency==='EUR'?(company.iban||company.qr_iban):(company.qr_iban||company.iban));}
 export function validSwissIban(value:unknown):boolean{
  const iban=normalizeIban(value);
  return /^(CH|LI)\d{2}[A-Z0-9]{17}$/.test(iban)&&isIBANValid(iban);
@@ -19,7 +20,9 @@ export function invoicePaymentIssue(company:Record<string,unknown>):string|null{
 }
 export function createQrBillData(company:Record<string,unknown>,document:{reference?:string;number:string;total:number;currency?:string;debtor?:Record<string,unknown>}):Data{
  const issue=invoicePaymentIssue(company);if(issue)throw new Error(issue);
- const account=normalizeIban(company.qr_iban||company.iban);
+ const account=qrPaymentAccount(company,document.currency);
+ if(!validSwissIban(account))throw new Error('Bitte eine gültige IBAN für die Zahlungswährung erfassen.');
+ if(document.currency==='EUR'&&isQRIBAN(account))throw new Error('Für EUR bitte eine reguläre IBAN statt einer QR-IBAN verwenden.');
  let reference:string|undefined;
  if(isQRIBAN(account)){
   if(!document.reference||!isQRReferenceValid(document.reference))throw new Error("Die QR-Referenz ist erst nach dem Speichern der Rechnung verfügbar.");
@@ -36,6 +39,8 @@ export function createQrBillData(company:Record<string,unknown>,document:{refere
  if(person?.name&&(person.street||person.address)&&(person.postal_code||person.zip)&&person.city&&!/^[A-Z]{2}$/.test(debtorCountry))throw new Error("Bitte den Ländercode der Kundenadresse prüfen.");
  const street=String(person?.street||person?.address||""),parts=!person?.building_number?street.match(/^(.*\S)\s+(\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?)$/):null;
  const debtor=person&&person.name&&(person.street||person.address)&&(person.postal_code||person.zip)&&person.city?{name:String(person.name),address:parts?.[1]||street,buildingNumber:String(person.building_number||parts?.[2]||""),zip:String(person.postal_code||person.zip),city:String(person.city),country:debtorCountry}:undefined;
+ const textValues=[company.legal_name||company.name,company.street,company.building_number,company.postal_code,company.city,document.number,...Object.values(debtor??{})];
+ if(textValues.some(value=>!/^[\u0020-\u007e\u00a0-\u017f\u0218-\u021b\u20ac]*$/u.test(String(value??''))))throw new Error('Die QR-Zahlungsdaten enthalten nicht unterstützte Zeichen. Bitte Adresse und Referenz prüfen.');
  return {debtor,creditor:{account,name:String(company.legal_name||company.name),address:String(company.street),buildingNumber:String(company.building_number||""),zip:String(company.postal_code),city:String(company.city),country:String(company.country_code||"CH")},amount:Math.round(document.total*100)/100,currency:document.currency==='EUR'?'EUR':'CHF',message:document.number,reference};
 }
 

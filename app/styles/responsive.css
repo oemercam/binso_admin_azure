@@ -1012,7 +1012,8 @@
 }
 
 /* Mobile / PWA */
-@media (max-width:760px){.header-panel-layer{padding:0;justify-content:stretch}.header-panel{width:100%;max-height:calc(var(--dialog-available-height) - var(--header-panel-top));border-radius:0 0 14px 14px;padding:0 max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}.header-panel-search{height:calc(var(--dialog-available-height) - var(--header-panel-top))}
+@media (max-width:760px){
+.app-start-icon,.app-launch-brand .logo{width:72px;height:72px}.header-panel-layer{padding:0;justify-content:stretch}.header-panel{width:100%;max-height:calc(var(--dialog-available-height) - var(--header-panel-top));border-radius:0 0 14px 14px;padding:0 max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}.header-panel-search{height:calc(var(--dialog-available-height) - var(--header-panel-top))}
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
@@ -2872,9 +2873,9 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Reduced motion */
 @media (prefers-reduced-motion:reduce){
+.app-start-icon,.app-launch-brand .logo{animation:none}
 .hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta,.marketing-mobile-menu{animation:none}
 
-.app-launch{display:none}
   .bottom-sheet,.operator-mobile-more{animation:none}
 }
 

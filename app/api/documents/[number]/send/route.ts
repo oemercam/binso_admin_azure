@@ -5,6 +5,7 @@ import {requireSession} from "@/lib/server/session";
 import {withTenant} from "@/lib/server/db";
 import {lockDocument} from "@/lib/server/document-process";
 import {listApiBusiness} from "@/lib/server/repositories/business-api";
+import {documentLogo} from "@/lib/server/document-logo";
 import {documentPdf} from "@/lib/server/document-pdf";
 import {sendMail,mailLayout} from "@/lib/server/email";
 import {audit} from "@/lib/server/audit";
@@ -23,7 +24,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];
   const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];
-  const pdf=await documentPdf(document,company);const id=randomUUID();
+  const pdf=await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();
   await c.query("insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id) values($1,$2,$3,$4,$5,'sending',$6,$7)",[id,s.organizationId,kind,row.id,recipient,key,s.userId]);
   return {sent:false,id,kind,document,pdf,company};
  });

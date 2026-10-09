@@ -1,0 +1,18 @@
+{
+  "sent": [
+    {
+      "page": 2,
+      "payload": "SPC\n0200\n1\nCH9300762011623852957\nS\nAlpenblick Digital AG\nSeefeldstrasse\n73\n8008\nZ\u00fcrich\nCH\n\n\n\n\n\n\n\n216.20\nCHF\nS\nAcme AG\nBahnhofstrasse\n123\n8001\nZ\u00fcrich\nCH\nNON\n\nRE-QR-QA\nEPD"
+    }
+  ],
+  "partial": [
+    {
+      "page": 2,
+      "payload": "SPC\n0200\n1\nCH9300762011623852957\nS\nAlpenblick Digital AG\nSeefeldstrasse\n73\n8008\nZ\u00fcrich\nCH\n\n\n\n\n\n\n\n116.20\nCHF\nS\nAcme AG\nBahnhofstrasse\n123\n8001\nZ\u00fcrich\nCH\nNON\n\nRE-QR-QA\nEPD"
+    }
+  ],
+  "paid": [],
+  "cancelled": [],
+  "draft": [],
+  "offer-sent": []
+}
