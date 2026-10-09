@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/lib/financial-status";
+import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 import { useEffect, useState } from "react";
 import { type DemoCollection } from "@/lib/demo-storage";
 import { apiGet, isProductionBackendEnabled } from "@/lib/client/backend";
@@ -28,10 +29,10 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
     String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="products") return items.map(item=>[
-    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",moneyChf(item.unit_price),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",withPriceUnit(moneyChf(item.unit_price),item.unit),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="employees") return items.map(item=>[
-    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),`${String(item.workload_percent??0)}%`,String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
+    [item.first_name,item.last_name].filter(Boolean).join(" "),String(item.job_title??"—"),formatQuantity(item.workload_percent??0,"%"),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
   ]);
   if(collection==="expenses") return items.map(item=>{
     const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;

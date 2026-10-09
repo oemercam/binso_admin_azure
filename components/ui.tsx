@@ -20,6 +20,7 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
 
   const paths: Record<string, React.ReactNode> = {
     home: <><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/></>,
+    trash: <><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></>,
     phone: <path d="M5 3h4l2 5-3 2a14 14 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2Z"/>,
     users: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
     user: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
@@ -118,8 +119,11 @@ export function SectionTitle({ title, action }: { title: string; action?: React.
 }
 
 /** Native controls keep browser autofill and validation, with one shared field contract. */
-export function Input(props:React.ComponentProps<"input">){return <input {...props}/>}
-export function Select(props:React.ComponentProps<"select">){return <select {...props}/>}
+export function Input(props:React.ComponentProps<"input">){
+ const sized=!props.hidden&&!['checkbox','radio','file','hidden','range','color','button','submit','reset','image'].includes(props.type??'text');
+ return <input {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
+}
+export function Select(props:React.ComponentProps<"select">){return <select {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
 export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}
@@ -136,7 +140,8 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
   return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel>{label}</FormLabel>}{inline?<FormLabel>{label}</FormLabel>:fields}</label>;
 }
 
-export function EmptyState({ icon = "file", title, text, action }: { icon?: string; title: string; text: string; action?: React.ReactNode }) {
+export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
+  if(compact)return <p role="status" data-empty-state="compact">{title}</p>;
   return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3>{title}</h3><p>{text}</p>{action}</div>;
 }
 

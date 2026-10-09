@@ -1,5 +1,7 @@
 "use client";
 
+import { formatQuantity, withPriceUnit } from "@/lib/display-format";
+
 import { formatCurrency } from "@/lib/financial-status";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,7 +12,7 @@ import { products } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
-import { ActionsMenu, CreateAction } from "../binso-ux";
+import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
 import { useDemoRows } from "./shared";
 
 export function ProductsPage() {
@@ -83,13 +85,13 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<p role="status">Produkt wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<Button requiresWrite variant="ghost" icon="edit" onClick={()=>setEditingRecord(true)}>Bearbeiten</Button>}<Button href="/angebote/neu" variant="ghost" icon="file">Angebot erstellen</Button><Button href="/rechnungen/neu" variant="ghost" icon="receipt">Rechnung erstellen</Button></ActionsMenu>{editingRecord&&<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}</>:<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}>
+  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         {!editingRecord?<dl className="detail-list">
-          <div><dt>Verkaufspreis</dt><dd>{formatCurrency(price,"CHF")} / {({hour:"Stunde",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[unit]??unit}</dd></div>
-          <div><dt>MwSt.</dt><dd>{vatRate}%</dd></div>
+          <div><dt>Verkaufspreis</dt><dd>{withPriceUnit(formatCurrency(price,"CHF"),unit)}</dd></div>
+          <div><dt>MwSt.</dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
           {sku&&<div><dt>Artikelnummer</dt><dd>{sku}</dd></div>}
           {description&&<div><dt>Beschreibung</dt><dd>{description}</dd></div>}
         </dl>:<div className="form-grid two">
@@ -97,8 +99,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></Select></Field>
           <Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
           <Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour">Stunde</option><option value="piece">Stück</option><option value="flat">Pauschal</option></Select></Field>
-          <Field label="Verkaufspreis"><Input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
-          <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></Select></Field>
+          <Field label="Verkaufspreis (CHF)"><Input inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
+          <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1 %</option><option value="2.6">2.6 %</option><option value="0">0 %</option></Select></Field>
           <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></Select></Field>
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div>}

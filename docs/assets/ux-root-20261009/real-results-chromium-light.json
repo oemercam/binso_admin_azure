@@ -1,0 +1,17 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "documents"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/rechnungen/RE-TEST-1",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

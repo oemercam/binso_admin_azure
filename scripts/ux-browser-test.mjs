@@ -43,6 +43,17 @@ const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BIN
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);if(process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));}
+async function actionEvidence(page,name,theme){
+ const dialog=page.getByRole('dialog',{name,exact:true});
+ await dialog.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))});
+ if(!process.env.BINSO_UX_BASELINE){
+  const rows=await dialog.locator('.action-row').evaluateAll(nodes=>nodes.map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),t=el.querySelector('span').getBoundingClientRect();return {height:r.height,font:c.fontSize,weight:c.fontWeight,gap:c.columnGap,text:t.x,icon:el.firstElementChild.tagName,destructive:el.classList.contains('action-row-danger'),chevron:el.querySelectorAll('svg').length}}));
+  assert.ok(rows.length>0,'Entity actions use the central row');
+  assert.equal(await dialog.locator('.sheet-menu,.button-danger').count(),0,'No legacy action rows or detached destructive button');
+  for(const row of rows){assert.ok(row.height>=48);assert.equal(row.font,'14px');assert.equal(row.weight,'500');assert.equal(row.text,rows[0].text);if(row.destructive)assert.equal(row.chevron,1,'Destructive row has no navigation arrow');}
+ }
+ await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${name}-actions.png`)});
+}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
 let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let context;
@@ -130,6 +141,10 @@ try{
       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect();return composer.bottom<=innerHeight&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays inside the viewport');
     }
+    if(!process.env.BINSO_UX_BASELINE){for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
+     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize}});
+     assert.equal(g.height,width<=760?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,'10px',`${route}: canonical field radius`);
+    }}
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
     if(width<=760&&await page.locator('.app-root:not(.app-preview)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
@@ -168,7 +183,7 @@ try{
   if(hasInteraction('customers')){
     await page.goto(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
     await page.getByRole('button',{name:'Kundenaktionen',exact:true}).filter({visible:true}).click();
-    const actions=page.getByRole('dialog',{name:'Kundenaktionen',exact:true});await actions.waitFor();
+    const actions=page.getByRole('dialog',{name:'Kundenaktionen',exact:true});await actions.waitFor();await actionEvidence(page,'Kundenaktionen',theme);
     await actions.getByRole('button',{name:/Kontakt hinzufügen/}).click();
     const contact=page.getByRole('dialog',{name:'Kontakt hinzufügen',exact:true});await contact.waitFor();
     await page.setViewportSize({width:375,height:400});await contact.getByLabel('Funktion',{exact:true}).focus();
@@ -224,8 +239,8 @@ try{
   const group=page.locator('details.time-group').first();await group.waitFor();
   assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
   assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
-  await group.locator('summary').click();await group.locator('.time-entry-list').waitFor();
-  assert.equal(await group.locator('.time-entry-list>div').count(),2,'Expansion shows both entries');
+  await group.locator('summary').click();await group.locator('.time-record-list').waitFor();
+  assert.equal(await group.locator('.time-record-list>div').count(),2,'Expansion shows both entries');
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-time-entries.png`),fullPage:true});
   const searchRect=await page.locator('.time-filter-toolbar .searchbox').boundingBox(),filterRect=await page.getByRole('button',{name:'Zeitfilter'}).boundingBox();
   assert.ok(filterRect.x>searchRect.x&&Math.abs(filterRect.y-searchRect.y)<5,'Mobile filter follows search on the same row');
@@ -240,7 +255,7 @@ try{
   if(hasInteraction('documents')){
   await page.waitForLoadState("networkidle");await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
-  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
+  await actionEvidence(page,'Weitere Aktionen',theme);await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
   const expectedPdfPages=Number(process.env.BINSO_UX_PDF_PAGES||2);
   const previous=page.getByRole('button',{name:'Vorherige Seite',exact:true}),next=page.getByRole('button',{name:'Nächste Seite',exact:true});
   const rendered=async number=>{await page.locator(`.pdf-page canvas[data-rendered-page="${number}"]`).waitFor();assert.equal(await page.locator('.pdf-page').count(),1,'Exactly one PDF page is mounted');await page.getByRole('status').filter({hasText:`Seite ${number} von ${expectedPdfPages}`}).waitFor();};
@@ -271,12 +286,13 @@ try{
   if(hasInteraction('employees')){
   employeeLedgerFixture=true;
   await page.waitForLoadState("networkidle");await page.goto(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Übersicht',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Mitarbeiteraktionen',exact:true}).filter({visible:true}).click();await actionEvidence(page,'Mitarbeiteraktionen',theme);await page.keyboard.press('Escape');
   const header=page.locator('.mobile-header');assert.equal(await header.locator('.status').count(),1,'Employee status appears beside the name once');
-  await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();await page.getByText('7:30 h',{exact:true}).waitFor();
+  await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();await page.getByText('7:30 h',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel .document-summary-row').count(),1,'Employee time uses central rows');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-time.png`),fullPage:true});
-  await page.getByRole('tab',{name:'Spesen',exact:true}).click();await page.locator('.employee-tab-panel a[href="/spesen/expense-one"]').waitFor();
+  await page.getByRole('tab',{name:'Spesen',exact:true}).click();await page.locator('.employee-tab-panel a[href="/spesen/expense-one"]').waitFor();assert.equal(await page.locator('.employee-tab-panel .document-summary-row').count(),1,'Employee expenses use the main module row');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-expenses.png`),fullPage:true});
-  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Noch keine Dokumente für diesen Mitarbeiter hinterlegt.',{exact:true}).waitFor();
+  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Keine Dokumente erfasst',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel [data-empty-state="compact"]').count(),1,'Documents use the central empty state');assert.equal(await page.locator('.employee-tab-panel .compact-list').count(),0,'No legacy employee document list is rendered');
   await page.getByRole('button',{name:'Dokument hinzufügen',exact:true}).waitFor();
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-documents.png`),fullPage:true});
   employeeLedgerFixture=false;
@@ -294,7 +310,7 @@ try{
   assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Opening the sheet moves focus inside');
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Produktaktionen','Sheet restores trigger focus');
-  await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();await page.getByRole('dialog',{name:'Produktaktionen'}).getByRole('button',{name:'Bearbeiten',exact:true}).click();await page.getByLabel('Verkaufspreis',{exact:true}).fill('130');await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).first().click();await page.waitForURL(base+'/produkte');await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();await page.waitForTimeout(750);await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();await actionEvidence(page,'Produktaktionen',theme);await page.getByRole('dialog',{name:'Produktaktionen'}).getByRole('button',{name:'Bearbeiten',exact:true}).click();await page.getByLabel('Verkaufspreis (CHF)',{exact:true}).fill('130');await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).first().click();await page.waitForURL(base+'/produkte');await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();await page.waitForTimeout(750);await page.waitForLoadState('networkidle');
   // SPA navigation does not reset Playwright's load state. Allow the destination
   // fixtures and idle link prefetch to settle before the next hard navigation.
   }
@@ -330,7 +346,7 @@ try{
    const row=page.locator('.contact-list>div').first(),name=await row.locator('b').boundingBox(),menu=await row.getByRole('button',{name:'Alex Muster Aktionen'}).boundingBox();
    assert.ok(menu.x>name.x&&menu.y<=name.y+name.height,'Contact action stays in the first line');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contacts-final.png`)});
-   await row.getByRole('button',{name:'Alex Muster Aktionen'}).click();await page.getByRole('button',{name:'Kontakt bearbeiten / Hauptkontakt festlegen'}).click();
+   await row.getByRole('button',{name:'Alex Muster Aktionen'}).click();await actionEvidence(page,'Kontaktaktionen',theme);await page.getByRole('button',{name:'Kontakt bearbeiten'}).click();
    const primary=page.getByRole('checkbox',{name:'Als Hauptkontakt festlegen'}),box=await primary.boundingBox();assert.ok(box.width<=24&&box.height<=24,'Primary contact checkbox stays compact');assert.equal(await primary.isChecked(),true,'Existing primary contact value is retained');assert.ok((await page.getByRole('dialog').boundingBox()).x>=0,'Contact sheet stays inside the viewport');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contact-form-final.png`)});await page.keyboard.press('Escape');
    await page.getByRole('button',{name:'Finanzen',exact:true}).click();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-customer-finance-final.png`)});assert.equal(await page.locator('.mobile-record-list .document-summary-row').count(),2,'Offers and invoices share the same financial row');
@@ -350,7 +366,7 @@ try{
    await page.evaluate(()=>{localStorage.setItem('binso.demo.session','1');localStorage.removeItem('binso.demo.database')});
    await page.goto(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
    for(const date of ['01.10.2026','01.09.2026']){
-    await page.locator('.invoices-panel button').filter({hasText:date}).click();
+    assert.equal(await page.locator('.invoices-panel .compact-list').count(),0,'Billing history uses central rows');await page.locator('.invoices-panel button.document-summary-row').filter({hasText:date}).click();
     const modal=page.getByRole('dialog',{name:'Rechnungsvorschau'});await modal.locator('canvas[data-rendered-page="1"]').waitFor();
     assert.equal(await modal.locator('.pdf-page').count(),1,'Billing uses the shared one-page PDF renderer');
     await modal.getByText('Seite 1 von 1',{exact:true}).waitFor();

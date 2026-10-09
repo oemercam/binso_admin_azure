@@ -56,7 +56,7 @@ export function PaymentForm() {
         await apiPost("/api/payments",{invoiceId,paidOn:date,amount:value,method,note},{idempotencyKey:key});
       }
       else{
-        const id=String(Date.now());
+        const id=crypto.randomUUID();
         const displayDate=date.split("-").reverse().join(".");
         appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
@@ -68,7 +68,7 @@ export function PaymentForm() {
       window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell unsavedChanges={saved?false:undefined} title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"} actions={<Button onClick={save} disabled={saving||!selectedInvoice}>{saving?"Wird gespeichert…":"Zahlung speichern"}</Button>}>
+  return <AppShell unsavedChanges={saved?false:undefined} title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"}>
     <div className="form-page narrow" inert={saving}>
       <Field label="Rechnung"><Select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>
       {selectedInvoice&&<p>Offener Betrag: {formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}

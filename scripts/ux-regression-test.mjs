@@ -306,12 +306,15 @@ console.log('Project-linked idle timer context survives synchronization without 
 {
  const {compareRecordValues}=await import(moduleUrl(ts.transpileModule(await readPageFile('lib/record-sort.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
  assert.ok(compareRecordValues('CHF 900.00',"CHF 1’200.00")<0);
+ assert.ok(compareRecordValues('CHF 90.50 / Std.','CHF 100.00 / Std.')<0,'Unit suffixes must preserve numeric price sorting');
  assert.ok(compareRecordValues('31.12.2025','01.01.2026')<0);
  assert.ok(compareRecordValues('2026-10-02','2026-10-12')<0);
  assert.ok(compareRecordValues('RE-9','RE-10')<0);
  const list=await readPageFile('components/records.tsx','utf8');
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
- const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n');
+ const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
+ const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
  const render=(chip='Alle',sort='default',sortIndex=1)=>{
@@ -321,6 +324,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
  const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(sorted.includes('Betrag ↑'));assert.ok(sorted.includes('Betrag ↓'));
+ const empty=render('Bezahlt');assert.ok(empty.includes('data-empty-state="compact"'));assert.ok(!empty.includes('empty-icon'),'Empty lists remain one-line status messages');
  console.log('Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.');
 }
 
@@ -339,7 +343,7 @@ console.log('Project-linked idle timer context survives synchronization without 
   Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children);
   for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},12]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
-   const getSave=view=>{if(view?.props?.onClick&&view.props.children==='Speichern')return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
+   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
    const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
@@ -400,4 +404,28 @@ console.log('Project-linked idle timer context survives synchronization without 
   const retryRun=handler(file,fn,'save',retryScope);const failure=retryRun();retry.reject();await failure;const next=retryRun();assert.equal(retry.calls(),2,fn+' releases the lock after failure');retry.resolve();await next;
  }
  console.log('Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.');
+}
+
+// Central presentation helpers preserve units and do not mutate source values.
+{
+ const {formatQuantity,withPriceUnit,timeMetadata}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/display-format.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2017}}).outputText));
+ assert.equal(formatQuantity('100.00','%'),'100 %');assert.equal(formatQuantity('42.00','h/Woche'),'42 h/Woche');assert.equal(formatQuantity('25.5','Tage/Jahr'),'25.5 Tage/Jahr');assert.equal(formatQuantity('8.1','%'),'8.1 %');
+ assert.equal(withPriceUnit('CHF 185.00','hour'),'CHF 185.00 / Std.');assert.equal(withPriceUnit('CHF 50.00','custom-unit'),'CHF 50.00 / custom-unit');assert.equal(withPriceUnit('CHF 50.00',null),'CHF 50.00');
+ assert.equal(timeMetadata('Arbeitszeit','Arbeitszeit',null,'09.10.2026'),'09.10.2026');assert.equal(timeMetadata('Konzeption','Workplace','Alex','09.10.2026'),'Workplace · Alex · 09.10.2026');
+ console.log('Quantity/price units, fractional values, numeric sorting and distinct time metadata passed.');
+}
+
+// Render the actual central action component under permission contexts.
+{
+ const source=await fs.readFile('components/binso-ux.tsx','utf8'),ast=ts.createSourceFile('ux.tsx',source,99,true,4);
+ const node=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='ActionRow');
+ const code=ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const require=createRequire(import.meta.url),exports={};let access={write:true,canOpen:()=>true};
+ new Function('require','exports','usePageAccess','Icon','Link',code)(require,exports,()=>access,({name})=>React.createElement('svg',{'data-icon':name}),({children,...props})=>React.createElement('a',props,children));
+ const row=props=>renderToStaticMarkup(React.createElement(exports.ActionRow,{title:'Kontakt entfernen',icon:'trash',...props}));
+ assert.ok(row({danger:true}).includes('action-row-danger'));assert.equal((row({danger:true}).match(/<svg/g)||[]).length,1,'Destructive action has no chevron');
+ assert.equal((row({href:'/kunden'}).match(/<svg/g)||[]).length,2,'Navigation action has a chevron');
+ access={write:false,canOpen:()=>true};assert.ok(row({requiresWrite:true}).includes('disabled'));assert.ok(!row({href:'mailto:test@example.invalid'}).includes('disabled'));
+ access={write:true,canOpen:()=>false};assert.equal(row({href:'/mitarbeiter'}),'','Forbidden route stays hidden');
+ console.log('Central action row preserves write/route permissions and explicit navigation/destructive intent.');
 }

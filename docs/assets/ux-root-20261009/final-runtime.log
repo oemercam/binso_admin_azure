@@ -1,0 +1,71 @@
+curl: (7) Failed to connect to 127.0.0.1 port 3000 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 3000 after 0 ms: Couldn't connect to server
+Smoke: /
+Smoke: /produkt
+Smoke: /preise
+Smoke: /login
+Smoke: /registrieren
+Smoke: /portal
+Smoke: /portal/login
+Smoke: /portal/registrieren
+Smoke: /passwort-vergessen
+Smoke: /passwort-zuruecksetzen
+Smoke: /demo
+Smoke: /offline
+Smoke: /willkommen
+Smoke: /dashboard
+Smoke: /kunden
+Smoke: /kunden/acme
+Smoke: /kunden/neu
+Smoke: /angebote
+Smoke: /angebote/AN-2026-012
+Smoke: /angebote/neu
+Smoke: /rechnungen
+Smoke: /rechnungen/RE-2026-019
+Smoke: /rechnungen/neu
+Smoke: /zahlungen
+Smoke: /zahlungen/1
+Smoke: /zahlungen/neu
+Smoke: /produkte
+Smoke: /produkte/beratung
+Smoke: /produkte/neu
+Smoke: /mitarbeiter
+Smoke: /mitarbeiter/thomas
+Smoke: /mitarbeiter/neu
+Smoke: /spesen
+Smoke: /spesen/1
+Smoke: /spesen/neu
+Smoke: /support
+Smoke: /support/5832
+Smoke: /support/neu
+Smoke: /belege
+Smoke: /benachrichtigungen
+Smoke: /zeit
+Smoke: /einstellungen
+Smoke: /einstellungen/konto
+Smoke: /einstellungen/firma
+Smoke: /einstellungen/team
+Smoke: /einstellungen/abonnement
+Smoke: /einstellungen/benachrichtigungen
+Smoke: /einstellungen/sprache
+Smoke: /einstellungen/sicherheit
+Smoke: /einstellungen/darstellung
+Smoke: /operator
+Smoke: /operator/kunden
+Smoke: /operator/support
+Smoke: /operator/sicherheit
+Smoke: /operator/audit
+Smoke: /preview/dashboard
+Smoke: /preview/rechnungen
+Smoke: /preview/zeit
+
+> binso-one@0.11.0 routes:css-check /workspace/scratch/361663cf4cbf/binso_admin_azure
+> node scripts/check-route-css.mjs
+
+Route/CSS integrity OK: 57 routes, 4 unique stylesheets.
+Demo flow integrity OK.
+Initial theme integrity OK: explicit/system modes, opposite OS preference, blocked storage and browser chrome.
+Smoke: unauthenticated session
+Smoke: demo session create
+Smoke: protected APIs
+Smoke: security headers
