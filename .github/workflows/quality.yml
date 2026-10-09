@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: public.ecr.aws/docker/library/postgres:16 # Docker Official Image; avoids shared Docker Hub pull quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: public.ecr.aws/docker/library/postgres:16 # Docker Official Image; avoids shared Docker Hub pull quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test

@@ -68,7 +68,7 @@ V21.5 fügt keine neue Migration hinzu. Die gestapelte V21.3-Basis enthält addi
 
 ## Ergänztes HTTP-Schreibrollenpaket (noch nicht bestanden gemeldet)
 
-`api-tenant-postgres-test.mjs` führt 64 gültige POSTs über acht echte synthetische Tenant-Sessions aus. Erwartete Rollen sind unabhängig von tenantCan festgelegt. Zugelassene Requests müssen 201, eine persistierte ID im eigenen Mandanten und exakt einen zusätzlichen Datensatz ergeben; verbotene Requests 403 und keine Datenänderung. Auch der andere Mandant muss unverändert bleiben. Fremde Kunden-IDs werden zusätzlich mit PATCH und DELETE über alle acht Rollen geprüft (404/403, ursprünglicher Datensatz bleibt unverändert).
+`api-tenant-postgres-test.mjs` führt 80 gültige POSTs über acht echte synthetische Tenant-Sessions aus. Erwartete Rollen sind unabhängig von tenantCan festgelegt. Zugelassene Requests müssen 201, eine persistierte ID im eigenen Mandanten und exakt einen zusätzlichen Datensatz ergeben; verbotene Requests 403 und keine Datenänderung. Auch der andere Mandant muss unverändert bleiben. Fremde Kunden-IDs werden zusätzlich mit PATCH und DELETE über alle acht Rollen geprüft (404/403, ursprünglicher Datensatz bleibt unverändert).
 
 | Erfassung | Zugelassene Rollen | Persistenzbeleg |
 | --- | --- | --- |
@@ -80,5 +80,13 @@ V21.5 fügt keine neue Migration hinzu. Die gestapelte V21.3-Basis enthält addi
 | Spese als Entwurf | owner/admin/finance/project_manager/manager/member | expenses |
 | Support-Ticket | alle acht Tenant-Rollen | support_cases |
 | Angebot | owner/admin/project_manager/manager | quotes |
+| Rechnung | owner/admin/finance | invoices |
+| Zahlung auf offene synthetische Rechnung | owner/admin/finance | payments |
 
 Status: **Implementiert, nicht geprüft** bis der echte isolierte HTTP/PostgreSQL-CI-Lauf bestanden ist. Lokale synthetische Repository-Tests ersetzen diesen Nachweis nicht. Die übrigen Statuswechsel-/Versand-/Einladungs-/Datei-/Operator-/Finanzschreibverträge sind nicht damit automatisch vollständig abgedeckt. Tests verweigern bestehende oder produktive Datenbanken und löschen keine Geschäftsdatensätze.
+
+## Bestätigter CI-Infrastrukturfehler
+
+Quality1163 / 37991387930 scheiterte in beiden PostgreSQL-Jobs bereits bei Initialize containers: Docker Hub meldete `toomanyrequests: You have reached your unauthenticated pull rate limit`. Keiner der neuen Schreibtests wurde in diesem Lauf ausgeführt. Quality blockierte korrekt; Browser wurde wegen fehlendem Build übersprungen und gilt nicht als bestanden.
+
+Die Service-Imagequelle wird auf Docker Official Image `public.ecr.aws/docker/library/postgres:16` umgestellt (Publisher-Verzeichnis: https://gallery.ecr.aws/docker/library/postgres). Beide PostgreSQL-Services, Healthchecks, isolierte Datenbank, sämtliche Tests und das blockierende Quality-Gate bleiben erhalten. Der authentifizierte HTTP-Gate prüft zusätzlich server_version_num auf PostgreSQL16. Die Verfügbarkeit und erfolgreichen Gates über diese Quelle sind erst im neuen CI-Lauf nachgewiesen; kein Infrastruktur-Fallback ersetzt Datenbanktests durch Mocks.

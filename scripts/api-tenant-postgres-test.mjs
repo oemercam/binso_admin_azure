@@ -12,6 +12,7 @@ assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/bin
 const pool=new pg.Pool({connectionString:address,max:8});
 let server;
 try{
+ const pgVersion=Number((await pool.query("select current_setting('server_version_num') version")).rows[0].version);assert.ok(pgVersion>=160000&&pgVersion<170000,'Gate requires PostgreSQL 16');
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Never resets an existing database');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
@@ -107,6 +108,7 @@ try{
  // validation errors. Rejected roles must not change either tenant's row count.
  const customerWriters=['owner','admin','finance','project_manager','manager'];
  const projectWriters=['owner','admin','project_manager','manager'];
+ const paymentInvoice=(await pool.query("select id,customer_id from invoices where organization_id=$1 and archived_at is null and status in('sent','partial','overdue') and total_amount-paid_amount>3 limit 1",[organizations[0]])).rows[0];assert.ok(paymentInvoice,'Open synthetic invoice for three legal financial role writes');
  const writeContracts=[
   ['/api/customers','customers',customerWriters,role=>({name:'Write contract '+role,email:role+'@write.invalid'})],
   ['/api/employees','employees',['owner','admin','hr'],role=>({firstName:'Write',lastName:role,jobTitle:'Synthetic ICT',workloadPercent:80,email:role+'@employee-write.invalid',weeklyHours:42,vacationDays:25})],
@@ -115,6 +117,8 @@ try{
   ['/api/time-entries','time_entries',[...projectWriters,'member'],role=>({projectId:null,projectName:'Internal '+role,durationMinutes:60,startedAt:'2026-10-09',billable:false})],
   ['/api/expenses','expenses',[...customerWriters,'member'],role=>({merchant:'Synthetic expense '+role,expenseDate:'2026-10-09',amount:10,currency:'CHF',vatRate:8.1,status:'draft'})],
   ['/api/support/tickets','support_cases',roles,role=>({subject:'Synthetic support '+role,message:'Isolated role contract message'})],
+  ['/api/payments','payments',finance,()=>({invoiceId:paymentInvoice.id,customerId:paymentInvoice.customer_id,paidOn:'2026-10-09',amount:1,method:'bank'})],
+  ['/api/documents','invoices',finance,()=>({kind:'invoice',customerId:customer.id,issueDate:'2026-10-09',dueDate:'2026-11-09',currency:'CHF',items:[{description:'Synthetic invoice line',quantity:1,unitPrice:100,vatRate:8.1}]})],
   ['/api/documents','quotes',projectWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
  ];
  let writeCases=0;
@@ -138,7 +142,7 @@ try{
   assert.equal(removed.status,['owner','admin'].includes(role)?404:403,role+' foreign customer delete');
   assert.equal((await pool.query('select name from customers where id=$1 and archived_at is null',[foreignCustomer])).rows[0].name,original);
  }
- console.log('Authenticated valid write-role contract: '+writeCases+' actual create/persistence cases across all eight roles for customers, employees, products, projects, internal time, expenses, support and offers; foreign customer PATCH/DELETE blocked with unchanged rows. Other write/status/operator contracts remain explicitly outside this coverage.');
+ console.log('Authenticated valid write-role contract: '+writeCases+' actual create/persistence cases across all eight roles for customers, employees, products, projects, internal time, expenses, support, offers, invoices and payments; foreign customer PATCH/DELETE blocked with unchanged rows. Other write/status/operator contracts remain explicitly outside this coverage.');
  console.log('Authenticated read-role contract: every inventoried private GET route across all eight tenant roles, including binary PDF/files, own-record expense filtering, every operator/demo boundary; public/token entry points explicitly excluded. Write-role coverage is separate and incomplete.');
  for(const [role,allowed] of [['owner',true],['admin',true],['finance',true],['hr',false],['project_manager',false],['manager',false],['member',false],['reader',false]])assert.equal((await get('/api/payments',cookies.get('0:'+role))).status,allowed?200:403,role+' payment read policy');
  for(const role of roles)assert.equal((await get('/api/operator/dashboard',cookies.get('0:'+role))).status,401,'Tenant '+role+' cannot gain operator access');
