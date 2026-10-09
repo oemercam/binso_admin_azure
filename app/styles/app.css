@@ -563,8 +563,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .timer-card{text-align:left}
 .time-overview-section{padding-left:32px;border-left:1px solid var(--color-line)}
 .timer-project{max-width:360px;margin:var(--heading-content-gap) auto 0;display:grid;gap:var(--field-group-gap);text-align:left}
-.timer-project button,
-.timer-project select{
+.timer-project button{
   width:100%;
   min-height:44px;
   padding:0 12px;
