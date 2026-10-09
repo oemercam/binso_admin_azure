@@ -1102,12 +1102,11 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   min-height:74px;
   padding:8px 0 14px;
   display:grid;
-  grid-template-columns:44px minmax(0,1fr);
+  grid-template-columns:max-content minmax(0,1fr);
   gap:12px;
   align-items:center;
   border-bottom:1px solid var(--color-line);
 }
-.avatar-large{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--color-subtle);font-size:12px;font-weight:750}
 .account-sheet>h3{font-size:11px;text-transform:uppercase;color:var(--color-muted);margin:16px 0 4px}
 .account-sheet-profile b{font-size:13px}
 .account-sheet-profile small{display:block;margin-top:3px;color:var(--color-muted);font-size:11px}

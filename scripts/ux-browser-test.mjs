@@ -50,6 +50,10 @@ async function capture(page,options,target=page){
  const pending=captureQueue.then(async()=>{await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await target.screenshot(process.env.BINSO_UX_BROWSER==='webkit'?{...options,animations:'allow'}:options);if(target===page&&process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));});
  captureQueue=pending.catch(()=>{});return pending;
 }
+async function assertAccountAvatarSpacing(panel){
+ const geometry=await panel.locator('.account-sheet-profile').evaluate(el=>{const avatar=el.firstElementChild.getBoundingClientRect(),name=el.lastElementChild.getBoundingClientRect();return {avatarRight:avatar.right,nameLeft:name.left,gap:parseFloat(getComputedStyle(el).columnGap)}});
+ assert.ok(geometry.nameLeft>=geometry.avatarRight+geometry.gap-1,'Account identity preserves its declared gap after the actual avatar: '+JSON.stringify(geometry));
+}
 async function actionEvidence(page,name,theme){
  const dialog=page.getByRole('dialog',{name,exact:true});
  await dialog.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))});
@@ -452,7 +456,7 @@ try{
     assert.ok(keyboardGeometry.bottom<=401,'Search remains bounded even while the VisualViewport callback is pending: '+JSON.stringify(keyboardGeometry));
     await page.setViewportSize({width,height:740});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
     assert.equal(await page.evaluate(()=>scrollY),scroll,'Closing panel retains document scroll position');
-    await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();
+    await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();await assertAccountAvatarSpacing(account);
     assert.equal(await account.locator('.person-avatar').innerText(),'TP');assert.equal(await account.getByRole('link',{name:'Abonnement',exact:true}).count(),0,'Account panel does not duplicate company billing');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
     await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
@@ -504,7 +508,7 @@ try{
    await page.setViewportSize({width:320,height:740});await navigate(base+'/operator/sperrungen');await page.waitForLoadState('networkidle');const notice=await page.locator('.notice').evaluate(el=>[...el.children].map(child=>child.getBoundingClientRect().toJSON()));for(let i=1;i<notice.length;i++)assert.ok(notice[i].top>=notice[i-1].bottom+7,'Restriction details occupy separated rows');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-operator-restrictions.png`)});
    await navigate(base+'/operator');await page.waitForLoadState('networkidle');
    await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
-   const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();
+   const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();await assertAccountAvatarSpacing(panel);
    const g=await page.evaluate(()=>({header:document.querySelector('.operator-app-header').getBoundingClientRect().bottom,panel:document.querySelector('.header-panel').getBoundingClientRect().top,inert:document.querySelector('.operator-page-head').inert}));
    assert.ok(g.panel>=g.header&&g.panel-g.header<=12,'Operator account shares the anchored top panel');assert.equal(g.inert,true,'Operator background is inert');
    await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
