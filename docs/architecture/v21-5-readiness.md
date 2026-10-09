@@ -29,7 +29,7 @@ Kein separater integrierter V21.2-/V21.4-Implementierungscommit oder PR auffindb
 | --- | --- | --- | --- | --- | --- |
 | I1 | FormWizard deaktivierte Zurück bei step===0 statt Abbruch | cancelAction verbindlich; Schrittgrenzen und Busy-Abbruch zentral; alle drei Aufrufer migriert | Funktionsloser Schritt-1-Button | SSR First/Middle/Final, Lint-Ownership; employees Browser | /mitarbeiter/neu, Light/Dark, 375/1440 und 400px-Height geprüft; WebKit acht Light/Dark/Mobile-Kombinationen ebenfalls bestanden; Required-CI offen |
 | I2 | mutationResult akzeptierte gültiges JSON ohne bestätigte Persistenz; PaymentForm zeigte danach Erfolg | Payment-/Document-Create brauchen item.id, Dokument zusätzlich number vor publishMutation | Zu frühe Erfolgsinvalidierung | null/{}/leere ID/fehlende Nummer müssen invalid_response ergeben; keine Revision | PaymentForm verweigert 2xx {} ohne Erfolg; anschliessender Same-Key-Replay und sieben Tabs browsergeprüft; gezielt bestanden, Required-CI offen |
-| I3 | ProjectForm once-only GET-Effekte ignorierten Invalidierungen und konnten Source-/Kundenantworten lokal überschreiben; kein expliziter Dirty-State | bestehendes useApiQuery + einmalige Quellinitialisierung, Lade-/Fehlerblockade mit gezieltem Retry; useDirtySnapshot | Zwei direkte GET-Effekte | Lint/Typecheck und vorhandene Projektprozess-Tests | /projekte/neu Light/Dark 375/1440; Source-/Netzwerkvariante noch offen |
+| I3 | ProjectForm once-only GET-Effekte ignorierten Invalidierungen und konnten Source-/Kundenantworten lokal überschreiben; kein expliziter Dirty-State | bestehendes useApiQuery + einmalige Quellinitialisierung, Lade-/Fehlerblockade mit gezieltem Retry; useDirtySnapshot | Zwei direkte GET-Effekte | Lint/Typecheck und vorhandene Projektprozess-Tests | /projekte/neu Light/Dark 375/1440; Chromium 375: 503-Blockade, Retry ohne Reload, gesperrter Quellkunde, Hintergrundupdate ohne Draft-Verlust und Abbruchbestätigung bestanden; WebKit desselben zusätzlichen Falls ebenfalls bestanden |
 | I4 | app-pages war ein ungenutzter Runtime-Barrel; alle Seiten importieren actual owners; readPageFile virtualisiert bereits die Tests | Import-/Exportgraph geprüft; Barrel gelöscht; Testschutz gegen Wiedereinführung | components/app-pages.tsx | UI-Foundation, Test-only readPageFile, Build; keine Runtime-Imports im Graph | Kein UI-/Navigationsverhalten geändert |
 | I5 | Wizard-Wrapper konnten ausserhalb ihres Owners kopiert werden | vorhandenen ESLint-Ownerguard um form-wizard/wizard-content/wizard-progress erweitert | Keine weitere Engine eingeführt | Lint-Negativfixtures müssen kopierte Wrapper ablehnen | Technischer Architekturschutz; kein visueller Vollständigkeitsbeweis |
 
@@ -66,7 +66,7 @@ V21.5 fügt keine neue Migration hinzu. Die gestapelte V21.3-Basis enthält addi
 
 **Release noch nicht empfehlen.** Kandidaten-CI, vollständige noch offene Prozess-/Schreibrollen-/visuelle Abnahme, eindeutiger V21.2-/V21.4-Abgleich, physische PWA- und freigegebene Azure-Kandidatenprüfung fehlen. Keine Merge-/Deployfreigabe wird aus einem früheren Run abgeleitet. Erst belegte Aufrufermigration + tatsächliche relevante Tests + visueller Scope erlauben den jeweiligen Status Geprüft und bestanden. Diese Matrix meldet keinen Gesamterfolg.
 
-## Ergänztes HTTP-Schreibrollenpaket (noch nicht bestanden gemeldet)
+## Ergänztes HTTP-Schreibrollenpaket (geprüfter Umfang)
 
 `api-tenant-postgres-test.mjs` führt 80 gültige POSTs über acht echte synthetische Tenant-Sessions aus. Erwartete Rollen sind unabhängig von tenantCan festgelegt. Zugelassene Requests müssen 201, eine persistierte ID im eigenen Mandanten und exakt einen zusätzlichen Datensatz ergeben; verbotene Requests 403 und keine Datenänderung. Auch der andere Mandant muss unverändert bleiben. Fremde Kunden-IDs werden zusätzlich mit PATCH und DELETE über alle acht Rollen geprüft (404/403, ursprünglicher Datensatz bleibt unverändert).
 
@@ -83,10 +83,49 @@ V21.5 fügt keine neue Migration hinzu. Die gestapelte V21.3-Basis enthält addi
 | Rechnung | owner/admin/finance | invoices |
 | Zahlung auf offene synthetische Rechnung | owner/admin/finance | payments |
 
-Status: **Implementiert, nicht geprüft** bis der echte isolierte HTTP/PostgreSQL-CI-Lauf bestanden ist. Lokale synthetische Repository-Tests ersetzen diesen Nachweis nicht. Die übrigen Statuswechsel-/Versand-/Einladungs-/Datei-/Operator-/Finanzschreibverträge sind nicht damit automatisch vollständig abgedeckt. Tests verweigern bestehende oder produktive Datenbanken und löschen keine Geschäftsdatensätze.
+Status: **Geprüft und bestanden** für dieses genaue Schreibrollenpaket: Quality1164 / 37991755760, Build-Job114027443045, tatsächlicher HTTP/PG16-Gate erfolgreich (6 s). Dies ist ein Prozess-/Persistenznachweis und kein visueller Nachweis sämtlicher Erfassungszustände. Lokale synthetische Repository-Tests ersetzen diesen Nachweis nicht. Die übrigen Statuswechsel-/Versand-/Einladungs-/Datei-/Operator-/Finanzschreibverträge sind nicht damit automatisch vollständig abgedeckt. Tests verweigern bestehende oder produktive Datenbanken und löschen keine Geschäftsdatensätze.
 
 ## Bestätigter CI-Infrastrukturfehler
 
 Quality1163 / 37991387930 scheiterte in beiden PostgreSQL-Jobs bereits bei Initialize containers: Docker Hub meldete `toomanyrequests: You have reached your unauthenticated pull rate limit`. Keiner der neuen Schreibtests wurde in diesem Lauf ausgeführt. Quality blockierte korrekt; Browser wurde wegen fehlendem Build übersprungen und gilt nicht als bestanden.
 
-Die Service-Imagequelle wird auf Docker Official Image `public.ecr.aws/docker/library/postgres:16` umgestellt (Publisher-Verzeichnis: https://gallery.ecr.aws/docker/library/postgres). Beide PostgreSQL-Services, Healthchecks, isolierte Datenbank, sämtliche Tests und das blockierende Quality-Gate bleiben erhalten. Der authentifizierte HTTP-Gate prüft zusätzlich server_version_num auf PostgreSQL16. Die Verfügbarkeit und erfolgreichen Gates über diese Quelle sind erst im neuen CI-Lauf nachgewiesen; kein Infrastruktur-Fallback ersetzt Datenbanktests durch Mocks.
+Die Service-Imagequelle wird auf Docker Official Image `public.ecr.aws/docker/library/postgres:16` umgestellt (Publisher-Verzeichnis: https://gallery.ecr.aws/docker/library/postgres). Beide PostgreSQL-Services, Healthchecks, isolierte Datenbank, sämtliche Tests und das blockierende Quality-Gate bleiben erhalten. Der authentifizierte HTTP-Gate prüft zusätzlich server_version_num auf PostgreSQL16. Quality1164 bestätigt PostgreSQL16.15, erfolgreiche Parallel-/HTTP-Verträge und Build über diese Quelle; die Browser-Gates und der nachfolgende finale Commit benötigen weiterhin eigene vollständige Nachweise; kein Infrastruktur-Fallback ersetzt Datenbanktests durch Mocks.
+
+## FAST-Ursache und Korrektur
+
+Die vorhandene Änderungsplanung wählte für den globalen API-Client und Wizard bislang UX-/Theme-Tests, aber nicht die tatsächlichen Data-/UI-Foundation-Verträge aus. V21.5 ergänzt diese Zuordnung in der bestehenden qa-plan-Funktion. Backend/Query/Money/Financial-Status/Perioden wählen data-foundation-test; gemeinsame UI/Wizard/Lint-Owner wählen ui-foundation-test; Shell/Operator/Tokens/CSS behalten den Frozen-Navigation-Vertrag. Ausführbare Plan-Tests sichern jede Zuordnung. RELEASE-Abdeckung und erforderliche Browser-/Security-/Datenbank-Gates bleiben gleich.
+
+## Abgleich aller 24 abschliessenden Kriterien
+
+Diese Zeilen ergänzen den Route-/Prozessnachweis; sie ersetzen keine noch fehlende Prüfung. Technisch bestandene Teilverträge sind ausdrücklich vom vollständigen Produktkriterium getrennt.
+
+| Nr. | Kriterium | Aktueller Nachweis / konkrete Restarbeit | Status |
+| --- | --- | --- | --- |
+| 1 | V21.1–V21.4 integriert und abgeglichen | V21.1/V21.3 im Kandidaten; vorhandene Prozess-/QA-Implementierungen geprüft; eigenständiger V21.2/V21.4-Nachweis fehlt | In Bearbeitung |
+| 2 | Sämtliche Haupt-/Unterseiten inventarisiert | 71 Framework-Seiten + 13 Operator-Varianten im Source-Inventar; Vollständigkeit gegen aktuellen Dateibaum getestet | Geprüft und bestanden |
+| 3 | Gemeinsame UI einheitlich verwendet | Owner/Consumer inventarisiert; Lint-Ownership; vollständige gerenderte Variantenabnahme fehlt | In Bearbeitung |
+| 4 | Gemeinsame Prozessgrundlage | Alle drei Wizard-Aufrufer migriert; einfache Fachformulare behalten gemeinsamen Field/FormActions-Vertrag; vollständige Journeys fehlen | In Bearbeitung |
+| 5 | Nummern erst nach Erstellung | Atomare serverseitige Vergabe, keine vorweggenommene Nummer im Wizard; API/PG/Browser-Verträge | In Bearbeitung: letzter Kandidaten-Gate offen |
+| 6 | Wizard-Schrittnavigation | SSR aller Schrittaktionen, echte Retention-/Cancel-Browserfälle beider Engines | In Bearbeitung: letzter Kandidaten-Gate offen |
+| 7 | Speichern/Abbrechen zuverlässig | Busy/Dirty/invalid-response/Replay-Verträge; alle einfachen Erfassungsvarianten noch nicht vollständig abgenommen | In Bearbeitung |
+| 8 | Statusübergänge widerspruchsfrei | Zentral validierte Dokument-/Zeit-/Spesenregeln und PG-Regressionsfälle; vollständige HTTP-Statusrollenmatrix fehlt | In Bearbeitung |
+| 9 | Modulübergreifende Datenkonsistenz | Gemeinsame Invalidierung, sieben Zahlungsconsumer, Session-/Tab-/Retry-Prüfungen; Gesamtprozessabnahme fehlt | In Bearbeitung |
+| 10 | Finanzbeträge/Zahlungsstände | Minor-Unit-/Rundungs-/Teil-/Vollzahlungs-/Storno-/Überzahlungs-/Replay-Verträge | In Bearbeitung: letzter Kandidaten-Gate offen |
+| 11 | Serverberechtigungen/Mandanten | Alle privaten GET-Routen über acht Rollen; 80 gültige POST-Rollenfälle; vollständige übrige Schreib-/Operatorfälle fehlen | In Bearbeitung |
+| 12 | Vollständige PDF-Dokumente | Aktuelle Generator-/Snapshot-/Text-/A4-Tests und Vorschau; vollständige Dokumentvariantenabnahme fehlt | In Bearbeitung |
+| 13 | Schweizer QR | Offener Betrag, Referenz/IBAN und nichtzahlbare Zustände getestet; unabhängige vollständige Normabnahme fehlt | In Bearbeitung |
+| 14 | Header/Listen/Formulare/Sheets/Panels | Gemeinsame Owner, Fokus/Scroll/Responsive-Browserfälle; alle gerenderten Varianten fehlen | In Bearbeitung |
+| 15 | Chat-Scroll | Browser-Thread/Composer/Fokus geprüft; physische Mobile-Tastatur fehlt | Blockiert mit konkreter Ursache |
+| 16 | Kein horizontaler Gesamtüberlauf | Responsive-CI prüft definierte Routen/Breiten/Themes; physische installierte PWA fehlt | In Bearbeitung |
+| 17 | Vertikales Scrollen | Scroll-/Overlay-/Back-Verträge und definierter Browserumfang; Gesamtabnahme aller Zustände fehlt | In Bearbeitung |
+| 18 | Keine doppelten Loader | Start-/Session-/Navigation-/PWA-Lifecycle-Verträge; physischer PWA-Kaltstart fehlt | In Bearbeitung |
+| 19 | Bottom-Navigation unverändert | Vollständiger eingefrorener JSX-/Access-/Scroll-/Icon-/CSS-/Token-Vertrag gegen main | Geprüft und bestanden |
+| 20 | Bestätigte Altlasten beseitigt | I1–I5 und FAST-Ursache behoben; Barrel kontrolliert entfernt; CSS-Kandidaten nicht pauschal gelöscht | In Bearbeitung: gesamte Legacy-Abnahme offen |
+| 21 | Architektur/Prozess/Security/UX-Regressionsgates | Lokale und vorherige vollständige Gates; finale Required-CI für letzten Commit ausstehend | In Bearbeitung |
+| 22 | Entwicklungs-/Releasepipeline | Main-Release nachvollzogen; PG-Registry-Ursache behoben; finale Kandidatenprüfung offen | In Bearbeitung |
+| 23 | Vollständige dokumentierte Abnahmematrix | Diese 24 Kriterien + Foundation-/Root-Cause-/Route-/Prozesstabellen mit ausdrücklichen offenen Punkten | Geprüft und bestanden: Dokumentationsumfang, kein Produktgesamtpass |
+| 24 | Keine ungeklärten kritischen Regressionen | Bekannte Test-/Abnahmegrenzen dokumentiert; vor vollständiger Abnahme keine positive Gesamtbehauptung | Offen |
+
+## Browser-Back vor passiven Effekten
+
+Quality1164 scheiterte im Chromium-Browserjob beim direkten Browser-Zurück unmittelbar nach einer Änderung in Einladung/Passwortreset: Der erwartete Alertdialog erschien nicht. Der zentrale useBrowserBackGuard registrierte die History-Grenze bisher in einem passiven useEffect. Damit besteht nachweislich ein Zeitfenster für einen unmittelbaren History-Wechsel vor der Registrierung. Der lokale alte Build bestand den Einzeltest; der CI-Fehler ist mit dieser Race Condition vereinbar, aber seine genaue Laufzeitreihenfolge ist nicht aufgezeichnet. Die bestehende zentrale Registrierung und Callback-Aktualisierung werden in useLayoutEffect vor dem Paint ausgeführt. Kein neuer Guard, keine verlängerte Wartezeit und kein übersprungener Test; dieselben schnellen Browser-Back-Fälle bleiben blockierende Regressionen. Endgültiger Erfolg erfordert den erneuten vollständigen Kandidatenlauf.

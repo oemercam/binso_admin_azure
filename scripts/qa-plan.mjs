@@ -40,6 +40,9 @@ export function planChanges(files,{level='standard'}={}){
  const suites=new Set();
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
  if(global)suites.add('theme-selfcheck');
+ if(paths.some(p=>/^(components\/(ui|binso-ux|form-wizard|ux-lab)|scripts\/(eslint\/central-ui|ui-foundation-test))/.test(p)))suites.add('ui-foundation-test');
+ if(paths.some(p=>/^lib\/(client\/|money\.|financial-status\.|finance-periods\.)|^scripts\/data-foundation-test/.test(p)))suites.add('data-foundation-test');
+ if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/styles\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');
  if(paths.some(p=>/css|styles/.test(p)))suites.add('check-css-architecture');
  if(paths.some(p=>/document|invoice|qr|pdf/.test(p))){suites.add('document-presentation-test');suites.add('pwa-preview-test');}
  if(paths.some(p=>/session|auth/.test(p)))suites.add('client-session-test');

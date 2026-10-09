@@ -12,7 +12,7 @@ function resolve(file,spec){
  return base?[base,base+'.ts',base+'.tsx',base+'.mjs',base+'.js',base+'/index.ts',base+'/index.tsx'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile())??null:null;
 }
 export function integrationGraph(){
- const files=['app','components','lib','config','scripts'].flatMap(walk).filter(f=>/\.(tsx?|m?js)$/.test(f));
+ const files=['app','components','lib','config','scripts'].flatMap(walk).filter(f=>/\.(tsx?|m?js)$/.test(f)).sort();
  const modules=files.map(file=>{
   const text=fs.readFileSync(file,'utf8'),ast=ts.createSourceFile(file,text,99,true,file.endsWith('tsx')?4:3),dependencies=[],dynamicUnknown=[],providers=[],effects=[];
   const visit=n=>{

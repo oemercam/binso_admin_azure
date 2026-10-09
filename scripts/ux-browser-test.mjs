@@ -70,6 +70,7 @@ let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,fa
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
+let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer';
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
 let context;
@@ -104,6 +105,7 @@ try{
    }
    if(dataPaymentMode&&holdDataRefresh&&p==='/api/documents')await new Promise(resolve=>dataRefreshWaiters.push(resolve));
    if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
+   if(projectSourceMode&&p==='/api/documents/AN-TEST-1')return route.fulfill({status:failProjectSource?503:200,json:failProjectSource?{message:'Synthetic source unavailable'}:{item:{...offer,status:'accepted',title:projectSourceTitle}}});
    let data;
    if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
    else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:teamMemberRole,created_at:'2026-10-08'}],invitations:[],userLimit:10,plan:'pro'};
@@ -258,6 +260,15 @@ try{
   await page.waitForLoadState("networkidle");await navigate(base+'/projekte/neu');await page.waitForLoadState('networkidle');try{await page.getByRole('button',{name:'Auftrag starten',exact:true}).filter({visible:true}).waitFor()}catch(error){console.log('Project diagnostics',page.url(),await page.locator('body').innerText(),errors);await capture(page,{animations:'disabled',path:path.join(output,'project-error.png')});throw error;}
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),0,'Project creation has no competing save action');
   assert.equal(await page.getByRole('button',{name:'Auftrag starten',exact:true}).filter({visible:true}).count(),1);
+  projectSourceMode=true;failProjectSource=true;projectSourceTitle='Synthetic accepted offer';
+  await navigate(base+'/projekte/neu?sourceOffer=AN-TEST-1');await page.getByRole('alert').getByText('Synthetic source unavailable',{exact:true}).waitFor();assert.equal(await page.getByRole('button',{name:'Auftrag starten',exact:true}).count(),0,'Failed source cannot create a partial fictional project');
+  const projectMarker=await page.evaluate(()=>{window.v215ProjectMarker='same-document';return window.v215ProjectMarker});failProjectSource=false;
+  await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByLabel('Bezeichnung',{exact:true}).waitFor();await page.waitForFunction(()=>document.querySelector('input[placeholder="z. B. Cloud Migration"]')?.value==='Synthetic accepted offer');
+  assert.equal(await page.evaluate(()=>window.v215ProjectMarker),projectMarker,'Source retry uses a targeted query, no app reload');assert.equal(await page.getByLabel('Kunde',{exact:true}).inputValue(),'customer-one');assert.equal(await page.getByLabel('Kunde',{exact:true}).isDisabled(),true);
+  await page.getByLabel('Bezeichnung',{exact:true}).fill('Unsaved project draft');projectSourceTitle='Updated server offer';
+  const sourceRefresh=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/documents/AN-TEST-1');await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await sourceRefresh;await page.waitForLoadState('networkidle');assert.equal(await page.getByLabel('Bezeichnung',{exact:true}).inputValue(),'Unsaved project draft','Source revalidation cannot overwrite the local project draft');
+  await page.locator('.mobile-back').click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Bezeichnung',{exact:true}).inputValue(),'Unsaved project draft');await page.locator('.mobile-back').click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL('**/angebote/AN-TEST-1');projectSourceMode=false;
+
   }
   if(hasInteraction('employees')){
   await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
