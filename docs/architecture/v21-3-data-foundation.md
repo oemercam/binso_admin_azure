@@ -50,7 +50,7 @@ Cross-Device-Live-Push ist nicht implementiert: andere Geräte sehen Änderungen
 | Domäne | API / Repository, nachgewiesene Ursache am Basiscommit | Zentrale Korrektur | Kontrolliert entfernte Altlast | Regression / Ergebnis |
 |---|---|---|---|---|
 | Domänenübergreifend | backend + shared.useDemoRows: keine zentrale Mutationsinvalidierung; generisches Storage-Event aktualisierte alle Listen, individuelle useEffects blieben stehen | Domänenabhängigkeiten, Queryhook, Requestrevisionen; Payment mutiert Rechnungen/Kunde/Finanzen/Dashboard | generischer Storage-Reload in shared | data-foundation-test: Erfolg, Fehler, targeted revisions, dedup, alter Sessionrequest – grün; sieben Payment-Consumer gemeinsam browsergeprüft; weitere Mutationsarten offen |
-| Rechnungen/Angebote | business-api liess p_number den zentralen Counter umgehen; Editor zeigte Eingabefeld bei Neuanlage; kein create-Replay | zentrale Nummer ausschliesslich serverseitig, Bestandssuffix berücksichtigt, unveränderbar, atomarer Replay | manuelle Neuanlagenummer | migration-test: Replay, Payloadkonflikt, Rollback, unveränderte Counter – grün; echte Mehrverbindungsparallelität offen |
+| Rechnungen/Angebote | business-api liess p_number den zentralen Counter umgehen; Editor zeigte Eingabefeld bei Neuanlage; kein create-Replay | zentrale Nummer ausschliesslich serverseitig, Bestandssuffix berücksichtigt, unveränderbar, atomarer Replay | manuelle Neuanlagenummer | migration-test: Replay, Payloadkonflikt, Rollback, unveränderte Counter – grün; postgres:16-CI-Parallelitätsgate ergänzt; Ergebnis offen |
 | Geld / PDF | UI/PDF berechneten binary-float Summen, Listen raw line sums statt gespeicherter Invoice subtotal/vat; quote total vor separater Net/Tax-Rundung | BigInt-Dezimal/Minor-Units; bestehende DB-Spaltenpräzision, netto und Steuer separat; persistierte Werte in Reads | redundante Editor-/Previewtotalberechnung | PGlite numeric-Parität; 2561.97 - 1000 = 1561.97; Vollzahlung null; Angebotsparität – grün |
 | Finanzen | separate overview/documents/finance Requests; UI-KPIs aus begrenzter Dokumentliste; Finance query summierte CHF/EUR ohne Trennung | Workspace in einem Readsnapshot; vollständige Summary-KPIs; CHF-Cashreport, Fremdwährung gesonderte Summary | dreifacher FinancePage-Read; duplizierte Demo-Financequery | Finance Cash/Summary-/Periodenparität – grün; andere Währungen nicht umgerechnet |
 | Perioden | Analysejahr (rollierende 12 Monate) wich von kalenderjährlicher Übersicht ab; verschiedene Date-Grenzen | gemeinsames financeWindow/financeMetrics, date-only Kalendergrenzen, Zurich businessDate | parallele Analyseperiodenberechnung | ux-regression + data-foundation period tests – grün |
@@ -79,7 +79,7 @@ Die Bottom-Navigation ist durch navigation-contract-test und navigation-foundati
 | 3 | Teilzahlung | 2561.97 / 1000 / 1561.97 und Status partial geprüft |
 | 4 | Vollzahlung | Ledgercompletion, Datum, Saldo null geprüft |
 | 5 | Storno | Status, Schutz und Freigabe zugeordneter Leistungen geprüft |
-| 6 | Parallele Nummern | Counter-/Replay-/Rollback geprüft; echte PostgreSQL-Mehrverbindungsprüfung offen |
+| 6 | Parallele Nummern | Counter-/Replay-/Rollback geprüft; echte Mehrverbindungsprüfung als verpflichtender postgres:16-CI-Schritt ergänzt; Ergebnis offen |
 | 7 | Wiederholte Zahlung | gleicher Schlüssel liefert selben Datensatz; Konflikt/Überzahlung geprüft |
 | 8 | Zeit freigeben / verrechnen | echte Handler und Zuordnungen geprüft |
 | 9 | Erneute Verrechnung | abgelehnt; Invoice/Counter/Zuordnung rollback geprüft |

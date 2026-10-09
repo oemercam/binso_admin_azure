@@ -58,12 +58,27 @@ jobs:
           cat /tmp/qa-plan.json >> "$GITHUB_STEP_SUMMARY"
   checks:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_v213_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_v213_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
+      - name: Real isolated PostgreSQL parallel process gate
+        env:
+          BINSO_DB_PARALLEL_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_v213_test
+        run: node scripts/postgres-parallel-test.mjs
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck

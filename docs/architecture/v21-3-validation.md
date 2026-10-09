@@ -21,7 +21,7 @@
 | Einladung | bestanden | echte API/Service gegen isolierte DB: Membership/Token/Outbox atomar, Replay, Versandfehler/-unklarheit und finaler DB-Rollback; keine externen Mails |
 | File-Prozess | bestanden | tatsächliche Upload/List/Downloadhandler an isolierter DB; Byteprüfung, Relation, Rollen-/Tenantablehnung |
 | Azure-Smoke | offen | Kein Deployment ausgeführt, keine Live-Schreibtests |
-| Reales PostgreSQL Parallelitätsgate | offen | PGlite ist keine unabhängige Mehrverbindungsinstanz |
+| Reales PostgreSQL Parallelitätsgate | neuer verpflichtender CI-Schritt, Ergebnis offen | Isolierter postgres:16-Service; leere lokale Testdatenbank mit explizitem Namen/Benutzer; zehn gleichzeitige Nummern, sechs Dokument-/Payment-Replays und konkurrierende Vollzahlungen. Keine DATABASE_URL-Fallbacks oder Schemaresets. |
 | GitHub Required Quality | noch nicht bestanden | Erstlauf: checks/build inkl. Runtime- und Artefakt-Smoke grün; Chromium scheiterte an kurzzeitig ausgeblendeten Listen bei Hintergrundrevalidierung. Hook korrigiert, expliziter pending-read Browsertest ergänzt; aktualisierter Lauf erforderlich. |
 
 Reproduktion: `npm run test`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run release:check`, `npm run css:check`, `pnpm audit --prod --audit-level high`, `node scripts/full-security-audit.mjs`. Das neue Browserinteraktionspaket `data` ist im QA-Plan für payments und umfassende Läufe enthalten. `BINSO_UX_INTERACTIONS=data` führt den sieben-Tab-Test separat aus. Für lokale Browser ist `BINSO_PLAYWRIGHT_MODULE` zu setzen; Chromium kann über `BINSO_CHROMIUM_EXECUTABLE` gewählt werden.
