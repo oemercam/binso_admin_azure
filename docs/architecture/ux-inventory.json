@@ -115700,11 +115700,6 @@
           "property": "min-width",
           "value": "0",
           "important": false
-        },
-        {
-          "property": "overflow-x",
-          "value": "clip",
-          "important": false
         }
       ]
     },
