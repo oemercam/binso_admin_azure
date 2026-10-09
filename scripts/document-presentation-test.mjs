@@ -77,3 +77,14 @@ const employeeInput={email:'qa@example.invalid',entryDate:'2026-10-08',workloadP
 assert.equal(employeeInputIssue(employeeInput),null);
 for(const invalid of [{email:'invalid'},{entryDate:'2026-02-30'},{workloadPercent:101},{weeklyHours:0},{weeklyHours:81},{vacationDays:-1}])assert.ok(employeeInputIssue({...employeeInput,...invalid}));
 console.log('QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.');
+
+
+// Guard the central PDF viewer against regressing to an endless multi-page list.
+const pdfViewerSource=await fs.readFile('components/pdf-preview.tsx','utf8');
+assert.match(pdfViewerSource,/data-viewer-mode="single-page"/,'Viewer must explicitly declare single-page mode');
+assert.match(pdfViewerSource,/<PdfPage key=\{current\} pdf=\{pdf\} pageNumber=\{current\}\/>/,'Exactly the selected PDF page is mounted');
+assert.doesNotMatch(pdfViewerSource,/Array\.from\(\{length:pdf\.numPages\}/,'Do not render every PDF page simultaneously');
+for(const label of ['Vorherige Seite','Nächste Seite','PDF-Seitennavigation'])assert.ok(pdfViewerSource.includes(label),label);
+assert.match(pdfViewerSource,/disabled=\{current<=1\}/,'Previous page is disabled at first page');
+assert.match(pdfViewerSource,/disabled=\{current>=pdf\.numPages\}/,'Next page is disabled at last page');
+console.log('Single-page PDF viewer source contract and bounded navigation passed.');
