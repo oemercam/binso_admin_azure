@@ -6249,50 +6249,22 @@
       "file": "components/project-form.tsx",
       "calls": [
         {
-          "callee": "apiGet<{items:typeof customers}>('/api/customers').then(data=>setCustomers(data.items)).catch",
-          "line": 8,
-          "arguments": [
-            "e=>setError(e.message)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:typeof customers}>('/api/customers').then",
-          "line": 8,
-          "arguments": [
-            "data=>setCustomers(data.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 8,
+          "callee": "useApiQuery",
+          "line": 15,
           "arguments": [
             "'/api/customers'"
           ]
         },
         {
-          "callee": "apiGet<{item:{title?:string;customer_id:string}}>('/api/documents/'+encodeURIComponent(sourceOffer)).then(data=>{setName(data.item.title??'');setCustomerId(data.item.customer_id)}).catch",
-          "line": 8,
+          "callee": "useApiQuery",
+          "line": 16,
           "arguments": [
-            "e=>setError(e.message)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:{title?:string;customer_id:string}}>('/api/documents/'+encodeURIComponent(sourceOffer)).then",
-          "line": 8,
-          "arguments": [
-            "data=>{setName(data.item.title??'');setCustomerId(data.item.customer_id)}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 8,
-          "arguments": [
-            "'/api/documents/'+encodeURIComponent(sourceOffer)"
+            "sourceOffer?'/api/documents/'+encodeURIComponent(sourceOffer):null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 9,
+          "line": 31,
           "arguments": [
             "'/api/projects'",
             "{name:name.trim(),customerId,sourceOffer}"
@@ -8902,7 +8874,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 118,
+          "line": 127,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -8910,12 +8882,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 135,
+          "line": 144,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 136,
+          "line": 145,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -8923,7 +8895,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 148,
+          "line": 157,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -8931,7 +8903,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 158,
+          "line": 167,
           "arguments": [
             "path",
             "{method:\"DELETE\"}"
@@ -8939,7 +8911,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 164,
+          "line": 173,
           "arguments": [
             "path",
             "{method:\"POST\",body:form}"

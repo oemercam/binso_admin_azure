@@ -49,9 +49,13 @@ try{
  assert.equal(events.dataRevision(['/api/support/tickets']),unrelated,'Payment does not reload unrelated support');
  assert.deepEqual(Object.keys(messages.at(-1)).sort(),['domains','type'],'No business payload or credential broadcast');
  const committed=events.dataRevision(paths);
- for(const response of [()=>new Response(JSON.stringify({error:'conflict',message:'Changed'}),{status:409}),()=>new Response('<html>unavailable</html>'),()=>{throw new Error('offline')}]){
+ for(const response of [()=>new Response(JSON.stringify({error:'conflict',message:'Changed'}),{status:409}),()=>new Response('<html>unavailable</html>'),...[null,{}, {item:{}},{item:{id:''}}].map(payload=>()=>new Response(JSON.stringify(payload))),()=>{throw new Error('offline')}]){
   globalThis.fetch=async()=>response();await assert.rejects(()=>backend.apiPost('/api/payments',{}));assert.equal(events.dataRevision(paths),committed,'Failed mutation cannot broadcast success');
  }
+ for(const payload of [null,{}, {item:{id:'document'}},{item:{id:'document',number:''}}]){
+  globalThis.fetch=async()=>new Response(JSON.stringify(payload));await assert.rejects(()=>backend.apiPost('/api/documents',{}),error=>error.code==='invalid_response');assert.equal(events.dataRevision(paths),committed,'Incomplete document confirmation cannot broadcast success');
+ }
+ globalThis.fetch=async()=>new Response(JSON.stringify({item:{id:'document',number:'RE-2026-1'}}));await backend.apiPost('/api/documents',{});
  let reads=0,resolveRead;
  globalThis.fetch=()=>{reads++;return new Promise(resolve=>{resolveRead=resolve})};
  const a=backend.apiGet('/api/documents'),b=backend.apiGet('/api/documents');

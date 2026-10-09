@@ -37,7 +37,7 @@ export function UxLab(){
   <ActionSheet open={sheet==="action"} label="ActionSheet" onClose={closeSheet}><ActionRow title="Bearbeiten" icon="edit" onClick={closeSheet} navigation/><ActionRow title="Löschen" icon="close" onClick={closeSheet} danger/></ActionSheet>
   <FormSheet open={sheet==="form"} label="FormSheet" onClose={closeSheet} actions={<><Button variant="secondary" onClick={closeSheet}>Abbrechen</Button><Button onClick={closeSheet}>Speichern</Button></>}>{fields}</FormSheet>
   <FilterSheet open={sheet==="filter"} label="FilterSheet" onClose={closeSheet} actions={<Button onClick={closeSheet}>Anwenden</Button>}>{fields}</FilterSheet>
-  <FormSheet open={sheet==="wizard"} wizard label="WizardSheet" onClose={closeSheet}><FormWizard labels={["Angaben","Prüfen"]} step={step} onStep={setStep} action={<Button onClick={closeSheet}>Speichern</Button>}><div hidden={step!==0}>{fields}</div><div hidden={step!==1}>{value||"Keine Angaben"}</div></FormWizard></FormSheet>
+  <FormSheet open={sheet==="wizard"} wizard label="WizardSheet" onClose={closeSheet}><FormWizard cancelAction={<Button variant="secondary" onClick={closeSheet}>Abbrechen</Button>} labels={["Angaben","Prüfen"]} step={step} onStep={setStep} action={<Button onClick={closeSheet}>Speichern</Button>}><div hidden={step!==0}>{fields}</div><div hidden={step!==1}>{value||"Keine Angaben"}</div></FormWizard></FormSheet>
   <ConfirmDialog open={confirm} title="Synthetische Bestätigung" message="Keine produktive Aktion wird ausgeführt." onCancel={()=>setConfirm(false)} onConfirm={()=>setConfirm(false)}/>
  </main></PageAccessContext.Provider>;
 }

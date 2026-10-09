@@ -109,6 +109,15 @@ async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
 async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string){
   const result=await parseResponse<T>(response,fallback);
   if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.","session_changed",401);
+  // Critical creates need their persisted identity before any success broadcast.
+  // An unreadable or incomplete response can follow a committed transaction;
+  // leave the caller's idempotency key intact for its explicit retry.
+  if(path==="/api/payments"||path==="/api/documents"){
+    const item=(result as {item?:{id?:unknown;number?:unknown}}|null)?.item;
+    if(typeof item?.id!=="string"||!item.id.trim()||path==="/api/documents"&&(typeof item.number!=="string"||!item.number.trim())){
+      throw new ClientApiError("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);
+    }
+  }
   publishMutation(path);
   return result;
 }

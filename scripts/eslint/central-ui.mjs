@@ -8,6 +8,9 @@ const nativeOwners={
  'components/privacy-consent.tsx':{input:['PrivacyConsent']}, // consent toggle, outside tenant forms
 };
 const classOwners={
+ 'form-wizard':['components/form-wizard.tsx'],
+ 'wizard-progress':['components/form-wizard.tsx'],
+ 'wizard-content':['components/form-wizard.tsx'],
  'form-field':['components/ui.tsx'],
  'message':['components/ui.tsx'],
  'confirm-dialog':['components/confirm-dialog.tsx'],

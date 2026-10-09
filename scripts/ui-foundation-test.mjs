@@ -13,7 +13,7 @@ async function messages(code,filePath='app/future-module/page.tsx'){
  const [result]=await eslint.lintText(code,{filePath});return result.messages.filter(m=>m.ruleId==='binso-ui/central-components');
 }
 for(const tag of ['input','select','textarea'])assert.equal((await messages(`export default function Page(){return <${tag}/>;}`)).length,1,'Future routes cannot implement '+tag+' again');
-for(const expression of ['"form-field"','{`bottom-sheet ${true?"active":""}`}','{true?"operator-table":""}','"confirm-dialog"'])assert.equal((await messages(`export default function Page(){return <div className=${expression}/>;}`)).length,1,'Copied canonical wrappers must fail lint');
+for(const expression of ['"form-wizard"','"wizard-progress"','"wizard-content"','"form-field"','{`bottom-sheet ${true?"active":""}`}','{true?"operator-table":""}','"confirm-dialog"'])assert.equal((await messages(`export default function Page(){return <div className=${expression}/>;}`)).length,1,'Copied canonical wrappers must fail lint');
 assert.equal((await messages('import {DashboardPage} from "@/components/app-pages";export default DashboardPage;')).length,1);
 assert.equal((await messages('export default function Page(){return <p role="alert">Fehler</p>;}')).length,1);
 assert.equal((await messages('export default function Page(){return <p role="status">Daten werden geladen …</p>;}')).length,1);
@@ -40,4 +40,16 @@ const outgoing=html(React.createElement(ui.MessageBubble,{time:'10:37',author:'O
 assert.ok(outgoing.includes('message-user'));assert.ok(outgoing.includes('<span>Operator</span>'));assert.ok(outgoing.includes('Intern'));
 const catalog=inventory(),publicPage=catalog.routes.find(r=>r.route==='/login');assert.equal(publicPage.family,'AuthenticationPage');assert.ok(!publicPage.pageRenderGraph.some(k=>k.endsWith('#AppShellFrame')),'Inactive root shell branches must not become the actual public page graph');assert.ok(catalog.operatorVariants.some(v=>v.route==='/operator/sperrungen'&&v.component.endsWith('#RestrictionsView')));assert.ok(catalog.apiRoutes.some(r=>r.route==='/api/documents/preview'&&r.methods.includes('POST')));
 assert.ok(!fs.existsSync('components/pages/compatibility.tsx'));assert.ok(!fs.readFileSync('components/operator.tsx','utf8').includes('operator-modal-layer'));
+assert.ok(!fs.existsSync('components/app-pages.tsx'),'Unused runtime compatibility barrel stays retired; test-only page-source reads the actual owners.');
 console.log('UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.');
+
+const wizardSource=fs.readFileSync('components/form-wizard.tsx','utf8');
+const wizardAst=ts.createSourceFile('form-wizard.tsx',wizardSource,99,true,4);
+const wizardBody=wizardAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(wizardAst)).join('\n');
+const wizardCompiled=ts.transpileModule(wizardBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const wizard={};Function('require','exports','useEffect','useRef','Button','FormActions',wizardCompiled)(require,wizard,React.useEffect,React.useRef,ui.Button,ui.FormActions);
+for(const step of [0,1,2]){
+ const markup=html(React.createElement(wizard.FormWizard,{labels:['Kunde','Positionen','Prüfen'],step,onStep:()=>{},cancelAction:React.createElement(ui.Button,{href:'/rechnungen'},'Abbrechen'),action:React.createElement(ui.Button,null,'Erstellen')},'Entwurf'));
+ assert.equal(markup.includes('Abbrechen'),step===0);assert.equal(markup.includes('Zurück'),step>0);assert.equal(markup.includes('Weiter'),step<2);assert.equal(markup.includes('Erstellen'),step===2);
+}
+console.log('Wizard first/middle/final actions and architecture ownership passed.');
