@@ -1660,7 +1660,7 @@ html[data-theme="dark"] .app-launch img{filter:invert(1)}
 .bo-metric-tiles .metric strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:18px;line-height:1.25}
 .bo-metric-tiles .metric{padding:var(--field-group-gap) var(--kpi-padding);min-width:0;min-height:0;background:transparent}
 .bo-metric-tiles .metric-top>span{white-space:normal;overflow:visible}
-.document-summary-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);padding-block:var(--kpi-padding);border-bottom:1px solid var(--color-line);font-size:var(--control-label-font)}
+.document-summary-row{width:100%;min-width:0;padding-inline:0;border:0;background:transparent;color:inherit;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);padding-block:var(--kpi-padding);border-bottom:1px solid var(--color-line);font-size:var(--control-label-font)}
 .document-summary-row>b{min-width:0;overflow-wrap:anywhere}
 .document-summary-row>.status{justify-self:end;max-width:100%;white-space:normal;text-align:right}
 .document-summary-row>small{grid-column:1/-1;color:var(--color-muted);overflow-wrap:anywhere}

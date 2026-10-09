@@ -292,7 +292,7 @@ try{
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-time.png`),fullPage:true});
   await page.getByRole('tab',{name:'Spesen',exact:true}).click();await page.locator('.employee-tab-panel a[href="/spesen/expense-one"]').waitFor();assert.equal(await page.locator('.employee-tab-panel .document-summary-row').count(),1,'Employee expenses use the main module row');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-expenses.png`),fullPage:true});
-  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Keine Dokumente erfasst',{exact:true}).waitFor();
+  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Keine Dokumente erfasst',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel .empty-state').count(),1,'Documents use the central empty state');assert.equal(await page.locator('.employee-tab-panel .compact-list').count(),0,'No legacy employee document list is rendered');
   await page.getByRole('button',{name:'Dokument hinzufügen',exact:true}).waitFor();
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-documents.png`),fullPage:true});
   employeeLedgerFixture=false;
@@ -366,7 +366,7 @@ try{
    await page.evaluate(()=>{localStorage.setItem('binso.demo.session','1');localStorage.removeItem('binso.demo.database')});
    await page.goto(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
    for(const date of ['01.10.2026','01.09.2026']){
-    await page.locator('.invoices-panel button').filter({hasText:date}).click();
+    assert.equal(await page.locator('.invoices-panel .compact-list').count(),0,'Billing history uses central rows');await page.locator('.invoices-panel button.document-summary-row').filter({hasText:date}).click();
     const modal=page.getByRole('dialog',{name:'Rechnungsvorschau'});await modal.locator('canvas[data-rendered-page="1"]').waitFor();
     assert.equal(await modal.locator('.pdf-page').count(),1,'Billing uses the shared one-page PDF renderer');
     await modal.getByText('Seite 1 von 1',{exact:true}).waitFor();

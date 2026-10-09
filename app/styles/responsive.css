@@ -759,8 +759,6 @@
   .page-head-detail + :is(.desktop-detail-workspace,.document-desktop-workspace,.desktop-detail-single,.entity-edit-workspace){margin-top:0}
   .employee-tab-panel{padding:0}
   .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
-  .employee-tab-panel .compact-list>div,
-  .employee-tab-panel .compact-list>a{min-height:58px;padding-block:10px}
   .desktop-context-rail .desktop-summary-facts>span{min-height:44px}
   .desktop-context-rail .desktop-toolbox>a,
   .desktop-context-rail .desktop-toolbox>button{min-height:58px}
@@ -1627,7 +1625,6 @@
   .customer-tab-panel .compact-list>a:last-child,
   .customer-tab-panel .contact-list>div:last-child,
   .customer-tab-panel .timeline>div:last-child,
-  .employee-tab-panel .compact-list>a:last-child,
   .employee-tab-panel .detail-list>div:last-child,
   .surface>.compact-list:last-child>a:last-child,
   .surface>.activity-list:last-child>a:last-child{border-bottom:0}
@@ -2159,22 +2156,7 @@
     font-weight:750;
   }
   .mobile-notification-button{position:relative}
-  .invoices-panel .compact-list>button{
-    width:100%;
-    min-height:56px;
-    padding:10px 0;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto auto 16px;
-    gap:8px;
-    align-items:center;
-    border:0;
-    border-bottom:1px solid var(--color-line);
-    background:transparent;
-    color:inherit;
-    text-align:left;
-  }
-  .invoices-panel .compact-list>button>span{color:var(--color-muted)}
-  .invoices-panel .compact-list>button>svg{justify-self:end}
+
 
 .confirm-layer{place-items:end stretch;padding:0}
   .confirm-dialog{

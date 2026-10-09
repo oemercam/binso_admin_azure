@@ -130,7 +130,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  const demoEntries=<div className="compact-list"><div><b>Website Redesign</b><span>Acme AG · 09:27–11:41</span><strong>2:14</strong></div><div><b>Kundenmeeting</b><span>Müller GmbH · 13:00–14:30</span><strong>1:30</strong></div><div><b>Planung</b><span>Intern · 15:10–15:54</span><strong>0:44</strong></div></div>;
+  const demoEntries=<div>{[{title:"Website Redesign",meta:"Acme AG · 09:27–11:41",value:"2:14 h"},{title:"Kundenmeeting",meta:"Müller GmbH · 13:00–14:30",value:"1:30 h"},{title:"Planung",meta:"Intern · 15:10–15:54",value:"0:44 h"}].map(item=><TimeEntryRow key={item.title} {...item}/>)}</div>;
   const submitTime=async(id:string)=>{try{const data=await apiPatch<{item:{submitted_at:string}}>("/api/time-entries/"+encodeURIComponent(id),{action:"submit"});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,submitted_at:data.item.submitted_at}:item));}catch(e){setToast(e instanceof Error?e.message:"Zeit konnte nicht eingereicht werden.")}};
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const today=businessDate();

@@ -87,8 +87,8 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,title,meta,value,valueLabel,status,tone="neutral",compact=false}:{href?:string;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean}){
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false}:{href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean}){
  const content=<><b>{title}</b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small>{valueLabel}</small>}<strong>{value}</strong></span>}</>;
  const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
- return href?<Link href={href} className={className}>{content}</Link>:<div className={className}>{content}</div>;
+ return href?<Link href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }
