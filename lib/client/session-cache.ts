@@ -1,3 +1,4 @@
+import {resetClientData,dataRevision,subscribeClientData} from "./data-events";
 import type {PlanId} from "@/config/plan-access";
 
 export type ClientSession={authenticated:boolean;demo?:boolean;tenant?:{id?:string;role?:string;plan?:PlanId;readOnly?:boolean}};
@@ -5,11 +6,14 @@ let cached:ClientSession|null=null;
 let validUntil=0;
 let pending:Promise<ClientSession>|null=null;
 let revision=0;
+let observedSessionRevision="",listening=false;
+function observeSession(){if(listening||typeof window==="undefined")return;listening=true;observedSessionRevision=dataRevision([]);subscribeClientData(()=>{const next=dataRevision([]);if(next!==observedSessionRevision){observedSessionRevision=next;invalidateClientSession(false);}});}
 
 /** Only retain permissions in memory; cookies and API authorization remain authoritative. */
 export function cachedClientSession(){return typeof window!=="undefined"&&Date.now()<validUntil?cached:null;}
-export function invalidateClientSession(){++revision;cached=null;validUntil=0;pending=null;}
+export function invalidateClientSession(notify=true){++revision;cached=null;validUntil=0;pending=null;if(notify)resetClientData();}
 export function readClientSession():Promise<ClientSession>{
+  observeSession();
   const saved=cachedClientSession();
   if(saved)return Promise.resolve(saved);
   if(pending)return pending;

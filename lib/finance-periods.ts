@@ -1,3 +1,4 @@
+import {sumMoney} from "./money";
 type Row=Record<string,unknown>;
 export type FinancePeriodData={payments?:Row[];expenses?:Row[];payroll?:Row[];operatingCosts?:Row[]};
 export type PeriodBounds={start:Date;end:Date};
@@ -6,17 +7,10 @@ export function buildFinanceMonths(data:FinancePeriodData,bounds:PeriodBounds,ma
   if(!Number.isFinite(bounds.start.getTime())||!Number.isFinite(bounds.end.getTime())||bounds.end<=bounds.start)return {items:[],truncated:false};
   const last=new Date(bounds.end.getTime()-1);
   const count=(last.getFullYear()-bounds.start.getFullYear())*12+last.getMonth()-bounds.start.getMonth()+1;
-  const inMonth=(value:unknown,month:Date)=>{
-    const date=new Date(String(value??""));
-    return date>=bounds.start&&date<bounds.end&&date.getFullYear()===month.getFullYear()&&date.getMonth()===month.getMonth();
-  };
-  const sum=(rows:Row[]|undefined,month:Date,dateField:string,amountField:string)=>
-    (rows??[]).filter(row=>inMonth(dateField==="period"?String(row.period??"")+"-01":row[dateField],month)).reduce((total,row)=>total+Number(row[amountField]??0),0);
   const items=Array.from({length:Math.min(maxMonths,count)},(_,index)=>{
     const month=new Date(last.getFullYear(),last.getMonth()-index,1);
-    const income=sum(data.payments,month,"payment_date","amount");
-    const costs=sum(data.expenses,month,"expense_date","amount")+sum(data.operatingCosts,month,"cost_date","amount")+sum(data.payroll,month,"period","gross_amount");
-    return {key:String(month.getFullYear())+"-"+String(month.getMonth()+1).padStart(2,"0"),label:month.toLocaleDateString("de-CH",{month:"short",year:"2-digit"}),income,costs,result:income-costs};
+    const {income,costs,result}=financeMetrics(data,{start:new Date(Math.max(month.getTime(),bounds.start.getTime())),end:new Date(Math.min(new Date(month.getFullYear(),month.getMonth()+1,1).getTime(),bounds.end.getTime()))});
+    return {key:String(month.getFullYear())+"-"+String(month.getMonth()+1).padStart(2,"0"),label:month.toLocaleDateString("de-CH",{month:"short",year:"2-digit"}),income,costs,result};
   }).reverse();
   return {items,truncated:count>maxMonths};
 }
@@ -25,7 +19,18 @@ export function buildFinanceMonths(data:FinancePeriodData,bounds:PeriodBounds,ma
 export function financeWindow(range:string,from:string,to:string,today:string):PeriodBounds {
  const now=new Date(today+'T12:00:00');
  if(range==='custom'){const end=new Date(to+'T00:00:00');end.setDate(end.getDate()+1);return {start:new Date(from+'T00:00:00'),end}};
+ if(range==='previous')return {start:new Date(now.getFullYear()-1,0,1),end:new Date(now.getFullYear(),0,1)};
  const end=['last','three','six'].includes(range)?new Date(now.getFullYear(),now.getMonth(),1):range==='year'?new Date(now.getFullYear()+1,0,1):new Date(now.getFullYear(),now.getMonth()+1,1);
  const start=range==='year'?new Date(now.getFullYear(),0,1):new Date(end.getFullYear(),end.getMonth()-({month:1,last:1,three:3,six:6}[range]??3),1);
  return {start,end};
+}
+
+function calendarDate(value:Date){return String(value.getFullYear()).padStart(4,'0')+'-'+String(value.getMonth()+1).padStart(2,'0')+'-'+String(value.getDate()).padStart(2,'0');}
+export function inFinancePeriod(value:unknown,bounds:PeriodBounds){const day=String(value??'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(day)&&day>=calendarDate(bounds.start)&&day<calendarDate(bounds.end);}
+/** One set of cash metrics for overview, analysis and month charts. */
+export function financeMetrics(data:FinancePeriodData,bounds:PeriodBounds){
+ const sum=(rows:Row[]|undefined,dateField:string,amountField:string)=>sumMoney((rows??[]).filter(row=>inFinancePeriod(dateField==='period'?String(row.period??'')+'-01':row[dateField],bounds)).map(row=>row[amountField]));
+ const income=sum(data.payments,'payment_date','amount'),expense=sum(data.expenses,'expense_date','amount'),operating=sum(data.operatingCosts,'cost_date','amount'),staff=sum(data.payroll,'period','gross_amount');
+ const costs=sumMoney([expense,operating,staff]),result=sumMoney([income,-costs]);
+ return {income,expense,operating,staff,costs,result};
 }

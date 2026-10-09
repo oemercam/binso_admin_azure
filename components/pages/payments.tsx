@@ -3,13 +3,14 @@
 import { FinancialSummaryRow, FinanceTabs } from "../document-list";
 import { openAmount, formatCurrency, businessDate } from "@/lib/financial-status";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordsView } from "../records";
 import { payments } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
-import { apiGet, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { AccessLink, Button, EmptyState, Field, Icon, Status, Toast, Select, Input, FormActions } from "../ui";
+import {useApiQuery} from "@/lib/client/use-api-query";
+import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { AccessLink, Button, EmptyState, ErrorState, Field, Icon, Status, Toast, Select, Input, FormActions } from "../ui";
 import { CreateAction } from "../binso-ux";
 import { useDemoRows, swissDate, paymentMethodLabel } from "./shared";
 
@@ -34,9 +35,10 @@ export function PaymentForm() {
   const [idempotencyKey,setIdempotencyKey]=useState("");
   const [invoiceId,setInvoiceId]=useState("");
   const [note,setNote]=useState("");
-  const [availableInvoices,setAvailableInvoices]=useState<Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;customer?:{name?:string}}>>([]);
-  useEffect(()=>{apiGet<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(isProductionBackendEnabled()?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice").then(data=>setAvailableInvoices(data.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&Number(item.total)>Number(item.paid_amount)))).catch(()=>setToast("Rechnungen konnten nicht geladen werden."));},[]);
-  useEffect(()=>{if(!sourceInvoice)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));});},[sourceInvoice,availableInvoices]);
+  const production=useBackendMode();
+  const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(production?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice");
+  const availableInvoices=useMemo(()=>invoiceData?.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0)??[],[invoiceData]);
+  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));});},[sourceInvoice,availableInvoices,invoiceId]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):"/zahlungen";
 
@@ -70,7 +72,8 @@ export function PaymentForm() {
   };
   return <AppShell unsavedChanges={saved?false:undefined} title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"}>
     <div className="form-page narrow" inert={saving}>
-      <Field label="Rechnung"><Select value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>
+      <Field label="Rechnung"><Select disabled={invoicesLoading} value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value="">Rechnung auswählen</option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>
+      {invoiceError&&<ErrorState>{invoiceError}</ErrorState>}
       {selectedInvoice&&<p>Offener Betrag: {formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}
       <div className="form-grid two">
         <Field label="Zahlungsdatum"><Input type="date" value={date} onChange={e=>{setDate(e.target.value);setIdempotencyKey("")}}/></Field>
@@ -86,15 +89,8 @@ export function PaymentForm() {
 
 export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const production=useBackendMode();
-  const [payment,setPayment]=useState<Record<string,unknown>|null>(null);
-  const [paymentError,setPaymentError]=useState<string|null>(null);
-
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{item:Record<string,unknown>}>("/api/payments/"+encodeURIComponent(paymentId))
-      .then(payload=>queueMicrotask(()=>setPayment(payload.item)))
-      .catch(error=>setPaymentError(error instanceof Error?error.message:"Zahlung konnte nicht geladen werden."));
-  },[production,paymentId]);
+  const {data,error:paymentError}=useApiQuery<{item:Record<string,unknown>}>(production?"/api/payments/"+encodeURIComponent(paymentId):null);
+  const payment=data?.item;
 
   if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
     <div className="entity-detail-workspace">

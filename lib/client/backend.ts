@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {dataRevision,publishMutation} from "./data-events";
 import {invalidateClientSession,readClientSession} from "./session-cache";
 
 export function isProductionBackendEnabled(){
@@ -38,7 +39,7 @@ export function startDemoClientSession({name="Demo",company="Demo Firma",focus="
   if(typeof window==="undefined")return Promise.reject(new Error("Demo-Sitzung kann nur im Browser gestartet werden."));
   if(demoStart)return demoStart;
   const request=(async()=>{
-    const response=await fetch("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
+    const response=await fetchApi("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
     const payload=await parseResponse<{ok?:boolean;databaseBacked?:boolean;expiresIn?:number}>(response,"Demo-Sitzung konnte nicht gestartet werden.");
     if(payload.ok!==true)throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
     clearDemoClientSession();
@@ -69,18 +70,38 @@ export function logoutClientSession():Promise<void>{
   return request;
 }
 
+export class ClientApiError extends Error {
+  constructor(message:string,public code:string,public status:number){super(message);}
+}
+
+async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
+  try{return await fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});}
+  catch(error){
+    const timeout=error instanceof DOMException&&["TimeoutError","AbortError"].includes(error.name);
+    throw new ClientApiError(timeout?"Die Anfrage dauert zu lange. Bitte den gespeicherten Stand vor einer Wiederholung prüfen.":"Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.",timeout?"request_timeout":"network_unavailable",0);
+  }
+}
+
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
-  const payload=await response.json().catch(()=>({}));
-  if(response.status===401){invalidateClientSession();if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
+  const payload=await response.json().catch(()=>{throw new ClientApiError("Die Serverantwort konnte nicht gelesen werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);});
+  if(response.status===401){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
   if(!response.ok){
     const message=typeof payload?.message==="string"?payload.message:fallback;
-    throw new Error(message);
+    throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status);
   }
   return payload as T;
 }
 
+async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string){
+  const result=await parseResponse<T>(response,fallback);
+  if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.","session_changed",401);
+  publishMutation(path);
+  return result;
+}
+
 export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
-  const response=await fetch(path,{
+  const revision=dataRevision([]);
+  const response=await fetchApi(path,{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
@@ -88,30 +109,44 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
     },
     body:JSON.stringify(body),
   });
-  return parseResponse<T>(response,"Die Anfrage konnte nicht verarbeitet werden.");
+  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision);
 }
 
+const pendingGets=new Map<string,Promise<unknown>>();
 export async function apiGet<T>(path:string):Promise<T>{
   if(path==="/api/auth/session")return readClientSession() as Promise<T>;
-  const response=await fetch(path,{method:"GET",cache:"no-store"});
-  return parseResponse<T>(response,"Daten konnten nicht geladen werden.");
+  const sessionRevision=dataRevision([]);
+  const key=dataRevision([path])+":"+path;
+  const pending=pendingGets.get(key);if(pending)return pending as Promise<T>;
+  const request=(async()=>{
+    const response=await fetchApi(path,{method:"GET",cache:"no-store",signal:AbortSignal.timeout(15000)});
+    const result=await parseResponse<T>(response,"Daten konnten nicht geladen werden.");
+    if(sessionRevision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte erneut versuchen.","session_changed",401);
+    return result;
+  })();
+  pendingGets.set(key,request);
+  void request.finally(()=>{if(pendingGets.get(key)===request)pendingGets.delete(key);}).catch(()=>{});
+  return request;
 }
 
 export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
-  const response=await fetch(path,{
+  const revision=dataRevision([]);
+  const response=await fetchApi(path,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(body),
   });
-  return parseResponse<T>(response,"Änderung konnte nicht gespeichert werden.");
+  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision);
 }
 
 export async function apiDelete<T>(path:string):Promise<T>{
-  const response=await fetch(path,{method:"DELETE"});
-  return parseResponse<T>(response,"Löschen konnte nicht ausgeführt werden.");
+  const revision=dataRevision([]);
+  const response=await fetchApi(path,{method:"DELETE"});
+  return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision);
 }
 
 export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
-  const response=await fetch(path,{method:"POST",body:form});
-  return parseResponse<T>(response,"Datei konnte nicht hochgeladen werden.");
+  const revision=dataRevision([]);
+  const response=await fetchApi(path,{method:"POST",body:form});
+  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision);
 }

@@ -1,6 +1,8 @@
 "use client";
+import {documentTotals} from "@/lib/money";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {FormWizard} from "./form-wizard";
-import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
+import {financialStatus,financialStatusLabels,openAmount} from "@/lib/financial-status";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -54,21 +56,8 @@ type DocumentDraft = {
 type CustomerDirectory = Record<string,{id?:string;sector:string;city:string;address:string;zip:string}>;
 
 function useCustomerDirectory() {
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
-  const [directory,setDirectory]=useState<CustomerDirectory>({});
-  useEffect(()=>{
-    apiGet<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")
-      .then(payload=>{
-        const next:CustomerDirectory={};
-        for(const item of payload.items){
-          next[item.name]={id:item.id,sector:item.sector??"",city:item.city??"",address:item.street??"",zip:item.postal_code??""};
-        }
-        queueMicrotask(()=>setDirectory(next));
-      })
-      .catch(reason=>setError(reason instanceof Error?reason.message:"Kunden konnten nicht geladen werden."))
-      .finally(()=>setLoading(false));
-  },[]);
+  const {data,loading,error}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers");
+  const directory=useMemo(()=>{const next:CustomerDirectory={};for(const item of data?.items??[])next[item.name]={id:item.id,sector:item.sector??"",city:item.city??"",address:item.street??"",zip:item.postal_code??""};return next;},[data]);
   return {directory,loading,error};
 }
 
@@ -146,9 +135,8 @@ function useDocumentDraft(initial:DocumentDraft) {
 
 function useDocumentTotals(draft:DocumentDraft) {
   return useMemo(()=>{
-    const subtotal=draft.positions.reduce((sum,item)=>sum+(numberValue(item.quantity)*numberValue(item.price)),0);
-    const vat=draft.positions.reduce((sum,item)=>sum+numberValue(item.quantity)*numberValue(item.price)*numberValue(item.vatRate??draft.vatRate)/100,0);
-    return { subtotal:Number.isFinite(draft.subtotal)?draft.subtotal!:subtotal, vat:Number.isFinite(draft.vat)?draft.vat!:vat, total:Number.isFinite(draft.total)?draft.total!:subtotal+vat };
+    const {subtotal,vat,total}=documentTotals(draft.positions.map(item=>({quantity:numberValue(item.quantity),unit_price:numberValue(item.price),vat_rate:numberValue(item.vatRate??draft.vatRate)})));
+    return { subtotal:Number.isFinite(draft.subtotal)?draft.subtotal!:subtotal, vat:Number.isFinite(draft.vat)?draft.vat!:vat, total:Number.isFinite(draft.total)?draft.total!:total };
   },[draft]);
 }
 
@@ -199,16 +187,19 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
   };
 }
 
-function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setDraft:(draft:DocumentDraft)=>void){
+function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setDraft:(draft:DocumentDraft)=>void,editing=false){
+  const dataRevision=useDataRevision(editing?[]:["/api/documents"]);
   const [loading,setLoading]=useState(Boolean(documentKey));
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
     if(!documentKey) return;
     const url=isProductionBackendEnabled()?"/api/documents/"+encodeURIComponent(documentKey):"/api/demo/data?collection=documents&number="+encodeURIComponent(documentKey);
+    let active=true;
     apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)
-      .then(payload=>{const item=payload.item??payload.items?.[0];if(!item)throw new Error("Dokument wurde nicht gefunden.");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})
-      .catch(error=>{setLoading(false);setError(error instanceof Error?error.message:"Dokument konnte nicht geladen werden.");});
-  },[documentKey,kind,setDraft]);
+      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error("Dokument wurde nicht gefunden.");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})
+      .catch(error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:"Dokument konnte nicht geladen werden.");}});
+    return()=>{active=false};
+  },[documentKey,kind,setDraft,dataRevision]);
   return {loading,error};
 }
 
@@ -243,6 +234,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [toast,setToast]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const documentSavePending=useRef(false);
+  const createRequest=useRef<{body:string;key:string}|null>(null);
   const [dirty,setDirty]=useState(false);
   const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
@@ -250,7 +242,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const company=useDocumentCompany();
   const companyPending=kind==="Rechnung"&&company.loading;
   const paymentIssue=kind==="Rechnung"&&!company.loading?(company.error||invoicePaymentIssue(company.raw)):null;
-  const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft);
+  const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft,editing);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer||Object.keys(directory)[0]||""})))},[existing,directory,setDraft]);
   const selectedCustomerId=!existing?searchParams.get("customerId"):null;
   useEffect(()=>{if(!selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer)setDraft(current=>({...current,customer:customer[0],customerId:selectedCustomerId}));},[selectedCustomerId,directory,setDraft]);
@@ -309,7 +301,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
         const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:directory[draft.customer]?.id??draft.customerId};
-        const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload);
+        const requestBody=JSON.stringify(payload);
+        if(!existing&&createRequest.current?.body!==requestBody)createRequest.current={body:requestBody,key:crypto.randomUUID()};
+        const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload,{idempotencyKey:createRequest.current?.key});
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
       }
@@ -387,7 +381,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
-  const outstanding=Math.max(0,totals.total-Number(draft.paidAmount??0));
+  const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount});
   const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
@@ -470,7 +464,7 @@ function DocumentEditor({ type, draft, onChange, directory, step }: { type:Docum
       <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
         <h2>{type}details</h2>
         <div className="form-grid document-meta-grid">
-          <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><Input value={draft.number} placeholder="Wird beim Erstellen vergeben" readOnly aria-readonly="true"/></Field>
+          {draft.id&&<Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><Input value={draft.number} readOnly aria-readonly="true"/></Field>}
           <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><Input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
             {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}

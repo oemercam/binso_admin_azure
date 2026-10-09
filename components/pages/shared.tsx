@@ -2,9 +2,9 @@
 
 import { formatCurrency } from "@/lib/financial-status";
 import { formatQuantity, withPriceUnit } from "@/lib/display-format";
-import { useEffect, useState } from "react";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import { type DemoCollection } from "@/lib/demo-storage";
-import { apiGet, isProductionBackendEnabled } from "@/lib/client/backend";
+import { isProductionBackendEnabled } from "@/lib/client/backend";
 
 export function moneyChf(value:unknown){
   const amount=Number(value);
@@ -50,26 +50,8 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
 }
 
 export function useDemoRows(collection:DemoCollection, defaults:string[][]) {
-  const [rows,setRows]=useState<string[][]>([]);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<string|null>(null);
-  useEffect(()=>{
-    let active=true;
-    const sync=()=>{
-      const path=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
-      apiGet<{items:Record<string,unknown>[]}>(path)
-        .then(payload=>{if(active){setRows(mapRemoteRows(collection,payload.items));setError(null);}})
-        .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"Einträge konnten nicht geladen werden.");})
-        .finally(()=>{if(active)setLoading(false);});
-    };
-    sync();
-    const listener=(event:Event)=>{
-      const detail=(event as CustomEvent<{collection?:string}>).detail;
-      if(!detail?.collection||detail.collection===collection)sync();
-    };
-    window.addEventListener("binso-demo-data",listener);
-    window.addEventListener("storage",sync);
-    return()=>{active=false;window.removeEventListener("binso-demo-data",listener);window.removeEventListener("storage",sync);};
-  },[collection,defaults]);
-  return {rows,loading,error};
+  void defaults;
+  const path=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
+  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[]}>(path);
+  return {rows:mapRemoteRows(collection,data?.items??[]),loading,error};
 }

@@ -11,6 +11,7 @@ import { filterTimeEntries } from "@/lib/time-entry-filter";
 import { readTimer, changeTimer, withIdleTimerContext, type TimerState } from "@/lib/client/time-tracker";
 import { AppShell } from "../app-shell";
 import { customers } from "@/lib/demo-data";
+import {useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState} from "../ui";
 import { DetailTabs, ActionSheet, FormSheet, FilterSheet } from "../binso-ux";
@@ -20,6 +21,9 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const searchParams=useSearchParams();
   const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":undefined;
   const production=useBackendMode()&&!forceDemo;
+  const timeRevision=useDataRevision(["/api/time-entries"]);
+  const timerRevision=useDataRevision(["/api/time-tracker"]);
+  const timerBase=useRef({seconds:0,at:0});
   const employeeFilter=searchParams.get("employeeId");
   const projectFilter=searchParams.get("projectId");
   const [entriesError,setEntriesError]=useState<string|null>(null);
@@ -56,7 +60,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null;status?:string;hours?:number;invoiced_hours?:number;invoice_numbers?:string[]}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(async([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);setSeconds(state.seconds)}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams]);
+  useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(async([projects,customers])=>{setAvailableProjects(projects.items);setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds)}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams]);
   const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_id?:string|null;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
   const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState(searchParams.get("invoice")??"");
@@ -64,22 +68,25 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const openBilling=async()=>{setBillingOpen(true);setBillingError(null);try{const data=await apiGet<{items:typeof billingDrafts}>('/api/documents?kind=invoice');setBillingDrafts(data.items.filter(i=>i.status==='draft'));}catch(e){setBillingError(e instanceof Error?e.message:'Rechnungsentwürfe konnten nicht geladen werden.')}};
 
   useEffect(()=>{
-    const sync=()=>{readTimer().then(saved=>{const state=withIdleTimerContext(saved,timerContext.current);setRunning(state.running);setSeconds(state.seconds);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
+    let active=true,sequence=0;
+    const sync=()=>{const request=++sequence;readTimer().then(saved=>{if(!active||request!==sequence)return;const state=withIdleTimerContext(saved,timerContext.current);setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"")}).catch(()=>undefined)};
     sync();
     const syncTimer=window.setInterval(sync,30000);
     window.addEventListener("focus",sync);
     queueMicrotask(()=>setManualDate(businessDate()));
     window.addEventListener("binso-timer-change",sync);
-    return()=>{window.clearInterval(syncTimer);window.removeEventListener("focus",sync);window.removeEventListener("binso-timer-change",sync);};
-  },[]);
+    return()=>{active=false;window.clearInterval(syncTimer);window.removeEventListener("focus",sync);window.removeEventListener("binso-timer-change",sync);};
+  },[timerRevision]);
 
   useEffect(()=>{
+    let active=true;
     apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""):"/api/demo/data?collection=time_entries")
-      .then(payload=>queueMicrotask(()=>setRemoteEntries(payload.items)))
-      .catch(error=>setEntriesError(error instanceof Error?error.message:"Zeiteinträge konnten nicht geladen werden.")).finally(()=>setEntriesLoading(false));
-  },[production,forceDemo,employeeFilter]);
+      .then(payload=>{if(active){setRemoteEntries(payload.items);setEntriesError(null)}})
+      .catch(error=>{if(active)setEntriesError(error instanceof Error?error.message:"Zeiteinträge konnten nicht geladen werden.")}).finally(()=>{if(active)setEntriesLoading(false)});
+    return()=>{active=false};
+  },[production,forceDemo,employeeFilter,timeRevision]);
 
-  useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(value=>value+1),1000);return()=>window.clearInterval(id);},[running]);
+  useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(timerBase.current.seconds+Math.floor((Date.now()-timerBase.current.at)/1000)),1000);return()=>window.clearInterval(id);},[running]);
 
   const setProject=async(project:string)=>{
     try{const selected=availableProjects.find(item=>item.id===project);const customerId=selected?.customer_id??null;const state=await changeTimer("project",selected?.name??project,selected?.id??null,customerId);timerContext.current={project:state.project,projectId:state.projectId??null,customerId:state.customerId??null};setTimerProjectId(selected?.id??null);setTimerCustomer(customerId??"");setTimerProject(state.project);setProjectOpen(false)}
@@ -87,7 +94,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   };
   const toggleTimer=async()=>{
     if(timeBusy.current)return;timeBusy.current=true;setTimeSaving(true);
-    try{const selected=availableProjects.find(item=>item.id===timerProjectId);const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);setSeconds(state.seconds)}
+    try{const selected=availableProjects.find(item=>item.id===timerProjectId);const state=await changeTimer(running?"pause":"start",timerProject,selected?.id??null,timerCustomer||null);setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds)}
     catch(error){setToast(error instanceof Error?error.message:"Zeitmessung konnte nicht gespeichert werden.")}
     finally{timeBusy.current=false;setTimeSaving(false)}
   };

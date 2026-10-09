@@ -1,6 +1,7 @@
+import {moneyMinor} from "./money";
 /** Display state is derived; persisted legacy document states remain compatible. */
 export type FinancialDocument = {kind?:string;status?:string;total?:unknown;paid_amount?:unknown;due_date?:string|null;valid_until?:string|null;issue_date?:string|null;currency?:string;number?:string;customer?:{name?:string}|null};
-const cents=(amount:unknown)=>Math.round(Number(amount??0)*100);
+const cents=moneyMinor;
 export function openAmount(document:FinancialDocument){return Math.max(0,cents(document.total)-cents(document.paid_amount))/100;}
 export function businessDate(){return new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Zurich"});}
 export function paymentStatus(document:FinancialDocument){return cents(document.total)>0&&openAmount(document)===0?"paid":cents(document.paid_amount)>0?"partial":"open";}

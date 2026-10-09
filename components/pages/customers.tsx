@@ -1,4 +1,5 @@
 "use client";
+import {useDataRevision} from "@/lib/client/use-api-query";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {Avatar} from "../avatar";
 
@@ -35,6 +36,7 @@ export function CustomersPage() {
 
 export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const production=useBackendMode();
+  const dataRevision=useDataRevision(["/api/customers","/api/finance/overview"]);
   const searchParams=useSearchParams();
   const requestedReturnTo=searchParams.get("returnTo");
   const returnTo=requestedReturnTo==="/dashboard"?"/dashboard":"/kunden";
@@ -63,18 +65,21 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 
   useEffect(()=>{
     if(!production) return;
-    apiGet<{items:typeof customerActivity}>("/api/customers/"+encodeURIComponent(customerId)+"/activity").then(data=>setCustomerActivity(data.items)).catch(()=>undefined);
-    apiGet<FinancialSummary>("/api/finance/overview?customerId="+encodeURIComponent(customerId)).then(setCustomerSummary).catch(()=>undefined);
+    let active=true;
+    apiGet<{items:typeof customerActivity}>("/api/customers/"+encodeURIComponent(customerId)+"/activity").then(data=>{if(active)setCustomerActivity(data.items)}).catch(()=>undefined);
+    apiGet<FinancialSummary>("/api/finance/overview?customerId="+encodeURIComponent(customerId)).then(data=>{if(active)setCustomerSummary(data)}).catch(()=>undefined);
     Promise.all([
       apiGet<{item:Record<string,unknown>}>("/api/customers/"+encodeURIComponent(customerId)),
       apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/contacts"),
-      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/documents").catch(e=>{setCustomerDocumentsError(e.message);return {items:[]}}),
+      apiGet<{items:Array<Record<string,unknown>>}>("/api/customers/"+encodeURIComponent(customerId)+"/documents").catch(e=>{if(active)setCustomerDocumentsError(e.message);return {items:[]}}),
     ]).then(([customerPayload,contactPayload,documentPayload])=>queueMicrotask(()=>{
+      if(!active)return;setLoadError(null);
       setCustomer(customerPayload.item);
       setContacts(contactPayload.items);
       setCustomerDocuments(documentPayload.items);
-    })).catch(error=>setLoadError(error instanceof Error?error.message:"Kunde konnte nicht geladen werden."));
-  },[production,customerId]);
+    })).catch(error=>{if(active)setLoadError(error instanceof Error?error.message:"Kunde konnte nicht geladen werden.");});
+    return()=>{active=false};
+  },[production,customerId,dataRevision]);
 
   const openContact=(contact?:Record<string,unknown>)=>{
     setContactId(contact?String(contact.id):null);
