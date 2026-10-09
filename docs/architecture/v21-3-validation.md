@@ -4,6 +4,7 @@
 
 | Prüfung | Ergebnis | Umfang / Grenze |
 |---|---|---|
+| Aktuelles Schema | bestanden | alle Migrationen tatsächlich angewendet; 95 Tabellen, 1222 Spalten, 514 Constraints, 69 Policies, 335 Indizes inventarisiert; keine produktive Datenbank gelesen |
 | package test | bestanden | Architektur, Rollen, Session, alle 46 Migrationen in PGlite, 50 RLS-Testmandanten, Finanz-/Prozess-/PDF-/PWA-Verträge und neue Datenfundamenttests |
 | lint | bestanden | Vollständiges ESLint, keine Warnungen; zentrale UI-Regeln erhalten |
 | typecheck | bestanden | TypeScript noEmit; zusätzlich Build-Typecheck |
