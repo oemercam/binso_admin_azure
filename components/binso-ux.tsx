@@ -5,6 +5,19 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
 import { Button, Icon, Metric, Status } from "@/components/ui";
+import { usePageAccess } from "@/lib/client/page-access";
+
+/** Action rows have one DOM shape; navigation and destructive intent are explicit. */
+export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false}: {
+ title:string;icon:string;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;
+}) {
+ const access=usePageAccess();
+ if(href&&!access.canOpen(href))return null;
+ const blocked=disabled||(requiresWrite&&!access.write);
+ const className=`action-row${danger?" action-row-danger":""}`;
+ const body=<><Icon name={icon} size={18}/><span>{title}</span>{!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>}</>;
+ return href&&!blocked?<Link href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick}>{body}</button>;
+}
 
 /** Shared visual contract for Binso One. Existing page navigation is intentionally untouched. */
 export function PageHeading({ title, description, action, leading }: { title: string; description?: string; action?: ReactNode; leading?: ReactNode }) {
@@ -70,7 +83,7 @@ export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="fil
 /** The same compact action sheet is used for entity editors on every viewport. */
 export function ActionsMenu({label, children, busy=false}: {label:string;children:ReactNode;busy?:boolean}) {
   const [open,setOpen]=useState(false);
-  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>setOpen(false)}><div className="sheet-menu" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setOpen(false)}}>{children}</div></ActionSheet></>;
+  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>setOpen(false)}><div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setOpen(false)}}>{children}</div></ActionSheet></>;
 }
 
 /** Canonical two-line row shared by entity and financial lists. */

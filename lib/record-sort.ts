@@ -11,7 +11,7 @@ export function compareRecordValues(left:string|number,right:string|number):numb
   const a=date(left),b=date(right);
   if(a!==null&&b!==null)return a-b;
   const numeric=(value:string|number)=>{
-    const text=String(value).replace(/^[A-Z]{3}\s*/, '').replace(/['’\s%]/g,'').replace(',','.');
+    const text=String(value).replace(/^[A-Z]{3}\s*/, '').replace(/\s+\/\s+[^\d]+$/, '').replace(/['’\s%]/g,'').replace(',','.');
     return /^-?\d+(?:\.\d+)?$/.test(text)?Number(text):null;
   };
   const x=numeric(left),y=numeric(right);

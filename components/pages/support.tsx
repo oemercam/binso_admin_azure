@@ -8,7 +8,7 @@ import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView } from "../records";
 import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
-import { ActionsMenu, CreateAction, MetricTiles, MetricTile } from "../binso-ux";
+import { ActionRow, ActionsMenu, CreateAction, MetricTiles, MetricTile } from "../binso-ux";
 
 export function supportReference(id:string,caseNumber?:string|null){
   const raw=String(caseNumber??id);
@@ -87,7 +87,7 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support" actions={<Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button>}>
+  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
     <div className="form-page narrow">
       <div className="form-grid">
         <Field label="Betreff" className="full"><Input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
@@ -190,7 +190,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     setSending(false);
   };
 
-  return <AppShell title="Support-Chat" actions={<ActionsMenu label="Chataktionen"><Button href="/support" variant="ghost" icon="support">Alle Tickets</Button><Button href="/support/neu" variant="ghost" icon="plus">Neues Ticket</Button></ActionsMenu>} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
+  return <AppShell title="Support-Chat" actions={<ActionsMenu label="Chataktionen"><ActionRow href="/support" icon="support" title="Alle Tickets" navigation/><ActionRow href="/support/neu" icon="plus" title="Neues Ticket" navigation/></ActionsMenu>} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread"><div className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">

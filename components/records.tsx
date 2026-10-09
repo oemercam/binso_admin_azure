@@ -8,9 +8,9 @@ import { Icon, Status } from "./ui";
 import { ListSearch, ListRow } from "./binso-ux";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
-  if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst"].includes(status)) return "success";
+  if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst","Verrechnet","Freigegeben"].includes(status)) return "success";
   if (["Überfällig","Abgelehnt","Abgelaufen"].includes(status)) return "danger";
-  if (["Offen","Teilweise bezahlt","Eingereicht","Gesendet","Versendet","Ausstehend"].includes(status)) return "warning";
+  if (["Offen","Teilweise bezahlt","Eingereicht","Gesendet","Versendet","Ausstehend","Zuordnen","Zur Prüfung"].includes(status)) return "warning";
   if (["In Bearbeitung"].includes(status)) return "info";
   return "neutral";
 }
@@ -114,4 +114,9 @@ export function RecordRow({
   status?: string;
 }) {
   return <ListRow href={href} title={title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+}
+
+/** Employee ledgers and the time module share the same information layout. */
+export function TimeEntryRow({title,meta,value,status,selection,action}:{title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
+ return <div><RecordRow title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span>Für Rechnung auswählen</span></label>}{action}</div>}</div>;
 }

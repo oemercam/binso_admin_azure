@@ -8,7 +8,7 @@ import { invoicePaymentIssue } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
-import { ActionSheet, FormSheet } from "./binso-ux";
+import { ActionRow, ActionSheet, FormSheet } from "./binso-ux";
 import {DocumentPageViewer} from "./pdf-preview";
 import { Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea } from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -359,13 +359,13 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
     {editing&&<FormActions ><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
     {preview&&<DocumentModal previewDraft={{...draft,kind}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
-    <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="sheet-menu">
-      <button type="button" onClick={()=>{setMoreOpen(false);setPreview(true)}}><Icon name="file"/><span>Vorschau</span></button>
-      <a href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"}><Icon name="file"/><span>PDF herunterladen</span></a>
-      {canWrite&&!['draft','cancelled','declined','expired'].includes(draft.status??'')&&<button type="button" disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}><Icon name="mail"/><span>{demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'}</span></button>}
-      {canWrite&&draft.status==='draft'&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('issue')}><Icon name="check"/><span>{kind==='Rechnung'?'Rechnung stellen':'Als versendet erfassen'}</span></button>}
-      {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><button type="button" disabled={actionBusy} onClick={()=>void processAction('accept')}><Icon name="check"/><span>Kundenannahme erfassen</span></button><button type="button" disabled={actionBusy} onClick={()=>void processAction('decline')}><Icon name="close"/><span>Kundenablehnung erfassen</span></button></>}
-      {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<button type="button" disabled={actionBusy} onClick={()=>void processAction('cancel')}><Icon name="close"/><span>Rechnung stornieren</span></button>}
+    <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
+      <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
+      <ActionRow href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"} icon="file" title="PDF herunterladen"/>
+      {canWrite&&!['draft','cancelled','declined','expired'].includes(draft.status??'')&&<ActionRow disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}} icon="mail" title={demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'} navigation/>}
+      {canWrite&&draft.status==='draft'&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('issue')} icon="check" title={kind==='Rechnung'?'Rechnung stellen':'Als versendet erfassen'}/>}
+      {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><ActionRow disabled={actionBusy} onClick={()=>void processAction('accept')} icon="check" title="Kundenannahme erfassen"/><ActionRow disabled={actionBusy} onClick={()=>void processAction('decline')} icon="close" title="Kundenablehnung erfassen" danger/></>}
+      {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('cancel')} icon="close" title="Rechnung stornieren" danger/>}
       </div>{actionError&&<p role="alert">{actionError}</p>}</ActionSheet>
     <FormSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das ausgestellte Dokument wird als PDF versendet.</p>{actionError&&<p role="alert">{actionError}</p>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></FormSheet>
     {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
