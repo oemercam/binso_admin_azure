@@ -26,6 +26,9 @@ if(!process.env.BINSO_BASE_URL){
     await new Promise(resolve=>setTimeout(resolve,250));
   }
 }
+// Compile scoped development routes before opening clients: the initial webpack
+// compilation must not issue Fast Refresh into an in-progress browser scenario.
+if(server&&process.env.BINSO_UX_SERVER_MODE==='dev')for(const route of (process.env.BINSO_UX_ROUTES?.split(',')??fullRoutes)){const warm=await fetch(base+route);await warm.text();if(!warm.ok)throw new Error('Development reference failed to compile: '+route+' ('+warm.status+')');}
 const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const launchOptions={headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE&&(process.env.BINSO_UX_BROWSER??'chromium')==='chromium'?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--single-process']}: {})};
 let browser;
@@ -36,13 +39,17 @@ const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_
 const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent'};
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
-const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z'};
+const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
-const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing'];
+const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
 const hasInteraction=name=>requestedInteractions.includes(name);
-async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);if(process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));}
+let captureQueue=Promise.resolve();
+async function capture(page,options,target=page){
+ const pending=captureQueue.then(async()=>{await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await target.screenshot(process.env.BINSO_UX_BROWSER==='webkit'?{...options,animations:'allow'}:options);if(target===page&&process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));});
+ captureQueue=pending.catch(()=>{});return pending;
+}
 async function actionEvidence(page,name,theme){
  const dialog=page.getByRole('dialog',{name,exact:true});
  await dialog.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))});
@@ -56,6 +63,8 @@ async function actionEvidence(page,name,theme){
 }
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
 let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
+let failPreferences=false,preferencePosts=0;
+let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -74,18 +83,40 @@ try{
     if(p==='/api/files'){uploads++;return route.fulfill({json:{item:{id:'receipt-one'}}});}
     if(p==='/api/settings/team/invitations'||p.startsWith('/api/settings/team/members/')){teamPosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failTeam?503:200,json:failTeam?{message:'Fixture team unavailable'}:{ok:true}});}
     if(p==='/api/time-entries/policy'){policyPosts++;await new Promise(resolve=>setTimeout(resolve,150));if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});policyRequired=JSON.parse(req.postData()).required;return route.fulfill({json:{time_approval_required:policyRequired}});}
+    if(p==='/api/settings/notifications'){notificationWrites++;preferencePosts++;await new Promise(resolve=>setTimeout(resolve,100));return route.fulfill({status:(failNotificationWrite||failPreferences)?503:200,json:(failNotificationWrite||failPreferences)?{message:'Fixture notification unavailable'}:{ok:true}});}
+    if(p.startsWith('/api/auth/sessions')){sessionDeletes++;return route.fulfill({json:{ok:true,revoked:1}});}
+    if(p==='/api/operator/logout')return route.fulfill({status:503,json:{message:'Fixture logout unavailable'}});
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
+   if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
    let data;
    if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
    else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:'member',created_at:'2026-10-08'}],invitations:[],userLimit:10,plan:'pro'};
-   else if(p==='/api/notifications')data={items:[],unreadCount:0};
+   else if(p==='/api/notifications')data={items:[{id:'notification-one',kind:'document',title:'Neue Rechnung',body:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',read_at:null,created_at:'2026-10-09T09:00:00Z'},{id:'notification-two',kind:'announcement',title:'Produktinformation',body:'Testinformation',read_at:'2026-10-08T10:00:00Z',created_at:'2026-10-08T09:00:00Z'}]};
    else if(p==='/api/time-entries/policy')data={time_approval_required:policyRequired};
    else if(p==='/api/time-tracker')data={tracker:null};
-   else if(p==='/api/settings/profile')data={profile:{name:'Test Person',theme_mode:theme,email:'test@example.invalid'}};
+   else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme,language:'de',avatar_url:null},email:'test@example.invalid'};
+   else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
+
+   else if(p==='/api/auth/invitation')data={email:'eingeladen@example.invalid',organization:customer.name,existingAccount:false};
+
+
+
+
+
+   else if(p==='/api/settings/notifications')data={items:[{kind:'Rechnungen',email:true,push:false}]};
+   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>setTimeout(resolve,450));data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
+   else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
+   else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
+   else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
+   else if(p==='/api/billing/catalog')data={live:false,demo:false,automaticTax:false,items:[]};
+   else if(p==='/api/auth/mfa')data={enabled:true,required:true,role:'owner'};
+   else if(p==='/api/auth/sessions')data={items:[{id:'session-current',current:true,userAgent:'Mozilla/5.0 (iPhone) Version/17.0 Mobile Safari/605.1.15',lastSeenAt:'2026-10-09T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'},{id:'session-other',current:false,userAgent:'Mozilla/5.0 (Windows) Chrome/130.0',lastSeenAt:'2026-10-08T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'}]};
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
+   
    else if(p==='/api/finance/overview')data=summary;
+   else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
    else if(p==='/api/demo/data')data={items:(collections[url.searchParams.get('collection')]??[]).filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
@@ -107,7 +138,11 @@ try{
    if(failLedger&&url.searchParams.has('employeeId'))return route.fulfill({status:503,json:{message:'Fixture ledger unavailable'}});
    return route.fulfill({status:data?200:503,json:data??{message:'UI fixture unavailable'}});
   });
-  const page=await context.newPage();page.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(page.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)page.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));
+  const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(next.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)next.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));return next};
+  let page=await trackedPage();
+  // Hard fixture resets use a new document; real Link navigation stays on the same page.
+  // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
+  const navigate=async(...args)=>{await page.waitForLoadState('networkidle');assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);return page.goto(...args)};
   const routes=fullRoutes;
   await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
    console.log(`Checking ${theme} ${width}px`);
@@ -116,8 +151,11 @@ try{
     // Interaction scenarios below still exercise navigation in a persistent page.
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
-    console.log(`Route ${route}`);await page.goto(base+route);await page.waitForLoadState('networkidle');await page.locator('.app-session-loading').waitFor({state:'hidden'});
+    console.log(`Route ${route}`);const response=await page.goto(base+route);if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE!=='dev'){assert.equal(response.status(),404,'UX-Lab is never published');results.push({theme,width,route,passed:true,scope:'production 404 guard'});await page.close();continue;}await page.waitForLoadState('networkidle');await page.locator('.app-session-loading').waitFor({state:'hidden'});
     try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
+    assert.ok(!(await page.locator('body').innerText()).includes('UI fixture unavailable'),`${route}: a missing fixture cannot pass as content acceptance`);
+    if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
+    if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
@@ -130,6 +168,7 @@ try{
       const header=await page.locator('.mobile-header').boundingBox();assert.ok(header&&header.y>=-1&&header.y<=1,`${route}: primary header stays visible while scrolling`);
       await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
     }
+    if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
       assert.equal(await page.locator('.dashboard-summary .metric').count(),4);assert.equal(await page.locator('.dashboard-summary svg').count(),0,'KPIs have no decorative icons');assert.equal(await page.locator('.quick-grid').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width<=1100?2:4,'Quick actions retain the blueprint grid on narrow screens');
       const order=await page.evaluate(()=>['.dashboard-summary','.quick-section','.revenue-insight','.dashboard-grid'].map(selector=>document.querySelector(selector).getBoundingClientRect().top));assert.ok(order.every((top,i)=>i===0||top>order[i-1]),'Dashboard follows the blueprint hierarchy');
@@ -145,8 +184,10 @@ try{
      const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize}});
      assert.equal(g.height,width<=760?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,'10px',`${route}: canonical field radius`);
     }}
+    for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
-    if(width<=760&&await page.locator('.app-root:not(.app-preview)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    if(width<=760&&await page.locator('.app-root:not(.app-preview):not(.app-editing)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    if(await page.locator('.app-editing').count())assert.equal(await page.locator('nav.bottom-nav').count(),0,`${route}: capture processes apply the existing visibility contract`);
     if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count())assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');}
     if(!process.env.BINSO_UX_BASELINE&&width<=760){
@@ -170,18 +211,18 @@ try{
     }
   assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await page.locator('nav.bottom-nav').screenshot({animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)});await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
     await page.waitForLoadState("networkidle");
     assert.deepEqual(errors,[],"Browser runtime errors after rendering");
-    await page.close();
+    page.removeAllListeners("pageerror");await page.close();
    }
   }));
   if(process.env.BINSO_UX_MATRIX_ONLY==="1"){await context.close();context=null;await browser.close();browser=null;continue;}
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
   if(hasInteraction('customers')){
-    await page.goto(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
+    await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
     await page.getByRole('button',{name:'Kundenaktionen',exact:true}).filter({visible:true}).click();
     const actions=page.getByRole('dialog',{name:'Kundenaktionen',exact:true});await actions.waitFor();await actionEvidence(page,'Kundenaktionen',theme);
     await actions.getByRole('button',{name:/Kontakt hinzufügen/}).click();
@@ -194,20 +235,29 @@ try{
     await page.keyboard.press('Escape');await contact.waitFor({state:'hidden'});await page.setViewportSize({width:430,height:900});
   }
   if(hasInteraction('time')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/projekte/neu');await page.waitForLoadState('networkidle');try{await page.getByRole('button',{name:'Auftrag starten',exact:true}).filter({visible:true}).waitFor()}catch(error){console.log('Project diagnostics',page.url(),await page.locator('body').innerText(),errors);await capture(page,{animations:'disabled',path:path.join(output,'project-error.png')});throw error;}
+  await page.waitForLoadState("networkidle");await navigate(base+'/projekte/neu');await page.waitForLoadState('networkidle');try{await page.getByRole('button',{name:'Auftrag starten',exact:true}).filter({visible:true}).waitFor()}catch(error){console.log('Project diagnostics',page.url(),await page.locator('body').innerText(),errors);await capture(page,{animations:'disabled',path:path.join(output,'project-error.png')});throw error;}
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),0,'Project creation has no competing save action');
   assert.equal(await page.getByRole('button',{name:'Auftrag starten',exact:true}).filter({visible:true}).count(),1);
   }
   if(hasInteraction('employees')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).waitFor();
-  assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee creation has one primary action');
-  await page.locator('.mobile-sticky-save').scrollIntoViewIfNeeded();
-  const employeeSave=await page.locator('.mobile-sticky-save').boundingBox(),lastField=await page.getByText('Ferientage / Jahr',{exact:true}).boundingBox();
-  assert.ok(employeeSave.y>lastField.y,'Save follows all employee fields rather than floating between them');
+  await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
+  await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.getByLabel('Nachname',{exact:true}).fill('Person');await page.getByLabel('E-Mail',{exact:true}).fill('test@example.invalid');await page.getByLabel('Funktion',{exact:true}).fill('ICT');
+  const employeeFooter=await page.locator('.mobile-sticky-save').boundingBox();await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).waitFor();
+  assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee wizard has one final save');
+  const employeeSave=await page.locator('.mobile-sticky-save').boundingBox();assert.equal(employeeSave.y,employeeFooter.y,'Full-page wizard actions remain fixed across steps');assert.ok(employeeSave.y+employeeSave.height<=page.viewportSize().height+1,'Wizard save stays in the visible viewport');await page.getByText('Ferientage / Jahr',{exact:true}).scrollIntoViewIfNeeded();
+  await page.setViewportSize({width:430,height:400});
+  await page.waitForTimeout(100);
+  const shortFooter=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(shortFooter.y>=0&&shortFooter.y+shortFooter.height<=400,'Wizard actions stay visible in a short viewport');
+  await page.locator('.wizard-content').evaluate(el=>{el.scrollTop=el.scrollHeight});
+  const afterScroll=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(shortFooter.y-afterScroll.y)<2,'Only wizard content scrolls');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-400-employee-wizard.png`)});
+  await page.setViewportSize({width:430,height:900});
+  await page.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Test','Wizard retains input without navigation or dirty warnings');
+
   }
   if(hasInteraction('time')){
   for(const height of [568,400]){
-    await page.setViewportSize({width:375,height});await page.waitForLoadState("networkidle");await page.goto(base+'/zeit');await page.waitForLoadState('networkidle');
+    await page.setViewportSize({width:375,height});await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');
     assert.equal(await page.getByRole('button',{name:'Zeitfilter',exact:true}).count(),0,'Timer hides entry-only filters');
     await page.getByRole('button',{name:'Manuell erfassen',exact:true}).filter({visible:true}).click();
     const manual=page.getByRole('dialog',{name:'Zeit manuell erfassen'});await manual.waitFor();await manual.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>{})))});
@@ -221,7 +271,7 @@ try{
   await page.setViewportSize({width:430,height:900});
   }
   if(hasInteraction('finance')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/finanzen');await page.waitForLoadState('networkidle');
+  await page.waitForLoadState("networkidle");await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
   await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Finanzfilter',exact:true}).click();await page.getByRole('radio',{name:'Dieser Monat',exact:true}).check();await page.keyboard.press('Escape');
   await page.locator('.bo-metric-tiles').getByText('CHF 120.00',{exact:true}).waitFor();
@@ -235,7 +285,7 @@ try{
   await page.getByRole('dialog',{name:'Zeitraum auswählen'}).waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});await page.keyboard.press('Escape');
   }
   if(hasInteraction('time')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
+  await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
   const group=page.locator('details.time-group').first();await group.waitFor();
   assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
   assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
@@ -248,12 +298,33 @@ try{
   if(hasInteraction('time')){
    await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();let filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await page.keyboard.press('Escape');assert.equal(await page.locator('.time-group').count(),1,'Cancelling a filter preserves the applied range');
    await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});assert.equal(await filter.getByLabel('Von',{exact:true}).inputValue(),'','Discarded range is not applied');await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await filter.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.time-group').count(),0,'Applying updates the entries');
-   policyPosts=0;policyRequired=true;failPolicy=true;await page.goto(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');const required=page.getByRole('checkbox',{name:'Freigabe erforderlich'});await required.uncheck();await page.getByRole('button',{name:'Speichern',exact:true}).dblclick();await page.getByRole('alert').filter({hasText:'Fixture policy unavailable'}).waitFor();assert.equal(policyPosts,1,'Policy rejects same-frame duplicate writes');assert.equal(await required.isChecked(),false,'Policy error preserves the chosen value');failPolicy=false;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Zeiterfassungseinstellung gespeichert.',{exact:true}).waitFor();assert.equal(policyRequired,false);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-time-settings.png`)});
-   policyRole='member';await page.goto(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');assert.equal(await page.getByRole('checkbox',{name:'Freigabe erforderlich'}).isEnabled(),false);assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).count(),0,'Member cannot change the organization policy');policyRole='owner';
-   teamPosts=0;failTeam=false;await page.goto(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Mitarbeiter einladen',exact:true}).filter({visible:true}).click();const invitation=page.getByRole('dialog',{name:'Einladung',exact:true});await invitation.getByLabel('E-Mail',{exact:true}).fill('invalid');await invitation.getByRole('button',{name:'Einladen',exact:true}).click();assert.equal(teamPosts,0,'Invalid invitations do not write');await invitation.getByLabel('E-Mail',{exact:true}).fill('team@example.invalid');failTeam=true;await invitation.getByRole('button',{name:'Einladen',exact:true}).dblclick();await page.getByText('Fixture team unavailable',{exact:true}).waitFor();assert.equal(teamPosts,1,'Invitation locks duplicate writes');assert.equal(await invitation.getByLabel('E-Mail',{exact:true}).inputValue(),'team@example.invalid');failTeam=false;await invitation.getByRole('button',{name:'Einladen',exact:true}).click();await invitation.waitFor({state:'hidden'});assert.equal(teamPosts,2,'Invitation failure can be retried');
+   policyPosts=0;policyRequired=true;failPolicy=true;await navigate(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');const required=page.getByRole('switch',{name:'Freigabe erforderlich'});await required.click();await page.getByRole('button',{name:'Speichern',exact:true}).dblclick();await page.getByRole('alert').filter({hasText:'Fixture policy unavailable'}).waitFor();assert.equal(policyPosts,1,'Policy rejects same-frame duplicate writes');assert.equal(await required.getAttribute('aria-checked'),'false','Policy error preserves the chosen value');failPolicy=false;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Zeiterfassungseinstellung gespeichert.',{exact:true}).waitFor();assert.equal(policyRequired,false);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-time-settings.png`)});
+   policyRole='member';await navigate(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');assert.equal(await page.getByRole('switch',{name:'Freigabe erforderlich'}).isEnabled(),false);assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).count(),0,'Member cannot change the organization policy');policyRole='owner';
+   teamPosts=0;failTeam=false;await navigate(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Mitarbeiter einladen',exact:true}).filter({visible:true}).click();const invitation=page.getByRole('dialog',{name:'Einladung',exact:true});await invitation.getByLabel('E-Mail',{exact:true}).fill('invalid');await invitation.getByRole('button',{name:'Einladen',exact:true}).click();assert.equal(teamPosts,0,'Invalid invitations do not write');await invitation.getByLabel('E-Mail',{exact:true}).fill('team@example.invalid');failTeam=true;await invitation.getByRole('button',{name:'Einladen',exact:true}).dblclick();await page.getByText('Fixture team unavailable',{exact:true}).waitFor();assert.equal(teamPosts,1,'Invitation locks duplicate writes');assert.equal(await invitation.getByLabel('E-Mail',{exact:true}).inputValue(),'team@example.invalid');failTeam=false;await invitation.getByRole('button',{name:'Einladen',exact:true}).click();await invitation.waitFor({state:'hidden'});assert.equal(teamPosts,2,'Invitation failure can be retried');
   }
   if(hasInteraction('documents')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+  await navigate(base+'/rechnungen');await page.waitForLoadState('networkidle');await page.locator('a[href="/rechnungen/neu"]').filter({visible:true}).first().click();await page.waitForURL(base+'/rechnungen/neu');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.locator('.mobile-position-summary').first().click();
+  const appliedPosition=page.getByRole('dialog',{name:'Position bearbeiten',exact:true});await appliedPosition.getByLabel('Beschreibung',{exact:true}).fill('Übernommener Entwurf');await appliedPosition.getByRole('button',{name:'Übernehmen',exact:true}).click();await appliedPosition.waitFor({state:'hidden'});
+  await page.evaluate(()=>history.back());
+  const parentDiscard=page.getByRole('alertdialog');try{await parentDiscard.waitFor()}catch(error){console.log('Draft-transfer diagnostics',page.url(),await page.evaluate(()=>history.state));throw error;}
+  await parentDiscard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.locator('.mobile-position-summary').first().innerText().then(text=>text.includes('Übernommener Entwurf')),true,'Applying a child sheet preserves the parent draft and its back guard');
+  await page.evaluate(()=>history.back());await parentDiscard.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/rechnungen');
+  await navigate(base+'/rechnungen/neu');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Weiter',exact:true}).click();
+  await page.locator('.mobile-position-summary').first().click();
+  const position=page.getByRole('dialog',{name:'Position bearbeiten',exact:true});await position.getByLabel('Beschreibung',{exact:true}).fill('Ungespeicherte Position');
+  await position.getByRole('button',{name:'Abbrechen',exact:true}).click();
+  const discard=page.getByRole('alertdialog');await discard.waitFor();
+  const layers=await page.evaluate(()=>({confirm:Number(getComputedStyle(document.querySelector('.confirm-layer')).zIndex),sheet:Number(getComputedStyle(document.querySelector('.mobile-position-layer')).zIndex)}));assert.ok(layers.confirm>layers.sheet,'Discard confirmation is above the position sheet');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-position-discard.png`)});
+  await page.setViewportSize({width:320,height:568});
+  for(const button of await discard.getByRole('button').all())assert.equal(await button.evaluate(el=>el.scrollWidth<=el.clientWidth),true,'Discard actions fit a 320px viewport');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-position-discard.png`)});
+  await page.setViewportSize({width:430,height:900});
+  await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await position.getByLabel('Beschreibung',{exact:true}).inputValue(),'Ungespeicherte Position');
+  await position.getByRole('button',{name:'Abbrechen',exact:true}).click();await discard.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await position.waitFor({state:'hidden'});
+  await page.waitForLoadState("networkidle");await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
   await actionEvidence(page,'Weitere Aktionen',theme);await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
   const expectedPdfPages=Number(process.env.BINSO_UX_PDF_PAGES||2);
@@ -281,11 +352,11 @@ try{
   await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   }
   if(hasInteraction('documents')){
-   invoice.status='draft';await page.goto(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
+   invoice.status='draft';await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
   }
   if(hasInteraction('employees')){
   employeeLedgerFixture=true;
-  await page.waitForLoadState("networkidle");await page.goto(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Übersicht',exact:true}).waitFor();
+  await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Übersicht',exact:true}).waitFor();
   await page.getByRole('button',{name:'Mitarbeiteraktionen',exact:true}).filter({visible:true}).click();await actionEvidence(page,'Mitarbeiteraktionen',theme);await page.keyboard.press('Escape');
   const header=page.locator('.mobile-header');assert.equal(await header.locator('.status').count(),1,'Employee status appears beside the name once');
   await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();await page.getByText('7:30 h',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel .document-summary-row').count(),1,'Employee time uses central rows');
@@ -298,14 +369,14 @@ try{
   employeeLedgerFixture=false;
   }
   if(hasInteraction('products')){
-  await page.waitForLoadState("networkidle");await page.goto(base+'/produkte');await page.waitForLoadState('networkidle');
+  await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');
   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});
-  await page.waitForLoadState("networkidle");await page.goto(base+'/produkte');await page.waitForLoadState('networkidle');await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('not-present');
+  await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('not-present');
   await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
   await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('Beratung');
   await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();
-  await page.waitForLoadState("networkidle");await page.goto(base+'/produkte/product-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();
+  await page.waitForLoadState("networkidle");await navigate(base+'/produkte/product-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();
   const dialog=page.getByRole('dialog',{name:'Produktaktionen'});await dialog.waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-action-sheet.png`)});
   assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Opening the sheet moves focus inside');
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
@@ -316,7 +387,7 @@ try{
   }
   if(hasInteraction('expenses')){
   failMutation=true;posts=0;uploads=0;
-  await page.waitForLoadState("networkidle");await page.goto(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler / Firma',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');
+  await page.waitForLoadState("networkidle");await navigate(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler / Firma',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');
   await page.locator('#expense-receipt-upload').setInputFiles({name:'receipt.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64')});
   await page.waitForFunction(()=>[...document.querySelectorAll('button')].some(button=>button.textContent==='Einreichen'&&button.disabled));
   assert.equal(await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().isEnabled(),false,'Cannot submit while receipt recognition is running');
@@ -329,18 +400,18 @@ try{
   await page.waitForURL(base+'/spesen');await page.locator('.mobile-record-list').getByText('SBB',{exact:true}).waitFor();await page.waitForTimeout(750);await page.waitForLoadState('networkidle');assert.equal(posts,2,'Failed expense write can be retried');assert.equal(uploads,1,'Receipt is uploaded once after a successful expense save');
   }
   if(hasInteraction('employees')){
-  failLedger=true;await page.waitForLoadState("networkidle");await page.goto(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();
+  failLedger=true;await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();
   await page.getByText('Fixture ledger unavailable',{exact:true}).waitFor();assert.equal(await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).count(),0,'Failed ledger must not look empty');failLedger=false;
   await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).waitFor();
   }
   if(hasInteraction('chat')){
-  await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await page.goto(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
+  await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
   await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-375-400-chat.png`)});await page.setViewportSize({width:430,height:900});
-  failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await page.goto(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
+  failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
   }
   if(hasInteraction('customers')){
-   await page.setViewportSize({width:320,height:740});await page.goto(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
+   await page.setViewportSize({width:320,height:740});await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
    assert.equal(await page.locator('.customer-detail-workspace .surface .status').filter({hasText:/^Aktiv$/}).count(),0,'Customer status appears only in the header');
    await page.getByRole('button',{name:'Kontakte',exact:true}).click();
    const row=page.locator('.contact-list>div').first(),name=await row.locator('b').boundingBox(),menu=await row.getByRole('button',{name:'Alex Muster Aktionen'}).boundingBox();
@@ -352,7 +423,7 @@ try{
    await page.getByRole('button',{name:'Finanzen',exact:true}).click();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-customer-finance-final.png`)});assert.equal(await page.locator('.mobile-record-list .document-summary-row').count(),2,'Offers and invoices share the same financial row');
   }
   if(hasInteraction('time')){
-   groupingFixture=true;   await page.setViewportSize({width:320,height:740});await page.goto(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
+   groupingFixture=true;   await page.setViewportSize({width:320,height:740});await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
    assert.equal(await page.locator('.time-group').count(),4,'Internal time and distinct customer/project identities remain four groups');assert.equal(await page.locator('.timer-card .section-title strong').innerText(),'40:45 h','Group total counts each entry once');
    const group=page.locator('.time-group-head').first();assert.equal(await group.evaluate(el=>getComputedStyle(el).textAlign),'left','Time group does not inherit timer centering');
    const customerBox=await group.locator('b').boundingBox(),duration=await group.locator('strong').boundingBox(),chevron=await group.locator('svg').boundingBox();assert.ok(customerBox.x<duration.x&&duration.x<chevron.x,'Group duration and chevron are right aligned');assert.ok((await group.boundingBox()).height<=76,'Collapsed group is compact');
@@ -361,10 +432,89 @@ try{
    await page.setViewportSize({width:320,height:400});await sheet.getByLabel('Beschreibung',{exact:true}).focus();await sheet.getByLabel('Beschreibung',{exact:true}).scrollIntoViewIfNeeded();const footer=await sheet.locator('.filter-sheet-actions').boundingBox(),header=await sheet.locator('.sheet-header').boundingBox();assert.ok(header.y>=0&&footer.y+footer.height<=401&&footer.x+footer.width<=321,'Manual time sheet keeps header and footer visible at keyboard-sized height');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
   }
+  if(hasInteraction('header')){
+   for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
+    const header=page.locator(width<=760?'.mobile-header':'.desktop-appbar');
+    await page.evaluate(()=>window.scrollTo(0,180));const scroll=await page.evaluate(()=>scrollY);
+    const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
+    const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
+    assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
+    assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.y>=bar.y+bar.height-1&&box.x>=0&&box.x+box.width<=width+1,'Panel begins under the fixed header inside viewport');
+    assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
+    assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
+    await panel.getByLabel('Suchen',{exact:true}).fill('old');await page.waitForTimeout(220);await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
+    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();await page.waitForTimeout(500);assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-search.png`)});
+    await page.setViewportSize({width,height:400});
+    const keyboardGeometry=await panel.evaluate(el=>{const root=document.documentElement,previous=root.style.getPropertyValue('--dialog-viewport-height');root.style.setProperty('--dialog-viewport-height','740px');const box=el.getBoundingClientRect();root.style.setProperty('--dialog-viewport-height',previous);return {top:box.top,bottom:box.bottom,height:innerHeight}});
+    assert.ok(keyboardGeometry.bottom<=401,'Search remains bounded even while the VisualViewport callback is pending: '+JSON.stringify(keyboardGeometry));
+    await page.setViewportSize({width,height:740});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
+    assert.equal(await page.evaluate(()=>scrollY),scroll,'Closing panel retains document scroll position');
+    await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();
+    assert.equal(await account.locator('.person-avatar').innerText(),'TP');assert.equal(await account.getByRole('link',{name:'Abonnement',exact:true}).count(),0,'Account panel does not duplicate company billing');
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
+    await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
+    await notifications.getByRole('button',{name:'Ungelesen',exact:true}).click();assert.equal(await notifications.getByText('Produktinformation',{exact:true}).count(),0);
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-notifications.png`)});await page.keyboard.press('Escape');
+   }
+   await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();
+   await page.getByLabel('Vorname',{exact:true}).fill('Neu');await page.locator('.mobile-back').click();const confirm=page.getByRole('alertdialog');await confirm.waitFor();await confirm.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Neu');
+   await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');assert.equal(await page.getByRole('alertdialog').count(),0,'Restoring original values clears dirty state');
+   await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');await page.locator('.mobile-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();await page.getByRole('link',{name:'Mein Profil',exact:true}).click();await page.waitForURL(base+'/einstellungen/konto');await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();await page.getByLabel('Vorname',{exact:true}).fill('Browserentwurf');await page.evaluate(()=>history.back());await page.getByRole('alertdialog').waitFor();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Browserentwurf','Safari browser back retains unsaved input');await page.evaluate(()=>history.back());await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/dashboard');
+   await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Kontakte',exact:true}).click();await page.getByRole('button',{name:'Kontakt',exact:true}).click();const form=page.getByRole('dialog',{name:'Kontakt hinzufügen',exact:true});await form.getByLabel('Vorname',{exact:true}).fill('Unsaved');await page.keyboard.press('Control+k');assert.equal(await page.locator('.header-panel').count(),0,'Global shortcut cannot open a header panel over a form sheet');assert.equal(await form.isVisible(),true);await page.keyboard.press('Escape');await page.getByRole('alertdialog').waitFor();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await form.getByLabel('Vorname',{exact:true}).inputValue(),'Unsaved');await form.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await form.waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.body.style.overflow),'','Nested confirmations restore scroll lock');
+  }
+  if(hasInteraction('header')){
+   await navigate(base+'/einstellungen/benachrichtigungen');await page.waitForLoadState('networkidle');const emailSwitch=page.getByRole('switch',{name:'E-Mail Rechnungen',exact:true});assert.equal(await emailSwitch.getAttribute('aria-checked'),'true');failPreferences=true;preferencePosts=0;await emailSwitch.dblclick();await page.getByRole('alert').getByText('Einstellung konnte nicht gespeichert werden.',{exact:true}).waitFor();assert.equal(preferencePosts,1,'An in-flight channel cannot be toggled twice');assert.equal(await emailSwitch.getAttribute('aria-checked'),'true','Failed immediate persistence restores original preference');failPreferences=false;await emailSwitch.click();await page.waitForLoadState('networkidle');assert.equal(await emailSwitch.getAttribute('aria-checked'),'false');assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).count(),0,'Immediately saved preferences have no second save action');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-notification-preferences.png`)});
+   await navigate(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button').filter({hasText:'Team Person'}).click();const member=page.getByRole('dialog',{name:'Teammitglied',exact:true});await member.getByRole('combobox',{name:/^Rolle/}).selectOption('admin');teamPosts=0;await member.getByRole('button',{name:'Rolle speichern',exact:true}).click();const roleConfirm=page.getByRole('alertdialog');await roleConfirm.waitFor();assert.equal(teamPosts,0,'Rights are not changed before explicit confirmation');await roleConfirm.getByRole('button',{name:'Abbrechen',exact:true}).click();assert.equal(await member.getByRole('combobox',{name:/^Rolle/}).inputValue(),'admin');await member.getByRole('button',{name:'Rolle speichern',exact:true}).click();await page.getByRole('alertdialog').getByRole('button',{name:'Rolle ändern',exact:true}).dblclick();await member.waitFor({state:'hidden'});assert.equal(teamPosts,1,'Confirmed rights mutation is locked against duplicate submissions');await page.getByRole('button').filter({hasText:'Team Person'}).getByText('Administrator',{exact:true}).waitFor();
+  }
+  if(hasInteraction('header'))for(const route of ['/einladung?token=fixture','/passwort-zuruecksetzen?token=fixture']){
+   await navigate(base+route);await page.waitForLoadState('networkidle');const field=page.locator('input').first();await field.fill(route.startsWith('/einladung')?'Einladung Entwurf':'SyntheticPassword!123');await page.goBack();const discard=page.getByRole('alertdialog');await discard.waitFor();await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.ok((await field.inputValue()).length>0,'Auth creation drafts survive canceled browser back');await field.fill('');await page.waitForTimeout(50);assert.equal(await page.getByRole('alertdialog').count(),0,'Reverting a draft removes the warning');
+  }
+  for(const scenario of [
+   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Firmenname',back:'/kunden'},
+   {group:'products',route:'/produkte/product-one',menu:'Produktaktionen',field:'Name',back:'/produkte'},
+   {group:'employees',route:'/mitarbeiter/employee-one',menu:'Mitarbeiteraktionen',field:'Vorname',back:'/mitarbeiter'},
+  ]){
+   if(!hasInteraction(scenario.group))continue;
+   await page.setViewportSize({width:390,height:740});await navigate(base+scenario.route);await page.waitForLoadState('networkidle');
+   if(scenario.menu){await page.getByRole('button',{name:scenario.menu,exact:true}).filter({visible:true}).click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click()}
+   const field=page.getByLabel(scenario.field,{exact:true});const original=await field.inputValue();await field.fill(original+' geändert');await field.fill(original);await page.waitForTimeout(100);
+   await page.locator('.mobile-back').click();await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
+  }
+  if(hasInteraction('settings')){
+   await page.setViewportSize({width:320,height:740});await navigate(base+'/einstellungen/benachrichtigungen');await page.waitForLoadState('networkidle');
+   for(const row of await page.locator('.preference-row').all()){
+    const geometry=await row.evaluate(el=>{const description=el.firstElementChild.getBoundingClientRect(),channels=el.querySelector('.preference-channels').getBoundingClientRect(),label=el.querySelector('.preference-channels label span').getBoundingClientRect();return {description,channels,label}});
+    assert.ok(geometry.channels.y>=geometry.description.bottom,'Mobile notification channels follow the category');assert.ok(geometry.channels.width>=geometry.description.width-1,'Channels use the entire row width');assert.ok(geometry.label.height<=22,'E-Mail stays on one line');
+   }
+   notificationWrites=0;failNotificationWrite=true;const emailPreference=page.getByRole('switch',{name:'E-Mail Rechnungen',exact:true});await emailPreference.dblclick();await page.getByRole('alert').filter({hasText:'Einstellung konnte nicht gespeichert werden.'}).waitFor();assert.equal(notificationWrites,1,'Notification writes lock repeated clicks');assert.equal(await emailPreference.getAttribute('aria-checked'),'true','Failed optimistic preference returns to saved value');failNotificationWrite=false;await emailPreference.click();await page.getByRole('alert').filter({hasText:'Einstellung konnte nicht gespeichert werden.'}).waitFor({state:'hidden'});assert.equal(await emailPreference.getAttribute('aria-checked'),'false');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-notification-preferences.png`)});
+   await navigate(base+'/einstellungen/dokumente');await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();const documentGeometry=await page.evaluate(()=>({header:document.querySelector('.mobile-header').getBoundingClientRect().height,rows:[...document.querySelectorAll('.detail-list>div')].map(row=>({label:row.querySelector('dt').getBoundingClientRect().toJSON(),value:row.querySelector('dd').getBoundingClientRect().toJSON(),labelOverflow:row.querySelector('dt').scrollWidth-row.querySelector('dt').clientWidth}))}));assert.ok(documentGeometry.header<=64,'Long settings title keeps a compact header');for(const row of documentGeometry.rows){assert.ok(row.label.right<=row.value.left||row.label.bottom<=row.value.top,'Detail labels cannot collide with values');assert.ok(row.labelOverflow<=1,'Detail labels wrap within their column')}
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-document-settings.png`)});
+   await navigate(base+'/einstellungen/sicherheit');await page.getByText('Safari · iPhone',{exact:true}).waitFor();await page.getByText('Chrome · Windows',{exact:true}).waitFor();
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-security-settings.png`)});
+   sessionDeletes=0;await page.getByRole('button',{name:'Abmelden',exact:true}).click();const revoke=page.getByRole('alertdialog');await revoke.waitFor();assert.equal(sessionDeletes,0,'Opening session confirmation does not revoke');await revoke.getByRole('button',{name:'Abbrechen',exact:true}).click();assert.equal(sessionDeletes,0);await page.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.waitFor({state:'hidden'});assert.equal(sessionDeletes,1);await page.getByText('Dieses Gerät',{exact:false}).waitFor();
+   securityUnavailable=true;await navigate(base+'/einstellungen/sicherheit');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).waitFor();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).waitFor();assert.equal(await page.getByText('Keine aktive Sitzung gefunden.',{exact:true}).count(),0,'Failed session load is not an empty session list');assert.equal(await page.getByText('Sicherheitsstatus wird geladen…',{exact:true}).count(),0,'Failed security load is not perpetual loading');securityUnavailable=false;await page.getByLabel('Neues Passwort',{exact:true}).fill('Draft retained through retry');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Safari · iPhone',{exact:true}).waitFor();assert.equal(await page.getByLabel('Neues Passwort',{exact:true}).inputValue(),'Draft retained through retry','Retry preserves unsaved security inputs');
+   await navigate(base+'/einstellungen/abonnement');await page.getByText('Nutzung',{exact:true}).waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-subscription-settings.png`)});
+  }
+  if(hasInteraction('operator')){
+   await page.setViewportSize({width:320,height:740});await navigate(base+'/operator/sperrungen');await page.waitForLoadState('networkidle');const notice=await page.locator('.notice').evaluate(el=>[...el.children].map(child=>child.getBoundingClientRect().toJSON()));for(let i=1;i<notice.length;i++)assert.ok(notice[i].top>=notice[i-1].bottom+7,'Restriction details occupy separated rows');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-operator-restrictions.png`)});
+   await navigate(base+'/operator');await page.waitForLoadState('networkidle');
+   await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
+   const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();
+   const g=await page.evaluate(()=>({header:document.querySelector('.operator-app-header').getBoundingClientRect().bottom,panel:document.querySelector('.header-panel').getBoundingClientRect().top,inert:document.querySelector('.operator-page-head').inert}));
+   assert.ok(g.panel>=g.header&&g.panel-g.header<=12,'Operator account shares the anchored top panel');assert.equal(g.inert,true,'Operator background is inert');
+   await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-account.png`)});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});
+   assert.equal(await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).evaluate(el=>el===document.activeElement),true,'Operator account restores trigger focus');
+  }
   if(hasInteraction('billing')){
    await page.setViewportSize({width:390,height:740});
    await page.evaluate(()=>{localStorage.setItem('binso.demo.session','1');localStorage.removeItem('binso.demo.database')});
-   await page.goto(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
+   await navigate(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
    for(const date of ['01.10.2026','01.09.2026']){
     assert.equal(await page.locator('.invoices-panel .compact-list').count(),0,'Billing history uses central rows');await page.locator('.invoices-panel button.document-summary-row').filter({hasText:date}).click();
     const modal=page.getByRole('dialog',{name:'Rechnungsvorschau'});await modal.locator('canvas[data-rendered-page="1"]').waitFor();
@@ -376,6 +526,9 @@ try{
     await modal.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
    }
    await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
+  }
+  if(hasInteraction('lab')){
+   assert.equal(process.env.BINSO_UX_SERVER_MODE,'dev','UX-Lab checks require a development server');await navigate(base+'/dev/ux-lab');await page.waitForLoadState('networkidle');await page.setViewportSize({width:390,height:740});await page.getByRole('button',{name:'wizard',exact:true}).click();const wizard=page.getByRole('dialog',{name:'WizardSheet',exact:true});await wizard.getByLabel('Name',{exact:true}).fill('Lab-Entwurf');await wizard.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))});const first=await wizard.boundingBox(),footer=await wizard.locator('.mobile-sticky-save').boundingBox();await wizard.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal((await wizard.boundingBox()).height,first.height,'WizardSheet height stays stable across steps');assert.equal((await wizard.locator('.mobile-sticky-save').boundingBox()).y,footer.y,'Wizard actions never jump');await wizard.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await wizard.getByLabel('Name',{exact:true}).inputValue(),'Lab-Entwurf');await page.setViewportSize({width:390,height:400});const short=await wizard.locator('.mobile-sticky-save').boundingBox();assert.ok(short.y+short.height<=401,'Wizard actions remain visible at keyboard-sized height');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-400-lab-wizard.png`)});await page.keyboard.press('Escape');await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();await wizard.getByRole('button',{name:'Weiter',exact:true}).click();await wizard.getByRole('button',{name:'Speichern',exact:true}).click();await wizard.waitFor({state:'hidden'});await page.setViewportSize({width:390,height:740});await page.locator('input[type=file]').setInputFiles({name:'lab.pdf',mimeType:'application/pdf',buffer:fixturePdf});await page.locator('canvas[data-rendered-page="1"]').waitFor();await page.getByRole('button',{name:'Nächste Seite',exact:true}).click();await page.locator('canvas[data-rendered-page="2"]').waitFor();assert.equal(await page.locator('.pdf-page').count(),1);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-lab-reference.png`)});
   }
   assert.deepEqual(errors,[],'Browser runtime errors');
   await context.close();context=null;await browser.close();browser=null;

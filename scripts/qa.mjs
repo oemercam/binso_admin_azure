@@ -18,7 +18,7 @@ try{
   const existing=await Promise.all(candidates.map(async path=>{try{await fs.access(path);return path;}catch{return null;}}));
   const lintFiles=existing.filter(Boolean);
   if(lintFiles.length)await run('changed-file lint','pnpm',['exec','eslint','--cache','--cache-location','node_modules/.cache/eslint-fast','--max-warnings=0',...lintFiles]);
-  if(files.some(p=>/\.(ts|tsx)$|tsconfig|package\.json/.test(p)))await run('incremental typecheck','pnpm',['typecheck']);
+  if(args.includes('--typecheck'))await run('incremental typecheck','pnpm',['typecheck']);
   for(const suite of plan.suites)await run(suite,process.execPath,['scripts/'+suite+'.mjs']);
  }else if(level==='integration'){
   await run('typecheck','pnpm',['typecheck']);

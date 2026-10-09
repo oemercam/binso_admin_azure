@@ -1,4 +1,5 @@
 "use client";
+import {FormWizard} from "./form-wizard";
 import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -217,6 +218,8 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   return {loading,error};
 }
 
+function editableDocumentSnapshot(draft:DocumentDraft){const value={...draft};delete value.subtotal;delete value.vat;delete value.total;return JSON.stringify(value);}
+
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   return <DocumentPage kind="Angebot" existing={existing} documentKey={documentKey}/>;
 }
@@ -233,6 +236,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const production=useBackendMode();
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
+  const [wizardStep,setWizardStep]=useState(0);
   const documentActionPending=useRef(false);
   const [moreOpen,setMoreOpen]=useState(false);
   const [documentRole,setDocumentRole]=useState("");
@@ -246,6 +250,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [saving,setSaving]=useState(false);
   const documentSavePending=useRef(false);
   const [dirty,setDirty]=useState(false);
+  const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const {directory,loading:customersLoading,error:customersError}=useCustomerDirectory();
   const company=useDocumentCompany();
@@ -288,9 +293,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       if(times.length&&(existing?draft.currency:expenses[0]?.currency??draft.currency)!=='CHF')throw new Error('Stundensätze werden in CHF geführt. Für diese Zeiten ist eine CHF-Rechnung erforderlich.');
       const groups=Object.values(times.reduce<Record<string,typeof times>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
       const positions:LineItem[]=[...groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)})),...expenses.map(i=>({id:'expense-'+i.id,description:i.description,quantity:String(i.quantity),price:String(i.unit_price),unit:'Stück',vatRate:String(i.vat_rate),expenseIds:[i.id]}))];
+      draftBaseline.current??=editableDocumentSnapshot(draft);
       setDraft(current=>({...current,customer:sources[0].customer_name,customerId:customer,currency:expenses[0]?.currency??current.currency,positions:existing?[...current.positions,...positions]:positions,subtotal:undefined,vat:undefined,total:undefined}));setDirty(true);setEditing(true);
     };void load().catch(e=>setActionError(e instanceof Error?e.message:'Positionen konnten nicht geladen werden.'));
-  },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft.id,draft.customerId,draft.status,draft.currency,documentKey,setDraft]);
+  },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft,documentKey,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
@@ -313,7 +319,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
       }
-      setDirty(false);
+      draftBaseline.current=null;setDirty(false);
       show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
       if(existing){documentSavePending.current=false;setEditing(false);}
       else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
@@ -355,9 +361,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
             </section>
           </aside>}
         </div>
-      : <DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory}/>}
+      : !existing?<FormWizard labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>}
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
-    {editing&&<FormActions ><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
+    {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
     {preview&&<DocumentModal previewDraft={{...draft,kind}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
       <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
@@ -428,7 +434,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   </div>;
 }
 
-function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory }) {
+function DocumentEditor({ type, draft, onChange, directory, step }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory;step?:number }) {
   const production=useBackendMode();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
@@ -458,7 +464,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
 
   return <div className="invoice-workspace">
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
-      <div className="form-section customer-form-section">
+      <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
         <span className="compact-section-label">Kunde</span>
         <Field label="Kunde auswählen">
           <Select value={draft.customer} onChange={e=>onChange({...draft,customer:e.target.value,customerId:undefined})}>
@@ -467,7 +473,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         </Field>
         {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
       </div>
-      <div className="form-section">
+      <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
         <h2>{type}details</h2>
         <div className="form-grid document-meta-grid">
           <Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><Input value={draft.number} placeholder="Wird beim Erstellen vergeben" readOnly aria-readonly="true"/></Field>
@@ -478,7 +484,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
           <Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></Select></Field>
         </div>
       </div>
-      <div className="form-section">
+      <div hidden={step!==undefined&&step!==1} className="form-section">
         <div className="section-title"><h2>Positionen</h2><button className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></button></div>
         <div className="line-items document-line-items">
           <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Einheit</span><span>Einzelpreis</span><span>Total</span><span/></div>
@@ -501,7 +507,7 @@ function DocumentEditor({ type, draft, onChange, directory }: { type:DocumentKin
         <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
       </div>
       {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></FormSheet>})()}
-      <div className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
+      <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
   </div>;
 }

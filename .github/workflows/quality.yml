@@ -117,6 +117,12 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/binso-candidate"
           unzip -q deploy/binso-one.zip -d "$RUNNER_TEMP/binso-candidate"
+      - name: Restore pinned browser binaries
+        id: browser-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
       - name: Install one browser engine
         env:
           ENGINE: ${{ matrix.engine }}
@@ -127,6 +133,12 @@ jobs:
           else
             node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps webkit
           fi
+      - name: Save installed browser binaries
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
       - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
@@ -138,10 +150,17 @@ jobs:
           BINSO_UX_WIDTHS: ${{ matrix.engine == 'webkit' && needs.plan.outputs.webkit_widths || needs.plan.outputs.widths }}
           BINSO_UX_INTERACTIONS: ${{ needs.plan.outputs.interactions }}
           BINSO_UX_SCREENSHOTS: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_DOM_EVIDENCE: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
+      - name: Development-only shared component reference regression
+        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_LAB_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/lab
+        run: pnpm ux:lab
       - name: FULL PWA restart and offline regression
         if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:

@@ -1,4 +1,5 @@
 "use client";
+import {useDirtySnapshot} from "../use-dirty-snapshot";
 
 import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 
@@ -38,7 +39,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [recordError,setRecordError]=useState<string|null>(null);
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
-  const [editedRecord,setEditedRecord]=useState(false);
+  const {dirty,markPristine}=useDirtySnapshot([name,type,sku,unit,price,vatRate,description,status]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
 
@@ -55,10 +56,10 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
         setPrice(String(item.unit_price??"0.00"));
         setVatRate(String(item.vat_rate??"8.1"));
         setDescription(String(item.description??""));
-        setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
+        setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");markPristine([String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",String(item.sku??""),String(item.unit??"hour"),String(item.unit_price??"0.00"),String(item.vat_rate??"8.1"),String(item.description??""),item.status==="inactive"?"Inaktiv":"Aktiv"]);
       });
     }).catch(error=>setRecordError(error instanceof Error?error.message:"Produkt konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));
-  },[production,existing,productId]);
+  },[production,existing,productId,markPristine]);
 
   const save=async()=>{
     if(saveRecordPending.current||loadingRecord||recordError)return;
@@ -85,8 +86,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<p role="status">Produkt wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell unsavedChanges={editedRecord&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
-    <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
+  return <AppShell unsavedChanges={dirty&&!savedRecord} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
+    <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         {!editingRecord?<dl className="detail-list">

@@ -87,7 +87,7 @@ assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing histo
 console.log('Subscription settings use flat separators instead of legacy cards.');
 
 assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
-assert.ok(responsiveCss.includes('.desktop-search-field kbd{display:none}'),'Medium desktop header must compact the inline search instead of removing account controls');
+assert.ok(appCss.includes('.header-panel{'),'Shared header panels must define one anchored layout contract');
 console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
 
 const uiSource=await readPageFile('components/ui.tsx','utf8');
@@ -106,15 +106,10 @@ assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
 
 const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
-assert.ok(appShellSource.includes('className={"desktop-search "+(desktopSearchOpen?"is-open":"")}'),'Desktop search must be an inline header search');
-assert.ok(appShellSource.includes('ref={desktopSearchInputRef}'),'Desktop search keyboard shortcut must focus the inline field');
-assert.ok(!appShellSource.includes('className="desktop-search-trigger"'),'Desktop search must not regress to a popup trigger button');
-assert.ok(appCss.includes('.desktop-search-results{'),'Desktop search results must render as an anchored dropdown');
-assert.ok(!responsiveCss.includes('.desktop-search-trigger'),'Responsive CSS must not retain obsolete popup-search trigger rules');
-const mediaConditions=[...responsiveCss.matchAll(/@media\s*([^\{]+)\{/g)].map(match=>match[1].replace(/\s+/g,' ').replace(/\(\s*/g,'(').replace(/\s*\)/g,')').replace(/\s*:\s*/g,':').trim());
-assert.equal(mediaConditions.length,new Set(mediaConditions).size,'Each responsive media condition must be consolidated into one block');
-assert.ok(mediaConditions.length<=14,'Responsive architecture must stay within the canonical media-query budget');
-console.log('Desktop global search stays inline with anchored results and no modal trigger.');
+assert.ok(appShellSource.includes('<HeaderPanel key={sheet} kind={sheet}'),'Search, account and notifications must share HeaderPanel');
+assert.ok(!appShellSource.includes('desktopSearchOpen'),'No parallel desktop search state machine');
+assert.ok(!appCss.includes('.desktop-search-results{'),'Remove confirmed obsolete desktop dropdown CSS');
+console.log('Global header interactions share one anchored modal contract on every viewport.');
 
 assert.ok(appCss.includes('.desktop-appbar-actions svg{'),'Desktop header icons must use explicit integer geometry');
 assert.ok(appCss.includes('width:20px;'),'Desktop header icons must use a fixed integer size');
@@ -340,10 +335,10 @@ console.log('Project-linked idle timer context survives synchronization without 
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children);
-  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},12]]){
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}});
+  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
-   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
+   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
    const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
@@ -395,7 +390,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  };
  const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1'}}),reject:()=>reject(new Error('offline'))}};
  const noop=()=>{};
- const docScope=()=>({documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
+ const docScope=()=>({draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
  const expenseScope=()=>({expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
  for(const [file,fn,scopeFactory] of [['components/documents.tsx','DocumentPage',docScope],['components/app-pages.tsx','ExpenseForm',expenseScope]]){
   const pending=makeWrite();const scope=scopeFactory();scope.apiPost=pending.write;scope.apiPatch=pending.write;
@@ -428,4 +423,21 @@ console.log('Project-linked idle timer context survives synchronization without 
  access={write:false,canOpen:()=>true};assert.ok(row({requiresWrite:true}).includes('disabled'));assert.ok(!row({href:'mailto:test@example.invalid'}).includes('disabled'));
  access={write:true,canOpen:()=>false};assert.equal(row({href:'/mitarbeiter'}),'','Forbidden route stays hidden');
  console.log('Central action row preserves write/route permissions and explicit navigation/destructive intent.');
+}
+
+// Execute actual identity derivation and check the shipped palette, not a copied mock.
+{
+ const raw=await fs.readFile('components/avatar.tsx','utf8');
+ const ast=ts.createSourceFile('avatar.tsx',raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const node=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='avatarIdentity');
+ const {avatarIdentity}=await import(moduleUrl(ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+ assert.equal(avatarIdentity('  Nina  Müller ','person-1').initials,'NM');
+ assert.equal(avatarIdentity('Ömer Cam','person-2').initials,'ÖC');
+ assert.equal(avatarIdentity('', 'unknown').tone,5);
+ assert.equal(avatarIdentity('Nina Müller','person-1').tone,avatarIdentity('Nina Meier','person-1').tone,'Identity, not render order or changed name, owns the color');
+ for(let i=0;i<100;i++)assert.deepEqual(avatarIdentity('Nina Müller','person-1'),avatarIdentity('Nina Müller','person-1'));
+ const css=await fs.readFile('app/styles/app.css','utf8');
+ const palette=[...css.matchAll(/\.person-avatar-tone-\d\{background:#([0-9a-f]+)\}/g)];assert.equal(palette.length,6);
+ for(const [,hex] of palette){const h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
+ console.log('Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.');
 }

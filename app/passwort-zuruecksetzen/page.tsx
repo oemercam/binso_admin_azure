@@ -3,6 +3,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Button, Logo } from "@/components/ui";
 
+import ConfirmDialog from "@/components/confirm-dialog";
+import {useBrowserBackGuard} from "@/components/use-browser-back-guard";
+
 export default function Page(){
   const [ready,setReady]=useState(false);
   const [invalid,setInvalid]=useState(false);
@@ -12,6 +15,9 @@ export default function Page(){
   const [loading,setLoading]=useState(false);
   const [done,setDone]=useState(false);
   const [error,setError]=useState("");
+
+  const [discard,setDiscard]=useState(false);
+  const leaveBack=useBrowserBackGuard(!done&&!!(password||confirm),()=>setDiscard(true));
 
   useEffect(()=>{
     const token=new URLSearchParams(window.location.search).get("token");
@@ -34,7 +40,7 @@ export default function Page(){
     }finally{setLoading(false);}
   };
 
-  return <main className="auth-page"><section className="auth-card">
+  return <><main className="auth-page"><section className="auth-card">
     <Logo/>
     {!ready?<><h1>Link wird geprüft</h1><p>Einen Moment bitte.</p></>:invalid?<><h1>Link nicht gültig</h1><p>Der Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.</p><Button href="/passwort-vergessen">Neuen Link anfordern</Button></>:done?<><h1>Passwort geändert</h1><p>Du kannst dich jetzt mit deinem neuen Passwort anmelden.</p><Button href="/login">Zur Anmeldung</Button></>:<>
       <h1>Neues Passwort</h1><p>Lege ein neues Passwort für dein Binso One Konto fest.</p>
@@ -45,5 +51,5 @@ export default function Page(){
         <Button type="submit">{loading?"Wird gespeichert…":"Passwort speichern"}</Button>
       </form>
     </>}
-  </section></main>;
+  </section></main><ConfirmDialog open={discard} busy={loading} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setDiscard(false)} onConfirm={()=>{setDiscard(false);leaveBack()}}/></>;
 }

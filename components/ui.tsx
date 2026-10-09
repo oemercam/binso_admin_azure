@@ -149,8 +149,8 @@ export function Divider() {
   return <div className="divider" aria-hidden="true" />;
 }
 
-export function Toggle({ checked = false, label, onChange }: { checked?: boolean; label: string; onChange?: () => void }) {
-  return <button className={`toggle ${checked ? "is-on" : ""}`} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></button>;
+export function Toggle({ checked = false, label, onChange,disabled=false }: { checked?: boolean; label: string; onChange?: () => void;disabled?:boolean }) {
+  return <button className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></button>;
 }
 
 export function Toast({ title, text, tone = "success" }: { title: string; text?: string; tone?: "success" | "danger" | "info" }) {

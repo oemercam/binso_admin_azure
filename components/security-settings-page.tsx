@@ -1,7 +1,8 @@
 "use client";
 
-import {useEffect,useState} from "react";
+import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
+import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
 import { Button, Field, SectionTitle, Status, Toast, Input } from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
@@ -26,6 +27,8 @@ export function SecuritySettingsPage(){
   const search=useSearchParams();
   const next=search.get("next");
   const [mfa,setMfa]=useState<MfaState|null>(null);
+  const [mfaError,setMfaError]=useState("");
+  const [sessionsError,setSessionsError]=useState("");
   const [setup,setSetup]=useState<{secret:string;otpAuthUri:string}|null>(null);
   const [code,setCode]=useState("");
   const [recovery,setRecovery]=useState<string[]>([]);
@@ -33,61 +36,80 @@ export function SecuritySettingsPage(){
   const [newPassword,setNewPassword]=useState("");
   const [confirmPassword,setConfirmPassword]=useState("");
   const [toast,setToast]=useState<string|null>(null);
+  const [toastTone,setToastTone]=useState<"success"|"danger">("danger");
   const [sessions,setSessions]=useState<SessionItem[]>([]);
   const [sessionsLoading,setSessionsLoading]=useState(true);
+  const [revokeTarget,setRevokeTarget]=useState<string|null>(null);
+  const [busy,setBusy]=useState(false);const mutation=useRef(false);
 
-  useEffect(()=>{
-    apiGet<MfaState>("/api/auth/mfa").then(setMfa).catch(error=>setToast(error instanceof Error?error.message:"Sicherheitsstatus konnte nicht geladen werden."));
-    apiGet<{items:SessionItem[]}>("/api/auth/sessions")
+  const loadMfa=useCallback(()=>{
+    return apiGet<MfaState>("/api/auth/mfa").then(setMfa).catch(error=>setMfaError(error instanceof Error?error.message:"Sicherheitsstatus konnte nicht geladen werden."));
+  },[]);
+  const loadSessions=useCallback(()=>{
+    return apiGet<{items:SessionItem[]}>("/api/auth/sessions")
       .then(payload=>setSessions(payload.items))
-      .catch(error=>setToast(error instanceof Error?error.message:"Sitzungen konnten nicht geladen werden."))
+      .catch(error=>setSessionsError(error instanceof Error?error.message:"Sitzungen konnten nicht geladen werden."))
       .finally(()=>setSessionsLoading(false));
   },[]);
+  useEffect(()=>{void loadMfa();void loadSessions()},[loadMfa,loadSessions]);
 
-  const startSetup=async()=>{
+  const startSetup=async()=>{setToastTone("danger");
     try{
       const payload=await apiPost<{secret:string;otpAuthUri:string}>("/api/auth/mfa/setup",{});
       setSetup(payload);setCode("");setRecovery([]);
     }catch(error){setToast(error instanceof Error?error.message:"Authenticator-Einrichtung konnte nicht gestartet werden.");}
   };
 
-  const confirmSetup=async()=>{
+  const confirmSetup=async()=>{setToastTone("danger");
     try{
       const payload=await apiPost<{ok:boolean;recoveryCodes:string[]}>("/api/auth/mfa/confirm",{code});
       setRecovery(payload.recoveryCodes);setSetup(null);setMfa(current=>current?{...current,enabled:true}:current);setCode("");
-      setToast("Authenticator-App erfolgreich aktiviert.");
+      setToastTone("success");setToast("Authenticator-App erfolgreich aktiviert.");
     }catch(error){setToast(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
   };
 
-  const changePassword=async()=>{
+  const changePassword=async()=>{setToastTone("danger");
+    if(mutation.current)return;
     if(newPassword.length<12){setToast("Das Passwort muss mindestens 12 Zeichen haben.");return;}
     if(newPassword!==confirmPassword){setToast("Die Passwörter stimmen nicht überein.");return;}
+    mutation.current=true;setBusy(true);
     try{
       await apiPatch("/api/auth/password",{password:newPassword,currentPassword});
-      setCurrentPassword("");setNewPassword("");setConfirmPassword("");setToast("Passwort geändert.");
-    }catch(error){setToast(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");}
+      setCurrentPassword("");setNewPassword("");setConfirmPassword("");setToastTone("success");setToast("Passwort geändert.");
+    }catch(error){setToast(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");}finally{mutation.current=false;setBusy(false)}
   };
 
-  const revokeSession=async(id:string)=>{
+  const revokeSession=async(id:string)=>{setToastTone("danger");
+    if(mutation.current)return;mutation.current=true;setBusy(true);
     try{
       await apiDelete<{ok:boolean}>("/api/auth/sessions/"+encodeURIComponent(id));
       setSessions(current=>current.filter(item=>item.id!==id));
-      setToast("Sitzung abgemeldet.");
-    }catch(error){setToast(error instanceof Error?error.message:"Sitzung konnte nicht abgemeldet werden.");}
+      setToastTone("success");setToast("Sitzung abgemeldet.");
+    }catch(error){setToast(error instanceof Error?error.message:"Sitzung konnte nicht abgemeldet werden.");}finally{mutation.current=false;setBusy(false);setRevokeTarget(null)}
   };
 
-  const revokeOtherSessions=async()=>{
+  const revokeOtherSessions=async()=>{setToastTone("danger");
+    if(mutation.current)return;mutation.current=true;setBusy(true);
     try{
       const result=await apiDelete<{ok:boolean;revoked:number}>("/api/auth/sessions");
       setSessions(current=>current.filter(item=>item.current));
-      setToast(result.revoked===1?"Eine weitere Sitzung wurde abgemeldet.":result.revoked>1?String(result.revoked)+" weitere Sitzungen wurden abgemeldet.":"Keine weiteren aktiven Sitzungen.");
-    }catch(error){setToast(error instanceof Error?error.message:"Andere Sitzungen konnten nicht abgemeldet werden.");}
+      setToastTone("success");setToast(result.revoked===1?"Eine weitere Sitzung wurde abgemeldet.":result.revoked>1?String(result.revoked)+" weitere Sitzungen wurden abgemeldet.":"Keine weiteren aktiven Sitzungen.");
+    }catch(error){setToast(error instanceof Error?error.message:"Andere Sitzungen konnten nicht abgemeldet werden.");}finally{mutation.current=false;setBusy(false);setRevokeTarget(null)}
   };
 
-  return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+  return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={!!(currentPassword||newPassword||confirmPassword||code||setup||recovery.length)}>
+    <section className="surface security-card">
+      <SectionTitle title="Passwort ändern"/>
+      <div className="form-grid">
+        <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
+        <Field label="Neues Passwort"><Input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
+        <Field label="Neues Passwort bestätigen"><Input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
+      </div>
+      <Button variant="secondary" disabled={busy} onClick={()=>void changePassword()}>Passwort speichern</Button>
+    </section>
     <section className="surface security-card">
       <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
-      {!mfa?<p>Sicherheitsstatus wird geladen…</p>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
+      {!mfa?mfaError?<div role="alert"><p>{mfaError}</p><Button variant="secondary" onClick={()=>{setMfaError("");void loadMfa()}}>Erneut versuchen</Button></div>:<p role="status">Sicherheitsstatus wird geladen…</p>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
         <div className="context-block"><Status tone={mfa.required?"warning":"info"}>{mfa.required?"Erforderlich":"Empfohlen"}</Status><b>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</b><span>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</span></div>
         {!setup&&<Button onClick={()=>void startSetup()}>Authenticator einrichten</Button>}
       </>}
@@ -104,32 +126,24 @@ export function SecuritySettingsPage(){
 
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
-      <p>{mfa?.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung."}</p>
+      <p>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":mfaError?"Anmeldeschutzstatus nicht verfügbar.":"Anmeldeschutz wird geladen…"}</p>
     </section>
 
     <section className="surface security-card">
-      <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" onClick={()=>void revokeOtherSessions()}>Alle anderen abmelden</Button>:undefined}/>
-      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
+      <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}>Alle anderen abmelden</Button>:undefined}/>
+      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessionsError?<div role="alert"><p>{sessionsError}</p><Button variant="secondary" onClick={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}}>Erneut versuchen</Button></div>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>
             <small>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt)} · Ablauf: {sessionDate(item.expiresAt)}</small>
           </div>
-          {item.current?<Status tone="success">Aktuell</Status>:<Button variant="secondary" onClick={()=>void revokeSession(item.id)}>Abmelden</Button>}
+          {item.current?<Status tone="success">Aktuell</Status>:<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget(item.id)}>Abmelden</Button>}
         </div>)}
       </div>}
       <p className="settings-note">Es werden nur serverseitig tatsächlich aktive Sitzungen angezeigt. Geräteorte werden nicht geschätzt oder erfunden.</p>
     </section>
 
-    <section className="surface security-card">
-      <SectionTitle title="Passwort ändern"/>
-      <div className="form-grid">
-        <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
-        <Field label="Neues Passwort"><Input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
-        <Field label="Neues Passwort bestätigen"><Input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
-      </div>
-      <Button variant="secondary" onClick={()=>void changePassword()}>Passwort speichern</Button>
-    </section>
-    {toast&&<Toast title={toast} tone={toast.includes("nicht")||toast.includes("ungültig")||toast.includes("abgelaufen")?"danger":"success"}/>}
+    <ConfirmDialog open={revokeTarget!==null} busy={busy} title={revokeTarget==="all"?"Andere Sitzungen abmelden?":"Sitzung abmelden?"} message="Die ausgewählten Geräte müssen sich danach erneut anmelden. Dieses Gerät bleibt angemeldet." confirmLabel="Abmelden" onCancel={()=>setRevokeTarget(null)} onConfirm={()=>void (revokeTarget==="all"?revokeOtherSessions():revokeTarget?revokeSession(revokeTarget):Promise.resolve())}/>
+    {toast&&<Toast title={toast} tone={toastTone}/>}
   </AppShell>;
 }

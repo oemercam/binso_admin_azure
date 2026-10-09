@@ -1,4 +1,6 @@
 "use client";
+import {Avatar} from "../avatar";
+import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
 import {ActionSheet,FormSheet,ListRow} from "../binso-ux";
 
@@ -14,27 +16,23 @@ import { Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, I
 import { moneyChf } from "./shared";
 
 export function SettingsPage() {
-  const rows = [
-    ["/einstellungen/konto","user","Persönliche Daten","Name, E-Mail, Telefon und Funktion"],
-    ["/einstellungen/firma","users","Firma","Unternehmensdaten, Adresse und Firmenlogo"],
-    ["/einstellungen/dokumente","receipt","Rechnungen & Dokumente","MwSt., Zahlungsfrist, IBAN und Standardtexte"],
-    ["/einstellungen/zeiterfassung","clock","Zeiterfassung","Freigabe neuer Zeiteinträge"],
-    ["/einstellungen/team","users","Benutzer & Rollen","Zugänge, Rollen und Einladungen"],
-    ["/einstellungen/abonnement","card","Abonnement","Plan, Nutzung und Zahlungsabwicklung"],
-    ["/einstellungen/benachrichtigungen","bell","Benachrichtigungen","E-Mail- und Push-Einstellungen"],
-    ["/einstellungen/sprache","settings","Sprache","Oberflächen- und Kommunikationssprache"],
-    ["/einstellungen/sicherheit","lock","Sicherheit","Passwort, MFA, Sitzungen und Geräte"],
-    ["/einstellungen/darstellung","moon","Darstellung","Hell, Dunkel oder Systemeinstellung"],
-    ["/einstellungen/datenschutz","lock","Datenschutz & Cookies","Notwendige Funktionen und Performance-Messung"],
-  ];
-  return <AppShell title="Einstellungen" subtitle="Firma, Konto, Sicherheit und Abonnement." active="einstellungen">
-    <div className="settings-list">
-      {rows.map(([href,icon,title,text])=><Link href={href} key={title}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b><small>{text}</small></div><Icon name="arrow" size={17}/></Link>)}
-    </div>
+  return <AppShell title="Einstellungen" active="einstellungen" backHref="/dashboard">
+    <SettingsNavigation/>
   </AppShell>;
 }
 
+function SettingsNavigation(){
+ const access=usePageAccess();
+ const groups=[
+  {title:"Unternehmen",rows:[["/einstellungen/firma","users","Firma"],["/einstellungen/team","users","Benutzer & Rollen"],["/einstellungen/abonnement","card","Abonnement"]]},
+  {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
+  {title:"Weitere Einstellungen",rows:[["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
+ ];
+ return <>{groups.map(group=><section className="settings-section" key={group.title}><SectionTitle title={group.title}/><div className="settings-list">{group.rows.filter(([href])=>access.canOpen(href)).map(([href,icon,title])=><Link prefetch={false} href={href} key={href}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b></div><Icon name="arrow" size={17}/></Link>)}</div></section>)}</>;
+}
+
 export function AccountSettingsPage() {
+  const [profileName,setProfileName]=useState("");
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
   const [email,setEmail]=useState("");
@@ -46,8 +44,11 @@ export function AccountSettingsPage() {
   const [loadError,setLoadError]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
+  const [baseline,setBaseline]=useState("");
+  const currentValues=JSON.stringify([firstName,lastName,phone,jobTitle]);
+  const beginEdit=()=>{setBaseline(currentValues);setEditing(true)};
   const [avatarUrl,setAvatarUrl]=useState("");
-  const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
+  const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setAvatarUrl("/api/files/"+result.item.id+"/download");window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
@@ -55,6 +56,7 @@ export function AccountSettingsPage() {
       .then(payload=>{
         const item=payload.item??{};
         queueMicrotask(()=>{
+          setProfileName(String(item.display_name??""));
           setFirstName(String(item.first_name??""));
           setLastName(String(item.last_name??""));
           setEmail(payload.email??"");
@@ -70,6 +72,7 @@ export function AccountSettingsPage() {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle});
+      window.dispatchEvent(new Event("binso-profile-changed"));
       setToast(message);
       setEditing(false);
     }catch(error){
@@ -79,12 +82,11 @@ export function AccountSettingsPage() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  const initials=((firstName[0]??"")+(lastName[0]??"")).toUpperCase()||"BO";
-  const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Benutzer";
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>:undefined}>
+  const displayName=[firstName,lastName].filter(Boolean).join(" ")||profileName||"Benutzer";
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
     {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <div className="profile-avatar">{avatarUrl?<img src={avatarUrl} alt={displayName}/>:initials}</div><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
+        <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p>{jobTitle||"Benutzer"}</p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload">Bild ändern</label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
@@ -116,26 +118,14 @@ export function CompanySettingsPage() {
   const [loadError,setLoadError]=useState<string|null>(null);
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
+  const [baseline,setBaseline]=useState("");
+  const currentValues=JSON.stringify([name,uid,street,postalCode,city,email,phone]);
+  const beginEdit=()=>{setBaseline(currentValues);setEditing(true)};
 
-  const uploadLogo=async(file:File|undefined)=>{
-    if(!file) return;
-    if(!isProductionBackendEnabled()){
-      setToast("Logo-Upload ist im Demo-Modus nicht dauerhaft.");
-      window.setTimeout(()=>setToast(null),2200);
-      return;
-    }
-    try{
-      const form=new FormData();
-      form.append("file",file);
-      form.append("purpose","company_logo");
-      const result=await apiUpload<{item:{id:string}}>("/api/files",form);
-      setLogoUrl("/api/files/"+result.item.id+"/download");
-      setToast("Firmenlogo gespeichert.");
-    }catch(error){
-      setToast(error instanceof Error?error.message:"Firmenlogo konnte nicht gespeichert werden.");
-    }
-    window.setTimeout(()=>setToast(null),2600);
-  };
+  const [pendingLogo,setPendingLogo]=useState<File|null>(null);
+  const [logoPreview,setLogoPreview]=useState("");
+  useEffect(()=>()=>{if(logoPreview)URL.revokeObjectURL(logoPreview)},[logoPreview]);
+  const uploadLogo=(file:File|undefined)=>{if(!file)return;if(!["image/png","image/jpeg","image/webp"].includes(file.type)){setToast("Bitte PNG, JPEG oder WebP auswählen.");return;}setPendingLogo(file);setLogoPreview(URL.createObjectURL(file))};
 
   useEffect(()=>{
     if(!isProductionBackendEnabled()){queueMicrotask(()=>setLoading(false));return;}
@@ -158,6 +148,8 @@ export function CompanySettingsPage() {
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
+      if(!name.trim()){throw new Error("Firmenname ist erforderlich.")}
+      if(pendingLogo){const form=new FormData();form.append("file",pendingLogo);form.append("purpose","company_logo");const result=await apiUpload<{item:{id:string}}>("/api/files",form);setLogoUrl("/api/files/"+result.item.id+"/download");setPendingLogo(null);setLogoPreview("");}
       await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone});
       setToast(message);
       setEditing(false);
@@ -168,9 +160,9 @@ export function CompanySettingsPage() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing} backHref="/einstellungen" backLabel="Einstellungen" actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={()=>setEditing(true)}>Bearbeiten</Button>:undefined}>
+  return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={editing} unsavedChanges={editing&&(currentValues!==baseline||pendingLogo!==null)} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
     {loading?<p role="status">Einstellungen werden geladen …</p>:loadError?<div role="alert"><p>{loadError}</p><Button variant="secondary" onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>:<div className="settings-detail-grid">
-      <section className="surface company-logo-card"><img src={logoUrl||"/brand/logo-black.svg"} alt="Firmenlogo"/><div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><Input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
+      <section className="surface company-logo-card">{(logoPreview||logoUrl)?<img src={logoPreview||logoUrl} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div>{editing&&<><label className="button button-secondary" htmlFor="company-logo-upload">Logo ändern</label><Input id="company-logo-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></>}</section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
           <Field label="Firmenname"><Input value={name} onChange={e=>setName(e.target.value)}/></Field>
@@ -277,7 +269,7 @@ export function SubscriptionSettingsPage() {
 
   if(!production){
     return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-      <section className="plan-hero"><div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div><div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div><Button onClick={()=>setDialog("plan")}>Plan ändern</Button></section>
+      <p className="technical-hint">Abonnement-Demo mit synthetischen Beispielen. Es werden keine echten Zahlungen oder Kündigungen ausgelöst.</p><section className="plan-hero"><div><span className="eyebrow">AKTUELLER PLAN</span><h2>{plan}</h2><p>Für wachsende Teams mit allen wichtigen Business-Funktionen.</p></div><div className="plan-price"><strong>CHF {prices[plan]}</strong><span>/ Monat</span></div><Button onClick={()=>setDialog("plan")}>Plan ändern</Button></section>
       <div className="subscription-detail-grid"><section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzer</span><b>4 von 10</b></div><div className="usage-bar"><i style={{width:"40%"}}/></div><div className="usage-row"><span>Dateispeicher</span><b>2.4 GB von 20 GB</b></div><div className="usage-bar"><i style={{width:"12%"}}/></div></section><section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b>Visa •••• 4242</b><small>Läuft 08/29 ab</small></div><Button variant="secondary" onClick={()=>setDialog("payment")}>Ändern</Button></div></section></div>
       <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div>{[{date:"01.10.2026",number:"BO-2026-10"},{date:"01.09.2026",number:"BO-2026-09"}].map(item=><ListRow key={item.number} title={item.number} meta={item.date} value="CHF 49.00" valueLabel="Gesamtbetrag" status="Bezahlt" tone="success" onClick={()=>setBillingInvoice({date:item.date,amount:"CHF 49.00"})}/>)}</div></section>
       <div className="danger-zone"><div><b>Abonnement kündigen</b><p>Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv.</p></div><Button variant="danger" onClick={()=>setDialog("cancel")}>Kündigung starten</Button></div>
@@ -294,7 +286,7 @@ export function SubscriptionSettingsPage() {
   const contractAmount=subscription.unit_amount_chf==null?null:Number(subscription.unit_amount_chf);
   const statusLabel:Record<string,string>={trial:"Testphase",active:"Aktiv",past_due:"Überfällig",expired:"Abgelaufen",read_only:"Nur Lesen",suspended:"Pausiert",cancelled:"Gekündigt"};
   const accountLabel:Record<string,string>={trial:"Testphase",read_only:"Nur Lesen",grace_period:"Nachfrist",active:"Aktiv",restricted:"Eingeschränkt",suspended:"Gesperrt",cancelled:"Gekündigt"};
-  const subscriptionStatus=String(subscription.subscription_status??"trial");
+  const subscriptionStatus=String(subscription.subscription_status??"unknown");
   const accountStatus=String(subscription.account_status??"active");
   const billingConnected=Boolean(subscription.billing_customer_ref&&subscription.billing_subscription_ref)&&!["cancelled","expired"].includes(subscriptionStatus);
   const billingIntegration=integrations.find(item=>item.key==="billing");
@@ -308,7 +300,7 @@ export function SubscriptionSettingsPage() {
 
   return <AppShell title="Abonnement" subtitle="Plan, Nutzung und Kontostatus." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
-      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{planLabel[planKey]??planKey}</h2><p>{billingDemo?"Isolierte Demo ohne echte Zahlungen.":subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</p></div>
+      <div><span className="eyebrow">AKTUELLER PLAN</span><h2>{planLabel[planKey]??planKey}</h2><Status tone={subscriptionStatus==="active"?"success":subscriptionStatus==="trial"?"info":"warning"}>{statusLabel[subscriptionStatus]??"Unbekannt"}</Status>{!billingDemo&&<p>{subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</p>}</div>
       <div className="plan-price"><strong>{subscriptionStatus==="trial"?"CHF 0.00":contractAmount==null?"—":moneyChf(contractAmount)}</strong><span>{subscriptionStatus==="trial"?`noch ${trialDaysRemaining} ${trialDaysRemaining===1?"Tag":"Tage"}`:subscription.billing_interval==="yearly"?"/ Jahr":"/ Monat"}</span></div>
       {billingDemo?<Status tone="info">Demo-Modus</Status>:billingConfigured?(billingConnected?<Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing verwalten</Button>:<Button onClick={()=>setDialog("plan")}>Plan aktivieren</Button>):<Status tone="warning">Stripe nicht verfügbar</Status>}
     </section>
@@ -318,10 +310,10 @@ export function SubscriptionSettingsPage() {
       <section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span>Benutzerlimit</span><b>{String(subscription.user_limit??"—")}</b></div><div className="usage-row"><span>Dateispeicher</span><b>{storageLabel}</b></div><div className="usage-row"><span>Kontostatus</span><b>{accountLabel[accountStatus]??accountStatus}</b></div><div className="usage-row"><span>{subscriptionStatus==="trial"?"Testphase bis":"Aktuelle Periode bis"}</span><b>{subscriptionStatus==="trial"?trialEnd:periodEnd}</b></div></section>
       <section className="surface"><SectionTitle title="Zahlungsabwicklung"/>{billingDemo?<div className="context-block"><Status tone="info">Demo</Status><b>Zahlungen sind in der Demo deaktiviert</b><span>Die Demo-Umgebung verwendet keine echten Stripe-Zahlungen. Für ein echtes Abo registrierst du ein produktives Konto über die Preis- oder Registrierungsseite.</span><Button href="/preise">Pläne ansehen</Button></div>:billingConnected?<div className="context-block"><Status tone="success">Verbunden</Status><b>Stripe Billing verbunden</b><span>Zahlungsmittel und SaaS-Rechnungen bleiben bei Stripe und werden über das sichere Kundenportal verwaltet.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal öffnen</Button></div>:billingConfigured?<div className="context-block"><Status tone="info">Bereit</Status><b>Stripe ist konfiguriert</b><span>Wähle einen Plan, um das produktive Abonnement über Stripe Checkout zu starten.</span><Button onClick={()=>setDialog("plan")}>Plan auswählen</Button></div>:<div className="context-block"><Status tone="warning">Nicht verfügbar</Status><b>Zahlungsabwicklung ist derzeit nicht verfügbar</b><span>Bitte versuche es später erneut oder kontaktiere den Support.</span></div>}</section>
     </div>
-    <p className="technical-hint">{automaticTax?"Stripe Tax ist für den Checkout aktiviert.":"Steuer-ID wird im Checkout erfasst; allfällige Steuern richten sich nach der produktiven Stripe-Steuerkonfiguration."}</p><section className="surface invoices-panel"><SectionTitle title="SaaS-Abrechnungen"/>{billingConnected?<div className="context-block"><b>Rechnungen und Zahlungsmittel in Stripe</b><span>Binso One speichert keine vollständigen Kartendaten. Öffne das Billing-Portal für Rechnungsdownloads und Zahlungsmittel.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal</Button></div>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/>}</section>
+    {billingConfigured&&!billingDemo&&<p className="technical-hint">{automaticTax?"Stripe Tax ist für den Checkout aktiviert.":"Steuer-ID wird im Checkout erfasst; allfällige Steuern richten sich nach der produktiven Stripe-Steuerkonfiguration."}</p>}<section className="surface invoices-panel"><SectionTitle title="SaaS-Abrechnungen"/>{billingConnected?<div className="context-block"><b>Rechnungen und Zahlungsmittel in Stripe</b><span>Binso One speichert keine vollständigen Kartendaten. Öffne das Billing-Portal für Rechnungsdownloads und Zahlungsmittel.</span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}>Billing-Portal</Button></div>:<EmptyState icon="card" title="Noch keine Billing-Daten" text="Es werden keine erfundenen Zahlungsmittel oder SaaS-Rechnungen angezeigt."/>}</section>
     <div className="danger-zone"><div><b>Abonnement verwalten</b><p>{billingConnected?"Planwechsel, Zahlungsmittel und Kündigung werden über Stripe Billing ausgeführt.":"Ohne verbundenes Billing gibt es hier keine produktive Kündigungsaktion."}</p></div><Button variant="secondary" disabled={!billingConnected||billingLoading} onClick={()=>void openPortal()}>Abonnement verwalten</Button></div>
 
-    {dialog==="plan"&&billingConfigured&&!billingConnected&&<FormSheet label={"Plan auswählen"} description={"Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet."} open={true} onClose={()=>setDialog(null)} busy={billingLoading} className={"subscription-sheet"} layerClassName={""} ariaLabel={dialog==="plan"?"Plan auswählen":dialog==="payment"?"Zahlungsart":"Abonnement"}><div className="sheet-body"><Field label="Zahlungszeitraum"><Select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly">Monatlich</option><option value="yearly">Jährlich</option></Select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{price?.available?moneyChf(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div><label className="billing-legal-consent"><Input type="checkbox" checked={acceptedPaidTerms} onChange={e=>setAcceptedPaidTerms(e.target.checked)}/><span>Ich bestätige den kostenpflichtigen Abschluss gemäss <Link href="/agb" target="_blank">AGB</Link> und habe <Link href="/datenschutz" target="_blank">Datenschutz</Link> sowie <Link href="/auftragsbearbeitung" target="_blank">Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label><p className="technical-hint">Das Abonnement wird erst durch den erfolgreichen Stripe-Checkout aktiviert. Laufzeit und Preis werden vor dem Abschluss nochmals angezeigt.</p></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!acceptedPaidTerms||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}>{billingLoading?"Checkout wird geöffnet…":"Kostenpflichtig zu Stripe"}</Button></div></FormSheet>}
+    {dialog==="plan"&&billingConfigured&&!billingConnected&&<FormSheet label={"Plan auswählen"} description={"Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet."} open={true} onClose={()=>setDialog(null)} busy={billingLoading} className={"subscription-sheet"} layerClassName={""} ariaLabel={dialog==="plan"?"Plan auswählen":dialog==="payment"?"Zahlungsart":"Abonnement"}><div className="sheet-body"><Field label="Zahlungszeitraum"><Select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly">Monatlich</option><option value="yearly">Jährlich</option></Select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small>{price?.available?moneyChf(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div><label className="billing-legal-consent"><Input type="checkbox" checked={acceptedPaidTerms} onChange={e=>setAcceptedPaidTerms(e.target.checked)}/><span>Ich bestätige den kostenpflichtigen Abschluss gemäss <Link prefetch={false} href="/agb" target="_blank">AGB</Link> und habe <Link prefetch={false} href="/datenschutz" target="_blank">Datenschutz</Link> sowie <Link prefetch={false} href="/auftragsbearbeitung" target="_blank">Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label><p className="technical-hint">Das Abonnement wird erst durch den erfolgreichen Stripe-Checkout aktiviert. Laufzeit und Preis werden vor dem Abschluss nochmals angezeigt.</p></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setDialog(null)}>Abbrechen</Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!acceptedPaidTerms||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}>{billingLoading?"Checkout wird geöffnet…":"Kostenpflichtig zu Stripe"}</Button></div></FormSheet>}
     {toast&&<Toast title={toast} tone={toast.startsWith("Stripe Checkout abgeschlossen.")||toast==="Planwechsel abgebrochen."?"info":"danger"}/>}
   </AppShell>;
 }
@@ -337,12 +329,26 @@ export function NotificationSettingsPage() {
   const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
     Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
   });
+  const pending=useRef(new Set<string>());
+  const [saving,setSaving]=useState<string[]>([]);
+  const [ready,setReady]=useState(false);
   const [error,setError]=useState("");
-  useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
-  const toggle = async (title:string, channel:"email"|"push") => {const enabled=!prefs[title][channel];try{if(!isProductionBackendEnabled())throw new Error("Schreibgeschützte Vorschau");await apiPatch("/api/settings/notifications",{kind:title,channel,enabled});setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));setError("");}catch{setError("Einstellung konnte nicht gespeichert werden.")}};
+  useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
+  const toggle=async(title:string,channel:"email"|"push")=>{
+    const key=title+channel;if(!ready||pending.current.has(key))return;
+    const before=prefs[title][channel],enabled=!before;
+    if(channel==="push"&&enabled&&(!("Notification" in window)||Notification.permission!=="granted")){
+      setError("Push benötigt eine Browserfreigabe. Aktiviere Benachrichtigungen in den Geräteeinstellungen.");return;
+    }
+    pending.current.add(key);setSaving([...pending.current]);setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));
+    try{await apiPatch("/api/settings/notifications",{kind:title,channel,enabled});setError("");}
+    catch{setPrefs(current=>({...current,[title]:{...current[title],[channel]:before}}));setError("Einstellung konnte nicht gespeichert werden.");}
+    finally{pending.current.delete(key);setSaving([...pending.current]);}
+  };
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<p role="alert">{error}</p>}
-    <section className="preference-table"><div className="preference-head"><span>Benachrichtigung</span><span>E-Mail</span><span>Push</span></div>{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><Toggle checked={prefs[title].email} onChange={()=>void toggle(title,"email")} label={`E-Mail ${title}`}/><Toggle checked={prefs[title].push} onChange={()=>void toggle(title,"push")} label={`Push ${title}`}/></div>)}</section>
+    {!ready&&!error&&<p role="status">Einstellungen werden geladen …</p>}
+    <section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span>{channel==="email"?"E-Mail":"Push"}</span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section>
   </AppShell>;
 }
 
@@ -352,10 +358,10 @@ export function LanguageSettingsPage() {
   useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>{const value=data.item?.language??"de-CH";setLanguage(value==="de"?"de-CH":value)}).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
   const choose=async(code:string)=>{try{if(!isProductionBackendEnabled())throw new Error("Schreibgeschützte Vorschau");await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
   const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
-  return <AppShell title="Sprache" subtitle="Sprache für Oberfläche und Kommunikation wählen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
+  return <AppShell title="Sprache" subtitle="Sprache der Benutzeroberfläche." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} disabled={code!=="de-CH"} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{code!=="de-CH"?"Noch nicht vollständig verfügbar":language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
     {error&&<p role="alert">{error}</p>}
-    <p className="settings-note">Die vollständigen Übersetzungen werden mit der produktiven Sprachschicht geladen. Diese Auswahl ist bereits für DE, FR, IT, EN und TR vorbereitet.</p>
+    <p className="settings-note">Die Oberfläche ist derzeit vollständig auf Deutsch verfügbar. Weitere Sprachen werden erst nach vollständiger Übersetzung freigeschaltet.</p>
   </AppShell>;
 }
 
@@ -376,6 +382,7 @@ export function AppearanceSettingsPage() {
   const choose=async(next:"light"|"dark"|"system")=>{try{await saveTheme(next);setTheme(next);setError("");}catch{setError("Darstellung konnte nicht gespeichert werden.")}};
   return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<p role="alert">{error}</p>}
+    <Link className="text-action" href="/einstellungen/sprache">Sprache wählen</Link>
     <div className="appearance-grid">
       <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>void choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
       <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>void choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>

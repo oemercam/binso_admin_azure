@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import {useRouter,useSearchParams} from "next/navigation";
-import {FormEvent,useMemo,useState} from "react";
+import {FormEvent,useEffect,useMemo,useState} from "react";
 import {Eye,EyeOff} from "lucide-react";
+import {useBrowserBackGuard,allowDraftNavigation} from "@/components/use-browser-back-guard";
 import ConfirmDialog from "@/components/confirm-dialog";
 import {Button,Logo} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
@@ -31,6 +32,15 @@ export default function Register(){
   const [acceptedTerms,setAcceptedTerms]=useState(false);
   const [resendStatus,setResendStatus]=useState("");
 
+  const [leaveHref,setLeaveHref]=useState<string|null>(null);
+  const registrationDirty=!confirmation&&!!(companyName||email||password||acceptedTerms);
+  const leaveBack=useBrowserBackGuard(registrationDirty,()=>{setLeaveHref("browser-back");setConfirmCancel(true)});
+  useEffect(()=>{
+    if(!registrationDirty)return;
+    const navigate=(event:MouseEvent)=>{const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>('a[href]'):null;if(!link||link.target==="_blank"||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey)return;event.preventDefault();event.stopPropagation();setLeaveHref(link.href);setConfirmCancel(true)};
+    document.addEventListener("click",navigate,true);return()=>document.removeEventListener("click",navigate,true);
+  },[registrationDirty]);
+
   const submit=async(event:FormEvent)=>{
     event.preventDefault();setLoading(true);setError("");
     try{
@@ -50,7 +60,7 @@ export default function Register(){
       const payload=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
       const next=payload.mfaSetupRequired?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(subscriptionHref)}`:subscriptionHref;
-      window.location.replace(next);
+      allowDraftNavigation();window.location.replace(next);
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");setLoading(false);}
   };
 
@@ -84,11 +94,11 @@ export default function Register(){
       <label>Firmenname<input required minLength={2} maxLength={120} autoFocus value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Meine Firma GmbH"/></label>
       <label>E-Mail<input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></label>
       <label>Passwort<div className="password-field"><input required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password" placeholder="Mindestens 12 Zeichen"/><button type="button" className="password-visibility" onClick={()=>setShowPassword(!showPassword)} aria-label={showPassword?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={showPassword}>{showPassword?<EyeOff aria-hidden="true"/>:<Eye aria-hidden="true"/>}</button></div><small className="password-hint">Mindestens 12 Zeichen.</small></label>
-      <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/><span>Ich akzeptiere die <Link href="/agb">AGB</Link> für Binso One und habe die <Link href="/datenschutz">Datenschutzerklärung</Link> sowie die <Link href="/auftragsbearbeitung">Vereinbarung zur Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label>
+      <label><input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/><span>Ich akzeptiere die <Link href="/agb" target="_blank" rel="noopener noreferrer">AGB</Link> für Binso One und habe die <Link href="/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</Link> sowie die <Link href="/auftragsbearbeitung" target="_blank" rel="noopener noreferrer">Vereinbarung zur Auftragsbearbeitung</Link> zur Kenntnis genommen.</span></label>
       {error&&<p className="auth-error" role="alert">{error}</p>}
       <Button type="submit" disabled={loading||!acceptedTerms}>{loading?"Account wird erstellt…":"Account erstellen"}</Button>
     </form>
-    <div className="auth-after-submit"><p className="auth-legal">Mit der Registrierung akzeptierst du die <Link href="/agb">AGB</Link> und bestätigst, die <Link href="/datenschutz">Datenschutzerklärung</Link> und die <Link href="/auftragsbearbeitung">Auftragsbearbeitung</Link> zur Kenntnis genommen zu haben.</p><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>
-    <ConfirmDialog open={confirmCancel} title="Registrierung abbrechen?" message="Deine Eingaben gehen verloren." confirmLabel="Registrierung abbrechen" cancelLabel="Weiter bearbeiten" onCancel={()=>setConfirmCancel(false)} onConfirm={()=>router.push("/preise")}/>
+    <div className="auth-after-submit"><p className="auth-bottom">Bereits registriert? <Link href="/login">Anmelden</Link></p></div>
+    <ConfirmDialog open={confirmCancel} title="Registrierung abbrechen?" message="Deine Eingaben gehen verloren." confirmLabel="Registrierung abbrechen" cancelLabel="Weiter bearbeiten" onCancel={()=>{setConfirmCancel(false);setLeaveHref(null)}} onConfirm={()=>{allowDraftNavigation();if(leaveHref==="browser-back")leaveBack();else router.replace(leaveHref?new URL(leaveHref).pathname:"/preise")}}/>
   </section></main>;
 }
