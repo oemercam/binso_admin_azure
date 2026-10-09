@@ -1,14 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import ts from 'typescript';
-const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
+const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2020}}).outputText).toString('base64');
 const makeStorage=()=>{const values=new Map();return {getItem:key=>values.get(key)??null,setItem:(key,value)=>{values.set(key,value)},removeItem:key=>values.delete(key)};};
 const local=makeStorage(),session=makeStorage();
 globalThis.window={localStorage:local,sessionStorage:session,dispatchEvent(){},location:{pathname:'/dashboard'}};
-globalThis.document={querySelector:()=>null};
+globalThis.document={querySelector:()=>null,addEventListener(){},visibilityState:'visible'};
+window.addEventListener=()=>{};
+const originalBroadcastChannel=globalThis.BroadcastChannel;globalThis.BroadcastChannel=undefined;
 const originalFetch=globalThis.fetch;
 try{
- const cacheUrl=moduleUrl(await fs.readFile('lib/client/session-cache.ts','utf8'));
+ const eventsUrl=moduleUrl(await fs.readFile('lib/client/data-events.ts','utf8'));
+ const cacheUrl=moduleUrl((await fs.readFile('lib/client/session-cache.ts','utf8')).replace('"./data-events"',JSON.stringify(eventsUrl)));
  const cache=await import(cacheUrl);
  let resolveSession;let reads=0;
  globalThis.fetch=()=>{++reads;return new Promise(resolve=>{resolveSession=resolve});};
@@ -21,7 +24,7 @@ try{
  globalThis.fetch=async()=>{++reads;throw new Error('offline')};await assert.rejects(cache.readClientSession());
  globalThis.fetch=async()=>{throw new DOMException('timeout','TimeoutError')};await assert.rejects(cache.readClientSession(),/Sitzungsprüfung dauert zu lange/);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:false}));assert.equal((await cache.readClientSession()).authenticated,false,'A failed check must be retryable');
- const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl));
+ const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl)).replace('"./data-events"',JSON.stringify(eventsUrl));
  const backend=await import(moduleUrl(backendSource));
  globalThis.fetch=async()=>{throw new Error('offline')};
  await assert.rejects(backend.startDemoClientSession());assert.equal(local.getItem('binso.demo.session'),null,'Offline demo startup must not leave a fake active session');
@@ -43,4 +46,4 @@ try{
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).tenant.readOnly,true,'A static preview is explicitly read-only');
  console.log('Expired database demo is unauthenticated; static cookie preview remains read-only.');
-}finally{globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}
+}finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}
