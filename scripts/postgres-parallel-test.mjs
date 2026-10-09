@@ -28,7 +28,9 @@ try{
  const process=await import(await compile('lib/server/document-process.ts',{'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans}),'./http':http,'./rbac':rbac,'./audit':audit}));
  const organizationId='00000000-0000-4000-8000-000000000099';
  await pool.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional',status='active'",[organizationId]);
- const session={organizationId,userId:'demo-readonly',name:'Concurrency fixture',role:'owner'};
+ const session={organizationId,userId:'v213-parallel-fixture',name:'Concurrency fixture',role:'owner'};
+ await pool.query("insert into app_users(id,email,display_name,status) values($1,'parallel@fixture.invalid','Concurrency fixture','active')",[session.userId]);
+ await pool.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'parallel@fixture.invalid','owner','active')",[organizationId,session.userId]);
  const customer=(await pool.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[organizationId])).rows[0];assert.ok(customer);
  const txn=async fn=>{const c=await pool.connect();try{await c.query('begin');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,session.userId]);const result=await fn(c);await c.query('commit');return result;}catch(error){await c.query('rollback');throw error;}finally{c.release();}};
  const args={p_kind:'invoice',p_customer_id:customer.id,p_issue_date:'2026-10-09',p_due_date:'2026-11-09',p_currency:'CHF',p_vat_rate:0,p_items:[{description:'Synthetic concurrency work',quantity:1,unit_price:2561.97,vat_rate:0}],p_note:'Isolated test'};

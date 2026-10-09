@@ -25,7 +25,7 @@ try{
   for(const role of roles){
    const user='http-'+index+'-'+role,token=randomBytes(32).toString('base64url');
    await pool.query("insert into app_users(id,email,display_name,status,mfa_enabled) values($1,$2,$1,'active',true)",[user,user+'@fixture.invalid']);
-   await pool.query("insert into organization_memberships(organization_id,user_id,role,status) values($1,$2,$3,'active')",[organizationId,user,role]);
+   await pool.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,$4,'active')",[organizationId,user,user+'@fixture.invalid',role]);
    await pool.query("insert into auth_sessions(user_id,organization_id,token_hash,expires_at) values($1,$2,$3,now()+interval '1 hour')",[user,organizationId,createHash('sha256').update(token).digest('hex')]);
    cookies.set(index+':'+role,'binso_v213_test_session='+token);
   }
