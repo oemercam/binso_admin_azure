@@ -6,7 +6,7 @@ for(const path of ['app/styles/app.css','components/ui.tsx','components/records.
 for(const path of ['.github/workflows/quality.yml','database/migrations/new.sql','app/api/auth/session/route.ts','components/unmapped.tsx'])assert.deepEqual(planChanges([path]).routes,fullRoutes,path);
 assert.deepEqual(planChanges(['docs/readme.md']).routes,[]);
 assert.deepEqual(planChanges(['components/documents.tsx']).interactions,['documents']);
-assert.equal(planChanges([],{level:'full'}).routes.length,58);
+assert.equal(planChanges([],{level:'full'}).routes.length,fullRoutes.length);
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');
 assert.throws(()=>planChanges([],{level:'skip'}));
 console.log('QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.');
@@ -18,3 +18,5 @@ assert.deepEqual(planChanges(['components/pdf-preview.tsx'],{level:'fast'}).inte
 assert.deepEqual(planChanges(['components/pages/products.tsx'],{level:'fast'}).widths,[390,768,1440]);
 assert(!planChanges(['components/pages/products.tsx'],{level:'fast'}).routes.includes('/zeit'),'Product-only changes do not rebuild a cross-module browser scope');
 assert.equal(planChanges(['scripts/qa.mjs'],{level:'integration'}).level,'integration','Local integration uses representative coverage while required CI remains full');
+
+assert.ok(fullRoutes.includes('/agb')&&fullRoutes.includes('/preview/dashboard')&&fullRoutes.includes('/belege'),'Full coverage includes legal, preview and document-hub routes found by the inventory');

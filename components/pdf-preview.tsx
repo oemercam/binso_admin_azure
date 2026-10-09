@@ -3,52 +3,54 @@
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
 
-function PdfPage({pdf,pageNumber}: {pdf:PDFDocumentProxy;pageNumber:number}) {
+function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:number;zoomed:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
+  const frameElement=useRef<HTMLElement>(null);
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
     const element=canvas.current;
     if(!element)return;
     let active=true;
-    let lastWidth=0;
+    let lastSize="";
     let renderTask:ReturnType<Awaited<ReturnType<PDFDocumentProxy['getPage']>>['render']>|undefined;
     let frame=0;
     const draw=()=>{
-      const width=element.parentElement?.clientWidth??0;
-      if(width<=0||width===lastWidth)return;
-      lastWidth=width;
+      const width=frameElement.current?.clientWidth??0;
+      const height=frameElement.current?.clientHeight??0;
+      const size=width+":"+height;
+      if(width<=0||height<=0||size===lastSize)return;
+      lastSize=size;
+      delete element.dataset.renderedPage;
       renderTask?.cancel();
       void pdf.getPage(pageNumber).then(page=>{
-        if(!active||width!==lastWidth)return;
+        if(!active||size!==lastSize)return;
         const base=page.getViewport({scale:1});
-        const viewport=page.getViewport({scale:width/base.width});
+        const scale=zoomed?width/base.width*1.75:Math.min(width/base.width,height/base.height);
+        const viewport=page.getViewport({scale});
         const ratio=Math.min(window.devicePixelRatio||1,2);
         element.width=Math.floor(viewport.width*ratio);
         element.height=Math.floor(viewport.height*ratio);
-        element.style.width="100%";
-        element.style.height="auto";
+        element.style.width=viewport.width+"px";
+        element.style.height=viewport.height+"px";
         renderTask=page.render({canvas:element,viewport,transform:ratio===1?undefined:[ratio,0,0,ratio,0,0]});
-        return renderTask.promise;
+        return renderTask.promise.then(()=>{if(active&&size===lastSize)element.dataset.renderedPage=String(pageNumber)});
       }).catch(reason=>{if(active&&reason?.name!=="RenderingCancelledException")setError("PDF-Seite konnte nicht angezeigt werden.")});
     };
     const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw)});
-    observer.observe(element.parentElement??element);
+    observer.observe(frameElement.current??element);
     return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
-  },[pdf,pageNumber]);
-  return <section className="pdf-page" aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
+  },[pdf,pageNumber,zoomed]);
+  return <section ref={frameElement} className={zoomed?"pdf-page is-zoomed":"pdf-page"} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<p role="alert">{error}</p>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
 }
 
-export function PdfPreview({file}: {file:Blob}) {
-  const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null);
-  const [error,setError]=useState<string|null>(null);
+export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
+  const [loaded,setLoaded]=useState<{file:Blob;pdf:PDFDocumentProxy}|null>(null);
+  const [error,setError]=useState<{file:Blob;message:string}|null>(null);
   const [pageNumber,setPageNumber]=useState(1);
-  const touchStart=useRef<number|null>(null);
-  useEffect(()=>{setPdf(null);setError(null);setPageNumber(1)},[file]);
+  const touchStart=useRef<{x:number;y:number}|null>(null);
   useEffect(()=>{
     let active=true;
     let task:ReturnType<typeof import("pdfjs-dist").getDocument>|undefined;
-    // Load the self-contained ESM as a same-origin asset: PDF.js internal
-    // webpack bindings collide with eval-wrapped development modules.
     const engineUrl=new URL("pdfjs-dist/build/pdf.mjs",import.meta.url).toString();
     void import(/* webpackIgnore: true */ engineUrl).then(async (engine:typeof import("pdfjs-dist"))=>{
       if(!active)return;
@@ -57,21 +59,28 @@ export function PdfPreview({file}: {file:Blob}) {
       if(!active)return;
       task=engine.getDocument({data,isEvalSupported:false});
       const document=await task.promise;
-      if(active)setPdf(document);
-    }).catch(()=>{if(active)setError("PDF konnte nicht angezeigt werden.")});
+      if(active){setError(null);setLoaded({file,pdf:document});setPageNumber(1);}
+    }).catch(()=>{if(active)setError({file,message:"PDF konnte nicht angezeigt werden."})});
     return()=>{active=false;void task?.destroy()};
   },[file]);
-  if(error)return <p role="alert">{error}</p>;
+  const pdf=loaded?.file===file?loaded.pdf:null;
+  if(error?.file===file)return <p role="alert">{error.message}</p>;
   if(!pdf)return <p role="status">PDF wird angezeigt …</p>;
   const current=Math.min(Math.max(pageNumber,1),pdf.numPages);
-  return <div className="pdf-pages" data-viewer-mode="single-page" style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",minWidth:0,overflowX:"hidden"}}>
-    <div style={{width:"100%",maxWidth:"min(100%, 720px)",minWidth:0,touchAction:"pan-y"}} onTouchStart={event=>{touchStart.current=event.touches[0]?.clientX??null}} onTouchEnd={event=>{const start=touchStart.current;touchStart.current=null;if(start===null)return;const delta=(event.changedTouches[0]?.clientX??start)-start;if(Math.abs(delta)>60)setPageNumber(value=>Math.min(pdf.numPages,Math.max(1,value+(delta<0?1:-1))))}}>
-      <PdfPage key={current} pdf={pdf} pageNumber={current}/>
+  return <div className="pdf-pages" data-viewer-mode="single-page">
+    <div className={zoomed?"pdf-page-stage is-zoomed":"pdf-page-stage"}
+      onTouchStart={event=>{const touch=event.touches[0];touchStart.current=!zoomed&&event.touches.length===1&&touch?{x:touch.clientX,y:touch.clientY}:null}}
+      onTouchCancel={()=>{touchStart.current=null}}
+      onTouchEnd={event=>{const start=touchStart.current;touchStart.current=null;const end=event.changedTouches[0];if(!start||!end||zoomed)return;const dx=end.clientX-start.x,dy=end.clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)setPageNumber(value=>Math.min(pdf.numPages,Math.max(1,value+(dx<0?1:-1))))}}>
+      <PdfPage key={current} pdf={pdf} pageNumber={current} zoomed={zoomed}/>
     </div>
-    <nav aria-label="PDF-Seitennavigation" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,padding:"12px 0",width:"100%"}}>
+    <nav className="pdf-page-navigation" aria-label="PDF-Seitennavigation">
       <button type="button" aria-label="Vorherige Seite" disabled={current<=1} onClick={()=>setPageNumber(value=>Math.max(1,value-1))}>‹</button>
       <span aria-live="polite">Seite {current} von {pdf.numPages}</span>
       <button type="button" aria-label="Nächste Seite" disabled={current>=pdf.numPages} onClick={()=>setPageNumber(value=>Math.min(pdf.numPages,value+1))}>›</button>
     </nav>
   </div>;
 }
+
+// Existing consumers keep the same API; there is only one viewer implementation.
+export {DocumentPageViewer as PdfPreview};

@@ -70,7 +70,7 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,title,meta,value,valueLabel,status,tone="neutral",compact=false}:{href?:string;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean}){
- const content=<><b>{title}</b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small>{valueLabel}</small>}<strong>{value}</strong></span>}</>;
- const className=`document-summary-row${compact?" is-compact":""}`;
+ const content=<><b>{title}</b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<>{valueLabel&&<span className="document-summary-value-label">{valueLabel}</span>}<span className="document-summary-amount"><strong>{value}</strong></span></>}</>;
+ const className=`document-summary-row${value!=null&&valueLabel?" has-value-label":""}${compact?" is-compact":""}`;
  return href?<Link href={href} className={className}>{content}</Link>:<div className={className}>{content}</div>;
 }
