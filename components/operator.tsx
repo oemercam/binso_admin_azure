@@ -1,4 +1,5 @@
 "use client";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {FormSheet, ListSearch} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow} from "./records";
 import ConfirmDialog from "./confirm-dialog";
@@ -6,12 +7,14 @@ import ConfirmDialog from "./confirm-dialog";
 import Link from "next/link";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
-import { apiGet, apiPatch, apiPost, useBackendMode } from "@/lib/client/backend";
+import { apiPatch, apiPost, logoutOperatorClientSession, useBackendMode } from "@/lib/client/backend";
+import {platformFinanceInsights} from "@/lib/finance-periods";
+import {businessDate} from "@/lib/financial-status";
 import { plans } from "@/lib/plans";
 
 const operatorNav = [
@@ -90,34 +93,28 @@ function operatorPlan(value:string|undefined){
   return map[value??""]??"—";
 }
 
-function OperatorLoadState({loading,error}:{loading:boolean;error:string|null}){
- return loading?<LoadingState>Daten werden geladen …</LoadingState>:<ErrorState onRetry={()=>window.location.reload()} retryLabel="Erneut versuchen">{error}</ErrorState>;
+function OperatorLoadState({loading,error,onRetry}:{loading:boolean;error:string|null;onRetry:()=>void}){
+ return loading?<LoadingState>Daten werden geladen …</LoadingState>:<ErrorState onRetry={onRetry} retryLabel="Erneut versuchen">{error}</ErrorState>;
 }
 
 function useOperatorTickets(){
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<OperatorTicket[]>([]);
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:OperatorTicket[]}>("/api/operator/tickets")
-      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
-  return {production,items,loading,loadError};
+  
+  const resource=useApiQuery<{items:OperatorTicket[]}>(production?"/api/operator/tickets":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
+  
+  return {production,items,loading,loadError,refresh};
 }
 
 function useOperatorCustomers(){
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<OperatorTenant[]>([]);
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:OperatorTenant[]}>("/api/operator/customers")
-      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
-  return {production,items,loading,loadError};
+  
+  const resource=useApiQuery<{items:OperatorTenant[]}>(production?"/api/operator/customers":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
+  
+  return {production,items,loading,loadError,refresh};
 }
 
 
@@ -130,7 +127,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const [accountOpen,setAccountOpen]=useState(false);
   const [logoutBusy,setLogoutBusy]=useState(false);
   const [logoutError,setLogoutError]=useState("");
-  const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const response=await fetch("/api/operator/logout",{method:"POST"});if(!response.ok)throw new Error("Abmelden fehlgeschlagen. Bitte erneut versuchen.");const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
+  const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const payload=await logoutOperatorClientSession();const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
@@ -195,10 +192,12 @@ function operatorSubtitle(key: string, detail: string) {
 
 function OperatorDashboard() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [data,setData]=useState<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>({});
+  
+  const resource=useApiQuery<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>(production?"/api/operator/dashboard":null);
+  const data=resource.data??{};
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [metric,setMetric]=useState<"availability"|"users"|"api">("availability");
-  useEffect(()=>{if(!production)return;apiGet<typeof data>("/api/operator/dashboard").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false))},[production]);
+  
   const stats=data.stats??{};
   const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket));
   const incidents=data.incidents??[];
@@ -206,7 +205,7 @@ function OperatorDashboard() {
   const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
   const metricInfo={availability:["Systemverfügbarkeit","99.99 %","+0.01 %","0,6,12,18,24"],users:["Aktive Nutzer",production?String(stats.users_active??0):"128","aktuell online","0,6,12,18,24"],api:["Antwortzeit API","182 ms","−12 %","0,6,12,18,24"]} as const;
   const current=metricInfo[metric];
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(production)return <div className="operator-dashboard-cockpit">
     <div className="operator-ticket-stats">{[
@@ -242,7 +241,7 @@ function OperatorDashboard() {
 }
 
 function TicketsView() {
-  const {production,items,loading,loadError}=useOperatorTickets();
+  const {production,items,loading,loadError,refresh}=useOperatorTickets();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
   const demoTicketVisible=tickets.filter(([nr,subject,customer,status])=>{
@@ -251,7 +250,7 @@ function TicketsView() {
     return matchQuery&&matchFilter;
   });
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <section className="surface operator-table-card">
     <div className="operator-toolbar"><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {tickets.length}</button><button className={filter==="Offen"?"active":""} onClick={()=>setFilter("Offen")}>Offen</button><button className={filter==="In Bearbeitung"?"active":""} onClick={()=>setFilter("In Bearbeitung")}>In Bearbeitung</button><button className={filter==="Wartet auf Kunde"?"active":""} onClick={()=>setFilter("Wartet auf Kunde")}>Wartet auf Kunde</button></div><ListSearch value={query} onChange={setQuery} placeholder="Tickets suchen..."/></div>
@@ -279,19 +278,18 @@ function TicketsView() {
 
 function TicketDetail({ticketId}:{ticketId:string}) {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
+  const resource=useApiQuery<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>(production?"/api/operator/tickets/"+encodeURIComponent(ticketId):null);
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
+
+  
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
   const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
   const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
+  useEffect(()=>{if(!resource.data)return;const payload=resource.data;let active=true;queueMicrotask(()=>{if(active){setTicket(payload.item);setMessages(payload.messages)}});return()=>{active=false}},[resource.data]);
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>("/api/operator/tickets/"+encodeURIComponent(ticketId))
-      .then(payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);}))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production,ticketId]);
+  
 
   const update=async(field:"status"|"priority",value:string)=>{
     if(!production) return;
@@ -311,7 +309,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     if(!production){setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value,internal});
-      setMessages(current=>[...current,payload.item]);
+      setMessages(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
       setReply("");
       setToast(internal?"Interne Notiz gespeichert.":"Antwort gesendet.");
     }catch(error){
@@ -320,7 +318,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     window.setTimeout(()=>setToast(null),2200);
   };
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <div className="operator-ticket-layout">
     <section className="surface operator-thread">
@@ -359,7 +357,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
 }
 
 function CustomersView() {
-  const {production,items,loading,loadError}=useOperatorCustomers();
+  const {production,items,loading,loadError,refresh}=useOperatorCustomers();
   const [query,setQuery]=useState("");
   const [filter,setFilter]=useState("all");
   const demoCustomerVisible=demoCustomers.filter(({name,status})=>{
@@ -368,7 +366,7 @@ function CustomersView() {
     return matchQuery&&matchFilter;
   });
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <section className="surface">
     <div className="operator-toolbar"><ListSearch value={query} onChange={setQuery} placeholder="Kunden suchen..."/><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="Aktiv"?"active":""} onClick={()=>setFilter("Aktiv")}>Aktiv</button><button className={filter==="Eingeschränkt"?"active":""} onClick={()=>setFilter("Eingeschränkt")}>Eingeschränkt</button></div></div>
@@ -389,16 +387,13 @@ function CustomersView() {
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
+  
   const [toast,setToast]=useState<string|null>(null);
-  const [data,setData]=useState<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>({});
+  const resource=useApiQuery<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>(production?"/api/operator/customers/"+encodeURIComponent(tenantId):null);
+  const data=resource.data??{};
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<typeof data>("/api/operator/customers/"+encodeURIComponent(tenantId))
-      .then(payload=>queueMicrotask(()=>setData(payload)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production,tenantId]);
+  
 
   const notify=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
@@ -414,7 +409,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const tenant=overview.tenant as Record<string,unknown>|null|undefined;
   const account=overview.account as Record<string,unknown>|null|undefined;
   const restrictions=Array.isArray(overview.active_restrictions)?overview.active_restrictions as Array<Record<string,unknown>>:[];
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!tenant) return <section className="surface"><EmptyState icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></section>;
 
@@ -450,40 +445,34 @@ function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:s
 
 function OperatorFinanceView({demo=false}:{demo?:boolean}){
   const production=useBackendMode();
-  const [data,setData]=useState<{payments?:Array<Record<string,unknown>>;subscriptions?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>({});
-  const [error,setError]=useState<string|null>(null);
+  const resource=useApiQuery<{payments?:Array<Record<string,unknown>>;subscriptions?:Array<Record<string,unknown>>;operatingCosts?:Array<Record<string,unknown>>}>(demo?"/api/demo/platform-finance":production?"/api/operator/finance":null);
+  const data=resource.data??{};
+  const error=resource.error,refresh=resource.refresh;
+  
   const [range,setRange]=useState("month");
-  useEffect(()=>{apiGet<typeof data>(demo?"/api/demo/platform-finance":"/api/operator/finance").then(payload=>{setData(payload);setError(null)}).catch(e=>setError(e instanceof Error?e.message:"Finanzdaten konnten nicht geladen werden."))},[production,demo]);
-  const now=new Date(), ranges:Record<string,{label:string;months:number}>={month:{label:"Dieser Monat",months:1},last:{label:"Letzter Monat",months:1},three:{label:"3 Monate",months:3},year:{label:"12 Monate",months:12},previous:{label:"Letztes Jahr",months:12}};
-  let end=new Date(now.getFullYear(),now.getMonth()+1,1),start=new Date(now.getFullYear(),now.getMonth(),1);if(range==="last"){end=start;start=new Date(end.getFullYear(),end.getMonth()-1,1)}else if(range==="three")start=new Date(end.getFullYear(),end.getMonth()-3,1);else if(range==="year")start=new Date(end.getFullYear(),end.getMonth()-12,1);else if(range==="previous"){start=new Date(now.getFullYear()-1,0,1);end=new Date(now.getFullYear(),0,1)}
-  const source=(data.payments??[]);
-  const inRange=(value:unknown)=>{const d=new Date(String(value??""));return d>=start&&d<end};
-  const volume=source.filter(x=>inRange(x.payment_date)).reduce((s,x)=>s+Number(x.amount??0),0);
-  const platformRevenue=((data.subscriptions??[])).filter(x=>inRange(x.created_at)).reduce((s,x)=>s+Number(x.monthly_revenue_chf??0),0);
-  const costs=((data.operatingCosts??[])).filter(x=>inRange(x.cost_date)).reduce((s,x)=>s+Number(x.amount??0),0);
-  const monthly=Array.from({length:Math.min(12,ranges[range].months)},(_,i)=>{const d=new Date(end.getFullYear(),end.getMonth()-1-i,1);const value=source.filter(x=>{const p=new Date(String(x.payment_date??""));return p.getFullYear()===d.getFullYear()&&p.getMonth()===d.getMonth()}).reduce((s,x)=>s+Number(x.amount??0),0);return{label:d.toLocaleDateString("de-CH",{month:"short"}),value}}).reverse(),max=Math.max(1,...monthly.map(x=>x.value));
+  if(resource.loading||error)return <OperatorLoadState loading={resource.loading} error={error} onRetry={refresh}/>;
+  
+  const ranges:Record<string,{label:string}>={month:{label:"Dieser Monat"},last:{label:"Letzter Monat"},three:{label:"3 Monate"},year:{label:"12 Monate"},previous:{label:"Letztes Jahr"}};
+  const {volume,platformRevenue,costs,result,monthly}=platformFinanceInsights(data,range,businessDate()),max=Math.max(1,...monthly.map(x=>x.value));
   return <div>
-    {error&&<ErrorState>{error}</ErrorState>}
+    {error&&<ErrorState onRetry={refresh}>{error}</ErrorState>}
     <div className="finance-range">{Object.entries(ranges).map(([key,x])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{x.label}</button>)}</div>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="donut" ratio={platformRevenue+costs?Math.round(platformRevenue/(platformRevenue+costs)*100):0}/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="status" ratio={platformRevenue+costs?Math.round(costs/(platformRevenue+costs)*100):0}/></div>
     <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/><div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div></section>
-    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+(platformRevenue-costs).toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden aus Azure PostgreSQL geladen und nach dem gewählten Zeitraum ausgewertet.</p></section></div>
+    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden aus Azure PostgreSQL geladen und nach dem gewählten Zeitraum ausgewertet.</p></section></div>
   </div>
 }
 
 function PaymentsView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/payments":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/payments")
-      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
@@ -510,18 +499,15 @@ function PaymentsView() {
 
 function SubscriptionsView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/accounts":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [selected,setSelected]=useState<Record<string,unknown>|null>(null);
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=useCallback(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/accounts")
-      .then(payload=>setItems(payload.items))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
-  useEffect(()=>{load();},[load]);
+  const load=refresh;
+  
 
   const updateSelected=async(patch:Record<string,unknown>)=>{
     if(!selected||!production)return;
@@ -544,7 +530,7 @@ function SubscriptionsView() {
   const grouped=["trial","start","business","pro"].map(plan=>({plan,items:items.filter(item=>item.plan===plan)}));
   const price:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
     <div className="operator-grid thirds">
@@ -560,9 +546,11 @@ function SubscriptionsView() {
 
 function RestrictionsView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
+  
   const {items:customers}=useOperatorCustomers();
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/restrictions":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [tenantId,setTenantId]=useState("");
   const [reason,setReason]=useState("Zahlungsausstand");
   const [scope,setScope]=useState("write");
@@ -571,12 +559,9 @@ function RestrictionsView() {
   const [confirm,setConfirm]=useState<"create"|string|null>(null);
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=useCallback(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/restrictions").then(payload=>setItems(payload.items)).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  const load=refresh;
 
-  useEffect(()=>{load();},[load]);
+  
   useEffect(()=>{if(production&&!tenantId&&customers[0]) queueMicrotask(()=>setTenantId(customers[0].id));},[production,tenantId,customers]);
 
   const createRestriction=async()=>{
@@ -600,7 +585,7 @@ function RestrictionsView() {
   };
 
   const active=production?items.filter(item=>item.active===true):[];
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
     <div className="operator-grid">
@@ -652,14 +637,13 @@ function MonitoringCockpit({services,api,database,errorRate,incidents}:{services
 
 function MonitoringView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [data,setData]=useState<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;mailQueue?:Array<{status:string;count:number;oldest:string}>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>({});
+  
+  const resource=useApiQuery<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;mailQueue?:Array<{status:string;count:number;oldest:string}>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>(production?"/api/operator/monitoring":null);
+  const data=resource.data??{};
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [toast,setToast]=useState<string|null>(null);
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<typeof data>("/api/operator/monitoring").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  
 
   const testEmail=async()=>{
     try{
@@ -671,7 +655,7 @@ function MonitoringView() {
     window.setTimeout(()=>setToast(null),2600);
   };
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} errorRate="—" incidents={[]}/>;
 
@@ -702,22 +686,19 @@ function MonitoringView() {
 
 function AnnouncementsView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/announcements":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [title,setTitle]=useState("");
   const [kind,setKind]=useState("information");
   const [audience,setAudience]=useState("all");
   const [body,setBody]=useState("");
   const [toast,setToast]=useState<string|null>(null);
 
-  const load=useCallback(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/announcements")
-      .then(payload=>setItems(payload.items))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  const load=refresh;
 
-  useEffect(()=>{load();},[load]);
+  
 
   const publish=async()=>{
     if(!title.trim()||!body.trim()){
@@ -731,8 +712,8 @@ function AnnouncementsView() {
       return;
     }
     try{
-      const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/announcements",{title,body,kind,audience,published:true});
-      setItems(current=>[payload.item,...current]);
+      await apiPost<{item:Record<string,unknown>}>("/api/operator/announcements",{title,body,kind,audience,published:true});
+      refresh();
       setTitle("");setBody("");
       setToast("Ankündigung veröffentlicht.");
     }catch(error){
@@ -744,7 +725,7 @@ function AnnouncementsView() {
   const kindLabel:Record<string,string>={information:"Information",maintenance:"Wartung",incident:"Störung",feature:"Neue Funktion"};
   const audienceLabel:Record<string,string>={all:"Alle Kunden",start:"Start",business:"Business",pro:"Pro"};
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <div className="operator-grid">
     <section className="surface">
@@ -762,17 +743,14 @@ function AnnouncementsView() {
 
 function SecurityView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/users":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/users")
-      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <>
     <section className="surface">
@@ -800,19 +778,16 @@ function SecurityView() {
 
 function AuditView() {
   const production=useBackendMode();
-  const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState<string|null>(null);
-  const [items,setItems]=useState<Array<Record<string,unknown>>>([]);
+  
+  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/audit":null);
+  const items=resource.data?.items??[];
+  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [query,setQuery]=useState("");
   const demoAuditRows=[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].filter(row=>!query.trim()||row.join(" ").toLowerCase().includes(query.trim().toLowerCase()));
 
-  useEffect(()=>{
-    if(!production) return;
-    apiGet<{items:Array<Record<string,unknown>>}>("/api/operator/audit")
-      .then(payload=>queueMicrotask(()=>setItems(payload.items)))
-      .catch(e=>setLoadError(e instanceof Error?e.message:"Daten konnten nicht geladen werden.")).finally(()=>setLoading(false));
-  },[production]);
+  
 
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError}/>;
+  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <section className="surface">
     <div className="operator-toolbar"><span className="operator-demo-filter">Demo · letzte 7 Tage</span><ListSearch value={query} onChange={setQuery} placeholder="Audit durchsuchen..."/></div>

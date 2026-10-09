@@ -70,6 +70,20 @@ export function logoutClientSession():Promise<void>{
   return request;
 }
 
+let operatorLogoutPending:Promise<{microsoftLogoutUrl?:string|null}>|null=null;
+export function logoutOperatorClientSession(){
+  if(operatorLogoutPending)return operatorLogoutPending;
+  const request=(async()=>{
+    const payload=await apiPost<{ok?:boolean;microsoftLogoutUrl?:string|null}>("/api/operator/logout",{});
+    if(payload.ok!==true)throw new Error("Abmelden konnte nicht bestätigt werden. Bitte erneut versuchen.");
+    clearDemoClientSession();
+    return payload;
+  })();
+  operatorLogoutPending=request;
+  void request.finally(()=>{if(operatorLogoutPending===request)operatorLogoutPending=null;}).catch(()=>{});
+  return request;
+}
+
 export class ClientApiError extends Error {
   constructor(message:string,public code:string,public status:number){super(message);}
 }

@@ -5304,128 +5304,36 @@
       "file": "components/operator.tsx",
       "calls": [
         {
-          "callee": "apiGet<{items:OperatorTicket[]}>(\"/api/operator/tickets\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
+          "callee": "useApiQuery",
           "line": 103,
           "arguments": [
-            "()=>setLoading(false)"
+            "production?\"/api/operator/tickets\":null"
           ]
         },
         {
-          "callee": "apiGet<{items:OperatorTicket[]}>(\"/api/operator/tickets\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 103,
+          "callee": "useApiQuery",
+          "line": 113,
           "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
+            "production?\"/api/operator/customers\":null"
           ]
         },
         {
-          "callee": "apiGet<{items:OperatorTicket[]}>(\"/api/operator/tickets\")\n      .then",
-          "line": 103,
+          "callee": "useApiQuery",
+          "line": 196,
           "arguments": [
-            "payload=>queueMicrotask(()=>setItems(payload.items))"
+            "production?\"/api/operator/dashboard\":null"
           ]
         },
         {
-          "callee": "apiGet",
-          "line": 103,
+          "callee": "useApiQuery",
+          "line": 281,
           "arguments": [
-            "\"/api/operator/tickets\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:OperatorTenant[]}>(\"/api/operator/customers\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 116,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:OperatorTenant[]}>(\"/api/operator/customers\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 116,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:OperatorTenant[]}>(\"/api/operator/customers\")\n      .then",
-          "line": 116,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setItems(payload.items))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 116,
-          "arguments": [
-            "\"/api/operator/customers\""
-          ]
-        },
-        {
-          "callee": "fetch",
-          "line": 133,
-          "arguments": [
-            "\"/api/operator/logout\"",
-            "{method:\"POST\"}"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(\"/api/operator/dashboard\").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 201,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(\"/api/operator/dashboard\").then(payload=>queueMicrotask(()=>setData(payload))).catch",
-          "line": 201,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(\"/api/operator/dashboard\").then",
-          "line": 201,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setData(payload))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 201,
-          "arguments": [
-            "\"/api/operator/dashboard\""
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>(\"/api/operator/tickets/\"+encodeURIComponent(ticketId))\n      .then(payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);}))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 291,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>(\"/api/operator/tickets/\"+encodeURIComponent(ticketId))\n      .then(payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);}))\n      .catch",
-          "line": 291,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>;messages:Array<Record<string,unknown>>}>(\"/api/operator/tickets/\"+encodeURIComponent(ticketId))\n      .then",
-          "line": 291,
-          "arguments": [
-            "payload=>queueMicrotask(()=>{setTicket(payload.item);setMessages(payload.messages);})"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 291,
-          "arguments": [
-            "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)"
+            "production?\"/api/operator/tickets/\"+encodeURIComponent(ticketId):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 299,
+          "line": 297,
           "arguments": [
             "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)",
             "{[field]:value}"
@@ -5433,156 +5341,58 @@
         },
         {
           "callee": "apiPost",
-          "line": 313,
+          "line": 311,
           "arguments": [
             "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)+\"/messages\"",
             "{body:value,internal}"
           ]
         },
         {
-          "callee": "apiGet<typeof data>(\"/api/operator/customers/\"+encodeURIComponent(tenantId))\n      .then(payload=>queueMicrotask(()=>setData(payload)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 398,
+          "callee": "useApiQuery",
+          "line": 392,
           "arguments": [
-            "()=>setLoading(false)"
+            "production?\"/api/operator/customers/\"+encodeURIComponent(tenantId):null"
           ]
         },
         {
-          "callee": "apiGet<typeof data>(\"/api/operator/customers/\"+encodeURIComponent(tenantId))\n      .then(payload=>queueMicrotask(()=>setData(payload)))\n      .catch",
-          "line": 398,
+          "callee": "useApiQuery",
+          "line": 448,
           "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
+            "demo?\"/api/demo/platform-finance\":production?\"/api/operator/finance\":null"
           ]
         },
         {
-          "callee": "apiGet<typeof data>(\"/api/operator/customers/\"+encodeURIComponent(tenantId))\n      .then",
-          "line": 398,
+          "callee": "useApiQuery",
+          "line": 469,
           "arguments": [
-            "payload=>queueMicrotask(()=>setData(payload))"
+            "production?\"/api/operator/payments\":null"
           ]
         },
         {
-          "callee": "apiGet",
-          "line": 398,
+          "callee": "useApiQuery",
+          "line": 503,
           "arguments": [
-            "\"/api/operator/customers/\"+encodeURIComponent(tenantId)"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(demo?\"/api/demo/platform-finance\":\"/api/operator/finance\").then(payload=>{setData(payload);setError(null)}).catch",
-          "line": 456,
-          "arguments": [
-            "e=>setError(e instanceof Error?e.message:\"Finanzdaten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(demo?\"/api/demo/platform-finance\":\"/api/operator/finance\").then",
-          "line": 456,
-          "arguments": [
-            "payload=>{setData(payload);setError(null)}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 456,
-          "arguments": [
-            "demo?\"/api/demo/platform-finance\":\"/api/operator/finance\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/payments\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 481,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/payments\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 481,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/payments\")\n      .then",
-          "line": 481,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setItems(payload.items))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 481,
-          "arguments": [
-            "\"/api/operator/payments\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/accounts\")\n      .then(payload=>setItems(payload.items))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 520,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/accounts\")\n      .then(payload=>setItems(payload.items))\n      .catch",
-          "line": 520,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/accounts\")\n      .then",
-          "line": 520,
-          "arguments": [
-            "payload=>setItems(payload.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 520,
-          "arguments": [
-            "\"/api/operator/accounts\""
+            "production?\"/api/operator/accounts\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 530,
+          "line": 516,
           "arguments": [
             "\"/api/operator/accounts/\"+encodeURIComponent(tenantId)",
             "patch"
           ]
         },
         {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/restrictions\").then(payload=>setItems(payload.items)).catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 576,
+          "callee": "useApiQuery",
+          "line": 551,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/restrictions\").then(payload=>setItems(payload.items)).catch",
-          "line": 576,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/restrictions\").then",
-          "line": 576,
-          "arguments": [
-            "payload=>setItems(payload.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 576,
-          "arguments": [
-            "\"/api/operator/restrictions\""
+            "production?\"/api/operator/restrictions\":null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 585,
+          "line": 570,
           "arguments": [
             "\"/api/operator/restrictions\"",
             "{tenantId,scope,reason,note:note.trim()||reason,endsAt:endsAt||null}"
@@ -5590,138 +5400,54 @@
         },
         {
           "callee": "apiPatch",
-          "line": 596,
+          "line": 581,
           "arguments": [
             "\"/api/operator/restrictions/\"+encodeURIComponent(id)",
             "{active:false}"
           ]
         },
         {
-          "callee": "apiGet<typeof data>(\"/api/operator/monitoring\").then(payload=>queueMicrotask(()=>setData(payload))).catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 661,
+          "callee": "useApiQuery",
+          "line": 641,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(\"/api/operator/monitoring\").then(payload=>queueMicrotask(()=>setData(payload))).catch",
-          "line": 661,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<typeof data>(\"/api/operator/monitoring\").then",
-          "line": 661,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setData(payload))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 661,
-          "arguments": [
-            "\"/api/operator/monitoring\""
+            "production?\"/api/operator/monitoring\":null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 666,
+          "line": 650,
           "arguments": [
             "\"/api/operator/integrations/email-test\"",
             "{}"
           ]
         },
         {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then(payload=>setItems(payload.items))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 715,
+          "callee": "useApiQuery",
+          "line": 690,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then(payload=>setItems(payload.items))\n      .catch",
-          "line": 715,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then",
-          "line": 715,
-          "arguments": [
-            "payload=>setItems(payload.items)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 715,
-          "arguments": [
-            "\"/api/operator/announcements\""
+            "production?\"/api/operator/announcements\":null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 734,
+          "line": 715,
           "arguments": [
             "\"/api/operator/announcements\"",
             "{title,body,kind,audience,published:true}"
           ]
         },
         {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 770,
+          "callee": "useApiQuery",
+          "line": 747,
           "arguments": [
-            "()=>setLoading(false)"
+            "production?\"/api/operator/users\":null"
           ]
         },
         {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 770,
+          "callee": "useApiQuery",
+          "line": 782,
           "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then",
-          "line": 770,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setItems(payload.items))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 770,
-          "arguments": [
-            "\"/api/operator/users\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 810,
-          "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 810,
-          "arguments": [
-            "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then",
-          "line": 810,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setItems(payload.items))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 810,
-          "arguments": [
-            "\"/api/operator/audit\""
+            "production?\"/api/operator/audit\":null"
           ]
         }
       ],
@@ -9154,8 +8880,21 @@
           ]
         },
         {
+          "callee": "(async()=>{\n    const payload=await apiPost<{ok?:boolean;microsoftLogoutUrl?:string|null}>(\"/api/operator/logout\",{});\n    if(payload.ok!==true)throw new Error(\"Abmelden konnte nicht bestätigt werden. Bitte erneut versuchen.\");\n    clearDemoClientSession();\n    return payload;\n  })",
+          "line": 76,
+          "arguments": []
+        },
+        {
+          "callee": "apiPost",
+          "line": 77,
+          "arguments": [
+            "\"/api/operator/logout\"",
+            "{}"
+          ]
+        },
+        {
           "callee": "fetch",
-          "line": 78,
+          "line": 92,
           "arguments": [
             "path",
             "{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!==\"GET\"?30000:15000)}"
@@ -9163,7 +8902,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 104,
+          "line": 118,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -9171,12 +8910,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 121,
+          "line": 135,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 122,
+          "line": 136,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -9184,7 +8923,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 134,
+          "line": 148,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -9192,7 +8931,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 144,
+          "line": 158,
           "arguments": [
             "path",
             "{method:\"DELETE\"}"
@@ -9200,7 +8939,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 150,
+          "line": 164,
           "arguments": [
             "path",
             "{method:\"POST\",body:form}"

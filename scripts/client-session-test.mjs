@@ -38,6 +38,15 @@ try{
  await assert.rejects(backend.logoutClientSession(),/erneut/);assert.equal(local.getItem('binso.demo.session'),'1','Failed logout must preserve the current session state');
  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(local.getItem('binso.demo.session'),null);assert.equal(local.getItem('binso.theme.mode'),'light');assert.equal(cache.cachedClientSession(),null);
  console.log('Demo start deduplication, offline failure, session-cache isolation and confirmed logout with retry passed.');
+ local.setItem('binso.demo.session','1');
+ globalThis.fetch=async()=>new Response(JSON.stringify({ok:false}));
+ await assert.rejects(backend.logoutOperatorClientSession(),/bestätigt/);assert.equal(local.getItem('binso.demo.session'),'1','Unconfirmed operator logout cannot erase session state');
+ let resolveOperator;let operatorLogouts=0;
+ globalThis.fetch=()=>{operatorLogouts++;return new Promise(resolve=>{resolveOperator=resolve})};
+ const operatorLogout=backend.logoutOperatorClientSession();assert.equal(backend.logoutOperatorClientSession(),operatorLogout);assert.equal(operatorLogouts,1,'Concurrent operator logout is deduplicated');
+ resolveOperator(new Response(JSON.stringify({ok:true,microsoftLogoutUrl:null})));await operatorLogout;
+ assert.equal(local.getItem('binso.demo.session'),null);assert.equal(cache.cachedClientSession(),null);assert.equal(local.getItem('binso.theme.mode'),'light');
+ console.log('Confirmed operator logout clears the shared private session fence; unconfirmed logout preserves state and simultaneous clicks share one request.');
  const route=ts.createSourceFile('session.ts',await fs.readFile('app/api/auth/session/route.ts','utf8'),ts.ScriptTarget.Latest,true);
  const get=route.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='GET').getText(route);
  const compiled=ts.transpileModule(get,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;

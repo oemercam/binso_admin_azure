@@ -71,10 +71,12 @@ let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
 let teamMemberRole='member';let supportMessages=[];
+const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
   teamMemberRole='member';supportMessages=[];
+  operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
   await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
@@ -82,6 +84,7 @@ try{
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
    if(req.method()!=='GET'){
+    if(req.method()==='PATCH'&&p==='/api/operator/accounts/tenant-one'){const body=JSON.parse(req.postData());if(body.plan)operatorAccount.plan=body.plan;if(body.userLimit)operatorAccount.user_limit=body.userLimit;if(body.subscriptionStatus)operatorAccount.subscription_status=body.subscriptionStatus;return route.fulfill({json:{item:operatorAccount}});}
     if(customerIdentityMode&&req.method()==='PATCH'&&p.startsWith('/api/customers/')){const item=collections.customers.find(item=>item.id===p.split('/')[3]);Object.assign(item,JSON.parse(req.postData()));return route.fulfill({json:{item}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
@@ -110,7 +113,7 @@ try{
    else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme,language:'de',avatar_url:null},email:'test@example.invalid'};
    else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
 
-   else if(p==='/api/operator/accounts')data={items:[{tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'}]};
+   else if(p==='/api/operator/accounts')data={items:[operatorAccount]};
    else if(p==='/api/operator/customers')data={items:[{id:'tenant-one',name:'Prüffirma AG',created_at:'2026-10-09'}]};
    else if(p==='/api/operator/restrictions')data={items:[]};
    else if(p==='/api/operator/tickets/ticket-one')data={item:{id:'ticket-one',tenant:{name:'Prüffirma AG'},status:'open',priority:'normal'},messages:[{id:'public',body:'Öffentliche Nachricht',author_type:'customer',created_at:'2026-10-09',internal:false},{id:'private',body:'Vertrauliche interne Notiz',author_type:'operator',created_at:'2026-10-09',internal:true}]};
@@ -209,8 +212,8 @@ try{
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count())assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');}
     if(!process.env.BINSO_UX_BASELINE&&width<=760){
      for(const row of await page.locator('.document-summary-row.has-value').filter({visible:true}).all()){
-      const title=await row.locator(':scope>b').boundingBox(),meta=await row.locator(':scope>small').boundingBox(),amount=await row.locator('.document-summary-amount').boundingBox();
-      if(amount)assert.ok(meta.y>=title.y+title.height-1&&amount.y>=meta.y+meta.height-1,'Financial row has distinct title, metadata and amount lines');
+      const geometry=await row.evaluate(el=>{const box=selector=>{const node=el.querySelector(selector);return node?.getClientRects().length?node.getBoundingClientRect().toJSON():null};return {title:box(':scope>b'),meta:box(':scope>small'),amount:box('.document-summary-amount')}});
+      if(geometry.amount){assert.ok(geometry.title&&geometry.meta,'A visible financial amount must have a visible title and metadata');assert.ok(geometry.meta.y>=geometry.title.y+geometry.title.height-1&&geometry.amount.y>=geometry.meta.y+geometry.meta.height-1,'Financial row has distinct title, metadata and amount lines');}
      }
      if(['/rechnungen/RE-TEST-1','/angebote/AN-TEST-1'].includes(route)){
       const header=page.locator('.mobile-header');assert.equal(await header.locator('.status').count(),1,'Document status appears once in its header');
@@ -546,9 +549,13 @@ try{
    await page.setViewportSize({width:390,height:740});await navigate(base+'/operator/abonnemente');
    const accountRow=page.locator('.operator-table-row').filter({hasText:'Prüffirma AG'});await accountRow.click();
    const accountSheet=page.getByRole('dialog',{name:'Prüffirma AG',exact:true});await accountSheet.waitFor();assert.equal(await accountSheet.getByLabel('Plan',{exact:true}).inputValue(),'pro');assert.equal(await accountSheet.getByLabel('Benutzerlimit',{exact:true}).inputValue(),'10');assert.equal(await accountSheet.evaluate(el=>el.contains(document.activeElement)),true);
+   const operatorPeer=await trackedPage();await operatorPeer.goto(base+'/operator/abonnemente');await operatorPeer.locator('.operator-table-row').getByText('Pro',{exact:true}).waitFor();
+   await accountSheet.getByLabel('Plan',{exact:true}).selectOption('business');await operatorPeer.locator('.operator-table-row').getByText('Business',{exact:true}).waitFor();assert.equal(await accountSheet.getByLabel('Plan',{exact:true}).inputValue(),'business','Operator mutation revalidates the list and open account consistently');await operatorPeer.close();await page.bringToFront();
    await page.setViewportSize({width:390,height:400});await accountSheet.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))});const actionBox=await accountSheet.locator('.filter-sheet-actions').boundingBox();assert.ok(actionBox.y+actionBox.height<=401,'Operator FormSheet actions fit a short viewport');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-subscription-sheet.png`)});await page.keyboard.press('Escape');await accountSheet.waitFor({state:'hidden'});assert.equal(await accountRow.evaluate(el=>el===document.activeElement),true);
    await page.setViewportSize({width:390,height:740});await navigate(base+'/operator/sperrungen');await page.getByRole('button',{name:'Einschränkung erstellen',exact:true}).click();const restrict=page.getByRole('alertdialog',{name:'Zugriff einschränken?',exact:true});await restrict.waitFor();assert.equal(await restrict.evaluate(el=>el.contains(document.activeElement)),true);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-restriction-confirm.png`)});await restrict.getByRole('button',{name:'Abbrechen',exact:true}).click();await restrict.waitFor({state:'hidden'});
    await navigate(base+'/operator/tickets/ticket-one');await page.getByText('Öffentliche Nachricht',{exact:true}).waitFor();assert.equal(await page.getByText('Vertrauliche interne Notiz',{exact:true}).count(),0);await page.getByRole('button',{name:'Interne Notiz',exact:true}).click();await page.getByText('Vertrauliche interne Notiz',{exact:true}).waitFor();assert.equal(await page.getByText('Öffentliche Nachricht',{exact:true}).count(),0);assert.equal(await page.locator('.message').count(),1);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-internal-message.png`)});
+   let failAccounts=true;const accountFailure=async route=>failAccounts?route.fulfill({status:503,json:{message:'Synthetic operator accounts unavailable'}}):route.fallback();await context.route('**/api/operator/accounts',accountFailure);
+   await navigate(base+'/operator/abonnemente');await page.getByText('Synthetic operator accounts unavailable',{exact:true}).waitFor();await page.evaluate(()=>{window.__operatorRetryMarker='same-document'});failAccounts=false;await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Prüffirma AG',{exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.__operatorRetryMarker),'same-document','Operator retry preserves the document and targets the query');await context.unroute('**/api/operator/accounts',accountFailure);
 
   }
   if(hasInteraction('billing')){
