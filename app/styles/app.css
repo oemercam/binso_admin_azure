@@ -105,6 +105,7 @@
   min-height:30px;
   margin-bottom:var(--heading-content-gap);
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
   gap:12px;
@@ -917,7 +918,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .session-list>div{
   min-height:64px;
   display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr) auto;
   gap:11px;
   align-items:center;
   border-bottom:1px solid var(--color-line);

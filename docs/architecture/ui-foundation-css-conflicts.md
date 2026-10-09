@@ -5,12 +5,12 @@ This lists every property with different declared values for the same selector/c
 | Selector | Context | Property | Ordered sources / values | Assessment |
 | --- | --- | --- | --- | --- |
 | input | Base | color | app/styles/base.css:24 = inherit; app/styles/base.css:163 = var(--color-fg) | Different ordered values; candidate only, computed browser evidence required |
-| select | Base | font | app/styles/base.css:24 = inherit; app/styles/app.css:394 = inherit | Repeated identical value; context/selector-list ownership must be checked before removal |
+| select | Base | font | app/styles/base.css:24 = inherit; app/styles/app.css:395 = inherit | Repeated identical value; context/selector-list ownership must be checked before removal |
 | select | Base | color | app/styles/base.css:24 = inherit; app/styles/base.css:163 = var(--color-fg) | Different ordered values; candidate only, computed browser evidence required |
-| textarea | Base | font | app/styles/base.css:24 = inherit; app/styles/app.css:394 = inherit | Repeated identical value; context/selector-list ownership must be checked before removal |
+| textarea | Base | font | app/styles/base.css:24 = inherit; app/styles/app.css:395 = inherit | Repeated identical value; context/selector-list ownership must be checked before removal |
 | textarea | Base | color | app/styles/base.css:24 = inherit; app/styles/base.css:163 = var(--color-fg) | Different ordered values; candidate only, computed browser evidence required |
-| .desktop-notification-button | Base | display | app/styles/base.css:81 = grid; app/styles/app.css:1247 = grid | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .desktop-notification-button | Base | place-items | app/styles/base.css:81 = center; app/styles/app.css:1247 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .desktop-notification-button | Base | display | app/styles/base.css:81 = grid; app/styles/app.css:1248 = grid | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .desktop-notification-button | Base | place-items | app/styles/base.css:81 = center; app/styles/app.css:1248 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
 | .desktop-notification-button | Base | border-radius | app/styles/base.css:81 = var(--radius-md); app/styles/base.css:99 = 0 | Different ordered values; candidate only, computed browser evidence required |
 | .desktop-notification-button | Base | background | app/styles/base.css:81 = transparent; app/styles/base.css:99 = transparent | Repeated identical value; context/selector-list ownership must be checked before removal |
 | .desktop-notification-button | Base | color | app/styles/base.css:81 = inherit; app/styles/base.css:99 = var(--color-fg) | Different ordered values; candidate only, computed browser evidence required |
@@ -34,42 +34,42 @@ This lists every property with different declared values for the same selector/c
 | .auth-card>.logo | Base | margin-bottom | app/styles/marketing.css:401 = 56px; app/styles/marketing.css:704 = 40px | Different ordered values; candidate only, computed browser evidence required |
 | .auth-topbar | Base | margin-bottom | app/styles/marketing.css:402 = 56px; app/styles/marketing.css:704 = 40px | Different ordered values; candidate only, computed browser evidence required |
 | .page-head>div | Base | min-width | app/styles/app.css:65 = 0; app/styles/responsive.css:2874 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .invoice-tablet-preview | Base | border-radius | app/styles/app.css:91 = var(--radius-lg); app/styles/app.css:554 = var(--radius-lg) | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .invoice-tablet-preview | Base | background | app/styles/app.css:91 = var(--color-bg); app/styles/app.css:554 = var(--color-bg) | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .desktop-record-table | Base | min-width | app/styles/app.css:271 = 0; app/styles/responsive.css:2884 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .desktop-record-row>.table-status-cell | Base | overflow | app/styles/app.css:282 = visible; app/styles/responsive.css:2886 = visible | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .operator-detail-list>div | Base | padding | app/styles/app.css:316 = 12px 0; app/styles/operator.css:114 = 11px 0 | Different ordered values; candidate only, computed browser evidence required |
-| .operator-detail-list>div | Base | display | app/styles/app.css:316 = grid; app/styles/operator.css:114 = grid | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .operator-detail-list>div | Base | grid-template-columns | app/styles/app.css:316 = 120px minmax(0,1fr); app/styles/operator.css:114 = 130px 1fr | Different ordered values; candidate only, computed browser evidence required |
-| .operator-detail-list>div | Base | gap | app/styles/app.css:316 = 12px; app/styles/operator.css:114 = 12px | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .operator-detail-list>div | Base | border-bottom | app/styles/app.css:316 = 1px solid var(--color-line); app/styles/operator.css:114 = 1px solid var(--color-line) | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field | Base | grid-template-columns | app/styles/app.css:416 = minmax(0,1fr); app/styles/app.css:1455 = minmax(0,1fr) | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field | Base | min-width | app/styles/app.css:416 = 0; app/styles/app.css:1448 = 0; app/styles/responsive.css:2891 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .document-line-items>div | Base | grid-template-columns | app/styles/app.css:525 = minmax(0,1fr) 72px 96px 110px 110px 36px; app/styles/app.css:1468 = minmax(0,1fr) 58px 84px 86px 90px 32px | Different ordered values; candidate only, computed browser evidence required |
-| .invoice-totals>strong | Base | font-size | app/styles/app.css:541 = 12px; app/styles/app.css:552 = 14px | Different ordered values; candidate only, computed browser evidence required |
-| .settings-profile | Base | align-items | app/styles/app.css:759 = center; app/styles/app.css:1313 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .company-logo-card | Base | align-items | app/styles/app.css:759 = center; app/styles/app.css:1313 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .header-panel .search-results section span | Base | font-size | app/styles/app.css:1012 = 13px; app/styles/app.css:1013 = 11px | Different ordered values; candidate only, computed browser evidence required |
-| .sheet-menu>:is(a | Base | justify-self | app/styles/app.css:1087 = end; app/styles/app.css:1088 = end | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .payment-donut-card | Base | border | app/styles/app.css:1338 = 1px solid var(--color-line); app/styles/app.css:1375 = 0 | Different ordered values; candidate only, computed browser evidence required |
-| .payment-donut-card | Base | border-radius | app/styles/app.css:1338 = 16px; app/styles/app.css:1375 = 0 | Different ordered values; candidate only, computed browser evidence required |
-| .payment-donut-card | Base | background | app/styles/app.css:1338 = var(--color-bg); app/styles/app.css:1375 = transparent | Different ordered values; candidate only, computed browser evidence required |
-| .finance-kpis | Base | border | app/styles/app.css:1338 = 1px solid var(--color-line); app/styles/app.css:1375 = 0 | Different ordered values; candidate only, computed browser evidence required |
-| .finance-kpis | Base | border-radius | app/styles/app.css:1338 = 16px; app/styles/app.css:1375 = 0 | Different ordered values; candidate only, computed browser evidence required |
-| .finance-kpis | Base | background | app/styles/app.css:1338 = var(--color-bg); app/styles/app.css:1375 = transparent | Different ordered values; candidate only, computed browser evidence required |
-| .finance-kpis | Base | padding | app/styles/app.css:1338 = 18px; app/styles/app.css:1341 = 0 | Different ordered values; candidate only, computed browser evidence required |
-| .revenue-bars | Base | margin-top | app/styles/app.css:1363 = 20px; app/styles/app.css:1370 = 6px | Different ordered values; candidate only, computed browser evidence required |
-| .finance-period-head | Base | min-height | app/styles/app.css:1418 = 48px; app/styles/app.css:1432 = 34px | Different ordered values; candidate only, computed browser evidence required |
-| .finance-period-head | Base | color | app/styles/app.css:1418 = inherit; app/styles/app.css:1432 = var(--color-muted) | Different ordered values; candidate only, computed browser evidence required |
-| .sheet-body | Base | min-height | app/styles/app.css:1440 = 0; app/styles/app.css:1442 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .sheet-body | Base | min-width | app/styles/app.css:1440 = 0; app/styles/app.css:1442 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .sheet-body | Base | overflow-y | app/styles/app.css:1440 = auto; app/styles/app.css:1442 = auto | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .sheet-body | Base | overscroll-behavior | app/styles/app.css:1440 = contain; app/styles/app.css:1442 = contain | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field | Base | max-width | app/styles/app.css:1448 = 100%; app/styles/responsive.css:2891 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field>select | Base | min-width | app/styles/app.css:1448 = 0; app/styles/app.css:1456 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field>select | Base | max-width | app/styles/app.css:1448 = 100%; app/styles/app.css:1456 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field>textarea | Base | min-width | app/styles/app.css:1448 = 0; app/styles/app.css:1456 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
-| .form-field>textarea | Base | max-width | app/styles/app.css:1448 = 100%; app/styles/app.css:1456 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .invoice-tablet-preview | Base | border-radius | app/styles/app.css:91 = var(--radius-lg); app/styles/app.css:555 = var(--radius-lg) | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .invoice-tablet-preview | Base | background | app/styles/app.css:91 = var(--color-bg); app/styles/app.css:555 = var(--color-bg) | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .desktop-record-table | Base | min-width | app/styles/app.css:272 = 0; app/styles/responsive.css:2884 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .desktop-record-row>.table-status-cell | Base | overflow | app/styles/app.css:283 = visible; app/styles/responsive.css:2886 = visible | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .operator-detail-list>div | Base | padding | app/styles/app.css:317 = 12px 0; app/styles/operator.css:114 = 11px 0 | Different ordered values; candidate only, computed browser evidence required |
+| .operator-detail-list>div | Base | display | app/styles/app.css:317 = grid; app/styles/operator.css:114 = grid | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .operator-detail-list>div | Base | grid-template-columns | app/styles/app.css:317 = 120px minmax(0,1fr); app/styles/operator.css:114 = 130px 1fr | Different ordered values; candidate only, computed browser evidence required |
+| .operator-detail-list>div | Base | gap | app/styles/app.css:317 = 12px; app/styles/operator.css:114 = 12px | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .operator-detail-list>div | Base | border-bottom | app/styles/app.css:317 = 1px solid var(--color-line); app/styles/operator.css:114 = 1px solid var(--color-line) | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field | Base | grid-template-columns | app/styles/app.css:417 = minmax(0,1fr); app/styles/app.css:1456 = minmax(0,1fr) | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field | Base | min-width | app/styles/app.css:417 = 0; app/styles/app.css:1449 = 0; app/styles/responsive.css:2891 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .document-line-items>div | Base | grid-template-columns | app/styles/app.css:526 = minmax(0,1fr) 72px 96px 110px 110px 36px; app/styles/app.css:1469 = minmax(0,1fr) 58px 84px 86px 90px 32px | Different ordered values; candidate only, computed browser evidence required |
+| .invoice-totals>strong | Base | font-size | app/styles/app.css:542 = 12px; app/styles/app.css:553 = 14px | Different ordered values; candidate only, computed browser evidence required |
+| .settings-profile | Base | align-items | app/styles/app.css:760 = center; app/styles/app.css:1314 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .company-logo-card | Base | align-items | app/styles/app.css:760 = center; app/styles/app.css:1314 = center | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .header-panel .search-results section span | Base | font-size | app/styles/app.css:1013 = 13px; app/styles/app.css:1014 = 11px | Different ordered values; candidate only, computed browser evidence required |
+| .sheet-menu>:is(a | Base | justify-self | app/styles/app.css:1088 = end; app/styles/app.css:1089 = end | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .payment-donut-card | Base | border | app/styles/app.css:1339 = 1px solid var(--color-line); app/styles/app.css:1376 = 0 | Different ordered values; candidate only, computed browser evidence required |
+| .payment-donut-card | Base | border-radius | app/styles/app.css:1339 = 16px; app/styles/app.css:1376 = 0 | Different ordered values; candidate only, computed browser evidence required |
+| .payment-donut-card | Base | background | app/styles/app.css:1339 = var(--color-bg); app/styles/app.css:1376 = transparent | Different ordered values; candidate only, computed browser evidence required |
+| .finance-kpis | Base | border | app/styles/app.css:1339 = 1px solid var(--color-line); app/styles/app.css:1376 = 0 | Different ordered values; candidate only, computed browser evidence required |
+| .finance-kpis | Base | border-radius | app/styles/app.css:1339 = 16px; app/styles/app.css:1376 = 0 | Different ordered values; candidate only, computed browser evidence required |
+| .finance-kpis | Base | background | app/styles/app.css:1339 = var(--color-bg); app/styles/app.css:1376 = transparent | Different ordered values; candidate only, computed browser evidence required |
+| .finance-kpis | Base | padding | app/styles/app.css:1339 = 18px; app/styles/app.css:1342 = 0 | Different ordered values; candidate only, computed browser evidence required |
+| .revenue-bars | Base | margin-top | app/styles/app.css:1364 = 20px; app/styles/app.css:1371 = 6px | Different ordered values; candidate only, computed browser evidence required |
+| .finance-period-head | Base | min-height | app/styles/app.css:1419 = 48px; app/styles/app.css:1433 = 34px | Different ordered values; candidate only, computed browser evidence required |
+| .finance-period-head | Base | color | app/styles/app.css:1419 = inherit; app/styles/app.css:1433 = var(--color-muted) | Different ordered values; candidate only, computed browser evidence required |
+| .sheet-body | Base | min-height | app/styles/app.css:1441 = 0; app/styles/app.css:1443 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .sheet-body | Base | min-width | app/styles/app.css:1441 = 0; app/styles/app.css:1443 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .sheet-body | Base | overflow-y | app/styles/app.css:1441 = auto; app/styles/app.css:1443 = auto | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .sheet-body | Base | overscroll-behavior | app/styles/app.css:1441 = contain; app/styles/app.css:1443 = contain | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field | Base | max-width | app/styles/app.css:1449 = 100%; app/styles/responsive.css:2891 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field>select | Base | min-width | app/styles/app.css:1449 = 0; app/styles/app.css:1457 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field>select | Base | max-width | app/styles/app.css:1449 = 100%; app/styles/app.css:1457 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field>textarea | Base | min-width | app/styles/app.css:1449 = 0; app/styles/app.css:1457 = 0 | Repeated identical value; context/selector-list ownership must be checked before removal |
+| .form-field>textarea | Base | max-width | app/styles/app.css:1449 = 100%; app/styles/app.css:1457 = 100% | Repeated identical value; context/selector-list ownership must be checked before removal |
 | .operator-sidebar a.active | Base | background | app/styles/operator.css:27 = var(--color-bg); app/styles/operator.css:345 = var(--color-subtle) | Different ordered values; candidate only, computed browser evidence required |
 | .operator-main | Base | padding | app/styles/operator.css:38 = 30px; app/styles/operator.css:349 = 0 var(--page-x) 72px | Different ordered values; candidate only, computed browser evidence required |
 | .operator-grid | Base | gap | app/styles/operator.css:65 = 14px; app/styles/operator.css:421 = 20px | Different ordered values; candidate only, computed browser evidence required |

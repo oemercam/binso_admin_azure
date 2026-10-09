@@ -112972,9 +112972,7 @@
         {
           "tag": "FormLabel",
           "line": 114,
-          "props": [
-            "id={`${id}-label`}"
-          ]
+          "props": []
         },
         {
           "tag": "Icon",
@@ -115066,6 +115064,14 @@
           "line": 30,
           "props": [
             "onRetry={()=>{}}"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 30,
+          "props": [
+            "variant=\"secondary\"",
+            "onClick={()=>setShowToast(!showToast)}"
           ]
         },
         {
@@ -155458,6 +155464,11 @@
           "important": false
         },
         {
+          "property": "flex-wrap",
+          "value": "wrap",
+          "important": false
+        },
+        {
           "property": "align-items",
           "value": "center",
           "important": false
@@ -155477,7 +155488,7 @@
     {
       "id": 335,
       "file": "app/styles/app.css",
-      "line": 112,
+      "line": 113,
       "selector": ".section-title h2",
       "context": "",
       "declarations": [
@@ -155506,7 +155517,7 @@
     {
       "id": 336,
       "file": "app/styles/app.css",
-      "line": 113,
+      "line": 114,
       "selector": ".section-title>a,\n.text-action",
       "context": "",
       "declarations": [
@@ -155540,7 +155551,7 @@
     {
       "id": 337,
       "file": "app/styles/app.css",
-      "line": 123,
+      "line": 124,
       "selector": ".metrics-grid",
       "context": "",
       "declarations": [
@@ -155569,7 +155580,7 @@
     {
       "id": 338,
       "file": "app/styles/app.css",
-      "line": 124,
+      "line": 125,
       "selector": ".metrics-grid.three",
       "context": "",
       "declarations": [
@@ -155583,7 +155594,7 @@
     {
       "id": 339,
       "file": "app/styles/app.css",
-      "line": 125,
+      "line": 126,
       "selector": ".metric",
       "context": "",
       "declarations": [
@@ -155627,7 +155638,7 @@
     {
       "id": 340,
       "file": "app/styles/app.css",
-      "line": 126,
+      "line": 127,
       "selector": ".metric-top",
       "context": "",
       "declarations": [
@@ -155671,7 +155682,7 @@
     {
       "id": 341,
       "file": "app/styles/app.css",
-      "line": 127,
+      "line": 128,
       "selector": ".metric-top>span",
       "context": "",
       "declarations": [
@@ -155695,7 +155706,7 @@
     {
       "id": 342,
       "file": "app/styles/app.css",
-      "line": 128,
+      "line": 129,
       "selector": ".metric-top svg",
       "context": "",
       "declarations": [
@@ -155719,7 +155730,7 @@
     {
       "id": 343,
       "file": "app/styles/app.css",
-      "line": 129,
+      "line": 130,
       "selector": ".metric strong",
       "context": "",
       "declarations": [
@@ -155758,7 +155769,7 @@
     {
       "id": 344,
       "file": "app/styles/app.css",
-      "line": 130,
+      "line": 131,
       "selector": ".metric small",
       "context": "",
       "declarations": [
@@ -155772,7 +155783,7 @@
     {
       "id": 345,
       "file": "app/styles/app.css",
-      "line": 131,
+      "line": 132,
       "selector": ".dashboard-grid,\n.detail-grid",
       "context": "",
       "declarations": [
@@ -155801,7 +155812,7 @@
     {
       "id": 346,
       "file": "app/styles/app.css",
-      "line": 133,
+      "line": 134,
       "selector": ".big-chart",
       "context": "",
       "declarations": [
@@ -155835,7 +155846,7 @@
     {
       "id": 347,
       "file": "app/styles/app.css",
-      "line": 134,
+      "line": 135,
       "selector": ".big-chart>div",
       "context": "",
       "declarations": [
@@ -155879,7 +155890,7 @@
     {
       "id": 348,
       "file": "app/styles/app.css",
-      "line": 135,
+      "line": 136,
       "selector": ".big-chart i",
       "context": "",
       "declarations": [
@@ -155908,7 +155919,7 @@
     {
       "id": 349,
       "file": "app/styles/app.css",
-      "line": 136,
+      "line": 137,
       "selector": ".big-chart span",
       "context": "",
       "declarations": [
@@ -155927,7 +155938,7 @@
     {
       "id": 350,
       "file": "app/styles/app.css",
-      "line": 137,
+      "line": 138,
       "selector": ".activity-list",
       "context": "",
       "declarations": [
@@ -155941,7 +155952,7 @@
     {
       "id": 351,
       "file": "app/styles/app.css",
-      "line": 138,
+      "line": 139,
       "selector": ".activity-list>div,\n.activity-list>a",
       "context": "",
       "declarations": [
@@ -155985,7 +155996,7 @@
     {
       "id": 352,
       "file": "app/styles/app.css",
-      "line": 148,
+      "line": 149,
       "selector": ".activity-list>div:last-child,\n.activity-list>a:last-child",
       "context": "",
       "declarations": [
@@ -155999,7 +156010,7 @@
     {
       "id": 353,
       "file": "app/styles/app.css",
-      "line": 150,
+      "line": 151,
       "selector": ".activity-icon,\n.settings-icon,\n.sheet-menu-icon",
       "context": "",
       "declarations": [
@@ -156043,7 +156054,7 @@
     {
       "id": 354,
       "file": "app/styles/app.css",
-      "line": 161,
+      "line": 162,
       "selector": ".activity-list b,.activity-list small",
       "context": "",
       "declarations": [
@@ -156057,7 +156068,7 @@
     {
       "id": 355,
       "file": "app/styles/app.css",
-      "line": 162,
+      "line": 163,
       "selector": ".activity-list b",
       "context": "",
       "declarations": [
@@ -156071,7 +156082,7 @@
     {
       "id": 356,
       "file": "app/styles/app.css",
-      "line": 163,
+      "line": 164,
       "selector": ".activity-list small",
       "context": "",
       "declarations": [
@@ -156095,7 +156106,7 @@
     {
       "id": 357,
       "file": "app/styles/app.css",
-      "line": 164,
+      "line": 165,
       "selector": ".quick-section",
       "context": "",
       "declarations": [
@@ -156109,7 +156120,7 @@
     {
       "id": 358,
       "file": "app/styles/app.css",
-      "line": 165,
+      "line": 166,
       "selector": ".quick-grid",
       "context": "",
       "declarations": [
@@ -156133,7 +156144,7 @@
     {
       "id": 359,
       "file": "app/styles/app.css",
-      "line": 166,
+      "line": 167,
       "selector": ".quick-grid .button",
       "context": "",
       "declarations": [
@@ -156167,7 +156178,7 @@
     {
       "id": 360,
       "file": "app/styles/app.css",
-      "line": 169,
+      "line": 170,
       "selector": ".toolbar",
       "context": "",
       "declarations": [
@@ -156201,7 +156212,7 @@
     {
       "id": 361,
       "file": "app/styles/app.css",
-      "line": 170,
+      "line": 171,
       "selector": ".searchbox",
       "context": "",
       "declarations": [
@@ -156260,7 +156271,7 @@
     {
       "id": 362,
       "file": "app/styles/app.css",
-      "line": 182,
+      "line": 183,
       "selector": ".searchbox>input,\n.searchbox>input:focus,\nhtml[data-theme=\"dark\"] .searchbox>input",
       "context": "",
       "declarations": [
@@ -156309,7 +156320,7 @@
     {
       "id": 363,
       "file": "app/styles/app.css",
-      "line": 185,
+      "line": 186,
       "selector": ".searchbox:focus-within",
       "context": "",
       "declarations": [
@@ -156333,7 +156344,7 @@
     {
       "id": 364,
       "file": "app/styles/app.css",
-      "line": 186,
+      "line": 187,
       "selector": ".searchbox>svg",
       "context": "",
       "declarations": [
@@ -156347,7 +156358,7 @@
     {
       "id": 365,
       "file": "app/styles/app.css",
-      "line": 187,
+      "line": 188,
       "selector": ".toolbar .searchbox",
       "context": "",
       "declarations": [
@@ -156366,7 +156377,7 @@
     {
       "id": 366,
       "file": "app/styles/app.css",
-      "line": 188,
+      "line": 189,
       "selector": ".searchbox.large",
       "context": "",
       "declarations": [
@@ -156380,7 +156391,7 @@
     {
       "id": 367,
       "file": "app/styles/app.css",
-      "line": 189,
+      "line": 190,
       "selector": ".chips,\n.tabs,\n.notification-center-tabs",
       "context": "",
       "declarations": [
@@ -156404,7 +156415,7 @@
     {
       "id": 368,
       "file": "app/styles/app.css",
-      "line": 192,
+      "line": 193,
       "selector": ".chips",
       "context": "",
       "declarations": [
@@ -156423,7 +156434,7 @@
     {
       "id": 369,
       "file": "app/styles/app.css",
-      "line": 193,
+      "line": 194,
       "selector": ".chips::-webkit-scrollbar,\n.tabs::-webkit-scrollbar",
       "context": "",
       "declarations": [
@@ -156437,7 +156448,7 @@
     {
       "id": 370,
       "file": "app/styles/app.css",
-      "line": 195,
+      "line": 196,
       "selector": ".chips button,\n.tabs button,\n.tabs a,\n.notification-center-tabs button",
       "context": "",
       "declarations": [
@@ -156516,7 +156527,7 @@
     {
       "id": 371,
       "file": "app/styles/app.css",
-      "line": 214,
+      "line": 215,
       "selector": ".chips button.active,\n.tabs button.active,\n.tabs a.active,\n.notification-center-tabs button.active",
       "context": "",
       "declarations": [
@@ -156535,7 +156546,7 @@
     {
       "id": 372,
       "file": "app/styles/app.css",
-      "line": 218,
+      "line": 219,
       "selector": ".toolbar .filter-button",
       "context": "",
       "declarations": [
@@ -156629,7 +156640,7 @@
     {
       "id": 373,
       "file": "app/styles/app.css",
-      "line": 237,
+      "line": 238,
       "selector": ".toolbar .filter-button > svg",
       "context": "",
       "declarations": [
@@ -156648,7 +156659,7 @@
     {
       "id": 374,
       "file": "app/styles/app.css",
-      "line": 238,
+      "line": 239,
       "selector": ".toolbar .filter-button > select",
       "context": "",
       "declarations": [
@@ -156712,7 +156723,7 @@
     {
       "id": 375,
       "file": "app/styles/app.css",
-      "line": 251,
+      "line": 252,
       "selector": ".toolbar .filter-button:focus-within",
       "context": "",
       "declarations": [
@@ -156731,7 +156742,7 @@
     {
       "id": 376,
       "file": "app/styles/app.css",
-      "line": 252,
+      "line": 253,
       "selector": ".toolbar .filter-button.active",
       "context": "",
       "declarations": [
@@ -156745,7 +156756,7 @@
     {
       "id": 377,
       "file": "app/styles/app.css",
-      "line": 253,
+      "line": 254,
       "selector": ".records-count",
       "context": "",
       "declarations": [
@@ -156774,7 +156785,7 @@
     {
       "id": 378,
       "file": "app/styles/app.css",
-      "line": 254,
+      "line": 255,
       "selector": ".toolbar-reset",
       "context": "",
       "declarations": [
@@ -156813,7 +156824,7 @@
     {
       "id": 379,
       "file": "app/styles/app.css",
-      "line": 255,
+      "line": 256,
       "selector": ".records",
       "context": "",
       "declarations": [
@@ -156837,7 +156848,7 @@
     {
       "id": 380,
       "file": "app/styles/app.css",
-      "line": 256,
+      "line": 257,
       "selector": ".record-wrapper",
       "context": "",
       "declarations": [
@@ -156851,7 +156862,7 @@
     {
       "id": 381,
       "file": "app/styles/app.css",
-      "line": 257,
+      "line": 258,
       "selector": ".record-avatar",
       "context": "",
       "declarations": [
@@ -156910,7 +156921,7 @@
     {
       "id": 382,
       "file": "app/styles/app.css",
-      "line": 269,
+      "line": 270,
       "selector": ".record-avatar.large",
       "context": "",
       "declarations": [
@@ -156939,7 +156950,7 @@
     {
       "id": 383,
       "file": "app/styles/app.css",
-      "line": 271,
+      "line": 272,
       "selector": ".desktop-record-table",
       "context": "",
       "declarations": [
@@ -156968,7 +156979,7 @@
     {
       "id": 384,
       "file": "app/styles/app.css",
-      "line": 272,
+      "line": 273,
       "selector": ".desktop-record-head",
       "context": "",
       "declarations": [
@@ -156992,7 +157003,7 @@
     {
       "id": 385,
       "file": "app/styles/app.css",
-      "line": 273,
+      "line": 274,
       "selector": ".desktop-record-head button",
       "context": "",
       "declarations": [
@@ -157051,7 +157062,7 @@
     {
       "id": 386,
       "file": "app/styles/app.css",
-      "line": 274,
+      "line": 275,
       "selector": ".desktop-record-head button:first-child,.desktop-record-row>span:first-child",
       "context": "",
       "declarations": [
@@ -157065,7 +157076,7 @@
     {
       "id": 387,
       "file": "app/styles/app.css",
-      "line": 275,
+      "line": 276,
       "selector": ".desktop-record-head .align-right",
       "context": "",
       "declarations": [
@@ -157079,7 +157090,7 @@
     {
       "id": 388,
       "file": "app/styles/app.css",
-      "line": 276,
+      "line": 277,
       "selector": ".desktop-record-row",
       "context": "",
       "declarations": [
@@ -157113,7 +157124,7 @@
     {
       "id": 389,
       "file": "app/styles/app.css",
-      "line": 277,
+      "line": 278,
       "selector": ".desktop-record-row:hover",
       "context": "",
       "declarations": [
@@ -157127,7 +157138,7 @@
     {
       "id": 390,
       "file": "app/styles/app.css",
-      "line": 278,
+      "line": 279,
       "selector": ".desktop-record-row>span",
       "context": "",
       "declarations": [
@@ -157166,7 +157177,7 @@
     {
       "id": 391,
       "file": "app/styles/app.css",
-      "line": 279,
+      "line": 280,
       "selector": ".desktop-record-row>span:first-child",
       "context": "",
       "declarations": [
@@ -157180,7 +157191,7 @@
     {
       "id": 392,
       "file": "app/styles/app.css",
-      "line": 280,
+      "line": 281,
       "selector": ".desktop-record-row>.align-right",
       "context": "",
       "declarations": [
@@ -157199,7 +157210,7 @@
     {
       "id": 393,
       "file": "app/styles/app.css",
-      "line": 281,
+      "line": 282,
       "selector": ".desktop-record-row>svg",
       "context": "",
       "declarations": [
@@ -157213,7 +157224,7 @@
     {
       "id": 394,
       "file": "app/styles/app.css",
-      "line": 282,
+      "line": 283,
       "selector": ".desktop-record-row>.table-status-cell",
       "context": "",
       "declarations": [
@@ -157227,7 +157238,7 @@
     {
       "id": 395,
       "file": "app/styles/app.css",
-      "line": 286,
+      "line": 287,
       "selector": ".tablet-master-detail",
       "context": "",
       "declarations": [
@@ -157251,7 +157262,7 @@
     {
       "id": 396,
       "file": "app/styles/app.css",
-      "line": 287,
+      "line": 288,
       "selector": ".tablet-detail",
       "context": "",
       "declarations": [
@@ -157275,7 +157286,7 @@
     {
       "id": 397,
       "file": "app/styles/app.css",
-      "line": 288,
+      "line": 289,
       "selector": ".tablet-detail-head,\n.entity-hero",
       "context": "",
       "declarations": [
@@ -157299,7 +157310,7 @@
     {
       "id": 398,
       "file": "app/styles/app.css",
-      "line": 294,
+      "line": 295,
       "selector": ".entity-hero",
       "context": "",
       "declarations": [
@@ -157313,7 +157324,7 @@
     {
       "id": 399,
       "file": "app/styles/app.css",
-      "line": 295,
+      "line": 296,
       "selector": ".tablet-detail-head",
       "context": "",
       "declarations": [
@@ -157332,7 +157343,7 @@
     {
       "id": 400,
       "file": "app/styles/app.css",
-      "line": 296,
+      "line": 297,
       "selector": ".tablet-detail-head h2,\n.entity-hero h2",
       "context": "",
       "declarations": [
@@ -157356,7 +157367,7 @@
     {
       "id": 401,
       "file": "app/styles/app.css",
-      "line": 298,
+      "line": 299,
       "selector": ".tablet-detail-head p,\n.entity-hero p",
       "context": "",
       "declarations": [
@@ -157380,7 +157391,7 @@
     {
       "id": 402,
       "file": "app/styles/app.css",
-      "line": 300,
+      "line": 301,
       "selector": ".tablet-detail-head .status,\n.entity-hero .status",
       "context": "",
       "declarations": [
@@ -157394,7 +157405,7 @@
     {
       "id": 403,
       "file": "app/styles/app.css",
-      "line": 302,
+      "line": 303,
       "selector": ".tablet-actions,\n.tablet-document-actions",
       "context": "",
       "declarations": [
@@ -157418,7 +157429,7 @@
     {
       "id": 404,
       "file": "app/styles/app.css",
-      "line": 304,
+      "line": 305,
       "selector": ".text-link",
       "context": "",
       "declarations": [
@@ -157467,7 +157478,7 @@
     {
       "id": 405,
       "file": "app/styles/app.css",
-      "line": 314,
+      "line": 315,
       "selector": ".tabs",
       "context": "",
       "declarations": [
@@ -157501,7 +157512,7 @@
     {
       "id": 406,
       "file": "app/styles/app.css",
-      "line": 315,
+      "line": 316,
       "selector": ".detail-list",
       "context": "",
       "declarations": [
@@ -157515,7 +157526,7 @@
     {
       "id": 407,
       "file": "app/styles/app.css",
-      "line": 316,
+      "line": 317,
       "selector": ".detail-list>div,\n.operator-detail-list>div",
       "context": "",
       "declarations": [
@@ -157554,7 +157565,7 @@
     {
       "id": 408,
       "file": "app/styles/app.css",
-      "line": 325,
+      "line": 326,
       "selector": ".detail-list dt",
       "context": "",
       "declarations": [
@@ -157588,7 +157599,7 @@
     {
       "id": 409,
       "file": "app/styles/app.css",
-      "line": 326,
+      "line": 327,
       "selector": ".detail-list dd",
       "context": "",
       "declarations": [
@@ -157612,7 +157623,7 @@
     {
       "id": 410,
       "file": "app/styles/app.css",
-      "line": 327,
+      "line": 328,
       "selector": ".detail-list>div:last-child,\n.operator-detail-list>div:last-child,\n.compact-list>div:last-child,\n.compact-list>a:last-child,\n.contact-list>div:last-child",
       "context": "",
       "declarations": [
@@ -157626,7 +157637,7 @@
     {
       "id": 411,
       "file": "app/styles/app.css",
-      "line": 332,
+      "line": 333,
       "selector": ".compact-list",
       "context": "",
       "declarations": [
@@ -157640,7 +157651,7 @@
     {
       "id": 412,
       "file": "app/styles/app.css",
-      "line": 333,
+      "line": 334,
       "selector": ".compact-list>div,\n.compact-list>a",
       "context": "",
       "declarations": [
@@ -157679,7 +157690,7 @@
     {
       "id": 413,
       "file": "app/styles/app.css",
-      "line": 342,
+      "line": 343,
       "selector": ".compact-list b",
       "context": "",
       "declarations": [
@@ -157703,7 +157714,7 @@
     {
       "id": 414,
       "file": "app/styles/app.css",
-      "line": 343,
+      "line": 344,
       "selector": ".compact-list span",
       "context": "",
       "declarations": [
@@ -157722,7 +157733,7 @@
     {
       "id": 415,
       "file": "app/styles/app.css",
-      "line": 344,
+      "line": 345,
       "selector": ".contact-list>div",
       "context": "",
       "declarations": [
@@ -157766,7 +157777,7 @@
     {
       "id": 416,
       "file": "app/styles/app.css",
-      "line": 353,
+      "line": 354,
       "selector": ".contact-list b",
       "context": "",
       "declarations": [
@@ -157780,7 +157791,7 @@
     {
       "id": 417,
       "file": "app/styles/app.css",
-      "line": 354,
+      "line": 355,
       "selector": ".contact-list small",
       "context": "",
       "declarations": [
@@ -157809,7 +157820,7 @@
     {
       "id": 418,
       "file": "app/styles/app.css",
-      "line": 355,
+      "line": 356,
       "selector": ".timeline>div",
       "context": "",
       "declarations": [
@@ -157848,7 +157859,7 @@
     {
       "id": 419,
       "file": "app/styles/app.css",
-      "line": 363,
+      "line": 364,
       "selector": ".timeline i",
       "context": "",
       "declarations": [
@@ -157882,7 +157893,7 @@
     {
       "id": 420,
       "file": "app/styles/app.css",
-      "line": 364,
+      "line": 365,
       "selector": ".timeline b",
       "context": "",
       "declarations": [
@@ -157896,7 +157907,7 @@
     {
       "id": 421,
       "file": "app/styles/app.css",
-      "line": 365,
+      "line": 366,
       "selector": ".timeline small",
       "context": "",
       "declarations": [
@@ -157925,7 +157936,7 @@
     {
       "id": 422,
       "file": "app/styles/app.css",
-      "line": 368,
+      "line": 369,
       "selector": ".page-add-button",
       "context": "",
       "declarations": [
@@ -157969,7 +157980,7 @@
     {
       "id": 423,
       "file": "app/styles/app.css",
-      "line": 369,
+      "line": 370,
       "selector": ".page-add-button svg",
       "context": "",
       "declarations": [
@@ -157983,7 +157994,7 @@
     {
       "id": 424,
       "file": "app/styles/app.css",
-      "line": 370,
+      "line": 371,
       "selector": ".responsive-create-action",
       "context": "",
       "declarations": [
@@ -158037,7 +158048,7 @@
     {
       "id": 425,
       "file": "app/styles/app.css",
-      "line": 381,
+      "line": 382,
       "selector": ".responsive-create-action>span,\n.responsive-create-action .create-action-label",
       "context": "",
       "declarations": [
@@ -158056,7 +158067,7 @@
     {
       "id": 426,
       "file": "app/styles/app.css",
-      "line": 383,
+      "line": 384,
       "selector": ".form-page",
       "context": "",
       "declarations": [
@@ -158080,7 +158091,7 @@
     {
       "id": 427,
       "file": "app/styles/app.css",
-      "line": 384,
+      "line": 385,
       "selector": ".form-page.narrow",
       "context": "",
       "declarations": [
@@ -158094,7 +158105,7 @@
     {
       "id": 428,
       "file": "app/styles/app.css",
-      "line": 385,
+      "line": 386,
       "selector": ".form-section,\n.settings-form",
       "context": "",
       "declarations": [
@@ -158118,7 +158129,7 @@
     {
       "id": 429,
       "file": "app/styles/app.css",
-      "line": 387,
+      "line": 388,
       "selector": ".form-section.clean",
       "context": "",
       "declarations": [
@@ -158132,7 +158143,7 @@
     {
       "id": 430,
       "file": "app/styles/app.css",
-      "line": 388,
+      "line": 389,
       "selector": ".form-section:first-child,\n.settings-form:first-child",
       "context": "",
       "declarations": [
@@ -158146,7 +158157,7 @@
     {
       "id": 431,
       "file": "app/styles/app.css",
-      "line": 390,
+      "line": 391,
       "selector": ".form-section h2",
       "context": "",
       "declarations": [
@@ -158165,7 +158176,7 @@
     {
       "id": 432,
       "file": "app/styles/app.css",
-      "line": 391,
+      "line": 392,
       "selector": ".form-section .section-title h2,.settings-form .section-title h2",
       "context": "",
       "declarations": [
@@ -158179,7 +158190,7 @@
     {
       "id": 433,
       "file": "app/styles/app.css",
-      "line": 392,
+      "line": 393,
       "selector": ".form-grid",
       "context": "",
       "declarations": [
@@ -158203,7 +158214,7 @@
     {
       "id": 434,
       "file": "app/styles/app.css",
-      "line": 393,
+      "line": 394,
       "selector": ".form-grid.two",
       "context": "",
       "declarations": [
@@ -158217,7 +158228,7 @@
     {
       "id": 435,
       "file": "app/styles/app.css",
-      "line": 394,
+      "line": 395,
       "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]),\nselect,\ntextarea",
       "context": "",
       "declarations": [
@@ -158241,7 +158252,7 @@
     {
       "id": 436,
       "file": "app/styles/app.css",
-      "line": 401,
+      "line": 402,
       "selector": ".form-control,\n.form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]),\n.form-field select,\n.form-grid>label input:not([type=\"checkbox\"]):not([type=\"radio\"]),\n.form-grid>label select",
       "context": "",
       "declarations": [
@@ -158270,7 +158281,7 @@
     {
       "id": 437,
       "file": "app/styles/app.css",
-      "line": 411,
+      "line": 412,
       "selector": ".form-field>span,\n.form-grid>label>span",
       "context": "",
       "declarations": [
@@ -158284,7 +158295,7 @@
     {
       "id": 438,
       "file": "app/styles/app.css",
-      "line": 413,
+      "line": 414,
       "selector": ".form-field small,\n.form-grid>label small",
       "context": "",
       "declarations": [
@@ -158298,7 +158309,7 @@
     {
       "id": 439,
       "file": "app/styles/app.css",
-      "line": 415,
+      "line": 416,
       "selector": ".form-grid .full,.form-field.full",
       "context": "",
       "declarations": [
@@ -158312,7 +158323,7 @@
     {
       "id": 440,
       "file": "app/styles/app.css",
-      "line": 416,
+      "line": 417,
       "selector": ".form-field,\n.form-grid>label",
       "context": "",
       "declarations": [
@@ -158356,7 +158367,7 @@
     {
       "id": 441,
       "file": "app/styles/app.css",
-      "line": 419,
+      "line": 420,
       "selector": ".form-textarea",
       "context": "",
       "declarations": [
@@ -158390,7 +158401,7 @@
     {
       "id": 442,
       "file": "app/styles/app.css",
-      "line": 420,
+      "line": 421,
       "selector": ".form-control:disabled,.form-textarea:disabled,.form-check>input:disabled,.toggle:disabled",
       "context": "",
       "declarations": [
@@ -158409,7 +158420,7 @@
     {
       "id": 443,
       "file": "app/styles/app.css",
-      "line": 421,
+      "line": 422,
       "selector": ".form-field>.form-error",
       "context": "",
       "declarations": [
@@ -158438,7 +158449,7 @@
     {
       "id": 444,
       "file": "app/styles/app.css",
-      "line": 422,
+      "line": 423,
       "selector": ".form-field :is(input,select,textarea)[aria-invalid=\"true\"]",
       "context": "",
       "declarations": [
@@ -158452,7 +158463,7 @@
     {
       "id": 445,
       "file": "app/styles/app.css",
-      "line": 423,
+      "line": 424,
       "selector": "html[data-theme] .form-field select",
       "context": "",
       "declarations": [
@@ -158491,7 +158502,7 @@
     {
       "id": 446,
       "file": "app/styles/app.css",
-      "line": 424,
+      "line": 425,
       "selector": ".optional-details",
       "context": "",
       "declarations": [
@@ -158515,7 +158526,7 @@
     {
       "id": 447,
       "file": "app/styles/app.css",
-      "line": 425,
+      "line": 426,
       "selector": ".optional-details summary",
       "context": "",
       "declarations": [
@@ -158554,7 +158565,7 @@
     {
       "id": 448,
       "file": "app/styles/app.css",
-      "line": 426,
+      "line": 427,
       "selector": ".optional-details>div",
       "context": "",
       "declarations": [
@@ -158568,7 +158579,7 @@
     {
       "id": 449,
       "file": "app/styles/app.css",
-      "line": 427,
+      "line": 428,
       "selector": ".select-card",
       "context": "",
       "declarations": [
@@ -158612,7 +158623,7 @@
     {
       "id": 450,
       "file": "app/styles/app.css",
-      "line": 436,
+      "line": 437,
       "selector": ".select-card b,.select-card small",
       "context": "",
       "declarations": [
@@ -158626,7 +158637,7 @@
     {
       "id": 451,
       "file": "app/styles/app.css",
-      "line": 437,
+      "line": 438,
       "selector": ".select-card small",
       "context": "",
       "declarations": [
@@ -158650,7 +158661,7 @@
     {
       "id": 452,
       "file": "app/styles/app.css",
-      "line": 440,
+      "line": 441,
       "selector": ".document-detail-view",
       "context": "",
       "declarations": [
@@ -158669,7 +158680,7 @@
     {
       "id": 453,
       "file": "app/styles/app.css",
-      "line": 444,
+      "line": 445,
       "selector": ".document-detail-section",
       "context": "",
       "declarations": [
@@ -158683,7 +158694,7 @@
     {
       "id": 454,
       "file": "app/styles/app.css",
-      "line": 447,
+      "line": 448,
       "selector": ".document-detail-section h2",
       "context": "",
       "declarations": [
@@ -158707,7 +158718,7 @@
     {
       "id": 455,
       "file": "app/styles/app.css",
-      "line": 452,
+      "line": 453,
       "selector": ".document-detail-section p",
       "context": "",
       "declarations": [
@@ -158736,7 +158747,7 @@
     {
       "id": 456,
       "file": "app/styles/app.css",
-      "line": 458,
+      "line": 459,
       "selector": ".document-facts",
       "context": "",
       "declarations": [
@@ -158760,7 +158771,7 @@
     {
       "id": 457,
       "file": "app/styles/app.css",
-      "line": 463,
+      "line": 464,
       "selector": ".document-facts>div",
       "context": "",
       "declarations": [
@@ -158779,7 +158790,7 @@
     {
       "id": 458,
       "file": "app/styles/app.css",
-      "line": 467,
+      "line": 468,
       "selector": ".document-facts small,\n.document-facts b",
       "context": "",
       "declarations": [
@@ -158793,7 +158804,7 @@
     {
       "id": 459,
       "file": "app/styles/app.css",
-      "line": 469,
+      "line": 470,
       "selector": ".document-facts small",
       "context": "",
       "declarations": [
@@ -158817,7 +158828,7 @@
     {
       "id": 460,
       "file": "app/styles/app.css",
-      "line": 474,
+      "line": 475,
       "selector": ".document-facts b",
       "context": "",
       "declarations": [
@@ -158836,7 +158847,7 @@
     {
       "id": 461,
       "file": "app/styles/app.css",
-      "line": 478,
+      "line": 479,
       "selector": ".document-read-table",
       "context": "",
       "declarations": [
@@ -158860,7 +158871,7 @@
     {
       "id": 462,
       "file": "app/styles/app.css",
-      "line": 483,
+      "line": 484,
       "selector": ".document-read-head,\n.document-read-row",
       "context": "",
       "declarations": [
@@ -158889,7 +158900,7 @@
     {
       "id": 463,
       "file": "app/styles/app.css",
-      "line": 490,
+      "line": 491,
       "selector": ".document-read-head",
       "context": "",
       "declarations": [
@@ -158913,7 +158924,7 @@
     {
       "id": 464,
       "file": "app/styles/app.css",
-      "line": 495,
+      "line": 496,
       "selector": ".document-read-head span:not(:first-child),\n.document-read-row>span,\n.document-read-row>strong",
       "context": "",
       "declarations": [
@@ -158927,7 +158938,7 @@
     {
       "id": 465,
       "file": "app/styles/app.css",
-      "line": 498,
+      "line": 499,
       "selector": ".document-read-row",
       "context": "",
       "declarations": [
@@ -158951,7 +158962,7 @@
     {
       "id": 466,
       "file": "app/styles/app.css",
-      "line": 503,
+      "line": 504,
       "selector": ".document-read-row:first-of-type",
       "context": "",
       "declarations": [
@@ -158965,7 +158976,7 @@
     {
       "id": 467,
       "file": "app/styles/app.css",
-      "line": 504,
+      "line": 505,
       "selector": ".document-read-row b",
       "context": "",
       "declarations": [
@@ -158994,7 +159005,7 @@
     {
       "id": 468,
       "file": "app/styles/app.css",
-      "line": 510,
+      "line": 511,
       "selector": ".document-read-row span",
       "context": "",
       "declarations": [
@@ -159018,7 +159029,7 @@
     {
       "id": 469,
       "file": "app/styles/app.css",
-      "line": 515,
+      "line": 516,
       "selector": ".document-read-row strong",
       "context": "",
       "declarations": [
@@ -159037,7 +159048,7 @@
     {
       "id": 470,
       "file": "app/styles/app.css",
-      "line": 519,
+      "line": 520,
       "selector": ".invoice-workspace",
       "context": "",
       "declarations": [
@@ -159051,7 +159062,7 @@
     {
       "id": 471,
       "file": "app/styles/app.css",
-      "line": 520,
+      "line": 521,
       "selector": ".invoice-form",
       "context": "",
       "declarations": [
@@ -159065,7 +159076,7 @@
     {
       "id": 472,
       "file": "app/styles/app.css",
-      "line": 521,
+      "line": 522,
       "selector": ".document-actions",
       "context": "",
       "declarations": [
@@ -159094,7 +159105,7 @@
     {
       "id": 473,
       "file": "app/styles/app.css",
-      "line": 522,
+      "line": 523,
       "selector": ".document-customer-hint",
       "context": "",
       "declarations": [
@@ -159118,7 +159129,7 @@
     {
       "id": 474,
       "file": "app/styles/app.css",
-      "line": 523,
+      "line": 524,
       "selector": ".line-items,\n.document-line-items",
       "context": "",
       "declarations": [
@@ -159142,7 +159153,7 @@
     {
       "id": 475,
       "file": "app/styles/app.css",
-      "line": 525,
+      "line": 526,
       "selector": ".line-items>div,\n.document-line-items>div",
       "context": "",
       "declarations": [
@@ -159186,7 +159197,7 @@
     {
       "id": 476,
       "file": "app/styles/app.css",
-      "line": 535,
+      "line": 536,
       "selector": ".line-items>div:last-child,\n.document-line-items>div:last-child",
       "context": "",
       "declarations": [
@@ -159200,7 +159211,7 @@
     {
       "id": 477,
       "file": "app/styles/app.css",
-      "line": 537,
+      "line": 538,
       "selector": ".line-head",
       "context": "",
       "declarations": [
@@ -159219,7 +159230,7 @@
     {
       "id": 478,
       "file": "app/styles/app.css",
-      "line": 538,
+      "line": 539,
       "selector": ".line-items input,.line-items select",
       "context": "",
       "declarations": [
@@ -159253,7 +159264,7 @@
     {
       "id": 479,
       "file": "app/styles/app.css",
-      "line": 538,
+      "line": 539,
       "selector": ".document-line-item>.mobile-line-field:nth-of-type(n+2) input,.document-line-item>.mobile-line-field:nth-of-type(n+2) select",
       "context": "",
       "declarations": [
@@ -159272,7 +159283,7 @@
     {
       "id": 480,
       "file": "app/styles/app.css",
-      "line": 538,
+      "line": 539,
       "selector": ".line-head span:nth-child(n+2)",
       "context": "",
       "declarations": [
@@ -159286,7 +159297,7 @@
     {
       "id": 481,
       "file": "app/styles/app.css",
-      "line": 539,
+      "line": 540,
       "selector": ".line-remove",
       "context": "",
       "declarations": [
@@ -159325,7 +159336,7 @@
     {
       "id": 482,
       "file": "app/styles/app.css",
-      "line": 540,
+      "line": 541,
       "selector": ".invoice-totals",
       "context": "",
       "declarations": [
@@ -159344,7 +159355,7 @@
     {
       "id": 483,
       "file": "app/styles/app.css",
-      "line": 541,
+      "line": 542,
       "selector": ".invoice-totals>div,\n.invoice-totals>span,\n.invoice-totals>strong",
       "context": "",
       "declarations": [
@@ -159388,7 +159399,7 @@
     {
       "id": 484,
       "file": "app/styles/app.css",
-      "line": 552,
+      "line": 553,
       "selector": ".invoice-totals>strong",
       "context": "",
       "declarations": [
@@ -159407,7 +159418,7 @@
     {
       "id": 485,
       "file": "app/styles/app.css",
-      "line": 553,
+      "line": 554,
       "selector": ".document-lines-section",
       "context": "",
       "declarations": [
@@ -159421,7 +159432,7 @@
     {
       "id": 486,
       "file": "app/styles/app.css",
-      "line": 554,
+      "line": 555,
       "selector": ".invoice-tablet-preview",
       "context": "",
       "declarations": [
@@ -159455,7 +159466,7 @@
     {
       "id": 487,
       "file": "app/styles/app.css",
-      "line": 555,
+      "line": 556,
       "selector": ".payment-method,\n.optional-row",
       "context": "",
       "declarations": [
@@ -159474,7 +159485,7 @@
     {
       "id": 488,
       "file": "app/styles/app.css",
-      "line": 557,
+      "line": 558,
       "selector": ".document-modal-header-spacer",
       "context": "",
       "declarations": [
@@ -159488,7 +159499,7 @@
     {
       "id": 489,
       "file": "app/styles/app.css",
-      "line": 558,
+      "line": 559,
       "selector": ".document-modal-header-actions",
       "context": "",
       "declarations": [
@@ -159517,7 +159528,7 @@
     {
       "id": 490,
       "file": "app/styles/app.css",
-      "line": 559,
+      "line": 560,
       "selector": ".document-modal>header button",
       "context": "",
       "declarations": [
@@ -159566,7 +159577,7 @@
     {
       "id": 491,
       "file": "app/styles/app.css",
-      "line": 560,
+      "line": 561,
       "selector": ".document-modal>header button:focus-visible",
       "context": "",
       "declarations": [
@@ -159585,7 +159596,7 @@
     {
       "id": 492,
       "file": "app/styles/app.css",
-      "line": 561,
+      "line": 562,
       "selector": ".qr-page-spacer",
       "context": "",
       "declarations": [
@@ -159599,7 +159610,7 @@
     {
       "id": 493,
       "file": "app/styles/app.css",
-      "line": 562,
+      "line": 563,
       "selector": ".mobile-document-bar",
       "context": "",
       "declarations": [
@@ -159613,7 +159624,7 @@
     {
       "id": 494,
       "file": "app/styles/app.css",
-      "line": 565,
+      "line": 566,
       "selector": ".time-layout",
       "context": "",
       "declarations": [
@@ -159637,7 +159648,7 @@
     {
       "id": 495,
       "file": "app/styles/app.css",
-      "line": 566,
+      "line": 567,
       "selector": ".time-section",
       "context": "",
       "declarations": [
@@ -159676,7 +159687,7 @@
     {
       "id": 496,
       "file": "app/styles/app.css",
-      "line": 567,
+      "line": 568,
       "selector": ".timer-card",
       "context": "",
       "declarations": [
@@ -159690,7 +159701,7 @@
     {
       "id": 497,
       "file": "app/styles/app.css",
-      "line": 568,
+      "line": 569,
       "selector": ".time-overview-section",
       "context": "",
       "declarations": [
@@ -159709,7 +159720,7 @@
     {
       "id": 498,
       "file": "app/styles/app.css",
-      "line": 569,
+      "line": 570,
       "selector": ".timer-project",
       "context": "",
       "declarations": [
@@ -159743,7 +159754,7 @@
     {
       "id": 499,
       "file": "app/styles/app.css",
-      "line": 570,
+      "line": 571,
       "selector": ".timer-project button",
       "context": "",
       "declarations": [
@@ -159802,7 +159813,7 @@
     {
       "id": 500,
       "file": "app/styles/app.css",
-      "line": 582,
+      "line": 583,
       "selector": ".timer-ring",
       "context": "",
       "declarations": [
@@ -159846,7 +159857,7 @@
     {
       "id": 501,
       "file": "app/styles/app.css",
-      "line": 583,
+      "line": 584,
       "selector": ".timer-ring div",
       "context": "",
       "declarations": [
@@ -159865,7 +159876,7 @@
     {
       "id": 502,
       "file": "app/styles/app.css",
-      "line": 584,
+      "line": 585,
       "selector": ".timer-ring strong",
       "context": "",
       "declarations": [
@@ -159884,7 +159895,7 @@
     {
       "id": 503,
       "file": "app/styles/app.css",
-      "line": 585,
+      "line": 586,
       "selector": ".timer-ring small,.timer-ring span",
       "context": "",
       "declarations": [
@@ -159903,7 +159914,7 @@
     {
       "id": 504,
       "file": "app/styles/app.css",
-      "line": 586,
+      "line": 587,
       "selector": ".timer-actions",
       "context": "",
       "declarations": [
@@ -159927,7 +159938,7 @@
     {
       "id": 505,
       "file": "app/styles/app.css",
-      "line": 587,
+      "line": 588,
       "selector": ".time-summary-row",
       "context": "",
       "declarations": [
@@ -159961,7 +159972,7 @@
     {
       "id": 506,
       "file": "app/styles/app.css",
-      "line": 588,
+      "line": 589,
       "selector": ".time-summary-row>div",
       "context": "",
       "declarations": [
@@ -159985,7 +159996,7 @@
     {
       "id": 507,
       "file": "app/styles/app.css",
-      "line": 589,
+      "line": 590,
       "selector": ".time-summary-row>div:last-child",
       "context": "",
       "declarations": [
@@ -159999,7 +160010,7 @@
     {
       "id": 508,
       "file": "app/styles/app.css",
-      "line": 590,
+      "line": 591,
       "selector": ".time-summary-row small",
       "context": "",
       "declarations": [
@@ -160018,7 +160029,7 @@
     {
       "id": 509,
       "file": "app/styles/app.css",
-      "line": 591,
+      "line": 592,
       "selector": ".time-summary-row b",
       "context": "",
       "declarations": [
@@ -160042,7 +160053,7 @@
     {
       "id": 510,
       "file": "app/styles/app.css",
-      "line": 593,
+      "line": 594,
       "selector": ".timer-notice",
       "context": "",
       "declarations": [
@@ -160131,7 +160142,7 @@
     {
       "id": 511,
       "file": "app/styles/app.css",
-      "line": 611,
+      "line": 612,
       "selector": "from",
       "context": "@keyframes timer-notice-in",
       "declarations": [
@@ -160150,7 +160161,7 @@
     {
       "id": 512,
       "file": "app/styles/app.css",
-      "line": 611,
+      "line": 612,
       "selector": "to",
       "context": "@keyframes timer-notice-in",
       "declarations": [
@@ -160169,7 +160180,7 @@
     {
       "id": 513,
       "file": "app/styles/app.css",
-      "line": 612,
+      "line": 613,
       "selector": ".global-timer",
       "context": "",
       "declarations": [
@@ -160248,7 +160259,7 @@
     {
       "id": 514,
       "file": "app/styles/app.css",
-      "line": 628,
+      "line": 629,
       "selector": ".global-timer-main",
       "context": "",
       "declarations": [
@@ -160282,7 +160293,7 @@
     {
       "id": 515,
       "file": "app/styles/app.css",
-      "line": 629,
+      "line": 630,
       "selector": ".global-timer-main i",
       "context": "",
       "declarations": [
@@ -160311,7 +160322,7 @@
     {
       "id": 516,
       "file": "app/styles/app.css",
-      "line": 630,
+      "line": 631,
       "selector": ".global-timer-main small",
       "context": "",
       "declarations": [
@@ -160335,7 +160346,7 @@
     {
       "id": 517,
       "file": "app/styles/app.css",
-      "line": 631,
+      "line": 632,
       "selector": ".global-timer-main span",
       "context": "",
       "declarations": [
@@ -160349,7 +160360,7 @@
     {
       "id": 518,
       "file": "app/styles/app.css",
-      "line": 632,
+      "line": 633,
       "selector": ".global-timer>b",
       "context": "",
       "declarations": [
@@ -160363,7 +160374,7 @@
     {
       "id": 519,
       "file": "app/styles/app.css",
-      "line": 633,
+      "line": 634,
       "selector": ".global-timer>button",
       "context": "",
       "declarations": [
@@ -160417,7 +160428,7 @@
     {
       "id": 520,
       "file": "app/styles/app.css",
-      "line": 636,
+      "line": 637,
       "selector": ".expense-layout",
       "context": "",
       "declarations": [
@@ -160441,7 +160452,7 @@
     {
       "id": 521,
       "file": "app/styles/app.css",
-      "line": 637,
+      "line": 638,
       "selector": ".receipt-upload",
       "context": "",
       "declarations": [
@@ -160505,7 +160516,7 @@
     {
       "id": 522,
       "file": "app/styles/app.css",
-      "line": 650,
+      "line": 651,
       "selector": ".receipt-upload>span",
       "context": "",
       "declarations": [
@@ -160544,7 +160555,7 @@
     {
       "id": 523,
       "file": "app/styles/app.css",
-      "line": 651,
+      "line": 652,
       "selector": ".receipt-upload b",
       "context": "",
       "declarations": [
@@ -160558,7 +160569,7 @@
     {
       "id": 524,
       "file": "app/styles/app.css",
-      "line": 652,
+      "line": 653,
       "selector": ".receipt-upload small",
       "context": "",
       "declarations": [
@@ -160577,7 +160588,7 @@
     {
       "id": 525,
       "file": "app/styles/app.css",
-      "line": 655,
+      "line": 656,
       "selector": ".support-summary",
       "context": "",
       "declarations": [
@@ -160626,7 +160637,7 @@
     {
       "id": 526,
       "file": "app/styles/app.css",
-      "line": 665,
+      "line": 666,
       "selector": ".support-summary .metric",
       "context": "",
       "declarations": [
@@ -160645,7 +160656,7 @@
     {
       "id": 527,
       "file": "app/styles/app.css",
-      "line": 670,
+      "line": 671,
       "selector": ".support-master-detail",
       "context": "",
       "declarations": [
@@ -160679,7 +160690,7 @@
     {
       "id": 528,
       "file": "app/styles/app.css",
-      "line": 677,
+      "line": 678,
       "selector": ".support-preview-message",
       "context": "",
       "declarations": [
@@ -160698,7 +160709,7 @@
     {
       "id": 529,
       "file": "app/styles/app.css",
-      "line": 678,
+      "line": 679,
       "selector": ".support-preview-message small",
       "context": "",
       "declarations": [
@@ -160717,7 +160728,7 @@
     {
       "id": 530,
       "file": "app/styles/app.css",
-      "line": 679,
+      "line": 680,
       "selector": ".support-preview-message p",
       "context": "",
       "declarations": [
@@ -160756,7 +160767,7 @@
     {
       "id": 531,
       "file": "app/styles/app.css",
-      "line": 680,
+      "line": 681,
       "selector": ".support-thread",
       "context": "",
       "declarations": [
@@ -160805,7 +160816,7 @@
     {
       "id": 532,
       "file": "app/styles/app.css",
-      "line": 690,
+      "line": 691,
       "selector": ".thread-day",
       "context": "",
       "declarations": [
@@ -160834,7 +160845,7 @@
     {
       "id": 533,
       "file": "app/styles/app.css",
-      "line": 691,
+      "line": 692,
       "selector": ".message",
       "context": "",
       "declarations": [
@@ -160853,7 +160864,7 @@
     {
       "id": 534,
       "file": "app/styles/app.css",
-      "line": 692,
+      "line": 693,
       "selector": ".message>div",
       "context": "",
       "declarations": [
@@ -160882,7 +160893,7 @@
     {
       "id": 535,
       "file": "app/styles/app.css",
-      "line": 693,
+      "line": 694,
       "selector": ".message small",
       "context": "",
       "declarations": [
@@ -160911,7 +160922,7 @@
     {
       "id": 536,
       "file": "app/styles/app.css",
-      "line": 694,
+      "line": 695,
       "selector": ".message>span",
       "context": "",
       "declarations": [
@@ -160940,7 +160951,7 @@
     {
       "id": 537,
       "file": "app/styles/app.css",
-      "line": 695,
+      "line": 696,
       "selector": ".message-user",
       "context": "",
       "declarations": [
@@ -160964,7 +160975,7 @@
     {
       "id": 538,
       "file": "app/styles/app.css",
-      "line": 696,
+      "line": 697,
       "selector": ".message-user>div",
       "context": "",
       "declarations": [
@@ -160993,7 +161004,7 @@
     {
       "id": 539,
       "file": "app/styles/app.css",
-      "line": 697,
+      "line": 698,
       "selector": ".message-support",
       "context": "",
       "declarations": [
@@ -161012,7 +161023,7 @@
     {
       "id": 540,
       "file": "app/styles/app.css",
-      "line": 698,
+      "line": 699,
       "selector": ".message-support>div",
       "context": "",
       "declarations": [
@@ -161036,7 +161047,7 @@
     {
       "id": 541,
       "file": "app/styles/app.css",
-      "line": 699,
+      "line": 700,
       "selector": ".thread-composer",
       "context": "",
       "declarations": [
@@ -161100,7 +161111,7 @@
     {
       "id": 542,
       "file": "app/styles/app.css",
-      "line": 712,
+      "line": 713,
       "selector": ".thread-composer input",
       "context": "",
       "declarations": [
@@ -161149,7 +161160,7 @@
     {
       "id": 543,
       "file": "app/styles/app.css",
-      "line": 722,
+      "line": 723,
       "selector": ".thread-composer:focus-within",
       "context": "",
       "declarations": [
@@ -161163,7 +161174,7 @@
     {
       "id": 544,
       "file": "app/styles/app.css",
-      "line": 723,
+      "line": 724,
       "selector": ".thread-composer input:focus,\n.thread-composer input:focus-visible",
       "context": "",
       "declarations": [
@@ -161187,7 +161198,7 @@
     {
       "id": 545,
       "file": "app/styles/app.css",
-      "line": 729,
+      "line": 730,
       "selector": ".thread-composer button",
       "context": "",
       "declarations": [
@@ -161231,7 +161242,7 @@
     {
       "id": 546,
       "file": "app/styles/app.css",
-      "line": 730,
+      "line": 731,
       "selector": ".thread-composer button:last-child",
       "context": "",
       "declarations": [
@@ -161250,7 +161261,7 @@
     {
       "id": 547,
       "file": "app/styles/app.css",
-      "line": 731,
+      "line": 732,
       "selector": ".attachment-button",
       "context": "",
       "declarations": [
@@ -161309,7 +161320,7 @@
     {
       "id": 548,
       "file": "app/styles/app.css",
-      "line": 745,
+      "line": 746,
       "selector": ".settings-list",
       "context": "",
       "declarations": [
@@ -161328,7 +161339,7 @@
     {
       "id": 549,
       "file": "app/styles/app.css",
-      "line": 746,
+      "line": 747,
       "selector": ".settings-list>a",
       "context": "",
       "declarations": [
@@ -161372,7 +161383,7 @@
     {
       "id": 550,
       "file": "app/styles/app.css",
-      "line": 755,
+      "line": 756,
       "selector": ".settings-list b",
       "context": "",
       "declarations": [
@@ -161386,7 +161397,7 @@
     {
       "id": 551,
       "file": "app/styles/app.css",
-      "line": 756,
+      "line": 757,
       "selector": ".settings-list small",
       "context": "",
       "declarations": [
@@ -161415,7 +161426,7 @@
     {
       "id": 552,
       "file": "app/styles/app.css",
-      "line": 757,
+      "line": 758,
       "selector": ".settings-detail-grid",
       "context": "",
       "declarations": [
@@ -161439,7 +161450,7 @@
     {
       "id": 553,
       "file": "app/styles/app.css",
-      "line": 758,
+      "line": 759,
       "selector": ".settings-readonly",
       "context": "",
       "declarations": [
@@ -161458,7 +161469,7 @@
     {
       "id": 554,
       "file": "app/styles/app.css",
-      "line": 759,
+      "line": 760,
       "selector": ".settings-profile,\n.company-logo-card",
       "context": "",
       "declarations": [
@@ -161502,7 +161513,7 @@
     {
       "id": 555,
       "file": "app/styles/app.css",
-      "line": 769,
+      "line": 770,
       "selector": ".settings-profile .button,\n.company-logo-card .button",
       "context": "",
       "declarations": [
@@ -161516,7 +161527,7 @@
     {
       "id": 556,
       "file": "app/styles/app.css",
-      "line": 771,
+      "line": 772,
       "selector": ".ux-lab",
       "context": "",
       "declarations": [
@@ -161540,7 +161551,7 @@
     {
       "id": 557,
       "file": "app/styles/app.css",
-      "line": 772,
+      "line": 773,
       "selector": ".ux-lab>section",
       "context": "",
       "declarations": [
@@ -161559,7 +161570,7 @@
     {
       "id": 558,
       "file": "app/styles/app.css",
-      "line": 773,
+      "line": 774,
       "selector": ".ux-lab-viewer",
       "context": "",
       "declarations": [
@@ -161588,7 +161599,7 @@
     {
       "id": 559,
       "file": "app/styles/app.css",
-      "line": 774,
+      "line": 775,
       "selector": ".bottom-sheet[data-wizard]",
       "context": "",
       "declarations": [
@@ -161602,7 +161613,7 @@
     {
       "id": 560,
       "file": "app/styles/app.css",
-      "line": 775,
+      "line": 776,
       "selector": ".bottom-sheet[data-wizard] .sheet-body",
       "context": "",
       "declarations": [
@@ -161621,7 +161632,7 @@
     {
       "id": 561,
       "file": "app/styles/app.css",
-      "line": 776,
+      "line": 777,
       "selector": ".bottom-sheet[data-wizard] .form-wizard",
       "context": "",
       "declarations": [
@@ -161650,7 +161661,7 @@
     {
       "id": 562,
       "file": "app/styles/app.css",
-      "line": 777,
+      "line": 778,
       "selector": ".bottom-sheet[data-wizard] .wizard-content",
       "context": "",
       "declarations": [
@@ -161674,7 +161685,7 @@
     {
       "id": 563,
       "file": "app/styles/app.css",
-      "line": 778,
+      "line": 779,
       "selector": ".bottom-sheet[data-wizard] .wizard-progress",
       "context": "",
       "declarations": [
@@ -161693,7 +161704,7 @@
     {
       "id": 564,
       "file": "app/styles/app.css",
-      "line": 779,
+      "line": 780,
       "selector": ".form-wizard",
       "context": "",
       "declarations": [
@@ -161712,7 +161723,7 @@
     {
       "id": 565,
       "file": "app/styles/app.css",
-      "line": 780,
+      "line": 781,
       "selector": ".form-wizard[data-guided]",
       "context": "",
       "declarations": [
@@ -161741,7 +161752,7 @@
     {
       "id": 566,
       "file": "app/styles/app.css",
-      "line": 781,
+      "line": 782,
       "selector": ".form-wizard[data-guided] .wizard-content",
       "context": "",
       "declarations": [
@@ -161770,7 +161781,7 @@
     {
       "id": 567,
       "file": "app/styles/app.css",
-      "line": 782,
+      "line": 783,
       "selector": ".form-wizard[data-guided] .wizard-progress",
       "context": "",
       "declarations": [
@@ -161789,7 +161800,7 @@
     {
       "id": 568,
       "file": "app/styles/app.css",
-      "line": 783,
+      "line": 784,
       "selector": ".bottom-sheet[data-wizard] .form-wizard[data-guided]",
       "context": "",
       "declarations": [
@@ -161803,7 +161814,7 @@
     {
       "id": 569,
       "file": "app/styles/app.css",
-      "line": 784,
+      "line": 785,
       "selector": ".wizard-progress",
       "context": "",
       "declarations": [
@@ -161847,7 +161858,7 @@
     {
       "id": 570,
       "file": "app/styles/app.css",
-      "line": 785,
+      "line": 786,
       "selector": ".form-wizard .wizard-content [hidden]",
       "context": "",
       "declarations": [
@@ -161861,7 +161872,7 @@
     {
       "id": 571,
       "file": "app/styles/app.css",
-      "line": 786,
+      "line": 787,
       "selector": ".wizard-content",
       "context": "",
       "declarations": [
@@ -161880,7 +161891,7 @@
     {
       "id": 572,
       "file": "app/styles/app.css",
-      "line": 787,
+      "line": 788,
       "selector": ".form-wizard .mobile-sticky-save",
       "context": "",
       "declarations": [
@@ -161919,7 +161930,7 @@
     {
       "id": 573,
       "file": "app/styles/app.css",
-      "line": 788,
+      "line": 789,
       "selector": ".form-wizard .mobile-sticky-save>.button",
       "context": "",
       "declarations": [
@@ -161948,7 +161959,7 @@
     {
       "id": 574,
       "file": "app/styles/app.css",
-      "line": 789,
+      "line": 790,
       "selector": ".person-record",
       "context": "",
       "declarations": [
@@ -161977,7 +161988,7 @@
     {
       "id": 575,
       "file": "app/styles/app.css",
-      "line": 790,
+      "line": 791,
       "selector": ".person-record>span:last-child",
       "context": "",
       "declarations": [
@@ -161996,7 +162007,7 @@
     {
       "id": 576,
       "file": "app/styles/app.css",
-      "line": 791,
+      "line": 792,
       "selector": ".person-avatar",
       "context": "",
       "declarations": [
@@ -162060,7 +162071,7 @@
     {
       "id": 577,
       "file": "app/styles/app.css",
-      "line": 792,
+      "line": 793,
       "selector": ".person-avatar-small",
       "context": "",
       "declarations": [
@@ -162084,7 +162095,7 @@
     {
       "id": 578,
       "file": "app/styles/app.css",
-      "line": 793,
+      "line": 794,
       "selector": ".person-avatar-medium",
       "context": "",
       "declarations": [
@@ -162103,7 +162114,7 @@
     {
       "id": 579,
       "file": "app/styles/app.css",
-      "line": 794,
+      "line": 795,
       "selector": ".person-avatar-large",
       "context": "",
       "declarations": [
@@ -162127,7 +162138,7 @@
     {
       "id": 580,
       "file": "app/styles/app.css",
-      "line": 795,
+      "line": 796,
       "selector": ".person-avatar img",
       "context": "",
       "declarations": [
@@ -162151,7 +162162,7 @@
     {
       "id": 581,
       "file": "app/styles/app.css",
-      "line": 796,
+      "line": 797,
       "selector": ".person-avatar-tone-0",
       "context": "",
       "declarations": [
@@ -162165,7 +162176,7 @@
     {
       "id": 582,
       "file": "app/styles/app.css",
-      "line": 797,
+      "line": 798,
       "selector": ".person-avatar-tone-1",
       "context": "",
       "declarations": [
@@ -162179,7 +162190,7 @@
     {
       "id": 583,
       "file": "app/styles/app.css",
-      "line": 798,
+      "line": 799,
       "selector": ".person-avatar-tone-2",
       "context": "",
       "declarations": [
@@ -162193,7 +162204,7 @@
     {
       "id": 584,
       "file": "app/styles/app.css",
-      "line": 799,
+      "line": 800,
       "selector": ".person-avatar-tone-3",
       "context": "",
       "declarations": [
@@ -162207,7 +162218,7 @@
     {
       "id": 585,
       "file": "app/styles/app.css",
-      "line": 800,
+      "line": 801,
       "selector": ".person-avatar-tone-4",
       "context": "",
       "declarations": [
@@ -162221,7 +162232,7 @@
     {
       "id": 586,
       "file": "app/styles/app.css",
-      "line": 801,
+      "line": 802,
       "selector": ".person-avatar-tone-5",
       "context": "",
       "declarations": [
@@ -162235,7 +162246,7 @@
     {
       "id": 587,
       "file": "app/styles/app.css",
-      "line": 802,
+      "line": 803,
       "selector": ".company-logo-placeholder",
       "context": "",
       "declarations": [
@@ -162279,7 +162290,7 @@
     {
       "id": 588,
       "file": "app/styles/app.css",
-      "line": 803,
+      "line": 804,
       "selector": ".settings-profile h2",
       "context": "",
       "declarations": [
@@ -162298,7 +162309,7 @@
     {
       "id": 589,
       "file": "app/styles/app.css",
-      "line": 804,
+      "line": 805,
       "selector": ".settings-profile p,\n.company-logo-card small",
       "context": "",
       "declarations": [
@@ -162322,7 +162333,7 @@
     {
       "id": 590,
       "file": "app/styles/app.css",
-      "line": 806,
+      "line": 807,
       "selector": ".company-logo-card img",
       "context": "",
       "declarations": [
@@ -162351,7 +162362,7 @@
     {
       "id": 591,
       "file": "app/styles/app.css",
-      "line": 807,
+      "line": 808,
       "selector": ".company-logo-card b,.company-logo-card small",
       "context": "",
       "declarations": [
@@ -162365,7 +162376,7 @@
     {
       "id": 592,
       "file": "app/styles/app.css",
-      "line": 808,
+      "line": 809,
       "selector": ".company-logo-card small",
       "context": "",
       "declarations": [
@@ -162379,7 +162390,7 @@
     {
       "id": 593,
       "file": "app/styles/app.css",
-      "line": 810,
+      "line": 811,
       "selector": ".subscription-panel",
       "context": "",
       "declarations": [
@@ -162423,7 +162434,7 @@
     {
       "id": 594,
       "file": "app/styles/app.css",
-      "line": 819,
+      "line": 820,
       "selector": ".subscription-panel small,\n.subscription-panel p",
       "context": "",
       "declarations": [
@@ -162442,7 +162453,7 @@
     {
       "id": 595,
       "file": "app/styles/app.css",
-      "line": 821,
+      "line": 822,
       "selector": ".subscription-panel h2",
       "context": "",
       "declarations": [
@@ -162461,7 +162472,7 @@
     {
       "id": 596,
       "file": "app/styles/app.css",
-      "line": 822,
+      "line": 823,
       "selector": ".subscription-panel p",
       "context": "",
       "declarations": [
@@ -162475,7 +162486,7 @@
     {
       "id": 597,
       "file": "app/styles/app.css",
-      "line": 823,
+      "line": 824,
       "selector": ".plan-hero",
       "context": "",
       "declarations": [
@@ -162534,7 +162545,7 @@
     {
       "id": 598,
       "file": "app/styles/app.css",
-      "line": 835,
+      "line": 836,
       "selector": ".plan-hero .eyebrow",
       "context": "",
       "declarations": [
@@ -162548,7 +162559,7 @@
     {
       "id": 599,
       "file": "app/styles/app.css",
-      "line": 836,
+      "line": 837,
       "selector": ".plan-hero h2",
       "context": "",
       "declarations": [
@@ -162567,7 +162578,7 @@
     {
       "id": 600,
       "file": "app/styles/app.css",
-      "line": 837,
+      "line": 838,
       "selector": ".plan-hero p",
       "context": "",
       "declarations": [
@@ -162591,7 +162602,7 @@
     {
       "id": 601,
       "file": "app/styles/app.css",
-      "line": 838,
+      "line": 839,
       "selector": ".plan-price",
       "context": "",
       "declarations": [
@@ -162615,7 +162626,7 @@
     {
       "id": 602,
       "file": "app/styles/app.css",
-      "line": 839,
+      "line": 840,
       "selector": ".plan-price strong",
       "context": "",
       "declarations": [
@@ -162629,7 +162640,7 @@
     {
       "id": 603,
       "file": "app/styles/app.css",
-      "line": 840,
+      "line": 841,
       "selector": ".plan-price span",
       "context": "",
       "declarations": [
@@ -162648,7 +162659,7 @@
     {
       "id": 604,
       "file": "app/styles/app.css",
-      "line": 841,
+      "line": 842,
       "selector": ".subscription-detail-grid",
       "context": "",
       "declarations": [
@@ -162672,7 +162683,7 @@
     {
       "id": 605,
       "file": "app/styles/app.css",
-      "line": 842,
+      "line": 843,
       "selector": ".usage-row",
       "context": "",
       "declarations": [
@@ -162706,7 +162717,7 @@
     {
       "id": 606,
       "file": "app/styles/app.css",
-      "line": 843,
+      "line": 844,
       "selector": ".usage-bar",
       "context": "",
       "declarations": [
@@ -162740,7 +162751,7 @@
     {
       "id": 607,
       "file": "app/styles/app.css",
-      "line": 844,
+      "line": 845,
       "selector": ".usage-bar i",
       "context": "",
       "declarations": [
@@ -162764,7 +162775,7 @@
     {
       "id": 608,
       "file": "app/styles/app.css",
-      "line": 845,
+      "line": 846,
       "selector": ".payment-method",
       "context": "",
       "declarations": [
@@ -162798,7 +162809,7 @@
     {
       "id": 609,
       "file": "app/styles/app.css",
-      "line": 846,
+      "line": 847,
       "selector": ".payment-method>div",
       "context": "",
       "declarations": [
@@ -162812,7 +162823,7 @@
     {
       "id": 610,
       "file": "app/styles/app.css",
-      "line": 847,
+      "line": 848,
       "selector": ".payment-method b,.payment-method small",
       "context": "",
       "declarations": [
@@ -162826,7 +162837,7 @@
     {
       "id": 611,
       "file": "app/styles/app.css",
-      "line": 848,
+      "line": 849,
       "selector": ".payment-method small",
       "context": "",
       "declarations": [
@@ -162850,7 +162861,7 @@
     {
       "id": 612,
       "file": "app/styles/app.css",
-      "line": 849,
+      "line": 850,
       "selector": ".invoices-panel",
       "context": "",
       "declarations": [
@@ -162864,7 +162875,7 @@
     {
       "id": 613,
       "file": "app/styles/app.css",
-      "line": 850,
+      "line": 851,
       "selector": ".danger-zone",
       "context": "",
       "declarations": [
@@ -162918,7 +162929,7 @@
     {
       "id": 614,
       "file": "app/styles/app.css",
-      "line": 861,
+      "line": 862,
       "selector": ".danger-zone b",
       "context": "",
       "declarations": [
@@ -162932,7 +162943,7 @@
     {
       "id": 615,
       "file": "app/styles/app.css",
-      "line": 862,
+      "line": 863,
       "selector": ".danger-zone p",
       "context": "",
       "declarations": [
@@ -162956,7 +162967,7 @@
     {
       "id": 616,
       "file": "app/styles/app.css",
-      "line": 864,
+      "line": 865,
       "selector": ".preference-table",
       "context": "",
       "declarations": [
@@ -162975,7 +162986,7 @@
     {
       "id": 617,
       "file": "app/styles/app.css",
-      "line": 865,
+      "line": 866,
       "selector": ".preference-row",
       "context": "",
       "declarations": [
@@ -163014,7 +163025,7 @@
     {
       "id": 618,
       "file": "app/styles/app.css",
-      "line": 866,
+      "line": 867,
       "selector": ".preference-channels",
       "context": "",
       "declarations": [
@@ -163033,7 +163044,7 @@
     {
       "id": 619,
       "file": "app/styles/app.css",
-      "line": 867,
+      "line": 868,
       "selector": ".preference-channels>label",
       "context": "",
       "declarations": [
@@ -163067,7 +163078,7 @@
     {
       "id": 620,
       "file": "app/styles/app.css",
-      "line": 868,
+      "line": 869,
       "selector": ".preference-row b,.preference-row small",
       "context": "",
       "declarations": [
@@ -163081,7 +163092,7 @@
     {
       "id": 621,
       "file": "app/styles/app.css",
-      "line": 869,
+      "line": 870,
       "selector": ".preference-row b",
       "context": "",
       "declarations": [
@@ -163095,7 +163106,7 @@
     {
       "id": 622,
       "file": "app/styles/app.css",
-      "line": 870,
+      "line": 871,
       "selector": ".preference-row small",
       "context": "",
       "declarations": [
@@ -163119,7 +163130,7 @@
     {
       "id": 623,
       "file": "app/styles/app.css",
-      "line": 872,
+      "line": 873,
       "selector": ".toggle",
       "context": "",
       "declarations": [
@@ -163168,7 +163179,7 @@
     {
       "id": 624,
       "file": "app/styles/app.css",
-      "line": 882,
+      "line": 883,
       "selector": ".toggle span",
       "context": "",
       "declarations": [
@@ -163207,7 +163218,7 @@
     {
       "id": 625,
       "file": "app/styles/app.css",
-      "line": 883,
+      "line": 884,
       "selector": ".toggle.is-on",
       "context": "",
       "declarations": [
@@ -163221,7 +163232,7 @@
     {
       "id": 626,
       "file": "app/styles/app.css",
-      "line": 884,
+      "line": 885,
       "selector": ".toggle.is-on span",
       "context": "",
       "declarations": [
@@ -163235,7 +163246,7 @@
     {
       "id": 627,
       "file": "app/styles/app.css",
-      "line": 885,
+      "line": 886,
       "selector": ".choice-list,\n.plan-choice-list",
       "context": "",
       "declarations": [
@@ -163259,7 +163270,7 @@
     {
       "id": 628,
       "file": "app/styles/app.css",
-      "line": 887,
+      "line": 888,
       "selector": ".choice-list button,\n.plan-choice-list button",
       "context": "",
       "declarations": [
@@ -163323,7 +163334,7 @@
     {
       "id": 629,
       "file": "app/styles/app.css",
-      "line": 901,
+      "line": 902,
       "selector": ".choice-list button:has(>span)",
       "context": "",
       "declarations": [
@@ -163337,7 +163348,7 @@
     {
       "id": 630,
       "file": "app/styles/app.css",
-      "line": 902,
+      "line": 903,
       "selector": ".choice-list button>div,.plan-choice-list button>div",
       "context": "",
       "declarations": [
@@ -163356,7 +163367,7 @@
     {
       "id": 631,
       "file": "app/styles/app.css",
-      "line": 903,
+      "line": 904,
       "selector": ".choice-list button>svg,.plan-choice-list button>svg",
       "context": "",
       "declarations": [
@@ -163375,7 +163386,7 @@
     {
       "id": 632,
       "file": "app/styles/app.css",
-      "line": 904,
+      "line": 905,
       "selector": ".choice-list button>span,\n.plan-choice-list button>span",
       "context": "",
       "declarations": [
@@ -163424,7 +163435,7 @@
     {
       "id": 633,
       "file": "app/styles/app.css",
-      "line": 906,
+      "line": 907,
       "selector": ".choice-list b,.choice-list small,.plan-choice-list b,.plan-choice-list small",
       "context": "",
       "declarations": [
@@ -163438,7 +163449,7 @@
     {
       "id": 634,
       "file": "app/styles/app.css",
-      "line": 907,
+      "line": 908,
       "selector": ".choice-list b,.plan-choice-list b",
       "context": "",
       "declarations": [
@@ -163452,7 +163463,7 @@
     {
       "id": 635,
       "file": "app/styles/app.css",
-      "line": 908,
+      "line": 909,
       "selector": ".choice-list small,.plan-choice-list small",
       "context": "",
       "declarations": [
@@ -163481,7 +163492,7 @@
     {
       "id": 636,
       "file": "app/styles/app.css",
-      "line": 909,
+      "line": 910,
       "selector": ".choice-list button.selected>span,\n.plan-choice-list button.selected>span",
       "context": "",
       "declarations": [
@@ -163500,7 +163511,7 @@
     {
       "id": 637,
       "file": "app/styles/app.css",
-      "line": 912,
+      "line": 913,
       "selector": ".security-card",
       "context": "",
       "declarations": [
@@ -163524,7 +163535,7 @@
     {
       "id": 638,
       "file": "app/styles/app.css",
-      "line": 913,
+      "line": 914,
       "selector": ".security-row",
       "context": "",
       "declarations": [
@@ -163553,7 +163564,7 @@
     {
       "id": 639,
       "file": "app/styles/app.css",
-      "line": 914,
+      "line": 915,
       "selector": ".security-row b",
       "context": "",
       "declarations": [
@@ -163567,7 +163578,7 @@
     {
       "id": 640,
       "file": "app/styles/app.css",
-      "line": 915,
+      "line": 916,
       "selector": ".security-row p",
       "context": "",
       "declarations": [
@@ -163591,7 +163602,7 @@
     {
       "id": 641,
       "file": "app/styles/app.css",
-      "line": 916,
+      "line": 917,
       "selector": ".session-list",
       "context": "",
       "declarations": [
@@ -163605,7 +163616,7 @@
     {
       "id": 642,
       "file": "app/styles/app.css",
-      "line": 917,
+      "line": 918,
       "selector": ".session-list>div",
       "context": "",
       "declarations": [
@@ -163621,7 +163632,7 @@
         },
         {
           "property": "grid-template-columns",
-          "value": "auto minmax(0,1fr) auto",
+          "value": "minmax(0,1fr) auto",
           "important": false
         },
         {
@@ -163644,7 +163655,7 @@
     {
       "id": 643,
       "file": "app/styles/app.css",
-      "line": 925,
+      "line": 926,
       "selector": ".session-list b,.session-list small",
       "context": "",
       "declarations": [
@@ -163658,7 +163669,7 @@
     {
       "id": 644,
       "file": "app/styles/app.css",
-      "line": 926,
+      "line": 927,
       "selector": ".session-list b",
       "context": "",
       "declarations": [
@@ -163672,7 +163683,7 @@
     {
       "id": 645,
       "file": "app/styles/app.css",
-      "line": 927,
+      "line": 928,
       "selector": ".session-list small",
       "context": "",
       "declarations": [
@@ -163696,7 +163707,7 @@
     {
       "id": 646,
       "file": "app/styles/app.css",
-      "line": 928,
+      "line": 929,
       "selector": ".two-factor-setup",
       "context": "",
       "declarations": [
@@ -163730,7 +163741,7 @@
     {
       "id": 647,
       "file": "app/styles/app.css",
-      "line": 929,
+      "line": 930,
       "selector": ".two-factor-code",
       "context": "",
       "declarations": [
@@ -163779,7 +163790,7 @@
     {
       "id": 648,
       "file": "app/styles/app.css",
-      "line": 931,
+      "line": 932,
       "selector": ".appearance-grid",
       "context": "",
       "declarations": [
@@ -163808,7 +163819,7 @@
     {
       "id": 649,
       "file": "app/styles/app.css",
-      "line": 932,
+      "line": 933,
       "selector": ".appearance-card",
       "context": "",
       "declarations": [
@@ -163842,7 +163853,7 @@
     {
       "id": 650,
       "file": "app/styles/app.css",
-      "line": 933,
+      "line": 934,
       "selector": ".appearance-card.selected",
       "context": "",
       "declarations": [
@@ -163861,7 +163872,7 @@
     {
       "id": 651,
       "file": "app/styles/app.css",
-      "line": 934,
+      "line": 935,
       "selector": ".appearance-card b,.appearance-card small",
       "context": "",
       "declarations": [
@@ -163875,7 +163886,7 @@
     {
       "id": 652,
       "file": "app/styles/app.css",
-      "line": 935,
+      "line": 936,
       "selector": ".appearance-card b",
       "context": "",
       "declarations": [
@@ -163894,7 +163905,7 @@
     {
       "id": 653,
       "file": "app/styles/app.css",
-      "line": 936,
+      "line": 937,
       "selector": ".appearance-card small",
       "context": "",
       "declarations": [
@@ -163918,7 +163929,7 @@
     {
       "id": 654,
       "file": "app/styles/app.css",
-      "line": 937,
+      "line": 938,
       "selector": ".theme-preview",
       "context": "",
       "declarations": [
@@ -163962,7 +163973,7 @@
     {
       "id": 655,
       "file": "app/styles/app.css",
-      "line": 938,
+      "line": 939,
       "selector": ".theme-preview i",
       "context": "",
       "declarations": [
@@ -163986,7 +163997,7 @@
     {
       "id": 656,
       "file": "app/styles/app.css",
-      "line": 939,
+      "line": 940,
       "selector": ".theme-preview i:nth-child(2)",
       "context": "",
       "declarations": [
@@ -164000,7 +164011,7 @@
     {
       "id": 657,
       "file": "app/styles/app.css",
-      "line": 940,
+      "line": 941,
       "selector": ".theme-preview i:nth-child(3)",
       "context": "",
       "declarations": [
@@ -164014,7 +164025,7 @@
     {
       "id": 658,
       "file": "app/styles/app.css",
-      "line": 941,
+      "line": 942,
       "selector": ".theme-preview.light",
       "context": "",
       "declarations": [
@@ -164028,7 +164039,7 @@
     {
       "id": 659,
       "file": "app/styles/app.css",
-      "line": 942,
+      "line": 943,
       "selector": ".theme-preview.light i",
       "context": "",
       "declarations": [
@@ -164042,7 +164053,7 @@
     {
       "id": 660,
       "file": "app/styles/app.css",
-      "line": 943,
+      "line": 944,
       "selector": ".theme-preview.dark",
       "context": "",
       "declarations": [
@@ -164061,7 +164072,7 @@
     {
       "id": 661,
       "file": "app/styles/app.css",
-      "line": 944,
+      "line": 945,
       "selector": ".theme-preview.dark i",
       "context": "",
       "declarations": [
@@ -164075,7 +164086,7 @@
     {
       "id": 662,
       "file": "app/styles/app.css",
-      "line": 945,
+      "line": 946,
       "selector": ".theme-preview.system",
       "context": "",
       "declarations": [
@@ -164089,7 +164100,7 @@
     {
       "id": 663,
       "file": "app/styles/app.css",
-      "line": 946,
+      "line": 947,
       "selector": ".theme-preview.system i",
       "context": "",
       "declarations": [
@@ -164103,7 +164114,7 @@
     {
       "id": 664,
       "file": "app/styles/app.css",
-      "line": 949,
+      "line": 950,
       "selector": ".documents-hub-grid",
       "context": "",
       "declarations": [
@@ -164127,7 +164138,7 @@
     {
       "id": 665,
       "file": "app/styles/app.css",
-      "line": 950,
+      "line": 951,
       "selector": ".full-button",
       "context": "",
       "declarations": [
@@ -164146,7 +164157,7 @@
     {
       "id": 666,
       "file": "app/styles/app.css",
-      "line": 951,
+      "line": 952,
       "selector": ".notification-center",
       "context": "",
       "declarations": [
@@ -164160,7 +164171,7 @@
     {
       "id": 667,
       "file": "app/styles/app.css",
-      "line": 952,
+      "line": 953,
       "selector": ".notification-center-tabs",
       "context": "",
       "declarations": [
@@ -164179,7 +164190,7 @@
     {
       "id": 668,
       "file": "app/styles/app.css",
-      "line": 953,
+      "line": 954,
       "selector": ".notification-center-row",
       "context": "",
       "declarations": [
@@ -164218,7 +164229,7 @@
     {
       "id": 669,
       "file": "app/styles/app.css",
-      "line": 961,
+      "line": 962,
       "selector": ".notification-center-row b",
       "context": "",
       "declarations": [
@@ -164232,7 +164243,7 @@
     {
       "id": 670,
       "file": "app/styles/app.css",
-      "line": 962,
+      "line": 963,
       "selector": ".notification-center-row p",
       "context": "",
       "declarations": [
@@ -164256,7 +164267,7 @@
     {
       "id": 671,
       "file": "app/styles/app.css",
-      "line": 963,
+      "line": 964,
       "selector": ".notification-center-row small",
       "context": "",
       "declarations": [
@@ -164275,7 +164286,7 @@
     {
       "id": 672,
       "file": "app/styles/app.css",
-      "line": 964,
+      "line": 965,
       "selector": ".unread-dot",
       "context": "",
       "declarations": [
@@ -164304,7 +164315,7 @@
     {
       "id": 673,
       "file": "app/styles/app.css",
-      "line": 965,
+      "line": 966,
       "selector": ".notification-preferences",
       "context": "",
       "declarations": [
@@ -164353,7 +164364,7 @@
     {
       "id": 674,
       "file": "app/styles/app.css",
-      "line": 968,
+      "line": 969,
       "selector": ".payment-context",
       "context": "",
       "declarations": [
@@ -164407,7 +164418,7 @@
     {
       "id": 675,
       "file": "app/styles/app.css",
-      "line": 979,
+      "line": 980,
       "selector": ".payment-context small",
       "context": "",
       "declarations": [
@@ -164431,7 +164442,7 @@
     {
       "id": 676,
       "file": "app/styles/app.css",
-      "line": 980,
+      "line": 981,
       "selector": ".payment-context b",
       "context": "",
       "declarations": [
@@ -164455,7 +164466,7 @@
     {
       "id": 677,
       "file": "app/styles/app.css",
-      "line": 981,
+      "line": 982,
       "selector": ".payment-context span",
       "context": "",
       "declarations": [
@@ -164474,7 +164485,7 @@
     {
       "id": 678,
       "file": "app/styles/app.css",
-      "line": 982,
+      "line": 983,
       "selector": ".payment-detail-summary",
       "context": "",
       "declarations": [
@@ -164518,7 +164529,7 @@
     {
       "id": 679,
       "file": "app/styles/app.css",
-      "line": 991,
+      "line": 992,
       "selector": ".payment-detail-summary h2",
       "context": "",
       "declarations": [
@@ -164552,7 +164563,7 @@
     {
       "id": 680,
       "file": "app/styles/app.css",
-      "line": 992,
+      "line": 993,
       "selector": ".payment-detail-summary>.status",
       "context": "",
       "declarations": [
@@ -164571,7 +164582,7 @@
     {
       "id": 681,
       "file": "app/styles/app.css",
-      "line": 993,
+      "line": 994,
       "selector": ".payment-detail-summary + .detail-card",
       "context": "",
       "declarations": [
@@ -164585,7 +164596,7 @@
     {
       "id": 682,
       "file": "app/styles/app.css",
-      "line": 994,
+      "line": 995,
       "selector": ".detail-card",
       "context": "",
       "declarations": [
@@ -164599,7 +164610,7 @@
     {
       "id": 683,
       "file": "app/styles/app.css",
-      "line": 997,
+      "line": 998,
       "selector": ".header-panel-layer",
       "context": "",
       "declarations": [
@@ -164653,7 +164664,7 @@
     {
       "id": 684,
       "file": "app/styles/app.css",
-      "line": 998,
+      "line": 999,
       "selector": ".header-panel",
       "context": "",
       "declarations": [
@@ -164717,7 +164728,7 @@
     {
       "id": 685,
       "file": "app/styles/app.css",
-      "line": 999,
+      "line": 1000,
       "selector": ".header-panel-heading",
       "context": "",
       "declarations": [
@@ -164761,7 +164772,7 @@
     {
       "id": 686,
       "file": "app/styles/app.css",
-      "line": 1000,
+      "line": 1001,
       "selector": ".header-panel-heading h2",
       "context": "",
       "declarations": [
@@ -164785,7 +164796,7 @@
     {
       "id": 687,
       "file": "app/styles/app.css",
-      "line": 1001,
+      "line": 1002,
       "selector": ".header-panel-heading .icon-button",
       "context": "",
       "declarations": [
@@ -164804,7 +164815,7 @@
     {
       "id": 688,
       "file": "app/styles/app.css",
-      "line": 1002,
+      "line": 1003,
       "selector": ".header-panel>:not(.header-panel-heading)",
       "context": "",
       "declarations": [
@@ -164833,7 +164844,7 @@
     {
       "id": 689,
       "file": "app/styles/app.css",
-      "line": 1003,
+      "line": 1004,
       "selector": ".header-panel .global-search",
       "context": "",
       "declarations": [
@@ -164857,7 +164868,7 @@
     {
       "id": 690,
       "file": "app/styles/app.css",
-      "line": 1004,
+      "line": 1005,
       "selector": ".search-clear",
       "context": "",
       "declarations": [
@@ -164906,7 +164917,7 @@
     {
       "id": 691,
       "file": "app/styles/app.css",
-      "line": 1005,
+      "line": 1006,
       "selector": ".header-search-controls",
       "context": "",
       "declarations": [
@@ -164940,7 +164951,7 @@
     {
       "id": 692,
       "file": "app/styles/app.css",
-      "line": 1006,
+      "line": 1007,
       "selector": ".header-search-controls .searchbox",
       "context": "",
       "declarations": [
@@ -164964,7 +164975,7 @@
     {
       "id": 693,
       "file": "app/styles/app.css",
-      "line": 1007,
+      "line": 1008,
       "selector": ".header-search-controls .text-action",
       "context": "",
       "declarations": [
@@ -164983,7 +164994,7 @@
     {
       "id": 694,
       "file": "app/styles/app.css",
-      "line": 1008,
+      "line": 1009,
       "selector": ".header-panel .search-results",
       "context": "",
       "declarations": [
@@ -165007,7 +165018,7 @@
     {
       "id": 695,
       "file": "app/styles/app.css",
-      "line": 1009,
+      "line": 1010,
       "selector": ".header-panel .search-results h3",
       "context": "",
       "declarations": [
@@ -165041,7 +165052,7 @@
     {
       "id": 696,
       "file": "app/styles/app.css",
-      "line": 1010,
+      "line": 1011,
       "selector": ".header-panel .search-results section>a",
       "context": "",
       "declarations": [
@@ -165080,7 +165091,7 @@
     {
       "id": 697,
       "file": "app/styles/app.css",
-      "line": 1011,
+      "line": 1012,
       "selector": ".header-panel .search-results section>a>div",
       "context": "",
       "declarations": [
@@ -165099,7 +165110,7 @@
     {
       "id": 698,
       "file": "app/styles/app.css",
-      "line": 1012,
+      "line": 1013,
       "selector": ".header-panel .search-results section b,.header-panel .search-results section span",
       "context": "",
       "declarations": [
@@ -165118,7 +165129,7 @@
     {
       "id": 699,
       "file": "app/styles/app.css",
-      "line": 1013,
+      "line": 1014,
       "selector": ".header-panel .search-results section span",
       "context": "",
       "declarations": [
@@ -165137,7 +165148,7 @@
     {
       "id": 700,
       "file": "app/styles/app.css",
-      "line": 1014,
+      "line": 1015,
       "selector": ".header-notification-filters",
       "context": "",
       "declarations": [
@@ -165176,7 +165187,7 @@
     {
       "id": 701,
       "file": "app/styles/app.css",
-      "line": 1015,
+      "line": 1016,
       "selector": ".header-notification-filters button",
       "context": "",
       "declarations": [
@@ -165215,7 +165226,7 @@
     {
       "id": 702,
       "file": "app/styles/app.css",
-      "line": 1016,
+      "line": 1017,
       "selector": ".header-notification-filters button[aria-pressed=\"true\"]",
       "context": "",
       "declarations": [
@@ -165234,7 +165245,7 @@
     {
       "id": 703,
       "file": "app/styles/app.css",
-      "line": 1017,
+      "line": 1018,
       "selector": ".sheet-layer",
       "context": "",
       "declarations": [
@@ -165278,7 +165289,7 @@
     {
       "id": 704,
       "file": "app/styles/app.css",
-      "line": 1026,
+      "line": 1027,
       "selector": ".bottom-sheet",
       "context": "",
       "declarations": [
@@ -165342,7 +165353,7 @@
     {
       "id": 705,
       "file": "app/styles/app.css",
-      "line": 1039,
+      "line": 1040,
       "selector": ".sheet-handle",
       "context": "",
       "declarations": [
@@ -165376,7 +165387,7 @@
     {
       "id": 706,
       "file": "app/styles/app.css",
-      "line": 1040,
+      "line": 1041,
       "selector": ".sheet-header",
       "context": "",
       "declarations": [
@@ -165435,7 +165446,7 @@
     {
       "id": 707,
       "file": "app/styles/app.css",
-      "line": 1052,
+      "line": 1053,
       "selector": ".sheet-header>div,.sheet-header>h2",
       "context": "",
       "declarations": [
@@ -165454,7 +165465,7 @@
     {
       "id": 708,
       "file": "app/styles/app.css",
-      "line": 1053,
+      "line": 1054,
       "selector": ".sheet-header>:is(button,.button)",
       "context": "",
       "declarations": [
@@ -165493,7 +165504,7 @@
     {
       "id": 709,
       "file": "app/styles/app.css",
-      "line": 1054,
+      "line": 1055,
       "selector": ".sheet-header h2",
       "context": "",
       "declarations": [
@@ -165522,7 +165533,7 @@
     {
       "id": 710,
       "file": "app/styles/app.css",
-      "line": 1055,
+      "line": 1056,
       "selector": ".sheet-header p",
       "context": "",
       "declarations": [
@@ -165551,7 +165562,7 @@
     {
       "id": 711,
       "file": "app/styles/app.css",
-      "line": 1057,
+      "line": 1058,
       "selector": ".action-list",
       "context": "",
       "declarations": [
@@ -165570,7 +165581,7 @@
     {
       "id": 712,
       "file": "app/styles/app.css",
-      "line": 1058,
+      "line": 1059,
       "selector": ".action-row",
       "context": "",
       "declarations": [
@@ -165664,7 +165675,7 @@
     {
       "id": 713,
       "file": "app/styles/app.css",
-      "line": 1059,
+      "line": 1060,
       "selector": ".action-row:last-child",
       "context": "",
       "declarations": [
@@ -165678,7 +165689,7 @@
     {
       "id": 714,
       "file": "app/styles/app.css",
-      "line": 1060,
+      "line": 1061,
       "selector": ".action-row>span",
       "context": "",
       "declarations": [
@@ -165697,7 +165708,7 @@
     {
       "id": 715,
       "file": "app/styles/app.css",
-      "line": 1061,
+      "line": 1062,
       "selector": ".action-row>svg:last-child:not(:first-child)",
       "context": "",
       "declarations": [
@@ -165711,7 +165722,7 @@
     {
       "id": 716,
       "file": "app/styles/app.css",
-      "line": 1062,
+      "line": 1063,
       "selector": ".action-row-danger",
       "context": "",
       "declarations": [
@@ -165725,7 +165736,7 @@
     {
       "id": 717,
       "file": "app/styles/app.css",
-      "line": 1063,
+      "line": 1064,
       "selector": ".action-row:disabled",
       "context": "",
       "declarations": [
@@ -165744,7 +165755,7 @@
     {
       "id": 718,
       "file": "app/styles/app.css",
-      "line": 1064,
+      "line": 1065,
       "selector": ".action-row:focus-visible",
       "context": "",
       "declarations": [
@@ -165758,7 +165769,7 @@
     {
       "id": 719,
       "file": "app/styles/app.css",
-      "line": 1065,
+      "line": 1066,
       "selector": ".record-controls",
       "context": "",
       "declarations": [
@@ -165792,7 +165803,7 @@
     {
       "id": 720,
       "file": "app/styles/app.css",
-      "line": 1066,
+      "line": 1067,
       "selector": ".record-controls>label",
       "context": "",
       "declarations": [
@@ -165821,7 +165832,7 @@
     {
       "id": 721,
       "file": "app/styles/app.css",
-      "line": 1067,
+      "line": 1068,
       "selector": ".time-record-list",
       "context": "",
       "declarations": [
@@ -165835,7 +165846,7 @@
     {
       "id": 722,
       "file": "app/styles/app.css",
-      "line": 1068,
+      "line": 1069,
       "selector": ".sheet-menu",
       "context": "",
       "declarations": [
@@ -165849,7 +165860,7 @@
     {
       "id": 723,
       "file": "app/styles/app.css",
-      "line": 1069,
+      "line": 1070,
       "selector": ".sheet-menu>a,.sheet-menu>button",
       "context": "",
       "declarations": [
@@ -165928,7 +165939,7 @@
     {
       "id": 724,
       "file": "app/styles/app.css",
-      "line": 1085,
+      "line": 1086,
       "selector": ".sheet-menu>:is(a,button):last-child",
       "context": "",
       "declarations": [
@@ -165942,7 +165953,7 @@
     {
       "id": 725,
       "file": "app/styles/app.css",
-      "line": 1086,
+      "line": 1087,
       "selector": ".sheet-menu>:is(a,button)>div",
       "context": "",
       "declarations": [
@@ -165961,7 +165972,7 @@
     {
       "id": 726,
       "file": "app/styles/app.css",
-      "line": 1087,
+      "line": 1088,
       "selector": ".sheet-menu>:is(a,button)>svg:last-child",
       "context": "",
       "declarations": [
@@ -165975,7 +165986,7 @@
     {
       "id": 727,
       "file": "app/styles/app.css",
-      "line": 1088,
+      "line": 1089,
       "selector": ".sheet-menu>:is(a,button):not(:has(>svg:last-child))::after",
       "context": "",
       "declarations": [
@@ -166014,7 +166025,7 @@
     {
       "id": 728,
       "file": "app/styles/app.css",
-      "line": 1089,
+      "line": 1090,
       "selector": ".sheet-menu b",
       "context": "",
       "declarations": [
@@ -166038,7 +166049,7 @@
     {
       "id": 729,
       "file": "app/styles/app.css",
-      "line": 1090,
+      "line": 1091,
       "selector": ".sheet-menu small",
       "context": "",
       "declarations": [
@@ -166072,7 +166083,7 @@
     {
       "id": 730,
       "file": "app/styles/app.css",
-      "line": 1091,
+      "line": 1092,
       "selector": ".sheet-secondary",
       "context": "",
       "declarations": [
@@ -166101,7 +166112,7 @@
     {
       "id": 731,
       "file": "app/styles/app.css",
-      "line": 1092,
+      "line": 1093,
       "selector": ".sheet-secondary :is(button,a)",
       "context": "",
       "declarations": [
@@ -166160,7 +166171,7 @@
     {
       "id": 732,
       "file": "app/styles/app.css",
-      "line": 1104,
+      "line": 1105,
       "selector": ".account-sheet-profile",
       "context": "",
       "declarations": [
@@ -166204,7 +166215,7 @@
     {
       "id": 733,
       "file": "app/styles/app.css",
-      "line": 1113,
+      "line": 1114,
       "selector": ".account-sheet>h3",
       "context": "",
       "declarations": [
@@ -166233,7 +166244,7 @@
     {
       "id": 734,
       "file": "app/styles/app.css",
-      "line": 1114,
+      "line": 1115,
       "selector": ".account-sheet-profile b",
       "context": "",
       "declarations": [
@@ -166247,7 +166258,7 @@
     {
       "id": 735,
       "file": "app/styles/app.css",
-      "line": 1115,
+      "line": 1116,
       "selector": ".account-sheet-profile small",
       "context": "",
       "declarations": [
@@ -166276,7 +166287,7 @@
     {
       "id": 736,
       "file": "app/styles/app.css",
-      "line": 1116,
+      "line": 1117,
       "selector": ".search-results",
       "context": "",
       "declarations": [
@@ -166295,7 +166306,7 @@
     {
       "id": 737,
       "file": "app/styles/app.css",
-      "line": 1117,
+      "line": 1118,
       "selector": ".search-results>a",
       "context": "",
       "declarations": [
@@ -166334,7 +166345,7 @@
     {
       "id": 738,
       "file": "app/styles/app.css",
-      "line": 1125,
+      "line": 1126,
       "selector": ".search-results small",
       "context": "",
       "declarations": [
@@ -166358,7 +166369,7 @@
     {
       "id": 739,
       "file": "app/styles/app.css",
-      "line": 1126,
+      "line": 1127,
       "selector": ".search-results b",
       "context": "",
       "declarations": [
@@ -166382,7 +166393,7 @@
     {
       "id": 740,
       "file": "app/styles/app.css",
-      "line": 1127,
+      "line": 1128,
       "selector": ".search-results span",
       "context": "",
       "declarations": [
@@ -166401,7 +166412,7 @@
     {
       "id": 741,
       "file": "app/styles/app.css",
-      "line": 1128,
+      "line": 1129,
       "selector": ".notification-list>a",
       "context": "",
       "declarations": [
@@ -166445,7 +166456,7 @@
     {
       "id": 742,
       "file": "app/styles/app.css",
-      "line": 1137,
+      "line": 1138,
       "selector": ".notification-list b",
       "context": "",
       "declarations": [
@@ -166459,7 +166470,7 @@
     {
       "id": 743,
       "file": "app/styles/app.css",
-      "line": 1138,
+      "line": 1139,
       "selector": ".notification-list p",
       "context": "",
       "declarations": [
@@ -166483,7 +166494,7 @@
     {
       "id": 744,
       "file": "app/styles/app.css",
-      "line": 1139,
+      "line": 1140,
       "selector": ".notification-list small",
       "context": "",
       "declarations": [
@@ -166502,7 +166513,7 @@
     {
       "id": 745,
       "file": "app/styles/app.css",
-      "line": 1140,
+      "line": 1141,
       "selector": ".notification-list>a.notification-settings-link",
       "context": "",
       "declarations": [
@@ -166541,7 +166552,7 @@
     {
       "id": 746,
       "file": "app/styles/app.css",
-      "line": 1141,
+      "line": 1142,
       "selector": ".notification-settings-link>span",
       "context": "",
       "declarations": [
@@ -166560,7 +166571,7 @@
     {
       "id": 747,
       "file": "app/styles/app.css",
-      "line": 1142,
+      "line": 1143,
       "selector": ".notification-settings-link>svg",
       "context": "",
       "declarations": [
@@ -166574,7 +166585,7 @@
     {
       "id": 748,
       "file": "app/styles/app.css",
-      "line": 1143,
+      "line": 1144,
       "selector": ".notification-badge",
       "context": "",
       "declarations": [
@@ -166638,7 +166649,7 @@
     {
       "id": 749,
       "file": "app/styles/app.css",
-      "line": 1144,
+      "line": 1145,
       "selector": ".filter-sheet-actions",
       "context": "",
       "declarations": [
@@ -166692,7 +166703,7 @@
     {
       "id": 750,
       "file": "app/styles/app.css",
-      "line": 1155,
+      "line": 1156,
       "selector": ".filter-sheet-actions .button",
       "context": "",
       "declarations": [
@@ -166726,7 +166737,7 @@
     {
       "id": 751,
       "file": "app/styles/app.css",
-      "line": 1158,
+      "line": 1159,
       "selector": ".onboarding-progress",
       "context": "",
       "declarations": [
@@ -166760,7 +166771,7 @@
     {
       "id": 752,
       "file": "app/styles/app.css",
-      "line": 1159,
+      "line": 1160,
       "selector": ".onboarding-progress>div",
       "context": "",
       "declarations": [
@@ -166789,7 +166800,7 @@
     {
       "id": 753,
       "file": "app/styles/app.css",
-      "line": 1160,
+      "line": 1161,
       "selector": ".onboarding-progress>div.active",
       "context": "",
       "declarations": [
@@ -166803,7 +166814,7 @@
     {
       "id": 754,
       "file": "app/styles/app.css",
-      "line": 1161,
+      "line": 1162,
       "selector": ".onboarding-progress span",
       "context": "",
       "declarations": [
@@ -166852,7 +166863,7 @@
     {
       "id": 755,
       "file": "app/styles/app.css",
-      "line": 1162,
+      "line": 1163,
       "selector": ".onboarding-progress>i",
       "context": "",
       "declarations": [
@@ -166876,7 +166887,7 @@
     {
       "id": 756,
       "file": "app/styles/app.css",
-      "line": 1163,
+      "line": 1164,
       "selector": ".onboarding-progress b",
       "context": "",
       "declarations": [
@@ -166890,7 +166901,7 @@
     {
       "id": 757,
       "file": "app/styles/app.css",
-      "line": 1164,
+      "line": 1165,
       "selector": ".onboarding-intro",
       "context": "",
       "declarations": [
@@ -166909,7 +166920,7 @@
     {
       "id": 758,
       "file": "app/styles/app.css",
-      "line": 1165,
+      "line": 1166,
       "selector": ".onboarding-intro h2",
       "context": "",
       "declarations": [
@@ -166933,7 +166944,7 @@
     {
       "id": 759,
       "file": "app/styles/app.css",
-      "line": 1166,
+      "line": 1167,
       "selector": ".onboarding-intro p",
       "context": "",
       "declarations": [
@@ -166962,7 +166973,7 @@
     {
       "id": 760,
       "file": "app/styles/app.css",
-      "line": 1167,
+      "line": 1168,
       "selector": ".welcome-grid",
       "context": "",
       "declarations": [
@@ -166981,7 +166992,7 @@
     {
       "id": 761,
       "file": "app/styles/app.css",
-      "line": 1168,
+      "line": 1169,
       "selector": ".welcome-grid>a",
       "context": "",
       "declarations": [
@@ -167025,7 +167036,7 @@
     {
       "id": 762,
       "file": "app/styles/app.css",
-      "line": 1177,
+      "line": 1178,
       "selector": ".welcome-grid>a>span",
       "context": "",
       "declarations": [
@@ -167064,7 +167075,7 @@
     {
       "id": 763,
       "file": "app/styles/app.css",
-      "line": 1178,
+      "line": 1179,
       "selector": ".welcome-grid b",
       "context": "",
       "declarations": [
@@ -167078,7 +167089,7 @@
     {
       "id": 764,
       "file": "app/styles/app.css",
-      "line": 1179,
+      "line": 1180,
       "selector": ".welcome-grid small",
       "context": "",
       "declarations": [
@@ -167107,7 +167118,7 @@
     {
       "id": 765,
       "file": "app/styles/app.css",
-      "line": 1180,
+      "line": 1181,
       "selector": ".onboarding-footer",
       "context": "",
       "declarations": [
@@ -167146,7 +167157,7 @@
     {
       "id": 766,
       "file": "app/styles/app.css",
-      "line": 1181,
+      "line": 1182,
       "selector": ".onboarding-footer p",
       "context": "",
       "declarations": [
@@ -167170,7 +167181,7 @@
     {
       "id": 767,
       "file": "app/styles/app.css",
-      "line": 1184,
+      "line": 1185,
       "selector": ".toast",
       "context": "",
       "declarations": [
@@ -167259,7 +167270,7 @@
     {
       "id": 768,
       "file": "app/styles/app.css",
-      "line": 1202,
+      "line": 1203,
       "selector": ".toast-icon",
       "context": "",
       "declarations": [
@@ -167298,7 +167309,7 @@
     {
       "id": 769,
       "file": "app/styles/app.css",
-      "line": 1203,
+      "line": 1204,
       "selector": ".toast b",
       "context": "",
       "declarations": [
@@ -167312,7 +167323,7 @@
     {
       "id": 770,
       "file": "app/styles/app.css",
-      "line": 1204,
+      "line": 1205,
       "selector": ".toast small",
       "context": "",
       "declarations": [
@@ -167341,7 +167352,7 @@
     {
       "id": 771,
       "file": "app/styles/app.css",
-      "line": 1207,
+      "line": 1208,
       "selector": ".pwa-update",
       "context": "",
       "declarations": [
@@ -167420,7 +167431,7 @@
     {
       "id": 772,
       "file": "app/styles/app.css",
-      "line": 1223,
+      "line": 1224,
       "selector": ".pwa-update>div",
       "context": "",
       "declarations": [
@@ -167434,7 +167445,7 @@
     {
       "id": 773,
       "file": "app/styles/app.css",
-      "line": 1224,
+      "line": 1225,
       "selector": ".pwa-update b,.pwa-update span",
       "context": "",
       "declarations": [
@@ -167448,7 +167459,7 @@
     {
       "id": 774,
       "file": "app/styles/app.css",
-      "line": 1225,
+      "line": 1226,
       "selector": ".pwa-update b",
       "context": "",
       "declarations": [
@@ -167462,7 +167473,7 @@
     {
       "id": 775,
       "file": "app/styles/app.css",
-      "line": 1226,
+      "line": 1227,
       "selector": ".pwa-update span",
       "context": "",
       "declarations": [
@@ -167486,7 +167497,7 @@
     {
       "id": 776,
       "file": "app/styles/app.css",
-      "line": 1227,
+      "line": 1228,
       "selector": ".pwa-update button",
       "context": "",
       "declarations": [
@@ -167535,7 +167546,7 @@
     {
       "id": 777,
       "file": "app/styles/app.css",
-      "line": 1230,
+      "line": 1231,
       "selector": ".desktop-appbar-actions",
       "context": "",
       "declarations": [
@@ -167559,7 +167570,7 @@
     {
       "id": 778,
       "file": "app/styles/app.css",
-      "line": 1231,
+      "line": 1232,
       "selector": ".desktop-appbar-actions :is(svg,.avatar-button,.desktop-notification-button)",
       "context": "",
       "declarations": [
@@ -167573,7 +167584,7 @@
     {
       "id": 779,
       "file": "app/styles/app.css",
-      "line": 1234,
+      "line": 1235,
       "selector": ".desktop-appbar-actions svg",
       "context": "",
       "declarations": [
@@ -167617,7 +167628,7 @@
     {
       "id": 780,
       "file": "app/styles/app.css",
-      "line": 1243,
+      "line": 1244,
       "selector": ".desktop-header-timer svg",
       "context": "",
       "declarations": [
@@ -167636,7 +167647,7 @@
     {
       "id": 781,
       "file": "app/styles/app.css",
-      "line": 1247,
+      "line": 1248,
       "selector": ".desktop-notification-button",
       "context": "",
       "declarations": [
@@ -167660,7 +167671,7 @@
     {
       "id": 782,
       "file": "app/styles/app.css",
-      "line": 1252,
+      "line": 1253,
       "selector": ".desktop-notification-button svg",
       "context": "",
       "declarations": [
@@ -167679,7 +167690,7 @@
     {
       "id": 783,
       "file": "app/styles/app.css",
-      "line": 1257,
+      "line": 1258,
       "selector": ".account-sheet,\n.global-search,\n.quick-create-menu,\n.notification-center-list,\n.customer-tab-panel,\n.employee-tab-panel,\n.invoice-master-detail",
       "context": "",
       "declarations": [
@@ -167693,7 +167704,7 @@
     {
       "id": 784,
       "file": "app/styles/app.css",
-      "line": 1265,
+      "line": 1266,
       "selector": ".contact-sheet,\n.manual-time-sheet,\n.project-sheet,\n.security-sheet,\n.subscription-sheet",
       "context": "",
       "declarations": [
@@ -167707,7 +167718,7 @@
     {
       "id": 785,
       "file": "app/styles/app.css",
-      "line": 1271,
+      "line": 1272,
       "selector": ".quick-create-menu",
       "context": "",
       "declarations": [
@@ -167721,7 +167732,7 @@
     {
       "id": 786,
       "file": "app/styles/app.css",
-      "line": 1272,
+      "line": 1273,
       "selector": ".notification-center-list",
       "context": "",
       "declarations": [
@@ -167735,7 +167746,7 @@
     {
       "id": 787,
       "file": "app/styles/app.css",
-      "line": 1274,
+      "line": 1275,
       "selector": ".document-source-note",
       "context": "",
       "declarations": [
@@ -167789,7 +167800,7 @@
     {
       "id": 788,
       "file": "app/styles/app.css",
-      "line": 1285,
+      "line": 1286,
       "selector": ".document-source-note span",
       "context": "",
       "declarations": [
@@ -167803,7 +167814,7 @@
     {
       "id": 789,
       "file": "app/styles/app.css",
-      "line": 1286,
+      "line": 1287,
       "selector": ".document-source-note b",
       "context": "",
       "declarations": [
@@ -167817,7 +167828,7 @@
     {
       "id": 790,
       "file": "app/styles/app.css",
-      "line": 1290,
+      "line": 1291,
       "selector": ".button,.icon-button,.sheet-menu>a,.sheet-menu>button",
       "context": "",
       "declarations": [
@@ -167831,7 +167842,7 @@
     {
       "id": 791,
       "file": "app/styles/app.css",
-      "line": 1293,
+      "line": 1294,
       "selector": ".button:active,.icon-button:active,.sheet-menu>a:active,.sheet-menu>button:active",
       "context": "",
       "declarations": [
@@ -167845,7 +167856,7 @@
     {
       "id": 792,
       "file": "app/styles/app.css",
-      "line": 1294,
+      "line": 1295,
       "selector": ".bottom-sheet",
       "context": "",
       "declarations": [
@@ -167859,7 +167870,7 @@
     {
       "id": 793,
       "file": "app/styles/app.css",
-      "line": 1296,
+      "line": 1297,
       "selector": "from",
       "context": "@keyframes sheet-enter",
       "declarations": [
@@ -167878,7 +167889,7 @@
     {
       "id": 794,
       "file": "app/styles/app.css",
-      "line": 1297,
+      "line": 1298,
       "selector": "to",
       "context": "@keyframes sheet-enter",
       "declarations": [
@@ -167897,7 +167908,7 @@
     {
       "id": 795,
       "file": "app/styles/app.css",
-      "line": 1300,
+      "line": 1301,
       "selector": ".documents-summary",
       "context": "",
       "declarations": [
@@ -167926,7 +167937,7 @@
     {
       "id": 796,
       "file": "app/styles/app.css",
-      "line": 1300,
+      "line": 1301,
       "selector": ".documents-summary>div",
       "context": "",
       "declarations": [
@@ -167970,7 +167981,7 @@
     {
       "id": 797,
       "file": "app/styles/app.css",
-      "line": 1300,
+      "line": 1301,
       "selector": ".documents-summary svg",
       "context": "",
       "declarations": [
@@ -167984,7 +167995,7 @@
     {
       "id": 798,
       "file": "app/styles/app.css",
-      "line": 1300,
+      "line": 1301,
       "selector": ".documents-summary span,.documents-summary small",
       "context": "",
       "declarations": [
@@ -168003,7 +168014,7 @@
     {
       "id": 799,
       "file": "app/styles/app.css",
-      "line": 1300,
+      "line": 1301,
       "selector": ".documents-summary b",
       "context": "",
       "declarations": [
@@ -168017,7 +168028,7 @@
     {
       "id": 800,
       "file": "app/styles/app.css",
-      "line": 1303,
+      "line": 1304,
       "selector": ".settings-choice-list",
       "context": "",
       "declarations": [
@@ -168036,7 +168047,7 @@
     {
       "id": 801,
       "file": "app/styles/app.css",
-      "line": 1304,
+      "line": 1305,
       "selector": ".settings-choice-list>button,.settings-static-row",
       "context": "",
       "declarations": [
@@ -168105,7 +168116,7 @@
     {
       "id": 802,
       "file": "app/styles/app.css",
-      "line": 1305,
+      "line": 1306,
       "selector": ".settings-choice-list>button:last-child,.settings-static-row:last-child",
       "context": "",
       "declarations": [
@@ -168119,7 +168130,7 @@
     {
       "id": 803,
       "file": "app/styles/app.css",
-      "line": 1306,
+      "line": 1307,
       "selector": ".settings-choice-list b,.settings-choice-list small,.settings-static-row b,.settings-static-row small",
       "context": "",
       "declarations": [
@@ -168133,7 +168144,7 @@
     {
       "id": 804,
       "file": "app/styles/app.css",
-      "line": 1307,
+      "line": 1308,
       "selector": ".settings-choice-list>button>div,.settings-static-row>div",
       "context": "",
       "declarations": [
@@ -168152,7 +168163,7 @@
     {
       "id": 805,
       "file": "app/styles/app.css",
-      "line": 1308,
+      "line": 1309,
       "selector": ".settings-choice-list small,.settings-static-row small",
       "context": "",
       "declarations": [
@@ -168176,7 +168187,7 @@
     {
       "id": 806,
       "file": "app/styles/app.css",
-      "line": 1309,
+      "line": 1310,
       "selector": ".team-list .status",
       "context": "",
       "declarations": [
@@ -168190,7 +168201,7 @@
     {
       "id": 807,
       "file": "app/styles/app.css",
-      "line": 1310,
+      "line": 1311,
       "selector": ".settings-section",
       "context": "",
       "declarations": [
@@ -168204,7 +168215,7 @@
     {
       "id": 808,
       "file": "app/styles/app.css",
-      "line": 1311,
+      "line": 1312,
       "selector": ".settings-section>h2",
       "context": "",
       "declarations": [
@@ -168223,7 +168234,7 @@
     {
       "id": 809,
       "file": "app/styles/app.css",
-      "line": 1312,
+      "line": 1313,
       "selector": ".settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form",
       "context": "",
       "declarations": [
@@ -168237,7 +168248,7 @@
     {
       "id": 810,
       "file": "app/styles/app.css",
-      "line": 1313,
+      "line": 1314,
       "selector": ".settings-profile,.company-logo-card",
       "context": "",
       "declarations": [
@@ -168251,7 +168262,7 @@
     {
       "id": 811,
       "file": "app/styles/app.css",
-      "line": 1314,
+      "line": 1315,
       "selector": ".receipt-upload.is-scanning",
       "context": "",
       "declarations": [
@@ -168265,7 +168276,7 @@
     {
       "id": 812,
       "file": "app/styles/app.css",
-      "line": 1316,
+      "line": 1317,
       "selector": ".payment-summary-strip",
       "context": "",
       "declarations": [
@@ -168294,7 +168305,7 @@
     {
       "id": 813,
       "file": "app/styles/app.css",
-      "line": 1317,
+      "line": 1318,
       "selector": ".payment-summary-strip>div",
       "context": "",
       "declarations": [
@@ -168318,7 +168329,7 @@
     {
       "id": 814,
       "file": "app/styles/app.css",
-      "line": 1318,
+      "line": 1319,
       "selector": ".payment-summary-strip>div:last-child",
       "context": "",
       "declarations": [
@@ -168332,7 +168343,7 @@
     {
       "id": 815,
       "file": "app/styles/app.css",
-      "line": 1319,
+      "line": 1320,
       "selector": ".payment-summary-strip span,.payment-summary-strip b,.payment-summary-strip small",
       "context": "",
       "declarations": [
@@ -168346,7 +168357,7 @@
     {
       "id": 816,
       "file": "app/styles/app.css",
-      "line": 1320,
+      "line": 1321,
       "selector": ".payment-summary-strip span,.payment-summary-strip small",
       "context": "",
       "declarations": [
@@ -168360,7 +168371,7 @@
     {
       "id": 817,
       "file": "app/styles/app.css",
-      "line": 1321,
+      "line": 1322,
       "selector": ".payment-summary-strip span",
       "context": "",
       "declarations": [
@@ -168379,7 +168390,7 @@
     {
       "id": 818,
       "file": "app/styles/app.css",
-      "line": 1322,
+      "line": 1323,
       "selector": ".payment-summary-strip b",
       "context": "",
       "declarations": [
@@ -168403,7 +168414,7 @@
     {
       "id": 819,
       "file": "app/styles/app.css",
-      "line": 1323,
+      "line": 1324,
       "selector": ".payment-summary-strip small",
       "context": "",
       "declarations": [
@@ -168417,7 +168428,7 @@
     {
       "id": 820,
       "file": "app/styles/app.css",
-      "line": 1326,
+      "line": 1327,
       "selector": ".revenue-insight",
       "context": "",
       "declarations": [
@@ -168436,7 +168447,7 @@
     {
       "id": 821,
       "file": "app/styles/app.css",
-      "line": 1327,
+      "line": 1328,
       "selector": ".revenue-insight-head",
       "context": "",
       "declarations": [
@@ -168465,7 +168476,7 @@
     {
       "id": 822,
       "file": "app/styles/app.css",
-      "line": 1328,
+      "line": 1329,
       "selector": ".revenue-insight-head h2",
       "context": "",
       "declarations": [
@@ -168489,7 +168500,7 @@
     {
       "id": 823,
       "file": "app/styles/app.css",
-      "line": 1329,
+      "line": 1330,
       "selector": ".revenue-total",
       "context": "",
       "declarations": [
@@ -168513,7 +168524,7 @@
     {
       "id": 824,
       "file": "app/styles/app.css",
-      "line": 1330,
+      "line": 1331,
       "selector": ".revenue-period",
       "context": "",
       "declarations": [
@@ -168547,7 +168558,7 @@
     {
       "id": 825,
       "file": "app/styles/app.css",
-      "line": 1331,
+      "line": 1332,
       "selector": ".trend-positive,.trend-negative",
       "context": "",
       "declarations": [
@@ -168571,7 +168582,7 @@
     {
       "id": 826,
       "file": "app/styles/app.css",
-      "line": 1331,
+      "line": 1332,
       "selector": ".trend-positive",
       "context": "",
       "declarations": [
@@ -168585,7 +168596,7 @@
     {
       "id": 827,
       "file": "app/styles/app.css",
-      "line": 1331,
+      "line": 1332,
       "selector": ".trend-negative",
       "context": "",
       "declarations": [
@@ -168599,7 +168610,7 @@
     {
       "id": 828,
       "file": "app/styles/app.css",
-      "line": 1331,
+      "line": 1332,
       "selector": ".trend-positive span,.trend-negative span",
       "context": "",
       "declarations": [
@@ -168618,7 +168629,7 @@
     {
       "id": 829,
       "file": "app/styles/app.css",
-      "line": 1332,
+      "line": 1333,
       "selector": ".revenue-chart",
       "context": "",
       "declarations": [
@@ -168632,7 +168643,7 @@
     {
       "id": 830,
       "file": "app/styles/app.css",
-      "line": 1332,
+      "line": 1333,
       "selector": ".revenue-chart svg",
       "context": "",
       "declarations": [
@@ -168661,7 +168672,7 @@
     {
       "id": 831,
       "file": "app/styles/app.css",
-      "line": 1333,
+      "line": 1334,
       "selector": ".revenue-line",
       "context": "",
       "declarations": [
@@ -168680,7 +168691,7 @@
     {
       "id": 832,
       "file": "app/styles/app.css",
-      "line": 1333,
+      "line": 1334,
       "selector": ".revenue-line.current",
       "context": "",
       "declarations": [
@@ -168699,7 +168710,7 @@
     {
       "id": 833,
       "file": "app/styles/app.css",
-      "line": 1333,
+      "line": 1334,
       "selector": ".revenue-line.previous",
       "context": "",
       "declarations": [
@@ -168723,7 +168734,7 @@
     {
       "id": 834,
       "file": "app/styles/app.css",
-      "line": 1334,
+      "line": 1335,
       "selector": ".revenue-dot",
       "context": "",
       "declarations": [
@@ -168752,7 +168763,7 @@
     {
       "id": 835,
       "file": "app/styles/app.css",
-      "line": 1335,
+      "line": 1336,
       "selector": ".revenue-axis",
       "context": "",
       "declarations": [
@@ -168791,7 +168802,7 @@
     {
       "id": 836,
       "file": "app/styles/app.css",
-      "line": 1336,
+      "line": 1337,
       "selector": ".chart-legend",
       "context": "",
       "declarations": [
@@ -168825,7 +168836,7 @@
     {
       "id": 837,
       "file": "app/styles/app.css",
-      "line": 1336,
+      "line": 1337,
       "selector": ".chart-legend span",
       "context": "",
       "declarations": [
@@ -168849,7 +168860,7 @@
     {
       "id": 838,
       "file": "app/styles/app.css",
-      "line": 1336,
+      "line": 1337,
       "selector": ".chart-legend i",
       "context": "",
       "declarations": [
@@ -168873,7 +168884,7 @@
     {
       "id": 839,
       "file": "app/styles/app.css",
-      "line": 1336,
+      "line": 1337,
       "selector": ".legend-current",
       "context": "",
       "declarations": [
@@ -168887,7 +168898,7 @@
     {
       "id": 840,
       "file": "app/styles/app.css",
-      "line": 1336,
+      "line": 1337,
       "selector": ".legend-previous",
       "context": "",
       "declarations": [
@@ -168901,7 +168912,7 @@
     {
       "id": 841,
       "file": "app/styles/app.css",
-      "line": 1337,
+      "line": 1338,
       "selector": ".finance-insights",
       "context": "",
       "declarations": [
@@ -168930,7 +168941,7 @@
     {
       "id": 842,
       "file": "app/styles/app.css",
-      "line": 1338,
+      "line": 1339,
       "selector": ".payment-donut-card,.finance-kpis",
       "context": "",
       "declarations": [
@@ -168959,7 +168970,7 @@
     {
       "id": 843,
       "file": "app/styles/app.css",
-      "line": 1339,
+      "line": 1340,
       "selector": ".payment-donut-card",
       "context": "",
       "declarations": [
@@ -168983,7 +168994,7 @@
     {
       "id": 844,
       "file": "app/styles/app.css",
-      "line": 1339,
+      "line": 1340,
       "selector": ".payment-donut",
       "context": "",
       "declarations": [
@@ -169022,7 +169033,7 @@
     {
       "id": 845,
       "file": "app/styles/app.css",
-      "line": 1339,
+      "line": 1340,
       "selector": ".payment-donut>div",
       "context": "",
       "declarations": [
@@ -169066,7 +169077,7 @@
     {
       "id": 846,
       "file": "app/styles/app.css",
-      "line": 1339,
+      "line": 1340,
       "selector": ".payment-donut b",
       "context": "",
       "declarations": [
@@ -169080,7 +169091,7 @@
     {
       "id": 847,
       "file": "app/styles/app.css",
-      "line": 1339,
+      "line": 1340,
       "selector": ".payment-donut span",
       "context": "",
       "declarations": [
@@ -169099,7 +169110,7 @@
     {
       "id": 848,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend",
       "context": "",
       "declarations": [
@@ -169128,7 +169139,7 @@
     {
       "id": 849,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend p",
       "context": "",
       "declarations": [
@@ -169167,7 +169178,7 @@
     {
       "id": 850,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend p b",
       "context": "",
       "declarations": [
@@ -169186,7 +169197,7 @@
     {
       "id": 851,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend p span",
       "context": "",
       "declarations": [
@@ -169210,7 +169221,7 @@
     {
       "id": 852,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend i",
       "context": "",
       "declarations": [
@@ -169234,7 +169245,7 @@
     {
       "id": 853,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend .paid",
       "context": "",
       "declarations": [
@@ -169248,7 +169259,7 @@
     {
       "id": 854,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend .open",
       "context": "",
       "declarations": [
@@ -169262,7 +169273,7 @@
     {
       "id": 855,
       "file": "app/styles/app.css",
-      "line": 1340,
+      "line": 1341,
       "selector": ".payment-legend .overdue",
       "context": "",
       "declarations": [
@@ -169276,7 +169287,7 @@
     {
       "id": 856,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis",
       "context": "",
       "declarations": [
@@ -169300,7 +169311,7 @@
     {
       "id": 857,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis>div",
       "context": "",
       "declarations": [
@@ -169329,7 +169340,7 @@
     {
       "id": 858,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis>div+div",
       "context": "",
       "declarations": [
@@ -169343,7 +169354,7 @@
     {
       "id": 859,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis span",
       "context": "",
       "declarations": [
@@ -169367,7 +169378,7 @@
     {
       "id": 860,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis b",
       "context": "",
       "declarations": [
@@ -169381,7 +169392,7 @@
     {
       "id": 861,
       "file": "app/styles/app.css",
-      "line": 1341,
+      "line": 1342,
       "selector": ".finance-kpis small",
       "context": "",
       "declarations": [
@@ -169400,7 +169411,7 @@
     {
       "id": 862,
       "file": "app/styles/app.css",
-      "line": 1343,
+      "line": 1344,
       "selector": ".revenue-chart",
       "context": "",
       "declarations": [
@@ -169419,7 +169430,7 @@
     {
       "id": 863,
       "file": "app/styles/app.css",
-      "line": 1344,
+      "line": 1345,
       "selector": ".revenue-tooltip",
       "context": "",
       "declarations": [
@@ -169513,7 +169524,7 @@
     {
       "id": 864,
       "file": "app/styles/app.css",
-      "line": 1345,
+      "line": 1346,
       "selector": ".revenue-tooltip b",
       "context": "",
       "declarations": [
@@ -169527,7 +169538,7 @@
     {
       "id": 865,
       "file": "app/styles/app.css",
-      "line": 1345,
+      "line": 1346,
       "selector": ".revenue-tooltip span",
       "context": "",
       "declarations": [
@@ -169541,7 +169552,7 @@
     {
       "id": 866,
       "file": "app/styles/app.css",
-      "line": 1346,
+      "line": 1347,
       "selector": ".revenue-guide",
       "context": "",
       "declarations": [
@@ -169575,7 +169586,7 @@
     {
       "id": 867,
       "file": "app/styles/app.css",
-      "line": 1347,
+      "line": 1348,
       "selector": ".revenue-dot.active",
       "context": "",
       "declarations": [
@@ -169594,7 +169605,7 @@
     {
       "id": 868,
       "file": "app/styles/app.css",
-      "line": 1348,
+      "line": 1349,
       "selector": ".payment-donut-wrap",
       "context": "",
       "declarations": [
@@ -169613,7 +169624,7 @@
     {
       "id": 869,
       "file": "app/styles/app.css",
-      "line": 1349,
+      "line": 1350,
       "selector": ".payment-donut-wrap .payment-donut",
       "context": "",
       "declarations": [
@@ -169657,7 +169668,7 @@
     {
       "id": 870,
       "file": "app/styles/app.css",
-      "line": 1350,
+      "line": 1351,
       "selector": ".donut-ring",
       "context": "",
       "declarations": [
@@ -169681,7 +169692,7 @@
     {
       "id": 871,
       "file": "app/styles/app.css",
-      "line": 1351,
+      "line": 1352,
       "selector": ".donut-center",
       "context": "",
       "declarations": [
@@ -169735,7 +169746,7 @@
     {
       "id": 872,
       "file": "app/styles/app.css",
-      "line": 1352,
+      "line": 1353,
       "selector": ".donut-center b",
       "context": "",
       "declarations": [
@@ -169749,7 +169760,7 @@
     {
       "id": 873,
       "file": "app/styles/app.css",
-      "line": 1352,
+      "line": 1353,
       "selector": ".donut-center span",
       "context": "",
       "declarations": [
@@ -169768,7 +169779,7 @@
     {
       "id": 874,
       "file": "app/styles/app.css",
-      "line": 1353,
+      "line": 1354,
       "selector": ".donut-hit",
       "context": "",
       "declarations": [
@@ -169807,7 +169818,7 @@
     {
       "id": 875,
       "file": "app/styles/app.css",
-      "line": 1354,
+      "line": 1355,
       "selector": ".paid-hit",
       "context": "",
       "declarations": [
@@ -169821,7 +169832,7 @@
     {
       "id": 876,
       "file": "app/styles/app.css",
-      "line": 1354,
+      "line": 1355,
       "selector": ".open-hit",
       "context": "",
       "declarations": [
@@ -169835,7 +169846,7 @@
     {
       "id": 877,
       "file": "app/styles/app.css",
-      "line": 1354,
+      "line": 1355,
       "selector": ".overdue-hit",
       "context": "",
       "declarations": [
@@ -169849,7 +169860,7 @@
     {
       "id": 878,
       "file": "app/styles/app.css",
-      "line": 1356,
+      "line": 1357,
       "selector": ".security-setting-row",
       "context": "",
       "declarations": [
@@ -169883,7 +169894,7 @@
     {
       "id": 879,
       "file": "app/styles/app.css",
-      "line": 1357,
+      "line": 1358,
       "selector": ".security-setting-row b",
       "context": "",
       "declarations": [
@@ -169902,7 +169913,7 @@
     {
       "id": 880,
       "file": "app/styles/app.css",
-      "line": 1357,
+      "line": 1358,
       "selector": ".security-setting-row p",
       "context": "",
       "declarations": [
@@ -169926,7 +169937,7 @@
     {
       "id": 881,
       "file": "app/styles/app.css",
-      "line": 1358,
+      "line": 1359,
       "selector": ".settings-switch",
       "context": "",
       "declarations": [
@@ -169985,7 +169996,7 @@
     {
       "id": 882,
       "file": "app/styles/app.css",
-      "line": 1359,
+      "line": 1360,
       "selector": ".settings-switch>span",
       "context": "",
       "declarations": [
@@ -170039,7 +170050,7 @@
     {
       "id": 883,
       "file": "app/styles/app.css",
-      "line": 1360,
+      "line": 1361,
       "selector": ".settings-switch.is-on",
       "context": "",
       "declarations": [
@@ -170053,7 +170064,7 @@
     {
       "id": 884,
       "file": "app/styles/app.css",
-      "line": 1360,
+      "line": 1361,
       "selector": ".settings-switch.is-on>span",
       "context": "",
       "declarations": [
@@ -170067,7 +170078,7 @@
     {
       "id": 885,
       "file": "app/styles/app.css",
-      "line": 1361,
+      "line": 1362,
       "selector": ".settings-switch:disabled",
       "context": "",
       "declarations": [
@@ -170086,7 +170097,7 @@
     {
       "id": 886,
       "file": "app/styles/app.css",
-      "line": 1363,
+      "line": 1364,
       "selector": ".revenue-bars",
       "context": "",
       "declarations": [
@@ -170125,7 +170136,7 @@
     {
       "id": 887,
       "file": "app/styles/app.css",
-      "line": 1364,
+      "line": 1365,
       "selector": ".revenue-bars button",
       "context": "",
       "declarations": [
@@ -170189,7 +170200,7 @@
     {
       "id": 888,
       "file": "app/styles/app.css",
-      "line": 1365,
+      "line": 1366,
       "selector": ".revenue-bars i",
       "context": "",
       "declarations": [
@@ -170233,7 +170244,7 @@
     {
       "id": 889,
       "file": "app/styles/app.css",
-      "line": 1366,
+      "line": 1367,
       "selector": ".revenue-bars button.active i,.revenue-bars button:hover i",
       "context": "",
       "declarations": [
@@ -170247,7 +170258,7 @@
     {
       "id": 890,
       "file": "app/styles/app.css",
-      "line": 1367,
+      "line": 1368,
       "selector": ".revenue-bars button:focus-visible",
       "context": "",
       "declarations": [
@@ -170271,7 +170282,7 @@
     {
       "id": 891,
       "file": "app/styles/app.css",
-      "line": 1369,
+      "line": 1370,
       "selector": ".revenue-bar-detail",
       "context": "",
       "declarations": [
@@ -170310,7 +170321,7 @@
     {
       "id": 892,
       "file": "app/styles/app.css",
-      "line": 1369,
+      "line": 1370,
       "selector": ".revenue-bar-detail>span",
       "context": "",
       "declarations": [
@@ -170324,7 +170335,7 @@
     {
       "id": 893,
       "file": "app/styles/app.css",
-      "line": 1369,
+      "line": 1370,
       "selector": ".revenue-bar-detail b",
       "context": "",
       "declarations": [
@@ -170338,7 +170349,7 @@
     {
       "id": 894,
       "file": "app/styles/app.css",
-      "line": 1370,
+      "line": 1371,
       "selector": ".revenue-bars",
       "context": "",
       "declarations": [
@@ -170352,7 +170363,7 @@
     {
       "id": 895,
       "file": "app/styles/app.css",
-      "line": 1371,
+      "line": 1372,
       "selector": ".revenue-bars button.up i",
       "context": "",
       "declarations": [
@@ -170366,7 +170377,7 @@
     {
       "id": 896,
       "file": "app/styles/app.css",
-      "line": 1371,
+      "line": 1372,
       "selector": ".revenue-bars button.down i",
       "context": "",
       "declarations": [
@@ -170380,7 +170391,7 @@
     {
       "id": 897,
       "file": "app/styles/app.css",
-      "line": 1371,
+      "line": 1372,
       "selector": ".revenue-bars button.neutral i",
       "context": "",
       "declarations": [
@@ -170394,7 +170405,7 @@
     {
       "id": 898,
       "file": "app/styles/app.css",
-      "line": 1372,
+      "line": 1373,
       "selector": ".revenue-bars button.active i",
       "context": "",
       "declarations": [
@@ -170413,7 +170424,7 @@
     {
       "id": 899,
       "file": "app/styles/app.css",
-      "line": 1372,
+      "line": 1373,
       "selector": ".revenue-bars button.up",
       "context": "",
       "declarations": [
@@ -170427,7 +170438,7 @@
     {
       "id": 900,
       "file": "app/styles/app.css",
-      "line": 1372,
+      "line": 1373,
       "selector": ".revenue-bars button.down",
       "context": "",
       "declarations": [
@@ -170441,7 +170452,7 @@
     {
       "id": 901,
       "file": "app/styles/app.css",
-      "line": 1372,
+      "line": 1373,
       "selector": ".revenue-bars button.neutral",
       "context": "",
       "declarations": [
@@ -170455,7 +170466,7 @@
     {
       "id": 902,
       "file": "app/styles/app.css",
-      "line": 1375,
+      "line": 1376,
       "selector": ".payment-donut-card,.finance-kpis",
       "context": "",
       "declarations": [
@@ -170484,7 +170495,7 @@
     {
       "id": 903,
       "file": "app/styles/app.css",
-      "line": 1376,
+      "line": 1377,
       "selector": ".donut-center",
       "context": "",
       "declarations": [
@@ -170498,7 +170509,7 @@
     {
       "id": 904,
       "file": "app/styles/app.css",
-      "line": 1378,
+      "line": 1379,
       "selector": ".finance-range",
       "context": "",
       "declarations": [
@@ -170532,7 +170543,7 @@
     {
       "id": 905,
       "file": "app/styles/app.css",
-      "line": 1379,
+      "line": 1380,
       "selector": ".finance-custom-range",
       "context": "",
       "declarations": [
@@ -170576,7 +170587,7 @@
     {
       "id": 906,
       "file": "app/styles/app.css",
-      "line": 1380,
+      "line": 1381,
       "selector": ".finance-custom-range>small",
       "context": "",
       "declarations": [
@@ -170600,7 +170611,7 @@
     {
       "id": 907,
       "file": "app/styles/app.css",
-      "line": 1380,
+      "line": 1381,
       "selector": ".finance-range::-webkit-scrollbar",
       "context": "",
       "declarations": [
@@ -170614,7 +170625,7 @@
     {
       "id": 908,
       "file": "app/styles/app.css",
-      "line": 1380,
+      "line": 1381,
       "selector": ".finance-range button",
       "context": "",
       "declarations": [
@@ -170668,7 +170679,7 @@
     {
       "id": 909,
       "file": "app/styles/app.css",
-      "line": 1380,
+      "line": 1381,
       "selector": ".finance-range button.active",
       "context": "",
       "declarations": [
@@ -170692,7 +170703,7 @@
     {
       "id": 910,
       "file": "app/styles/app.css",
-      "line": 1380,
+      "line": 1381,
       "selector": ".finance-analysis",
       "context": "",
       "declarations": [
@@ -170721,7 +170732,7 @@
     {
       "id": 911,
       "file": "app/styles/app.css",
-      "line": 1381,
+      "line": 1382,
       "selector": ".finance-flow",
       "context": "",
       "declarations": [
@@ -170770,7 +170781,7 @@
     {
       "id": 912,
       "file": "app/styles/app.css",
-      "line": 1391,
+      "line": 1392,
       "selector": ".finance-flow-primary,\n.finance-flow-result",
       "context": "",
       "declarations": [
@@ -170799,7 +170810,7 @@
     {
       "id": 913,
       "file": "app/styles/app.css",
-      "line": 1398,
+      "line": 1399,
       "selector": ".finance-flow-primary span,\n.finance-flow-result span,\n.finance-flow-costs span",
       "context": "",
       "declarations": [
@@ -170818,7 +170829,7 @@
     {
       "id": 914,
       "file": "app/styles/app.css",
-      "line": 1401,
+      "line": 1402,
       "selector": ".finance-flow-primary strong,\n.finance-flow-result strong",
       "context": "",
       "declarations": [
@@ -170842,7 +170853,7 @@
     {
       "id": 915,
       "file": "app/styles/app.css",
-      "line": 1403,
+      "line": 1404,
       "selector": ".finance-flow-result small",
       "context": "",
       "declarations": [
@@ -170866,7 +170877,7 @@
     {
       "id": 916,
       "file": "app/styles/app.css",
-      "line": 1404,
+      "line": 1405,
       "selector": ".finance-flow-costs",
       "context": "",
       "declarations": [
@@ -170890,7 +170901,7 @@
     {
       "id": 917,
       "file": "app/styles/app.css",
-      "line": 1409,
+      "line": 1410,
       "selector": ".finance-flow-costs>div",
       "context": "",
       "declarations": [
@@ -170924,7 +170935,7 @@
     {
       "id": 918,
       "file": "app/styles/app.css",
-      "line": 1416,
+      "line": 1417,
       "selector": ".finance-flow-costs strong",
       "context": "",
       "declarations": [
@@ -170953,7 +170964,7 @@
     {
       "id": 919,
       "file": "app/styles/app.css",
-      "line": 1417,
+      "line": 1418,
       "selector": ".finance-period-table",
       "context": "",
       "declarations": [
@@ -170972,7 +170983,7 @@
     {
       "id": 920,
       "file": "app/styles/app.css",
-      "line": 1418,
+      "line": 1419,
       "selector": ".finance-period-head,\n.finance-period-table>button",
       "context": "",
       "declarations": [
@@ -171036,7 +171047,7 @@
     {
       "id": 921,
       "file": "app/styles/app.css",
-      "line": 1432,
+      "line": 1433,
       "selector": ".finance-period-head",
       "context": "",
       "declarations": [
@@ -171060,7 +171071,7 @@
     {
       "id": 922,
       "file": "app/styles/app.css",
-      "line": 1433,
+      "line": 1434,
       "selector": ".finance-period-head span:first-child,\n.finance-period-table>button b",
       "context": "",
       "declarations": [
@@ -171074,7 +171085,7 @@
     {
       "id": 923,
       "file": "app/styles/app.css",
-      "line": 1435,
+      "line": 1436,
       "selector": ".finance-period-table>button",
       "context": "",
       "declarations": [
@@ -171088,7 +171099,7 @@
     {
       "id": 924,
       "file": "app/styles/app.css",
-      "line": 1436,
+      "line": 1437,
       "selector": ".finance-period-table>button:hover",
       "context": "",
       "declarations": [
@@ -171102,7 +171113,7 @@
     {
       "id": 925,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-period-table>button strong",
       "context": "",
       "declarations": [
@@ -171116,7 +171127,7 @@
     {
       "id": 926,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars",
       "context": "",
       "declarations": [
@@ -171150,7 +171161,7 @@
     {
       "id": 927,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars>button",
       "context": "",
       "declarations": [
@@ -171224,7 +171235,7 @@
     {
       "id": 928,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars>button.active i,.finance-month-bars>button:hover i",
       "context": "",
       "declarations": [
@@ -171238,7 +171249,7 @@
     {
       "id": 929,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars>button:focus-visible",
       "context": "",
       "declarations": [
@@ -171262,7 +171273,7 @@
     {
       "id": 930,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars i",
       "context": "",
       "declarations": [
@@ -171296,7 +171307,7 @@
     {
       "id": 931,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars b",
       "context": "",
       "declarations": [
@@ -171310,7 +171321,7 @@
     {
       "id": 932,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-month-bars small",
       "context": "",
       "declarations": [
@@ -171334,7 +171345,7 @@
     {
       "id": 933,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-breakdown",
       "context": "",
       "declarations": [
@@ -171363,7 +171374,7 @@
     {
       "id": 934,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-breakdown section",
       "context": "",
       "declarations": [
@@ -171382,7 +171393,7 @@
     {
       "id": 935,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-breakdown h3",
       "context": "",
       "declarations": [
@@ -171396,7 +171407,7 @@
     {
       "id": 936,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-breakdown section>div",
       "context": "",
       "declarations": [
@@ -171435,7 +171446,7 @@
     {
       "id": 937,
       "file": "app/styles/app.css",
-      "line": 1437,
+      "line": 1438,
       "selector": ".finance-breakdown p",
       "context": "",
       "declarations": [
@@ -171464,7 +171475,7 @@
     {
       "id": 938,
       "file": "app/styles/app.css",
-      "line": 1440,
+      "line": 1441,
       "selector": ".sheet-body",
       "context": "",
       "declarations": [
@@ -171503,7 +171514,7 @@
     {
       "id": 939,
       "file": "app/styles/app.css",
-      "line": 1441,
+      "line": 1442,
       "selector": ".bottom-sheet>.sheet-header,.bottom-sheet>.sheet-handle,.bottom-sheet>.filter-sheet-actions",
       "context": "",
       "declarations": [
@@ -171517,7 +171528,7 @@
     {
       "id": 940,
       "file": "app/styles/app.css",
-      "line": 1442,
+      "line": 1443,
       "selector": ".bottom-sheet>:is(.choice-list,.plan-choice-list,.sheet-menu,.sheet-body,.form-grid)",
       "context": "",
       "declarations": [
@@ -171551,7 +171562,7 @@
     {
       "id": 941,
       "file": "app/styles/app.css",
-      "line": 1443,
+      "line": 1444,
       "selector": ".bottom-sheet>.form-grid,.bottom-sheet>.form-field",
       "context": "",
       "declarations": [
@@ -171565,7 +171576,7 @@
     {
       "id": 942,
       "file": "app/styles/app.css",
-      "line": 1444,
+      "line": 1445,
       "selector": ".bottom-sheet>.filter-sheet-actions",
       "context": "",
       "declarations": [
@@ -171584,7 +171595,7 @@
     {
       "id": 943,
       "file": "app/styles/app.css",
-      "line": 1445,
+      "line": 1446,
       "selector": ".bottom-sheet .choice-list,.bottom-sheet .plan-choice-list",
       "context": "",
       "declarations": [
@@ -171598,7 +171609,7 @@
     {
       "id": 944,
       "file": "app/styles/app.css",
-      "line": 1446,
+      "line": 1447,
       "selector": ".bottom-sheet :is(.choice-list,.plan-choice-list)>button",
       "context": "",
       "declarations": [
@@ -171622,7 +171633,7 @@
     {
       "id": 945,
       "file": "app/styles/app.css",
-      "line": 1447,
+      "line": 1448,
       "selector": ".bottom-sheet :is(.choice-list,.plan-choice-list)>button:last-child",
       "context": "",
       "declarations": [
@@ -171636,7 +171647,7 @@
     {
       "id": 946,
       "file": "app/styles/app.css",
-      "line": 1448,
+      "line": 1449,
       "selector": ".form-grid,.form-field,.form-field>input,.form-field>select,.form-field>textarea",
       "context": "",
       "declarations": [
@@ -171655,7 +171666,7 @@
     {
       "id": 947,
       "file": "app/styles/app.css",
-      "line": 1449,
+      "line": 1450,
       "selector": ".form-field>input[type=\"date\"],.form-field>input[type=\"time\"]",
       "context": "",
       "declarations": [
@@ -171684,7 +171695,7 @@
     {
       "id": 948,
       "file": "app/styles/app.css",
-      "line": 1450,
+      "line": 1451,
       "selector": ".payment-setup-notice",
       "context": "",
       "declarations": [
@@ -171713,7 +171724,7 @@
     {
       "id": 949,
       "file": "app/styles/app.css",
-      "line": 1451,
+      "line": 1452,
       "selector": ".payment-setup-notice p",
       "context": "",
       "declarations": [
@@ -171732,7 +171743,7 @@
     {
       "id": 950,
       "file": "app/styles/app.css",
-      "line": 1455,
+      "line": 1456,
       "selector": ".form-field",
       "context": "",
       "declarations": [
@@ -171746,7 +171757,7 @@
     {
       "id": 951,
       "file": "app/styles/app.css",
-      "line": 1456,
+      "line": 1457,
       "selector": ".form-field>input:not([type=\"checkbox\"]):not([type=\"radio\"]),.form-field>select,.form-field>textarea",
       "context": "",
       "declarations": [
@@ -171770,7 +171781,7 @@
     {
       "id": 952,
       "file": "app/styles/app.css",
-      "line": 1457,
+      "line": 1458,
       "selector": ".detail-grid:has(>.surface:only-child)",
       "context": "",
       "declarations": [
@@ -171784,7 +171795,7 @@
     {
       "id": 953,
       "file": "app/styles/app.css",
-      "line": 1458,
+      "line": 1459,
       "selector": ".entity-hero>div",
       "context": "",
       "declarations": [
@@ -171798,7 +171809,7 @@
     {
       "id": 954,
       "file": "app/styles/app.css",
-      "line": 1458,
+      "line": 1459,
       "selector": ".entity-hero h2,.entity-hero p",
       "context": "",
       "declarations": [
@@ -171812,7 +171823,7 @@
     {
       "id": 955,
       "file": "app/styles/app.css",
-      "line": 1460,
+      "line": 1461,
       "selector": ".customer-records-layout",
       "context": "",
       "declarations": [
@@ -171831,7 +171842,7 @@
     {
       "id": 956,
       "file": "app/styles/app.css",
-      "line": 1463,
+      "line": 1464,
       "selector": ".mobile-position-summary",
       "context": "",
       "declarations": [
@@ -171845,7 +171856,7 @@
     {
       "id": 957,
       "file": "app/styles/app.css",
-      "line": 1464,
+      "line": 1465,
       "selector": ".document-line-item>.mobile-line-field",
       "context": "",
       "declarations": [
@@ -171859,7 +171870,7 @@
     {
       "id": 958,
       "file": "app/styles/app.css",
-      "line": 1465,
+      "line": 1466,
       "selector": ".document-line-item>.mobile-line-field>span,\n.document-line-item>.mobile-line-total>span",
       "context": "",
       "declarations": [
@@ -171873,7 +171884,7 @@
     {
       "id": 959,
       "file": "app/styles/app.css",
-      "line": 1467,
+      "line": 1468,
       "selector": ".document-line-item>.mobile-line-field input,.document-line-item>.mobile-line-field select",
       "context": "",
       "declarations": [
@@ -171892,7 +171903,7 @@
     {
       "id": 960,
       "file": "app/styles/app.css",
-      "line": 1468,
+      "line": 1469,
       "selector": ".document-line-items>div",
       "context": "",
       "declarations": [
@@ -171906,7 +171917,7 @@
     {
       "id": 961,
       "file": "app/styles/app.css",
-      "line": 1469,
+      "line": 1470,
       "selector": ".mobile-position-remove",
       "context": "",
       "declarations": [
@@ -171920,7 +171931,7 @@
     {
       "id": 962,
       "file": "app/styles/app.css",
-      "line": 1471,
+      "line": 1472,
       "selector": ".time-groups",
       "context": "",
       "declarations": [
@@ -171939,7 +171950,7 @@
     {
       "id": 963,
       "file": "app/styles/app.css",
-      "line": 1472,
+      "line": 1473,
       "selector": ".time-group",
       "context": "",
       "declarations": [
@@ -171963,7 +171974,7 @@
     {
       "id": 964,
       "file": "app/styles/app.css",
-      "line": 1473,
+      "line": 1474,
       "selector": ".time-group:last-child",
       "context": "",
       "declarations": [
@@ -171982,7 +171993,7 @@
     {
       "id": 965,
       "file": "app/styles/app.css",
-      "line": 1474,
+      "line": 1475,
       "selector": ".time-group-head",
       "context": "",
       "declarations": [
@@ -172021,7 +172032,7 @@
     {
       "id": 966,
       "file": "app/styles/app.css",
-      "line": 1475,
+      "line": 1476,
       "selector": ".time-group-head>div",
       "context": "",
       "declarations": [
@@ -172050,7 +172061,7 @@
     {
       "id": 967,
       "file": "app/styles/app.css",
-      "line": 1476,
+      "line": 1477,
       "selector": ".time-group-head",
       "context": "",
       "declarations": [
@@ -172074,7 +172085,7 @@
     {
       "id": 968,
       "file": "app/styles/app.css",
-      "line": 1477,
+      "line": 1478,
       "selector": ".time-group-head::-webkit-details-marker",
       "context": "",
       "declarations": [
@@ -172088,7 +172099,7 @@
     {
       "id": 969,
       "file": "app/styles/app.css",
-      "line": 1478,
+      "line": 1479,
       "selector": ".time-group-head strong",
       "context": "",
       "declarations": [
@@ -172107,7 +172118,7 @@
     {
       "id": 970,
       "file": "app/styles/app.css",
-      "line": 1479,
+      "line": 1480,
       "selector": ".time-group[open]>.time-group-head>svg",
       "context": "",
       "declarations": [
@@ -172121,7 +172132,7 @@
     {
       "id": 971,
       "file": "app/styles/app.css",
-      "line": 1480,
+      "line": 1481,
       "selector": ".finance-overview-toolbar",
       "context": "",
       "declarations": [
@@ -172145,7 +172156,7 @@
     {
       "id": 972,
       "file": "app/styles/app.css",
-      "line": 1481,
+      "line": 1482,
       "selector": ".period-trigger",
       "context": "",
       "declarations": [
@@ -172214,7 +172225,7 @@
     {
       "id": 973,
       "file": "app/styles/app.css",
-      "line": 1482,
+      "line": 1483,
       "selector": ".period-trigger span",
       "context": "",
       "declarations": [
@@ -172233,7 +172244,7 @@
     {
       "id": 974,
       "file": "app/styles/app.css",
-      "line": 1483,
+      "line": 1484,
       "selector": ".period-options",
       "context": "",
       "declarations": [
@@ -172247,7 +172258,7 @@
     {
       "id": 975,
       "file": "app/styles/app.css",
-      "line": 1484,
+      "line": 1485,
       "selector": ".period-options>label",
       "context": "",
       "declarations": [
@@ -172281,7 +172292,7 @@
     {
       "id": 976,
       "file": "app/styles/app.css",
-      "line": 1485,
+      "line": 1486,
       "selector": ".period-options input",
       "context": "",
       "declarations": [
@@ -172305,7 +172316,7 @@
     {
       "id": 977,
       "file": "app/styles/app.css",
-      "line": 1486,
+      "line": 1487,
       "selector": ".timer-display",
       "context": "",
       "declarations": [
@@ -172334,7 +172345,7 @@
     {
       "id": 978,
       "file": "app/styles/app.css",
-      "line": 1487,
+      "line": 1488,
       "selector": ".timer-display>div",
       "context": "",
       "declarations": [
@@ -172353,7 +172364,7 @@
     {
       "id": 979,
       "file": "app/styles/app.css",
-      "line": 1488,
+      "line": 1489,
       "selector": ".timer-display strong",
       "context": "",
       "declarations": [
@@ -172372,7 +172383,7 @@
     {
       "id": 980,
       "file": "app/styles/app.css",
-      "line": 1489,
+      "line": 1490,
       "selector": ".timer-display small,.timer-display span",
       "context": "",
       "declarations": [
@@ -172391,7 +172402,7 @@
     {
       "id": 981,
       "file": "app/styles/app.css",
-      "line": 1490,
+      "line": 1491,
       "selector": ".pdf-page",
       "context": "",
       "declarations": [
@@ -172415,7 +172426,7 @@
     {
       "id": 982,
       "file": "app/styles/app.css",
-      "line": 1491,
+      "line": 1492,
       "selector": ".pdf-page canvas",
       "context": "",
       "declarations": [
@@ -172434,7 +172445,7 @@
     {
       "id": 983,
       "file": "app/styles/app.css",
-      "line": 1492,
+      "line": 1493,
       "selector": ".document-modal",
       "context": "",
       "declarations": [
@@ -172493,7 +172504,7 @@
     {
       "id": 984,
       "file": "app/styles/app.css",
-      "line": 1493,
+      "line": 1494,
       "selector": ".document-modal>header",
       "context": "",
       "declarations": [
@@ -172542,7 +172553,7 @@
     {
       "id": 985,
       "file": "app/styles/app.css",
-      "line": 1494,
+      "line": 1495,
       "selector": ".document-modal-body",
       "context": "",
       "declarations": [
@@ -172576,7 +172587,7 @@
     {
       "id": 986,
       "file": "app/styles/app.css",
-      "line": 1495,
+      "line": 1496,
       "selector": ".document-page-viewer",
       "context": "",
       "declarations": [
@@ -172610,7 +172621,7 @@
     {
       "id": 987,
       "file": "app/styles/app.css",
-      "line": 1496,
+      "line": 1497,
       "selector": ".document-page-stage",
       "context": "",
       "declarations": [
@@ -172654,7 +172665,7 @@
     {
       "id": 988,
       "file": "app/styles/app.css",
-      "line": 1497,
+      "line": 1498,
       "selector": ".document-page-stage>.pdf-page",
       "context": "",
       "declarations": [
@@ -172678,7 +172689,7 @@
     {
       "id": 989,
       "file": "app/styles/app.css",
-      "line": 1498,
+      "line": 1499,
       "selector": ".document-page-navigation",
       "context": "",
       "declarations": [
@@ -172732,7 +172743,7 @@
     {
       "id": 990,
       "file": "app/styles/app.css",
-      "line": 1499,
+      "line": 1500,
       "selector": ".document-page-navigation button:disabled",
       "context": "",
       "declarations": [
@@ -172751,7 +172762,7 @@
     {
       "id": 991,
       "file": "app/styles/app.css",
-      "line": 1500,
+      "line": 1501,
       "selector": ".time-filter-toolbar>.icon-button",
       "context": "",
       "declarations": [
@@ -172765,7 +172776,7 @@
     {
       "id": 992,
       "file": "app/styles/app.css",
-      "line": 1501,
+      "line": 1502,
       "selector": ".timer-actions .button",
       "context": "",
       "declarations": [
@@ -172784,7 +172795,7 @@
     {
       "id": 993,
       "file": "app/styles/app.css",
-      "line": 1502,
+      "line": 1503,
       "selector": ".time-group-head small",
       "context": "",
       "declarations": [
@@ -172803,7 +172814,7 @@
     {
       "id": 994,
       "file": "app/styles/app.css",
-      "line": 1503,
+      "line": 1504,
       "selector": ".time-entry-actions",
       "context": "",
       "declarations": [
@@ -172837,7 +172848,7 @@
     {
       "id": 995,
       "file": "app/styles/app.css",
-      "line": 1505,
+      "line": 1506,
       "selector": ".sidebar-nav-group",
       "context": "",
       "declarations": [
@@ -172861,7 +172872,7 @@
     {
       "id": 996,
       "file": "app/styles/app.css",
-      "line": 1506,
+      "line": 1507,
       "selector": ".sidebar-nav-label",
       "context": "",
       "declarations": [
@@ -172890,7 +172901,7 @@
     {
       "id": 997,
       "file": "app/styles/app.css",
-      "line": 1509,
+      "line": 1510,
       "selector": ".document-payment-facts",
       "context": "",
       "declarations": [
@@ -172919,7 +172930,7 @@
     {
       "id": 998,
       "file": "app/styles/app.css",
-      "line": 1510,
+      "line": 1511,
       "selector": ".document-payment-facts h2",
       "context": "",
       "declarations": [
@@ -172938,7 +172949,7 @@
     {
       "id": 999,
       "file": "app/styles/app.css",
-      "line": 1511,
+      "line": 1512,
       "selector": ".document-payment-facts>span",
       "context": "",
       "declarations": [
@@ -172962,7 +172973,7 @@
     {
       "id": 1000,
       "file": "app/styles/app.css",
-      "line": 1512,
+      "line": 1513,
       "selector": ".document-payment-facts b",
       "context": "",
       "declarations": [
@@ -172981,7 +172992,7 @@
     {
       "id": 1001,
       "file": "app/styles/app.css",
-      "line": 1513,
+      "line": 1514,
       "selector": ".document-desktop-detail>.tabs",
       "context": "",
       "declarations": [
@@ -172995,7 +173006,7 @@
     {
       "id": 1002,
       "file": "app/styles/app.css",
-      "line": 1515,
+      "line": 1516,
       "selector": ".document-header-icons",
       "context": "",
       "declarations": [
@@ -173019,7 +173030,7 @@
     {
       "id": 1003,
       "file": "app/styles/app.css",
-      "line": 1516,
+      "line": 1517,
       "selector": ".document-desktop-workspace:not(:has(>.document-desktop-rail))",
       "context": "",
       "declarations": [
@@ -173033,7 +173044,7 @@
     {
       "id": 1004,
       "file": "app/styles/app.css",
-      "line": 1518,
+      "line": 1519,
       "selector": ".desktop-detail-main>.tabs + .detail-grid>.surface:first-child,\n.document-desktop-detail>.tabs + .document-detail-view",
       "context": "",
       "declarations": [
@@ -173047,7 +173058,7 @@
     {
       "id": 1005,
       "file": "app/styles/app.css",
-      "line": 1521,
+      "line": 1522,
       "selector": ".time-layout:has([role=\"tab\"][aria-selected=\"true\"]:last-child)",
       "context": "",
       "declarations": [
@@ -173061,7 +173072,7 @@
     {
       "id": 1006,
       "file": "app/styles/app.css",
-      "line": 1523,
+      "line": 1524,
       "selector": ".desktop-detail-main>.surface",
       "context": "",
       "declarations": [
@@ -173085,7 +173096,7 @@
     {
       "id": 1007,
       "file": "app/styles/app.css",
-      "line": 1525,
+      "line": 1526,
       "selector": ".toolbar + .desktop-record-table",
       "context": "",
       "declarations": [
@@ -173099,7 +173110,7 @@
     {
       "id": 1008,
       "file": "app/styles/app.css",
-      "line": 1528,
+      "line": 1529,
       "selector": ".contact-actions",
       "context": "",
       "declarations": [
@@ -173128,7 +173139,7 @@
     {
       "id": 1009,
       "file": "app/styles/app.css",
-      "line": 1529,
+      "line": 1530,
       "selector": ".contact-actions .button",
       "context": "",
       "declarations": [
@@ -173152,7 +173163,7 @@
     {
       "id": 1010,
       "file": "app/styles/app.css",
-      "line": 1530,
+      "line": 1531,
       "selector": ".contact-main",
       "context": "",
       "declarations": [
@@ -173171,7 +173182,7 @@
     {
       "id": 1011,
       "file": "app/styles/app.css",
-      "line": 1531,
+      "line": 1532,
       "selector": ".contact-main>.status",
       "context": "",
       "declarations": [
@@ -173185,7 +173196,7 @@
     {
       "id": 1012,
       "file": "app/styles/app.css",
-      "line": 1532,
+      "line": 1533,
       "selector": ".contact-actions",
       "context": "",
       "declarations": [
@@ -173199,7 +173210,7 @@
     {
       "id": 1013,
       "file": "app/styles/app.css",
-      "line": 1533,
+      "line": 1534,
       "selector": ".form-field.form-check",
       "context": "",
       "declarations": [
@@ -173233,7 +173244,7 @@
     {
       "id": 1014,
       "file": "app/styles/app.css",
-      "line": 1534,
+      "line": 1535,
       "selector": ".form-check>.form-error,.form-check>small",
       "context": "",
       "declarations": [
@@ -173247,7 +173258,7 @@
     {
       "id": 1015,
       "file": "app/styles/app.css",
-      "line": 1535,
+      "line": 1536,
       "selector": ".form-check>input",
       "context": "",
       "declarations": [
@@ -173286,7 +173297,7 @@
     {
       "id": 1016,
       "file": "app/styles/app.css",
-      "line": 1536,
+      "line": 1537,
       "selector": ".time-filter-toolbar",
       "context": "",
       "declarations": [
@@ -173305,7 +173316,7 @@
     {
       "id": 1017,
       "file": "app/styles/app.css",
-      "line": 1537,
+      "line": 1538,
       "selector": ".time-filter-toolbar .form-field",
       "context": "",
       "declarations": [
@@ -173324,7 +173335,7 @@
     {
       "id": 1018,
       "file": "app/styles/app.css",
-      "line": 1538,
+      "line": 1539,
       "selector": ".time-filter-toolbar .searchbox",
       "context": "",
       "declarations": [
@@ -173343,7 +173354,7 @@
     {
       "id": 1019,
       "file": "app/styles/app.css",
-      "line": 1541,
+      "line": 1542,
       "selector": ".document-customer-heading",
       "context": "",
       "declarations": [
@@ -173377,7 +173388,7 @@
     {
       "id": 1020,
       "file": "app/styles/app.css",
-      "line": 1542,
+      "line": 1543,
       "selector": ".document-customer-heading h2",
       "context": "",
       "declarations": [
@@ -173396,7 +173407,7 @@
     {
       "id": 1021,
       "file": "app/styles/app.css",
-      "line": 1543,
+      "line": 1544,
       "selector": ".mobile-header,.mobile-header *",
       "context": "",
       "declarations": [
@@ -173420,7 +173431,7 @@
     {
       "id": 1022,
       "file": "app/styles/app.css",
-      "line": 1544,
+      "line": 1545,
       "selector": ".mobile-header .logo,.mobile-header svg,.mobile-header .icon-button,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button",
       "context": "",
       "declarations": [
@@ -173434,7 +173445,7 @@
     {
       "id": 1023,
       "file": "app/styles/app.css",
-      "line": 1546,
+      "line": 1547,
       "selector": ".document-mobile-price",
       "context": "",
       "declarations": [
@@ -173448,7 +173459,7 @@
     {
       "id": 1024,
       "file": "app/styles/app.css",
-      "line": 1550,
+      "line": 1551,
       "selector": ".document-modal-header-spacer",
       "context": "",
       "declarations": [
@@ -173462,7 +173473,7 @@
     {
       "id": 1025,
       "file": "app/styles/app.css",
-      "line": 1551,
+      "line": 1552,
       "selector": ".document-modal>header>strong",
       "context": "",
       "declarations": [
@@ -173496,7 +173507,7 @@
     {
       "id": 1026,
       "file": "app/styles/app.css",
-      "line": 1552,
+      "line": 1553,
       "selector": ".document-modal-header-actions button:disabled",
       "context": "",
       "declarations": [
@@ -173510,7 +173521,7 @@
     {
       "id": 1027,
       "file": "app/styles/app.css",
-      "line": 1553,
+      "line": 1554,
       "selector": ".sheet-layer",
       "context": "",
       "declarations": [
@@ -173534,7 +173545,7 @@
     {
       "id": 1028,
       "file": "app/styles/app.css",
-      "line": 1554,
+      "line": 1555,
       "selector": ".sheet-layer>.bottom-sheet",
       "context": "",
       "declarations": [
@@ -173563,7 +173574,7 @@
     {
       "id": 1029,
       "file": "app/styles/app.css",
-      "line": 1557,
+      "line": 1558,
       "selector": ".form-field>span",
       "context": "",
       "declarations": [
@@ -173587,7 +173598,7 @@
     {
       "id": 1030,
       "file": "app/styles/app.css",
-      "line": 1560,
+      "line": 1561,
       "selector": ".bo-metric-tiles",
       "context": "",
       "declarations": [
@@ -173606,7 +173617,7 @@
     {
       "id": 1031,
       "file": "app/styles/app.css",
-      "line": 1561,
+      "line": 1562,
       "selector": ".bo-metric-tiles .metric>small",
       "context": "",
       "declarations": [
@@ -173635,7 +173646,7 @@
     {
       "id": 1032,
       "file": "app/styles/app.css",
-      "line": 1562,
+      "line": 1563,
       "selector": ".bo-metric-tiles .metric strong",
       "context": "",
       "declarations": [
@@ -173669,7 +173680,7 @@
     {
       "id": 1033,
       "file": "app/styles/app.css",
-      "line": 1563,
+      "line": 1564,
       "selector": ".bo-metric-tiles .metric",
       "context": "",
       "declarations": [
@@ -173698,7 +173709,7 @@
     {
       "id": 1034,
       "file": "app/styles/app.css",
-      "line": 1564,
+      "line": 1565,
       "selector": ".bo-metric-tiles .metric-top>span",
       "context": "",
       "declarations": [
@@ -173717,7 +173728,7 @@
     {
       "id": 1035,
       "file": "app/styles/app.css",
-      "line": 1565,
+      "line": 1566,
       "selector": ".document-summary-row",
       "context": "",
       "declarations": [
@@ -173796,7 +173807,7 @@
     {
       "id": 1036,
       "file": "app/styles/app.css",
-      "line": 1566,
+      "line": 1567,
       "selector": ".document-summary-row>b",
       "context": "",
       "declarations": [
@@ -173815,7 +173826,7 @@
     {
       "id": 1037,
       "file": "app/styles/app.css",
-      "line": 1567,
+      "line": 1568,
       "selector": ".document-summary-row>.status",
       "context": "",
       "declarations": [
@@ -173844,7 +173855,7 @@
     {
       "id": 1038,
       "file": "app/styles/app.css",
-      "line": 1568,
+      "line": 1569,
       "selector": ".document-summary-row>small",
       "context": "",
       "declarations": [
@@ -173868,7 +173879,7 @@
     {
       "id": 1039,
       "file": "app/styles/app.css",
-      "line": 1569,
+      "line": 1570,
       "selector": ".document-summary-amount",
       "context": "",
       "declarations": [
@@ -173912,7 +173923,7 @@
     {
       "id": 1040,
       "file": "app/styles/app.css",
-      "line": 1570,
+      "line": 1571,
       "selector": ".document-summary-amount>small",
       "context": "",
       "declarations": [
@@ -173926,7 +173937,7 @@
     {
       "id": 1041,
       "file": "app/styles/app.css",
-      "line": 1571,
+      "line": 1572,
       "selector": ".document-summary-amount>strong",
       "context": "",
       "declarations": [
@@ -173960,7 +173971,7 @@
     {
       "id": 1042,
       "file": "app/styles/app.css",
-      "line": 1572,
+      "line": 1573,
       "selector": ".finance-overview-chart",
       "context": "",
       "declarations": [
@@ -173994,7 +174005,7 @@
     {
       "id": 1043,
       "file": "app/styles/app.css",
-      "line": 1573,
+      "line": 1574,
       "selector": ".finance-overview-chart>button",
       "context": "",
       "declarations": [
@@ -174058,7 +174069,7 @@
     {
       "id": 1044,
       "file": "app/styles/app.css",
-      "line": 1574,
+      "line": 1575,
       "selector": ".finance-bar-pair",
       "context": "",
       "declarations": [
@@ -174097,7 +174108,7 @@
     {
       "id": 1045,
       "file": "app/styles/app.css",
-      "line": 1575,
+      "line": 1576,
       "selector": ".finance-bar-pair>i",
       "context": "",
       "declarations": [
@@ -174121,7 +174132,7 @@
     {
       "id": 1046,
       "file": "app/styles/app.css",
-      "line": 1576,
+      "line": 1577,
       "selector": ".finance-bar-pair>i+ i",
       "context": "",
       "declarations": [
@@ -174140,7 +174151,7 @@
     {
       "id": 1047,
       "file": "app/styles/app.css",
-      "line": 1577,
+      "line": 1578,
       "selector": ".finance-overview-chart small",
       "context": "",
       "declarations": [
@@ -174164,7 +174175,7 @@
     {
       "id": 1048,
       "file": "app/styles/app.css",
-      "line": 1578,
+      "line": 1579,
       "selector": ".document-payment-term",
       "context": "",
       "declarations": [
@@ -174188,7 +174199,7 @@
     {
       "id": 1049,
       "file": "app/styles/app.css",
-      "line": 1579,
+      "line": 1580,
       "selector": ".detail-list dd",
       "context": "",
       "declarations": [
@@ -174207,7 +174218,7 @@
     {
       "id": 1050,
       "file": "app/styles/app.css",
-      "line": 1580,
+      "line": 1581,
       "selector": ".thread-messages",
       "context": "",
       "declarations": [
@@ -174251,7 +174262,7 @@
     {
       "id": 1051,
       "file": "app/styles/app.css",
-      "line": 1581,
+      "line": 1582,
       "selector": ".thread-messages>.message",
       "context": "",
       "declarations": [
@@ -174265,7 +174276,7 @@
     {
       "id": 1052,
       "file": "app/styles/app.css",
-      "line": 1582,
+      "line": 1583,
       "selector": ".app-main:has(.support-detail-workspace) .page-container",
       "context": "",
       "declarations": [
@@ -174299,7 +174310,7 @@
     {
       "id": 1053,
       "file": "app/styles/app.css",
-      "line": 1583,
+      "line": 1584,
       "selector": ".support-detail-workspace",
       "context": "",
       "declarations": [
@@ -174323,7 +174334,7 @@
     {
       "id": 1054,
       "file": "app/styles/app.css",
-      "line": 1584,
+      "line": 1585,
       "selector": ".support-detail-workspace .desktop-detail-main",
       "context": "",
       "declarations": [
@@ -174352,7 +174363,7 @@
     {
       "id": 1055,
       "file": "app/styles/app.css",
-      "line": 1586,
+      "line": 1587,
       "selector": ".dashboard-summary",
       "context": "",
       "declarations": [
@@ -174366,7 +174377,7 @@
     {
       "id": 1056,
       "file": "app/styles/app.css",
-      "line": 1587,
+      "line": 1588,
       "selector": ".recent-invoices",
       "context": "",
       "declarations": [
@@ -208210,7 +208221,7 @@
           {
             "rule": 435,
             "file": "app/styles/app.css",
-            "line": 394,
+            "line": 395,
             "value": "inherit",
             "important": false
           }
@@ -208250,7 +208261,7 @@
           {
             "rule": 435,
             "file": "app/styles/app.css",
-            "line": 394,
+            "line": 395,
             "value": "inherit",
             "important": false
           }
@@ -208290,7 +208301,7 @@
           {
             "rule": 781,
             "file": "app/styles/app.css",
-            "line": 1247,
+            "line": 1248,
             "value": "grid",
             "important": false
           }
@@ -208310,7 +208321,7 @@
           {
             "rule": 781,
             "file": "app/styles/app.css",
-            "line": 1247,
+            "line": 1248,
             "value": "center",
             "important": false
           }
@@ -208790,7 +208801,7 @@
           {
             "rule": 486,
             "file": "app/styles/app.css",
-            "line": 554,
+            "line": 555,
             "value": "var(--radius-lg)",
             "important": false
           }
@@ -208810,7 +208821,7 @@
           {
             "rule": 486,
             "file": "app/styles/app.css",
-            "line": 554,
+            "line": 555,
             "value": "var(--color-bg)",
             "important": false
           }
@@ -208823,7 +208834,7 @@
           {
             "rule": 383,
             "file": "app/styles/app.css",
-            "line": 271,
+            "line": 272,
             "value": "0",
             "important": false
           },
@@ -208843,7 +208854,7 @@
           {
             "rule": 394,
             "file": "app/styles/app.css",
-            "line": 282,
+            "line": 283,
             "value": "visible",
             "important": false
           },
@@ -208863,7 +208874,7 @@
           {
             "rule": 407,
             "file": "app/styles/app.css",
-            "line": 316,
+            "line": 317,
             "value": "12px 0",
             "important": false
           },
@@ -208883,7 +208894,7 @@
           {
             "rule": 407,
             "file": "app/styles/app.css",
-            "line": 316,
+            "line": 317,
             "value": "grid",
             "important": false
           },
@@ -208903,7 +208914,7 @@
           {
             "rule": 407,
             "file": "app/styles/app.css",
-            "line": 316,
+            "line": 317,
             "value": "120px minmax(0,1fr)",
             "important": false
           },
@@ -208923,7 +208934,7 @@
           {
             "rule": 407,
             "file": "app/styles/app.css",
-            "line": 316,
+            "line": 317,
             "value": "12px",
             "important": false
           },
@@ -208943,7 +208954,7 @@
           {
             "rule": 407,
             "file": "app/styles/app.css",
-            "line": 316,
+            "line": 317,
             "value": "1px solid var(--color-line)",
             "important": false
           },
@@ -208963,14 +208974,14 @@
           {
             "rule": 440,
             "file": "app/styles/app.css",
-            "line": 416,
+            "line": 417,
             "value": "minmax(0,1fr)",
             "important": false
           },
           {
             "rule": 950,
             "file": "app/styles/app.css",
-            "line": 1455,
+            "line": 1456,
             "value": "minmax(0,1fr)",
             "important": false
           }
@@ -208983,14 +208994,14 @@
           {
             "rule": 440,
             "file": "app/styles/app.css",
-            "line": 416,
+            "line": 417,
             "value": "0",
             "important": false
           },
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "0",
             "important": false
           },
@@ -209010,14 +209021,14 @@
           {
             "rule": 475,
             "file": "app/styles/app.css",
-            "line": 525,
+            "line": 526,
             "value": "minmax(0,1fr) 72px 96px 110px 110px 36px",
             "important": false
           },
           {
             "rule": 960,
             "file": "app/styles/app.css",
-            "line": 1468,
+            "line": 1469,
             "value": "minmax(0,1fr) 58px 84px 86px 90px 32px",
             "important": false
           }
@@ -209030,14 +209041,14 @@
           {
             "rule": 483,
             "file": "app/styles/app.css",
-            "line": 541,
+            "line": 542,
             "value": "12px",
             "important": false
           },
           {
             "rule": 484,
             "file": "app/styles/app.css",
-            "line": 552,
+            "line": 553,
             "value": "14px",
             "important": false
           }
@@ -209050,14 +209061,14 @@
           {
             "rule": 554,
             "file": "app/styles/app.css",
-            "line": 759,
+            "line": 760,
             "value": "center",
             "important": false
           },
           {
             "rule": 810,
             "file": "app/styles/app.css",
-            "line": 1313,
+            "line": 1314,
             "value": "center",
             "important": false
           }
@@ -209070,14 +209081,14 @@
           {
             "rule": 554,
             "file": "app/styles/app.css",
-            "line": 759,
+            "line": 760,
             "value": "center",
             "important": false
           },
           {
             "rule": 810,
             "file": "app/styles/app.css",
-            "line": 1313,
+            "line": 1314,
             "value": "center",
             "important": false
           }
@@ -209090,14 +209101,14 @@
           {
             "rule": 698,
             "file": "app/styles/app.css",
-            "line": 1012,
+            "line": 1013,
             "value": "13px",
             "important": false
           },
           {
             "rule": 699,
             "file": "app/styles/app.css",
-            "line": 1013,
+            "line": 1014,
             "value": "11px",
             "important": false
           }
@@ -209110,14 +209121,14 @@
           {
             "rule": 726,
             "file": "app/styles/app.css",
-            "line": 1087,
+            "line": 1088,
             "value": "end",
             "important": false
           },
           {
             "rule": 727,
             "file": "app/styles/app.css",
-            "line": 1088,
+            "line": 1089,
             "value": "end",
             "important": false
           }
@@ -209130,14 +209141,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "1px solid var(--color-line)",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "0",
             "important": false
           }
@@ -209150,14 +209161,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "16px",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "0",
             "important": false
           }
@@ -209170,14 +209181,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "var(--color-bg)",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "transparent",
             "important": false
           }
@@ -209190,14 +209201,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "1px solid var(--color-line)",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "0",
             "important": false
           }
@@ -209210,14 +209221,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "16px",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "0",
             "important": false
           }
@@ -209230,14 +209241,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "var(--color-bg)",
             "important": false
           },
           {
             "rule": 902,
             "file": "app/styles/app.css",
-            "line": 1375,
+            "line": 1376,
             "value": "transparent",
             "important": false
           }
@@ -209250,14 +209261,14 @@
           {
             "rule": 842,
             "file": "app/styles/app.css",
-            "line": 1338,
+            "line": 1339,
             "value": "18px",
             "important": false
           },
           {
             "rule": 856,
             "file": "app/styles/app.css",
-            "line": 1341,
+            "line": 1342,
             "value": "0",
             "important": false
           }
@@ -209270,14 +209281,14 @@
           {
             "rule": 886,
             "file": "app/styles/app.css",
-            "line": 1363,
+            "line": 1364,
             "value": "20px",
             "important": false
           },
           {
             "rule": 894,
             "file": "app/styles/app.css",
-            "line": 1370,
+            "line": 1371,
             "value": "6px",
             "important": false
           }
@@ -209290,14 +209301,14 @@
           {
             "rule": 920,
             "file": "app/styles/app.css",
-            "line": 1418,
+            "line": 1419,
             "value": "48px",
             "important": false
           },
           {
             "rule": 921,
             "file": "app/styles/app.css",
-            "line": 1432,
+            "line": 1433,
             "value": "34px",
             "important": false
           }
@@ -209310,14 +209321,14 @@
           {
             "rule": 920,
             "file": "app/styles/app.css",
-            "line": 1418,
+            "line": 1419,
             "value": "inherit",
             "important": false
           },
           {
             "rule": 921,
             "file": "app/styles/app.css",
-            "line": 1432,
+            "line": 1433,
             "value": "var(--color-muted)",
             "important": false
           }
@@ -209330,14 +209341,14 @@
           {
             "rule": 938,
             "file": "app/styles/app.css",
-            "line": 1440,
+            "line": 1441,
             "value": "0",
             "important": false
           },
           {
             "rule": 940,
             "file": "app/styles/app.css",
-            "line": 1442,
+            "line": 1443,
             "value": "0",
             "important": false
           }
@@ -209350,14 +209361,14 @@
           {
             "rule": 938,
             "file": "app/styles/app.css",
-            "line": 1440,
+            "line": 1441,
             "value": "0",
             "important": false
           },
           {
             "rule": 940,
             "file": "app/styles/app.css",
-            "line": 1442,
+            "line": 1443,
             "value": "0",
             "important": false
           }
@@ -209370,14 +209381,14 @@
           {
             "rule": 938,
             "file": "app/styles/app.css",
-            "line": 1440,
+            "line": 1441,
             "value": "auto",
             "important": false
           },
           {
             "rule": 940,
             "file": "app/styles/app.css",
-            "line": 1442,
+            "line": 1443,
             "value": "auto",
             "important": false
           }
@@ -209390,14 +209401,14 @@
           {
             "rule": 938,
             "file": "app/styles/app.css",
-            "line": 1440,
+            "line": 1441,
             "value": "contain",
             "important": false
           },
           {
             "rule": 940,
             "file": "app/styles/app.css",
-            "line": 1442,
+            "line": 1443,
             "value": "contain",
             "important": false
           }
@@ -209410,7 +209421,7 @@
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "100%",
             "important": false
           },
@@ -209430,14 +209441,14 @@
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "0",
             "important": false
           },
           {
             "rule": 951,
             "file": "app/styles/app.css",
-            "line": 1456,
+            "line": 1457,
             "value": "0",
             "important": false
           }
@@ -209450,14 +209461,14 @@
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "100%",
             "important": false
           },
           {
             "rule": 951,
             "file": "app/styles/app.css",
-            "line": 1456,
+            "line": 1457,
             "value": "100%",
             "important": false
           }
@@ -209470,14 +209481,14 @@
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "0",
             "important": false
           },
           {
             "rule": 951,
             "file": "app/styles/app.css",
-            "line": 1456,
+            "line": 1457,
             "value": "0",
             "important": false
           }
@@ -209490,14 +209501,14 @@
           {
             "rule": 946,
             "file": "app/styles/app.css",
-            "line": 1448,
+            "line": 1449,
             "value": "100%",
             "important": false
           },
           {
             "rule": 951,
             "file": "app/styles/app.css",
-            "line": 1456,
+            "line": 1457,
             "value": "100%",
             "important": false
           }
