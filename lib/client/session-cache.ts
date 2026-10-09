@@ -6,8 +6,9 @@ let cached:ClientSession|null=null;
 let validUntil=0;
 let pending:Promise<ClientSession>|null=null;
 let revision=0;
+let lastIdentity:string|null=null;
 let observedSessionRevision="",listening=false;
-function observeSession(){if(listening||typeof window==="undefined")return;listening=true;observedSessionRevision=dataRevision([]);subscribeClientData(()=>{const next=dataRevision([]);if(next!==observedSessionRevision){observedSessionRevision=next;invalidateClientSession(false);}});}
+function observeSession(){if(listening||typeof window==="undefined")return;listening=true;observedSessionRevision=dataRevision(['/api/auth/session']);subscribeClientData(()=>{const next=dataRevision(['/api/auth/session']);if(next!==observedSessionRevision){observedSessionRevision=next;invalidateClientSession(false);}});}
 
 /** Only retain permissions in memory; cookies and API authorization remain authoritative. */
 export function cachedClientSession(){return typeof window!=="undefined"&&Date.now()<validUntil?cached:null;}
@@ -24,6 +25,9 @@ export function readClientSession():Promise<ClientSession>{
     if(!response.ok)throw new Error(typeof payload.message==="string"?payload.message:"Zugang konnte nicht geprüft werden.");
     if(typeof payload.authenticated!=="boolean")throw new Error("Zugang konnte nicht geprüft werden.");
     if(startedRevision!==revision)throw new Error("Die Sitzung wurde geändert. Bitte erneut versuchen.");
+    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);
+    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);
+    lastIdentity=identity;
     cached=payload;validUntil=Date.now()+30000;
     return payload as ClientSession;
   })();

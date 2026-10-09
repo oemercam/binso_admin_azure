@@ -69,7 +69,7 @@ const results=[];const errors=[];const accessibilityFailures=[];let failMutation
 let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
-let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0;
+let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false;const dataRefreshWaiters=[];
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -95,6 +95,7 @@ try{
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
+   if(dataPaymentMode&&holdDataRefresh&&p==='/api/documents')await new Promise(resolve=>dataRefreshWaiters.push(resolve));
    if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
    let data;
    if(p==='/api/auth/session')data={authenticated:true,tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
@@ -563,6 +564,12 @@ try{
    const priorInvoice={...invoice},priorOpenAmount=summary.invoices[0].open_amount;
    dataPaymentMode=true;dataPaymentPosts=0;invoice.total=2561.97;invoice.subtotal=2370;invoice.vat=191.97;invoice.paid_amount=0;summary.invoices[0].open_amount=2561.97;
    const tabs={};for(const [name,path] of Object.entries({detail:'/rechnungen/RE-TEST-1',list:'/rechnungen',customer:'/kunden/customer-one',payments:'/zahlungen',finance:'/finanzen',dashboard:'/dashboard',activity:'/kunden/customer-one',form:'/zahlungen/neu?invoice=RE-TEST-1'})){tabs[name]=await trackedPage();await tabs[name].goto(base+path);await tabs[name].waitForLoadState('networkidle');}
+   await tabs.list.bringToFront();await tabs.list.waitForLoadState('networkidle');holdDataRefresh=true;
+   const backgroundRead=tabs.list.waitForRequest(request=>new URL(request.url()).pathname==='/api/documents');
+   await tabs.list.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await backgroundRead;
+   if(!await tabs.list.getByText(/2[’']561\.97/).count())console.log('Pending read diagnostics:',await tabs.list.locator('body').innerText());
+   assert.ok(await tabs.list.getByText(/2[’']561\.97/).count(),'A confirmed invoice stays visible while a background request is pending');
+   holdDataRefresh=false;dataRefreshWaiters.splice(0).forEach(resolve=>resolve());await tabs.list.waitForLoadState('networkidle');
    await tabs.customer.getByRole('button',{name:'Finanzen',exact:true}).click();await tabs.activity.getByRole('button',{name:'Aktivität',exact:true}).click();
    await tabs.form.getByLabel('Zahlungsbetrag CHF',{exact:true}).fill('1000');
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');

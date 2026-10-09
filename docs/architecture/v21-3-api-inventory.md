@@ -90,8 +90,8 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/settings/notifications` | GET, PATCH | `app/api/settings/notifications/route.ts` | `requireSession:6`, `withTenant:6`, `c.query:6`, `requireSession:7`, `withTenant:7`, `c.query:7` |
 | `/api/settings/profile` | GET, PATCH | `app/api/settings/profile/route.ts` |  |
 | `/api/settings/subscription` | GET | `app/api/settings/subscription/route.ts` | `requireSession:6`, `authorize:6`, `withTenant:7`, `c.query:7` |
-| `/api/settings/team/invitations/[id]` | DELETE | `app/api/settings/team/invitations/[id]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:9`, `c.query:10` |
-| `/api/settings/team/invitations` | GET, POST | `app/api/settings/team/invitations/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:9`, `c.query:9`, `c.query:9`, `c.query:9`, `requireSession:10`, `authorize:10`, `withTenant:10`, `c.query:11`, `c.query:12`, `c.query:14`, `c.query:15`, `c.query:16`, `withTenant:16`, `c.query:16` |
+| `/api/settings/team/invitations/[id]` | DELETE | `app/api/settings/team/invitations/[id]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:9`, `c.query:10`, `c.query:11` |
+| `/api/settings/team/invitations` | GET, POST | `app/api/settings/team/invitations/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8`, `c.query:8`, `c.query:8`, `requireSession:9`, `authorize:9` |
 | `/api/settings/team/members/[userId]` | PATCH | `app/api/settings/team/members/[userId]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8`, `c.query:8` |
 | `/api/support/tickets/[id]/messages` | GET, POST | `app/api/support/tickets/[id]/messages/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:8`, `c.query:8`, `requireSession:11`, `authorize:11`, `withTenant:12`, `c.query:13`, `c.query:14` |
 | `/api/support/tickets` | GET, POST | `app/api/support/tickets/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8`, `requireSession:12`, `authorize:12`, `withTenant:19`, `c.query:20`, `c.query:21` |

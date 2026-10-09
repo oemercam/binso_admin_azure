@@ -53,7 +53,9 @@ try{
  const cachedSession=await import(cacheUrl);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:true,tenant:{id:'one',role:'owner'}}));await cachedSession.readClientSession();
  received({data:{type:'session'}});assert.equal(cachedSession.cachedClientSession(),null,'Other-tab logout clears cached permissions');
- const oldRevision=events.dataRevision(['/api/documents']);listeners.online();assert.notEqual(events.dataRevision(['/api/documents']),oldRevision);
+ const oldRevision=events.dataRevision(['/api/documents']),sessionBeforeRefresh=events.dataRevision([]);listeners.online();assert.notEqual(events.dataRevision(['/api/documents']),oldRevision);assert.equal(events.dataRevision([]),sessionBeforeRefresh,'Online refresh is not a session change');
+ await cachedSession.readClientSession();const sameIdentity=events.dataRevision([]);listeners.visibilitychange();await cachedSession.readClientSession();assert.equal(events.dataRevision([]),sameIdentity,'Visibility rechecks authentication without discarding the same tenant');
+ globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:true,tenant:{id:'two',role:'reader'}}));listeners.visibilitychange();await cachedSession.readClientSession();assert.notEqual(events.dataRevision([]),sameIdentity,'A real tenant/role change invalidates private query data');
  const previous=events.dataRevision(['/api/finance']);received({data:{type:'changed',domains:['finance']}});assert.notEqual(events.dataRevision(['/api/finance']),previous);
 }finally{Object.assign(globalThis,original);}
 const httpUrl=moduleUrl((await fs.readFile('lib/server/http.ts','utf8')).replace('"next/server"',JSON.stringify(moduleUrl('export const NextResponse={json:(data,init)=>new Response(JSON.stringify(data),init)}'))));

@@ -4077,7 +4077,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const updated=await c.query(\"update organization_invitations set status='revoked' where organization_id=$1 and id::text=$2 and status='pending' returning id\",[s.organizationId,id]);\n  if(updated.rows[0])await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'invitation.revoked',entityType:'organization_invitations',entityId:id});return updated.rows[0];\n }"
+            "async c=>{\n  const updated=await c.query(\"update organization_invitations set status='revoked' where organization_id=$1 and id::text=$2 and status='pending' returning id\",[s.organizationId,id]);\n  if(updated.rows[0])await c.query(\"update mail_outbox set status='cancelled',updated_at=now() where organization_id=$1 and kind='invitation' and entity_id=$2 and status in ('queued','failed')\",[s.organizationId,id]);\n  if(updated.rows[0])await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'invitation.revoked',entityType:'organization_invitations',entityId:id});return updated.rows[0];\n }"
           ]
         },
         {
@@ -4085,6 +4085,14 @@
           "line": 10,
           "arguments": [
             "\"update organization_invitations set status='revoked' where organization_id=$1 and id::text=$2 and status='pending' returning id\"",
+            "[s.organizationId,id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 11,
+          "arguments": [
+            "\"update mail_outbox set status='cancelled',updated_at=now() where organization_id=$1 and kind='invitation' and entity_id=$2 and status in ('queued','failed')\"",
             "[s.organizationId,id]"
           ]
         }
@@ -4106,20 +4114,21 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/invitations.ts",
-        "lib/server/auth-tokens.ts",
         "lib/server/password.ts",
         "lib/server/email.ts",
-        "lib/server/logger.ts"
+        "lib/server/logger.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 9,
+          "line": 8,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 9,
+          "line": 8,
           "arguments": [
             "s",
             "\"users:read\""
@@ -4127,7 +4136,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 9,
+          "line": 8,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4136,7 +4145,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 8,
           "arguments": [
             "\"select m.user_id,m.role,m.status,m.created_at,u.display_name name,u.email from organization_memberships m join app_users u on u.id=m.user_id where m.organization_id=$1 and m.status='active' order by m.created_at\"",
             "[s.organizationId]"
@@ -4144,7 +4153,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 8,
           "arguments": [
             "\"select id,email,role,status,expires_at,created_at from organization_invitations where organization_id=$1 order by created_at desc\"",
             "[s.organizationId]"
@@ -4152,7 +4161,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 8,
           "arguments": [
             "\"select e.max_users user_limit,s.plan from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1\"",
             "[s.organizationId]"
@@ -4160,81 +4169,15 @@
         },
         {
           "callee": "requireSession",
-          "line": 10,
+          "line": 9,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 10,
+          "line": 9,
           "arguments": [
             "s",
             "\"users:manage\""
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 10,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "async c=>{\n await c.query(\"select id from organizations where id=$1 for update\",[s.organizationId]);\n const capacity=(await c.query(\"select e.max_users,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active')+(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) occupied from organization_entitlements e where e.organization_id=$1\",[s.organizationId])).rows[0];\n if(!capacity||Number(capacity.occupied)>=Number(capacity.max_users))throw new ApiError(409,\"user_limit\",\"Das Benutzerlimit ist erreicht.\");\n if((await c.query(\"select user_id from organization_memberships m join app_users u on u.id=m.user_id where m.organization_id=$1 and lower(u.email)=lower($2) and m.status='active'\",[s.organizationId,email])).rowCount)throw new ApiError(409,\"already_member\",\"Diese Person ist bereits im Team.\");\n if((await c.query(\"select id from organization_invitations where organization_id=$1 and lower(email)=lower($2) and status='pending' and expires_at>now()\",[s.organizationId,email])).rowCount)throw new ApiError(409,\"already_invited\",\"Für diese Person besteht bereits eine Einladung.\");\n await c.query(\"insert into organization_invitations(id,organization_id,email,role,status,expires_at,created_by_user_id) values($1,$2,$3,$4,'pending',now()+interval '7 days',$5)\",[id,s.organizationId,email,role,s.userId]);}"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 11,
-          "arguments": [
-            "\"select id from organizations where id=$1 for update\"",
-            "[s.organizationId]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 12,
-          "arguments": [
-            "\"select e.max_users,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active')+(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) occupied from organization_entitlements e where e.organization_id=$1\"",
-            "[s.organizationId]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 14,
-          "arguments": [
-            "\"select user_id from organization_memberships m join app_users u on u.id=m.user_id where m.organization_id=$1 and lower(u.email)=lower($2) and m.status='active'\"",
-            "[s.organizationId,email]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 15,
-          "arguments": [
-            "\"select id from organization_invitations where organization_id=$1 and lower(email)=lower($2) and status='pending' and expires_at>now()\"",
-            "[s.organizationId,email]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 16,
-          "arguments": [
-            "\"insert into organization_invitations(id,organization_id,email,role,status,expires_at,created_by_user_id) values($1,$2,$3,$4,'pending',now()+interval '7 days',$5)\"",
-            "[id,s.organizationId,email,role,s.userId]"
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 16,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "c=>c.query(\"update organization_invitations set status='revoked' where id=$1 and organization_id=$2\",[id,s.organizationId])"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 16,
-          "arguments": [
-            "\"update organization_invitations set status='revoked' where id=$1 and organization_id=$2\"",
-            "[id,s.organizationId]"
           ]
         }
       ]
@@ -7038,21 +6981,7 @@
       "file": "components/team-settings.tsx",
       "calls": [
         {
-          "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>setCanManage(!s.demo&&!s.tenant?.readOnly&&[\"owner\",\"admin\"].includes(s.tenant?.role??\"\"))).catch",
-          "line": 24,
-          "arguments": [
-            "()=>{}"
-          ]
-        },
-        {
-          "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 24,
-          "arguments": [
-            "s=>setCanManage(!s.demo&&!s.tenant?.readOnly&&[\"owner\",\"admin\"].includes(s.tenant?.role??\"\"))"
-          ]
-        },
-        {
-          "callee": "apiGet",
+          "callee": "useApiQuery",
           "line": 24,
           "arguments": [
             "\"/api/auth/session\""
@@ -7060,33 +6989,33 @@
         },
         {
           "callee": "apiGet",
-          "line": 27,
+          "line": 29,
           "arguments": [
             "\"/api/settings/team/invitations\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 30,
+          "line": 33,
           "arguments": [
             "\"/api/settings/team/invitations\"",
-            "{email,role}"
+            "{email,role}",
+            "{idempotencyKey:inviteRequest.current.key}"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 33,
+          "line": 36,
           "arguments": [
             "\"/api/settings/team/members/\"+encodeURIComponent(selected.user_id)",
             "{role:editRole}"
           ]
         },
         {
-          "callee": "fetch",
-          "line": 34,
+          "callee": "apiDelete",
+          "line": 37,
           "arguments": [
-            "'/api/settings/team/invitations/'+encodeURIComponent(id)",
-            "{method:'DELETE'}"
+            "'/api/settings/team/invitations/'+encodeURIComponent(id)"
           ]
         }
       ],
@@ -9560,20 +9489,20 @@
       "methods": [],
       "calls": [
         {
-          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
-          "line": 21,
+          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);\n    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);\n    lastIdentity=identity;\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
+          "line": 22,
           "arguments": []
         },
         {
           "callee": "fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;}"
           ]
         },
         {
           "callee": "fetch",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "\"/api/auth/session\"",
             "{cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -9639,22 +9568,22 @@
       "methods": [],
       "calls": [
         {
-          "callee": "apiGet<T>(path).then(data=>{if(active)setState({path,revision,data,error:null,loading:false});}).catch",
-          "line": 18,
+          "callee": "apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch",
+          "line": 19,
           "arguments": [
-            "error=>{if(active)setState({path,revision,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});}"
+            "error=>{if(active)setState({path,revision,session,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});}"
           ]
         },
         {
           "callee": "apiGet<T>(path).then",
-          "line": 18,
+          "line": 19,
           "arguments": [
-            "data=>{if(active)setState({path,revision,data,error:null,loading:false});}"
+            "data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 18,
+          "line": 19,
           "arguments": [
             "path"
           ]
