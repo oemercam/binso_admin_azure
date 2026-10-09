@@ -1,5 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import {createRequire} from "node:module";
+import {redundantDeclarations} from "./css-contract.mjs";
+const require=createRequire(import.meta.url),postcss=require(require.resolve("postcss",{paths:[require.resolve("next")]}));
 
 const root=process.cwd();
 const styleDir=path.join(root,"app","styles");
@@ -59,6 +62,7 @@ for(const file of runtimeCss){
   const source=fs.readFileSync(path.join(styleDir,file),"utf8");
   if(/\\[nr]/.test(source))throw new Error(`Literal newline escape in app/styles/${file}`);
   css+="\n"+source;
+  if(file!=="tokens.css"){const redundant=redundantDeclarations(postcss.parse(source));if(redundant.length)throw new Error(`Redundant same-selector declarations in ${file}: ${JSON.stringify(redundant)}`);}
 
   if(source.includes("!important"))throw new Error(`!important is not allowed in app/styles/${file}`);
 
