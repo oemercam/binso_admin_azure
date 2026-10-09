@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 const modalStack:HTMLElement[]=[];
 let savedOverflow="",savedRootOverflow="",savedScrollX=0,savedScrollY=0;
 
-export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=false) {
+export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=false, headerSelector=".mobile-header,.desktop-appbar") {
   const dialogRef = useRef<HTMLElement>(null);
   const closeRef = useRef(onClose);
   const triggerRef = useRef<HTMLElement|null>(null);
@@ -43,24 +43,24 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(
       'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
     )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert]'));
-    if(!dialog.contains(document.activeElement)) (controls()[0] ?? dialog).focus();
+    if(!dialog.contains(document.activeElement)) (controls()[0] ?? dialog).focus({preventScroll:true});
     const onKey = (event: KeyboardEvent) => {
       if(modalStack.at(-1)!==dialog)return;
       if (event.key === "Escape") { event.preventDefault(); closeRef.current(); return; }
       if (event.key !== "Tab") return;
       const items = controls();
       const first = items[0], last = items.at(-1);
-      if (!first || !last) { event.preventDefault(); dialog.focus(); return; }
+      if (!first || !last) { event.preventDefault(); dialog.focus({preventScroll:true}); return; }
       if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
-        event.preventDefault(); last.focus();
+        event.preventDefault(); last.focus({preventScroll:true});
       } else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) {
-        event.preventDefault(); first.focus();
+        event.preventDefault(); first.focus({preventScroll:true});
       }
     };
     const onFocus = (event: FocusEvent) => {
       if(modalStack.at(-1)!==dialog)return;
-      if(headerPanel&&event.target instanceof Element&&event.target.closest('.mobile-header,.desktop-appbar'))return;
-      if (event.target instanceof Node && !dialog.contains(event.target)) (controls()[0] ?? dialog).focus();
+      if(headerPanel&&event.target instanceof Element&&event.target.closest(headerSelector))return;
+      if (event.target instanceof Node && !dialog.contains(event.target)) (controls()[0] ?? dialog).focus({preventScroll:true});
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("focusin", onFocus);
@@ -69,6 +69,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("focusin", onFocus);
+      if(modalStack.length&&trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
       if(!modalStack.length){
         document.documentElement.style.removeProperty("--dialog-viewport-height");document.documentElement.style.removeProperty("--dialog-viewport-top");
         document.body.style.overflow = savedOverflow;
@@ -77,6 +78,6 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
         window.scrollTo(savedScrollX,savedScrollY);
       }
     };
-  }, [open,headerPanel]);
+  }, [open,headerPanel,headerSelector]);
   return dialogRef;
 }

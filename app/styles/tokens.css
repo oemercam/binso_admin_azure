@@ -107,6 +107,8 @@
   --dialog-edge-gap:16px;
   --sheet-max-width:560px;
   --layer-sheet:80;
+  --layer-confirm:190;
+  --wizard-height:auto;
   --header-panel-top:64px;
   --header-panel-right:16px;
   --dialog-viewport-height:100dvh;

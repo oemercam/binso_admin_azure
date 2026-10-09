@@ -1,7 +1,9 @@
 "use client";
-import {ActionSheet,FormSheet} from "./binso-ux";
+import {FormSheet} from "./binso-ux";
 
 import Link from "next/link";
+import {HeaderPanel} from "./header-panel";
+import {Avatar} from "./avatar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -124,8 +126,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
   const [mobileMore,setMobileMore]=useState(false);
   const mobileMoreDialog=useDialogFocus(mobileMore,()=>setMobileMore(false));
   const [accountOpen,setAccountOpen]=useState(false);
-  const router=useRouter();
-  const logout=async()=>{try{const response=await fetch("/api/operator/logout",{method:"POST"});const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{router.push("/operator/login");router.refresh();}};
+  const [logoutBusy,setLogoutBusy]=useState(false);
+  const [logoutError,setLogoutError]=useState("");
+  const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const response=await fetch("/api/operator/logout",{method:"POST"});if(!response.ok)throw new Error("Abmelden fehlgeschlagen. Bitte erneut versuchen.");const payload=await response.json().catch(()=>({}));const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
 
   return <div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
@@ -136,10 +139,10 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
     <main className="operator-main">
       <header className="operator-app-header">
         <div className="operator-header-brand"><Logo/><span>Admin</span></div>
-        <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setAccountOpen(true)}>OC</button></div>
+        <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
       </header>
       <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)}/></div>
-      {accountOpen&&<ActionSheet label={"Konto"} description={"Profil, Darstellung und Sitzung."} open={true} onClose={()=>setAccountOpen(false)} busy={false} className={""} layerClassName={""} ariaLabel={"Konto"}><div className="account-sheet"><div className="account-sheet-profile"><span className="avatar avatar-large">OC</span><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div></div></ActionSheet>}
+      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div>{logoutError&&<p role="alert">{logoutError}</p>}</div></HeaderPanel>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}

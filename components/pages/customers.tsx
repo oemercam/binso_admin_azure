@@ -1,4 +1,5 @@
 "use client";
+import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {Avatar} from "../avatar";
 
 import { DocumentList, type DocumentListItem } from "../document-list";
@@ -150,9 +151,9 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [recordError,setRecordError]=useState<string|null>(null);
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
-  const [editedRecord,setEditedRecord]=useState(false);
+  const {dirty,markPristine}=useDirtySnapshot([company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus]);
   const [savedRecord,setSavedRecord]=useState(false);
-  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));}).catch(e=>setRecordError(e instanceof Error?e.message:"Kunde konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));},[customerId]);
+  useEffect(()=>{if(!customerId)return;apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);}).catch(e=>setRecordError(e instanceof Error?e.message:"Kunde konnte nicht geladen werden.")).finally(()=>setLoadingRecord(false));},[customerId,markPristine]);
   const save=async()=>{
     if(saveRecordPending.current||loadingRecord||recordError)return;
     if(!company.trim() || !city.trim()){
@@ -174,8 +175,8 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     }
   };
   if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<p role="status">Kunde wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell editing={true} unsavedChanges={editedRecord&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
-    <div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
+  return <AppShell editing={true} unsavedChanges={dirty&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
+    <div className="form-page" inert={savingRecord}>
       <section className="form-section clean">
         <h2>Grundangaben</h2>
         <div className="form-grid two">

@@ -774,11 +774,15 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bottom-sheet[data-wizard] .wizard-content{min-height:0;flex:1;overflow:auto}
 .bottom-sheet[data-wizard] .wizard-progress{position:static;flex:none}
 .form-wizard{min-width:0;scroll-margin-top:80px}
+.form-wizard[data-guided]{height:var(--wizard-height,auto);display:flex;flex-direction:column;min-height:0}
+.form-wizard[data-guided] .wizard-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.form-wizard[data-guided] .wizard-progress{position:static;flex:none}
+.bottom-sheet[data-wizard] .form-wizard[data-guided]{height:auto}
 .wizard-progress{position:sticky;top:var(--desktop-header-h);z-index:10;padding:12px 0;background:var(--color-bg);border-bottom:1px solid var(--color-line);font-size:12px}
 .form-wizard .wizard-content [hidden]{display:none}
 .wizard-content{min-width:0;padding-top:16px}
-.form-wizard .mobile-sticky-save{display:flex;gap:12px}
-.form-wizard .mobile-sticky-save>.button{flex:1;width:0}
+.form-wizard .mobile-sticky-save{display:flex;gap:12px;position:static;flex:none;background:var(--color-bg);padding-top:16px}
+.form-wizard .mobile-sticky-save>.button{flex:1;width:0;min-height:48px;height:48px}
 .person-record{display:flex;align-items:center;gap:10px;min-width:0}
 .person-record>span:last-child{min-width:0;overflow-wrap:anywhere}
 .person-avatar{width:36px;height:36px;flex:none;display:inline-grid;place-items:center;overflow:hidden;border-radius:50%;font-size:13px;font-weight:600;color:#fff;line-height:1}

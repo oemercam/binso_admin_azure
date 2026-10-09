@@ -218,6 +218,8 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   return {loading,error};
 }
 
+function editableDocumentSnapshot(draft:DocumentDraft){const value={...draft};delete value.subtotal;delete value.vat;delete value.total;return JSON.stringify(value);}
+
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   return <DocumentPage kind="Angebot" existing={existing} documentKey={documentKey}/>;
 }
@@ -248,6 +250,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [saving,setSaving]=useState(false);
   const documentSavePending=useRef(false);
   const [dirty,setDirty]=useState(false);
+  const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const {directory,loading:customersLoading,error:customersError}=useCustomerDirectory();
   const company=useDocumentCompany();
@@ -290,9 +293,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       if(times.length&&(existing?draft.currency:expenses[0]?.currency??draft.currency)!=='CHF')throw new Error('Stundensätze werden in CHF geführt. Für diese Zeiten ist eine CHF-Rechnung erforderlich.');
       const groups=Object.values(times.reduce<Record<string,typeof times>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
       const positions:LineItem[]=[...groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id)})),...expenses.map(i=>({id:'expense-'+i.id,description:i.description,quantity:String(i.quantity),price:String(i.unit_price),unit:'Stück',vatRate:String(i.vat_rate),expenseIds:[i.id]}))];
+      draftBaseline.current??=editableDocumentSnapshot(draft);
       setDraft(current=>({...current,customer:sources[0].customer_name,customerId:customer,currency:expenses[0]?.currency??current.currency,positions:existing?[...current.positions,...positions]:positions,subtotal:undefined,vat:undefined,total:undefined}));setDirty(true);setEditing(true);
     };void load().catch(e=>setActionError(e instanceof Error?e.message:'Positionen konnten nicht geladen werden.'));
-  },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft.id,draft.customerId,draft.status,draft.currency,documentKey,setDraft]);
+  },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft,documentKey,setDraft]);
 
   useEffect(()=>{
     if(existing||!isProductionBackendEnabled()) return;
@@ -315,7 +319,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
       }
-      setDirty(false);
+      draftBaseline.current=null;setDirty(false);
       show(existing?`${kind} gespeichert.`:`${kind} erstellt.`);
       if(existing){documentSavePending.current=false;setEditing(false);}
       else window.setTimeout(()=>router.push("/"+plural+"/"+encodeURIComponent(savedNumber)),900);
@@ -357,7 +361,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
             </section>
           </aside>}
         </div>
-      : !existing?<FormWizard labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{setDirty(true);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>}
+      : !existing?<FormWizard labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} step={!existing?wizardStep:undefined}/>}
     {editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
     {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
     {preview&&<DocumentModal previewDraft={{...draft,kind}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}

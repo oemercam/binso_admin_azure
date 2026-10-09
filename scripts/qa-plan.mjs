@@ -17,15 +17,15 @@ const groups={
  expenses:{match:/expense|spesen/,routes:['/spesen','/spesen/expense-one','/spesen/neu'],interactions:['expenses']},
  chat:{match:/support|chat|ticket|workspace-viewport/,routes:['/support','/support/ticket-one','/support/neu'],interactions:['chat']},
  settings:{match:/setting|einstellungen/,routes:['/einstellungen','/einstellungen/darstellung','/benachrichtigungen','/einstellungen/abonnement'],interactions:['billing']},
- operator:{match:/operator/,routes:fullRoutes.filter(r=>r.startsWith('/operator')),interactions:[]},
+ operator:{match:/operator/,routes:fullRoutes.filter(r=>r.startsWith('/operator')),interactions:['operator']},
  public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public\//,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo'],interactions:[]},
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
-const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing','header'];
+const allInteractions=['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator'];
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
- const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
+ const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard|use-dirty-snapshot)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
  const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
  const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);

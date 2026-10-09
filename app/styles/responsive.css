@@ -25,7 +25,7 @@
 
 
 .confirm-layer{
-  position:fixed;inset:0;z-index:90;
+  position:fixed;inset:0;z-index:var(--layer-confirm);
   display:grid;place-items:center;
   padding:20px;
   background:rgba(0,0,0,.36);
@@ -2146,7 +2146,7 @@
     border-left:0;border-right:0;border-bottom:0;
     border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;
   }
-  .confirm-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .confirm-actions{grid-template-columns:minmax(0,1fr)}
   .confirm-actions .button{min-height:48px;height:48px}
 
 .sheet-layer{

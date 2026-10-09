@@ -40,7 +40,7 @@ const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',statu
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
-const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing','header'];
+const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 async function capture(page,options){if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await page.screenshot(options);if(process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));}
 async function actionEvidence(page,name,theme){
@@ -74,6 +74,7 @@ try{
     if(p==='/api/files'){uploads++;return route.fulfill({json:{item:{id:'receipt-one'}}});}
     if(p==='/api/settings/team/invitations'||p.startsWith('/api/settings/team/members/')){teamPosts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failTeam?503:200,json:failTeam?{message:'Fixture team unavailable'}:{ok:true}});}
     if(p==='/api/time-entries/policy'){policyPosts++;await new Promise(resolve=>setTimeout(resolve,150));if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});policyRequired=JSON.parse(req.postData()).required;return route.fulfill({json:{time_approval_required:policyRequired}});}
+    if(p==='/api/operator/logout')return route.fulfill({status:503,json:{message:'Fixture logout unavailable'}});
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
@@ -209,9 +210,17 @@ try{
   if(hasInteraction('employees')){
   await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
   await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.getByLabel('Nachname',{exact:true}).fill('Person');await page.getByLabel('E-Mail',{exact:true}).fill('test@example.invalid');await page.getByLabel('Funktion',{exact:true}).fill('ICT');
+  const wizardFooter=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();
   await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).waitFor();
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee wizard has one final save');
-  await page.locator('.mobile-sticky-save').scrollIntoViewIfNeeded();const employeeSave=await page.locator('.mobile-sticky-save').boundingBox(),lastField=await page.getByText('Ferientage / Jahr',{exact:true}).boundingBox();assert.ok(employeeSave.y>lastField.y,'Save follows current step fields');
+  const employeeSave=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(employeeSave.y-wizardFooter.y)<2,'Wizard actions remain in the same position across steps');
+  await page.setViewportSize({width:430,height:400});
+  await page.waitForTimeout(100);
+  const shortFooter=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(shortFooter.y>=0&&shortFooter.y+shortFooter.height<=400,'Wizard actions stay visible in a short viewport');
+  await page.locator('.wizard-content').evaluate(el=>{el.scrollTop=el.scrollHeight});
+  const afterScroll=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(shortFooter.y-afterScroll.y)<2,'Only wizard content scrolls');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-400-employee-wizard.png`)});
+  await page.setViewportSize({width:430,height:900});
   await page.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Test','Wizard retains input without navigation or dirty warnings');
 
   }
@@ -263,6 +272,20 @@ try{
    teamPosts=0;failTeam=false;await navigate(base+'/einstellungen/team');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Mitarbeiter einladen',exact:true}).filter({visible:true}).click();const invitation=page.getByRole('dialog',{name:'Einladung',exact:true});await invitation.getByLabel('E-Mail',{exact:true}).fill('invalid');await invitation.getByRole('button',{name:'Einladen',exact:true}).click();assert.equal(teamPosts,0,'Invalid invitations do not write');await invitation.getByLabel('E-Mail',{exact:true}).fill('team@example.invalid');failTeam=true;await invitation.getByRole('button',{name:'Einladen',exact:true}).dblclick();await page.getByText('Fixture team unavailable',{exact:true}).waitFor();assert.equal(teamPosts,1,'Invitation locks duplicate writes');assert.equal(await invitation.getByLabel('E-Mail',{exact:true}).inputValue(),'team@example.invalid');failTeam=false;await invitation.getByRole('button',{name:'Einladen',exact:true}).click();await invitation.waitFor({state:'hidden'});assert.equal(teamPosts,2,'Invitation failure can be retried');
   }
   if(hasInteraction('documents')){
+  await navigate(base+'/rechnungen/neu');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Weiter',exact:true}).click();
+  await page.locator('.mobile-position-summary').first().click();
+  const position=page.getByRole('dialog',{name:'Position bearbeiten',exact:true});await position.getByLabel('Beschreibung',{exact:true}).fill('Ungespeicherte Position');
+  await position.getByRole('button',{name:'Abbrechen',exact:true}).click();
+  const discard=page.getByRole('alertdialog');await discard.waitFor();
+  const layers=await page.evaluate(()=>({confirm:Number(getComputedStyle(document.querySelector('.confirm-layer')).zIndex),sheet:Number(getComputedStyle(document.querySelector('.mobile-position-layer')).zIndex)}));assert.ok(layers.confirm>layers.sheet,'Discard confirmation is above the position sheet');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-position-discard.png`)});
+  await page.setViewportSize({width:320,height:568});
+  for(const button of await discard.getByRole('button').all())assert.equal(await button.evaluate(el=>el.scrollWidth<=el.clientWidth),true,'Discard actions fit a 320px viewport');
+  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-position-discard.png`)});
+  await page.setViewportSize({width:430,height:900});
+  await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await position.getByLabel('Beschreibung',{exact:true}).inputValue(),'Ungespeicherte Position');
+  await position.getByRole('button',{name:'Abbrechen',exact:true}).click();await discard.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await position.waitFor({state:'hidden'});
   await page.waitForLoadState("networkidle");await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
   await actionEvidence(page,'Weitere Aktionen',theme);await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
@@ -402,6 +425,27 @@ try{
    await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');assert.equal(await page.getByRole('alertdialog').count(),0,'Restoring original values clears dirty state');
    await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');await page.locator('.mobile-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();await page.getByRole('link',{name:'Mein Profil',exact:true}).click();await page.waitForURL(base+'/einstellungen/konto');await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();await page.getByLabel('Vorname',{exact:true}).fill('Browserentwurf');await page.evaluate(()=>history.back());await page.getByRole('alertdialog').waitFor();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Browserentwurf','Safari browser back retains unsaved input');await page.evaluate(()=>history.back());await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/dashboard');
    await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Kontakte',exact:true}).click();await page.getByRole('button',{name:'Kontakt',exact:true}).click();const form=page.getByRole('dialog',{name:'Kontakt hinzufügen',exact:true});await form.getByLabel('Vorname',{exact:true}).fill('Unsaved');await page.keyboard.press('Escape');await page.getByRole('alertdialog').waitFor();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await form.getByLabel('Vorname',{exact:true}).inputValue(),'Unsaved');await form.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await form.waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.body.style.overflow),'','Nested confirmations restore scroll lock');
+  }
+  for(const scenario of [
+   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Firmenname',back:'/kunden'},
+   {group:'products',route:'/produkte/product-one',menu:'Produktaktionen',field:'Name',back:'/produkte'},
+   {group:'employees',route:'/mitarbeiter/employee-one',menu:'Mitarbeiteraktionen',field:'Vorname',back:'/mitarbeiter'},
+  ]){
+   if(!hasInteraction(scenario.group))continue;
+   await page.setViewportSize({width:390,height:740});await navigate(base+scenario.route);await page.waitForLoadState('networkidle');
+   if(scenario.menu){await page.getByRole('button',{name:scenario.menu,exact:true}).filter({visible:true}).click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click()}
+   const field=page.getByLabel(scenario.field,{exact:true});const original=await field.inputValue();await field.fill(original+' geändert');await field.fill(original);await page.waitForTimeout(100);
+   await page.locator('.mobile-back').click();await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
+  }
+  if(hasInteraction('operator')){
+   await navigate(base+'/operator');await page.waitForLoadState('networkidle');
+   await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
+   const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();
+   const g=await page.evaluate(()=>({header:document.querySelector('.operator-app-header').getBoundingClientRect().bottom,panel:document.querySelector('.header-panel').getBoundingClientRect().top,inert:document.querySelector('.operator-page-head').inert}));
+   assert.ok(g.panel>=g.header&&g.panel-g.header<=12,'Operator account shares the anchored top panel');assert.equal(g.inert,true,'Operator background is inert');
+   await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-account.png`)});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});
+   assert.equal(await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).evaluate(el=>el===document.activeElement),true,'Operator account restores trigger focus');
   }
   if(hasInteraction('billing')){
    await page.setViewportSize({width:390,height:740});
