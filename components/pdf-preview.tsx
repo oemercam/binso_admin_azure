@@ -41,6 +41,9 @@ function PdfPage({pdf,pageNumber}: {pdf:PDFDocumentProxy;pageNumber:number}) {
 export function PdfPreview({file}: {file:Blob}) {
   const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null);
   const [error,setError]=useState<string|null>(null);
+  const [pageNumber,setPageNumber]=useState(1);
+  const touchStart=useRef<number|null>(null);
+  useEffect(()=>{setPdf(null);setError(null);setPageNumber(1)},[file]);
   useEffect(()=>{
     let active=true;
     let task:ReturnType<typeof import("pdfjs-dist").getDocument>|undefined;
@@ -60,5 +63,15 @@ export function PdfPreview({file}: {file:Blob}) {
   },[file]);
   if(error)return <p role="alert">{error}</p>;
   if(!pdf)return <p role="status">PDF wird angezeigt …</p>;
-  return <div className="pdf-pages">{Array.from({length:pdf.numPages},(_,index)=><PdfPage key={index} pdf={pdf} pageNumber={index+1}/>)}</div>;
+  const current=Math.min(Math.max(pageNumber,1),pdf.numPages);
+  return <div className="pdf-pages" data-viewer-mode="single-page" style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",minWidth:0,overflowX:"hidden"}}>
+    <div style={{width:"100%",maxWidth:"min(100%, 720px)",minWidth:0,touchAction:"pan-y"}} onTouchStart={event=>{touchStart.current=event.touches[0]?.clientX??null}} onTouchEnd={event=>{const start=touchStart.current;touchStart.current=null;if(start===null)return;const delta=(event.changedTouches[0]?.clientX??start)-start;if(Math.abs(delta)>60)setPageNumber(value=>Math.min(pdf.numPages,Math.max(1,value+(delta<0?1:-1))))}}>
+      <PdfPage key={current} pdf={pdf} pageNumber={current}/>
+    </div>
+    <nav aria-label="PDF-Seitennavigation" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,padding:"12px 0",width:"100%"}}>
+      <button type="button" aria-label="Vorherige Seite" disabled={current<=1} onClick={()=>setPageNumber(value=>Math.max(1,value-1))}>‹</button>
+      <span aria-live="polite">Seite {current} von {pdf.numPages}</span>
+      <button type="button" aria-label="Nächste Seite" disabled={current>=pdf.numPages} onClick={()=>setPageNumber(value=>Math.min(pdf.numPages,value+1))}>›</button>
+    </nav>
+  </div>;
 }
