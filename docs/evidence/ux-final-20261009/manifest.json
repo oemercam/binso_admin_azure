@@ -1,0 +1,422 @@
+{
+  "before-detail-text-overlap.png": {
+    "bytes": 58247,
+    "sha256": "5fb7638096d8c5014a049fda2faa3e713b427a3c03937d6c94ddee85a68833e2"
+  },
+  "computed-browser-evidence.json.gz": {
+    "bytes": 678188,
+    "sha256": "1a79f593dc3644be98af5ad85a7004e3b8f4112a27f042f7896992ce28b6eee2"
+  },
+  "dark-390-400-lab-wizard.png": {
+    "bytes": 17408,
+    "sha256": "5ab8b888ac558cc145bea5ef2d78028caa372c3f7300e1d63313dc46efaa9e11"
+  },
+  "dark-390-header-account.png": {
+    "bytes": 36216,
+    "sha256": "e38ff69573cfaa646ab15738893a277439fd583b8c52f4d3734a2a9eb7f33001"
+  },
+  "dark-390-header-notifications.png": {
+    "bytes": 43130,
+    "sha256": "07ea9ef6605b6467b173daf94a34250578ba7dd01f771e5518ccc6208ed1c246"
+  },
+  "dark-390-header-search.png": {
+    "bytes": 19820,
+    "sha256": "34035981738fc70626fef4229f8155139dd496a2d7643dc5033fbc937ce0087b"
+  },
+  "dark-390-lab-reference.png": {
+    "bytes": 14280,
+    "sha256": "4f15121311dbb2e8b99b50bb271acf585716415565fa9a0ae79a274e5b907564"
+  },
+  "fast-after.json": {
+    "bytes": 848,
+    "sha256": "6680eec5abc91fa506e319c237fcfa584610e3f1133fe272b3d56f26a449c5da"
+  },
+  "fast-before.json": {
+    "bytes": 946,
+    "sha256": "02aa370e832e7fbef6cbd95b529f6c3667542c5bb57464aaafe005312ee28fc4"
+  },
+  "light-1440-header-account.png": {
+    "bytes": 106939,
+    "sha256": "ecc5dbad2241cbaf06818aea8f61eb878b8668c3db8bd0a663ef746de7bf7fcf"
+  },
+  "light-1440-header-notifications.png": {
+    "bytes": 102052,
+    "sha256": "56e58bbfba83063f7f5c728cd49bda3f5c6a6be3731a129057a3421b0eb0c7f2"
+  },
+  "light-1440-header-search.png": {
+    "bytes": 90841,
+    "sha256": "eedf447ae5d20ab6c1861d82055b98faa1473d91cd22b59668e03359ec7f9892"
+  },
+  "light-320-header-account.png": {
+    "bytes": 34300,
+    "sha256": "5212518ba7d8a0e37d411b892f03e803e089cc579bc59ae294b6e124c77f93ce"
+  },
+  "light-320-header-notifications.png": {
+    "bytes": 42892,
+    "sha256": "2f2a92b63e4d273e43afe46b3b0034ade31a0ab9522775e4a1e0c5c47f924012"
+  },
+  "light-320-header-search.png": {
+    "bytes": 19747,
+    "sha256": "69e1582621bfc86c6c41b413f3ed88804f449c22d00df601dd3d9495898a7cfd"
+  },
+  "light-390-400-lab-wizard.png": {
+    "bytes": 18703,
+    "sha256": "6363207297ccd50f9965333a2e369a51cb880194f58a1a76699fd4bee1a35431"
+  },
+  "light-390-_.png": {
+    "bytes": 466667,
+    "sha256": "055a9e8672789bc1a0c9ec4dd4f3fbb5d9509d27b975b646246ff5dea48955d7"
+  },
+  "light-390-_agb.png": {
+    "bytes": 464049,
+    "sha256": "179789de4c58b9534f5ffd15e9fbe423e00c4f733ca614e7997faa9bdd6dbb36"
+  },
+  "light-390-_angebote.png": {
+    "bytes": 36548,
+    "sha256": "46286a618df68f1a6b8555f3739fff7a2634d5c2ae37163d414ae5b7a1303c81"
+  },
+  "light-390-_angebote_AN-TEST-1.png": {
+    "bytes": 37443,
+    "sha256": "6ebb2b13c07082e4aa9043fb84ae0941eca9bc052e5e8a6030693033902d4d3d"
+  },
+  "light-390-_angebote_neu.png": {
+    "bytes": 21812,
+    "sha256": "8b8a710743115708d7bfea614f7708793a64e5608dd4601b6322d9d0a49ea821"
+  },
+  "light-390-_auftragsbearbeitung.png": {
+    "bytes": 366049,
+    "sha256": "8d70b4ebdf30e5e0bee3fc275303523fb075ecba2261eed1b791e845a98f4df1"
+  },
+  "light-390-_belege.png": {
+    "bytes": 64183,
+    "sha256": "4a5da1a8154e3511dd0ffc7be7fa8c0309df7d5e26f38364f69b5a8e63700a2a"
+  },
+  "light-390-_benachrichtigungen.png": {
+    "bytes": 30986,
+    "sha256": "91a8c5572cd57dddf5fb259a05ef37217d0bd8ef46b1209119d8153d3bf69657"
+  },
+  "light-390-_dashboard.png": {
+    "bytes": 78430,
+    "sha256": "e126e28bb8296dc247465ba94f5b5329875f2a0ebd22629511c0cc141f915cca"
+  },
+  "light-390-_datenschutz.png": {
+    "bytes": 459134,
+    "sha256": "ae69d4a23bc91f0231b4c158a468b0b359f6926552f8cfc22fe77abf427a6946"
+  },
+  "light-390-_demo.png": {
+    "bytes": 78430,
+    "sha256": "e126e28bb8296dc247465ba94f5b5329875f2a0ebd22629511c0cc141f915cca"
+  },
+  "light-390-_einladung.png": {
+    "bytes": 25248,
+    "sha256": "22d84d9a6ae77a8682680c50eb6f48f71696f6aacc5b7f663c2a4b2399e955b0"
+  },
+  "light-390-_einladung_token-fixture.png": {
+    "bytes": 25248,
+    "sha256": "22d84d9a6ae77a8682680c50eb6f48f71696f6aacc5b7f663c2a4b2399e955b0"
+  },
+  "light-390-_einstellungen.png": {
+    "bytes": 39393,
+    "sha256": "c4a065938795846933fc4600adb7ab4344fd15807ad3dfdab2c4106b1743afbc"
+  },
+  "light-390-_einstellungen_abonnement.png": {
+    "bytes": 65779,
+    "sha256": "d13574803635dd522d33f7220cca42539b99514715400c82b6efdbc3a8c7470f"
+  },
+  "light-390-_einstellungen_benachrichtigungen.png": {
+    "bytes": 47731,
+    "sha256": "bd36176b5f4e4c5b0aa3517c6172e1bb5ce6b1685169f7cdd74f7a308a7ca811"
+  },
+  "light-390-_einstellungen_darstellung.png": {
+    "bytes": 28185,
+    "sha256": "7c0ce454568e0aa2f8fdbb2a81bedaee0a637089a801f9f2aca510128744f2fa"
+  },
+  "light-390-_einstellungen_datenschutz.png": {
+    "bytes": 63503,
+    "sha256": "ca6bb157074bf2be172d20b2c23ea8c8c9a3f1973efb5b55aa8e63a81c7d0950"
+  },
+  "light-390-_einstellungen_dokumente.png": {
+    "bytes": 54089,
+    "sha256": "26b84d3d474982bb33cbd906a5f9166f89e9e0e6f83bb2f3348facb2083a7784"
+  },
+  "light-390-_einstellungen_firma.png": {
+    "bytes": 28862,
+    "sha256": "388be9c4cab8cd4505cc986c2e217ecc7c8bec188b3b92eb3c9e93ebd29cd164"
+  },
+  "light-390-_einstellungen_konto.png": {
+    "bytes": 25847,
+    "sha256": "bc1a0527e51311e7effe572d17c8564beb40136e49067028612e490cbb68d3bd"
+  },
+  "light-390-_einstellungen_sicherheit.png": {
+    "bytes": 65830,
+    "sha256": "a919d6db7047812bb7b0ead0a49c5dabcfea25dd018a31b1e67f030dc7da7605"
+  },
+  "light-390-_einstellungen_sprache.png": {
+    "bytes": 37854,
+    "sha256": "1ec5c7da3c2eecd9e7ed3800cb420534dabc77e83b5ffae47bf140895ea64726"
+  },
+  "light-390-_einstellungen_team.png": {
+    "bytes": 23411,
+    "sha256": "84cb72681c4794cdca7f8ef7e76c4a09eb6d2e9a8520c639b82e18e24dcaf318"
+  },
+  "light-390-_einstellungen_zeiterfassung.png": {
+    "bytes": 27159,
+    "sha256": "4c3143e516a36d94b7104dfe42d61c70774da7cc171c9c877785c646609cbfcf"
+  },
+  "light-390-_email-bestaetigen.png": {
+    "bytes": 16260,
+    "sha256": "602df399fe78ab9ba470aafc92a991ffb140a8c391cad647e792826a58a7f873"
+  },
+  "light-390-_finanzen.png": {
+    "bytes": 64577,
+    "sha256": "92452a8914d9f89f41acb496ae9f1806258091e29ba09933b4349c47d8f4f693"
+  },
+  "light-390-_finanzen_analyse.png": {
+    "bytes": 38450,
+    "sha256": "e9d785c5b26ec0e31ba0b771300d3e0b9f51f872401f94292f20413f4582c783"
+  },
+  "light-390-_impressum.png": {
+    "bytes": 114332,
+    "sha256": "e3cfc71da67e330fc48b0febaf02b3917d1889ef50768bf3f37d170725bc1ba2"
+  },
+  "light-390-_kunden.png": {
+    "bytes": 31331,
+    "sha256": "b55460077b44b636d8093a1648dabe7d2814cfef0bb4342b748dc0b70b97a139"
+  },
+  "light-390-_kunden_customer-one.png": {
+    "bytes": 45016,
+    "sha256": "8e857beaaa20dd6ae5ea80848d09f54d80d2006b21eb6e1f6e476e32edfd14e9"
+  },
+  "light-390-_kunden_customer-one_bearbeiten.png": {
+    "bytes": 33838,
+    "sha256": "bf7abb75fa7d1d57fa84f5ade886c1dba6a8476f3f94230257baa8e412b58c0a"
+  },
+  "light-390-_kunden_neu.png": {
+    "bytes": 28357,
+    "sha256": "3b6e7b062667537b87aacbbd1d17835876e907adc6e423cf64c4a3a972ce4b74"
+  },
+  "light-390-_login.png": {
+    "bytes": 29908,
+    "sha256": "827e9741cef62395554ed8c36d18fb9fe5fb5cdf94b564fe37cbd66bd210ecb9"
+  },
+  "light-390-_mitarbeiter.png": {
+    "bytes": 32432,
+    "sha256": "c8941d1b560e1b6d925e8958e1351b9620e247638fba9dfab45b0b557c7abdb6"
+  },
+  "light-390-_mitarbeiter_employee-one.png": {
+    "bytes": 36440,
+    "sha256": "cd897581b048a67acedb8de0c4901e4eb78ffb87ef129400cb482f77b2853d57"
+  },
+  "light-390-_mitarbeiter_neu.png": {
+    "bytes": 24430,
+    "sha256": "dc9542d80eedcf9ee5ff5d9c81484f54eb9ed47bf06a2801fa0ea05ee09791a1"
+  },
+  "light-390-_offline.png": {
+    "bytes": 20164,
+    "sha256": "4b1ac99fc77214fde9cd204d24bd7403d41f19df92e41d7988325413366c53bc"
+  },
+  "light-390-_operator.png": {
+    "bytes": 127047,
+    "sha256": "f70976e87a8fd604c6077a8b84484d6e0d1d0d2a9e75e6c6447075735c10bde3"
+  },
+  "light-390-_operator_abonnemente.png": {
+    "bytes": 45020,
+    "sha256": "5dee6c33bdf23d0c1ef9fe2bce4bd06dc28da405ea8bc72f09c8356cb6b96103"
+  },
+  "light-390-_operator_ankuendigungen.png": {
+    "bytes": 48817,
+    "sha256": "a064a6ffb17ba32e8e7805d2ad24986fe88deab4dfc4804dada9f8687b1b76e3"
+  },
+  "light-390-_operator_audit.png": {
+    "bytes": 39218,
+    "sha256": "a7f04baeff75163052196d03b867cd825e6924cd45f19cc4c396f307faacaaba"
+  },
+  "light-390-_operator_finanzen.png": {
+    "bytes": 62882,
+    "sha256": "0cd54b7f3cf5f5ec8f80e548b86bee228425a8ca44406a1769b8e3e2ea93ac1b"
+  },
+  "light-390-_operator_kunden.png": {
+    "bytes": 46848,
+    "sha256": "bb120bff549d1fabd0ceb01abc39e5127f67a42b20cc9c8c9539b8e73b247800"
+  },
+  "light-390-_operator_login.png": {
+    "bytes": 32427,
+    "sha256": "8b5983ab065bec5b2950c160d3ec07839e1290cc792616debde01ddf52235758"
+  },
+  "light-390-_operator_monitoring.png": {
+    "bytes": 67928,
+    "sha256": "7f9806fa49ee8527d76d1a810b696a6a31e6c169b8a0a77eb71584fe69853209"
+  },
+  "light-390-_operator_sicherheit.png": {
+    "bytes": 43595,
+    "sha256": "ec4fe2841a9a507c552c0f326b2e16edb84cb7e1cefc79d89d1f46c21a44008e"
+  },
+  "light-390-_operator_sperrungen.png": {
+    "bytes": 58829,
+    "sha256": "8c37db0d39987ab7332c2dfce515dfc9bfc0e24b7d27f2c5ee20a3d802a73ce0"
+  },
+  "light-390-_operator_tickets.png": {
+    "bytes": 52765,
+    "sha256": "c523d1f81227ad29266a33117742a499597c89e8ff49a0b32a2064805a418d34"
+  },
+  "light-390-_operator_zahlungen.png": {
+    "bytes": 45534,
+    "sha256": "ac57d892b2235149c385db232470a317e239f19992080e56ba4e66384d82e5d5"
+  },
+  "light-390-_passwort-vergessen.png": {
+    "bytes": 24001,
+    "sha256": "0f692fc75b690b40c5a3afd4b254ee8afbabf1a795551a1687b7105d5bb1e0e0"
+  },
+  "light-390-_passwort-zuruecksetzen.png": {
+    "bytes": 16042,
+    "sha256": "350869563e7de575d0d5862bd6fb8d22e2f98de983d1852b5cb9443c0b0e6b5b"
+  },
+  "light-390-_passwort-zuruecksetzen_token-fixture.png": {
+    "bytes": 27438,
+    "sha256": "c3ce2f5c73366c594f3461b58fbb412cdaa57d4ba58fbc3f9da6b331c00bb770"
+  },
+  "light-390-_portal.png": {
+    "bytes": 29908,
+    "sha256": "827e9741cef62395554ed8c36d18fb9fe5fb5cdf94b564fe37cbd66bd210ecb9"
+  },
+  "light-390-_portal_login.png": {
+    "bytes": 29908,
+    "sha256": "827e9741cef62395554ed8c36d18fb9fe5fb5cdf94b564fe37cbd66bd210ecb9"
+  },
+  "light-390-_portal_registrieren.png": {
+    "bytes": 51662,
+    "sha256": "e7fb83523169acebc66c8df40d97ab50904c60184466c89b2191ce5412774b36"
+  },
+  "light-390-_preise.png": {
+    "bytes": 167052,
+    "sha256": "60f2db39005751d7d31ca9f74a3be93861ea5416413ff65b09280137088f3794"
+  },
+  "light-390-_preview_dashboard.png": {
+    "bytes": 72577,
+    "sha256": "ffbbf1692ddefc3488919af631743f78b9a46ece7b679a9fcbd69625ca550588"
+  },
+  "light-390-_preview_rechnungen.png": {
+    "bytes": 34852,
+    "sha256": "b1aa5eac6925d8113f9d5ed223aa96fa670045314c1ffcd64a7294264a8de723"
+  },
+  "light-390-_preview_zeit.png": {
+    "bytes": 54865,
+    "sha256": "e917f8a9d234110878def38e376092968614997cc85c038b8e48477de52c3d95"
+  },
+  "light-390-_produkt.png": {
+    "bytes": 164851,
+    "sha256": "990de50ff884410f9ffd6aa523f142f3287651b3220084f435e84ea169381bfb"
+  },
+  "light-390-_produkte.png": {
+    "bytes": 35434,
+    "sha256": "01f2a0f0ff886fa6c948162da19541884590116a5cf43bf81a710e861d54e717"
+  },
+  "light-390-_produkte_neu.png": {
+    "bytes": 30102,
+    "sha256": "f543aacedd7ae6641c3cc35dbef536e0b1330d53c2470804accbce5fe8d94e57"
+  },
+  "light-390-_produkte_product-one.png": {
+    "bytes": 19074,
+    "sha256": "6dd221ed75373e25cb9f574bd841dc3c4ac0dbd32883b3e9d5de2082ba70fe74"
+  },
+  "light-390-_projekte_neu.png": {
+    "bytes": 16984,
+    "sha256": "a7bd2d7c9a40a74ca6588331896df1177ee2606c46bbb0e1e62fdb196cac460c"
+  },
+  "light-390-_rechnungen.png": {
+    "bytes": 37255,
+    "sha256": "ce8cac0ee97762dfed43bd0b4b50d9f0c273ff0741416146a447f3450e24513d"
+  },
+  "light-390-_rechnungen_RE-TEST-1.png": {
+    "bytes": 48158,
+    "sha256": "c4bedc840e35bf99533aa30d641669977ec76477b8ca294d5fd889f3ef56746d"
+  },
+  "light-390-_rechnungen_neu.png": {
+    "bytes": 44466,
+    "sha256": "9e478d6ef67fb0242cfacb19d561b89a6f968c45a9ebff2d58e11b941dbbe7db"
+  },
+  "light-390-_registrieren.png": {
+    "bytes": 51662,
+    "sha256": "e7fb83523169acebc66c8df40d97ab50904c60184466c89b2191ce5412774b36"
+  },
+  "light-390-_spesen.png": {
+    "bytes": 34431,
+    "sha256": "1216d65bd1cfdca619a6cd5aef74f6439c5faa886f0994564f9e77c4718d886b"
+  },
+  "light-390-_spesen_expense-one.png": {
+    "bytes": 54889,
+    "sha256": "ec08689835dbb9494814c61684343b30ee0d9a74b1a0d82aa2c92ef78286b990"
+  },
+  "light-390-_spesen_neu.png": {
+    "bytes": 53882,
+    "sha256": "9e70fe5e305f752c5cf990f7a98714c04a8eed2062fd632bdf9f262823895341"
+  },
+  "light-390-_support.png": {
+    "bytes": 37398,
+    "sha256": "0dfb64b3614974a7f20489f1786bfcb85553c6ce4109427d4d0151f042b38728"
+  },
+  "light-390-_support_neu.png": {
+    "bytes": 4360,
+    "sha256": "fb1c06efc42255b198a3b2b14f1ec9367979bb7cc92455b6dc2a933e10841104"
+  },
+  "light-390-_support_ticket-one.png": {
+    "bytes": 68679,
+    "sha256": "c410b0de02ed0365f18dcd880b98172a4f9bbc2bb5c5f5b4ec3bb5ae2f0302d1"
+  },
+  "light-390-_unterauftragsbearbeiter.png": {
+    "bytes": 157321,
+    "sha256": "c1958ff124e3de94ce488d0df36af60973ec8186c1449f9122a98e71cc7c1dc2"
+  },
+  "light-390-_willkommen.png": {
+    "bytes": 78430,
+    "sha256": "e126e28bb8296dc247465ba94f5b5329875f2a0ebd22629511c0cc141f915cca"
+  },
+  "light-390-_zahlungen.png": {
+    "bytes": 42214,
+    "sha256": "b75a1ebed64c1bb33e1ede47a840701e1e3286d30269a6ee35c09d9af885af11"
+  },
+  "light-390-_zahlungen_neu.png": {
+    "bytes": 29850,
+    "sha256": "f378dfd95026684824919a139df46bbe76cf2c6766affe229a8a085449105685"
+  },
+  "light-390-_zahlungen_payment-one.png": {
+    "bytes": 25151,
+    "sha256": "87fce33234c1356c614da631ad8d9ff549abda6ed509c56817f57153801de9bf"
+  },
+  "light-390-_zeit.png": {
+    "bytes": 46020,
+    "sha256": "b8064c0f035a4e1dfd6545ce12b96165f2e04f42e159984ee1ec9528d4615226"
+  },
+  "light-390-billing-09.png": {
+    "bytes": 30772,
+    "sha256": "eafe5a637a90ca8d57702c304370b2492348dc0024a17800c2bea6b1b3699696"
+  },
+  "light-390-billing-10.png": {
+    "bytes": 30706,
+    "sha256": "42babd6b52e16c82274db69eab46ac51349d00ef44e7ca13315558a8015ba47e"
+  },
+  "light-390-header-account.png": {
+    "bytes": 37516,
+    "sha256": "a1f7acf964585142534d0f65bc507d86a794194dd5736d61405e2ed69dafc5c8"
+  },
+  "light-390-header-notifications.png": {
+    "bytes": 44103,
+    "sha256": "e5103f45d479e9ca976cd1c535246f2f56402c75dda1bebb789c5b544696f8f9"
+  },
+  "light-390-header-search.png": {
+    "bytes": 20174,
+    "sha256": "beb8bc0c941281b09bf4c8c0d44a3bb5c916fabaec26a8e3d6e1c1e3f38c3ced"
+  },
+  "light-390-lab-reference.png": {
+    "bytes": 15247,
+    "sha256": "13c099af899b8a6ff114e85c3fabbcd9b71ccef3032e7796528b16bfeb6e524a"
+  },
+  "light-390-notification-preferences.png": {
+    "bytes": 50928,
+    "sha256": "cecc61a58a3d473e294dfc955c48c7ba27e3e78726337da4a5ba72ed2a8cfb21"
+  },
+  "results.json": {
+    "bytes": 19152,
+    "sha256": "0b09d3ad6185a4e64d4432666659522ef9de3489325ce473d68cb7c289740e7e"
+  }
+}

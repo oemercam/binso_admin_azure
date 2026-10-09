@@ -7,7 +7,7 @@ export function avatarIdentity(name:string,identity=name){
  const parts=name.trim().split(/\s+/).filter(Boolean);
  const initials=parts.length?(parts[0][0]+(parts.length>1?parts.at(-1)![0]:"")).toLocaleUpperCase("de-CH"):"";
  let hash=0;for(const character of identity)hash=(Math.imul(hash,31)+character.codePointAt(0)!)>>>0;
- return {initials,tone:identity?hash%5:5};
+ return {initials,tone:parts.length&&identity?hash%5:5};
 }
 
 /** Person identity only. Company and platform logos have separate render paths. */

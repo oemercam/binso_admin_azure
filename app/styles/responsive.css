@@ -1566,7 +1566,7 @@
   .entity-hero h2{font-size:18px}
   .entity-hero p{font-size:11px}
   .detail-list>div{grid-template-columns:minmax(94px,31%) 1fr;gap:12px;padding:12px 0}
-  .detail-list>.employee-email{grid-template-columns:minmax(0,1fr);gap:var(--field-label-gap)}
+  .detail-list>.detail-list-stacked{grid-template-columns:minmax(0,1fr);gap:var(--field-label-gap)}
 
   .form-page,
   .form-page.narrow,
@@ -2677,6 +2677,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   .bottom-sheet>.sheet-body{flex:1 1 auto;overflow-y:auto}
   .bottom-sheet>.form-grid{min-height:0;overflow-y:auto}
   .app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}
+  .app-editing .page-container{padding-bottom:calc(24px + var(--safe-bottom))}
   .bottom-sheet>.filter-sheet-actions{position:static;bottom:auto;margin-top:var(--heading-content-gap);padding-bottom:0}
   .bottom-sheet .form-grid{grid-template-columns:minmax(0,1fr)}
   .form-field>input::-webkit-date-and-time-value{min-width:0;text-align:left}

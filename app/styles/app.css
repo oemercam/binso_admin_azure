@@ -321,7 +321,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   gap:12px;
   border-bottom:1px solid var(--color-line);
 }
-.detail-list dt{color:var(--color-muted);font-size:12px}
+.detail-list dt{min-width:0;color:var(--color-muted);font-size:12px;overflow-wrap:anywhere;line-height:1.5}
 .detail-list dd{margin:0;font-size:12px;font-weight:550;overflow-wrap:anywhere}
 .detail-list>div:last-child,
 .operator-detail-list>div:last-child,
@@ -774,6 +774,10 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bottom-sheet[data-wizard] .wizard-content{min-height:0;flex:1;overflow:auto}
 .bottom-sheet[data-wizard] .wizard-progress{position:static;flex:none}
 .form-wizard{min-width:0;scroll-margin-top:80px}
+.form-wizard[data-frame]{display:flex;flex-direction:column;min-height:0}
+.form-wizard[data-frame] .wizard-progress{position:static;flex:none}
+.form-wizard[data-frame] .wizard-content{flex:1;min-height:0;overflow:auto}
+.form-wizard[data-frame] .mobile-sticky-save{flex:none}
 .wizard-progress{position:sticky;top:var(--desktop-header-h);z-index:10;padding:12px 0;background:var(--color-bg);border-bottom:1px solid var(--color-line);font-size:12px}
 .form-wizard .wizard-content [hidden]{display:none}
 .wizard-content{min-width:0;padding-top:16px}

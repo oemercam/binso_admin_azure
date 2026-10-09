@@ -424,3 +424,20 @@ console.log('Project-linked idle timer context survives synchronization without 
  access={write:true,canOpen:()=>false};assert.equal(row({href:'/mitarbeiter'}),'','Forbidden route stays hidden');
  console.log('Central action row preserves write/route permissions and explicit navigation/destructive intent.');
 }
+
+// Execute actual identity derivation and check the shipped palette, not a copied mock.
+{
+ const raw=await fs.readFile('components/avatar.tsx','utf8');
+ const ast=ts.createSourceFile('avatar.tsx',raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const node=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='avatarIdentity');
+ const {avatarIdentity}=await import(moduleUrl(ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+ assert.equal(avatarIdentity('  Nina  Müller ','person-1').initials,'NM');
+ assert.equal(avatarIdentity('Ömer Cam','person-2').initials,'ÖC');
+ assert.equal(avatarIdentity('', 'unknown').tone,5);
+ assert.equal(avatarIdentity('Nina Müller','person-1').tone,avatarIdentity('Nina Meier','person-1').tone,'Identity, not render order or changed name, owns the color');
+ for(let i=0;i<100;i++)assert.deepEqual(avatarIdentity('Nina Müller','person-1'),avatarIdentity('Nina Müller','person-1'));
+ const css=await fs.readFile('app/styles/app.css','utf8');
+ const palette=[...css.matchAll(/\.person-avatar-tone-\d\{background:#([0-9a-f]+)\}/g)];assert.equal(palette.length,6);
+ for(const [,hex] of palette){const h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
+ console.log('Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.');
+}

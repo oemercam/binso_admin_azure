@@ -174,7 +174,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     }
   };
   if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<p role="status">Kunde wird geladen …</p>:<div role="alert"><p>{recordError}</p><Button onClick={()=>window.location.reload()}>Erneut versuchen</Button></div>}</AppShell>;
-  return <AppShell editing={true} unsavedChanges={editedRecord&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
+  return <AppShell editing={true} compareFormValues unsavedChanges={editedRecord&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
     <div className="form-page" inert={savingRecord} onChangeCapture={()=>setEditedRecord(true)}>
       <section className="form-section clean">
         <h2>Grundangaben</h2>

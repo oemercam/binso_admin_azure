@@ -8,6 +8,7 @@ const protectedPrefixes=[
 
 export function proxy(request:NextRequest){
   const pathname=request.nextUrl.pathname;
+  if(pathname.startsWith("/dev/")&&process.env.NODE_ENV!=="development")return new NextResponse(null,{status:404});
   const isProtected=protectedPrefixes.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"));
   if(!isProtected) return NextResponse.next();
 
@@ -22,6 +23,7 @@ export function proxy(request:NextRequest){
 
 export const config={
   matcher:[
+    "/dev/:path*",
     "/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
