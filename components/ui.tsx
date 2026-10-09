@@ -140,7 +140,8 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
   return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel>{label}</FormLabel>}{inline?<FormLabel>{label}</FormLabel>:fields}</label>;
 }
 
-export function EmptyState({ icon = "file", title, text, action }: { icon?: string; title: string; text: string; action?: React.ReactNode }) {
+export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
+  if(compact)return <p role="status" data-empty-state="compact">{title}</p>;
   return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3>{title}</h3><p>{text}</p>{action}</div>;
 }
 

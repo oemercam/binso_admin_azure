@@ -292,7 +292,7 @@ try{
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-time.png`),fullPage:true});
   await page.getByRole('tab',{name:'Spesen',exact:true}).click();await page.locator('.employee-tab-panel a[href="/spesen/expense-one"]').waitFor();assert.equal(await page.locator('.employee-tab-panel .document-summary-row').count(),1,'Employee expenses use the main module row');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-expenses.png`),fullPage:true});
-  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Keine Dokumente erfasst',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel .empty-state').count(),1,'Documents use the central empty state');assert.equal(await page.locator('.employee-tab-panel .compact-list').count(),0,'No legacy employee document list is rendered');
+  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await page.getByText('Keine Dokumente erfasst',{exact:true}).waitFor();assert.equal(await page.locator('.employee-tab-panel [data-empty-state="compact"]').count(),1,'Documents use the central empty state');assert.equal(await page.locator('.employee-tab-panel .compact-list').count(),0,'No legacy employee document list is rendered');
   await page.getByRole('button',{name:'Dokument hinzufügen',exact:true}).waitFor();
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-employee-documents.png`),fullPage:true});
   employeeLedgerFixture=false;

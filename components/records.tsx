@@ -4,7 +4,7 @@ import {matchesRecordChip} from "@/lib/list-filter";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Icon, Status } from "./ui";
+import { EmptyState, Icon, Status } from "./ui";
 import { ListSearch, ListRow } from "./binso-ux";
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
@@ -95,7 +95,7 @@ export function RecordsView({
     </div>
 
     {loading?<p role="status">Einträge werden geladen …</p>:error?<p role="alert">{error}</p>:visible.length ? <><div className="desktop-record-table" role="table" aria-label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<div className="desktop-record-head" role="row" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><button type="button" role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label} onClick={()=>cycleSort(col.index)}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</button>)}<span aria-hidden="true"/></div>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<Link href={href} className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</Link>:<div className="desktop-record-row" role="row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</div>})}</div><div className="records mobile-record-list">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
-      <p role="status">{query.trim()?"Keine Treffer für diese Suche":emptyLabel?.(activeChip)??(activeChip==="Inaktiv"?"Keine inaktiven "+countLabel:activeChip==="Aktiv"?"Keine aktiven "+countLabel:"Keine "+countLabel+" erfasst")}</p>}
+      <EmptyState compact text="" title={query.trim()?"Keine Treffer für diese Suche":emptyLabel?.(activeChip)??(activeChip==="Inaktiv"?"Keine inaktiven "+countLabel:activeChip==="Aktiv"?"Keine aktiven "+countLabel:"Keine "+countLabel+" erfasst")}/>}
   </>;
 }
 
