@@ -15,7 +15,7 @@ import ConfirmDialog from "./confirm-dialog";
 import { PageHeading, DetailHeading } from "./binso-ux";
 import { Button, EmptyState, Icon, IconButton, Logo, Status } from "./ui";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {cachedClientSession,invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
+import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
 import {HeaderPanel} from "./header-panel";
@@ -76,7 +76,7 @@ function AppShellFrame({
   const pathname=usePathname();
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
-  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(()=>accessFromSession(cachedClientSession()));
+  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{

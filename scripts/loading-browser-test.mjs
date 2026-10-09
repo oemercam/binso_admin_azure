@@ -35,10 +35,10 @@ try{
   if(!baseline)assert.equal(await page.locator('link[rel="manifest"]').getAttribute('href'),'/manifest-app.webmanifest','Actual customer routes use the app manifest');
   if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,72);assert.equal(startup?.iconAnimation,theme==='dark'?'none':'binso-start');}
   await measure('refresh',()=>page.reload());
-  await page.evaluate(()=>{window.shellBefore=document.querySelector('.app-root');window.navBefore=document.querySelector('.bottom-nav');window.loadingFrames=[];});const beforeNav=authCalls;
+  await page.evaluate(()=>{window.shellBefore=document.querySelector('.app-root');window.navBefore=document.querySelector('.bottom-nav');window.loadingFrames=[];});const beforeNav=authCalls,navCalls={...calls};
   const start=await page.evaluate(()=>performance.now());await page.locator('.app-sidebar a[href="/produkte"]').evaluate(el=>el.click());await page.getByText('Keine Produkte erfasst',{exact:true}).waitFor();
   const navigation=await page.evaluate(t=>({ms:performance.now()-t,shellPreserved:window.shellBefore===document.querySelector('.app-root'),navigationPreserved:window.navBefore===document.querySelector('.bottom-nav'),phases:[...new Set(window.loadingFrames.map(f=>f.phase.join(',')))]}),start);
-  results.push({theme,label:'navigation',...navigation,authRequests:authCalls-beforeNav});
+  results.push({theme,label:'navigation',...navigation,authRequests:authCalls-beforeNav,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(navCalls[p]||0)]).filter(([,n])=>n))});
   if(!baseline){assert(navigation.shellPreserved&&navigation.navigationPreserved,'Navigation DOM persists');assert(!navigation.phases.some(p=>p.includes('.app-launch-screen')),'No internal splash');assert.equal(authCalls-beforeNav,0,'Warm route uses bounded in-memory session');}
   await page.goBack();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Back navigation retains navigation');

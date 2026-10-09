@@ -129,7 +129,8 @@ assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA header
 assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
 console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
 
-const manifestSource=await readPageFile('app/manifest.ts','utf8');
+const manifestSource=await readPageFile('lib/site-manifest.ts','utf8');
+assert.ok(!(await fs.readdir('app')).includes('manifest.ts'),'File-based root metadata must not override the application manifest');
 const layoutSource=await readPageFile('app/layout.tsx','utf8');
 assert.ok(manifestSource.includes('/brand/pwa-icon-192.png'),'PWA manifest must expose the Binso One 192px icon');
 assert.ok(manifestSource.includes('/brand/pwa-icon-512.png'),'PWA manifest must expose the Binso One 512px icon');

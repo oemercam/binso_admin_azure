@@ -5,7 +5,7 @@ import {useCallback,useEffect,useState,useRef} from "react";
 import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
 import { Button, EmptyState, Field, Icon, Status, Toast, Input, Select } from "./ui";
-import {apiGet,apiPatch,apiPost,isProductionBackendEnabled} from "@/lib/client/backend";
+import {apiGet,apiPatch,apiPost,useBackendMode} from "@/lib/client/backend";
 type Member={user_id:string;role:string;created_at:string;name?:string;email?:string};
 type Invitation={id:string;email:string;role:string;status:string;expires_at:string;created_at:string};
 type TeamPayload={members:Member[];invitations:Invitation[];userLimit:number;plan:string};
@@ -18,13 +18,13 @@ const demoMembers:Member[]=[
 ];
 const roleLabel=(role:string)=>({owner:"Inhaber",admin:"Administrator",finance:"Finanzen",hr:"Personal",project_manager:"Projektleitung",manager:"Management",member:"Mitarbeitende",reader:"Lesen",employee:"Mitarbeitende"}[role]??role);
 export function TeamSettingsPage(){
- const production=isProductionBackendEnabled();
+ const production=useBackendMode();
  const [loadError,setLoadError]=useState<string|null>(null);
  const [canManage,setCanManage]=useState(false);
  useEffect(()=>{apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(s=>setCanManage(!s.demo&&!s.tenant?.readOnly&&["owner","admin"].includes(s.tenant?.role??""))).catch(()=>{});},[]);
  const [data,setData]=useState<TeamPayload>({members:production?[]:demoMembers,invitations:[],userLimit:production?1:10,plan:production?"trial":"pro"});
  const [email,setEmail]=useState(""),[role,setRole]=useState("member"),[loading,setLoading]=useState(production),[toast,setToast]=useState<string|null>(null),[inviteOpen,setInviteOpen]=useState(false),[selected,setSelected]=useState<Member|null>(null),[editRole,setEditRole]=useState("member");
- const load=useCallback(async()=>{if(!production){setLoading(false);return}try{setLoadError(null);setLoading(true);setData(await apiGet<TeamPayload>("/api/settings/team/invitations"))}catch(e){setLoadError(e instanceof Error?e.message:"Team konnte nicht geladen werden.")}finally{setLoading(false)}},[production]);
+ const load=useCallback(async()=>{if(!production){setData({members:demoMembers,invitations:[],userLimit:10,plan:"pro"});setLoading(false);return}try{setLoadError(null);setLoading(true);setData(await apiGet<TeamPayload>("/api/settings/team/invitations"))}catch(e){setLoadError(e instanceof Error?e.message:"Team konnte nicht geladen werden.")}finally{setLoading(false)}},[production]);
  useEffect(()=>{queueMicrotask(()=>void load())},[load]);
  const mutation=useRef(false);const [saving,setSaving]=useState(false);
  const invite=async()=>{if(mutation.current||!email.trim()||!canManage)return;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())){setToast("Bitte eine gültige E-Mail-Adresse eingeben.");return}mutation.current=true;setSaving(true);try{if(production)await apiPost("/api/settings/team/invitations",{email,role});setEmail("");setInviteOpen(false);setToast("Einladung wurde gesendet.");await load()}catch(e){setToast(e instanceof Error?e.message:"Einladung konnte nicht gesendet werden.")}mutation.current=false;setSaving(false);window.setTimeout(()=>setToast(null),2600)};

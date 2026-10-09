@@ -10,12 +10,12 @@ const values=new Map(),sessionStorage={getItem:key=>values.get(key)??null,setIte
 const worker={state:'installed',addEventListener:(name,fn)=>workerListeners[name]=fn,postMessage:()=>{updates++;listeners.controllerchange()}};
 const registration={waiting:null,installing:worker,update:async()=>{},addEventListener:(name,fn)=>listeners[name]=fn};
 const navigator={serviceWorker:{controller:null,register:async()=>registration,getRegistration:async()=>registration,addEventListener:(name,fn)=>listeners[name]=fn,removeEventListener:()=>{}}};
-const module={};
-Function('require','exports','useEffect','useState','navigator','window','sessionStorage','process',compiled)(require,module,fn=>{if(effectsEnabled)fn()},()=>[available,value=>available=value],navigator,{location:{reload:()=>reloads++}},sessionStorage,{env:{NODE_ENV:'production'}});
-module.PwaRegister();await Promise.resolve();await Promise.resolve();
+const pwaExports={};
+Function('require','exports','useEffect','useState','navigator','window','sessionStorage','process',compiled)(require,pwaExports,fn=>{if(effectsEnabled)fn()},()=>[available,value=>available=value],navigator,{location:{reload:()=>reloads++}},sessionStorage,{env:{NODE_ENV:'production'}});
+pwaExports.PwaRegister();await Promise.resolve();await Promise.resolve();
 listeners.controllerchange();assert.equal(reloads,0,'First service-worker ownership must not reload the application');
 navigator.serviceWorker.controller={};listeners.updatefound();workerListeners.statechange();assert.equal(available,true);
-registration.waiting=worker;effectsEnabled=false;const banner=module.PwaRegister();
+registration.waiting=worker;effectsEnabled=false;const banner=pwaExports.PwaRegister();
 await banner.props.children[1].props.onClick();assert.equal(updates,1);assert.equal(reloads,1,'Explicit update reloads on activation, not before');
 listeners.controllerchange();assert.equal(reloads,1,'Repeated controllerchange cannot double reload');
 await banner.props.children[1].props.onClick();assert.equal(reloads,2,'A later explicitly accepted update can reload once');

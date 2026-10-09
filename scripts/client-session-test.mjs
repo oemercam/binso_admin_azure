@@ -19,6 +19,7 @@ try{
  const obsolete=cache.readClientSession();cache.invalidateClientSession();resolveSession(new Response(JSON.stringify({authenticated:true,tenant:{id:'old-tenant'}})));
  await assert.rejects(obsolete,/Sitzung wurde geändert/);assert.equal(cache.cachedClientSession(),null);
  globalThis.fetch=async()=>{++reads;throw new Error('offline')};await assert.rejects(cache.readClientSession());
+ globalThis.fetch=async()=>{throw new DOMException('timeout','TimeoutError')};await assert.rejects(cache.readClientSession(),/Sitzungsprüfung dauert zu lange/);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:false}));assert.equal((await cache.readClientSession()).authenticated,false,'A failed check must be retryable');
  const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl));
  const backend=await import(moduleUrl(backendSource));
