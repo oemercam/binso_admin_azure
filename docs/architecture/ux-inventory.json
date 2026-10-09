@@ -34205,6 +34205,7 @@
         "components/ui.tsx#Icon",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
+        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#accessFromSession",
         "components/use-dialog-focus.ts#useDialogFocus",
@@ -34218,7 +34219,6 @@
         "components/ui.tsx#IconButton",
         "components/binso-ux.tsx#DetailHeading",
         "components/binso-ux.tsx#PageHeading",
-        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#SheetLink",
         "components/app-shell.tsx#notificationIcon",
         "components/app-shell.tsx#notificationTime",
@@ -34288,6 +34288,7 @@
         "lib/display-format.ts#timeMetadata",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
+        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#accessFromSession",
         "lib/permissions.ts#routePermission",
@@ -34333,7 +34334,6 @@
         "components/ui.tsx#IconButton",
         "components/binso-ux.tsx#DetailHeading",
         "components/binso-ux.tsx#PageHeading",
-        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#SheetLink",
         "components/app-shell.tsx#notificationIcon",
         "components/app-shell.tsx#notificationTime",
@@ -52277,6 +52277,7 @@
         "components/ui.tsx#Icon",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
+        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#accessFromSession",
         "components/use-dialog-focus.ts#useDialogFocus",
@@ -52290,7 +52291,6 @@
         "components/ui.tsx#IconButton",
         "components/binso-ux.tsx#DetailHeading",
         "components/binso-ux.tsx#PageHeading",
-        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#SheetLink",
         "components/app-shell.tsx#notificationIcon",
         "components/app-shell.tsx#notificationTime",
@@ -52360,6 +52360,7 @@
         "lib/display-format.ts#timeMetadata",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
+        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#accessFromSession",
         "lib/permissions.ts#routePermission",
@@ -52405,7 +52406,6 @@
         "components/ui.tsx#IconButton",
         "components/binso-ux.tsx#DetailHeading",
         "components/binso-ux.tsx#PageHeading",
-        "components/ui.tsx#EmptyState",
         "components/app-shell.tsx#SheetLink",
         "components/app-shell.tsx#notificationIcon",
         "components/app-shell.tsx#notificationTime",
@@ -60454,22 +60454,30 @@
       "widgets": [],
       "elements": [
         {
-          "tag": "div",
+          "tag": "p",
           "line": 144,
+          "props": [
+            "role=\"status\"",
+            "data-empty-state=\"compact\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 145,
           "props": [
             "className=\"empty-state\""
           ]
         },
         {
           "tag": "span",
-          "line": 144,
+          "line": 145,
           "props": [
             "className=\"empty-icon\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 144,
+          "line": 145,
           "props": [
             "name={icon}",
             "size={22}"
@@ -60477,16 +60485,21 @@
         },
         {
           "tag": "h3",
-          "line": 144,
+          "line": 145,
           "props": []
         },
         {
           "tag": "p",
-          "line": 144,
+          "line": 145,
           "props": []
         }
       ],
-      "conditions": []
+      "conditions": [
+        {
+          "line": 144,
+          "expression": "compact"
+        }
+      ]
     },
     {
       "key": "components/app-shell.tsx#SheetLink",
@@ -62802,7 +62815,7 @@
       "key": "components/ui.tsx#Toast",
       "file": "components/ui.tsx",
       "name": "Toast",
-      "line": 155,
+      "line": 156,
       "classes": [
         "toast",
         "toast-",
@@ -62814,7 +62827,7 @@
       "elements": [
         {
           "tag": "div",
-          "line": 156,
+          "line": 157,
           "props": [
             "className={`toast toast-${tone}`}",
             "role=\"status\""
@@ -62822,14 +62835,14 @@
         },
         {
           "tag": "span",
-          "line": 157,
+          "line": 158,
           "props": [
             "className=\"toast-icon\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 157,
+          "line": 158,
           "props": [
             "name={tone === \"danger\" ? \"close\" : tone === \"info\" ? \"bell\" : \"check\"}",
             "size={16}"
@@ -62837,27 +62850,27 @@
         },
         {
           "tag": "div",
-          "line": 158,
+          "line": 159,
           "props": []
         },
         {
           "tag": "b",
-          "line": 158,
+          "line": 159,
           "props": []
         },
         {
           "tag": "small",
-          "line": 158,
+          "line": 159,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 157,
+          "line": 158,
           "expression": "tone === \"danger\""
         },
         {
-          "line": 157,
+          "line": 158,
           "expression": "tone === \"info\""
         }
       ]
@@ -63578,10 +63591,12 @@
           ]
         },
         {
-          "tag": "p",
+          "tag": "EmptyState",
           "line": 98,
           "props": [
-            "role=\"status\""
+            "compact",
+            "text=\"\"",
+            "title={query.trim()?\"Keine Treffer für diese Suche\":emptyLabel?.(activeChip)??(activeChip===\"Inaktiv\"?\"Keine inaktiven \"+countLabel:activeChip===\"Aktiv\"?\"Keine aktiven \"+countLabel:\"Keine \"+countLabel+\" erfasst\")}"
           ]
         }
       ],
@@ -68390,7 +68405,7 @@
       "key": "components/ui.tsx#Toggle",
       "file": "components/ui.tsx",
       "name": "Toggle",
-      "line": 151,
+      "line": 152,
       "classes": [
         "toggle",
         "is-on"
@@ -68401,7 +68416,7 @@
       "elements": [
         {
           "tag": "button",
-          "line": 152,
+          "line": 153,
           "props": [
             "className={`toggle ${checked ? \"is-on\" : \"\"}`}",
             "type=\"button\"",
@@ -68413,13 +68428,13 @@
         },
         {
           "tag": "span",
-          "line": 152,
+          "line": 153,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 152,
+          "line": 153,
           "expression": "checked"
         }
       ]
@@ -75695,10 +75710,12 @@
           ]
         },
         {
-          "tag": "p",
+          "tag": "EmptyState",
           "line": 165,
           "props": [
-            "role=\"status\""
+            "compact",
+            "title=\"Keine Arbeitszeiten erfasst\"",
+            "text=\"\""
           ]
         },
         {
@@ -75769,10 +75786,12 @@
           ]
         },
         {
-          "tag": "p",
+          "tag": "EmptyState",
           "line": 166,
           "props": [
-            "role=\"status\""
+            "compact",
+            "title=\"Keine Spesen erfasst\"",
+            "text=\"\""
           ]
         },
         {
@@ -75856,8 +75875,9 @@
           "tag": "EmptyState",
           "line": 167,
           "props": [
+            "compact",
             "title=\"Keine Dokumente erfasst\"",
-            "text=\"Hier findest du die Dokumente dieses Mitarbeiters.\""
+            "text=\"\""
           ]
         },
         {
@@ -86252,10 +86272,12 @@
           ]
         },
         {
-          "tag": "p",
+          "tag": "EmptyState",
           "line": 143,
           "props": [
-            "role=\"status\""
+            "compact",
+            "text=\"\"",
+            "title={remoteEntries.length?\"Keine Zeiteinträge für diese Auswahl\":\"Keine Zeiteinträge erfasst\"}"
           ]
         },
         {
@@ -95347,13 +95369,13 @@
     {
       "file": "components/ui.tsx",
       "name": "Divider",
-      "line": 147,
+      "line": 148,
       "usedBy": []
     },
     {
       "file": "components/ui.tsx",
       "name": "Toggle",
-      "line": 151,
+      "line": 152,
       "usedBy": [
         "/einstellungen/benachrichtigungen"
       ]
@@ -95361,7 +95383,7 @@
     {
       "file": "components/ui.tsx",
       "name": "Toast",
-      "line": 155,
+      "line": 156,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -95394,7 +95416,7 @@
     {
       "file": "components/ui.tsx",
       "name": "Skeleton",
-      "line": 162,
+      "line": 163,
       "usedBy": []
     }
   ],
