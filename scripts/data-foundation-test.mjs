@@ -35,7 +35,8 @@ globalThis.window={addEventListener:(name,fn)=>listeners[name]=fn,dispatchEvent(
 globalThis.document={addEventListener:(name,fn)=>listeners[name]=fn,querySelector:()=>null,visibilityState:'visible'};
 globalThis.BroadcastChannel=class {set onmessage(fn){received=fn}postMessage(value){messages.push(value)}};
 try{
- const eventsUrl=moduleUrl(await fs.readFile('lib/client/data-events.ts','utf8'));
+ const draftUrl=moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8'));
+ const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)));
  const events=await import(eventsUrl);
  const cacheUrl=moduleUrl((await fs.readFile('lib/client/session-cache.ts','utf8')).replace('"./data-events"',JSON.stringify(eventsUrl)));
  const backend=await import(moduleUrl((await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./data-events"',JSON.stringify(eventsUrl)).replace('"./session-cache"',JSON.stringify(cacheUrl))));

@@ -121,7 +121,7 @@ try{
   ['/api/documents','invoices',finance,()=>({kind:'invoice',customerId:customer.id,issueDate:'2026-10-09',dueDate:'2026-11-09',currency:'CHF',items:[{description:'Synthetic invoice line',quantity:1,unitPrice:100,vatRate:8.1}]})],
   ['/api/documents','quotes',projectWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
  ];
- let writeCases=0;
+ let writeCases=0;const createdInvoices=new Map();
  for(const [path,table,allowed,payload] of writeContracts)for(const role of roles){
   const count=async org=>(await pool.query('select count(*)::int n from '+table+' where organization_id=$1',[org])).rows[0].n;
   const before=await count(organizations[0]),otherBefore=await count(organizations[1]);
@@ -130,8 +130,35 @@ try{
   assert.equal(await count(organizations[0]),before+(allowed.includes(role)?1:0),role+' persistence/denial '+path);
   assert.equal(await count(organizations[1]),otherBefore,'Other tenant unchanged '+path);
   if(allowed.includes(role)){assert.ok(result.data.item?.id,role+' persisted identity '+path);const saved=(await pool.query('select organization_id from '+table+' where id=$1',[result.data.item.id])).rows[0];assert.equal(saved.organization_id,organizations[0]);}
+  if(table==='invoices'&&allowed.includes(role))createdInvoices.set(role,result.data.item);
   writeCases++;
  }
+ // Real HTTP status changes: successful finance roles each use their own draft;
+ // denied roles must leave the invoice row exactly unchanged.
+ for(const role of roles){
+  const item=createdInvoices.get(role)??createdInvoices.get('owner');
+  const before=(await pool.query('select status,paid_amount from invoices where id=$1',[item.id])).rows[0];
+  const result=await write('POST','/api/documents/'+encodeURIComponent(item.number)+'/status',{action:'issue'},role);
+  assert.equal(result.status,finance.includes(role)?200:403,role+' invoice status role '+JSON.stringify(result.data));
+  const after=(await pool.query('select status,paid_amount from invoices where id=$1',[item.id])).rows[0];
+  if(finance.includes(role)){assert.equal(after.status,'sent');assert.equal(after.paid_amount,before.paid_amount);}
+  else assert.deepEqual(after,before,'Forbidden role cannot issue invoice');
+ }
+ const issued=createdInvoices.get('owner');
+ const invalidState=await write('POST','/api/documents/'+encodeURIComponent(issued.number)+'/status',{action:'accept'},'owner');
+ assert.equal(invalidState.status,409,'Invoice cannot use offer-only accept transition');
+ assert.equal((await pool.query('select status from invoices where id=$1',[issued.id])).rows[0].status,'sent');
+ for(const role of roles){
+  const result=await write('PATCH','/api/settings/team/members/http-1-member',{role:'admin'},role);
+  assert.equal(result.status,['owner','admin'].includes(role)?404:403,role+' foreign membership role change');
+  assert.equal((await pool.query("select role from organization_memberships where organization_id=$1 and user_id='http-1-member'",[organizations[1]])).rows[0].role,'member');
+ }
+ for(const role of roles)for(const [method,path,body] of [
+  ['POST','/api/operator/announcements',{title:'Forbidden tenant action',body:'Synthetic message'}],
+  ['PATCH','/api/operator/accounts/'+organizations[1],{plan:'pro'}],
+  ['POST','/api/operator/restrictions',{tenantId:organizations[1],reason:'Forbidden action'}],
+ ])assert.equal((await write(method,path,body,role)).status,401,role+' cannot use operator mutation '+path);
+ console.log('Extended HTTP negative/status contract: eight invoice issue-role cases, forbidden invoice transition, eight cross-tenant membership changes and 24 tenant-to-operator mutation denials passed with unchanged forbidden rows. Full operator-role/provider matrix remains separate.');
  for(const role of roles){
   const original=(await pool.query('select name from customers where organization_id=$1 and id=$2',[organizations[1],(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id])).rows[0].name;
   const foreignCustomer=(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id;

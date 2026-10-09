@@ -38,6 +38,7 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
  if(global)suites.add('theme-selfcheck');
  if(paths.some(p=>/^(components\/(ui|binso-ux|form-wizard|ux-lab)|scripts\/(eslint\/central-ui|ui-foundation-test))/.test(p)))suites.add('ui-foundation-test');
