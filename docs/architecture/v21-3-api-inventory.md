@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-95 API route files, 21 client consumers, 46 migrations, 95 declared tables.
+95 API route files, 23 client consumers, 46 migrations, 95 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -24,11 +24,11 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/billing/checkout` | POST | `app/api/billing/checkout/route.ts` | `requireSession:15`, `authorize:15`, `query:22`, `withTenant:25` |
 | `/api/billing/portal` | POST | `app/api/billing/portal/route.ts` | `requireSession:1`, `authorize:1`, `query:1` |
 | `/api/billing/webhook` | POST | `app/api/billing/webhook/route.ts` | `withPlatform:14` |
-| `/api/customers/[id]/activity` | GET | `app/api/customers/[id]/activity/route.ts` | `requireSession:6`, `authorize:6`, `withTenant:7`, `c.query:15` |
+| `/api/customers/[id]/activity` | GET | `app/api/customers/[id]/activity/route.ts` | `requireSession:6`, `authorize:6`, `withTenant:7` |
 | `/api/customers/[id]/contacts/[contactId]` | PATCH, DELETE | `app/api/customers/[id]/contacts/[contactId]/route.ts` | `authorize:8`, `authorize:11` |
 | `/api/customers/[id]/contacts` | GET, POST | `app/api/customers/[id]/contacts/route.ts` | `tenantList:13`, `authorize:27` |
 | `/api/customers/[id]/documents` | GET | `app/api/customers/[id]/documents/route.ts` | `tenantList:7` |
-| `/api/customers/[id]` | GET, PATCH, DELETE | `app/api/customers/[id]/route.ts` | `requireSession:11`, `authorize:11`, `tenantList:11`, `requireSession:15`, `authorize:15`, `requireSession:22`, `authorize:22` |
+| `/api/customers/[id]` | GET, PATCH, DELETE | `app/api/customers/[id]/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:14`, `tenantList:14`, `requireSession:18`, `authorize:18`, `requireSession:25`, `authorize:25` |
 | `/api/customers` | GET, POST | `app/api/customers/route.ts` | `requireSession:10`, `authorize:10`, `requireSession:15`, `authorize:15` |
 | `/api/dashboard` | GET | `app/api/dashboard/route.ts` | `requireSession:11`, `authorize:13`, `authorize:14`, `withTenant:15` |
 | `/api/demo/dashboard` | GET | `app/api/demo/dashboard/route.ts` |  |
@@ -70,7 +70,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/operator/finance` | GET | `app/api/operator/finance/route.ts` | `requireOperatorSession:8`, `authorizeOperator:8`, `withPlatform:9`, `c.query:11`, `c.query:12`, `c.query:13` |
 | `/api/operator/integrations/email-test` | POST | `app/api/operator/integrations/email-test/route.ts` | `authorizeOperator:9`, `requireOperatorSession:11` |
 | `/api/operator/logout` | POST | `app/api/operator/logout/route.ts` |  |
-| `/api/operator/monitoring` | GET | `app/api/operator/monitoring/route.ts` | `requireOperatorSession:15`, `authorizeOperator:15`, `withPlatform:17`, `c.query:18`, `c.query:19`, `c.query:20` |
+| `/api/operator/monitoring` | GET | `app/api/operator/monitoring/route.ts` | `requireOperatorSession:15`, `authorizeOperator:15`, `withPlatform:17`, `c.query:18`, `c.query:19`, `c.query:20`, `c.query:21` |
 | `/api/operator/payments` | GET | `app/api/operator/payments/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |
 | `/api/operator/restrictions/[id]` | PATCH | `app/api/operator/restrictions/[id]/route.ts` | `authorizeOperator:9`, `requireOperatorSession:14` |
 | `/api/operator/restrictions` | GET, POST | `app/api/operator/restrictions/route.ts` | `authorizeOperator:11`, `authorizeOperator:22`, `requireOperatorSession:27` |

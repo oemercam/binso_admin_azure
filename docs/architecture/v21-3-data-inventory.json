@@ -3,7 +3,7 @@
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
     "apis": 95,
-    "consumers": 21,
+    "consumers": 23,
     "migrations": 46,
     "tables": 95
   },
@@ -776,6 +776,7 @@
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
+        "lib/server/repositories/customer-activity.ts",
         "lib/server/http.ts"
       ],
       "evidence": [
@@ -798,15 +799,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n const sources=[`select created_at at,'Kunde erstellt' title,name detail from customers where organization_id=$1 and id=$2 and archived_at is null`,`select created_at at,'Kontakt hinzugefügt' title,name detail from customer_contacts where organization_id=$1 and customer_id=$2 and archived_at is null`];\n if(tenantCan(s.role,'invoices:read'))sources.push(`select created_at at,'Rechnung erstellt' title,invoice_no detail from invoices where organization_id=$1 and customer_id=$2 and archived_at is null`);\n if(tenantCan(s.role,'sales:read')){sources.push(`select created_at at,'Angebot erstellt' title,quote_no detail from quotes where organization_id=$1 and customer_id=$2 and archived_at is null`);sources.push(`select decision_at at,case status when 'accepted' then 'Angebot angenommen' else 'Angebot abgelehnt' end title,quote_no detail from quotes where organization_id=$1 and customer_id=$2 and archived_at is null and decision_at is not null and status in ('accepted','declined')`);}\n if(tenantCan(s.role,'payments:read'))sources.push(`select p.payment_date::timestamptz at,'Zahlung erhalten' title,i.invoice_no||' · '||p.amount::text||' '||i.currency detail from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched'`);\n if(tenantCan(s.role,'projects:read'))sources.push(`select created_at at,'Projekt erstellt' title,name detail from projects where organization_id=$1 and customer_id=$2 and archived_at is null`);\n if(tenantCan(s.role,'time:read'))sources.push(`select t.work_date::timestamptz at,'Arbeitszeit erfasst' title,t.hours::text||' h · '||coalesce(p.name,t.project_label,'Arbeitszeit')||' · '||t.person_name detail from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id where t.organization_id=$1 and t.customer_id=$2 and t.archived_at is null ${ownRecordOnly(s.role,'zeiterfassung')?'and t.created_by_user_id=$3':''}`);\n for(const [kind,table,number,permission] of [['invoice','invoices','invoice_no','invoices:read'],['offer','quotes','quote_no','sales:read']] as const){if(tenantCan(s.role,permission))sources.push(`select x.completed_at at,'${kind==='invoice'?'Rechnung':'Angebot'} versendet' title,d.${number} detail from document_deliveries x join ${table} d on d.id=x.document_id and d.organization_id=x.organization_id where x.organization_id=$1 and d.customer_id=$2 and x.kind='${kind}' and x.status='sent' and x.completed_at is not null`);}\n const needsUser=sources.some(source=>source.includes('$3'));return (await c.query(`select * from (${sources.join(' union all ')}) events order by at desc,title,detail limit 100`,needsUser?[s.organizationId,id,s.userId]:[s.organizationId,id])).rows;}"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 15,
-          "arguments": [
-            "`select * from (${sources.join(' union all ')}) events order by at desc,title,detail limit 100`",
-            "needsUser?[s.organizationId,id,s.userId]:[s.organizationId,id]"
+            "c=>customerActivity(c,s,id)"
           ]
         }
       ]
@@ -976,25 +969,38 @@
         "lib/money.ts",
         "lib/qr-bill.ts",
         "lib/server/plan-access.ts",
+        "lib/server/repositories/customer-workspace.ts",
+        "lib/server/repositories/financial-summary.ts",
+        "lib/server/repositories/customer-activity.ts",
         "lib/server/validation.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 11,
+          "line": 14,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 11,
+          "line": 14,
           "arguments": [
             "s",
             "\"customers:read\""
           ]
         },
         {
+          "callee": "withTenant",
+          "line": 14,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>customerWorkspace(c,s,id)",
+            "{snapshot:true}"
+          ]
+        },
+        {
           "callee": "tenantList",
-          "line": 11,
+          "line": 14,
           "arguments": [
             "\"customers\"",
             "\"*\"",
@@ -1003,12 +1009,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 15,
+          "line": 18,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 15,
+          "line": 18,
           "arguments": [
             "s",
             "\"customers:write\""
@@ -1016,12 +1022,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 22,
+          "line": 25,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 22,
+          "line": 25,
           "arguments": [
             "s",
             "\"customers:delete\""
@@ -2036,13 +2042,13 @@
       ],
       "dependencies": [
         "lib/server/file-relations.ts",
-        "lib/permissions.ts",
         "lib/server/http.ts",
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
+        "lib/permissions.ts",
         "lib/server/storage.ts"
       ],
       "evidence": [
@@ -2095,13 +2101,13 @@
       ],
       "dependencies": [
         "lib/server/file-relations.ts",
-        "lib/permissions.ts",
         "lib/server/file-validation.ts",
         "lib/server/http.ts",
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/permissions.ts",
         "lib/server/rbac.ts"
       ],
       "evidence": [
@@ -3018,7 +3024,7 @@
           "callee": "withPlatform",
           "line": 17,
           "arguments": [
-            "async c=>{\n      const incidents=await c.query(\"select id,title,status,started_at,resolved_at,public_message note,'Plattform' service from platform_incidents where status<>'resolved' order by started_at desc limit 100\");\n      const vitals=await c.query<{metric:string;value:number;rating:string;route:string;created_at:string}>(\"select metric,value,rating,route,created_at from web_vitals where created_at>=now()-interval '7 days' order by created_at desc limit 2000\");\n      const billing=await c.query(\"select external_event_id event_id,event_type,status,processed_at from billing_webhook_events order by received_at desc limit 25\");\n      return {incidents:incidents.rows,vitals:vitals.rows,billingEvents:billing.rows};\n    }"
+            "async c=>{\n      const incidents=await c.query(\"select id,title,status,started_at,resolved_at,public_message note,'Plattform' service from platform_incidents where status<>'resolved' order by started_at desc limit 100\");\n      const vitals=await c.query<{metric:string;value:number;rating:string;route:string;created_at:string}>(\"select metric,value,rating,route,created_at from web_vitals where created_at>=now()-interval '7 days' order by created_at desc limit 2000\");\n      const billing=await c.query(\"select external_event_id event_id,event_type,status,processed_at from billing_webhook_events order by received_at desc limit 25\");\n      const queue=await c.query(\"select status,count(*)::int count,min(updated_at) oldest from mail_outbox where status in ('queued','failed','uncertain') or status='sending' and updated_at<now()-interval '5 minutes' group by status order by status\");\n      return {incidents:incidents.rows,vitals:vitals.rows,billingEvents:billing.rows,mailQueue:queue.rows};\n    }"
           ]
         },
         {
@@ -3040,6 +3046,13 @@
           "line": 20,
           "arguments": [
             "\"select external_event_id event_id,event_type,status,processed_at from billing_webhook_events order by received_at desc limit 25\""
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 21,
+          "arguments": [
+            "\"select status,count(*)::int count,min(updated_at) oldest from mail_outbox where status in ('queued','failed','uncertain') or status='sending' and updated_at<now()-interval '5 minutes' group by status order by status\""
           ]
         }
       ]
@@ -4883,77 +4896,63 @@
       "calls": [
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then(session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }).catch",
-          "line": 85,
+          "line": 87,
           "arguments": [
             "error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}}"
           ]
         },
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then",
-          "line": 85,
+          "line": 87,
           "arguments": [
             "session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 85,
+          "line": 87,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
+          "callee": "useApiQuery",
+          "line": 159,
+          "arguments": [
+            "production?\"/api/notifications\":null"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 165,
+          "arguments": [
+            "production?\"/api/settings/profile\":null"
+          ]
+        },
+        {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then(payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})})\n        .catch",
-          "line": 243,
+          "line": 249,
           "arguments": [
             "error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:\"Suche konnte nicht geladen werden.\"})}"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then",
-          "line": 243,
+          "line": 249,
           "arguments": [
             "payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 243,
+          "line": 249,
           "arguments": [
             "\"/api/search?q=\"+encodeURIComponent(term)"
           ]
         },
         {
-          "callee": "apiGet",
-          "line": 258,
-          "arguments": [
-            "\"/api/notifications\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:NotificationItem[]}>(\"/api/notifications\")\n      .then(payload=>queueMicrotask(()=>setNotifications(payload.items)))\n      .catch",
-          "line": 269,
-          "arguments": [
-            "()=>undefined"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:NotificationItem[]}>(\"/api/notifications\")\n      .then",
-          "line": 269,
-          "arguments": [
-            "payload=>queueMicrotask(()=>setNotifications(payload.items))"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 269,
-          "arguments": [
-            "\"/api/notifications\""
-          ]
-        },
-        {
           "callee": "apiPatch",
-          "line": 282,
+          "line": 268,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -4961,31 +4960,10 @@
         },
         {
           "callee": "apiPatch",
-          "line": 291,
+          "line": 277,
           "arguments": [
             "\"/api/notifications\"",
             "{all:true}"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string}>(\"/api/settings/profile\").then(({item,email})=>{if(active)setProfile({name:String(item?.display_name||[item?.first_name,item?.last_name].filter(Boolean).join(\" \")||\"\"),identity:String(email||\"\"),avatar:String(item?.avatar_url||\"\")})}).catch",
-          "line": 295,
-          "arguments": [
-            "()=>undefined"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string}>(\"/api/settings/profile\").then",
-          "line": 295,
-          "arguments": [
-            "({item,email})=>{if(active)setProfile({name:String(item?.display_name||[item?.first_name,item?.last_name].filter(Boolean).join(\" \")||\"\"),identity:String(email||\"\"),avatar:String(item?.avatar_url||\"\")})}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 295,
-          "arguments": [
-            "\"/api/settings/profile\""
           ]
         }
       ],
@@ -5052,35 +5030,35 @@
       "calls": [
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then(({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})).catch(e=>setError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then(({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})).catch",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "e=>setError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/documents\").then",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "({item})=>queueMicrotask(()=>{setVatRate(String(item.vat_rate??\"8.1\"));setTerms(String(item.payment_terms_days??\"30\"));setIban(String(item.iban??\"\"));setQrIban(String(item.qr_iban??\"\"));setInvoiceIntro(String(item.invoice_intro_text??\"\"));setInvoiceFooter(String(item.invoice_footer_text??\"\"));setQuoteIntro(String(item.quote_intro_text??\"\"));setQuoteFooter(String(item.quote_footer_text??\"\"))})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "\"/api/settings/documents\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 16,
+          "line": 18,
           "arguments": [
             "\"/api/settings/documents\"",
             "{vatRate:Number(vatRate),paymentTermsDays:Number(terms),iban,qrIban,invoiceIntroText:invoiceIntro,invoiceFooterText:invoiceFooter,quoteIntroText:quoteIntro,quoteFooterText:quoteFooter}"
@@ -5096,112 +5074,112 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 59,
+          "line": 60,
           "arguments": [
             "isProductionBackendEnabled()?\"/api/customers\":\"/api/demo/data?collection=customers\""
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 198,
+          "line": 199,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 198,
+          "line": 199,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 198,
+          "line": 199,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 233,
+          "line": 234,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 233,
+          "line": 234,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 233,
+          "line": 234,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/documents/\"+encodeURIComponent(sourceOffer))\n        .then(payload=>queueMicrotask(()=>{\n          const source=remoteDraftFromItem(payload.item,\"Angebot\");\n          setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));\n        })).catch",
-          "line": 255,
+          "line": 257,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/documents/\"+encodeURIComponent(sourceOffer))\n        .then",
-          "line": 255,
+          "line": 257,
           "arguments": [
             "payload=>queueMicrotask(()=>{\n          const source=remoteDraftFromItem(payload.item,\"Angebot\");\n          setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));\n        })"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 255,
+          "line": 257,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(sourceOffer)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],\"Angebot\");setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));}}).catch",
-          "line": 262,
+          "line": 264,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)).then",
-          "line": 262,
+          "line": 264,
           "arguments": [
             "payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],\"Angebot\");setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));}}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 262,
+          "line": 264,
           "arguments": [
             "\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 272,
+          "line": 274,
           "arguments": [
             "\"/api/time-entries/billing?ids=\"+encodeURIComponent(sourceTimeEntriesParam)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 273,
+          "line": 275,
           "arguments": [
             "\"/api/expenses/billing?ids=\"+encodeURIComponent(sourceExpenseParam)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 306,
+          "line": 309,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload"
@@ -5209,7 +5187,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 306,
+          "line": 309,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -5218,7 +5196,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 322,
+          "line": 325,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -5226,14 +5204,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 322,
+          "line": 325,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 323,
+          "line": 326,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey}"
@@ -5241,14 +5219,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 323,
+          "line": 326,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "fetch",
-          "line": 510,
+          "line": 515,
           "arguments": [
             "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
             "fileUrl||pdfNumber?undefined:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}"
@@ -5256,28 +5234,28 @@
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then(data=>{if(active){setCompany(data.item);setError(null);}})\n     .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:\"Firmendaten konnten nicht geladen werden.\");})\n     .finally",
-          "line": 532,
+          "line": 537,
           "arguments": [
             "()=>{if(active)setLoading(false);}"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then(data=>{if(active){setCompany(data.item);setError(null);}})\n     .catch",
-          "line": 532,
+          "line": 537,
           "arguments": [
             "reason=>{if(active)setError(reason instanceof Error?reason.message:\"Firmendaten konnten nicht geladen werden.\");}"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then",
-          "line": 532,
+          "line": 537,
           "arguments": [
             "data=>{if(active){setCompany(data.item);setError(null);}}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 532,
+          "line": 537,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -5295,6 +5273,52 @@
         "app/einstellungen/sprache/page.tsx",
         "app/rechnungen/[id]/page.tsx",
         "app/rechnungen/neu/page.tsx"
+      ]
+    },
+    {
+      "file": "components/entity-files.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 14,
+          "arguments": [
+            "production?'/api/auth/session':null"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 16,
+          "arguments": [
+            "production&&relation&&entityId?'/api/files?'+relation.filter+'='+encodeURIComponent(entityId):null"
+          ]
+        },
+        {
+          "callee": "apiUpload",
+          "line": 20,
+          "arguments": [
+            "'/api/files'",
+            "form"
+          ]
+        }
+      ],
+      "pages": [
+        "app/angebote/[id]/page.tsx",
+        "app/angebote/neu/page.tsx",
+        "app/einstellungen/abonnement/page.tsx",
+        "app/einstellungen/benachrichtigungen/page.tsx",
+        "app/einstellungen/darstellung/page.tsx",
+        "app/einstellungen/firma/page.tsx",
+        "app/einstellungen/konto/page.tsx",
+        "app/einstellungen/page.tsx",
+        "app/einstellungen/sprache/page.tsx",
+        "app/kunden/[id]/bearbeiten/page.tsx",
+        "app/kunden/[id]/page.tsx",
+        "app/kunden/neu/page.tsx",
+        "app/kunden/page.tsx",
+        "app/preview/zeit/page.tsx",
+        "app/rechnungen/[id]/page.tsx",
+        "app/rechnungen/neu/page.tsx",
+        "app/zeit/page.tsx"
       ]
     },
     {
@@ -5631,35 +5655,35 @@
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then(payload=>setItems(payload.items))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 714,
+          "line": 715,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then(payload=>setItems(payload.items))\n      .catch",
-          "line": 714,
+          "line": 715,
           "arguments": [
             "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/announcements\")\n      .then",
-          "line": 714,
+          "line": 715,
           "arguments": [
             "payload=>setItems(payload.items)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 714,
+          "line": 715,
           "arguments": [
             "\"/api/operator/announcements\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 733,
+          "line": 734,
           "arguments": [
             "\"/api/operator/announcements\"",
             "{title,body,kind,audience,published:true}"
@@ -5667,56 +5691,56 @@
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 769,
+          "line": 770,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 769,
+          "line": 770,
           "arguments": [
             "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/users\")\n      .then",
-          "line": 769,
+          "line": 770,
           "arguments": [
             "payload=>queueMicrotask(()=>setItems(payload.items))"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 769,
+          "line": 770,
           "arguments": [
             "\"/api/operator/users\""
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch(e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")).finally",
-          "line": 809,
+          "line": 810,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then(payload=>queueMicrotask(()=>setItems(payload.items)))\n      .catch",
-          "line": 809,
+          "line": 810,
           "arguments": [
             "e=>setLoadError(e instanceof Error?e.message:\"Daten konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/operator/audit\")\n      .then",
-          "line": 809,
+          "line": 810,
           "arguments": [
             "payload=>queueMicrotask(()=>setItems(payload.items))"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 809,
+          "line": 810,
           "arguments": [
             "\"/api/operator/audit\""
           ]
@@ -5732,115 +5756,31 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 26,
+          "line": 27,
           "arguments": [
             "\"customers\"",
             "customers"
           ]
         },
         {
-          "callee": "apiGet<{items:typeof customerActivity}>(\"/api/customers/\"+encodeURIComponent(customerId)+\"/activity\").then(data=>{if(active)setCustomerActivity(data.items)}).catch",
-          "line": 69,
+          "callee": "useApiQuery",
+          "line": 40,
           "arguments": [
-            "()=>undefined"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:typeof customerActivity}>(\"/api/customers/\"+encodeURIComponent(customerId)+\"/activity\").then",
-          "line": 69,
-          "arguments": [
-            "data=>{if(active)setCustomerActivity(data.items)}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 69,
-          "arguments": [
-            "\"/api/customers/\"+encodeURIComponent(customerId)+\"/activity\""
-          ]
-        },
-        {
-          "callee": "apiGet<FinancialSummary>(\"/api/finance/overview?customerId=\"+encodeURIComponent(customerId)).then(data=>{if(active)setCustomerSummary(data)}).catch",
-          "line": 70,
-          "arguments": [
-            "()=>undefined"
-          ]
-        },
-        {
-          "callee": "apiGet<FinancialSummary>(\"/api/finance/overview?customerId=\"+encodeURIComponent(customerId)).then",
-          "line": 70,
-          "arguments": [
-            "data=>{if(active)setCustomerSummary(data)}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 70,
-          "arguments": [
-            "\"/api/finance/overview?customerId=\"+encodeURIComponent(customerId)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 72,
-          "arguments": [
-            "\"/api/customers/\"+encodeURIComponent(customerId)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 73,
-          "arguments": [
-            "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/customers/\"+encodeURIComponent(customerId)+\"/documents\").catch",
-          "line": 74,
-          "arguments": [
-            "e=>{if(active)setCustomerDocumentsError(e.message);return {items:[]}}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 74,
-          "arguments": [
-            "\"/api/customers/\"+encodeURIComponent(customerId)+\"/documents\""
+            "production?\"/api/customers/\"+encodeURIComponent(customerId)+\"?include=workspace\":null"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 91,
+          "line": 76,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
-          "callee": "apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);}).catch(e=>setRecordError(e instanceof Error?e.message:\"Kunde konnte nicht geladen werden.\")).finally",
-          "line": 161,
+          "callee": "useApiQuery",
+          "line": 141,
           "arguments": [
-            "()=>setLoadingRecord(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then(({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);}).catch",
-          "line": 161,
-          "arguments": [
-            "e=>setRecordError(e instanceof Error?e.message:\"Kunde konnte nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item:Record<string,unknown>}>('/api/customers/'+encodeURIComponent(customerId)).then",
-          "line": 161,
-          "arguments": [
-            "({item})=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 161,
-          "arguments": [
-            "'/api/customers/'+encodeURIComponent(customerId)"
+            "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
           ]
         }
       ],
@@ -5872,36 +5812,43 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 26,
+          "line": 27,
           "arguments": [
             "\"employees\"",
             "employees"
           ]
         },
         {
+          "callee": "useApiQuery",
+          "line": 50,
+          "arguments": [
+            "existing&&employeeId?(production?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)):null"
+          ]
+        },
+        {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))).catch",
-          "line": 59,
+          "line": 62,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 59,
+          "line": 62,
           "arguments": [
             "data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 59,
+          "line": 62,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 65,
+          "line": 68,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -5909,56 +5856,28 @@
         },
         {
           "callee": "apiGet",
-          "line": 77,
+          "line": 80,
           "arguments": [
             "\"/api/time-entries?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 78,
+          "line": 81,
           "arguments": [
             "\"/api/expenses?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 79,
+          "line": 82,
           "arguments": [
             "\"/api/files?employeeId=\"+encoded"
           ]
         },
         {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Mitarbeiter wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setFirstName(String(item.first_name??\"\"));\n        setLastName(String(item.last_name??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n        setRole(String(item.job_title??\"\"));\n        setLoad(String(Number(item.workload_percent??100)));\n        setEntryDate(String(item.entry_date??item.start_date??\"\").slice(0,10));\n        setWeeklyHours(String(Number(item.weekly_hours??42)));\n        setVacationDays(String(Number(item.vacation_days??25)));\n        setAddress(String(item.address??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");\n        markPristine([String(item.first_name??\"\"),String(item.last_name??\"\"),String(item.email??\"\"),String(item.phone??\"\"),String(item.job_title??\"\"),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??\"\").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }).catch(error=>setRecordError(error instanceof Error?error.message:\"Mitarbeiter konnte nicht geladen werden.\")).finally",
-          "line": 91,
-          "arguments": [
-            "()=>setLoadingRecord(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Mitarbeiter wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setFirstName(String(item.first_name??\"\"));\n        setLastName(String(item.last_name??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n        setRole(String(item.job_title??\"\"));\n        setLoad(String(Number(item.workload_percent??100)));\n        setEntryDate(String(item.entry_date??item.start_date??\"\").slice(0,10));\n        setWeeklyHours(String(Number(item.weekly_hours??42)));\n        setVacationDays(String(Number(item.vacation_days??25)));\n        setAddress(String(item.address??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");\n        markPristine([String(item.first_name??\"\"),String(item.last_name??\"\"),String(item.email??\"\"),String(item.phone??\"\"),String(item.job_title??\"\"),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??\"\").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }).catch",
-          "line": 91,
-          "arguments": [
-            "error=>setRecordError(error instanceof Error?error.message:\"Mitarbeiter konnte nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)).then",
-          "line": 91,
-          "arguments": [
-            "payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Mitarbeiter wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setFirstName(String(item.first_name??\"\"));\n        setLastName(String(item.last_name??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n        setRole(String(item.job_title??\"\"));\n        setLoad(String(Number(item.workload_percent??100)));\n        setEntryDate(String(item.entry_date??item.start_date??\"\").slice(0,10));\n        setWeeklyHours(String(Number(item.weekly_hours??42)));\n        setVacationDays(String(Number(item.vacation_days??25)));\n        setAddress(String(item.address??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");\n        markPristine([String(item.first_name??\"\"),String(item.last_name??\"\"),String(item.email??\"\"),String(item.phone??\"\"),String(item.job_title??\"\"),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??\"\").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 91,
-          "arguments": [
-            "isProductionBackendEnabled()?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)"
-          ]
-        },
-        {
           "callee": "apiPatch",
-          "line": 120,
+          "line": 121,
           "arguments": [
             "\"/api/employees/\"+encodeURIComponent(employeeId)",
             "payload"
@@ -5966,7 +5885,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 121,
+          "line": 122,
           "arguments": [
             "\"/api/employees\"",
             "payload"
@@ -6221,36 +6140,15 @@
       "file": "components/pages/notifications.tsx",
       "calls": [
         {
-          "callee": "apiGet",
-          "line": 50,
+          "callee": "useApiQuery",
+          "line": 36,
           "arguments": [
-            "\"/api/notifications\""
-          ]
-        },
-        {
-          "callee": "apiGet<{items:NotificationRecord[]}>(\"/api/notifications\")\n      .then(payload=>queueMicrotask(()=>{setRemoteItems(payload.items);setLoading(false);}))\n      .catch",
-          "line": 61,
-          "arguments": [
-            "err=>queueMicrotask(()=>{setError(err instanceof Error?err.message:\"Benachrichtigungen konnten nicht geladen werden.\");setLoading(false);})"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:NotificationRecord[]}>(\"/api/notifications\")\n      .then",
-          "line": 61,
-          "arguments": [
-            "payload=>queueMicrotask(()=>{setRemoteItems(payload.items);setLoading(false);})"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 61,
-          "arguments": [
-            "\"/api/notifications\""
+            "production?\"/api/notifications\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 69,
+          "line": 50,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -6258,10 +6156,10 @@
         },
         {
           "callee": "apiPatch",
-          "line": 78,
+          "line": 54,
           "arguments": [
             "\"/api/notifications\"",
-            "{action:\"read_all\"}"
+            "{all:true}"
           ]
         }
       ],
@@ -6315,38 +6213,17 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 20,
+          "line": 21,
           "arguments": [
             "\"products\"",
             "products"
           ]
         },
         {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Produkt wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setType(item.kind===\"product\"?\"Produkt\":\"Dienstleistung\");\n        setSku(String(item.sku??\"\"));\n        setUnit(String(item.unit??\"hour\"));\n        setPrice(String(item.unit_price??\"0.00\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setDescription(String(item.description??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");markPristine([String(item.name??\"\"),item.kind===\"product\"?\"Produkt\":\"Dienstleistung\",String(item.sku??\"\"),String(item.unit??\"hour\"),String(item.unit_price??\"0.00\"),String(item.vat_rate??\"8.1\"),String(item.description??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }).catch(error=>setRecordError(error instanceof Error?error.message:\"Produkt konnte nicht geladen werden.\")).finally",
-          "line": 48,
+          "callee": "useApiQuery",
+          "line": 39,
           "arguments": [
-            "()=>setLoadingRecord(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)).then(payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Produkt wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setType(item.kind===\"product\"?\"Produkt\":\"Dienstleistung\");\n        setSku(String(item.sku??\"\"));\n        setUnit(String(item.unit??\"hour\"));\n        setPrice(String(item.unit_price??\"0.00\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setDescription(String(item.description??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");markPristine([String(item.name??\"\"),item.kind===\"product\"?\"Produkt\":\"Dienstleistung\",String(item.sku??\"\"),String(item.unit??\"hour\"),String(item.unit_price??\"0.00\"),String(item.vat_rate??\"8.1\"),String(item.description??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }).catch",
-          "line": 48,
-          "arguments": [
-            "error=>setRecordError(error instanceof Error?error.message:\"Produkt konnte nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(isProductionBackendEnabled()?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)).then",
-          "line": 48,
-          "arguments": [
-            "payload=>{\n      const item=payload.item??payload.items?.[0];\n      if(!item)throw new Error(\"Produkt wurde nicht gefunden.\");\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setType(item.kind===\"product\"?\"Produkt\":\"Dienstleistung\");\n        setSku(String(item.sku??\"\"));\n        setUnit(String(item.unit??\"hour\"));\n        setPrice(String(item.unit_price??\"0.00\"));\n        setVatRate(String(item.vat_rate??\"8.1\"));\n        setDescription(String(item.description??\"\"));\n        setStatus(item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\");markPristine([String(item.name??\"\"),item.kind===\"product\"?\"Produkt\":\"Dienstleistung\",String(item.sku??\"\"),String(item.unit??\"hour\"),String(item.unit_price??\"0.00\"),String(item.vat_rate??\"8.1\"),String(item.description??\"\"),item.status===\"inactive\"?\"Inaktiv\":\"Aktiv\"]);\n      });\n    }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 48,
-          "arguments": [
-            "isProductionBackendEnabled()?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)"
+            "existing&&productId?(production?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)):null"
           ]
         },
         {
@@ -6377,7 +6254,7 @@
       "calls": [
         {
           "callee": "apiUpload",
-          "line": 51,
+          "line": 53,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6385,35 +6262,35 @@
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then(payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }).catch(e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 55,
+          "line": 58,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then(payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }).catch",
-          "line": 55,
+          "line": 58,
           "arguments": [
             "e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>|null;email?:string|null}>(\"/api/settings/profile\")\n      .then",
-          "line": 55,
+          "line": 58,
           "arguments": [
             "payload=>{\n        const item=payload.item??{};\n        queueMicrotask(()=>{\n          setProfileName(String(item.display_name??\"\"));\n          setFirstName(String(item.first_name??\"\"));\n          setLastName(String(item.last_name??\"\"));\n          setEmail(payload.email??\"\");\n          setPhone(String(item.phone??\"\"));\n          setAvatarUrl(String(item.avatar_url??\"\"));\n          setJobTitle(String(item.job_title??\"\"));\n        });\n      }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 55,
+          "line": 58,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 74,
+          "line": 77,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -6421,35 +6298,35 @@
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then(payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }).catch(e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")).finally",
-          "line": 132,
+          "line": 137,
           "arguments": [
             "()=>setLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then(payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }).catch",
-          "line": 132,
+          "line": 137,
           "arguments": [
             "e=>setLoadError(e instanceof Error?e.message:\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/settings/company\").then",
-          "line": 132,
+          "line": 137,
           "arguments": [
             "payload=>{\n      const item=payload.item;\n      queueMicrotask(()=>{\n        setName(String(item.name??\"\"));\n        setUid(String(item.uid??\"\"));\n        setLogoUrl(String(item.logo_url??\"\"));\n        setStreet(String(item.street??\"\"));\n        setPostalCode(String(item.postal_code??\"\"));\n        setCity(String(item.city??\"\"));\n        setEmail(String(item.email??\"\"));\n        setPhone(String(item.phone??\"\"));\n      });\n    }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 132,
+          "line": 137,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 152,
+          "line": 157,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6457,7 +6334,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 153,
+          "line": 158,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,postalCode,city,email,phone}"
@@ -6465,35 +6342,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 214,
+          "line": 219,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 215,
+          "line": 220,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 216,
+          "line": 221,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 230,
+          "line": 235,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 249,
+          "line": 254,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -6501,7 +6378,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 261,
+          "line": 266,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -6509,35 +6386,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 336,
+          "line": 341,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 336,
+          "line": 341,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 336,
+          "line": 341,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 336,
+          "line": 341,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 344,
+          "line": 349,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -6545,28 +6422,28 @@
         },
         {
           "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then(data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}).catch",
-          "line": 358,
+          "line": 363,
           "arguments": [
             "()=>setError(\"Sprache konnte nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then",
-          "line": 358,
+          "line": 363,
           "arguments": [
             "data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 358,
+          "line": 363,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 359,
+          "line": 364,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:code}"
@@ -6634,36 +6511,15 @@
       "file": "components/pages/support.tsx",
       "calls": [
         {
-          "callee": "apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\")\n      .then(payload=>{\n        const statusMap:Record<string,string>={new:\"Neu\",open:\"Offen\",in_progress:\"In Bearbeitung\",waiting_customer:\"Warten auf Kunde\",resolved:\"Gelöst\",closed:\"Geschlossen\"};\n        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||\"Support-Anfrage\",new Date(item.updated_at).toLocaleString(\"de-CH\",{dateStyle:\"short\",timeStyle:\"short\"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));\n      })\n      .catch(error=>setError(error instanceof Error?error.message:\"Tickets konnten nicht geladen werden.\"))\n      .finally",
-          "line": 24,
+          "callee": "useApiQuery",
+          "line": 22,
           "arguments": [
-            "()=>setLoading(false)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\")\n      .then(payload=>{\n        const statusMap:Record<string,string>={new:\"Neu\",open:\"Offen\",in_progress:\"In Bearbeitung\",waiting_customer:\"Warten auf Kunde\",resolved:\"Gelöst\",closed:\"Geschlossen\"};\n        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||\"Support-Anfrage\",new Date(item.updated_at).toLocaleString(\"de-CH\",{dateStyle:\"short\",timeStyle:\"short\"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));\n      })\n      .catch",
-          "line": 24,
-          "arguments": [
-            "error=>setError(error instanceof Error?error.message:\"Tickets konnten nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(isProductionBackendEnabled()?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\")\n      .then",
-          "line": 24,
-          "arguments": [
-            "payload=>{\n        const statusMap:Record<string,string>={new:\"Neu\",open:\"Offen\",in_progress:\"In Bearbeitung\",waiting_customer:\"Warten auf Kunde\",resolved:\"Gelöst\",closed:\"Geschlossen\"};\n        queueMicrotask(()=>setRows(payload.items.map(item=>[item.id,item.subject?.trim()||\"Support-Anfrage\",new Date(item.updated_at).toLocaleString(\"de-CH\",{dateStyle:\"short\",timeStyle:\"short\"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)])));\n      }"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 24,
-          "arguments": [
-            "isProductionBackendEnabled()?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\""
+            "production?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 68,
+          "line": 61,
           "arguments": [
             "\"/api/support/tickets\"",
             "{subject,category,priority:\"normal\",message}"
@@ -6671,7 +6527,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 74,
+          "line": 67,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6679,7 +6535,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 142,
+          "line": 136,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6687,21 +6543,21 @@
         },
         {
           "callee": "apiGet",
-          "line": 158,
+          "line": 152,
           "arguments": [
             "\"/api/support/tickets\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 159,
+          "line": 153,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 177,
+          "line": 171,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\"",
             "{body:value}"
@@ -6719,84 +6575,84 @@
       "calls": [
         {
           "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then(data=>{const role=data.tenant?.role;setCanApprove([\"owner\",\"admin\",\"project_manager\",\"manager\"].includes(role??\"\"));setCanInvoice([\"owner\",\"admin\",\"finance\"].includes(role??\"\"));}).catch",
-          "line": 44,
+          "line": 46,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string}}>(\"/api/auth/session\").then",
-          "line": 44,
+          "line": 46,
           "arguments": [
             "data=>{const role=data.tenant?.role;setCanApprove([\"owner\",\"admin\",\"project_manager\",\"manager\"].includes(role??\"\"));setCanInvoice([\"owner\",\"admin\",\"finance\"].includes(role??\"\"));}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 44,
+          "line": 46,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 63,
+          "line": 65,
           "arguments": [
             "isProductionBackendEnabled()?\"/api/projects\":\"/api/demo/data?collection=projects\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 63,
+          "line": 65,
           "arguments": [
             "isProductionBackendEnabled()?\"/api/customers\":\"/api/demo/data?collection=customers\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 68,
+          "line": 70,
           "arguments": [
             "'/api/documents?kind=invoice'"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?\"/api/time-entries\"+(employeeFilter?\"?employeeId=\"+encodeURIComponent(employeeFilter):\"\"):\"/api/demo/data?collection=time_entries\")\n      .then(payload=>{if(active){setRemoteEntries(payload.items);setEntriesError(null)}})\n      .catch(error=>{if(active)setEntriesError(error instanceof Error?error.message:\"Zeiteinträge konnten nicht geladen werden.\")}).finally",
-          "line": 83,
+          "line": 85,
           "arguments": [
             "()=>{if(active)setEntriesLoading(false)}"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?\"/api/time-entries\"+(employeeFilter?\"?employeeId=\"+encodeURIComponent(employeeFilter):\"\"):\"/api/demo/data?collection=time_entries\")\n      .then(payload=>{if(active){setRemoteEntries(payload.items);setEntriesError(null)}})\n      .catch",
-          "line": 83,
+          "line": 85,
           "arguments": [
             "error=>{if(active)setEntriesError(error instanceof Error?error.message:\"Zeiteinträge konnten nicht geladen werden.\")}"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?\"/api/time-entries\"+(employeeFilter?\"?employeeId=\"+encodeURIComponent(employeeFilter):\"\"):\"/api/demo/data?collection=time_entries\")\n      .then",
-          "line": 83,
+          "line": 85,
           "arguments": [
             "payload=>{if(active){setRemoteEntries(payload.items);setEntriesError(null)}}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 83,
+          "line": 85,
           "arguments": [
             "isProductionBackendEnabled()?\"/api/time-entries\"+(employeeFilter?\"?employeeId=\"+encodeURIComponent(employeeFilter):\"\"):\"/api/demo/data?collection=time_entries\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 109,
+          "line": 111,
           "arguments": [
             "\"/api/time-entries\"+(employeeFilter?\"?employeeId=\"+encodeURIComponent(employeeFilter):\"\")"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 128,
+          "line": 130,
           "arguments": [
             "\"/api/time-entries\"",
             "{customerId:manualCustomer||null,projectId:manualProject||null,projectName:availableProjects.find(item=>item.id===manualProject)?.name||(manualCustomer?\"Arbeitszeit\":manualInternalCategory),description:manualDescription,startedAt:manualDate+\"T12:00:00\",durationMinutes,billable:!!manualCustomer&&manualBillable,salesRate:Number(manualRate)}"
@@ -6804,7 +6660,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 141,
+          "line": 143,
           "arguments": [
             "\"/api/time-entries/\"+encodeURIComponent(id)",
             "{action:\"submit\"}"
@@ -6812,7 +6668,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 142,
+          "line": 144,
           "arguments": [
             "\"/api/time-entries/\"+encodeURIComponent(id)",
             "{}"
@@ -6976,6 +6832,19 @@
       "pages": [
         "app/einstellungen/sicherheit/page.tsx"
       ]
+    },
+    {
+      "file": "components/session-data-boundary.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 9,
+          "arguments": [
+            "'/api/auth/session'"
+          ]
+        }
+      ],
+      "pages": []
     },
     {
       "file": "components/team-settings.tsx",
@@ -8796,6 +8665,37 @@
       ]
     },
     {
+      "file": "lib/server/repositories/customer-activity.ts",
+      "imports": [
+        "lib/server/session.ts",
+        "lib/permissions.ts"
+      ],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "c.query",
+          "line": 13,
+          "arguments": [
+            "`select * from (${sources.join(' union all ')}) events order by at desc,title,detail limit 100`",
+            "needsUser?[s.organizationId,id,s.userId]:[s.organizationId,id]"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "lib/server/repositories/customer-workspace.ts",
+      "imports": [
+        "lib/server/session.ts",
+        "lib/permissions.ts",
+        "lib/server/http.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/repositories/financial-summary.ts",
+        "lib/server/repositories/customer-activity.ts"
+      ],
+      "methods": [],
+      "calls": []
+    },
+    {
       "file": "lib/server/repositories/customers.ts",
       "imports": [
         "lib/server/db.ts",
@@ -9489,7 +9389,7 @@
       "methods": [],
       "calls": [
         {
-          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);\n    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);\n    lastIdentity=identity;\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
+          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.user?.id,payload.tenant?.id,payload.tenant?.role,payload.tenant?.readOnly]);\n    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);\n    lastIdentity=identity;\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
           "line": 22,
           "arguments": []
         },
@@ -9569,21 +9469,21 @@
       "calls": [
         {
           "callee": "apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch",
-          "line": 19,
+          "line": 24,
           "arguments": [
             "error=>{if(active)setState({path,revision,session,data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false});}"
           ]
         },
         {
           "callee": "apiGet<T>(path).then",
-          "line": 19,
+          "line": 24,
           "arguments": [
             "data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 19,
+          "line": 24,
           "arguments": [
             "path"
           ]
