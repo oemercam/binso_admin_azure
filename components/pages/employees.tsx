@@ -15,18 +15,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
-import { RecordRow, RecordsView, TimeEntryRow } from "../records";
+import { RecordRow, RecordsView, RecordsControls, useRecordsController, TimeEntryRow } from "../records";
 import { employees, expenses } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
-import { useDemoRows, swissDate, formatMinutes } from "./shared";
+import { useRecordList, swissDate, formatMinutes } from "./shared";
 
 export function EmployeesPage() {
-  const {rows:employeeRows,loading,error}=useDemoRows("employees",employees);
-  return <AppShell title="Mitarbeiter" subtitle="Team, Rollen und Stammdaten verwalten." active="mitarbeiter" actions={<CreateAction href="/mitarbeiter/neu" label="Mitarbeiter hinzufügen"/>}>
-    <RecordsView countLabel="Mitarbeiter" loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." columns={[{label:"Mitarbeiter",index:0,render:row=><span className="person-record"><Avatar name={row[0]} identity={row[4]?row[3]:row[0]}/><span>{row[0]}</span></span>},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow personIdentity={id} href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
+  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Mitarbeiter",index:0,render:row=><span className="person-record"><Avatar name={row[0]} identity={row[4]?row[3]:row[0]}/><span>{row[0]}</span></span>},{label:"Funktion",index:1},{label:"Pensum",index:2},{label:"Status",index:4,status:true}];
+  const chips=["Alle","Aktiv","Inaktiv"];
+  const {rows:employeeRows,total,controller,pagination,loading,error}=useRecordList("employees",{placeholder:"Mitarbeiter suchen...",chips,columns,sortFields:{0:"name",1:"job_title",2:"workload_percent",4:"status"},defaultOrder:"name.asc",filterValues:{Aktiv:{field:"status",value:"active"},Inaktiv:{field:"status",value:"inactive"}}});
+  return <AppShell title="Mitarbeiter" subtitle={loading?"Wird geladen…":`${total} Mitarbeiter`} active="mitarbeiter" actions={<RecordsControls controller={controller} placeholder="Mitarbeiter suchen..." chips={chips} columns={columns}><CreateAction href="/mitarbeiter/neu" label="Mitarbeiter hinzufügen"/></RecordsControls>}>
+    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Mitarbeiter" loading={loading} error={error} items={employeeRows} placeholder="Mitarbeiter suchen..." chips={chips} columns={columns} rowHref={row=>`/mitarbeiter/${row[4]?row[3]:"thomas"}`}>{(row)=>{const [name,role,load,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"thomas";const status=statusMaybe??idOrStatus;return <RecordRow personIdentity={id} href={"/mitarbeiter/"+id} icon="users" title={name} meta={`${role} · ${load}`} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 

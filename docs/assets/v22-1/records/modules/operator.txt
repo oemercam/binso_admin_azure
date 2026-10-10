@@ -1,0 +1,9 @@
+Checking light 390px
+Checking light 1440px
+Route /operator/abonnemente
+Route /operator/abonnemente
+Checking dark 390px
+Checking dark 1440px
+Route /operator/abonnemente
+Route /operator/abonnemente
+UX browser checks passed: 4 route/theme/viewport combinations ; interactions: operator. Artifacts: /tmp/binso-v22-operator-regression-final

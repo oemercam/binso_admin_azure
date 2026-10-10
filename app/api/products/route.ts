@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList } from "@/lib/server/database";
+import { tenantInsert, tenantListPage } from "@/lib/server/database";
 
 type ProductBody={name?:unknown;kind?:unknown;sku?:unknown;unit?:unknown;unitPrice?:unknown;vatRate?:unknown;description?:unknown;status?:unknown};
 
-export async function GET(){
-  try{return json({items:await tenantList("products","id,name,kind,sku,unit,unit_price,vat_rate,description,status,created_at","order=created_at.desc")});}
+export async function GET(request:NextRequest){
+  try{return json(await tenantListPage("products",request.nextUrl.searchParams));}
   catch(error){return apiError(error);}
 }
 

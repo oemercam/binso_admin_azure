@@ -697,6 +697,15 @@ try{
  console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
  await db.exec('begin');
  try{
+  for(const [table,fields] of Object.entries({products:['name','kind','unit_price','status'],employees:['name','job_title','workload_percent','status'],expenses:['merchant','employee_name','amount','status'],payments:['paid_on','customer_name','invoice_number','amount','status']})){
+   for(const field of fields)for(const direction of ['asc','desc'])assert.ok((await listApiBusiness(client,session,table,'order='+field+'.'+direction+'&limit=1')).length>0,'Every offered module sort resolves against actual authorized database fields');
+  }
+  await db.query("insert into products_services(organization_id,external_id,name,item_type,sku,unit,unit_price,vat_rate,status) values($1,'native-sort-low','Native money sort low','service','SKU-V22-11','hour',9,8.1,'active'),($1,'native-sort-high','Native money sort high','service','SKU-V22-22','hour',10000,8.1,'active')",[demo]);
+  const nativePrice=await listApiBusiness(client,session,'products','q=Native%20money%20sort&order=unit_price.desc&limit=1');
+  assert.equal(Number(nativePrice[0].unit_price),10000,'Money is sorted numerically in SQL before the page limit');
+  assert.equal((await listApiBusiness(client,session,'products','q=SKU%20V22%2022&kind=eq.service'))[0].name,'Native money sort high','Search includes actual SKU values absent from displayed list rows');
+  assert.equal((await listApiBusiness(client,session,'products','q=SKU%20V22%2022&kind=eq.product')).length,0,'Only the selected product type is returned');
+  assert.equal((await listApiBusiness(client,{...session,organizationId:sandbox},'products','q=SKU%20V22%2022')).length,0,'Module search cannot expose another tenant inventory');
   await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) select $1,'search-bulk-'||i,'K-SYN-'||i,'Search bulk '||i,'active',now()-interval '1 day' from generate_series(1,1001) i",[demo]);
   const target=(await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) values($1,'search-target','K-998877','Search target Zürich AG','active',now()-interval '2 days') returning id",[demo])).rows[0];
   assert.equal((await listApiBusiness(client,session,'customers','')).some(row=>row.id===target.id),false,'The target is beyond the old 1000-record loaded window');

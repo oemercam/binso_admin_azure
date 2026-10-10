@@ -1,0 +1,674 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "customers",
+    "products",
+    "employees",
+    "expenses"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/mitarbeiter",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/spesen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/zahlungen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/zahlungen",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

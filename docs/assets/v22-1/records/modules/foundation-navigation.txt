@@ -1,0 +1,3 @@
+UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.
+Wizard first/middle/final actions and architecture ownership passed.
+Customer and operator bottom navigation: markup, access/display/scroll logic, icons, styles and transitive tokens unchanged against 1eef9fb1d005d4752f12a9dd5c0e620decca4444.

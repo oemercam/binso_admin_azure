@@ -54,7 +54,7 @@ console.log('Search respects member record ownership.');
 for(const path of ['app/api/expenses/route.ts','app/api/expenses/[id]/route.ts']){
  for(const role of ['member','reader','hr','finance','owner','admin','project_manager']){
   let writes=0;
-  const databaseUrl=moduleUrl(`export async function requireTenantFeature(){return {role:${JSON.stringify(role)}}} export async function tenantList(){return []} export async function tenantInsert(){globalThis.__expenseWrites++;return [{id:'expense'}]} export async function tenantUpdate(){globalThis.__expenseWrites++;return [{id:'expense'}]}`);
+  const databaseUrl=moduleUrl(`export async function requireTenantFeature(){return {role:${JSON.stringify(role)}}} export async function tenantList(){return []} export async function tenantListPage(){return {items:[],total:0}} export async function tenantInsert(){globalThis.__expenseWrites++;return [{id:'expense'}]} export async function tenantUpdate(){globalThis.__expenseWrites++;return [{id:'expense'}]}`);
   const httpUrl=moduleUrl(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>({status:e.status??500,data:{error:e.code}});`);
   let expenseSource=await fs.readFile(path,'utf8');
   expenseSource=expenseSource.replaceAll('"@/lib/server/http"',JSON.stringify(httpUrl)).replaceAll('"@/lib/server/database"',JSON.stringify(databaseUrl));

@@ -5,6 +5,7 @@ import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { type DemoCollection } from "@/lib/demo-storage";
 import { isProductionBackendEnabled } from "@/lib/client/backend";
+import {useRecordsController} from "../records";
 
 export function moneyChf(value:unknown){
   const amount=Number(value);
@@ -55,4 +56,16 @@ export function useDemoRows(collection:DemoCollection, defaults:string[][],filte
   const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
   const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
   return {rows:mapRemoteRows(collection,data?.items??[]),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading,error};
+}
+
+/** Module configuration changes domain fields, never the committed list state owner. */
+export function useRecordList(collection:DemoCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;filterValues:Record<string,{field:'status'|'kind';value:string}>}){
+ const controller=useRecordsController(options),pageSize=50;
+ const {sortFields,defaultOrder='created_at.desc',filterValues}=options;
+ const field=sortFields[controller.sortIndex];
+ const filters=new URLSearchParams({limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'||!field?defaultOrder:field+'.'+controller.sort});
+ if(controller.query.trim())filters.set('q',controller.query.trim());
+ const selected=filterValues[controller.activeChip];if(selected)filters.set(selected.field,selected.value);
+ const data=useDemoRows(collection,[],filters.toString());
+ return {...data,controller,pagination:{total:data.total,page:controller.page,pageSize,onPage:controller.setPage}};
 }

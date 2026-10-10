@@ -31,6 +31,17 @@ const ident=(v:string)=>{if(!/^[a-z_]+$/.test(v)||!names.has(v))throw new ApiErr
 const selectCols=(v:string)=>v==="*"?"*":v.split(",").map(x=>x.trim()).filter(x=>/^[a-z_]+$/.test(x)).join(",")||"*";
 export async function currentTenant(){const s=await requireSession();return {user:{id:s.userId,email:s.email},token:"",tenantId:s.organizationId,role:s.role,session:s}}
 export async function tenantList<T extends Row>(table:string,select="*",extra=""){const s=await requireSession();await assertTablePermission(s,table,"read");if(canonicalApiTables.has(table))return withTenant(s.organizationId,s.userId,async c=>await listApiBusiness(c,s,table,extra) as T[]);return withTenant(s.organizationId,s.userId,async c=>(await c.query<T>(`select ${selectCols(select)} from ${ident(table)} where organization_id=$1 order by created_at desc limit 1000`,[s.organizationId])).rows)}
+/** Canonical list endpoints share query forwarding and authorized population counts. */
+export async function tenantListPage(table:string,params:URLSearchParams,defaultOrder="created_at.desc",equalFilters:Record<string,string>={}){
+ const filters=new URLSearchParams({order:defaultOrder});
+ for(const key of ['q','order','limit','offset']){const value=params.get(key);if(value)filters.set(key,value)}
+ for(const key of ['status',...(table==='products'||table==='documents'?['kind']:[])]){const value=params.get(key);if(value)filters.set(key,'eq.'+value)}
+ for(const [key,value] of Object.entries(equalFilters))if(value)filters.set(key,'eq.'+value);
+ const items=await tenantList(table,'*',filters.toString());
+ let total=Number(items[0]?.total_count??0);
+ if(!items.length&&Number(filters.get('offset')??0)>0){filters.set('offset','0');filters.set('limit','1');const first=await tenantList(table,'*',filters.toString());total=Number(first[0]?.total_count??0)}
+ return {items,total};
+}
 export async function tenantInsert<T extends Row>(table:string,data:T,requestKey?:string){
  const s=await requireSession();await assertTablePermission(s,table,"write");
  const translated=translateBusinessWrite(table,data,true);const fields:Row={...translated.data,...(table==="customer_contacts"?{}:{created_by_user_id:s.userId})};

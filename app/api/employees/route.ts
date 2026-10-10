@@ -1,13 +1,13 @@
 import {employeeInputIssue} from "@/lib/employee-validation";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantInsert, tenantList, requireTenantFeature } from "@/lib/server/database";
+import { tenantInsert, tenantListPage, requireTenantFeature } from "@/lib/server/database";
 
 type EmployeeBody={firstName?:unknown;lastName?:unknown;email?:unknown;phone?:unknown;jobTitle?:unknown;workloadPercent?:unknown;entryDate?:unknown;weeklyHours?:unknown;vacationDays?:unknown;address?:unknown;status?:unknown};
 
-export async function GET(){
+export async function GET(request:NextRequest){
   try{
-    await requireTenantFeature("employees");return json({items:await tenantList("employees","id,first_name,last_name,email,phone,job_title,workload_percent,start_date,weekly_hours,vacation_days,address,status,created_at","order=created_at.desc")});}
+    await requireTenantFeature("employees");return json(await tenantListPage("employees",request.nextUrl.searchParams));}
   catch(error){return apiError(error);}
 }
 

@@ -7,7 +7,7 @@ export async function GET(request:NextRequest){
   const collection=request.nextUrl.searchParams.get('collection')??'';
   if(!canonicalApiTables.has(collection))throw new ApiError(400,'invalid_collection','Ungültige Datenquelle.');
   const filters=new URLSearchParams();
-  for(const key of ['kind','number','id','customer_id']){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,'eq.'+value)}
+  for(const key of ['kind','number','id','customer_id','status']){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,'eq.'+value)}
   for(const key of ['q','order','limit','offset']){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,value)}
   const result=await withDemo(async(c,s)=>{
    const items=await listApiBusiness(c,s,collection,filters.toString());

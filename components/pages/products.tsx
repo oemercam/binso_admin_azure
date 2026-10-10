@@ -9,18 +9,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
-import { RecordRow, RecordsView } from "../records";
-import { products } from "@/lib/demo-data";
+import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
-import { useDemoRows } from "./shared";
+import { useRecordList } from "./shared";
 
 export function ProductsPage() {
-  const {rows:productRows,loading,error}=useDemoRows("products",products);
-  return <AppShell title="Produkte" subtitle="Produkte und Dienstleistungen zentral verwalten." active="produkte" actions={<CreateAction href="/produkte/neu" label="Neues Produkt"/>}>
-    <RecordsView countLabel="Produkte" loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={["Alle","Dienstleistungen","Produkte"]} columns={[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}]} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
+  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}];
+  const chips=["Alle","Dienstleistungen","Produkte","Aktiv","Inaktiv"];
+  const {rows:productRows,total,controller,pagination,loading,error}=useRecordList("products",{placeholder:"Produkte suchen...",chips,columns,sortFields:{0:"name",1:"kind",2:"unit_price",4:"status"},defaultOrder:"name.asc",filterValues:{Dienstleistungen:{field:"kind",value:"service"},Produkte:{field:"kind",value:"product"},Aktiv:{field:"status",value:"active"},Inaktiv:{field:"status",value:"inactive"}}});
+  return <AppShell title="Produkte" subtitle={loading?"Wird geladen…":`${total} Produkte`} active="produkte" actions={<RecordsControls controller={controller} placeholder="Produkte suchen..." chips={chips} columns={columns}><CreateAction href="/produkte/neu" label="Neues Produkt"/></RecordsControls>}>
+    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Produkte" loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={chips} columns={columns} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
