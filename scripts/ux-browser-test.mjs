@@ -344,7 +344,7 @@ try{
   if(hasInteraction('employees')){
   await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
   assert.equal(await page.getByRole('button',{name:'Zurück',exact:true}).count(),0,'First wizard step has no dead back button');
-  await page.getByRole('link',{name:'Abbrechen',exact:true}).click();await page.waitForURL('**/mitarbeiter');await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.waitForURL('**/mitarbeiter');await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
   await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.getByLabel('Nachname',{exact:true}).fill('Person');await page.getByLabel('E-Mail',{exact:true}).fill('test@example.invalid');await page.getByLabel('Funktion',{exact:true}).fill('ICT');
   const employeeFooter=await page.locator('.mobile-sticky-save').boundingBox();await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).waitFor();
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee wizard has one final save');
@@ -357,7 +357,7 @@ try{
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-400-employee-wizard.png`)});
   await page.setViewportSize({width:430,height:900});
   await page.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Test','Wizard retains input without navigation or dirty warnings');
-  await page.getByRole('link',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Test','Cancel guard retains draft');await page.getByRole('link',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL('**/mitarbeiter');
+  await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Vorname',{exact:true}).inputValue(),'Test','Cancel guard retains draft');await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL('**/mitarbeiter');
 
   }
   if(hasInteraction('time')){
@@ -722,7 +722,7 @@ try{
    const editor=await trackedPage();await editor.goto(base+'/rechnungen/neu?customerId=customer-one');await editor.waitForLoadState('networkidle');const picker=editor.getByLabel('Kunde auswählen',{exact:true});assert.equal(await picker.locator('option').count(),2,'Duplicate names retain two distinct choices');assert.equal(await picker.inputValue(),'customer-one','Linked customer initialized by ID');await picker.selectOption('customer-two');
    const rename=await trackedPage();await rename.goto(base+'/kunden/customer-two/bearbeiten');await rename.getByLabel('Kundenname *',{exact:true}).fill('Identität bleibt erhalten AG');await rename.getByRole('button',{name:'Änderungen speichern',exact:true}).click();await rename.getByText('Kunde gespeichert.',{exact:true}).waitFor();
    await customerList.waitForFunction(()=>window.v215CustomerChanges.some(message=>message.domains?.includes('customers')),undefined,{polling:100});
-   await editor.bringToFront();await editor.waitForFunction(()=>document.querySelector('option[value="customer-two"]')?.textContent?.includes('Identität bleibt erhalten AG'));assert.equal(await picker.inputValue(),'customer-two','Rename/revalidation cannot switch a draft back to the URL customer');await customerList.bringToFront();await customerList.getByText('Identität bleibt erhalten AG',{exact:true}).first().waitFor();assert.equal(await customerList.evaluate(()=>window.v215CustomerListMarker),'same-document','Returning to the consumer tab revalidates without a reload');
+   await editor.bringToFront();await editor.waitForFunction(()=>document.querySelector('option[value="customer-two"]')?.textContent?.includes('Identität bleibt erhalten AG'));assert.equal(await picker.inputValue(),'customer-two','Rename/revalidation cannot switch a draft back to the URL customer');await customerList.bringToFront();await customerList.locator('.mobile-record-list:visible,.desktop-record-table:visible').getByText('Identität bleibt erhalten AG',{exact:true}).waitFor();assert.equal(await customerList.evaluate(()=>window.v215CustomerListMarker),'same-document','Returning to the consumer tab revalidates without a reload');
    for(const consumer of Object.values(tabs))await consumer.waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('customers')),undefined,{polling:100});
    await rename.close();await editor.close();await customerList.close();customerIdentityMode=false;
    await tabs.list.bringToFront();await tabs.list.waitForLoadState('networkidle');holdDataRefresh=true;

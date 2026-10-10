@@ -139,6 +139,14 @@ try{
  assert.equal((await db.query('select status from invoices where id=$1',[document.id])).rows[0].status,'paid');
  await assert.rejects(mutateApiBusiness(client,session,'create_payment_idempotent',{...paymentArgs,p_amount:2}),e=>e.status===409);
  await assert.rejects(db.query("insert into tasks(organization_id,external_id,title,project_id) values('00000000-0000-4000-8000-000000000001','cross-tenant','Blocked','30000000-0000-4000-8000-000000000001')"),e=>e.code==='23503');
+ const paidList=await listApiBusiness(client,session,'documents','kind=eq.invoice&display_status=eq.paid&q='+encodeURIComponent(document.number)+'&order=total.desc&limit=1');
+ assert.equal(paidList[0]?.id,document.id);assert.equal(Number(paidList[0]?.total_count),1,'Document status/search runs before pagination');
+ const latePartial=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_due_date:'2000-01-01',p_idempotency_key:'late-partial-list-test'});
+ await db.query("update invoices set paid_amount=1,status='partial' where id=$1",[latePartial.id]);
+ for(const filter of ['open','overdue'])assert.equal((await listApiBusiness(client,session,'documents','display_status=eq.'+filter+'&q='+encodeURIComponent(latePartial.number)))[0]?.id,latePartial.id,'Derived '+filter+' filter includes late partial invoice');
+ await db.query('update invoices set archived_at=now() where id=$1',[latePartial.id]);
+ await assert.rejects(()=>listApiBusiness(client,session,'documents','display_status=eq.invalid'),e=>e.code==='invalid_filter');
+ await assert.rejects(()=>listApiBusiness(client,session,'documents','order=total.desc;drop table invoices'),e=>e.code==='invalid_order');
  const {dashboardAnalytics}=await import(dataModule((await fs.readFile('lib/server/repositories/dashboard.ts','utf8')).replace("import 'server-only';",'')));
  const analytics=await dashboardAnalytics(client,demo);
  const october=analytics.analyticsInvoices.find(row=>new Date(row.issue_date).toISOString().startsWith('2026-10'));
@@ -442,6 +450,11 @@ try{
  const employeeEdit=await import(dataModule(employeeEditSource));
  assert.equal((await employeeEdit.PATCH({body:{...employeeBody,weeklyHours:38}},{params:Promise.resolve({id:createdEmployee.data.item.id})})).status,200);
  assert.equal(String((await db.query('select start_date::text from employees where id=$1',[createdEmployee.data.item.id])).rows[0].start_date),'2026-10-08','Editing hours must not clear the employee entry date');
+ for(const [table,input] of [['products',{name:'Replay product fixture',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'}],['employees',{first_name:'Replay',last_name:'Person',email:'replay-person@example.invalid',job_title:'ICT',workload_percent:100,weekly_hours:42,vacation_days:25,status:'active'}]]){
+  const key=table+'-creation-replay',first=(await databaseProcess.tenantInsert(table,input,key))[0];
+  const again=(await databaseProcess.tenantInsert(table,input,key))[0];assert.equal(again.id,first.id,'Lost-reply retry returns the same '+table+' identity');
+  await assert.rejects(()=>databaseProcess.tenantInsert(table,{...input,...(table==='products'?{name:'Changed product'}:{first_name:'Changed person'})},key),e=>e.code==='idempotency_conflict');
+ }
  const expenseBody={employee_id:null,customer_id:documentArgs.p_customer_id,billable:true,merchant:'Fixture meal',expense_date:'2026-10-06',category:'Verpflegung',amount:42,currency:'CHF',vat_rate:8.1,status:'submitted'};
  const expenseId=(await databaseProcess.tenantInsert('expenses',expenseBody))[0].id;
  const repeatedExpense=(await databaseProcess.tenantInsert('expenses',expenseBody,'expense-process-retry'))[0].id;

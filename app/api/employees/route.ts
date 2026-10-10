@@ -23,7 +23,7 @@ export async function POST(request:NextRequest){
     if(!Number.isFinite(workload)||workload<0||workload>100) return json({error:"workload_invalid",message:"Pensum muss zwischen 0 und 100 liegen."},400);
     if(!Number.isFinite(weeklyHours)||weeklyHours<=0||weeklyHours>80) return json({error:"weekly_hours_invalid",message:"Wochenstunden müssen zwischen 0 und 80 liegen."},400);
     if(!Number.isFinite(vacationDays)||vacationDays<0||vacationDays>60) return json({error:"vacation_days_invalid",message:"Ferientage müssen zwischen 0 und 60 liegen."},400);
-    const rows=await tenantInsert("employees",{first_name:firstName,last_name:lastName,email:cleanText(body.email,320)||null,phone:cleanText(body.phone,80)||null,job_title:jobTitle,workload_percent:workload,start_date:cleanText(body.entryDate,20)||null,weekly_hours:weeklyHours,vacation_days:vacationDays,address:cleanText(body.address,500)||null,status:body.status==="inactive"?"inactive":"active"});
+    const rows=await tenantInsert("employees",{first_name:firstName,last_name:lastName,email:cleanText(body.email,320)||null,phone:cleanText(body.phone,80)||null,job_title:jobTitle,workload_percent:workload,start_date:cleanText(body.entryDate,20)||null,weekly_hours:weeklyHours,vacation_days:vacationDays,address:cleanText(body.address,500)||null,status:body.status==="inactive"?"inactive":"active"},request.headers?.get("idempotency-key")?.trim());
     return json({item:rows[0]},201);
   }catch(error){return apiError(error);}
 }

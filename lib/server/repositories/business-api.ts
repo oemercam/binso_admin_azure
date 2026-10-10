@@ -14,7 +14,7 @@ export const canonicalApiTables=new Set(['products','employees','expenses','docu
 const sqlSources:Record<string,string>={
  projects:`select id,name,customer_id,status,source_quote_id,external_id,created_at from projects where organization_id=$1 and archived_at is null`,
  time_entries:`select t.id,coalesce(p.name,t.project_label,t.description) project_name,t.description,t.work_date started_at,round(t.hours*60) duration_minutes,t.created_at from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id where t.organization_id=$1 and t.archived_at is null`,
- support_tickets:`select id,case_number,subject,status,category,created_at,updated_at from support_cases where organization_id=$1`,
+ support_tickets:`select id,case_number,subject,status,category,priority,created_at,updated_at from support_cases where organization_id=$1`,
  products:`select id,name,item_type kind,sku,unit,unit_price,vat_rate,description,status,created_at,updated_at from products_services where organization_id=$1 and archived_at is null`,
  employees:`select id,name,coalesce(first_name,split_part(name,' ',1)) first_name,coalesce(last_name,substring(name from position(' ' in name)+1)) last_name,email,phone,title job_title,workload_percent,weekly_hours,vacation_days,address,start_date,start_date entry_date,case when active then 'active' else 'inactive' end status,created_at,updated_at from employees where organization_id=$1 and archived_at is null`,
  expenses:`select e.id,e.employee_id,e.customer_id,e.billable,e.invoiced_invoice_id,e.reimbursed_at,e.reimbursement_reference,e.reviewed_at,e.reviewed_by_user_id,coalesce(e.merchant,e.description) merchant,e.expense_date,coalesce(e.category_label,e.category) category,e.quantity*e.unit_price amount,e.currency,e.vat_rate,e.description,case when e.status='open' then 'draft' else e.status end status,e.created_at,e.updated_at,e.created_by_user_id,m.name employee_name,json_build_object('first_name',split_part(m.name,' ',1),'last_name',substring(m.name from position(' ' in m.name)+1)) employee from expenses e left join employees m on m.id=e.employee_id and m.organization_id=e.organization_id where e.organization_id=$1 and e.archived_at is null`,
@@ -61,7 +61,20 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   if(!sources.length)throw new ApiError(403,'forbidden','Keine Berechtigung.');source=sources.join(' union all ');
  }
  if(!source)throw new ApiError(400,'invalid_table','Ungültige Datenquelle.');
+ // Derive the same financial display state before filtering/pagination.
+ // Persisted legacy statuses and document snapshots remain unchanged.
+ if(table==='documents'){
+  values.push(businessDate());
+  source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(d.total*100)<=round(d.paid_amount*100) then 'paid' when d.due_date<$${values.length}::text and round(d.total*100)>round(d.paid_amount*100) then 'overdue' when round(d.paid_amount*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
+ }
  const where:string[]=[];
+ const display=filters.get('display_status');
+ if(display){
+  if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|sent|accepted|declined|expired|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
+  const state=display.slice(3);if(state!=='open')values.push(state);
+  where.push(state==='open'?"q.display_status in ('open','partial','overdue')":`q.display_status=$${values.length}`);
+ }
+
  for(const key of ['id','name','number','customer_id','status',...(table==='products'?['kind']:[]),...(table==='expenses'?['employee_id']:[]),...(table==='employees'?['first_name','last_name']:[])]){
   const value=filters.get(key);if(!value)continue;
   if(!value.startsWith('eq.'))throw new ApiError(400,'invalid_filter','Ungültiger Filter.');
@@ -78,12 +91,13 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   where.push(`${needle}<>'' and regexp_replace(lower(concat_ws(' ',${fields.join(',')})),'[^[:alnum:]]','','g') like '%'||${needle}||'%'`);
  }
  const requested=Number(filters.get('limit')||1000);const limit=Number.isSafeInteger(requested)?Math.max(1,Math.min(1000,requested)):1000;
- const allowedOrder=new Set(['created_at',...(table==='customers'?['name','city','customer_no','status']:[]),...(table==='documents'?['issue_date','updated_at']:[]),...(table==='products'?['name','kind','unit_price','status']:[]),...(table==='employees'?['name','job_title','workload_percent','status']:[]),...(table==='payments'?['paid_on','customer_name','invoice_number','amount','status']:[]),...(table==='expenses'?['expense_date','merchant','employee_name','amount','status']:[]),...(table==='customer_contacts'?['is_primary']:[])]);
+ const allowedOrder=new Set(['created_at',...(table==='customers'?['name','city','customer_no','status']:[]),...(table==='documents'?['number','customer_name','total','display_status','due_date','issue_date','updated_at']:[]),...(table==='products'?['name','kind','unit_price','status']:[]),...(table==='employees'?['name','job_title','workload_percent','status']:[]),...(table==='payments'?['paid_on','customer_name','invoice_number','amount','status']:[]),...(table==='expenses'?['expense_date','merchant','employee_name','amount','status']:[]),...(table==='customer_contacts'?['is_primary','first_name','last_name','email']:[]),...(table==='support_tickets'?['case_number','subject','status','updated_at']:[])]);
  const requestedOrder=filters.get('order')||'created_at.desc';
  const sortTerms=requestedOrder.split(',').map(term=>{
   const parts=term.split('.');
   if(parts.length!==2||!allowedOrder.has(parts[0])||!['asc','desc'].includes(parts[1]))throw new ApiError(400,'invalid_order','Ungültige Sortierung.');
-  return `q.${parts[0]} ${parts[1]}`;
+  const expression=table==='documents'&&parts[0]==='customer_name'?"q.customer->>'name'":`q.${parts[0]}`;
+  return `${expression} ${parts[1]}`;
  });
  const offset=Number(filters.get('offset')||0);
  if(!Number.isSafeInteger(offset)||offset<0||offset>10_000_000)throw new ApiError(400,'invalid_offset','Ungültige Listenseite.');

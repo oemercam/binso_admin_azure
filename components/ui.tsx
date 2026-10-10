@@ -133,7 +133,12 @@ export function TimeInput(props:React.ComponentProps<"input">){return <Input inp
 export function CurrencyInput(props:React.ComponentProps<"input">){return <Input inputMode="decimal" {...props}/>}
 export function FormLabel({children,id}:{children:React.ReactNode;id?:string}){return <span id={id}>{children}</span>}
 export function FormError({children,id}:{children?:React.ReactNode;id?:string}){return children?<span className="form-error" id={id} role="alert">{children}</span>:null}
-export function FormActions({children,sheet=false}:{children:React.ReactNode;sheet?:boolean}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"}>{children}</div>}
+/** Logical field groups share spacing and headings across editors and wizard steps. */
+export function FormSection({title,children,hidden=false}:{title?:string;children:React.ReactNode;hidden?:boolean}){
+ return <section className="form-section" hidden={hidden}>{title&&<SectionTitle title={title}/>} {children}</section>;
+}
+
+export function FormActions({children,sheet=false,onClickCapture}:{children:React.ReactNode;sheet?:boolean;onClickCapture?:React.MouseEventHandler<HTMLDivElement>}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"} onClickCapture={onClickCapture}>{children}</div>}
 
 export function Field({ label, children, className = "",allowReadOnlyInput=false,error,hint }: { label: React.ReactNode; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean;error?:string;hint?:string }) {
   const access=usePageAccess();

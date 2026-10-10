@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantList, tenantRpc } from "@/lib/server/database";
+import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
 
 type Line={unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
@@ -11,11 +11,7 @@ type DocumentBody={
 export async function GET(request:NextRequest){
   try{
     const kind=request.nextUrl.searchParams.get("kind");
-    const filters=new URLSearchParams({order:"created_at.desc"});
-    if(kind==="offer"||kind==="invoice")filters.set("kind","eq."+kind);
-    for(const key of ["q","limit","order","offset"]){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,value)}
-    const rows=await tenantList("documents","id,customer_id,kind,number,status,issue_date,due_date,valid_until,vat_rate,note,currency,subtotal,vat_amount,total,created_at,customer:customers(name)",filters.toString());
-    return json({items:rows});
+    return json(await tenantListPage("documents",request.nextUrl.searchParams,"created_at.desc",kind==="offer"||kind==="invoice"?{kind}:{}));
   }catch(error){return apiError(error);}
 }
 

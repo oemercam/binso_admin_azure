@@ -1,15 +1,18 @@
 "use client";
 
+import {allowDraftNavigation} from "../use-browser-back-guard";
+import {useProcessDraft} from "../use-process-draft";
+import {useDirtySnapshot} from "../use-dirty-snapshot";
 import Link from "next/link";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
-import { RecordRow, RecordsView } from "../records";
+import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble} from "../ui";
-import { ActionRow, ActionsMenu, CreateAction, MetricTiles, MetricTile } from "../binso-ux";
+import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
 export function supportReference(id:string,caseNumber?:string|null){
   const raw=String(caseNumber??id);
@@ -17,23 +20,22 @@ export function supportReference(id:string,caseNumber?:string|null){
   return raw.startsWith("#")?raw:"#"+raw;
 }
 
-export function useSupportRows(){
-  const production=useBackendMode();
-  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>}>(production?"/api/support/tickets":"/api/demo/data?collection=support_tickets");
-  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
-  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
-  return {rows,loading:query.loading,error:query.error};
-}
-
 export function SupportPage() {
-  const {rows:ticketRows,loading,error}=useSupportRows();
-  return <AppShell title="Support" subtitle="Hilfe direkt in Binso One – persönlich und nachvollziehbar." active="support" actions={<CreateAction href="/support/neu" label="Neues Ticket"/>}>
-    {!loading&&!error&&<MetricTiles><MetricTile label="Offene Tickets" value={String(ticketRows.filter(row=>!["Gelöst","Geschlossen"].includes(row[3])).length)}/><MetricTile label="Gelöste Tickets" value={String(ticketRows.filter(row=>["Gelöst","Geschlossen"].includes(row[3])).length)}/></MetricTiles>}
-    <div className="tablet-master-detail support-master-detail">
-      <RecordsView countLabel="Tickets" loading={loading} error={error} items={ticketRows} placeholder="Tickets suchen..." chips={["Alle","Offen","In Bearbeitung","Gelöst","Geschlossen"]} statusGroups={{Offen:["Neu","Warten auf Kunde"]}} columns={[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}]} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={`Ticket ${id} · ${updated}`} status={status}/>}</RecordsView>
-
-    </div>
-  </AppShell>;
+ const production=useBackendMode(),placeholder="Tickets suchen...";
+ const chips=["Alle","Neu","Offen","In Bearbeitung","Warten auf Kunde","Gelöst","Geschlossen"];
+ const columns=[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}];
+ const controller=useRecordsController({placeholder,chips,columns}),pageSize=50;
+ const fields:Record<number,string>={4:'case_number',1:'subject',2:'updated_at',3:'status'};
+ const params=new URLSearchParams({limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'?'updated_at.desc':fields[controller.sortIndex]+'.'+controller.sort});
+ if(controller.query.trim())params.set('q',controller.query.trim());
+ const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
+ const selected=Object.entries(statusMap).find(([,label])=>label===controller.activeChip)?.[0];if(selected)params.set('status',selected);
+ const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>(production?"/api/support/tickets?"+params:"/api/demo/data?collection=support_tickets&"+params);
+ const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
+ const total=query.data?.total??rows.length;
+ return <AppShell title="Support" subtitle={query.loading?"Wird geladen…":`${total} Tickets`} active="support" actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href="/support/neu" label="Neues Ticket"/></RecordsControls>}>
+  <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}} countLabel="Tickets" loading={query.loading} error={query.error} items={rows} placeholder={placeholder} chips={chips} columns={columns} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status,reference])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={`${reference} · ${updated}`} status={status}/>}</RecordsView>
+ </AppShell>;
 }
 
 export function SupportTicketForm() {
@@ -46,9 +48,21 @@ export function SupportTicketForm() {
   const [message,setMessage]=useState("");
   const [attachment,setAttachment]=useState<File|null>(null);
   const [toast,setToast]=useState<string|null>(null);
+  const [open,setOpen]=useState(false);
+  useEffect(()=>{queueMicrotask(()=>setOpen(true))},[]);
+  const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
+  const [createdId,setCreatedId]=useState<string|null>(null);
+  const {dirty}=useDirtySnapshot([subject,category,message,attachment]);
+  const recovery=useProcessDraft({process:'support:create',value:{subject,category,message,replay,createdId},dirty,enabled:!saved,onRestore:value=>{
+   if(!value||typeof value.subject!=='string'||value.subject.length>160||typeof value.message!=='string'||value.message.length>5000||typeof value.category!=='string')return;
+   setSubject(value.subject);setCategory(value.category);setMessage(value.message);
+   if(value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<10000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
+   if(typeof value.createdId==='string')setCreatedId(value.createdId);
+  }});
+  const close=()=>{recovery.clear();allowDraftNavigation();setOpen(false);router.push('/support')};
   const save=async()=>{
-    if(submitPending.current||saved)return;
-    if(!subject.trim()||!message.trim()){
+    if(submitPending.current||saved||!recovery.ready)return;
+    if(subject.trim().length<3||!message.trim()){
       setToast("Betreff und Nachricht sind erforderlich.");
       window.setTimeout(()=>setToast(null),2200);
       return;
@@ -58,7 +72,11 @@ export function SupportTicketForm() {
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(isProductionBackendEnabled()){
-        const payload=await apiPost<{item:{id:string}}>("/api/support/tickets",{subject,category,priority:"normal",message});
+        const body={subject:subject.trim(),category,priority:"normal",message:message.trim()},serialized=JSON.stringify(body);
+        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({subject,category,message,replay:attempt,createdId});
+        const payload=createdId?{item:{id:createdId}}:await apiPost<{item:{id:string}}>("/api/support/tickets",body,{idempotencyKey:attempt.key});
+        if(!payload.item?.id)throw new Error('Die Ticketanlage konnte nicht bestätigt werden.');
+        setCreatedId(payload.item.id);recovery.persist({subject,category,message,replay:attempt,createdId:payload.item.id});
         if(attachment){
           const form=new FormData();
           form.append("file",attachment);
@@ -66,7 +84,7 @@ export function SupportTicketForm() {
           form.append("entityId",payload.item.id);
           await apiUpload("/api/files",form);
         }
-        setSaved(true);
+        setSaved(true);recovery.clear();allowDraftNavigation();
         router.push("/support/"+payload.item.id);
       }else{
         setToast("Ticket erstellt.");
@@ -80,17 +98,19 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" unsavedChanges={!saved&&Boolean(subject||message||attachment||category!=="Allgemeine Frage")} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
-    <div className="form-page narrow">
+  return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
+    <FormSheet label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
+    <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">
-        <Field label="Betreff" className="full"><Input autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
-        <Field label="Kategorie" className="full"><Select value={category} onChange={e=>setCategory(e.target.value)}><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></Select></Field>
-        <Field label="Nachricht" className="full"><Textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
+        <Field label="Betreff" className="full"><Input required minLength={3} maxLength={160} disabled={submitting||!!createdId} autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
+        <Field label="Kategorie" className="full"><Select disabled={submitting||!!createdId} value={category} onChange={e=>setCategory(e.target.value)}><option>Allgemeine Frage</option><option>Rechnung</option><option>Zeiterfassung</option><option>Technisches Problem</option></Select></Field>
+        <Field label="Nachricht" className="full"><Textarea required maxLength={5000} disabled={submitting||!!createdId} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
       <label className="attachment-button" htmlFor="support-file-upload"><Icon name="upload"/><span>{attachment?attachment.name:"Screenshot oder Datei hinzufügen"}</span></label><Input id="support-file-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>setAttachment(e.target.files?.[0]??null)}/>
       <p className="technical-hint">Browser, App-Version und Zeitpunkt werden automatisch mitgesendet.</p>
-      <FormActions ><Button onClick={save} disabled={submitting||saved}>{submitting?"Wird erstellt…":"Ticket erstellen"}</Button></FormActions>
-    </div>
+      {createdId&&<p aria-live="polite">Das Ticket ist gespeichert. Ein fehlgeschlagener Anhang kann erneut hochgeladen werden.</p>}
+      <FormActions><Button variant="secondary" onClick={close} disabled={submitting}>Abbrechen</Button><Button type="submit" disabled={submitting||saved||!recovery.ready}>{submitting?"Wird erstellt…":createdId?"Anhang speichern":"Ticket erstellen"}</Button></FormActions>
+    </form></FormSheet>
     {toast&&<Toast title={toast} tone={toast==="Ticket erstellt."?"success":"danger"}/>}
   </AppShell>;
 }
@@ -149,7 +169,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     let active=true;
     queueMicrotask(()=>{if(active){setTicketError(null)}});
     Promise.all([
-      apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets"),
+      apiGet<{items:Array<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}>}>("/api/support/tickets?id="+encodeURIComponent(ticketId)),
       apiGet<{items:Array<{id:string;author_type:string;body:string;created_at:string}>}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages"),
     ]).then(([tickets,messages])=>{
       if(!active)return;

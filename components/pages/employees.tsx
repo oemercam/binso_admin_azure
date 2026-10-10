@@ -1,5 +1,6 @@
 "use client";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
+import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {FormWizard} from "../form-wizard";
 import {Avatar} from "../avatar";
@@ -19,8 +20,9 @@ import { RecordRow, RecordsView, RecordsControls, useRecordsController, TimeEntr
 import { employees, expenses } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState} from "../ui";
-import { ActionRow, ActionsMenu, CreateAction } from "../binso-ux";
+import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState, FormSection} from "../ui";
+import {allowDraftNavigation} from "../use-browser-back-guard";
+import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 import { useRecordList, swissDate, formatMinutes } from "./shared";
 
 export function EmployeesPage() {
@@ -111,8 +113,14 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       });
   },[recordQuery.data,editingRecord,markPristine]);
 
+  const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
+  const recovery=useProcessDraft({process:"employee:create",value:{firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status,replay},dirty,enabled:!existing,onRestore:value=>{
+   if(!value||[value.firstName,value.lastName,value.email,value.phone,value.role,value.load,value.entryDate,value.weeklyHours,value.vacationDays,value.address,value.status].some(field=>typeof field!=="string"||field.length>2000))return;
+   setFirstName(value.firstName);setLastName(value.lastName);setEmail(value.email);setPhone(value.phone);setRole(value.role);setLoad(value.load);setEntryDate(value.entryDate);setWeeklyHours(value.weeklyHours);setVacationDays(value.vacationDays);setAddress(value.address);setStatus(value.status);
+   if(value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<16000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
+  }});
   const save=async()=>{
-    if(saveRecordPending.current||loadingRecord||recordError)return;
+    if(saveRecordPending.current||loadingRecord||recordError||!existing&&!recovery.ready)return;
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
     const validation=employeeInputIssue({email,entryDate,workloadPercent:load,weeklyHours,vacationDays});
     if(validation){setToast(validation);return;}
@@ -120,12 +128,17 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     try{
       const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
       if(production){
-        if(existing&&employeeId) await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
-        else await apiPost("/api/employees",payload);
+        let result:{item?:{id?:string}};
+        if(existing&&employeeId)result=await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
+        else{
+         const serialized=JSON.stringify(payload),attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status,replay:attempt});
+         result=await apiPost("/api/employees",payload,{idempotencyKey:attempt.key});
+        }
+        if(!result.item?.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.");
       }else if(!existing){
         appendDemoRow("employees",[firstName.trim()+" "+lastName.trim(),role.trim(),load+"%",status]);
       }
-      setSavedRecord(true);
+      setSavedRecord(true);recovery.clear();allowDraftNavigation();
       setToast("Mitarbeiter gespeichert.");
       window.setTimeout(()=>router.push("/mitarbeiter"),700);
     }catch(error){
@@ -137,7 +150,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
   if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" subtitle={recordError?"Mitarbeiterdaten nicht verfügbar":"Daten werden geladen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter">{loadingRecord?<div role="status"><EmptyState icon="users" title="Mitarbeiter wird geladen" text="Die Mitarbeiterdaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="users" title="Mitarbeiter konnte nicht geladen werden" text={recordError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={recordQuery.refresh}>Erneut versuchen</Button><Button href="/mitarbeiter" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
-  return <AppShell unsavedChanges={dirty&&!savedRecord} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? role+" · "+formatQuantity(load,"%") : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}} title="Bearbeiten" navigation/>}<ActionRow href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} icon="clock" title="Zeiterfassung öffnen" navigation/><ActionRow href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} icon="card" title="Spese erfassen" navigation/></ActionsMenu></>:undefined}>
+  return <AppShell unsavedChanges={false} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? role+" · "+formatQuantity(load,"%") : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref="/mitarbeiter" backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}} title="Bearbeiten" navigation/>}<ActionRow href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} icon="clock" title="Zeiterfassung öffnen" navigation/><ActionRow href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} icon="card" title="Spese erfassen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
@@ -155,20 +168,20 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <div><dt>Wochenstunden</dt><dd>{formatQuantity(weeklyHours,"h/Woche")}</dd></div>
         <div><dt>Ferientage / Jahr</dt><dd>{formatQuantity(vacationDays,"Tage/Jahr")}</dd></div>
         {address&&<div><dt>Adresse</dt><dd>{address}</dd></div>}
-      </dl></>:<FormWizard cancelAction={<Button variant="secondary" href="/mitarbeiter" disabled={savingRecord}>Abbrechen</Button>} guided={!existing} labels={["Persönliche Daten","Arbeitsverhältnis"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} action={<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}><div className="form-grid two" hidden={!existing&&wizardStep!==0}>
+      </dl></>:<FormSheet label={existing?"Mitarbeiter bearbeiten":"Mitarbeiter hinzufügen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push("/mitarbeiter")}} busy={savingRecord} dirty={dirty&&!savedRecord} wizard><FormWizard cancelAction={<Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push("/mitarbeiter")}} disabled={savingRecord}>Abbrechen</Button>} guided={!existing} labels={["Persönliche Daten","Arbeitsverhältnis"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} action={<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button>}><FormSection title="Persönliche Daten" hidden={!existing&&wizardStep!==0}><div className="form-grid two">
         <Field label="Vorname"><Input required autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><Input required autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
         <Field label="E-Mail"><Input required autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
         <Field label="Telefon"><Input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         <Field label="Funktion"><Input required value={role} onChange={e=>setRole(e.target.value)}/></Field>
         <Field label="Pensum (%)"><Input type="number" min="0" max="100" required inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
-      </div><div className="form-grid two" hidden={!existing&&wizardStep!==1}>
+      </div></FormSection><FormSection title="Arbeitsverhältnis" hidden={!existing&&wizardStep!==1}><div className="form-grid two">
         <Field label="Eintritt"><Input type="date" value={entryDate} onChange={e=>setEntryDate(e.target.value)}/></Field>
         <Field label="Wochenstunden (h/Woche)"><Input type="number" min="0.1" max="80" step="0.1" required inputMode="decimal" value={weeklyHours} onChange={e=>setWeeklyHours(e.target.value)}/></Field>
         <Field label="Ferientage / Jahr"><Input type="number" min="0" max="60" step="0.5" required inputMode="decimal" value={vacationDays} onChange={e=>setVacationDays(e.target.value)}/></Field>
         <Field label="Adresse" className="full"><Input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>
         <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></Select></Field>
-      </div></FormWizard>}
+      </div></FormSection></FormWizard></FormSheet>}
     </div>}
     {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Zeiterfassung öffnen</Button>}/>{ledgerLoading?<LoadingState>Arbeitszeiten werden geladen …</LoadingState>:ledgerErrors.times?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.times}</ErrorState>:null}<div>{ledger.times.map(item=><TimeEntryRow key={item.id} title={item.description||item.project_name||"Zeiteintrag"} meta={timeMetadata(item.description||item.project_name,item.project_name,undefined,swissDate(item.started_at))} value={formatMinutes(Number(item.duration_minutes))+" h"} status={item.invoiced_invoice_id?"Verrechnet":item.approved?"Freigegeben":item.billable===false?"Intern":"Erfasst"}/>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<EmptyState compact title="Keine Arbeitszeiten erfasst" text=""/>}</section>}
     {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary">Spese erfassen</Button>}/>{ledgerLoading?<LoadingState>Spesen werden geladen …</LoadingState>:ledgerErrors.expenses?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.expenses}</ErrorState>:null}<div>{ledger.expenses.map(item=><RecordRow key={item.id} href={"/spesen/"+item.id} title={item.merchant} meta={swissDate(item.expense_date)} value={formatCurrency(item.amount,item.currency??"CHF")} status={({submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",draft:"Entwurf",rejected:"Abgelehnt"} as Record<string,string>)[item.status??""]??item.status}/>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<EmptyState compact title="Keine Spesen erfasst" text=""/>}</section>}

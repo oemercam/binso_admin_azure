@@ -32,7 +32,7 @@ function tone(status: string): "success" | "danger" | "warning" | "neutral" | "i
 }
 
 type RecordsColumns=Array<{label:string;index:number;align?:"left"|"right";status?:boolean;render?:(item:string[])=>React.ReactNode}>;
-type RecordsController=ReturnType<typeof useRecordsController>;
+export type RecordsController=ReturnType<typeof useRecordsController>;
 
 /** One committed search/filter/sort state, reusable in a page header or list toolbar. */
 export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,enabled=true}:{placeholder:string;chips?:string[];columns?:RecordsColumns;enabled?:boolean}){

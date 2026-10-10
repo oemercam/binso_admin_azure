@@ -57,6 +57,15 @@ if(process.env.BINSO_PDF_MATRIX_OUTPUT){await fs.mkdir(process.env.BINSO_PDF_MAT
 const quote=await inspectPdf({...data,kind:'offer',number:'AN-TEST',valid_until:'2026-10-31'});assert.ok(quote.pages.join(' ').includes('Individuelle Angebotseinleitung'));assert.ok(!quote.pages.join(' ').includes('Empfangsschein'));
 const multipage=await inspectPdf({...data,subtotal:2800,vat_amount:226.8,total:3026.8,items:Array.from({length:14},(_,i)=>({...data.items[0],description:'Position '+(i+1)+' – Prüfung des vollständigen Dokumentinhalts'}))});
 assert.ok(multipage.pages.length>1);assert.ok(multipage.pages.at(-1).includes('Zahlteil'),'Separate QR page remains reachable through document page count');
+const paginated=await getDocument({data:new Uint8Array(multipage.bytes),useSystemFonts:true}).promise;
+const positionStyles=[];
+for(let pageNumber=1;pageNumber<=paginated.numPages;pageNumber++){
+ const page=await paginated.getPage(pageNumber),content=await page.getTextContent();
+ for(const item of content.items)if(item.str?.startsWith('Position '))positionStyles.push({font:item.fontName,size:item.transform[0]});
+}
+await paginated.destroy();
+assert.equal(positionStyles.length,14,'Every paginated position remains present');
+for(const style of positionStyles)assert.deepEqual(style,positionStyles[0],'Table headers must not leak bold/small typography into a position after a page break');
 await fs.writeFile(process.env.BINSO_PDF_FIXTURE_OUTPUT??'/tmp/binso-production-pdf-fixture.pdf',multipage.bytes);
 await fs.writeFile('/tmp/binso-production-pdf-fixture.json',JSON.stringify({pages:multipage.pages.length,size:multipage.bytes.length}));
 console.log('Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.');
@@ -98,7 +107,7 @@ const listExports={};
 Function('require','exports','RecordsView','RecordRow','financialStatus','financialStatusLabels','documentDateLabel','formatCurrency',listCompiled)(require,listExports,()=>null,()=>null,financial.financialStatus,financial.financialStatusLabels,financial.documentDateLabel,financial.formatCurrency);
 const outstandingList=listExports.DocumentList({items:[],kind:'invoice',outstanding:true});
 assert.deepEqual(outstandingList.props.chips,['Alle','Überfällig']);assert.equal(outstandingList.props.emptyLabel('Alle'),'Keine offenen Rechnungen');
-assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt']);
+assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt','Storniert']);
 console.log('Optional outstanding lists retain scoped filters; the full invoice list retains all main filters.');
 
 assert.throws(()=>qr.createQrBillData({...company.raw,name:'Firma 🚀'},{number:'RE-CHAR',total:100}),/Zeichen/);

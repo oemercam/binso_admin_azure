@@ -33,7 +33,7 @@ const client={query:async(sql,values)=>{calls.push({sql,values});return {rows:[]
 await listApiBusiness(client,session,'documents','kind=eq.invoice&order=issue_date.desc&limit=5');
 assert.match(calls[0].sql,/order by q\.issue_date desc,q\.id desc limit 5/);
 assert.match(calls[0].sql,/organization_id=\$1/);
-assert.deepEqual(calls[0].values,['tenant-under-test']);
+assert.deepEqual(calls[0].values,['tenant-under-test',(await import(financialModuleUrl)).businessDate()]);
 await listApiBusiness(client,session,'payments','order=paid_on.desc&limit=5');
 assert.match(calls[1].sql,/order by q\.paid_on desc,q\.id desc limit 5/);
 for(const order of ['paid_on.desc;drop table payments','paid_on.sideways','secret.desc','issue_date.desc','created_at.desc.nullslast']){
@@ -46,8 +46,8 @@ await listApiBusiness(client,session,'customer_contacts','order=is_primary.desc,
 assert.match(calls[3].sql,/order by q\.is_primary desc,q\.created_at asc,q\.id desc/);
 console.log('Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.');
 await listApiBusiness(client,session,'documents','q='+encodeURIComponent('RE 2026-019')+'&kind=eq.invoice&limit=5');
-assert.deepEqual(calls[4].values,['tenant-under-test','RE 2026-019']);
-assert.ok(calls[4].sql.lastIndexOf(' where regexp_replace')<calls[4].sql.lastIndexOf(' order by '),'Search runs before result limiting');
+assert.deepEqual(calls[4].values,['tenant-under-test',(await import(financialModuleUrl)).businessDate(),'RE 2026-019']);
+assert.ok(calls[4].sql.lastIndexOf(' where ')<calls[4].sql.lastIndexOf(' order by '),'Search runs before result limiting');
 assert.ok(calls[4].sql.includes("q.customer->>'number'"),'Invoice search includes the related customer number');
 await assert.rejects(()=>listApiBusiness(client,session,'customers','q='+encodeURIComponent('x'.repeat(201))),error=>error.code==='invalid_search');
 assert.equal(calls.length,5,'An overlong search must not execute SQL');
@@ -350,7 +350,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError);
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState','FormSection',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError,({children})=>children);
   for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
    const getSave=view=>{if(view?.props?.onSubmit)return ()=>view.props.onSubmit({preventDefault(){}});if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};

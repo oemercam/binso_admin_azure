@@ -35,7 +35,7 @@ export async function tenantList<T extends Row>(table:string,select="*",extra=""
 export async function tenantListPage(table:string,params:URLSearchParams,defaultOrder="created_at.desc",equalFilters:Record<string,string>={}){
  const filters=new URLSearchParams({order:defaultOrder});
  for(const key of ['q','order','limit','offset']){const value=params.get(key);if(value)filters.set(key,value)}
- for(const key of ['status',...(table==='products'||table==='documents'?['kind']:[])]){const value=params.get(key);if(value)filters.set(key,'eq.'+value)}
+ for(const key of ['status',...(table==='products'||table==='documents'?['kind']:[]),...(table==='documents'?['display_status']:[])]){const value=params.get(key);if(value)filters.set(key,'eq.'+value)}
  for(const [key,value] of Object.entries(equalFilters))if(value)filters.set(key,'eq.'+value);
  const items=await tenantList(table,'*',filters.toString());
  let total=Number(items[0]?.total_count??0);
@@ -43,15 +43,17 @@ export async function tenantListPage(table:string,params:URLSearchParams,default
  return {items,total};
 }
 export async function tenantInsert<T extends Row>(table:string,data:T,requestKey?:string){
+ if(requestKey&&(requestKey.length<8||requestKey.length>128))throw new ApiError(400,"invalid_idempotency_key","Ungültige Anfragekennung.");
  const s=await requireSession();await assertTablePermission(s,table,"write");
  const translated=translateBusinessWrite(table,data,true);const fields:Row={...translated.data,...(table==="customer_contacts"?{}:{created_by_user_id:s.userId})};
  return withTenant(s.organizationId,s.userId,async c=>{
  const requestData={...translated.data};delete requestData.external_id;
  const requestHash=createHash('sha256').update(JSON.stringify({userId:s.userId,data:requestData})).digest('hex');
- if(table==='expenses'&&requestKey){
-  await c.query('select pg_advisory_xact_lock(hashtext($1))',[s.organizationId+':expense:'+requestKey]);
-  const previous=(await c.query("select request_hash,response_json from business_idempotency_keys where organization_id=$1 and operation='expense.create' and idempotency_key=$2",[s.organizationId,requestKey])).rows[0];
-  if(previous){if(previous.request_hash!==requestHash)throw new ApiError(409,'idempotency_conflict','Die Anfragekennung wurde für andere Spesen verwendet.');return previous.response_json;}
+ const replayOperation=table==='expenses'?'expense.create':table==='products'?'product.create':table==='employees'?'employee.create':null;
+ if(replayOperation&&requestKey){
+  await c.query('select pg_advisory_xact_lock(hashtext($1))',[s.organizationId+':'+replayOperation+':'+requestKey]);
+  const previous=(await c.query("select request_hash,response_json from business_idempotency_keys where organization_id=$1 and operation=$3 and idempotency_key=$2",[s.organizationId,requestKey,replayOperation])).rows[0];
+  if(previous){if(previous.request_hash!==requestHash)throw new ApiError(409,'idempotency_conflict','Die Anfragekennung wurde für andere Angaben verwendet.');return previous.response_json;}
  }
  if(table==='expenses'){
   if(ownRecordOnly(s.role,'spesen')){
@@ -64,8 +66,8 @@ export async function tenantInsert<T extends Row>(table:string,data:T,requestKey
  const keys=Object.keys(fields);const result=(await c.query(`insert into ${translated.target}(organization_id,${keys.join(',')}) values($1,${keys.map((_,i)=>'$'+(i+2)).join(',')}) returning id`,[s.organizationId,...Object.values(fields)])).rows;
  if(table==='expenses'){
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.created',entityType:'expenses',entityId:String(result[0].id),metadata:{status:fields.status}});
-  if(requestKey)await c.query("insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,'expense.create',$2,$3,$4::jsonb,$5)",[s.organizationId,requestKey,requestHash,JSON.stringify(result),s.userId]);
  }
+ if(replayOperation&&requestKey)await c.query("insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$6,$2,$3,$4::jsonb,$5)",[s.organizationId,requestKey,requestHash,JSON.stringify(result),s.userId,replayOperation]);
  return result;});
 }
 export async function tenantUpdate<T extends Row>(table:string,id:string,data:T){
