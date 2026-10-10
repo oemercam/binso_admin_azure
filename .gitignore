@@ -9,3 +9,8 @@ deploy/
 *.log
 
 tsconfig.tsbuildinfo
+
+# Reproducible UX evidence; compact reviewed snapshots are committed separately.
+docs/ux-compliance/report.json
+docs/ux-compliance/inventory.json
+docs/ux-compliance/evidence/

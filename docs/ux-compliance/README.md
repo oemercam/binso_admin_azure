@@ -45,3 +45,5 @@ Statistics conflict: the existing `.bo-statistics` and old browser assertion enf
 ## Completing acceptance later
 
 Requirements may register explicit `expectedCases` (route/state/theme/width/engine). They pass only when every registered applicable case has individual passing evidence. Review/device checks require named `reviewer` and `approvalReference`; a physical check additionally requires `device.physical=true` and `device.installedPwa=true`. Reconcile the full approval scope and set `approvalScopeComplete=true` only with that approval evidence. Current unspecified case matrices remain partial; the engine does not hardcode perpetual failure or manufacture full coverage.
+
+Main-push promotion, published releases and an explicitly full workflow dispatch use the strict release acceptance gate. Missing collection artifacts do not suppress reporting; coverage remains untested and the existing final Quality job still blocks any failed required check/browser job.

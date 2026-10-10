@@ -1,0 +1,62 @@
+{
+  "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
+  "workingSourceDigest": "033b96962b960931c4329a76f0e5f919f5dd09663b03fa036e45d887c6bf8de8",
+  "implementationBranch": "feat/ux-compliance-engine-20261010",
+  "localChecks": {
+    "productionBuild": "passed; product source unchanged",
+    "lint": "passed",
+    "typecheck": "passed",
+    "existingSuites": "passed; affected inventory/engine checks repeated after changes",
+    "navigationSourceAndTokens": "passed, unchanged",
+    "registryAndFixtureIsolation": "passed",
+    "adversarialReporterAndPixels": "passed",
+    "actualBrowserRuleAdversaries": "passed: overlap, inert/background, offscreen, clipped action, decorative footer bleed"
+  },
+  "browser": {
+    "playwright": "1.62.1",
+    "node": "24.19.0",
+    "chromiumNormalCases": 480,
+    "webkitNormalCases": 42,
+    "webkitScope": "Linux WebKit / iPhone 13 and viewport emulation. Local supplied libs; host preflight skipped after loader dependencies verified. Actual engine launched and assertions completed. No native iOS/PWA claim.",
+    "viewports": [
+      390,
+      768,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "fixtureVariants": 8,
+    "fixtureRouteCases": 9,
+    "interactionSuites": [
+      "customers",
+      "finance",
+      "time",
+      "documents",
+      "header"
+    ],
+    "completeEvidenceCases": 599
+  },
+  "gates": {
+    "fast": "passed",
+    "compliance": "failed as expected: UX-FIN-010, 43 measured cases",
+    "release": "blocked by measured defect and incomplete acceptance"
+  },
+  "coverage": {
+    "passed": 4,
+    "partial": 21,
+    "review-required": 399,
+    "not-tested": 6,
+    "failed": 1,
+    "manual-required": 1
+  },
+  "gitHubActions": "Configuration integrated and YAML parsed; remote required gates are not claimed passed.",
+  "limitations": [
+    "Original complete V21.1\u2013V21.5 approval artifacts unavailable",
+    "Physical installed iOS/Android PWA and OS keyboard unavailable",
+    "All route/state/role combinations have not yet been individually instrumented",
+    "Visual baseline requires reviewed same-commit capture; no auto-update",
+    "React component attribution is static reachability + selector mount; no React fiber identity claim"
+  ]
+}
