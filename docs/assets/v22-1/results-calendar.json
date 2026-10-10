@@ -1,0 +1,107 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "finance"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/kunden/customer-one",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

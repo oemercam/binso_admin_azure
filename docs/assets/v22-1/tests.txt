@@ -1,0 +1,82 @@
+
+> binso-one@0.11.0 test /workspace/scratch/bd6a0d67a03d/binso_admin_azure
+> node scripts/statistics-test.mjs && node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/pwa-lifecycle-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs && node scripts/data-foundation-test.mjs && node scripts/foundation-integration-test.mjs && node scripts/process-draft-test.mjs
+
+Central statistics: presets, inclusive dates, invalid dates, UTC/DST-independent groups, decimal precision, bounded long periods and cash mapping passed.
+Architecture entry points and package scripts passed.
+Finance and operator permission matrix passed.
+Search respects member record ownership.
+Expense approval/rejection rejects unauthorized roles before either mutation writes.
+Related-record links respect the AppShell context and retain a text fallback.
+Theme ownership, reload resolver and stale profile response checks passed.
+Demo start deduplication, offline failure, session-cache isolation and confirmed logout with retry passed.
+Confirmed operator logout clears the shared private session fence; unconfirmed logout preserves state and simultaneous clicks share one request.
+Expired database demo is unauthenticated; static cookie preview remains read-only.
+V22 statistics: real cash dates, expense reimbursement day, currency-separated invoice totals and role/tenant isolation passed.
+Document snapshots: creation defaults, individual replacement/reset, later template changes, invoice/offer issue and immutable payment/history passed.
+50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).
+Stripe signature, persisted checkout retries, duplicate/stale events, rollback, billing ledger, entitlements and tenant mapping passed (HTTP fixtures).
+Timer customer-only start/reload/pause/finish, context lock and internal work passed.
+Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.
+Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.
+PDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.
+Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.
+All ten canonical business repository sources reject foreign direct IDs with positive source fixtures.
+V21.3 document idempotency/payload conflict, immutable server numbers, transaction/counter rollback, quote precision and cash/open-balance parity passed.
+Actual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.
+Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.
+PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.
+Organization data lifecycle schema and deletion safeguards passed.
+Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.
+Search results use visible labels, canonical record IDs and existing detail routes.
+Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.
+Medium desktop uses the full content width and keeps create actions on one line.
+Support list uses the canonical full-width list and compact summary layout.
+Subscription settings use flat separators instead of legacy cards.
+Medium desktop keeps search, notifications and account/logout access in the header.
+Small SVG icons use crisp pixel-stable rendering.
+Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.
+Global header interactions share one anchored modal contract on every viewport.
+Desktop header icons render on a non-rasterized, pixel-stable appbar.
+PWA, portal and demo headers stay fully opaque without logo-dimming effects.
+Apple and PWA installation icons use the Binso One artwork with One wordmark.
+Invoice and offer details are operational workspaces; customer-document rendering exists only in preview.
+Shared page and section headings cannot create consecutive divider lines.
+Detail headings and tab dividers use one consistent vertical rhythm.
+Final rows cannot create duplicate section closing dividers.
+Customer details use company facts, active content and toolbox panes.
+Core web entity details use information, work area and toolbox panes.
+Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.
+Desktop customer and time-tracking processes preserve canonical entity identity.
+Finance month comparison includes the final month and excludes values outside partial date ranges.
+Time query, today-only period, project/customer context and approval filters passed.
+Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.
+Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.
+Project-linked idle timer context survives synchronization without changing active or already recorded time.
+Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.
+Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.
+Unknown server failures stay errors across 13 form, document, time and billing feedback paths.
+Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.
+Quantity/price units, fractional values, numeric sorting and distinct time metadata passed.
+Received `false` for a non-boolean attribute `prefetch`.
+
+If you want to write it to the DOM, pass a string instead: prefetch="false" or prefetch={value.toString()}.
+
+If you used to conditionally omit it with prefetch={condition && value}, pass prefetch={condition ? value : undefined} instead.
+Central action row preserves write/route permissions and explicit navigation/destructive intent.
+Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.
+Generated Swiss QR payment slip scales as a complete 210 × 105 mm viewport without altering its content.
+PWA lifecycle: no initial takeover reload, accepted update activates before a single reload, repeated events deduplicate, later acceptance works.
+Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.
+Operational document details: real paid date, no fabricated legacy date, derived open/overdue/partial/paid states, cancellation and mobile quantity/unit/unit-price/amount passed.
+Optional outstanding lists retain scoped filters; the full invoice list retains all main filters.
+QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.
+QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.
+Browser sharding preserves full route/interaction coverage, isolated servers and blocking failure status.
+Approved bottom-navigation markup and all responsive selector declarations are unchanged.
+UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.
+Wizard first/middle/final actions and architecture ownership passed.
+Customer and operator bottom navigation: markup, access/display/scroll logic, icons, styles and transitive tokens unchanged against 1eef9fb1d005d4752f12a9dd5c0e620decca4444.
+V21.3: decimal/PostgreSQL precision, partial/full balances, finance/calendar parity, targeted payment invalidation, read deduplication, mutation failures, old-session fencing, cross-tab logout/reconnect, safe API errors and file signatures passed.
+Integration architecture: no local runtime-import cycles, retired barrel protection and complete current route matrix passed.
+Process recovery: editable input/step/replay retained; user/tenant/role isolation, expiry, corruption, quota handling and session-fence purge passed.

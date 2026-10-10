@@ -14,5 +14,8 @@
   "baseline_deployment_run": 38038884445,
   "baseline_health_sha": "cf1a98a6e783ca4f7a2c06199002d5398fd5edd4",
   "new_version_merged": false,
-  "new_version_deployed": false
+  "new_version_deployed": false,
+  "pr": 234,
+  "implementation_sha": "7fe2bfb00b5ce33ec276b16d779b9bcb10d68e04",
+  "first_quality_run": 38046185491
 }

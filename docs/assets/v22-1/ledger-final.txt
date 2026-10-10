@@ -1,0 +1,11 @@
+Checking light 390px
+Route /dashboard
+Route /finanzen
+Route /kunden/customer-one
+Actual PaymentForm: failed mutation has no fictional balance; lost committed response retries the same key without double payment; confirmed partial payment updates eight mounted cross-tab consumers without reload.
+Checking dark 390px
+Route /dashboard
+Route /finanzen
+Route /kunden/customer-one
+Actual PaymentForm: failed mutation has no fictional balance; lost committed response retries the same key without double payment; confirmed partial payment updates eight mounted cross-tab consumers without reload.
+UX browser checks passed: 6 route/theme/viewport combinations ; interactions: data. Artifacts: /tmp/binso-v22-ledger-final
