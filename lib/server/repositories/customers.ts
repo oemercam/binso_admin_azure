@@ -3,6 +3,7 @@ import {randomUUID} from "node:crypto";
 import {withTenant} from "@/lib/server/db";
 import {audit} from "@/lib/server/audit";
 import {ApiError} from "@/lib/server/http";
+import {idempotentBusiness} from "../business-idempotency";
 import {listApiBusiness} from "./business-api";
 import type {SessionUser} from "@/lib/server/session";
 
@@ -32,12 +33,13 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
 }
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
 export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
-export async function createCustomer(organizationId:string,userId:string,input:CustomerInput){return withTenant(organizationId,userId,async client=>{
+export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey=""){return withTenant(organizationId,userId,async client=>{const write=async()=>{
  const id=randomUUID(),{zip,city}=addressParts(input);
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);
  const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');
  const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return result.rows[0];
+};return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();
 })}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;

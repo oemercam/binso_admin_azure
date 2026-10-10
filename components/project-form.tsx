@@ -53,8 +53,10 @@ export function ProjectForm(){
    {loading?<LoadingState>Projektdaten werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}>{loadError}</ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
     <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={saving} ariaLabel="Projekt erfassen" cancelAction={<Button variant="secondary" onClick={close}>Abbrechen</Button>} action={<Button requiresWrite type="submit" disabled={saving||!recovery.ready||name.trim().length<2}>{saving?'Wird erstellt…':'Auftrag starten'}</Button>}>
      {error&&<ErrorState>{error}</ErrorState>}
+     <div className="form-grid">
      <Field label="Bezeichnung *"><Input required minLength={2} maxLength={200} autoComplete="off" value={name} disabled={saving} onChange={e=>setName(e.target.value)} placeholder="z. B. Cloud Migration"/></Field>
      <Field label="Kunde"><Select disabled={!!sourceOffer||saving} value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Intern</option>{directory.data?.items.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field>
+     </div>
      {sourceOffer&&<p>Ursprungsangebot: {sourceOffer}</p>}
      <p>* Pflichtfeld</p>
     </FormWizard>

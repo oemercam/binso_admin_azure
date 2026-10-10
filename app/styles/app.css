@@ -763,6 +763,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .ux-lab-viewer{height:600px;display:flex;flex-direction:column;min-width:0}
 .bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
+.bottom-sheet[data-wizard] .sheet-body:has(.form-wizard){overflow:hidden}
+.bottom-sheet[data-wizard] .sheet-body>form:has(.form-wizard){display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
 .bottom-sheet[data-wizard] .form-wizard{min-height:0;display:flex;flex-direction:column;flex:1}
 .bottom-sheet[data-wizard] .wizard-content{min-height:0;flex:1;overflow:auto}
 .bottom-sheet[data-wizard] .wizard-progress{position:static;flex:none}
@@ -1462,8 +1464,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bo-statistics-detail{min-height:2.8em;font-size:12px;line-height:1.4;color:#c9cdd5;margin-bottom:0}
 
 /* Registration composes the shared sheet/wizard; no independent modal geometry. */
-.registration-sheet .registration-form{display:flex;flex:1;min-height:0;flex-direction:column}
-.registration-sheet .sheet-body:has(.registration-form){overflow:hidden}
 .registration-sheet h3{margin:0 0 var(--heading-content-gap);font-size:18px}
 .registration-sheet p{overflow-wrap:anywhere}
 .registration-summary{margin:0;display:grid;gap:var(--field-group-gap)}

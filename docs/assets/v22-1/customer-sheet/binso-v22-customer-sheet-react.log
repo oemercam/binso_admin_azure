@@ -1,0 +1,39 @@
+Auth and onboarding handoffs preserve local paths and reject URL-normalization redirect attacks.
+Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.
+Search results use visible labels, canonical record IDs and existing detail routes.
+Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.
+Medium desktop uses the full content width and keeps create actions on one line.
+Support list uses the canonical full-width list and compact summary layout.
+Subscription settings use flat separators instead of legacy cards.
+Medium desktop keeps search, notifications and account/logout access in the header.
+Small SVG icons use crisp pixel-stable rendering.
+Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.
+Global header interactions share one anchored modal contract on every viewport.
+Desktop header icons render on a non-rasterized, pixel-stable appbar.
+PWA, portal and demo headers stay fully opaque without logo-dimming effects.
+Apple and PWA installation icons use the Binso One artwork with One wordmark.
+Invoice and offer details are operational workspaces; customer-document rendering exists only in preview.
+Shared page and section headings cannot create consecutive divider lines.
+Detail headings and tab dividers use one consistent vertical rhythm.
+Final rows cannot create duplicate section closing dividers.
+Customer details use company facts, active content and toolbox panes.
+Core web entity details use information, work area and toolbox panes.
+Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.
+Desktop customer and time-tracking processes preserve canonical entity identity.
+Finance month comparison includes the final month and excludes values outside partial date ranges.
+Time query, today-only period, project/customer context and approval filters passed.
+Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.
+Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.
+Project-linked idle timer context survives synchronization without changing active or already recorded time.
+Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.
+Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.
+Unknown server failures stay errors across 13 form, document, time and billing feedback paths.
+Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.
+Quantity/price units, fractional values, numeric sorting and distinct time metadata passed.
+Received `false` for a non-boolean attribute `prefetch`.
+
+If you want to write it to the DOM, pass a string instead: prefetch="false" or prefetch={value.toString()}.
+
+If you used to conditionally omit it with prefetch={condition && value}, pass prefetch={condition ? value : undefined} instead.
+Central action row preserves write/route permissions and explicit navigation/destructive intent.
+Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.

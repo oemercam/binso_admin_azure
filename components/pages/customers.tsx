@@ -4,6 +4,9 @@ import {EntityFiles} from "../entity-files";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {Avatar} from "../avatar";
+import {FormWizard} from "../form-wizard";
+import {useProcessDraft} from "../use-process-draft";
+import {allowDraftNavigation} from "../use-browser-back-guard";
 
 import { DocumentList, type DocumentListItem } from "../document-list";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,7 +17,7 @@ import { RecordRow, RecordsView, RecordsControls, useRecordsController } from ".
 import { customers } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, FormActions, LoadingState, ErrorState} from "../ui";
+import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, CreateAction, DetailTabs } from "../binso-ux";
 import { useDemoRows, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
@@ -155,43 +158,61 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const saveRecordPending=useRef(false);
   const {dirty,markPristine}=useDirtySnapshot([company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus]);
   const [savedRecord,setSavedRecord]=useState(false);
+  const [sheetOpen,setSheetOpen]=useState(false);
+  useEffect(()=>{queueMicrotask(()=>setSheetOpen(true))},[]);
+  const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
+  const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
+    if(!value||[value.company,value.email,value.phone,value.city,value.sector,value.address,value.postalCode,value.uid,value.notes].some(item=>typeof item!=="string"||item.length>320)||!["active","inactive"].includes(value.customerStatus))return;
+    setCompany(value.company);setEmail(value.email);setPhone(value.phone);setCity(value.city);setSector(value.sector);setAddress(value.address);setPostalCode(value.postalCode);setUid(value.uid);setNotes(value.notes);setCustomerStatus(value.customerStatus);
+    if(value.replay&&typeof value.replay.body==="string"&&value.replay.body.length<8192&&typeof value.replay.key==="string"&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
+  }});
+  const close=()=>{recovery.clear();allowDraftNavigation();setSheetOpen(false);router.push(returnTo)};
   useEffect(()=>{if(!customerId||!recordQuery.data||hydratedCustomer.current===customerId)return;hydratedCustomer.current=customerId;const {item}=recordQuery.data;queueMicrotask(()=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);});},[customerId,recordQuery.data,markPristine]);
   const save=async()=>{
-    if(saveRecordPending.current||loadingRecord||recordError)return;
-    if(!company.trim() || !city.trim()){
-      setToast("Firmenname und Ort sind erforderlich.");
-      window.setTimeout(()=>setToast(null),2200);
+    if(saveRecordPending.current||!recovery.ready||loadingRecord||recordError)return;
+    if(company.trim().length<2){
+      setToast("Bitte einen Kundennamen mit mindestens zwei Zeichen eingeben.");
       return;
     }
-    saveRecordPending.current=true;setSavingRecord(true);
+    setToast(null);saveRecordPending.current=true;setSavingRecord(true);
     try{
-      if(isProductionBackendEnabled()) await (customerId?apiPatch:apiPost)("/api/customers"+(customerId?"/"+encodeURIComponent(customerId):""),{name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus});
+      if(isProductionBackendEnabled()){
+        const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus},serialized=JSON.stringify(body);
+        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt});
+        const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
+        if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
+      }
       else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
       setSavedRecord(true);
+      recovery.clear();allowDraftNavigation();
       window.setTimeout(()=>router.push(customerId?"/kunden/"+encodeURIComponent(customerId):returnTo),700);
     }catch(error){
       saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
-      window.setTimeout(()=>setToast(null),2600);
     }
   };
-  if(loadingRecord||recordError)return <AppShell title="Kunde" active="kunden" backHref="/kunden">{loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
-  return <AppShell editing={true} unsavedChanges={dirty&&!savedRecord} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} subtitle="Nur die wichtigsten Angaben. Details kannst du später ergänzen." active="kunden" backHref={returnTo} backLabel="Kunden">
-    <div className="form-page" inert={savingRecord}>
-      <section className="form-section clean">
-        <h2>Grundangaben</h2>
-        <div className="form-grid two">
-          <Field label="Firmenname"><Input autoFocus value={company} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
-          <Field label="E-Mail"><Input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
-          <Field label="Telefon"><Input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
-          <Field label="Ort"><Input value={city} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
-          <Field label="Status"><Select value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></Field><Field label="Branche"><Select value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></Select></Field>
-        </div>
-      </section>
-      <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two"><Field label="Adresse"><Input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field><Field label="PLZ"><Input inputMode="numeric" value={postalCode} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field><Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field><Field label="Interne Notiz"><Input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field></div></details>
-      <FormActions ><Button requiresWrite disabled={savingRecord} onClick={save}>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</Button></FormActions>
-    </div>
-    {toast&&<Toast title={toast} tone={toast==="Kunde gespeichert."?"success":"danger"}/>}
+  return <AppShell editing unsavedChanges={false} title="Kunden" active="kunden">
+    <FormSheet open={sheetOpen} onClose={close} label={customerId?"Kunde bearbeiten":"Kunde erstellen"} description="Beginne mit dem Namen. Weitere Angaben kannst du später ergänzen." busy={savingRecord} dirty={dirty&&!savedRecord} wizard>
+      {loadingRecord?<LoadingState>Kunde wird geladen …</LoadingState>:recordError?<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>:<form onSubmit={event=>{event.preventDefault();return save()}}>
+        <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={savingRecord} ariaLabel="Kunde erfassen" cancelAction={<Button variant="secondary" onClick={close}>Abbrechen</Button>} action={<Button requiresWrite type="submit" disabled={savingRecord||!recovery.ready||company.trim().length<2}>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</Button>}>
+          {toast&&toast!=="Kunde gespeichert."&&<ErrorState>{toast}</ErrorState>}
+          <Field label="Kundenname *"><Input required minLength={2} maxLength={320} autoComplete="organization" value={company} disabled={savingRecord} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
+          <p>* Pflichtfeld</p>
+          <details className="optional-details"><summary>Weitere Angaben</summary><div className="form-grid two">
+            <Field label="E-Mail"><Input type="email" autoComplete="email" maxLength={320} value={email} disabled={savingRecord} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
+            <Field label="Telefon"><Input type="tel" inputMode="tel" autoComplete="tel" maxLength={320} value={phone} disabled={savingRecord} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
+            <Field label="Adresse"><Input autoComplete="street-address" maxLength={320} value={address} disabled={savingRecord} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field>
+            <Field label="PLZ"><Input autoComplete="postal-code" maxLength={320} value={postalCode} disabled={savingRecord} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field>
+            <Field label="Ort"><Input autoComplete="address-level2" maxLength={320} value={city} disabled={savingRecord} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
+            <Field label="Status"><Select disabled={savingRecord} value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></Select></Field>
+            <Field label="Branche"><Select disabled={savingRecord} value={sector} onChange={e=>setSector(e.target.value)}><option>Dienstleistung</option><option>Bauunternehmen</option><option>Immobilien</option><option>Beratung</option><option>Handel</option><option>Elektro</option></Select></Field>
+            <Field label="UID"><Input maxLength={320} value={uid} disabled={savingRecord} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field>
+            <Field label="Interne Notiz"><Input maxLength={320} value={notes} disabled={savingRecord} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field>
+          </div></details>
+        </FormWizard>
+      </form>}
+    </FormSheet>
+    {toast==="Kunde gespeichert."&&<Toast title={toast} tone="success"/>}
   </AppShell>;
 }

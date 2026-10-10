@@ -1,0 +1,68 @@
+[
+  {
+    "theme": "light",
+    "width": 320,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "theme": "light",
+    "width": 375,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "theme": "dark",
+    "width": 320,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "theme": "dark",
+    "width": 375,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "phase": "review",
+    "observed": "passed"
+  },
+  {
+    "locale": "de",
+    "phase": "guided-validation-back-legal-network-create-resend",
+    "observed": "passed",
+    "provider": "synthetic UI fixture, no real mail"
+  },
+  {
+    "locale": "fr",
+    "phase": "guided-validation-back-legal-network-create-resend",
+    "observed": "passed",
+    "provider": "synthetic UI fixture, no real mail"
+  },
+  {
+    "locale": "it",
+    "phase": "guided-validation-back-legal-network-create-resend",
+    "observed": "passed",
+    "provider": "synthetic UI fixture, no real mail"
+  },
+  {
+    "locale": "en",
+    "phase": "guided-validation-back-legal-network-create-resend",
+    "observed": "passed",
+    "provider": "synthetic UI fixture, no real mail"
+  },
+  {
+    "locale": "tr",
+    "phase": "guided-validation-back-legal-network-create-resend",
+    "observed": "passed",
+    "provider": "synthetic UI fixture, no real mail"
+  }
+]

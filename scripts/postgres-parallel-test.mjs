@@ -20,8 +20,8 @@ try{
  const audit=moduleUrl((await fs.readFile('lib/server/audit.ts','utf8')).replace('import "server-only";',''));
  const qr=moduleUrl((await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/shared/utils.js',import.meta.url).href)));
  const replay=moduleUrl((await fs.readFile('lib/server/business-idempotency.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(http)));
- const compile=async(path,replacements)=>{let source=(await fs.readFile(path,'utf8')).replace('import "server-only";','');for(const [name,value] of Object.entries(replacements))source=source.replaceAll(JSON.stringify(name),JSON.stringify(value));return moduleUrl(source);};
- const business=await import(await compile('lib/server/repositories/business-api.ts',{'../business-idempotency':replay,'@/lib/financial-status':financialModuleUrl,'../http':http,'../audit':audit,'@/lib/permissions':permissions,'@/lib/qr-bill':qr}));
+ const compile=async(path,replacements)=>{let source=(await fs.readFile(path,'utf8')).replace('import "server-only";','');for(const [name,value] of Object.entries(replacements))source=source.replaceAll(JSON.stringify(name),JSON.stringify(value)).replaceAll("'"+name+"'",JSON.stringify(value));return moduleUrl(source);};
+ const businessModule=await compile('lib/server/repositories/business-api.ts',{'../business-idempotency':replay,'@/lib/financial-status':financialModuleUrl,'../http':http,'../audit':audit,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});const business=await import(businessModule);
  const plans=moduleUrl(await fs.readFile('config/plan-access.ts','utf8'));
  const scopedDb=moduleUrl('export async function query(sql,args){return globalThis.__binsoParallelPool.query(sql,args)} export async function withTenant(org,user,fn){const c=await globalThis.__binsoParallelPool.connect();try{await c.query("begin");await c.query("select set_config(\'app.organization_id\',$1,true)",[org]);const value=await fn(c);await c.query("commit");return value}catch(e){await c.query("rollback");throw e}finally{c.release()}}');
  const rbac=await compile('lib/server/rbac.ts',{'@/lib/permissions':permissions});
@@ -33,6 +33,21 @@ try{
  await pool.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'parallel@fixture.invalid','owner','active')",[organizationId,session.userId]);
  const customer=(await pool.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[organizationId])).rows[0];assert.ok(customer);
  const txn=async fn=>{const c=await pool.connect();try{await c.query('begin');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,session.userId]);const result=await fn(c);await c.query('commit');return result;}catch(error){await c.query('rollback');throw error;}finally{c.release();}};
+ // Six physical clients retry the same customer request; the counter advances once.
+ const customerRepository=await import(await compile('lib/server/repositories/customers.ts',{'@/lib/server/db':scopedDb,'@/lib/server/audit':audit,'@/lib/server/http':http,'../business-idempotency':replay,'./business-api':businessModule}));
+ const customerCounter=async()=>Number((await pool.query("select next_value from business_document_counters where organization_id=$1 and kind='customer' and period=''",[organizationId])).rows[0]?.next_value??1);
+ const beforeCustomers=await customerCounter();
+ const sameCustomers=await Promise.all(Array.from({length:6},()=>customerRepository.createCustomer(organizationId,session.userId,{name:'Synthetic parallel minimal customer'},'parallel-customer-replay')));
+ assert.equal(new Set(sameCustomers.map(row=>row.id)).size,1);assert.equal(new Set(sameCustomers.map(row=>row.customer_no)).size,1);assert.equal(await customerCounter(),beforeCustomers+1);assert.equal((await pool.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[organizationId,'Synthetic parallel minimal customer'])).rows[0].n,1);
+ const distinctCustomers=await Promise.all(Array.from({length:10},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{name:'Synthetic distinct customer '+i},'parallel-customer-number-'+i)));
+ assert.equal(new Set(distinctCustomers.map(row=>row.id)).size,10);assert.equal(new Set(distinctCustomers.map(row=>row.customer_no)).size,10);assert.equal(await customerCounter(),beforeCustomers+11);
+ // Internal projects use the same transaction-bound replay owner after a lost reply.
+ globalThis.__parallelProjectSession=session;
+ const projectHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>{throw e}');
+ const projects=await import(await compile('app/api/projects/route.ts',{'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelProjectSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':projectHttp,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':replay,'@/lib/permissions':permissions}));
+ const projectRequest={headers:new Headers({'idempotency-key':'parallel-internal-project-replay'}),body:{name:'Synthetic concurrent internal project'}};
+ const projectReplays=await Promise.all(Array.from({length:6},()=>projects.POST(projectRequest)));assert.ok(projectReplays.every(result=>result.status===201));assert.equal(new Set(projectReplays.map(result=>result.data.item.id)).size,1);assert.equal((await pool.query('select count(*)::int n from projects where organization_id=$1 and name=$2',[organizationId,projectRequest.body.name])).rows[0].n,1);delete globalThis.__parallelProjectSession;
+ console.log('Real PostgreSQL: six concurrent customer/project retries return one record; ten distinct customer creations allocate unique numbers with exact counter increments.');
  const args={p_kind:'invoice',p_customer_id:customer.id,p_issue_date:'2026-10-09',p_due_date:'2026-11-09',p_currency:'CHF',p_vat_rate:0,p_items:[{description:'Synthetic concurrency work',quantity:1,unit_price:2561.97,vat_rate:0}],p_note:'Isolated test'};
  // Ten transactions use distinct physical clients and contend on the same counter.
  const ids=(await Promise.all(Array.from({length:10},(_,i)=>txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',{...args,p_idempotency_key:'parallel-number-'+i})))));
@@ -60,4 +75,4 @@ try{
  assert.equal((await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n,baseline+1,'Concurrent stop stores one time entry');assert.equal((await timer.GET()).tracker,null);delete globalThis.__parallelTimerSession;
  console.log('Real PostgreSQL: concurrent device timer start/stop yields one tracker and one time entry.');
  console.log('Real PostgreSQL: ten parallel numbers, concurrent document/payment replay and competing final payments passed across independent connections. Synthetic disposable database only.');
-}finally{delete globalThis.__binsoParallelPool;await pool.end();}
+}finally{delete globalThis.__parallelProjectSession;delete globalThis.__binsoParallelPool;await pool.end();}

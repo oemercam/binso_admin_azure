@@ -1,0 +1,29 @@
+{
+  "overflow": false,
+  "footerBottom": 550,
+  "footerTop": 478,
+  "height": 580,
+  "boxBottom": 580,
+  "inputs": [
+    {
+      "name": "company",
+      "type": "text",
+      "value": "Synthetic Company with a deliberately long business name GmbH"
+    },
+    {
+      "name": "email",
+      "type": "email",
+      "value": "synthetic-long-email@company.example.invalid"
+    },
+    {
+      "name": "password",
+      "type": "password",
+      "value": "[omitted]"
+    },
+    {
+      "name": "acceptedTerms",
+      "type": "checkbox",
+      "value": "on"
+    }
+  ]
+}

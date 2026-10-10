@@ -22,7 +22,7 @@ export async function GET(request:NextRequest){
 export async function POST(request:NextRequest){
  try{
   assertSameOrigin(request);const s=await requireSession();authorize(s,"customers:write");const body=asObject(await readJson(request));
-  const item=await createCustomer(s.organizationId,s.userId,customerInput(body) as CustomerInput);
+  const item=await createCustomer(s.organizationId,s.userId,customerInput(body) as CustomerInput,request.headers.get("idempotency-key")?.trim()??"");
   return json({item},201);
  }catch(e){return apiError(e)}
 }
