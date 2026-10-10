@@ -723,7 +723,18 @@ try{
    const editor=await trackedPage();await editor.goto(base+'/rechnungen/neu?customerId=customer-one');await editor.waitForLoadState('networkidle');const picker=editor.getByLabel('Kunde auswählen',{exact:true});assert.equal(await picker.locator('option').count(),2,'Duplicate names retain two distinct choices');assert.equal(await picker.inputValue(),'customer-one','Linked customer initialized by ID');await picker.selectOption('customer-two');
    const rename=await trackedPage();await rename.goto(base+'/kunden/customer-two/bearbeiten');await rename.getByLabel('Kundenname *',{exact:true}).fill('Identität bleibt erhalten AG');await rename.getByRole('button',{name:'Änderungen speichern',exact:true}).click();await rename.getByText('Kunde gespeichert.',{exact:true}).waitFor();
    await customerList.waitForFunction(()=>window.v215CustomerChanges.some(message=>message.domains?.includes('customers')),undefined,{polling:100});
-   await editor.bringToFront();await editor.waitForFunction(()=>document.querySelector('option[value="customer-two"]')?.textContent?.includes('Identität bleibt erhalten AG'));assert.equal(await picker.inputValue(),'customer-two','Rename/revalidation cannot switch a draft back to the URL customer');await customerList.bringToFront();await customerList.locator('.mobile-record-list:visible,.desktop-record-table:visible').getByText('Identität bleibt erhalten AG',{exact:true}).waitFor();assert.equal(await customerList.evaluate(()=>window.v215CustomerListMarker),'same-document','Returning to the consumer tab revalidates without a reload');
+   await editor.bringToFront();await editor.waitForFunction(()=>document.querySelector('option[value="customer-two"]')?.textContent?.includes('Identität bleibt erhalten AG'));assert.equal(await picker.inputValue(),'customer-two','Rename/revalidation cannot switch a draft back to the URL customer');await customerList.bringToFront();
+   // Wait on the visible identity row itself: responsive container visibility is
+   // transient while the background consumer commits its refreshed response.
+   const renamedCustomerRow=customerList.locator('a[href="/kunden/customer-two"]').filter({visible:true});
+   try{
+    await renamedCustomerRow.getByText('Identität bleibt erhalten AG',{exact:true}).waitFor();
+   }catch(error){
+    console.log('Customer consumer diagnostics:',JSON.stringify(await customerList.evaluate(()=>({visibility:document.visibilityState,body:document.body.innerText,rows:[...document.querySelectorAll('a[href="/kunden/customer-two"]')].map(row=>({text:row.textContent,rect:row.getBoundingClientRect().toJSON(),display:getComputedStyle(row).display})),changes:window.v215CustomerChanges}))));
+    await capture(customerList,{fullPage:true,path:path.join(output,`${theme}-customer-consumer-error.png`)});
+    throw error;
+   }
+   assert.equal(await customerList.evaluate(()=>window.v215CustomerListMarker),'same-document','Returning to the consumer tab revalidates without a reload');
    for(const consumer of Object.values(tabs))await consumer.waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('customers')),undefined,{polling:100});
    await rename.close();await editor.close();await customerList.close();customerIdentityMode=false;
    await tabs.list.bringToFront();await tabs.list.waitForLoadState('networkidle');holdDataRefresh=true;
