@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type {SearchItem} from "@/lib/search";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
@@ -23,7 +22,7 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose}:{query:s
    {loading&&<LoadingState className="technical-hint">Suche läuft …</LoadingState>}
    {query.trim().length>=2&&!loading&&error&&<ErrorState className="technical-hint">{error}</ErrorState>}
    {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState compact title="Keine Treffer gefunden" text=""/>}
-   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><Link key={item.href} href={item.href} onClick={onClose}><span className="activity-icon"><Icon name={item.icon}/></span><div><b>{item.title}</b><span>{item.meta}</span></div><Icon name="arrow" size={16}/></Link>)}</section>)}
+   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={onClose}/>)}</section>)}
   </div>
  </div>;
 }

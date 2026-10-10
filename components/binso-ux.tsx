@@ -17,7 +17,7 @@ export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=
  if(href&&!access.canOpen(href))return null;
  const blocked=disabled||(requiresWrite&&!access.write);
  const className=`action-row${danger?" action-row-danger":""}`;
- const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{title}{description&&<small className="action-row-description">{description}</small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
+ const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span>{title}</span>:title}{description&&<small className="action-row-description">{description}</small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
  return href&&!blocked?<Link prefetch={false} href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
 }
 
