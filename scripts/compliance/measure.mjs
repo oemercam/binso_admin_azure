@@ -6,6 +6,28 @@ import {createHash} from 'node:crypto';
 const runIdentity=identity();
 const baselineFile='ux-compliance/navigation-baseline.v1.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
+export async function measureActionClearance(page){
+ return page.evaluate(async()=>{
+  const nav=document.querySelector('.bottom-nav');if(!nav?.getClientRects().length||document.querySelector('[role=dialog]'))return null;
+  const old={x:scrollX,y:scrollY},deadline=performance.now()+3000;
+  let stable=0,previous=null,atEnd=false;
+  // Route effects and late document growth can reset the first scroll. Prove the
+  // endpoint before comparing geometry; two RAFs alone never prove scroll end.
+  while(performance.now()<deadline){
+   window.scrollTo({left:0,top:document.documentElement.scrollHeight,behavior:'instant'});
+   await new Promise(r=>requestAnimationFrame(r));
+   const endpoint=Math.max(0,document.scrollingElement.scrollHeight-innerHeight);
+   atEnd=Math.abs(scrollY-endpoint)<=1;
+   stable=atEnd&&previous!==null&&Math.abs(previous-endpoint)<=1?stable+1:0;
+   previous=endpoint;if(stable>=2)break;
+  }
+  const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
+  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
+  const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
+  const observed={lastActionBottom:bottom,navigationTop:navRect.top,scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
+  window.scrollTo({left:old.x,top:old.y,behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return observed;
+ });
+}
 /** DOM-only measurements: no customer text or record values in the evidence. */
 export async function measureCompliance(page,{output,route,theme,width,state='normal',engine='chromium'}){
  await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getComputedTiming().endTime)).map(a=>a.finished.catch(()=>{})));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));});
@@ -55,15 +77,8 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   return {viewport:v,checks,surfaces,navigation:all('.bottom-nav').map(el=>({rect:rect(el),position:getComputedStyle(el).position,borderRadius:getComputedStyle(el).borderRadius,links:[...el.querySelectorAll('a')].map(a=>({href:a.getAttribute('href'),rect:rect(a)}))}))};
  });
  // Last reachable action at scroll end; measure only outside dialogs/editors. Restore scroll without firing navigation clicks.
- const clearance=await page.evaluate(async()=>{
-  const nav=document.querySelector('.bottom-nav');if(!nav?.getClientRects().length||document.querySelector('[role=dialog]'))return null;
-  const old={x:scrollX,y:scrollY};window.scrollTo(0,document.documentElement.scrollHeight);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
-  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'):[];
-  const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
-  window.scrollTo(old.x,old.y);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return {lastActionBottom:bottom,navigationTop:navRect.top};
- });
- if(clearance?.lastActionBottom!==null&&clearance)measured.checks.push({id:'UX-LAY-008',status:clearance.lastActionBottom<=clearance.navigationTop+1?'passed':'failed',selector:'.page-container,.bottom-nav',observed:clearance});
+ const clearance=await measureActionClearance(page);
+ if(clearance?.lastActionBottom!==null&&clearance)measured.checks.push({id:'UX-LAY-008',status:clearance.scrollEndEstablished&&clearance.lastActionBottom<=clearance.navigationTop+1?'passed':'failed',selector:'.page-container,.bottom-nav',observed:clearance});
  const evidence={schemaVersion:1,...runIdentity,engine,route,theme,width,state,scope:'Synthetic API fixtures; desktop engine emulation; no native keyboard proof',...measured};
  if(measured.navigation.length){
   const reference=navigationBaseline?.cases.find(c=>c.theme===theme&&c.width===width&&c.state===state);

@@ -48,3 +48,7 @@ The existing Quality pipeline and PR236 compliance engine are extended; no paral
 5. Review historical constraint violations without editing invoices; only then propose a migration.
 
 Bottom-navigation markup/logic/icons/styles/transitive tokens unchanged; no productive customer or invoice rows edited
+
+## Measurement integrity follow-up
+
+The first GitHub run passed both browser jobs but its combined report blocked one dashboard/demo 320px dark action-clearance measurement. The original adapter assumed two animation frames established the scroll endpoint. A delayed route reset can invalidate that assumption. The adapter now proves a stable current document endpoint, records scrollY/endpoint/proof and remains blocking if it cannot establish the endpoint or the actual action overlaps navigation. Chromium/WebKit adversarial fixtures cover a late reset, restoration, genuine overlap and blocked scrolling. No production navigation or padding was changed. The superseded run remains historical evidence; current source-bound measurements must be rerun after this adapter change.

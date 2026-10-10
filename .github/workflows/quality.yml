@@ -186,6 +186,11 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
+      - name: Scroll endpoint measurement adversaries
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+        run: node scripts/compliance/measure-browser-test.mjs
       - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
