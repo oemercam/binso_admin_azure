@@ -3,14 +3,14 @@ import {compareRecordValues} from "@/lib/record-sort";
 import {matchesRecordChip} from "@/lib/list-filter";
 
 import Link from "next/link";
-import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, type ReactNode, type CSSProperties } from "react";
+import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, useRef, type ReactNode, type CSSProperties } from "react";
 import {EmptyState, Icon, Status, LoadingState, ErrorState, Button, Field, Select, Input} from "./ui";
 import { ListRow, FilterSheet } from "./binso-ux";
 import {Avatar} from "./avatar";
 
 /** Domain columns differ; table/row/cell semantics and ownership stay central. */
-export function DataTable({children,label,variant="records"}:{children:ReactNode;label:string;variant?:"records"|"operator"}){
- return <div className={variant==="operator"?"operator-table":"desktop-record-table"} role="table" aria-label={label}>{children}</div>;
+export function DataTable({children,label,variant="records",owner}:{children:ReactNode;label:string;variant?:"records"|"operator";owner?:string}){
+ return <div className={variant==="operator"?"operator-table":"desktop-record-table"} role="table" aria-label={label} data-records-owner={owner}>{children}</div>;
 }
 function tableCells(children:ReactNode,header=false){
  return Children.map(children,child=>isValidElement<{role?:string}>(child)&&child.type==='span'&&!child.props.role?cloneElement(child,{role:header?'columnheader':'cell'}):child);
@@ -47,6 +47,24 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
   const columnIndexes=JSON.stringify(columns?.map(column=>column.index)??[]);
   const [restored,setRestored]=useState(false);
   const [page,setPage]=useState(0);
+  const scrollSnapshot=useRef<{y:number;context:string}|null>(null);
+  const listContext=JSON.stringify({query,activeChip,sort,sortIndex,page});
+  useEffect(()=>{
+    if(!enabled)return;
+    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    try{const saved=JSON.parse(window.sessionStorage.getItem(key)??"null");if(saved&&Number.isFinite(saved.y)&&saved.y>=0&&typeof saved.context==="string")scrollSnapshot.current=saved;}catch{}
+  },[enabled,placeholder]);
+  useEffect(()=>{
+    if(!enabled||!restored)return;
+    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    const remember=(event:MouseEvent)=>{
+      const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>(".mobile-record-list a,.desktop-record-row[href]"):null;
+      if(!link||link.closest("[data-records-owner]")?.getAttribute("data-records-owner")!==placeholder||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.target==="_blank")return;
+      try{const target=new URL(link.href);if(target.origin===window.location.origin&&target.pathname!==window.location.pathname)window.sessionStorage.setItem(key,JSON.stringify({y:window.scrollY,context:listContext}));}catch{}
+    };
+    document.addEventListener("click",remember,true);
+    return()=>document.removeEventListener("click",remember,true);
+  },[enabled,restored,placeholder,listContext]);
   useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);try{const saved=JSON.parse(window.sessionStorage.getItem("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle");setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>setRestored(true));},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
   useEffect(()=>{if(!enabled||!restored)return;try{window.sessionStorage.setItem("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
 
@@ -55,7 +73,7 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
   const [draft,setDraft]=useState({activeChip:chips[0]??"Alle",sort:"default" as "default"|"asc"|"desc",sortIndex:firstSortIndex});
   const openFilters=()=>{setDraft({activeChip,sort,sortIndex});setFilterOpen(true)};
   const applyFilters=()=>{setActiveChip(draft.activeChip);setSort(draft.sort);setSortIndex(draft.sortIndex);setPage(0);setFilterOpen(false)};
-  return {query,setQuery:(value:string)=>{setQuery(value);setPage(0)},activeChip,setActiveChip:(value:string)=>{setActiveChip(value);setPage(0)},sort,setSort:(value:"default"|"asc"|"desc")=>{setSort(value);setPage(0)},sortIndex,setSortIndex:(value:number)=>{setSortIndex(value);setPage(0)},page,setPage,firstSortIndex,statusIndex,searchOpen,setSearchOpen,filterOpen,setFilterOpen,draft,setDraft,openFilters,applyFilters};
+  return {query,setQuery:(value:string)=>{setQuery(value);setPage(0)},activeChip,setActiveChip:(value:string)=>{setActiveChip(value);setPage(0)},sort,setSort:(value:"default"|"asc"|"desc")=>{setSort(value);setPage(0)},sortIndex,setSortIndex:(value:number)=>{setSortIndex(value);setPage(0)},page,setPage,restored,scrollSnapshot,listContext,firstSortIndex,statusIndex,searchOpen,setSearchOpen,filterOpen,setFilterOpen,draft,setDraft,openFilters,applyFilters};
 }
 
 /** Search and filters use the existing sheet, fields and action footer. */
@@ -111,6 +129,14 @@ export function RecordsView({
   const state=controller??localController;
   const {query,setQuery,activeChip,setActiveChip,sort,setSort,sortIndex,setSortIndex,firstSortIndex,statusIndex}=state;
 
+  useEffect(()=>{
+    const snapshot=state.scrollSnapshot.current;
+    if(!state.restored||loading||error||!snapshot||snapshot.context!==state.listContext)return;
+    let second=0;
+    const first=requestAnimationFrame(()=>{second=requestAnimationFrame(()=>{window.scrollTo({top:snapshot.y,left:0,behavior:"instant"});state.scrollSnapshot.current=null;});});
+    return()=>{cancelAnimationFrame(first);cancelAnimationFrame(second);};
+  },[state.restored,state.listContext,state.scrollSnapshot,loading,error,items]);
+
   const visible=useMemo(()=>{
     if(remote)return items;
     const filtered=items.filter(item=>{
@@ -146,7 +172,7 @@ export function RecordsView({
       {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
     </div>}
 
-    {loading?<LoadingState>Einträge werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:visible.length ? <><DataTable label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list">{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
+    {loading?<LoadingState>Einträge werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
       <EmptyState compact text="" title={query.trim()?"Keine Treffer für diese Suche":emptyLabel?.(activeChip)??(activeChip==="Inaktiv"?"Keine inaktiven "+countLabel:activeChip==="Aktiv"?"Keine aktiven "+countLabel:"Keine "+countLabel+" erfasst")}/>}
     {pagination&&(pagination.total>pagination.pageSize||pagination.page>0)&&<nav className="records-pagination" aria-label="Listenseiten"><Button variant="secondary" disabled={loading||pagination.page===0} onClick={()=>pagination.onPage(pagination.page-1)}>Zurück</Button><span>Seite {pagination.page+1} von {Math.max(pagination.page+1,Math.ceil(pagination.total/pagination.pageSize))}</span><Button variant="secondary" disabled={loading||(pagination.page+1)*pagination.pageSize>=pagination.total} onClick={()=>pagination.onPage(pagination.page+1)}>Weiter</Button></nav>}
   </>;

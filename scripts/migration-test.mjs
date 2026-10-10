@@ -176,7 +176,9 @@ try{
  const customerRepository=await import(dataModule(customerSource));
  const input={name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
  const created=await customerRepository.createCustomer(sandbox,'sandbox-user',input);
+ assert.match(created.customer_no,/^K-\d{6,}$/,'Only the successful server creation returns the assigned business number');
  const updated=await customerRepository.updateCustomer(sandbox,'sandbox-user',created.id,{city:'Bern',sector:'Handel'});
+ assert.equal(updated.customer_no,created.customer_no,'Editing master data preserves the original business number');
  assert.equal(updated.notes,input.notes);assert.equal(updated.uid,input.uid);assert.equal(updated.address,input.address);assert.equal(updated.city,'Bern');assert.equal(updated.sector,'Handel');assert.equal(updated.email,input.email);assert.equal(Number(updated.paymentDays),45);
  assert.equal((await customerRepository.listCustomers({...clonedSession,userId:'sandbox-user'})).find(row=>row.id===created.id).postal_code,'8000');
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);

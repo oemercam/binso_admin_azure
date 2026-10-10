@@ -40,7 +40,7 @@ if(server&&process.env.BINSO_UX_SERVER_MODE==='dev')for(const route of (process.
 const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const launchOptions={headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE&&(process.env.BINSO_UX_BROWSER??'chromium')==='chromium'?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}: {})};
 let browser;
-const customer={id:'customer-one',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
+const customer={id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
@@ -290,11 +290,14 @@ try{
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-customer-list-standard.png`)});
     const originalCustomers=[...collections.customers];
     await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByLabel('Sortierung',{exact:true}).selectOption('0:asc');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();
-    collections.customers.push(...Array.from({length:55},(_,index)=>({...customer,id:'pagination-'+index,name:'Paging customer '+String(index).padStart(2,'0'),city:'Bern'})));
-    await page.reload();await page.getByRole('navigation',{name:'Listenseiten',exact:true}).getByRole('button',{name:'Weiter',exact:true}).click();await page.getByText('Seite 2 von 2',{exact:true}).waitFor();assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'The second customer page exposes the remaining authorized rows');
-    await page.locator('.mobile-record-list a[href="/kunden/customer-one"]').click();await page.waitForURL('**/kunden/customer-one');await page.goBack();await page.waitForURL('**/kunden');await page.getByText('Seite 2 von 2',{exact:true}).waitFor();assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'Returning from details restores the active page');
+    collections.customers.push(...Array.from({length:55},(_,index)=>({...customer,id:'pagination-'+index,name:'Paging customer '+String(index).padStart(2,'0'),customer_no:'K-PAGING-'+index,city:'Bern'})));
+    await page.reload();await page.locator('.mobile-record-list .record-wrapper').nth(49).waitFor({state:'visible'});
+    await page.evaluate(()=>{window.scrollTo(0,500);document.querySelector('.mobile-record-list a').click()});await page.waitForURL('**/kunden/pagination-*');await page.goBack();await page.waitForURL('**/kunden');await page.waitForFunction(()=>window.scrollY>=450);assert.ok(await page.evaluate(()=>window.scrollY)>=450,'Returning to a populated list restores its content scroll position');
+    await page.getByRole('navigation',{name:'Listenseiten',exact:true}).getByRole('button',{name:'Weiter',exact:true}).click();await page.getByText('Seite 2 von 2',{exact:true}).waitFor();await page.locator('.mobile-record-list .record-wrapper').nth(5).waitFor({state:'visible'});assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'The second customer page exposes the remaining authorized rows');
+    await page.locator('.mobile-record-list a[href="/kunden/customer-one"]').click();await page.waitForURL('**/kunden/customer-one');await page.goBack();await page.waitForURL('**/kunden');await page.getByText('Seite 2 von 2',{exact:true}).waitFor();await page.locator('.mobile-record-list .record-wrapper').nth(5).waitFor({state:'visible'});assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'Returning from details restores the active page');
     collections.customers.splice(0,collections.customers.length,...originalCustomers);await page.reload();await page.getByRole('navigation',{name:'Listenseiten',exact:true}).getByRole('button',{name:'Zurück',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
     await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
+    await page.locator('.detail-list').getByText('K-000001',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Kundenaktionen',exact:true}).filter({visible:true}).click();
     const actions=page.getByRole('dialog',{name:'Kundenaktionen',exact:true});await actions.waitFor();await actionEvidence(page,'Kundenaktionen',theme);
     await actions.getByRole('button',{name:/Kontakt hinzufügen/}).click();

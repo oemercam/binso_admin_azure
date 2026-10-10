@@ -27,7 +27,7 @@ export function swissDate(value:unknown){
 
 export function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
-    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??"")
   ]);
   if(collection==="products") return items.map(item=>[
     String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",withPriceUnit(moneyChf(item.unit_price),item.unit),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
