@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "commit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
+  "provenance": "Initial runtime geometry of unchanged approved bottom navigation; both source contract tests passed. Baseline was explicitly seeded during engine implementation, not visually re-approved. Physical PWA is separate.",
+  "toleranceCssPixels": 1,
+  "cases": [
+    {
+      "theme": "dark",
+      "width": 390,
+      "state": "normal",
+      "navigation": {
+        "rect": {
+          "x": 10.90625,
+          "y": 923.421875,
+          "width": 368.1875,
+          "height": 68,
+          "right": 379.09375,
+          "bottom": 991.421875
+        },
+        "position": "fixed",
+        "borderRadius": "30px",
+        "links": [
+          {
+            "href": "/dashboard",
+            "rect": {
+              "x": 17.90625,
+              "y": 930.421875,
+              "width": 70.828125,
+              "height": 54,
+              "right": 88.734375,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/kunden",
+            "rect": {
+              "x": 88.734375,
+              "y": 930.421875,
+              "width": 70.84375,
+              "height": 54,
+              "right": 159.578125,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/finanzen",
+            "rect": {
+              "x": 159.578125,
+              "y": 930.421875,
+              "width": 70.828125,
+              "height": 54,
+              "right": 230.40625,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/zeit",
+            "rect": {
+              "x": 230.40625,
+              "y": 930.421875,
+              "width": 70.84375,
+              "height": 54,
+              "right": 301.25,
+              "bottom": 984.421875
+            }
+          }
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "state": "normal",
+      "navigation": {
+        "rect": {
+          "x": 10.90625,
+          "y": 923.421875,
+          "width": 368.1875,
+          "height": 68,
+          "right": 379.09375,
+          "bottom": 991.421875
+        },
+        "position": "fixed",
+        "borderRadius": "30px",
+        "links": [
+          {
+            "href": "/dashboard",
+            "rect": {
+              "x": 17.90625,
+              "y": 930.421875,
+              "width": 70.828125,
+              "height": 54,
+              "right": 88.734375,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/kunden",
+            "rect": {
+              "x": 88.734375,
+              "y": 930.421875,
+              "width": 70.84375,
+              "height": 54,
+              "right": 159.578125,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/finanzen",
+            "rect": {
+              "x": 159.578125,
+              "y": 930.421875,
+              "width": 70.828125,
+              "height": 54,
+              "right": 230.40625,
+              "bottom": 984.421875
+            }
+          },
+          {
+            "href": "/zeit",
+            "rect": {
+              "x": 230.40625,
+              "y": 930.421875,
+              "width": 70.84375,
+              "height": 54,
+              "right": 301.25,
+              "bottom": 984.421875
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

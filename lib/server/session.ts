@@ -58,7 +58,6 @@ export async function getSession():Promise<SessionUser|null>{
  const demo=jar.get("binso_demo")?.value==="1";
  const token=jar.get(demo?"binso_demo_write":env.sessionCookieName)?.value;
  if(!token)return null;
- await expireUnpaidTrials();
  const result=await query<SessionUser>(
    `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
@@ -70,6 +69,7 @@ export async function getSession():Promise<SessionUser|null>{
    [tokenHash(token),demo]
  );
  const session=result.rows[0]||null;
+ if(session&&!session.isDemo){const expired=await expireUnpaidTrials(session.organizationId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }

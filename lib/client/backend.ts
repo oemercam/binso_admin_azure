@@ -171,8 +171,17 @@ export async function apiDelete<T>(path:string):Promise<T>{
   return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
 }
 
+const uploadReplayKeys=new WeakMap<File,Map<string,string>>();
 export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
   const revision=dataRevision([]);
-  const response=await fetchApi(path,{method:"POST",body:form});
+  const file=form.get("file");
+  const headers:Record<string,string>={};
+  if(file instanceof File){
+    const scope=JSON.stringify([path,form.get("purpose"),form.get("entityId")]);
+    let keys=uploadReplayKeys.get(file);if(!keys){keys=new Map();uploadReplayKeys.set(file,keys);}
+    let key=keys.get(scope);if(!key){key=crypto.randomUUID();keys.set(scope,key);}
+    headers["Idempotency-Key"]=key;
+  }
+  const response=await fetchApi(path,{method:"POST",body:form,headers});
   return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST");
 }

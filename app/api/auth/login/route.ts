@@ -55,8 +55,12 @@ export async function POST(request:NextRequest){
    let ok=false;
    if(/^\d{6}$/.test(mfaCode)&&user.mfa_secret_enc)ok=verifyTotp(decryptSecret(user.mfa_secret_enc),mfaCode);
    else{
-    const target=hashRecoveryCode(mfaCode);const codes=Array.isArray(user.recovery_code_hashes)?user.recovery_code_hashes:[];const idx=codes.indexOf(target);
-    if(idx>=0){ok=true;await query(`update app_users set recovery_code_hashes=$1::jsonb,updated_at=now() where id=$2`,[JSON.stringify(codes.filter((_,i)=>i!==idx)),user.id])}
+    const target=hashRecoveryCode(mfaCode);
+    // PostgreSQL rechecks this predicate after waiting for a concurrent writer.
+    // Remove from the current array, never overwrite a previously read snapshot.
+    const consumed=await query(`update app_users set recovery_code_hashes=recovery_code_hashes - (select ordinality::int-1 from jsonb_array_elements_text(recovery_code_hashes) with ordinality where value=$1 limit 1),updated_at=now()
+      where id=$2 and status='active' and mfa_enabled=true and password_hash=$3 and mfa_secret_enc is not distinct from $4 and recovery_code_hashes @> $5::jsonb returning id`,[target,user.id,user.password_hash,user.mfa_secret_enc,JSON.stringify([target])]);
+    ok=consumed.rowCount===1;
    }
    if(!ok)return json({error:"invalid_mfa",message:"Der MFA-Code ist ungültig.",mfaRequired:true,mfaMethod:"totp"},401);
   }else{

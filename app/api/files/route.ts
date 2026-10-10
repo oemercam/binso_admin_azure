@@ -1,3 +1,4 @@
+import {idempotentBusiness} from "@/lib/server/business-idempotency";
 import {fileRelations} from "@/lib/server/file-relations";
 import {validateFileContent} from "@/lib/server/file-validation";
 import {createHash,randomUUID} from "node:crypto";
@@ -7,7 +8,7 @@ import {requireSession} from "@/lib/server/session";
 import {tenantCan} from "@/lib/permissions";
 import {authorize} from "@/lib/server/rbac";
 import {withTenant} from "@/lib/server/db";
-import {ApiError,apiError,assertSameOrigin,json} from "@/lib/server/http";
+import {ApiError,apiError,assertSameOrigin,json,readBoundedBody} from "@/lib/server/http";
 export const runtime="nodejs";
 const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
 
@@ -25,7 +26,10 @@ export async function GET(request:NextRequest){try{
 export async function POST(request:NextRequest){
  try{
   assertSameOrigin(request);const s=await requireSession();
-  const form=await request.formData(),file=form.get('file'),purpose=String(form.get('purpose')||'document'),entityId=String(form.get('entityId')||'');
+  const replayKey=request.headers.get("idempotency-key")||"";
+  if(replayKey.length<8||replayKey.length>128)throw new ApiError(400,"idempotency_required","Idempotency-Key fehlt oder ist ungültig.");
+  const bytes=await readBoundedBody(request,limitsConfig.maxFileUploadBytes+64*1024);
+  const form=await new Response(new Uint8Array(bytes),{headers:{'content-type':request.headers.get('content-type')||''}}).formData(),file=form.get('file'),purpose=String(form.get('purpose')||'document'),entityId=String(form.get('entityId')||'');
   if(!(file instanceof File))throw new ApiError(400,'file_required','Datei fehlt.');
   if(file.size>limitsConfig.maxFileUploadBytes)throw new ApiError(413,'file_too_large',`Datei ist grösser als ${megabytes(limitsConfig.maxFileUploadBytes)} MB.`);
   if(!allowed.has(file.type))throw new ApiError(400,'file_type_invalid','Dateityp ist nicht erlaubt.');
@@ -43,7 +47,7 @@ export async function POST(request:NextRequest){
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
   validateFileContent(buffer,file.type);
   const sha256=createHash('sha256').update(buffer).digest('hex');
-  const item=await withTenant(s.organizationId,s.userId,async c=>{
+  const item=await withTenant(s.organizationId,s.userId,async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:"file-upload",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{
    if(purpose==='expense_receipt'){
     const expense=(await c.query("select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update",[s.organizationId,entityId])).rows[0];
     if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
@@ -55,7 +59,7 @@ export async function POST(request:NextRequest){
    if(purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
    if(purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
    return result.rows[0];
-  });
+  }));
   return json({item},201);
  }catch(e){return apiError(e)}
 }

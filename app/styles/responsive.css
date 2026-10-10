@@ -2739,6 +2739,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Reduced motion */
 @media (prefers-reduced-motion:reduce){
+.bo-statistics-group{transition:none}
 .app-start-icon,.app-launch-brand .logo{animation:none}
 .hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta,.marketing-mobile-menu{animation:none}
 
