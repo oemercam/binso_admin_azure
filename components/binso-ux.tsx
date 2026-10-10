@@ -23,7 +23,7 @@ export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=
 
 /** Compact single selection extends the action-row contract, including keyboard navigation. */
 export function SelectionRows<T extends string>({label,value,options,onChange}:{label:string;value:T;options:readonly {value:T;title:string;description:string;icon:ReactNode}[];onChange:(value:T)=>void}){
- return <div className="action-list" role="radiogroup" aria-label={label}>{options.map((option,index)=><ActionRow key={option.value} title={option.title} description={option.description} icon={option.icon} role="radio" selected={value===option.value} tabIndex={value===option.value?0:-1} onClick={()=>onChange(option.value)} onKeyDown={event=>{
+ return <div className="action-list selection-rows" role="radiogroup" aria-label={label}>{options.map((option,index)=><ActionRow key={option.value} title={option.title} description={option.description} icon={option.icon} role="radio" selected={value===option.value} tabIndex={value===option.value?0:-1} onClick={()=>onChange(option.value)} onKeyDown={event=>{
   const next=event.key==='Home'?0:event.key==='End'?options.length-1:['ArrowDown','ArrowRight'].includes(event.key)?(index+1)%options.length:['ArrowUp','ArrowLeft'].includes(event.key)?(index+options.length-1)%options.length:null;
   if(next===null)return;event.preventDefault();onChange(options[next].value);(event.currentTarget.parentElement?.children[next] as HTMLElement|undefined)?.focus();
  }}/>)}</div>;

@@ -1019,6 +1019,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .action-row-description{display:block;margin-top:3px;color:var(--color-muted);font-size:var(--control-help-font);font-weight:400}
 .action-row>.unread-dot{justify-self:end}
 .action-row-selection{display:grid;place-items:center;width:16px;height:16px;justify-self:end}
+.selection-rows{display:grid;grid-auto-rows:1fr}
 .action-row[aria-checked="true"]{font-weight:600}
 .action-row>svg:last-child:not(:first-child){justify-self:end}
 .action-row-danger{color:var(--color-danger)}

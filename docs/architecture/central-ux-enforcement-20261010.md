@@ -54,3 +54,5 @@ The final local `pnpm test` suite and optimized production build passed. Lint, t
 An actual installed iPhone/Android PWA and actual production tenant workflows require a device/session check; synthetic browser/API fixtures do not prove those environments. This report does not certify all historical requirements or every conditional state as accepted. Any unresolved release failure blocks merge and deployment.
 
 The first remote WebKit run (38036202499) caught the merged-title DOM regression in the new descriptive ActionRow. The production renderer was corrected to retain a separately addressable title; the exact-title browser assertion remains enabled. The entire final candidate must pass remote release checks again.
+
+The second remote run (38036728571) reproduced unequal selection-row heights in both Chromium and WebKit at narrow widths: descriptions wrap to different line counts. SelectionRows now owns a grid with equal fractional row tracks, sized by the longest description without truncation or fixed-height clipping. General menu and bottom-navigation sizing remain unchanged; the equal-height assertion stays enabled.
