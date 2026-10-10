@@ -59,8 +59,16 @@ export function MetricTile({ label, value, hint }: { label: string; value: React
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
-export function DetailTabs({children,label,role="navigation"}:{children:ReactNode;label:string;role?:"navigation"|"tablist"}){
- return <div className="tabs" role={role} aria-label={label}>{children}</div>;
+export function DetailTabs({children,label,role,panelId}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string}){
+ const root=useRef<HTMLDivElement>(null);
+ const nodes=Children.toArray(children);
+ const localTabs=role==='tablist'||(!role&&nodes.length>0&&nodes.every(child=>isValidElement(child)&&child.type==='button'));
+ useEffect(()=>{const active=root.current?.querySelector<HTMLElement>('[aria-selected="true"],.active');if(!active)return;const container=root.current!;const left=active.offsetLeft-container.offsetLeft,right=left+active.offsetWidth;if(left<container.scrollLeft)container.scrollLeft=left;else if(right>container.scrollLeft+container.clientWidth)container.scrollLeft=right-container.clientWidth;},[children]);
+ return <div ref={root} className="tabs" role={localTabs?'tablist':role??'navigation'} aria-label={label}>{nodes.map((child,index)=>{
+  if(!localTabs||!isValidElement<{className?:string;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>}>(child))return child;
+  const selected=child.props.className?.split(/\s+/).includes('active')??false;
+  return cloneElement(child,{'role':'tab','aria-selected':selected,tabIndex:selected?0:-1,...(panelId?{id:panelId+'-tab-'+index,'aria-controls':panelId}:{}),onKeyDown:(event:React.KeyboardEvent<HTMLButtonElement>)=>{child.props.onKeyDown?.(event);if(event.defaultPrevented)return;const next=event.key==='Home'?0:event.key==='End'?nodes.length-1:event.key==='ArrowRight'?(index+1)%nodes.length:event.key==='ArrowLeft'?(index+nodes.length-1)%nodes.length:null;if(next===null)return;event.preventDefault();const button=event.currentTarget.parentElement?.children[next] as HTMLButtonElement|undefined;button?.focus();button?.click();}} as Partial<typeof child.props>);
+ })}</div>;
 }
 
 export function ListSearch({ value, onChange, placeholder = "Suchen ..." }: {

@@ -1,0 +1,539 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "finance"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1920,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/dashboard",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/finanzen",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1920,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/finanzen/analyse",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/kunden/customer-one",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "route": "/kunden/customer-one",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

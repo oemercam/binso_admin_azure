@@ -552,7 +552,6 @@
   .timer-actions{gap:var(--desktop-action-gap)}
   .timer-actions .button{min-width:112px;white-space:nowrap}
 
-  .revenue-insight,
   .finance-analysis{
     width:100%;
     margin-top:16px;
@@ -561,7 +560,6 @@
     border-right:0;
     border-radius:0;
   }
-  .revenue-chart svg{height:260px}
   .finance-month-bars{width:100%;min-height:250px}
   .finance-breakdown{gap:32px}
   .finance-insights{grid-template-columns:minmax(0,1.7fr) minmax(300px,.7fr)}
@@ -991,7 +989,6 @@
 /* Large desktop refinement */
 @media (min-width:1500px){
 .document-desktop-workspace{grid-template-columns:minmax(0,1fr) 280px}
-  .revenue-chart svg{height:300px}
   .finance-month-bars{min-height:290px}
 
 .desktop-detail-workspace,
@@ -1747,15 +1744,6 @@
   .page-container> :last-child{margin-bottom:24px}
   .time-filter-toolbar + .chips{flex-wrap:nowrap;overflow-x:auto}
   .time-filter-toolbar + .chips>button{flex-shrink:0}
-  .finance-overview-months .finance-period-head,
-  .finance-overview-months .finance-period-table>button{display:grid;grid-template-columns:54px repeat(3,minmax(0,1fr));gap:6px;min-width:0;min-height:46px;align-items:center;text-align:right;padding:8px 0}
-  .finance-overview-months .finance-period-table{overflow:visible}
-  .finance-overview-months .finance-period-head{font-size:10px;min-height:30px;min-width:0}
-  .finance-overview-months .finance-period-table>button>b{grid-column:auto;padding:0;border:0;font-size:11px;text-align:left}
-  .finance-overview-months .finance-period-table>button>span,
-  .finance-overview-months .finance-period-table>button>strong{display:block;font-size:10px;overflow-wrap:anywhere}
-  .finance-overview-months .finance-period-table>button>span::before,
-  .finance-overview-months .finance-period-table>button>strong::before{content:none}
 
   .time-overview-section .full-button{margin-bottom:12px}
   .global-timer{
@@ -2381,24 +2369,14 @@ input:not([type="checkbox"]):not([type="radio"]),
   .form-field>span,
   .form-grid>label>span{font-size:var(--control-label-font)}
   .form-field small,
-  .form-grid>label small{font-size:var(--control-help-font)}
-
-.revenue-insight{padding:16px;margin-top:12px}
-  .revenue-insight-head h2{font-size:18px}.revenue-total{font-size:28px}.revenue-period{padding:7px 9px}
-  .revenue-chart{margin-top:18px;overflow:hidden}.revenue-chart svg{height:170px}
-  .revenue-axis span:nth-child(even){visibility:hidden}.chart-legend{margin-top:10px}
+  .form-grid>label small{font-size:var(--control-help-font)}.chart-legend{margin-top:10px}
   .finance-insights{grid-template-columns:1fr;margin-top:18px}
   .payment-donut-card{padding:14px;gap:16px}.payment-donut{width:118px}
   .payment-legend p{font-size:10px}.payment-legend p b{font-size:12px}
   .finance-kpis{grid-template-columns:repeat(3,1fr)}
   .finance-kpis>div{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;min-width:0;padding:12px 10px}
   .finance-kpis>div+div{border-top:0;border-left:1px solid var(--color-line)}
-  .finance-kpis b{font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis}.finance-kpis small{font-size:9px}
-
-.revenue-insight{width:100%;max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:14px;overflow:hidden}
-  .revenue-insight-head{gap:10px}.revenue-insight-head h2{margin:2px 0 5px;font-size:17px}.revenue-total{font-size:25px}.trend-positive,.trend-negative{margin-top:3px;font-size:12px}.revenue-period{padding:5px 7px;font-size:10px}
-  .revenue-chart{margin-top:10px}.revenue-chart svg{height:142px;margin-top:28px}.revenue-tooltip{top:0;min-height:26px;padding:4px 8px;max-width:94%;overflow:hidden;text-overflow:ellipsis}
-  .revenue-axis{margin-top:3px}.chart-legend{margin-top:6px;gap:12px;font-size:10px}
+  .finance-kpis b{font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis}.finance-kpis small{font-size:9px}.trend-positive,.trend-negative{margin-top:3px;font-size:12px}.chart-legend{margin-top:6px;gap:12px;font-size:10px}
   .finance-insights{margin-top:12px;gap:8px}.payment-donut-card{padding:10px 8px;gap:12px}.payment-donut{width:92px}.donut-center b{font-size:11px}.donut-center span{font-size:8px}
   .payment-legend{gap:5px}.payment-legend p{font-size:9px;gap:5px}.payment-legend p b{font-size:11px}
   .finance-kpis>div{padding:8px}.finance-kpis span{font-size:9px}.finance-kpis b{font-size:12px}.finance-kpis small{font-size:8px}
@@ -2506,10 +2484,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   }
 
 .operator-payment-insight,.monitoring-kpis-visual section{border:0;border-radius:0;background:transparent;box-shadow:none}
-
-.revenue-bars{height:118px;margin-top:14px;gap:5px}.revenue-bars button{grid-template-rows:1fr 15px}.revenue-bars i{border-radius:3px 3px 1px 1px}
-
-.revenue-bar-detail{min-height:30px;margin-top:12px;gap:6px;font-size:9px}.revenue-bar-detail b{font-size:10px}.revenue-bars{margin-top:4px;gap:4px}.revenue-bars button{font-size:var(--control-help-font)}
 
 .monitoring-latency-chart,.monitoring-health-chart,.operator-chart-card,.operator-selected-metric,.payment-donut-card,.finance-kpis{border:0;border-radius:0;background:transparent;box-shadow:none}
 
@@ -2718,19 +2692,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   .operator-table-row>*:last-child:nth-child(odd){grid-column:1/-1}
   .operator-table-card{overflow:visible}
 
-  .finance-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
-  .finance-flow-primary,
-  .finance-flow-result{padding:12px 14px}
-  .finance-flow-result{grid-column:2;grid-row:1}
-  .finance-flow-costs{grid-column:1/-1;grid-row:2;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
-  .finance-flow-costs>div{padding:10px 14px}
-  .finance-period-head,
-  .finance-period-table>button{
-    grid-template-columns:minmax(54px,.7fr) repeat(3,minmax(82px,1fr));
-    min-width:420px;
-  }
-  .finance-period-table{overflow-x:auto}
-
 @supports (height:100svh){
   }
   .page-head-detail{display:none}
@@ -2750,42 +2711,12 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Very narrow viewport */
 @media (max-width:420px){
 .payment-donut-card{align-items:flex-start}.payment-donut{width:104px}
-
-.finance-period-table{overflow:visible}
-  .finance-period-head{display:none}
-  .finance-period-table>button{
-    min-width:0;
-    padding:12px 0;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px 14px;
-    text-align:left;
-  }
-  .finance-period-table>button>b{
-    grid-column:1/-1;
-    padding-bottom:5px;
-    border-bottom:1px solid var(--color-line);
-    font-size:13px;
-  }
-  .finance-period-table>button>span,
-  .finance-period-table>button>strong{
-    min-width:0;
-    display:grid;
-    gap:3px;
-    font-size:11px;
-  }
-  .finance-period-table>button>span:nth-of-type(1)::before{content:"Einnahmen"}
-  .finance-period-table>button>span:nth-of-type(2)::before{content:"Kosten"}
-  .finance-period-table>button>strong::before{content:"Ergebnis"}
-  .finance-period-table>button>span::before,
-  .finance-period-table>button>strong::before{
-    color:var(--color-muted);
-    font-size:9px;
-    font-weight:500;
-  }
 }
 
 /* Extra narrow viewport */
 @media (max-width:389px){
+  .bo-statistics-kpis{grid-template-columns:minmax(0,1fr)}
+  .bo-statistics-kpis dd{font-size:20px}
 .metrics-grid,
   .metrics-grid.three,
   .support-summary{grid-template-columns:1fr}

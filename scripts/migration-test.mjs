@@ -68,6 +68,28 @@ try{
  const mutateApiBusiness=(c,s,operation,args)=>rawMutation(c,s,operation,{...args,p_idempotency_key:args.p_idempotency_key??randomUUID()});
  const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length}}};
  const session={organizationId:demo,userId:'demo-readonly',role:'owner'};
+ {
+ const {cashStatisticsData}=await import(dataModule((await fs.readFile('lib/server/repositories/finance.ts','utf8')).replaceAll("import 'server-only';",'')));
+ const cashBefore=await cashStatisticsData(client,demo);
+ assert.equal(cashBefore.incomplete,true,'Legacy payroll/operating records cannot be relabelled as proven cash outflows');
+ assert.equal(cashBefore.outflows.length,0,'Approved but not reimbursed expenses are not cash outflows');
+ assert.ok(cashBefore.payments.length>0,'Actual matched payment dates populate income');
+ const foreignCash=await cashStatisticsData(client,'00000000-0000-4000-8000-000000000001');
+ assert.deepEqual(foreignCash,{payments:[],outflows:[],incomplete:false},'Cash queries do not leak a different tenant population');
+ const fixtureExpense=(await db.query("select id from expenses where organization_id=$1 and currency='CHF' and status in ('approved','posted') limit 1",[demo])).rows[0];
+ if(fixtureExpense){await db.query("update expenses set reimbursed_at='2026-10-25T23:30:00Z' where id=$1",[fixtureExpense.id]);const reimbursed=await cashStatisticsData(client,demo);assert.ok(reimbursed.outflows.some(row=>row.payment_date==='2026-10-26'),'Reimbursement uses Europe/Zurich calendar day, not expense date or UTC date');await db.query('update expenses set reimbursed_at=null where id=$1',[fixtureExpense.id]);}
+ const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions))))).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)))));
+ const {customerWorkspace}=await import(dataModule(workspaceSource));
+ const statisticsCustomer=(await db.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[demo])).rows[0].id;
+ const customerStatistics=await customerWorkspace(client,session,statisticsCustomer);
+ assert.ok(customerStatistics.statistics!==null,'Owner can read customer statistics');
+ const totals=(await db.query("select currency,sum(total_amount)::text total,count(*)::int n from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') group by currency",[demo,statisticsCustomer])).rows;
+ for(const row of totals){const own=customerStatistics.statistics.filter(event=>event.currency===row.currency);assert.equal(own.reduce((sum,event)=>sum+Number(event.invoice_count),0),row.n);assert.equal(Math.round(own.reduce((sum,event)=>sum+Number(event.billed),0)*100),Math.round(Number(row.total)*100));}
+ const limitedStatistics=await customerWorkspace(client,{...session,role:'member'},statisticsCustomer);
+ assert.equal(limitedStatistics.statistics,null,'No finance aggregates exposed to a role without payment rights');
+ console.log('V22 statistics: real cash dates, expense reimbursement day, currency-separated invoice totals and role/tenant isolation passed.');
+ }
+
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  for(const table of ['customers','customer_contacts','products','employees','expenses','documents','payments'])assert.ok((await listApiBusiness(client,session,table,'')).length>0,table+' must have readable canonical fixture data');
  assert.equal((await listApiBusiness(client,session,'documents','number=eq.RE-2026-019')).length,1);

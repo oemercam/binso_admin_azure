@@ -104,7 +104,7 @@ assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables mus
 assert.ok(responsiveCss.includes('Primary layout states:'),'Viewport contract must stay explicit and centralized');
 assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
 assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
-assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
+assert.ok(appCss.includes('.bo-statistics{'),'Single and multiple periods use the same central statistics presentation');
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
 
 const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
@@ -208,15 +208,15 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 }
 
 
-// Finance periods: presets are shortcuts, not a limitation.
+// Period controls moved from individual pages to the single statistics owner.
 {
-  const pages=read("components/app-pages.tsx");
-  assert(pages.includes("Zeitraum wählen"),"Finance must offer a custom period in addition to presets.");
-  assert(pages.includes('Field label="Von"')&&pages.includes('Field label="Bis"'),"Custom finance periods must expose from/to date controls.");
-  assert(pages.includes('range==="custom"'),"Finance calculations must support the custom range mode.");
-  console.log("Finance supports free from/to periods alongside quick presets.");
+ const statistics=await fs.readFile('components/statistics.tsx','utf8');
+ assert(statistics.includes('statisticPeriods.map'), 'All statistics consume central month presets');
+ assert(statistics.includes('type="date" required')&&statistics.includes('Eigenen Statistikzeitraum wählen'), 'Actual date controls and calendar action exist');
+ assert(statistics.includes('aggregateStatistics')&&statistics.includes('metrics(aggregated.totals)'), 'KPIs and bars share aggregation');
+ for(const page of ['components/pages/dashboard.tsx','components/pages/finance.tsx'])assert((await fs.readFile(page,'utf8')).includes('CashStatistics'), page+' renders central cash statistics');
+ console.log('Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.');
 }
-
 
 // Desktop process integrity: time tracking must persist explicit customer/project identity and customer detail has one info pane per path.
 {
@@ -331,8 +331,8 @@ console.log('Project-linked idle timer context survives synchronization without 
 {
  const pages=await readPageFile('components/app-pages.tsx','utf8');
  const ast=ts.createSourceFile('pages.tsx',pages,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
- const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','RevenueInsight','moneyChf'].includes(node.name?.text));
- const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','moneyChf'].includes(node.name?.text));
+ const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  let values={},hook=0,calls=0,resolveSave,rejectSave;const scheduled=[];const navigations=[];
  const exports={};const Toast=()=>null;
  const write=()=>{++calls;return new Promise((resolve,reject)=>{resolveSave=resolve;rejectSave=reject});};
@@ -354,9 +354,7 @@ console.log('Project-linked idle timer context survives synchronization without 
   }
   assert.ok(navigations.includes('/dashboard'),'Customer created from quick access returns to the dashboard');
   values={};hook=0;
-  const chart=renderToStaticMarkup(React.createElement(exports.RevenueInsight,{invoices:[{issue_date:'2026-01-01',total:50},{issue_date:'2025-01-01',total:100}]}));
-  assert.ok(chart.includes('trend-negative'));assert.ok(chart.includes('Jan–Sep'));assert.ok(chart.includes('Laufender Monat'));assert.ok(!chart.includes('↗'));
-  console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts; revenue uses completed-month comparisons.');
+  console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.');
  }finally{if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow;}
 }
 

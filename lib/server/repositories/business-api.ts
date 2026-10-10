@@ -32,7 +32,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(kind&&kind!==k)continue;
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
-   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
+   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,d.updated_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
      ${k==='invoice'?`(select min(x.payment_date)::text from (select p.payment_date,sum(p.amount) over(order by p.payment_date,p.created_at,p.id) accumulated,sum(p.amount) over() recorded_total from payments p where p.organization_id=d.organization_id and p.invoice_id=d.id and p.archived_at is null and p.allocation_status='matched') x where x.accumulated>=d.total_amount and x.recorded_total=d.paid_amount and d.total_amount>0 and d.paid_amount>=d.total_amount)`:'null::text'} paid_on,
      ${k==='invoice'?`(select q.quote_no from quotes q where q.id=d.source_quote_id and q.organization_id=d.organization_id)`:'null::text'} source_offer,
      ${k==='offer'?`(select i.invoice_no from invoices i where i.source_quote_id=d.id and i.organization_id=d.organization_id and i.archived_at is null and i.status<>'cancelled' limit 1)`:'null::text'} invoice_number,
@@ -56,7 +56,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  }
  if(table==='expenses'&&ownRecordOnly(s.role,'spesen')){values.push(s.userId);where.push(`q.created_by_user_id=$${values.length}`)}
  const requested=Number(filters.get('limit')||1000);const limit=Number.isSafeInteger(requested)?Math.max(1,Math.min(1000,requested)):1000;
- const allowedOrder=new Set(['created_at',...(table==='documents'?['issue_date']:[]),...(table==='payments'?['paid_on']:[]),...(table==='expenses'?['expense_date']:[]),...(table==='customer_contacts'?['is_primary']:[])]);
+ const allowedOrder=new Set(['created_at',...(table==='documents'?['issue_date','updated_at']:[]),...(table==='payments'?['paid_on']:[]),...(table==='expenses'?['expense_date']:[]),...(table==='customer_contacts'?['is_primary']:[])]);
  const requestedOrder=filters.get('order')||'created_at.desc';
  const sortTerms=requestedOrder.split(',').map(term=>{
   const parts=term.split('.');

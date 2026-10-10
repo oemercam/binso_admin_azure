@@ -11,3 +11,13 @@ export async function financeData(c:PoolClient,organizationId:string){
  ]);
  return {payments:payments.rows,invoices:invoices.rows,expenses:expenses.rows,payroll:payroll.rows,operatingCosts:operating.rows};
 }
+
+/** Exact cash dates only. Legacy costs/payroll have no payment-date evidence. */
+export async function cashStatisticsData(c:PoolClient,organizationId:string){
+ const [payments,outflows,coverage]=await Promise.all([
+  c.query("select p.payment_date::text,sum(p.amount) amount from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and i.currency='CHF' group by p.payment_date order by p.payment_date",[organizationId]),
+  c.query("select (reimbursed_at at time zone 'Europe/Zurich')::date::text payment_date,sum(quantity*unit_price)::numeric(14,2) amount from expenses where organization_id=$1 and archived_at is null and currency='CHF' and reimbursed_at is not null and status in ('approved','posted') group by (reimbursed_at at time zone 'Europe/Zurich')::date order by payment_date",[organizationId]),
+  c.query("select exists(select 1 from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF') or exists(select 1 from payroll_runs where organization_id=$1 and status in ('approved','paid')) incomplete",[organizationId])
+ ]);
+ return {payments:payments.rows,outflows:outflows.rows,incomplete:Boolean(coverage.rows[0]?.incomplete)};
+}
