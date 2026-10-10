@@ -1,5 +1,5 @@
 {
-  "version": "22.6-remediation.2",
+  "version": "22.6-remediation.3",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "scope": "Repository implementation; no production migration, merge or deployment claimed",
   "findings": [
@@ -657,6 +657,33 @@
       "remediationStatus": "blocked-historical-proof",
       "implementation": "NOT VALID historical constraint preserved; no historical data correction or migration performed.",
       "verification": "Read-only deployed historical violation count and domain decision before VALIDATE"
+    },
+    {
+      "id": "V226-REM-SEC-001",
+      "category": "Sicherheit / Auth-Zustandswechsel",
+      "priority": "P0",
+      "severity": "High",
+      "title": "Veralteter Login kann nach abgeschlossenem Passwort-Reset eine Sitzung anlegen",
+      "file": "lib/server/session.ts",
+      "lines": "23-49",
+      "routes": [
+        "/api/auth/login",
+        "/api/auth/password",
+        "/api/auth/verify-email"
+      ],
+      "evidence": "Synthetic real-handler/real-session/PGlite barrier probe at 0c7947f: reset commits before login resumes; HTTP200 and one newly persisted session. No production account touched.",
+      "rootCause": "Credential verification and later session INSERT are not synchronized with password/MFA revocation; authenticated password change writes independently of its previously verified hash.",
+      "proposedCorrection": "Lock current user state and bind expected password/MFA snapshot to session INSERT in one transaction; CAS authenticated password changes against the verified hash.",
+      "consumers": "Login, password reset/change, shared createSession; email verification keeps its own token proof with an active-user check.",
+      "risk": "An in-flight stale authentication can survive session revocation; an in-flight authenticated password change can overwrite a reset. Requires the earlier credential proof; no real account compromise executed.",
+      "testRequirement": "Deterministic read barriers, real session INSERT, reset-first/old-login denial, fresh login, stale password change, changed MFA and inactive status; repeat with physical PostgreSQL clients.",
+      "acceptanceCriterion": "Reset-first stale login returns401 with zero persisted sessions; stale password change returns409 and preserves reset hash; valid current proofs still work.",
+      "status": "Reproduced on frozen draft; central correction implemented; see verification and release blockers",
+      "proofLimit": "Actual handlers, actual session owner, synthetic cookie/header adapters and isolated database. Deployed runtime not verified.",
+      "sourceUrl": "https://github.com/oemercam/binso_admin_azure/blob/0c7947f4cab7e9b1c93a0a684f59f4fdbf246ea8/lib/server/session.ts#L23",
+      "remediationStatus": "implemented",
+      "implementation": "User-row-locked credential-bound session INSERT; all callers reject inactive users. Login supplies verified password/MFA snapshot. Authenticated password change uses hash/status CAS. No schema migration.",
+      "verification": "scripts/auth-integrity-test.mjs using actual session owner; native PostgreSQL CI and final head checks required. docs/security/auth-state-integrity.md"
     }
   ],
   "releaseReady": false,

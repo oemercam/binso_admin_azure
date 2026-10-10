@@ -56,3 +56,7 @@ The first GitHub run passed both browser jobs but its combined report blocked on
 ## V22.6 scanner extension
 
 The existing quarantine finding remains a release blocker until the deployed engine is proven. See [central file-scanning contract](../../security/file-scanning.md). This extension adds no production migration, merge or deployment.
+
+## V22.6 Auth-Zustandswechsel
+
+V226-REM-SEC-001 (P0) wurde mit tatsächlichem Login, tatsächlicher Sitzungserstellung und isolierter Datenbank reproduziert: eine neue Sitzung nach abgeschlossenem Reset. Die zentrale Benutzer-Sperre und der gebundene Passwort-/MFA-Snapshot verhindern dies; die angemeldete Passwortänderung schützt ihren zuvor geprüften Hash ebenfalls. Siehe [Nachweis und Regression](../../security/auth-state-integrity.md). Dieser neue Befund ergänzt die unveränderten Originalbefunde im Register.

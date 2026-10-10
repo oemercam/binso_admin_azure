@@ -18,34 +18,39 @@ if(native){
  await db.exec('reset role');
 }
 const uri=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-let fault=false,created=0,lockObserved=false;const recorded=[];
+let actualSession,heldRead=null;
+let fault=false,created=0,cookieSets=0,lockObserved=false;const recorded=[];
 const query=async(sql,args,client=db)=>{
  recorded.push(sql);
  if(fault&&sql.startsWith('delete from auth_sessions'))throw new Error('synthetic reset session-delete fault');
  if(sql.includes('for update'))lockObserved=true;
- const result=await client.query(sql,args);return {...result,rowCount:result.rowCount??result.affectedRows??result.rows.length};
+ const result=await client.query(sql,args);
+ if(heldRead?.matches(sql)){const barrier=heldRead;heldRead=null;barrier.ready();await barrier.release;}
+ return {...result,rowCount:result.rowCount??result.affectedRows??result.rows.length};
 };
 const transaction=async fn=>{
+ if(!native)return db.transaction(client=>fn({query:(sql,args)=>query(sql,args,client)}));
  const client=native?await db.connect():db;
  await client.query('begin');try{const result=await fn({query:(sql,args)=>query(sql,args,client)});await client.query('commit');return result}catch(error){await client.query('rollback');throw error}finally{if(native)client.release()}
 };
-globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:()=>{created++}};
+globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:async input=>{const id=await actualSession.createSession(input);created++;return id},jar:{set(){cookieSets++},get(){},delete(){}}};
 globalThis.__integrity.scanStatus='pending';globalThis.__integrity.scanCalls=0;
 const adapters={
  'server-only':uri(''),
+ 'next/headers':uri('export const cookies=async()=>globalThis.__integrity.jar;export const headers=async()=>new Headers()'),
  'next/server':uri('export class NextResponse{static json(data,init){return Response.json(data,init)}}'),
  'lib/server/db.ts':uri('export const query=(...args)=>globalThis.__integrity.query(...args);export const withTransaction=fn=>globalThis.__integrity.transaction(fn);export const withTenant=(org,user,fn)=>globalThis.__integrity.transaction(async c=>{await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);return fn(c)})'),
- 'lib/server/session.ts':uri('export const getSession=async()=>globalThis.__integrity.getSession();export const requireSession=getSession;export const createSession=async()=>globalThis.__integrity.createSession();export const endDemoSession=async()=>{}'),
+ 'lib/server/session.ts':uri('export const getSession=async()=>globalThis.__integrity.getSession();export const requireSession=getSession;export const createSession=async input=>globalThis.__integrity.createSession(input);export const endDemoSession=async()=>{}'),
  'lib/server/rate-limit.ts':uri('export const enforceRateLimit=async()=>{}'),
- 'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only"}'),
+ 'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only",sessionTtlHours:168,sessionCookieName:"integrity_fixture_cookie"}'),
  'lib/server/file-scan.ts':uri('export const scanFile=async()=>{globalThis.__integrity.scanCalls++;if(globalThis.__integrity.scanStatus==="unavailable")throw new Response(null,{status:503});return globalThis.__integrity.scanStatus}'),
  'lib/server/email-otp.ts':uri('export const consumeEmailCode=async()=>false;export const issueEmailCode=async()=>{throw Error("unexpected email flow")}'),
  'lib/server/email.ts':uri('export const sendMail=async()=>{throw Error("no external mail in fixtures")};export const mailLayout=()=>""'),
  'lib/server/registration.ts':uri('export const completeRegistrationVerification=async()=>false;export const registrationHandoff=async()=>({next:"/dashboard"});export const sendRegistrationVerification=async()=>false'),
 };
 const cache=new Map();
-async function load(file){
- if(adapters[file])return adapters[file];if(cache.has(file))return cache.get(file);
+async function load(file,actualRoot=false){
+ if(adapters[file]&&!actualRoot)return adapters[file];if(cache.has(file))return cache.get(file);
  let source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
  for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){
   const name=match[2];let resolved=adapters[name];
@@ -55,7 +60,17 @@ async function load(file){
  const result=uri(source);cache.set(file,result);return result;
 }
 const req=body=>({headers:new Headers(),nextUrl:new URL('https://fixture.invalid/api/auth'),body:new Response(JSON.stringify(body)).body});
+async function raceAfterRead(matches,start,intervene){
+ let ready,release,rejectReady;
+ const reached=new Promise((resolve,reject)=>{ready=resolve;rejectReady=reject}),released=new Promise(resolve=>release=resolve);
+ heldRead={matches,ready,release:released};
+ const deadline=setTimeout(()=>rejectReady(new Error('Expected read barrier was not reached')),10000);
+ const pending=start();
+ try{await reached;await intervene();}finally{clearTimeout(deadline);heldRead=null;release();}
+ return pending;
+}
 try{
+ actualSession=await import(await load('lib/server/session.ts',true));
  const passwords=await import(await load('lib/server/password.ts')),totp=await import(await load('lib/server/totp.ts')),crypto=await import(await load('lib/server/crypto.ts'));
  const password='Synthetic-integrity-password-123',hash=await passwords.hashPassword(password),user='auth-integrity-fixture',org='00000000-0000-4000-8000-000000000099';
  await query("insert into app_users(id,email,display_name,status,password_hash,email_verified_at) values($1,'integrity@fixture.invalid','Synthetic Auth','active',$2,now())",[user,hash]);
@@ -78,6 +93,24 @@ try{
  fault=true;const failed=await reset.PATCH(req(resetBody));fault=false;assert.equal(failed.status,500);
  assert.equal((await query("select consumed_at from auth_tokens where user_id=$1 and token_type='password_reset'",[user])).rows[0].consumed_at,null,'Reset token rolls back with failed session revocation');assert.equal((await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash,hash,'Password change also rolls back');
  assert.equal((await reset.PATCH(req(resetBody))).status,200);assert.equal((await reset.PATCH(req(resetBody))).status,400);assert.ok(await passwords.verifyPassword(resetBody.password,(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash));
+ const nextToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
+ const thirdPassword='Synthetic-third-password-after-reset-789';
+ const cookiesBeforeStaleLogin=cookieSets;
+ const staleLogin=await raceAfterRead(sql=>sql.includes('join organization_memberships m'),()=>login.POST(req({email:'integrity@fixture.invalid',password:resetBody.password,mfaCode:totp.totp(secret)})),async()=>assert.equal((await reset.PATCH(req({token:nextToken,password:thirdPassword}))).status,200));
+ const lateSessions=(await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n;
+ assert.equal(staleLogin.status,401,'An old-password proof cannot mint a session after reset');assert.equal(lateSessions,0,'No late session survives reset');
+ assert.equal(cookieSets,cookiesBeforeStaleLogin,'Rejected stale authentication never publishes a new session cookie');
+ console.log(JSON.stringify({probe:'stale-login-after-committed-password-reset',status:staleLogin.status,persistedSessionsAfterReset:lateSessions,synthetic:true}));
+ assert.equal((await login.POST(req({email:'integrity@fixture.invalid',password:thirdPassword,mfaCode:totp.totp(secret)}))).status,200,'Fresh credential proof still creates a real session');
+ const finalToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
+ const finalPassword='Synthetic-final-password-after-reset-012';
+ const staleChange=await raceAfterRead(sql=>sql==='select password_hash from app_users where id=$1',()=>reset.PATCH(req({currentPassword:thirdPassword,password:'Synthetic-stale-password-must-not-win-345'})),async()=>assert.equal((await reset.PATCH(req({token:finalToken,password:finalPassword}))).status,200));
+ assert.equal(staleChange.status,409,'A started password change cannot overwrite a completed reset');assert.ok(await passwords.verifyPassword(finalPassword,(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash));assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,0);
+ console.log(JSON.stringify({probe:'stale-password-change-after-committed-reset',status:staleChange.status,resetPasswordPreserved:true,synthetic:true}));
+ const sessionInput={userId:user,organizationId:org,email:'integrity@fixture.invalid',name:'Synthetic Auth',role:'owner'};
+ const finalHash=(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash;
+ await assert.rejects(actualSession.createSession({...sessionInput,expectedAuth:{passwordHash:finalHash,mfaEnabled:false,mfaSecretEnc:null}}),e=>e.status===401,'Changed MFA state rejects stale pre-enrollment credentials');
+ await query("update app_users set status='suspended' where id=$1",[user]);await assert.rejects(actualSession.createSession(sessionInput),e=>e.status===401,'Even token-based callers cannot issue a session for an inactive user');await query("update app_users set status='active' where id=$1",[user]);
  const finance=await import(await load('app/api/finance/route.ts'));
  recorded.length=0;const cashResponse=await finance.GET(new Request('https://fixture.invalid/api/finance?view=cash'));assert.equal(cashResponse.status,200);assert.ok((await cashResponse.json()).cash);const cashQueries=recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length;assert.equal(cashQueries,3,'Cash-only consumers perform exactly three scoped queries');
  recorded.length=0;const legacyResponse=await finance.GET(new Request('https://fixture.invalid/api/finance'));assert.equal(legacyResponse.status,200);assert.ok((await legacyResponse.json()).payments,'Default external API contract preserved');assert.equal(recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length,8);
@@ -114,5 +147,5 @@ try{
  assert.equal((await company.PATCH(req({logoUrl:'/api/files/'+foreignFile+'/download'}))).status,404,'Clean foreign tenant logo cannot be assigned');
  assert.equal((await company.PATCH(req({logoUrl:cleanBranding.logo}))).status,200);
  assert.equal((await company.PATCH(req({logoUrl:null}))).status,200);assert.equal((await branding()).logo,null,'Explicit logo removal remains supported');
- console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': MFA replacement denied, locked enrollment, session revocation, same/distinct recovery-code consumption, transactional reset fault/retry/replay, upload replay/conflict, quarantine-safe branding, scan failure rollback/retry and tenant/purpose-safe logo references passed.');
+ console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': MFA replacement denied, locked enrollment, session revocation, same/distinct recovery-code consumption, transactional reset fault/retry/replay, actual session issuance vs reset and MFA/inactive-state guards, stale password-change denial, upload replay/conflict, quarantine-safe branding, scan failure rollback/retry and tenant/purpose-safe logo references passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

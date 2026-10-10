@@ -146,8 +146,8 @@
         "lib/server/env.ts",
         "lib/server/password.ts",
         "lib/server/session.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/crypto.ts",
@@ -206,8 +206,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/operator/session.ts",
         "lib/permissions.ts",
         "lib/server/operator/entra.ts"
@@ -227,8 +227,8 @@
         "lib/server/totp.ts",
         "lib/server/session.ts",
         "lib/server/db.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts"
       ],
@@ -278,8 +278,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
-        "lib/server/http.ts"
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts"
       ],
       "evidence": [
         {
@@ -304,8 +304,8 @@
         "lib/server/env.ts",
         "lib/server/session.ts",
         "lib/server/db.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/rate-limit.ts"
       ],
       "evidence": [
@@ -353,8 +353,8 @@
           "callee": "c.query",
           "line": 22,
           "arguments": [
-            "'update app_users set password_hash=$1,updated_at=now() where id=$2'",
-            "[hash,session.userId]"
+            "\"update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' and password_hash=$3 returning id\"",
+            "[hash,session.userId,user.password_hash]"
           ]
         },
         {
@@ -421,8 +421,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/mail-i18n.ts",
@@ -506,8 +506,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
-        "lib/server/http.ts"
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts"
       ],
       "evidence": [
         {
@@ -538,8 +538,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
-        "lib/server/http.ts"
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts"
       ],
       "evidence": [
         {
@@ -585,8 +585,8 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/session.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/registration.ts",
@@ -634,10 +634,10 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/http.ts",
         "lib/plans.ts",
         "lib/server/stripe.ts"
       ],
@@ -667,11 +667,11 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/stripe.ts",
-        "lib/server/http.ts",
         "lib/server/repositories/stripe-billing.ts",
         "lib/subscription-plans.ts",
         "lib/server/validation.ts",
@@ -720,11 +720,11 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/stripe.ts",
-        "lib/server/http.ts"
+        "lib/server/stripe.ts"
       ],
       "evidence": [
         {
@@ -786,11 +786,11 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/repositories/customer-activity.ts",
-        "lib/server/http.ts"
+        "lib/server/repositories/customer-activity.ts"
       ],
       "evidence": [
         {
@@ -965,12 +965,12 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/customers.ts",
         "lib/server/audit.ts",
-        "lib/server/http.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
@@ -1059,12 +1059,12 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/customers.ts",
         "lib/server/audit.ts",
-        "lib/server/http.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
@@ -2279,6 +2279,7 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -2286,7 +2287,6 @@
         "lib/server/repositories/finance.ts",
         "lib/server/repositories/business-api.ts",
         "lib/server/business-idempotency.ts",
-        "lib/server/http.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
@@ -2471,8 +2471,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
         "lib/server/validation.ts"
       ],
       "evidence": [
@@ -3646,11 +3646,11 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/server/audit.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/http.ts"
+        "lib/server/business-idempotency.ts"
       ],
       "evidence": [
         {
@@ -3749,9 +3749,9 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/permissions.ts",
-        "lib/server/http.ts",
         "lib/server/plan-access.ts",
         "lib/server/repositories/business-api.ts",
         "lib/server/business-idempotency.ts",
@@ -3964,8 +3964,8 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
-        "lib/server/subscription-lifecycle.ts",
-        "lib/server/http.ts"
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts"
       ],
       "evidence": [
         {
@@ -4055,10 +4055,10 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
-        "lib/permissions.ts",
-        "lib/server/http.ts"
+        "lib/permissions.ts"
       ],
       "evidence": [
         {
@@ -4302,10 +4302,10 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
-        "lib/permissions.ts",
-        "lib/server/http.ts"
+        "lib/permissions.ts"
       ],
       "evidence": [
         {
@@ -4389,12 +4389,12 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/database.ts",
         "lib/server/repositories/operator-api.ts",
-        "lib/server/http.ts",
         "lib/server/operator/session.ts",
         "lib/server/operator/entra.ts",
         "lib/server/operator/audit.ts",
@@ -4589,11 +4589,11 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/audit.ts",
-        "lib/server/http.ts"
+        "lib/server/audit.ts"
       ],
       "evidence": [
         {
@@ -4796,10 +4796,10 @@
         "lib/server/session.ts",
         "lib/server/db.ts",
         "lib/server/env.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
-        "lib/permissions.ts",
-        "lib/server/http.ts"
+        "lib/permissions.ts"
       ],
       "evidence": [
         {

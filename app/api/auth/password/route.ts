@@ -19,7 +19,7 @@ export async function PATCH(request:NextRequest){
     const user=(await query<{password_hash:string}>('select password_hash from app_users where id=$1',[session.userId])).rows[0];
     if(!user?.password_hash||!await verifyPassword(current,user.password_hash))return json({error:'reauth_required',message:'Das aktuelle Passwort stimmt nicht.'},403);
     const hash=await hashPassword(password);
-    await withTransaction(async c=>{await c.query('update app_users set password_hash=$1,updated_at=now() where id=$2',[hash,session.userId]);await c.query('delete from auth_sessions where user_id=$1 and id<>$2',[session.userId,session.sessionId]);});
+    await withTransaction(async c=>{const changed=await c.query("update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' and password_hash=$3 returning id",[hash,session.userId,user.password_hash]);if(!changed.rowCount)throw new ApiError(409,"auth_state_changed","Die Sicherheitsdaten wurden geändert. Bitte erneut anmelden.");await c.query('delete from auth_sessions where user_id=$1 and id<>$2',[session.userId,session.sessionId]);});
     return json({ok:true});
   }
   await enforceRateLimit(request,"password-reset",5,15*60_000);

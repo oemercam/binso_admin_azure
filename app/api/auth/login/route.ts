@@ -76,7 +76,7 @@ export async function POST(request:NextRequest){
   await query("update app_users set last_login_at=now(),updated_at=now() where id=$1",[user.id]);
   await query("update platform_tenants set last_active_at=now() where organization_id=$1",[user.organization_id]);
   await endDemoSession();
-  await createSession({userId:user.id,organizationId:user.organization_id,email:user.email,name:user.name,role:user.role});
+  await createSession({userId:user.id,organizationId:user.organization_id,email:user.email,name:user.name,role:user.role,expectedAuth:{passwordHash:user.password_hash,mfaEnabled:user.mfa_enabled,mfaSecretEnc:user.mfa_secret_enc}});
   return json({ok:true,emailVerified:true,...await registrationHandoff(user.organization_id,user.role,user.mfa_enabled)});
  }catch(error){return apiError(error)}
 }
