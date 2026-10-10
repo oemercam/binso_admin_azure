@@ -152,7 +152,10 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [toast,setToast]=useState<string|null>(null);
   const recordQuery=useApiQuery<{item:Record<string,unknown>}>(customerId?"/api/customers/"+encodeURIComponent(customerId):null);
   const hydratedCustomer=useRef<string|null>(null);
-  const loadingRecord=recordQuery.loading;
+  const [hydratedRecordId,setHydratedRecordId]=useState<string|null>(null);
+  // The query can resolve one render before its values reach the controlled
+  // fields. Keep the editor loading until that hydration commits atomically.
+  const loadingRecord=recordQuery.loading||Boolean(customerId&&hydratedRecordId!==customerId&&!recordQuery.error);
   const recordError=recordQuery.error;
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
@@ -167,7 +170,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     if(value.replay&&typeof value.replay.body==="string"&&value.replay.body.length<8192&&typeof value.replay.key==="string"&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
   }});
   const close=()=>{recovery.clear();allowDraftNavigation();setSheetOpen(false);router.push(returnTo)};
-  useEffect(()=>{if(!customerId||!recordQuery.data||hydratedCustomer.current===customerId)return;hydratedCustomer.current=customerId;const {item}=recordQuery.data;queueMicrotask(()=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);});},[customerId,recordQuery.data,markPristine]);
+  useEffect(()=>{if(!customerId||!recordQuery.data||hydratedCustomer.current===customerId)return;hydratedCustomer.current=customerId;const {item}=recordQuery.data;queueMicrotask(()=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));setHydratedRecordId(customerId);markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);});},[customerId,recordQuery.data,markPristine]);
   const save=async()=>{
     if(saveRecordPending.current||!recovery.ready||loadingRecord||recordError)return;
     if(company.trim().length<2){
