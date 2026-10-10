@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, cleanText, json, readJson, validEmail } from "@/lib/server/http";
+import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson, validEmail } from "@/lib/server/http";
 import { requireSession } from "@/lib/server/session";
 import { authorize } from "@/lib/server/rbac";
 import { withTenant } from "@/lib/server/db";
@@ -24,6 +24,13 @@ export async function PATCH(request:NextRequest){
   for(const [key,[column,max]] of Object.entries(textFields))if(b[key]!==undefined){const value=cleanText(b[key],max);if(key==='name'&&!value)return json({error:'name_required',message:'Firmenname ist erforderlich.'},400);if(key==='email'&&value&&!validEmail(value))return json({error:'email_invalid',message:'Ungültige Firmen-E-Mail.'},400);data[column]=key==='countryCode'?(value||'CH').toUpperCase():value||null;}
   const keys=Object.keys(data);if(!keys.length)return json({error:'empty_update',message:'Keine Änderungen angegeben.'},400);
   const item=await withTenant(s.organizationId,s.userId,async c=>{
+   if(data.logo_url){
+    const match=String(data.logo_url).match(/^\/api\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/download$/i);
+    if(!match)throw new ApiError(400,'logo_reference_invalid','Bitte ein geprüftes Firmenlogo hochladen.');
+    const logo=(await c.query("select scan_status from file_objects where id=$1 and organization_id=$2 and purpose='company_logo' and content_type in ('image/png','image/jpeg','image/webp')",[match[1],s.organizationId])).rows[0];
+    if(!logo)throw new ApiError(404,'logo_not_found','Firmenlogo wurde nicht gefunden.');
+    if(logo.scan_status!=='clean')throw new ApiError(423,'logo_not_ready','Das Firmenlogo ist noch nicht für die Verwendung freigegeben.');
+   }
    const item=(await c.query(`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`,[...Object.values(data),s.organizationId])).rows[0];
    if(b.completeOnboarding===true&&item){
     await c.query("insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','company_setup') on conflict do nothing",[s.organizationId]);

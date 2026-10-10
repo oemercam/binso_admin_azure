@@ -1,6 +1,7 @@
 import {idempotentBusiness} from "@/lib/server/business-idempotency";
 import {fileRelations} from "@/lib/server/file-relations";
 import {validateFileContent} from "@/lib/server/file-validation";
+import {scanFile} from "@/lib/server/file-scan";
 import {createHash,randomUUID} from "node:crypto";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {NextRequest} from "next/server";
@@ -53,11 +54,13 @@ export async function POST(request:NextRequest){
     if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
     if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');
    }
+   const scanStatus=await scanFile(buffer);
+   if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');
    const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)
-    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null]);
+    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
-   if(purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
-   if(purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
+   if(scanStatus==='clean'&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
+   if(scanStatus==='clean'&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
    return result.rows[0];
   }));
   return json({item},201);

@@ -647,6 +647,30 @@ try{
    if(scenario.group==='customers')await page.getByRole('dialog',{name:'Kunde bearbeiten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();else{const sheet=page.getByRole('dialog',{name:scenario.group==='products'?'Produkt bearbeiten':'Mitarbeiter bearbeiten',exact:true});await sheet.getByRole('button',{name:'Schliessen',exact:true}).click();await sheet.waitFor({state:'hidden'});assert.equal(await page.getByRole('alertdialog').count(),0,'Pristine sheet closes without a warning');await page.locator('.mobile-back').click();}await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
   if(hasInteraction('settings')){
+   // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
+   const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
+   const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};
+   const oldImage='/api/files/00000000-0000-4000-8000-000000000091/download',newImageId='00000000-0000-4000-8000-000000000092';
+   let scanVerdict='pending',scanFailure=0,companyWrites=0;
+   const scanUpload=route=>route.fulfill(scanFailure?{status:scanFailure,json:{message:'Synthetic scan unavailable'}}:{status:201,json:{item:{id:newImageId,scanStatus:scanVerdict}}});
+   const logoResource=route=>route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:oldImage}}});
+   const avatarResource=route=>route.fulfill({json:{item:{display_name:'Synthetic Branding User',first_name:'Synthetic',last_name:'Branding User',avatar_url:oldImage,theme,language:'de'},email:'branding@fixture.invalid'}});
+   const logoSettings=route=>{if(route.request().method()==='GET')return logoResource(route);companyWrites++;return route.fulfill({json:{item:{name:'Synthetic Branding Company'}}});};
+   const imageDownload=route=>route.fulfill({contentType:'image/png',body:imageBytes});
+   await context.route('**/api/files',scanUpload);await context.route('**/api/files/*/download',imageDownload);
+   await context.route('**/api/settings/company',logoSettings);await context.route('**/api/settings/profile',avatarResource);
+   await page.setViewportSize({width:390,height:844});await navigate(base+'/einstellungen/konto');await page.locator('.settings-profile h2').getByText('Synthetic Branding User',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();
+   await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('alert').filter({hasText:'Das Profilbild wartet auf die Sicherheitsprüfung.'}).waitFor();
+   assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage,'Quarantined avatar preserves the currently stored image');assert.equal(await page.getByText('Profilbild gespeichert.',{exact:true}).count(),0);
+   scanFailure=503;await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('alert').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage);
+   scanFailure=0;scanVerdict='clean';await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
+   await navigate(base+'/einstellungen/firma');await page.locator('.company-logo-card b').getByText('Synthetic Branding Company',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await page.locator('#company-logo-upload').setInputFiles(imageFile);
+   scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('alert').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
+   scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('alert').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
+   scanFailure=0;scanVerdict='clean';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Firmendaten gespeichert.',{exact:true}).waitFor();assert.equal(companyWrites,1,'Clean scan allows exactly one company save');
+   await context.unroute('**/api/files',scanUpload);await context.unroute('**/api/files/*/download',imageDownload);await context.unroute('**/api/settings/company',logoSettings);await context.unroute('**/api/settings/profile',avatarResource);
    let failDocumentSettings=true;
    const settingsFailure=async route=>{if(failDocumentSettings&&route.request().method()==='GET')return route.fulfill({status:503,json:{message:'Synthetic document settings unavailable'}});return route.fallback()};
    await context.route('**/api/settings/documents',settingsFailure);

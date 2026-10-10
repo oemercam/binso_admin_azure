@@ -9,7 +9,7 @@ The existing Quality pipeline and PR236 compliance engine are extended; no paral
 | V224-SEC-001 | implemented | Existing MFA replacement denied by both handlers. First enrollment verifies a row-locked pending secret, revokes other sessions and writes an audit event in the same transaction. | scripts/auth-integrity-test.mjs; PostgreSQL CI repeat required |
 | V224-SEC-002 | implemented | Atomic conditional removal from the current recovery hash array; same code succeeds once, distinct codes cannot resurrect each other. | scripts/auth-integrity-test.mjs --postgres |
 | V224-DATA-001 | implemented | Token consumption, active-user password change and session deletion share one transaction; bounded hashing happens first. | scripts/auth-integrity-test.mjs: injected deletion fault, rollback, retry and consumed-token denial |
-| V224-SEC-003 | partial-blocker | Pending/rejected download and PDF-logo use are denied. No scanner release was invented; uploads stay pending until a trusted scanner releases them. | Actual pending/clean/rejected handler test; live scanner operation is required before promotion |
+| V224-SEC-003 | partial-blocker | Download and PDF-logo quarantine enforced. Central fail-closed local ClamAV INSTREAM integration added; clean-only logo/avatar publication and tenant/purpose-scoped company references protected. Scanner infrastructure, real-engine detection, deployed limits/signatures and legacy pending-file rescan remain unproven. | scripts/file-scan-test.mjs (protocol peer only; OS socket in CI), scripts/auth-integrity-test.mjs and settings browser cases; docs/security/file-scanning.md defines remaining live scanner acceptance. No production release claim. |
 | V224-SEC-004 | implemented | Provider free text/recipient/subject removed from mail logs; API errors log category only; logger redacts sensitive payload fields. | scripts/runtime-integrity-test.mjs |
 | V224-SEC-005 | blocked-live-proof | Forwarded host/IP trust depends on Azure ingress configuration. No configuration assumptions or blind auth change made. | Read-only Azure ingress proof and origin/IP-spoof tests still required |
 | V224-SEC-006 | implemented | JSON, multipart uploads and signed Stripe webhook are bounded during stream reads, including chunked bodies. | scripts/runtime-integrity-test.mjs plus actual upload handlers |
@@ -34,7 +34,7 @@ The existing Quality pipeline and PR236 compliance engine are extended; no paral
 
 ## Release blockers
 
-- Trusted scanner workflow not proven: pending uploads intentionally blocked
+- Local scanner integration exists; actual deployed engine/signatures/limits and historical pending-file release not proven
 - Original complete V21 approval sources and 432-requirement bindings incomplete
 - Reviewed pixel baselines and physical installed iOS/Android keyboard/PWA evidence missing
 - Azure ingress/EasyAuth, deployed database role/RLS and historical data not inspected
@@ -52,3 +52,7 @@ Bottom-navigation markup/logic/icons/styles/transitive tokens unchanged; no prod
 ## Measurement integrity follow-up
 
 The first GitHub run passed both browser jobs but its combined report blocked one dashboard/demo 320px dark action-clearance measurement. The original adapter assumed two animation frames established the scroll endpoint. A delayed route reset can invalidate that assumption. The adapter now proves a stable current document endpoint, records scrollY/endpoint/proof and remains blocking if it cannot establish the endpoint or the actual action overlaps navigation. Chromium/WebKit adversarial fixtures cover a late reset, restoration, genuine overlap and blocked scrolling. No production navigation or padding was changed. The superseded run remains historical evidence; current source-bound measurements must be rerun after this adapter change.
+
+## V22.6 scanner extension
+
+The existing quarantine finding remains a release blocker until the deployed engine is proven. See [central file-scanning contract](../../security/file-scanning.md). This extension adds no production migration, merge or deployment.

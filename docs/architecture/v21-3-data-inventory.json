@@ -3,7 +3,7 @@
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
     "apis": 95,
-    "consumers": 23,
+    "consumers": 24,
     "migrations": 46,
     "tables": 95
   },
@@ -154,44 +154,33 @@
         "lib/server/totp.ts",
         "lib/server/email-otp.ts",
         "lib/server/email.ts",
-        "lib/server/logger.ts"
+        "lib/server/logger.ts",
+        "lib/server/registration.ts",
+        "lib/server/auth-tokens.ts",
+        "lib/server/mail-i18n.ts",
+        "lib/permissions.ts",
+        "lib/plans.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 24,
+          "line": 26,
           "arguments": [
-            "`\n   select u.id,m.organization_id,u.display_name as name,u.email,u.password_hash,m.role,\n          (o.is_demo or exists(select 1 from organization_milestones om where om.organization_id=o.id and om.milestone='onboarding_completed')) as onboarding_complete,\n          u.mfa_enabled,u.mfa_secret_enc,u.recovery_code_hashes,u.email_verified_at\n     from app_users u\n     join organization_memberships m on m.user_id=u.id and m.status='active'\n     join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')\n    where lower(u.email)=lower($1) and u.status='active'\n    order by m.created_at asc limit 1`",
+            "`\n   select u.id,m.organization_id,u.display_name as name,u.email,u.password_hash,m.role,\n          u.language,u.mfa_enabled,u.mfa_secret_enc,u.recovery_code_hashes,u.email_verified_at\n     from app_users u\n     join organization_memberships m on m.user_id=u.id and m.status='active'\n     join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')\n    where lower(u.email)=lower($1) and u.status='active'\n    order by m.created_at asc limit 1`",
             "[email]"
           ]
         },
         {
           "callee": "query",
-          "line": 48,
+          "line": 61,
           "arguments": [
-            "\"update app_users set email_verified_at=now(),updated_at=now() where id=$1\"",
-            "[user.id]"
+            "`update app_users set recovery_code_hashes=recovery_code_hashes - (select ordinality::int-1 from jsonb_array_elements_text(recovery_code_hashes) with ordinality where value=$1 limit 1),updated_at=now()\n      where id=$2 and status='active' and mfa_enabled=true and password_hash=$3 and mfa_secret_enc is not distinct from $4 and recovery_code_hashes @> $5::jsonb returning id`",
+            "[target,user.id,user.password_hash,user.mfa_secret_enc,JSON.stringify([target])]"
           ]
         },
         {
           "callee": "query",
-          "line": 49,
-          "arguments": [
-            "`update organization_subscriptions set trial_until=now()+($2||' days')::interval,updated_at=now() where organization_id=$1 and status='trial'`",
-            "[user.organization_id,String(domainConfig.trialDays)]"
-          ]
-        },
-        {
-          "callee": "query",
-          "line": 59,
-          "arguments": [
-            "`update app_users set recovery_code_hashes=$1::jsonb,updated_at=now() where id=$2`",
-            "[JSON.stringify(codes.filter((_,i)=>i!==idx)),user.id]"
-          ]
-        },
-        {
-          "callee": "query",
-          "line": 71,
+          "line": 76,
           "arguments": [
             "\"update app_users set last_login_at=now(),updated_at=now() where id=$1\"",
             "[user.id]"
@@ -199,7 +188,7 @@
         },
         {
           "callee": "query",
-          "line": 72,
+          "line": 77,
           "arguments": [
             "\"update platform_tenants set last_active_at=now() where organization_id=$1\"",
             "[user.organization_id]"
@@ -232,6 +221,7 @@
         "POST"
       ],
       "dependencies": [
+        "lib/server/audit.ts",
         "lib/server/crypto.ts",
         "lib/server/env.ts",
         "lib/server/totp.ts",
@@ -244,19 +234,35 @@
       ],
       "evidence": [
         {
-          "callee": "query",
-          "line": 19,
+          "callee": "client.query",
+          "line": 21,
           "arguments": [
-            "\"select mfa_pending_secret_enc,mfa_pending_expires_at from app_users where id=$1 limit 1\"",
+            "\"select mfa_enabled,status,mfa_pending_secret_enc,mfa_pending_expires_at from app_users where id=$1 for update\"",
             "[session.userId]"
           ]
         },
         {
-          "callee": "query",
-          "line": 25,
+          "callee": "client.query",
+          "line": 27,
           "arguments": [
-            "`update app_users set mfa_enabled=true,mfa_secret_enc=mfa_pending_secret_enc,recovery_code_hashes=$1::jsonb,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,updated_at=now() where id=$2`",
-            "[JSON.stringify(recoveryCodes.map(hashRecoveryCode)),session.userId]"
+            "`update app_users set mfa_enabled=true,mfa_secret_enc=$1,recovery_code_hashes=$2::jsonb,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,updated_at=now() where id=$3`",
+            "[pending.mfa_pending_secret_enc,JSON.stringify(codes.map(hashRecoveryCode)),session.userId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 28,
+          "arguments": [
+            "\"delete from auth_sessions where user_id=$1 and id<>$2\"",
+            "[session.userId,session.sessionId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 29,
+          "arguments": [
+            "\"select set_config('app.organization_id',$1,true)\"",
+            "[session.organizationId]"
           ]
         }
       ]
@@ -307,7 +313,7 @@
           "callee": "query",
           "line": 18,
           "arguments": [
-            "\"update app_users set mfa_pending_secret_enc=$1,mfa_pending_expires_at=$2,updated_at=now() where id=$3\"",
+            "\"update app_users set mfa_pending_secret_enc=$1,mfa_pending_expires_at=$2,updated_at=now() where id=$3 and mfa_enabled=false and status='active' returning id\"",
             "[encryptSecret(secret),expiresAt,session.userId]"
           ]
         }
@@ -332,12 +338,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 14,
+          "line": 15,
           "arguments": []
         },
         {
           "callee": "query",
-          "line": 18,
+          "line": 19,
           "arguments": [
             "'select password_hash from app_users where id=$1'",
             "[session.userId]"
@@ -345,7 +351,7 @@
         },
         {
           "callee": "c.query",
-          "line": 21,
+          "line": 22,
           "arguments": [
             "'update app_users set password_hash=$1,updated_at=now() where id=$2'",
             "[hash,session.userId]"
@@ -353,23 +359,23 @@
         },
         {
           "callee": "c.query",
-          "line": 21,
+          "line": 22,
           "arguments": [
             "'delete from auth_sessions where user_id=$1 and id<>$2'",
             "[session.userId,session.sessionId]"
           ]
         },
         {
-          "callee": "query",
-          "line": 26,
+          "callee": "client.query",
+          "line": 30,
           "arguments": [
-            "\"update app_users set password_hash=$1,updated_at=now() where id=$2\"",
-            "[await hashPassword(password),reset.user_id]"
+            "\"update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' returning id\"",
+            "[hash,reset.user_id]"
           ]
         },
         {
-          "callee": "query",
-          "line": 27,
+          "callee": "client.query",
+          "line": 32,
           "arguments": [
             "\"delete from auth_sessions where user_id=$1\"",
             "[reset.user_id]"
@@ -407,6 +413,7 @@
       "file": "app/api/auth/register/route.ts",
       "path": "/api/auth/register",
       "methods": [
+        "GET",
         "POST"
       ],
       "dependencies": [
@@ -418,19 +425,22 @@
         "lib/server/http.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
-        "lib/server/email-otp.ts",
-        "lib/server/email.ts",
-        "lib/server/logger.ts",
         "lib/server/mail-i18n.ts",
         "lib/server/provisioning.ts",
         "lib/server/repositories/demo-fixture.ts",
         "lib/subscription-plans.ts",
-        "lib/plans.ts"
+        "lib/plans.ts",
+        "lib/server/registration.ts",
+        "lib/server/auth-tokens.ts",
+        "lib/server/email-otp.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/permissions.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 33,
+          "line": 38,
           "arguments": [
             "\"select 1 from app_users where lower(email)=lower($1) limit 1\"",
             "[email]"
@@ -445,22 +455,26 @@
         "POST"
       ],
       "dependencies": [
-        "lib/server/email-otp.ts",
-        "lib/server/env.ts",
+        "lib/server/mail-i18n.ts",
+        "lib/server/registration.ts",
         "lib/server/db.ts",
+        "lib/server/env.ts",
+        "lib/server/http.ts",
+        "lib/server/auth-tokens.ts",
+        "lib/server/email-otp.ts",
         "lib/server/email.ts",
         "lib/server/logger.ts",
-        "lib/server/mail-i18n.ts",
-        "lib/server/http.ts",
+        "lib/permissions.ts",
+        "lib/plans.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 18,
+          "line": 16,
           "arguments": [
-            "`select u.id,m.organization_id,u.language,u.email_verified_at from app_users u\n        join organization_memberships m on m.user_id=u.id and m.status='active'\n        where lower(u.email)=lower($1) order by m.created_at asc limit 1`",
+            "`select u.id,m.organization_id,u.language,u.email_verified_at from app_users u\n    join organization_memberships m on m.user_id=u.id and m.status='active'\n    where lower(u.email)=lower($1) and u.status='active' order by m.created_at asc limit 1`",
             "[email]"
           ]
         }
@@ -574,36 +588,35 @@
         "lib/server/subscription-lifecycle.ts",
         "lib/server/http.ts",
         "lib/server/validation.ts",
-        "lib/server/rate-limit.ts"
+        "lib/server/rate-limit.ts",
+        "lib/server/registration.ts",
+        "lib/server/auth-tokens.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-i18n.ts",
+        "lib/permissions.ts",
+        "lib/plans.ts"
       ],
       "evidence": [
         {
-          "callee": "query",
-          "line": 13,
+          "callee": "client.query",
+          "line": 23,
           "arguments": [
-            "`select m.organization_id,m.role,u.display_name as name,u.email_verified_at from app_users u\n      join organization_memberships m on m.user_id=u.id and m.status='active'\n      where u.id=$1 and lower(u.email)=lower($2) and ($3::uuid is null or m.organization_id=$3::uuid)\n      order by m.created_at asc limit 1`",
-            "[userId,email,organizationId??null]"
+            "`select t.id,t.user_id,t.organization_id,t.email,t.consumed_at,u.email_verified_at is not null as verified from auth_tokens t\n      join app_users u on u.id=t.user_id and u.status='active'\n      where t.token_hash=$1 and t.token_type='verify_email' and t.expires_at>now() for update of t`",
+            "[hash]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 32,
+          "arguments": [
+            "\"update auth_tokens set consumed_at=now() where id=$1\"",
+            "[record.id]"
           ]
         },
         {
           "callee": "query",
-          "line": 21,
-          "arguments": [
-            "\"update app_users set email_verified_at=coalesce(email_verified_at,now()),updated_at=now() where id=$1\"",
-            "[userId]"
-          ]
-        },
-        {
-          "callee": "query",
-          "line": 22,
-          "arguments": [
-            "`update organization_subscriptions set trial_until=now()+($2||' days')::interval,updated_at=now() where organization_id=$1 and status='trial'`",
-            "[row.organization_id,String(domainConfig.trialDays)]"
-          ]
-        },
-        {
-          "callee": "query",
-          "line": 35,
+          "line": 40,
           "arguments": [
             "\"select id from app_users where lower(email)=lower($1) and status='active' limit 1\"",
             "[email]"
@@ -756,7 +769,7 @@
       "evidence": [
         {
           "callee": "withPlatform",
-          "line": 14,
+          "line": 12,
           "arguments": [
             "c=>processStripeEvent(c,event)"
           ]
@@ -958,16 +971,16 @@
         "lib/server/repositories/customers.ts",
         "lib/server/audit.ts",
         "lib/server/http.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/qr-bill.ts",
         "lib/server/database.ts",
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/session.ts",
         "lib/server/operator/entra.ts",
         "lib/server/operator/audit.ts",
-        "lib/server/repositories/business-api.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/financial-status.ts",
-        "lib/money.ts",
-        "lib/qr-bill.ts",
         "lib/server/plan-access.ts",
         "lib/server/repositories/customer-workspace.ts",
         "lib/server/repositories/financial-summary.ts",
@@ -1052,17 +1065,22 @@
         "lib/server/repositories/customers.ts",
         "lib/server/audit.ts",
         "lib/server/http.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/qr-bill.ts",
         "lib/server/validation.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 10,
+          "line": 11,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 10,
+          "line": 11,
           "arguments": [
             "s",
             "\"customers:read\""
@@ -1070,12 +1088,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 15,
+          "line": 24,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 15,
+          "line": 24,
           "arguments": [
             "s",
             "\"customers:write\""
@@ -1090,6 +1108,7 @@
         "GET"
       ],
       "dependencies": [
+        "lib/server/repositories/finance.ts",
         "lib/permissions.ts",
         "lib/server/repositories/dashboard.ts",
         "lib/server/repositories/business-api.ts",
@@ -1109,12 +1128,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 11,
+          "line": 12,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 13,
+          "line": 15,
           "arguments": [
             "session",
             "'documents:read'"
@@ -1122,7 +1141,7 @@
         },
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 16,
           "arguments": [
             "session",
             "'payments:read'"
@@ -1130,11 +1149,11 @@
         },
         {
           "callee": "withTenant",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "session.organizationId",
             "session.userId",
-            "async c=>{\n   const invoices=canInvoices?await listApiBusiness(c,session,'documents','kind=eq.invoice&order=issue_date.desc&limit=5'):[];\n   const payments=canPayments?await listApiBusiness(c,session,'payments','order=paid_on.desc&limit=5'):[];\n   const analytics=canInvoices&&canPayments?await dashboardAnalytics(c,session.organizationId):{analyticsInvoices:[],analyticsPayments:[],customerCount:0};\n   return {stats:{customer_count:analytics.customerCount},invoices,payments,canInvoices,canPayments,...analytics};\n  }",
+            "async c=>{\n   const invoices=canInvoices?await listApiBusiness(c,session,'documents','kind=eq.invoice&order=issue_date.desc&limit=5'):[];\n   const payments=canPayments?await listApiBusiness(c,session,'payments','order=paid_on.desc&limit=5'):[];\n   const analytics=canInvoices&&canPayments?await dashboardAnalytics(c,session.organizationId):{analyticsInvoices:[],analyticsPayments:[],customerCount:0};\n   const overdueIds=canInvoices?await dashboardAttention(c,session.organizationId):[];\n   const attention=(await Promise.all(overdueIds.map(row=>listApiBusiness(c,session,'documents','kind=eq.invoice&id=eq.'+encodeURIComponent(String(row.id)))))).flat();\n   const recent=canInvoices?await listApiBusiness(c,session,'documents','kind=eq.invoice&order=updated_at.desc&limit=5'):[];\n   const cash=canFinance?await cashStatisticsData(c,session.organizationId):null;\n   return {attention,recent,cash,canFinance,stats:{customer_count:analytics.customerCount},invoices,payments,canInvoices,canPayments,...analytics};\n  }",
             "{snapshot:true}"
           ]
         }
@@ -1147,6 +1166,7 @@
         "GET"
       ],
       "dependencies": [
+        "lib/server/repositories/finance.ts",
         "lib/server/repositories/dashboard.ts",
         "lib/server/demo.ts",
         "lib/server/http.ts",
@@ -1634,17 +1654,18 @@
       ],
       "evidence": [
         {
-          "callee": "tenantList",
-          "line": 15,
+          "callee": "tenantListPage",
+          "line": 14,
           "arguments": [
             "\"documents\"",
-            "\"id,customer_id,kind,number,status,issue_date,due_date,valid_until,vat_rate,note,currency,subtotal,vat_amount,total,created_at,customer:customers(name)\"",
-            "extra"
+            "request.nextUrl.searchParams",
+            "\"created_at.desc\"",
+            "kind===\"offer\"||kind===\"invoice\"?{kind}:{}"
           ]
         },
         {
           "callee": "tenantList",
-          "line": 32,
+          "line": 30,
           "arguments": [
             "\"customers\"",
             "\"id\"",
@@ -1653,7 +1674,7 @@
         },
         {
           "callee": "tenantRpc",
-          "line": 49,
+          "line": 47,
           "arguments": [
             "\"create_document_atomic\"",
             "{\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_idempotency_key:requestKey,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
@@ -1733,12 +1754,11 @@
       ],
       "evidence": [
         {
-          "callee": "tenantList",
+          "callee": "tenantListPage",
           "line": 10,
           "arguments": [
             "\"employees\"",
-            "\"id,first_name,last_name,email,phone,job_title,workload_percent,start_date,weekly_hours,vacation_days,address,status,created_at\"",
-            "\"order=created_at.desc\""
+            "request.nextUrl.searchParams"
           ]
         }
       ]
@@ -1968,12 +1988,13 @@
       ],
       "evidence": [
         {
-          "callee": "tenantList",
+          "callee": "tenantListPage",
           "line": 9,
           "arguments": [
             "\"expenses\"",
-            "\"id,employee_id,merchant,expense_date,category,amount,currency,vat_rate,description,status,created_at,employee:employees(first_name,last_name)\"",
-            "\"order=expense_date.desc\"+(request.nextUrl.searchParams.get(\"employeeId\")?\"&employee_id=eq.\"+encodeURIComponent(request.nextUrl.searchParams.get(\"employeeId\")!):\"\")"
+            "request.nextUrl.searchParams",
+            "\"expense_date.desc\"",
+            "{employee_id:request.nextUrl.searchParams.get(\"employeeId\")??''}"
           ]
         },
         {
@@ -2071,14 +2092,14 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async client=>(await client.query<{fileName:string;storagePath:string|null;mimeType:string;body:Buffer|null;purpose:string;expenseOwner:string|null}>(\n      `select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 limit 1`,\n      [id,s.organizationId]\n    )).rows[0]"
+            "async client=>(await client.query<{fileName:string;storagePath:string|null;mimeType:string;body:Buffer|null;purpose:string;scanStatus:string;expenseOwner:string|null}>(\n      `select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 limit 1`,\n      [id,s.organizationId]\n    )).rows[0]"
           ]
         },
         {
           "callee": "client.query",
           "line": 15,
           "arguments": [
-            "`select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 limit 1`",
+            "`select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 limit 1`",
             "[id,s.organizationId]"
           ]
         },
@@ -2100,12 +2121,14 @@
         "POST"
       ],
       "dependencies": [
+        "lib/server/business-idempotency.ts",
+        "lib/server/http.ts",
         "lib/server/file-relations.ts",
         "lib/server/file-validation.ts",
-        "lib/server/http.ts",
+        "lib/server/file-scan.ts",
+        "lib/server/env.ts",
         "lib/server/session.ts",
         "lib/server/db.ts",
-        "lib/server/env.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/permissions.ts",
         "lib/server/rbac.ts"
@@ -2113,12 +2136,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 17,
+          "line": 19,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 17,
+          "line": 19,
           "arguments": [
             "s",
             "'documents:read'"
@@ -2126,7 +2149,7 @@
         },
         {
           "callee": "authorize",
-          "line": 19,
+          "line": 21,
           "arguments": [
             "s",
             "relation.read"
@@ -2134,7 +2157,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 22,
+          "line": 24,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2143,7 +2166,7 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 24,
           "arguments": [
             "`select ${fileFields} from file_objects where ${where.join(' and ')} order by created_at desc limit 500`",
             "values"
@@ -2151,12 +2174,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 27,
+          "line": 29,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 33,
+          "line": 38,
           "arguments": [
             "s",
             "'documents:write'"
@@ -2164,7 +2187,7 @@
         },
         {
           "callee": "authorize",
-          "line": 36,
+          "line": 41,
           "arguments": [
             "s",
             "relation.write"
@@ -2172,7 +2195,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 38,
+          "line": 43,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2181,7 +2204,7 @@
         },
         {
           "callee": "c.query",
-          "line": 38,
+          "line": 43,
           "arguments": [
             "`select id from ${relation.table} where id=$1 and organization_id=$2${purpose==='expense_receipt'&&s.role==='member'?' and created_by_user_id=$3':''}`",
             "purpose==='expense_receipt'&&s.role==='member'?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId]"
@@ -2189,7 +2212,7 @@
         },
         {
           "callee": "authorize",
-          "line": 41,
+          "line": 46,
           "arguments": [
             "s",
             "'organization:write'"
@@ -2197,16 +2220,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 46,
+          "line": 51,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n   if(purpose==='expense_receipt'){\n    const expense=(await c.query(\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\",[s.organizationId,entityId])).rows[0];\n    if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');\n    if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');\n   }\n   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)\n    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null]);\n   await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);\n   if(purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);\n   if(purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);\n   return result.rows[0];\n  }"
+            "async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:\"file-upload\",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{\n   if(purpose==='expense_receipt'){\n    const expense=(await c.query(\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\",[s.organizationId,entityId])).rows[0];\n    if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');\n    if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');\n   }\n   const scanStatus=await scanFile(buffer);\n   if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');\n   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]);\n   await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);\n   if(scanStatus==='clean'&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);\n   if(scanStatus==='clean'&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);\n   return result.rows[0];\n  })"
           ]
         },
         {
           "callee": "c.query",
-          "line": 48,
+          "line": 53,
           "arguments": [
             "\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\"",
             "[s.organizationId,entityId]"
@@ -2214,15 +2237,15 @@
         },
         {
           "callee": "c.query",
-          "line": 52,
+          "line": 59,
           "arguments": [
-            "`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)\n    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`",
-            "[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null]"
+            "`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`",
+            "[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 54,
+          "line": 61,
           "arguments": [
             "'insert into file_contents(file_id,organization_id,body) values($1,$2,$3)'",
             "[id,s.organizationId,buffer]"
@@ -2230,7 +2253,7 @@
         },
         {
           "callee": "c.query",
-          "line": 55,
+          "line": 62,
           "arguments": [
             "'update app_users set avatar_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.userId]"
@@ -2238,7 +2261,7 @@
         },
         {
           "callee": "c.query",
-          "line": 56,
+          "line": 63,
           "arguments": [
             "'update organizations set logo_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.organizationId]"
@@ -2289,7 +2312,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const summary=await financialSummary(c,s,customerId);\n  if(request.nextUrl.searchParams.get('include')!=='workspace')return summary;\n  authorize(s,'documents:read');authorize(s,'accounting:read');\n  const documents=await listApiBusiness(c,s,'documents',customerId?'customer_id=eq.'+encodeURIComponent(customerId):'');\n  const data=tenantCan(s.role,'accounting:read')?await financeData(c,s.organizationId):{};\n  return {...summary,documents,data};\n }",
+            "async c=>{\n  const summary=await financialSummary(c,s,customerId);\n  if(request.nextUrl.searchParams.get('include')!=='workspace')return summary;\n  authorize(s,'documents:read');authorize(s,'accounting:read');\n  const documents=await listApiBusiness(c,s,'documents',customerId?'customer_id=eq.'+encodeURIComponent(customerId):'');\n  const data=tenantCan(s.role,'accounting:read')&&request.nextUrl.searchParams.get('view')!=='cash'?await financeData(c,s.organizationId):{};\n  const cash=tenantCan(s.role,'accounting:read')?await cashStatisticsData(c,s.organizationId):null;\n  return {...summary,documents,data,cash};\n }",
             "{snapshot:true}"
           ]
         },
@@ -2347,7 +2370,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "c=>financeData(c,s.organizationId)",
+            "async c=>({...(new URL(request.url).searchParams.get('view')==='cash'?{}:await financeData(c,s.organizationId)),cash:await cashStatisticsData(c,s.organizationId)})",
             "{snapshot:true}"
           ]
         }
@@ -3496,12 +3519,12 @@
       ],
       "evidence": [
         {
-          "callee": "tenantList",
+          "callee": "tenantListPage",
           "line": 8,
           "arguments": [
             "\"payments\"",
-            "\"id,invoice_id,customer_id,paid_on,amount,method,note,status,created_at,customer:customers(name),invoice:documents(number)\"",
-            "\"order=paid_on.desc\""
+            "request.nextUrl.searchParams",
+            "\"paid_on.desc\""
           ]
         },
         {
@@ -3602,12 +3625,11 @@
       ],
       "evidence": [
         {
-          "callee": "tenantList",
+          "callee": "tenantListPage",
           "line": 8,
           "arguments": [
             "\"products\"",
-            "\"id,name,kind,sku,unit,unit_price,vat_rate,description,status,created_at\"",
-            "\"order=created_at.desc\""
+            "request.nextUrl.searchParams"
           ]
         }
       ]
@@ -3627,17 +3649,18 @@
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
         "lib/server/http.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 9,
+          "line": 10,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s",
             "'projects:read'"
@@ -3645,7 +3668,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -3654,7 +3677,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "`select p.id,p.name,p.customer_id,p.status,p.source_quote_id,c.name customer_name,q.quote_no source_offer,\n coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),0) hours,\n coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and t.invoiced_invoice_id is not null),0) invoiced_hours\n  ,${tenantCan(s.role,'invoices:read')?`coalesce((select json_agg(distinct i.invoice_no) from time_entries t join invoices i on i.id=t.invoiced_invoice_id and i.organization_id=t.organization_id where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),'[]'::json)`:`'[]'::json`} invoice_numbers\n from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null order by p.name`",
             "[s.organizationId]"
@@ -3662,12 +3685,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 14,
+          "line": 15,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 15,
           "arguments": [
             "s",
             "'projects:write'"
@@ -3675,16 +3698,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{let quoteId=null;\n if(sourceOffer){const q=(await c.query(\"select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}\n if(customerId&&!(await c.query('select id from customers where organization_id=$1 and id=$2 and archived_at is null',[s.organizationId,customerId])).rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');\n const result=(await c.query(\"insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status\",[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.created',entityType:'project',entityId:result.id});return result;}"
+            "async c=>{const write=async()=>{let quoteId=null;\n if(sourceOffer){const q=(await c.query(\"select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}\n if(customerId&&!(await c.query('select id from customers where organization_id=$1 and id=$2 and archived_at is null',[s.organizationId,customerId])).rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');\n const result=(await c.query(\"insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status\",[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.created',entityType:'project',entityId:result.id});return result;};return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'project.create',key:requestKey,body:{name,customerId,sourceOffer}},write):write();}"
           ]
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 18,
           "arguments": [
             "\"select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\"",
             "[s.organizationId,sourceOffer]"
@@ -3692,7 +3715,7 @@
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 18,
           "arguments": [
             "'select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null'",
             "[s.organizationId,quoteId]"
@@ -3700,7 +3723,7 @@
         },
         {
           "callee": "c.query",
-          "line": 17,
+          "line": 19,
           "arguments": [
             "'select id from customers where organization_id=$1 and id=$2 and archived_at is null'",
             "[s.organizationId,customerId]"
@@ -3708,7 +3731,7 @@
         },
         {
           "callee": "c.query",
-          "line": 18,
+          "line": 20,
           "arguments": [
             "\"insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status\"",
             "[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId]"
@@ -3750,7 +3773,7 @@
           "arguments": [
             "session.organizationId",
             "session.userId",
-            "async client=>{\n      const results:SearchItem[]=[];\n      for(const source of searchSources){\n        const permission=permissionForModule(source.module,\"read\");\n        if(!permission||!tenantCan(session.role,permission)||!planAllowsModule(plan,source.module))continue;\n        const filters=\"kind\" in source?\"kind=eq.\"+source.kind:\"\";\n        const rows=await listApiBusiness(client,session,source.table,filters);\n        for(const row of rows){\n          if(!JSON.stringify(row).toLocaleLowerCase(\"de-CH\").includes(query))continue;\n          results.push(searchItem(source,row));\n          if(results.length>=12)return results;\n        }\n      }\n      return results;\n    }"
+            "async client=>{\n      const results:SearchItem[]=[];\n      for(const source of searchSources){\n        const permission=permissionForModule(source.module,\"read\");\n        if(!permission||!tenantCan(session.role,permission)||!planAllowsModule(plan,source.module))continue;\n        const filters=new URLSearchParams({q:query,limit:String(12-results.length)});\n        if(\"kind\" in source)filters.set(\"kind\",\"eq.\"+source.kind);\n        const rows=await listApiBusiness(client,session,source.table,filters.toString());\n        for(const row of rows){\n          results.push(searchItem(source,row));\n          if(results.length>=12)return results;\n        }\n      }\n      return results;\n    }"
           ]
         }
       ]
@@ -3821,15 +3844,31 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>(await c.query(`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`,[...Object.values(data),s.organizationId])).rows[0]"
+            "async c=>{\n   if(data.logo_url){\n    const match=String(data.logo_url).match(/^\\/api\\/files\\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\\/download$/i);\n    if(!match)throw new ApiError(400,'logo_reference_invalid','Bitte ein geprüftes Firmenlogo hochladen.');\n    const logo=(await c.query(\"select scan_status from file_objects where id=$1 and organization_id=$2 and purpose='company_logo' and content_type in ('image/png','image/jpeg','image/webp')\",[match[1],s.organizationId])).rows[0];\n    if(!logo)throw new ApiError(404,'logo_not_found','Firmenlogo wurde nicht gefunden.');\n    if(logo.scan_status!=='clean')throw new ApiError(423,'logo_not_ready','Das Firmenlogo ist noch nicht für die Verwendung freigegeben.');\n   }\n   const item=(await c.query(`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`,[...Object.values(data),s.organizationId])).rows[0];\n   if(b.completeOnboarding===true&&item){\n    await c.query(\"insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','company_setup') on conflict do nothing\",[s.organizationId]);\n   }\n   return item;\n  }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 26,
+          "line": 30,
+          "arguments": [
+            "\"select scan_status from file_objects where id=$1 and organization_id=$2 and purpose='company_logo' and content_type in ('image/png','image/jpeg','image/webp')\"",
+            "[match[1],s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 34,
           "arguments": [
             "`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`",
             "[...Object.values(data),s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 36,
+          "arguments": [
+            "\"insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','company_setup') on conflict do nothing\"",
+            "[s.organizationId]"
           ]
         }
       ]
@@ -4353,47 +4392,39 @@
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/http.ts"
+        "lib/server/database.ts",
+        "lib/server/repositories/operator-api.ts",
+        "lib/server/http.ts",
+        "lib/server/operator/session.ts",
+        "lib/server/operator/entra.ts",
+        "lib/server/operator/audit.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/audit.ts",
+        "lib/qr-bill.ts",
+        "lib/server/plan-access.ts"
       ],
       "evidence": [
         {
-          "callee": "requireSession",
-          "line": 8,
-          "arguments": []
-        },
-        {
-          "callee": "authorize",
-          "line": 8,
+          "callee": "tenantListPage",
+          "line": 10,
           "arguments": [
-            "s",
-            "'support:read'"
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 8,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "async c=>(await c.query('select id,case_number,subject,category,priority,status,created_at,updated_at from support_cases where organization_id=$1 order by updated_at desc limit 500',[s.organizationId])).rows"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 8,
-          "arguments": [
-            "'select id,case_number,subject,category,priority,status,created_at,updated_at from support_cases where organization_id=$1 order by updated_at desc limit 500'",
-            "[s.organizationId]"
+            "'support_tickets'",
+            "request.nextUrl.searchParams",
+            "'updated_at.desc'",
+            "request.nextUrl.searchParams.get('id')?{id:request.nextUrl.searchParams.get('id')!}:{}"
           ]
         },
         {
           "callee": "requireSession",
-          "line": 12,
+          "line": 14,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 12,
+          "line": 14,
           "arguments": [
             "s",
             "'support:write'"
@@ -4401,16 +4432,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 19,
+          "line": 22,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n   const id=randomUUID();const r=await c.query(\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,subject,status\",[id,s.organizationId,'T-'+id,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]);\n   await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\",[id,s.userId,message]);return r.rows[0];\n  }"
+            "async c=>{const write=async()=>{\n   const id=randomUUID();const r=await c.query(\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,subject,status\",[id,s.organizationId,'T-'+id,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]);\n   await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\",[id,s.userId,message]);return r.rows[0];\n  };return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.create',key,body:{subject,message,category,priority}},write):write();}"
           ]
         },
         {
           "callee": "c.query",
-          "line": 20,
+          "line": 23,
           "arguments": [
             "\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,subject,status\"",
             "[id,s.organizationId,'T-'+id,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]"
@@ -4418,7 +4449,7 @@
         },
         {
           "callee": "c.query",
-          "line": 21,
+          "line": 24,
           "arguments": [
             "\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\"",
             "[id,s.userId,message]"
@@ -4896,63 +4927,63 @@
       "calls": [
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then(session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }).catch",
-          "line": 87,
+          "line": 92,
           "arguments": [
             "error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}}"
           ]
         },
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then",
-          "line": 87,
+          "line": 92,
           "arguments": [
             "session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 87,
+          "line": 92,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 159,
+          "line": 165,
           "arguments": [
             "production?\"/api/notifications\":null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 165,
+          "line": 171,
           "arguments": [
             "production?\"/api/settings/profile\":null"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then(payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})})\n        .catch",
-          "line": 249,
+          "line": 255,
           "arguments": [
             "error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:\"Suche konnte nicht geladen werden.\"})}"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then",
-          "line": 249,
+          "line": 255,
           "arguments": [
             "payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 249,
+          "line": 255,
           "arguments": [
             "\"/api/search?q=\"+encodeURIComponent(term)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 268,
+          "line": 274,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -4960,7 +4991,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 277,
+          "line": 283,
           "arguments": [
             "\"/api/notifications\"",
             "{all:true}"
@@ -5053,112 +5084,77 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 60,
+          "line": 61,
           "arguments": [
             "isProductionBackendEnabled()?\"/api/customers\":\"/api/demo/data?collection=customers\""
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 199,
+          "line": 200,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 199,
+          "line": 200,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 199,
+          "line": 200,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 234,
+          "line": 235,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 234,
+          "line": 235,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 234,
+          "line": 235,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/documents/\"+encodeURIComponent(sourceOffer))\n        .then(payload=>queueMicrotask(()=>{\n          const source=remoteDraftFromItem(payload.item,\"Angebot\");\n          setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));\n        })).catch",
-          "line": 257,
+          "callee": "useApiQuery",
+          "line": 256,
           "arguments": [
-            "()=>undefined"
+            "!existing&&sourceOffer?(production?\"/api/documents/\"+encodeURIComponent(sourceOffer):\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
-          "callee": "apiGet<{item:Record<string,unknown>}>(\"/api/documents/\"+encodeURIComponent(sourceOffer))\n        .then",
-          "line": 257,
+          "callee": "useApiQuery",
+          "line": 273,
           "arguments": [
-            "payload=>queueMicrotask(()=>{\n          const source=remoteDraftFromItem(payload.item,\"Angebot\");\n          setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));\n        })"
+            "kind==='Rechnung'&&sourceTimeEntriesParam&&production?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
-          "callee": "apiGet",
-          "line": 257,
-          "arguments": [
-            "\"/api/documents/\"+encodeURIComponent(sourceOffer)"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)).then(payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],\"Angebot\");setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));}}).catch",
-          "line": 264,
-          "arguments": [
-            "()=>undefined"
-          ]
-        },
-        {
-          "callee": "apiGet<{items:Array<Record<string,unknown>>}>(\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)).then",
-          "line": 264,
-          "arguments": [
-            "payload=>{if(payload.items[0]){const source=remoteDraftFromItem(payload.items[0],\"Angebot\");setDraft(current=>({...source,id:undefined,status:\"draft\",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:\"30\"}));}}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 264,
-          "arguments": [
-            "\"/api/demo/data?collection=documents&number=\"+encodeURIComponent(sourceOffer)"
-          ]
-        },
-        {
-          "callee": "apiGet",
+          "callee": "useApiQuery",
           "line": 274,
           "arguments": [
-            "\"/api/time-entries/billing?ids=\"+encodeURIComponent(sourceTimeEntriesParam)"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 275,
-          "arguments": [
-            "\"/api/expenses/billing?ids=\"+encodeURIComponent(sourceExpenseParam)"
+            "kind==='Rechnung'&&sourceExpenseParam&&production?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 309,
+          "line": 320,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload"
@@ -5166,7 +5162,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 309,
+          "line": 320,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -5175,7 +5171,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 325,
+          "line": 336,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -5183,14 +5179,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 325,
+          "line": 336,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 326,
+          "line": 337,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey}"
@@ -5198,14 +5194,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 326,
+          "line": 337,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "fetch",
-          "line": 515,
+          "line": 526,
           "arguments": [
             "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
             "fileUrl||pdfNumber?undefined:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}"
@@ -5213,28 +5209,28 @@
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then(data=>{if(active){setCompany(data.item);setError(null);}})\n     .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:\"Firmendaten konnten nicht geladen werden.\");})\n     .finally",
-          "line": 537,
+          "line": 548,
           "arguments": [
             "()=>{if(active)setLoading(false);}"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then(data=>{if(active){setCompany(data.item);setError(null);}})\n     .catch",
-          "line": 537,
+          "line": 548,
           "arguments": [
             "reason=>{if(active)setError(reason instanceof Error?reason.message:\"Firmendaten konnten nicht geladen werden.\");}"
           ]
         },
         {
           "callee": "apiGet<{item:Record<string,unknown>}>('/api/settings/company')\n     .then",
-          "line": 537,
+          "line": 548,
           "arguments": [
             "data=>{if(active){setCompany(data.item);setError(null);}}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 537,
+          "line": 548,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -5461,31 +5457,49 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 27,
+          "line": 36,
           "arguments": [
             "\"customers\"",
-            "customers"
+            "customers",
+            "query.toString()"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 40,
+          "line": 44,
           "arguments": [
             "production?\"/api/customers/\"+encodeURIComponent(customerId)+\"?include=workspace\":null"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 76,
+          "line": 85,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 141,
+          "line": 153,
           "arguments": [
             "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
+          ]
+        },
+        {
+          "callee": "apiPatch",
+          "line": 185,
+          "arguments": [
+            "\"/api/customers/\"+encodeURIComponent(customerId)",
+            "body"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 185,
+          "arguments": [
+            "\"/api/customers\"",
+            "body",
+            "{idempotencyKey:attempt.key}"
           ]
         }
       ],
@@ -5501,9 +5515,9 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 34,
+          "line": 16,
           "arguments": [
-            "isProductionBackendEnabled()&&production?\"/api/dashboard\":\"/api/demo/dashboard\""
+            "isProductionBackendEnabled()&&production?'/api/dashboard':'/api/demo/dashboard'"
           ]
         }
       ],
@@ -5516,44 +5530,36 @@
       "file": "components/pages/employees.tsx",
       "calls": [
         {
-          "callee": "useDemoRows",
-          "line": 27,
-          "arguments": [
-            "\"employees\"",
-            "employees"
-          ]
-        },
-        {
           "callee": "useApiQuery",
-          "line": 50,
+          "line": 54,
           "arguments": [
             "existing&&employeeId?(production?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)):null"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))).catch",
-          "line": 62,
+          "line": 66,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 62,
+          "line": 66,
           "arguments": [
             "data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 62,
+          "line": 66,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 68,
+          "line": 72,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -5561,28 +5567,28 @@
         },
         {
           "callee": "apiGet",
-          "line": 80,
+          "line": 84,
           "arguments": [
             "\"/api/time-entries?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 81,
+          "line": 85,
           "arguments": [
             "\"/api/expenses?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 82,
+          "line": 86,
           "arguments": [
             "\"/api/files?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 121,
+          "line": 132,
           "arguments": [
             "\"/api/employees/\"+encodeURIComponent(employeeId)",
             "payload"
@@ -5590,10 +5596,11 @@
         },
         {
           "callee": "apiPost",
-          "line": 122,
+          "line": 135,
           "arguments": [
             "\"/api/employees\"",
-            "payload"
+            "payload",
+            "{idempotencyKey:attempt.key}"
           ]
         }
       ],
@@ -5607,51 +5614,43 @@
       "file": "components/pages/expenses.tsx",
       "calls": [
         {
-          "callee": "useDemoRows",
-          "line": 20,
-          "arguments": [
-            "\"expenses\"",
-            "expenses"
-          ]
-        },
-        {
           "callee": "useApiQuery",
-          "line": 31,
+          "line": 32,
           "arguments": [
             "production?\"/api/expenses/options\":\"/api/demo/data?collection=employees\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 43,
+          "line": 44,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 48,
+          "line": 49,
           "arguments": [
             "\"/api/customers\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 59,
+          "line": 60,
           "arguments": [
             "expenseId?\"/api/files?expenseId=\"+encodeURIComponent(expenseId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 62,
+          "line": 63,
           "arguments": [
             "existing&&expenseId?(production?\"/api/expenses/\"+encodeURIComponent(expenseId):\"/api/demo/data?collection=expenses&id=\"+encodeURIComponent(expenseId)):null"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 92,
+          "line": 93,
           "arguments": [
             "\"/api/expenses/scan-receipt\"",
             "form"
@@ -5659,7 +5658,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 114,
+          "line": 115,
           "arguments": [
             "'/api/files'",
             "form"
@@ -5667,7 +5666,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 115,
+          "line": 116,
           "arguments": [
             "\"/api/expenses/\"+encodeURIComponent(targetExpenseId)",
             "payload"
@@ -5675,7 +5674,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 119,
+          "line": 120,
           "arguments": [
             "\"/api/expenses\"",
             "payload",
@@ -5684,7 +5683,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 127,
+          "line": 128,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -5692,7 +5691,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 142,
+          "line": 143,
           "arguments": [
             "'/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement'",
             "{reference:reimbursementRef}"
@@ -5712,21 +5711,21 @@
           "callee": "useApiQuery",
           "line": 18,
           "arguments": [
-            "isProductionBackendEnabled()&&production?\"/api/finance\":\"/api/demo/finance\""
+            "isProductionBackendEnabled()&&production?\"/api/finance?view=cash\":\"/api/demo/finance\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 58,
+          "line": 32,
           "arguments": [
-            "isProductionBackendEnabled()&&production?`/api/documents?kind=${kind}`:`/api/demo/data?collection=documents&kind=${kind}`"
+            "production?`/api/documents?${params}`:`/api/demo/data?collection=documents&${params}`"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 71,
+          "line": 44,
           "arguments": [
-            "\"/api/finance/overview?include=workspace\""
+            "\"/api/finance/overview?include=workspace&view=cash\""
           ]
         }
       ],
@@ -5748,14 +5747,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 36,
+          "line": 37,
           "arguments": [
             "production?\"/api/notifications\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 50,
+          "line": 51,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -5763,7 +5762,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 54,
+          "line": 55,
           "arguments": [
             "\"/api/notifications\"",
             "{all:true}"
@@ -5778,23 +5777,15 @@
       "file": "components/pages/payments.tsx",
       "calls": [
         {
-          "callee": "useDemoRows",
-          "line": 18,
-          "arguments": [
-            "\"payments\"",
-            "payments"
-          ]
-        },
-        {
           "callee": "useApiQuery",
-          "line": 39,
+          "line": 40,
           "arguments": [
             "production?\"/api/documents?kind=invoice\":\"/api/demo/data?collection=documents&kind=invoice\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 58,
+          "line": 59,
           "arguments": [
             "\"/api/payments\"",
             "{invoiceId,paidOn:date,amount:value,method,note}",
@@ -5803,7 +5794,7 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 92,
+          "line": 93,
           "arguments": [
             "production?\"/api/payments/\"+encodeURIComponent(paymentId):null"
           ]
@@ -5819,23 +5810,15 @@
       "file": "components/pages/products.tsx",
       "calls": [
         {
-          "callee": "useDemoRows",
-          "line": 21,
-          "arguments": [
-            "\"products\"",
-            "products"
-          ]
-        },
-        {
           "callee": "useApiQuery",
-          "line": 39,
+          "line": 42,
           "arguments": [
             "existing&&productId?(production?\"/api/products/\"+encodeURIComponent(productId):\"/api/demo/data?collection=products&id=\"+encodeURIComponent(productId)):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 73,
+          "line": 83,
           "arguments": [
             "\"/api/products/\"+encodeURIComponent(productId)",
             "payload"
@@ -5843,10 +5826,11 @@
         },
         {
           "callee": "apiPost",
-          "line": 74,
+          "line": 86,
           "arguments": [
             "\"/api/products\"",
-            "payload"
+            "payload",
+            "{idempotencyKey:attempt.key}"
           ]
         }
       ],
@@ -5861,14 +5845,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 45,
+          "line": 47,
           "arguments": [
             "production?\"/api/settings/profile\":null"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 53,
+          "line": 55,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -5876,7 +5860,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 70,
+          "line": 72,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -5884,14 +5868,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 114,
+          "line": 119,
           "arguments": [
             "production?\"/api/settings/company\":null"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 142,
+          "line": 148,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -5899,43 +5883,43 @@
         },
         {
           "callee": "apiPatch",
-          "line": 143,
+          "line": 149,
           "arguments": [
             "\"/api/settings/company\"",
-            "{name,uid,street,postalCode,city,email,phone}"
+            "{name,uid,street,postalCode,city,email,phone,completeOnboarding:onboarding}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 204,
+          "line": 211,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 205,
+          "line": 212,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 206,
+          "line": 213,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 220,
+          "line": 227,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 239,
+          "line": 246,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -5943,7 +5927,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 251,
+          "line": 258,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -5951,67 +5935,53 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 326,
+          "line": 333,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 326,
+          "line": 333,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 326,
+          "line": 333,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 326,
+          "line": 333,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 334,
+          "line": 341,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
           ]
         },
         {
-          "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then(data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}).catch",
-          "line": 348,
+          "callee": "useApiQuery",
+          "line": 356,
           "arguments": [
-            "()=>setError(\"Sprache konnte nicht geladen werden.\")"
-          ]
-        },
-        {
-          "callee": "apiGet<{item?:{language?:string}}>(\"/api/settings/profile\").then",
-          "line": 348,
-          "arguments": [
-            "data=>{const value=data.item?.language??\"de-CH\";setLanguage(value===\"de\"?\"de-CH\":value)}"
-          ]
-        },
-        {
-          "callee": "apiGet",
-          "line": 348,
-          "arguments": [
-            "\"/api/settings/profile\""
+            "production?\"/api/settings/profile\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 349,
+          "line": 358,
           "arguments": [
             "\"/api/settings/profile\"",
-            "{language:code}"
+            "{language:code===\"de-CH\"?\"de\":code}"
           ]
         }
       ],
@@ -6030,16 +6000,22 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 55,
+          "line": 57,
           "arguments": [
             "path"
+          ]
+        },
+        {
+          "callee": "useDemoRows",
+          "line": 69,
+          "arguments": [
+            "collection",
+            "[]",
+            "filters.toString()"
           ]
         }
       ],
       "pages": [
-        "app/angebote/page.tsx",
-        "app/belege/page.tsx",
-        "app/dashboard/page.tsx",
         "app/einstellungen/abonnement/page.tsx",
         "app/einstellungen/benachrichtigungen/page.tsx",
         "app/einstellungen/darstellung/page.tsx",
@@ -6047,8 +6023,6 @@
         "app/einstellungen/konto/page.tsx",
         "app/einstellungen/page.tsx",
         "app/einstellungen/sprache/page.tsx",
-        "app/finanzen/analyse/page.tsx",
-        "app/finanzen/page.tsx",
         "app/kunden/[id]/bearbeiten/page.tsx",
         "app/kunden/[id]/page.tsx",
         "app/kunden/neu/page.tsx",
@@ -6056,13 +6030,10 @@
         "app/mitarbeiter/[id]/page.tsx",
         "app/mitarbeiter/neu/page.tsx",
         "app/mitarbeiter/page.tsx",
-        "app/preview/dashboard/page.tsx",
-        "app/preview/rechnungen/page.tsx",
         "app/preview/zeit/page.tsx",
         "app/produkte/[id]/page.tsx",
         "app/produkte/neu/page.tsx",
         "app/produkte/page.tsx",
-        "app/rechnungen/page.tsx",
         "app/spesen/[id]/page.tsx",
         "app/spesen/neu/page.tsx",
         "app/spesen/page.tsx",
@@ -6077,22 +6048,23 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 22,
+          "line": 33,
           "arguments": [
-            "production?\"/api/support/tickets\":\"/api/demo/data?collection=support_tickets\""
+            "production?\"/api/support/tickets?\"+params:\"/api/demo/data?collection=support_tickets&\"+params"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 61,
+          "line": 77,
           "arguments": [
             "\"/api/support/tickets\"",
-            "{subject,category,priority:\"normal\",message}"
+            "body",
+            "{idempotencyKey:attempt.key}"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 67,
+          "line": 85,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6100,7 +6072,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 136,
+          "line": 156,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6108,21 +6080,21 @@
         },
         {
           "callee": "apiGet",
-          "line": 152,
+          "line": 172,
           "arguments": [
-            "\"/api/support/tickets\""
+            "\"/api/support/tickets?id=\"+encodeURIComponent(ticketId)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 153,
+          "line": 173,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 171,
+          "line": 191,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\"",
             "{body:value}"
@@ -6250,24 +6222,25 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 15,
+          "line": 24,
           "arguments": [
             "'/api/customers'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 16,
+          "line": 25,
           "arguments": [
             "sourceOffer?'/api/documents/'+encodeURIComponent(sourceOffer):null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 31,
+          "line": 47,
           "arguments": [
             "'/api/projects'",
-            "{name:name.trim(),customerId,sourceOffer}"
+            "body",
+            "{idempotencyKey:attempt.key}"
           ]
         }
       ],
@@ -6276,60 +6249,84 @@
       ]
     },
     {
+      "file": "components/registration/registration-sheet.tsx",
+      "calls": [
+        {
+          "callee": "fetch",
+          "line": 32,
+          "arguments": [
+            "'/api/auth/register?'+params",
+            "{cache:'no-store'}"
+          ]
+        },
+        {
+          "callee": "fetch",
+          "line": 43,
+          "arguments": [
+            "url",
+            "{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/registrieren/page.tsx"
+      ]
+    },
+    {
       "file": "components/security-settings-page.tsx",
       "calls": [
         {
           "callee": "apiGet<MfaState>(\"/api/auth/mfa\").then(setMfa).catch",
-          "line": 46,
+          "line": 47,
           "arguments": [
             "error=>setMfaError(error instanceof Error?error.message:\"Sicherheitsstatus konnte nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<MfaState>(\"/api/auth/mfa\").then",
-          "line": 46,
+          "line": 47,
           "arguments": [
             "setMfa"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 46,
+          "line": 47,
           "arguments": [
             "\"/api/auth/mfa\""
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then(payload=>setSessions(payload.items))\n      .catch(error=>setSessionsError(error instanceof Error?error.message:\"Sitzungen konnten nicht geladen werden.\"))\n      .finally",
-          "line": 49,
+          "line": 50,
           "arguments": [
             "()=>setSessionsLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then(payload=>setSessions(payload.items))\n      .catch",
-          "line": 49,
+          "line": 50,
           "arguments": [
             "error=>setSessionsError(error instanceof Error?error.message:\"Sitzungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then",
-          "line": 49,
+          "line": 50,
           "arguments": [
             "payload=>setSessions(payload.items)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 49,
+          "line": 50,
           "arguments": [
             "\"/api/auth/sessions\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 58,
+          "line": 59,
           "arguments": [
             "\"/api/auth/mfa/setup\"",
             "{}"
@@ -6337,7 +6334,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 65,
+          "line": 66,
           "arguments": [
             "\"/api/auth/mfa/confirm\"",
             "{code}"
@@ -6345,7 +6342,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 77,
+          "line": 78,
           "arguments": [
             "\"/api/auth/password\"",
             "{password:newPassword,currentPassword}"
@@ -6353,14 +6350,14 @@
         },
         {
           "callee": "apiDelete",
-          "line": 85,
+          "line": 86,
           "arguments": [
             "\"/api/auth/sessions/\"+encodeURIComponent(id)"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 94,
+          "line": 95,
           "arguments": [
             "\"/api/auth/sessions\""
           ]
@@ -7907,15 +7904,15 @@
       "calls": [
         {
           "callee": "c.query",
-          "line": 66,
+          "line": 104,
           "arguments": [
-            "`select * from (${source}) q ${where.length?'where '+where.join(' and '):''} order by ${sortTerms.join(',')},q.id desc limit ${limit}`",
+            "`select *,count(*) over()::int total_count from (${source}) q ${where.length?'where '+where.join(' and '):''} order by ${sortTerms.join(',')},q.id desc limit ${limit}${offset?' offset '+offset:''}`",
             "values"
           ]
         },
         {
           "callee": "c.query",
-          "line": 98,
+          "line": 136,
           "arguments": [
             "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
             "[s.organizationId+':payment:'+key]"
@@ -7923,7 +7920,7 @@
         },
         {
           "callee": "c.query",
-          "line": 99,
+          "line": 137,
           "arguments": [
             "'select request_hash,response_json from business_idempotency_keys where organization_id=$1 and operation=$2 and idempotency_key=$3'",
             "[s.organizationId,operation,key]"
@@ -7931,7 +7928,7 @@
         },
         {
           "callee": "c.query",
-          "line": 105,
+          "line": 143,
           "arguments": [
             "'select id,customer_id,total_amount,paid_amount,status from invoices where id::text=$1 and organization_id=$2 and archived_at is null for update'",
             "[args.p_invoice_id,s.organizationId]"
@@ -7939,7 +7936,7 @@
         },
         {
           "callee": "c.query",
-          "line": 110,
+          "line": 148,
           "arguments": [
             "`insert into payments(organization_id,external_id,invoice_id,payer_customer_id,payment_date,amount,method,reference,allocation_status,created_by_user_id)\n   values($1,$2,$3,$4,$5,$6,$7,$8,'matched',$9) returning id,amount,payment_date paid_on`",
             "[s.organizationId,randomUUID(),row.id,row.customer_id,args.p_paid_on,amount,args.p_method,args.p_note,s.userId]"
@@ -7947,7 +7944,7 @@
         },
         {
           "callee": "c.query",
-          "line": 112,
+          "line": 150,
           "arguments": [
             "\"update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1>=total_amount then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3\"",
             "[amount,row.id,s.organizationId]"
@@ -7955,7 +7952,7 @@
         },
         {
           "callee": "c.query",
-          "line": 113,
+          "line": 151,
           "arguments": [
             "'insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)'",
             "[s.organizationId,operation,key,hash,JSON.stringify(payment.rows[0]),s.userId]"
@@ -7963,7 +7960,7 @@
         },
         {
           "callee": "c.query",
-          "line": 120,
+          "line": 158,
           "arguments": [
             "'select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1'",
             "[s.organizationId]"
@@ -7971,7 +7968,7 @@
         },
         {
           "callee": "c.query",
-          "line": 127,
+          "line": 165,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,coalesce((select max(substring(${numberingColumn} from $4)::integer) from ${numberingTable} where organization_id=$1),0)+2) on conflict(organization_id,kind,period) do update set next_value=greatest(business_document_counters.next_value+1,excluded.next_value) returning next_value-1 number`",
             "[s.organizationId,invoice?'invoice':'quote',year,'^'+pattern]"
@@ -7979,7 +7976,7 @@
         },
         {
           "callee": "c.query",
-          "line": 133,
+          "line": 171,
           "arguments": [
             "'select id from customers where id::text=$1 and organization_id=$2 and archived_at is null'",
             "[args.p_customer_id,s.organizationId]"
@@ -7987,7 +7984,7 @@
         },
         {
           "callee": "c.query",
-          "line": 137,
+          "line": 175,
           "arguments": [
             "\"select id,status,customer_id,currency from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update\"",
             "[s.organizationId,args.p_source_offer]"
@@ -7995,7 +7992,7 @@
         },
         {
           "callee": "c.query",
-          "line": 139,
+          "line": 177,
           "arguments": [
             "'select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\\'cancelled\\''",
             "[s.organizationId,quote.id]"
@@ -8003,7 +8000,7 @@
         },
         {
           "callee": "c.query",
-          "line": 144,
+          "line": 182,
           "arguments": [
             "`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
             "[args.p_current_number,s.organizationId]"
@@ -8011,7 +8008,7 @@
         },
         {
           "callee": "c.query",
-          "line": 148,
+          "line": 186,
           "arguments": [
             "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\"",
             "[s.organizationId,id]"
@@ -8019,7 +8016,7 @@
         },
         {
           "callee": "c.query",
-          "line": 149,
+          "line": 187,
           "arguments": [
             "`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`",
             "[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]"
@@ -8027,7 +8024,7 @@
         },
         {
           "callee": "c.query",
-          "line": 150,
+          "line": 188,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -8035,7 +8032,7 @@
         },
         {
           "callee": "c.query",
-          "line": 151,
+          "line": 189,
           "arguments": [
             "\"update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -8043,7 +8040,7 @@
         },
         {
           "callee": "c.query",
-          "line": 152,
+          "line": 190,
           "arguments": [
             "`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`",
             "[id,s.organizationId]"
@@ -8051,7 +8048,7 @@
         },
         {
           "callee": "c.query",
-          "line": 155,
+          "line": 193,
           "arguments": [
             "`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)\n   values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`",
             "[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]"
@@ -8059,7 +8056,7 @@
         },
         {
           "callee": "c.query",
-          "line": 158,
+          "line": 196,
           "arguments": [
             "\"update invoices set source_quote_id=$3 where organization_id=$1 and id=$2\"",
             "[s.organizationId,id,sourceQuoteId]"
@@ -8067,7 +8064,7 @@
         },
         {
           "callee": "c.query",
-          "line": 165,
+          "line": 203,
           "arguments": [
             "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`",
             "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat]"
@@ -8075,7 +8072,7 @@
         },
         {
           "callee": "c.query",
-          "line": 168,
+          "line": 206,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id\"",
             "[s.organizationId,ids,id,args.p_customer_id,args.p_currency]"
@@ -8083,7 +8080,7 @@
         },
         {
           "callee": "c.query",
-          "line": 170,
+          "line": 208,
           "arguments": [
             "'insert into invoice_line_expenses(organization_id,invoice_line_id,expense_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -8091,7 +8088,7 @@
         },
         {
           "callee": "c.query",
-          "line": 175,
+          "line": 213,
           "arguments": [
             "`update time_entries set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and billable=true and approved=true and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id`",
             "[s.organizationId,ids,id,args.p_customer_id]"
@@ -8099,7 +8096,7 @@
         },
         {
           "callee": "c.query",
-          "line": 177,
+          "line": 215,
           "arguments": [
             "'insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -8107,7 +8104,7 @@
         },
         {
           "callee": "c.query",
-          "line": 180,
+          "line": 218,
           "arguments": [
             "`update invoices set subtotal=x.subtotal,vat_amount=x.vat,total_amount=x.subtotal+x.vat from (select round(sum(quantity*unit_price),2) subtotal,round(sum(quantity*unit_price*vat_rate/100),2) vat from invoice_lines where invoice_id=$1 and organization_id=$2) x where invoices.id=$1 and invoices.organization_id=$2`",
             "[id,s.organizationId]"
@@ -8230,46 +8227,50 @@
         "lib/server/repositories/customer-activity.ts"
       ],
       "methods": [],
-      "calls": []
+      "calls": [
+        {
+          "callee": "c.query",
+          "line": 19,
+          "arguments": [
+            "`\n  select currency,issue_date::text date,sum(total_amount) billed,count(*)::int invoice_count,0::numeric paid\n  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') group by currency,issue_date\n  union all\n  select i.currency,p.payment_date::text date,0::numeric billed,0::int invoice_count,sum(p.amount) paid\n  from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id\n  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' group by i.currency,p.payment_date\n `",
+            "[s.organizationId,String(item.id)]"
+          ]
+        }
+      ]
     },
     {
       "file": "lib/server/repositories/customers.ts",
       "imports": [
         "lib/server/db.ts",
         "lib/server/audit.ts",
-        "lib/server/http.ts"
+        "lib/server/http.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/session.ts"
       ],
       "methods": [],
       "calls": [
         {
           "callee": "withTenant",
-          "line": 32,
+          "line": 35,
           "arguments": [
-            "organizationId",
-            "userId",
-            "async client=>(await client.query(`select ${columns} from customers where organization_id=$1 and archived_at is null order by lower(name) limit 1000`,[organizationId])).rows"
-          ]
-        },
-        {
-          "callee": "client.query",
-          "line": 32,
-          "arguments": [
-            "`select ${columns} from customers where organization_id=$1 and archived_at is null order by lower(name) limit 1000`",
-            "[organizationId]"
+            "session.organizationId",
+            "session.userId",
+            "client=>listApiBusiness(client,session,'customers',filters)"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 33,
+          "line": 36,
           "arguments": [
             "organizationId",
             "userId",
-            "async client=>{\n const id=randomUUID(),{zip,city}=addressParts(input);\n const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);\n const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');\n const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);\n await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return result.rows[0];\n}"
+            "async client=>{const write=async()=>{\n const id=randomUUID(),{zip,city}=addressParts(input);\n const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);\n const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');\n const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);\n await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return result.rows[0];\n};return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();\n}"
           ]
         },
         {
           "callee": "client.query",
-          "line": 35,
+          "line": 38,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`",
             "[organizationId]"
@@ -8277,7 +8278,7 @@
         },
         {
           "callee": "client.query",
-          "line": 37,
+          "line": 40,
           "arguments": [
             "`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`",
             "[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]"
@@ -8285,7 +8286,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 40,
+          "line": 44,
           "arguments": [
             "organizationId",
             "userId",
@@ -8294,7 +8295,7 @@
         },
         {
           "callee": "client.query",
-          "line": 41,
+          "line": 45,
           "arguments": [
             "'select * from customers where id=$1 and organization_id=$2 and archived_at is null for update'",
             "[id,organizationId]"
@@ -8302,7 +8303,7 @@
         },
         {
           "callee": "client.query",
-          "line": 43,
+          "line": 47,
           "arguments": [
             "`update customers set name=$1,legal_name=$1,contact_name=$2,email=$3,phone=$4,address=$5,zip=$6,city=$7,sector=$8,uid=$9,language=$10,payment_days=$11,discount=$12,status=$13,notes=$16,updated_at=now() where id=$14 and organization_id=$15 returning ${columns}`",
             "[input.name??current.name,input.contact??current.contact_name,input.email??current.email,input.phone??current.phone,input.address??current.address,zip,city,input.sector??current.sector,input.uid??current.uid,input.language??current.language,input.paymentDays??current.payment_days,input.discount??current.discount,input.status?statusToDb(input.status):current.status,id,organizationId,input.notes??current.notes]"
@@ -8310,7 +8311,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 46,
+          "line": 50,
           "arguments": [
             "organizationId",
             "userId",
@@ -8319,7 +8320,7 @@
         },
         {
           "callee": "client.query",
-          "line": 46,
+          "line": 50,
           "arguments": [
             "'select id from customers c where c.organization_id=$1 and c.id=$2 and (exists(select 1 from invoices i where i.organization_id=c.organization_id and i.customer_id=c.id) or exists(select 1 from quotes q where q.organization_id=c.organization_id and q.customer_id=c.id) or exists(select 1 from projects p where p.organization_id=c.organization_id and p.customer_id=c.id) or exists(select 1 from time_entries t where t.organization_id=c.organization_id and t.customer_id=c.id)) for update'",
             "[organizationId,id]"
@@ -8327,7 +8328,7 @@
         },
         {
           "callee": "client.query",
-          "line": 46,
+          "line": 50,
           "arguments": [
             "used?\"update customers set status='inactive',updated_at=now() where id=$1 and organization_id=$2 and archived_at is null returning id\":'update customers set archived_at=now(),updated_at=now() where id=$1 and organization_id=$2 and archived_at is null returning id'",
             "[id,organizationId]"
@@ -8361,6 +8362,14 @@
           "line": 6,
           "arguments": [
             "'select count(*)::int customer_count from customers where organization_id=$1 and archived_at is null'",
+            "[organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 12,
+          "arguments": [
+            "`select id from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and total_amount>paid_amount and due_date<(now() at time zone 'Europe/Zurich')::date order by due_date,id limit 5`",
             "[organizationId]"
           ]
         }
@@ -8529,6 +8538,30 @@
           "line": 10,
           "arguments": [
             "\"select cost_date::text,category,sum(amount) amount from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF' group by cost_date,category order by cost_date desc\"",
+            "[organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 18,
+          "arguments": [
+            "\"select p.payment_date::text,sum(p.amount) amount from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and i.currency='CHF' group by p.payment_date order by p.payment_date\"",
+            "[organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 19,
+          "arguments": [
+            "\"select (reimbursed_at at time zone 'Europe/Zurich')::date::text payment_date,sum(quantity*unit_price)::numeric(14,2) amount from expenses where organization_id=$1 and archived_at is null and currency='CHF' and reimbursed_at is not null and status in ('approved','posted') group by (reimbursed_at at time zone 'Europe/Zurich')::date order by payment_date\"",
+            "[organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 20,
+          "arguments": [
+            "\"select exists(select 1 from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF') or exists(select 1 from payroll_runs where organization_id=$1 and status in ('approved','paid')) incomplete\"",
             "[organizationId]"
           ]
         }
@@ -8874,7 +8907,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 127,
+          "line": 130,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -8882,12 +8915,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 144,
+          "line": 147,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 145,
+          "line": 148,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -8895,7 +8928,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 157,
+          "line": 160,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -8903,7 +8936,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 167,
+          "line": 170,
           "arguments": [
             "path",
             "{method:\"DELETE\"}"
@@ -8911,22 +8944,37 @@
         },
         {
           "callee": "fetchApi",
-          "line": 173,
+          "line": 185,
           "arguments": [
             "path",
-            "{method:\"POST\",body:form}"
+            "{method:\"POST\",body:form,headers}"
           ]
         }
       ]
     },
     {
       "file": "lib/client/data-events.ts",
+      "imports": [
+        "lib/client/list-state.ts",
+        "lib/client/process-draft.ts"
+      ],
+      "methods": [],
+      "calls": []
+    },
+    {
+      "file": "lib/client/list-state.ts",
       "imports": [],
       "methods": [],
       "calls": []
     },
     {
       "file": "lib/client/page-access.tsx",
+      "imports": [],
+      "methods": [],
+      "calls": []
+    },
+    {
+      "file": "lib/client/process-draft.ts",
       "imports": [],
       "methods": [],
       "calls": []
@@ -8969,15 +9017,20 @@
       "methods": [],
       "calls": [
         {
+          "callee": "(async()=>{\n  await pendingSave.catch(()=>{});\n  const data=await apiGet<{item?:{theme?:string}}>('/api/settings/profile');\n  if(revision!==preferenceRevision)return null;\n  const mode=data.item?.theme;\n  if(mode==='light'||mode==='dark'||mode==='system'){confirmedMode=mode;applyTheme(mode);return mode;}\n  return null;\n })",
+          "line": 17,
+          "arguments": []
+        },
+        {
           "callee": "apiGet",
-          "line": 13,
+          "line": 19,
           "arguments": [
             "'/api/settings/profile'"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 21,
+          "line": 34,
           "arguments": [
             "'/api/settings/profile'",
             "{theme:mode}"

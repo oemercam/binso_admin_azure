@@ -30,6 +30,7 @@ const transaction=async fn=>{
  await client.query('begin');try{const result=await fn({query:(sql,args)=>query(sql,args,client)});await client.query('commit');return result}catch(error){await client.query('rollback');throw error}finally{if(native)client.release()}
 };
 globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:()=>{created++}};
+globalThis.__integrity.scanStatus='pending';globalThis.__integrity.scanCalls=0;
 const adapters={
  'server-only':uri(''),
  'next/server':uri('export class NextResponse{static json(data,init){return Response.json(data,init)}}'),
@@ -37,6 +38,7 @@ const adapters={
  'lib/server/session.ts':uri('export const getSession=async()=>globalThis.__integrity.getSession();export const requireSession=getSession;export const createSession=async()=>globalThis.__integrity.createSession();export const endDemoSession=async()=>{}'),
  'lib/server/rate-limit.ts':uri('export const enforceRateLimit=async()=>{}'),
  'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only"}'),
+ 'lib/server/file-scan.ts':uri('export const scanFile=async()=>{globalThis.__integrity.scanCalls++;if(globalThis.__integrity.scanStatus==="unavailable")throw new Response(null,{status:503});return globalThis.__integrity.scanStatus}'),
  'lib/server/email-otp.ts':uri('export const consumeEmailCode=async()=>false;export const issueEmailCode=async()=>{throw Error("unexpected email flow")}'),
  'lib/server/email.ts':uri('export const sendMail=async()=>{throw Error("no external mail in fixtures")};export const mailLayout=()=>""'),
  'lib/server/registration.ts':uri('export const completeRegistrationVerification=async()=>false;export const registrationHandoff=async()=>({next:"/dashboard"});export const sendRegistrationVerification=async()=>false'),
@@ -89,5 +91,28 @@ try{
  assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423,'Pending files cannot be downloaded');
  await query("update file_objects set scan_status='clean' where id=$1",[uploaded.id]);const clean=await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})});assert.equal(clean.status,200);assert.equal(await clean.text(),'synthetic bytes');
  await query("update file_objects set scan_status='rejected' where id=$1",[uploaded.id]);assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423);
- console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': MFA replacement denied, locked enrollment, session revocation, same/distinct recovery-code consumption, transactional reset fault/retry/replay, upload replay/conflict and pending/clean/rejected download passed.');
+ const imageUpload=(purpose,key)=>{const form=new FormData();form.append('file',new File([Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082','hex')],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ const branding=async()=>({logo:(await query('select logo_url from organizations where id=$1',[org])).rows[0].logo_url,avatar:(await query('select avatar_url from app_users where id=$1',[user])).rows[0].avatar_url});
+ const initialBranding=await branding();
+ const pendingLogo=await files.POST(imageUpload('company_logo','synthetic-pending-logo'));assert.equal(pendingLogo.status,201);const pendingLogoId=(await pendingLogo.json()).item.id;
+ assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-pending-avatar'))).status,201);assert.deepEqual(await branding(),initialBranding,'Quarantined images never replace existing branding');
+ const beforeReject=(await query('select count(*)::int n from file_objects where organization_id=$1',[org])).rows[0].n;
+ globalThis.__integrity.scanStatus='rejected';assert.equal((await files.POST(imageUpload('company_logo','synthetic-rejected-logo'))).status,422);
+ globalThis.__integrity.scanStatus='unavailable';assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-unavailable-avatar'))).status,503);
+ assert.equal((await query('select count(*)::int n from file_objects where organization_id=$1',[org])).rows[0].n,beforeReject);assert.deepEqual(await branding(),initialBranding,'Rejected/unavailable scans create neither bytes nor branding changes');
+ globalThis.__integrity.scanStatus='clean';
+ const cleanLogoResponse=await files.POST(imageUpload('company_logo','synthetic-clean-logo'));assert.equal(cleanLogoResponse.status,201);const cleanLogo=(await cleanLogoResponse.json()).item;assert.equal(cleanLogo.scanStatus,'clean');
+ const cleanAvatarResponse=await files.POST(imageUpload('profile_avatar','synthetic-unavailable-avatar'));assert.equal(cleanAvatarResponse.status,201,'Failed scans do not consume retry keys');const cleanAvatar=(await cleanAvatarResponse.json()).item;
+ const cleanBranding={logo:'/api/files/'+cleanLogo.id+'/download',avatar:'/api/files/'+cleanAvatar.id+'/download'};assert.deepEqual(await branding(),cleanBranding);
+ const scansBeforeReplay=globalThis.__integrity.scanCalls;globalThis.__integrity.scanStatus='unavailable';assert.equal((await files.POST(imageUpload('company_logo','synthetic-clean-logo'))).status,201);assert.equal(globalThis.__integrity.scanCalls,scansBeforeReplay,'Successful replays do not depend on scanner availability');
+ const company=await import(await load('app/api/settings/company/route.ts'));
+ for(const [logoUrl,status] of [['https://external.fixture.invalid/logo.png',400],['/api/files/'+pendingLogoId+'/download',423],['/api/files/'+cleanAvatar.id+'/download',404],['/api/files/00000000-0000-4000-8000-000000000001/download',404]]){
+  assert.equal((await company.PATCH(req({logoUrl}))).status,status);assert.deepEqual(await branding(),cleanBranding);
+ }
+ const foreignOrg='00000000-0000-4000-8000-000000000098',foreignFile='00000000-0000-4000-8000-000000000097';await query("insert into organizations(id,name,slug) values($1,'Isolated foreign tenant','integrity-foreign-fixture')",[foreignOrg]);
+ await query("insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose) values($1,$2,$3,'synthetic-foreign.png','image/png',1,$4,'clean',$5,'company_logo')",[foreignFile,foreignOrg,foreignOrg+'/files/'+foreignFile,'a'.repeat(64),user]);
+ assert.equal((await company.PATCH(req({logoUrl:'/api/files/'+foreignFile+'/download'}))).status,404,'Clean foreign tenant logo cannot be assigned');
+ assert.equal((await company.PATCH(req({logoUrl:cleanBranding.logo}))).status,200);
+ assert.equal((await company.PATCH(req({logoUrl:null}))).status,200);assert.equal((await branding()).logo,null,'Explicit logo removal remains supported');
+ console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': MFA replacement denied, locked enrollment, session revocation, same/distinct recovery-code consumption, transactional reset fault/retry/replay, upload replay/conflict, quarantine-safe branding, scan failure rollback/retry and tenant/purpose-safe logo references passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

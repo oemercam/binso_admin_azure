@@ -1,5 +1,5 @@
 {
-  "version": "22.4-remediation.1",
+  "version": "22.6-remediation.2",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "scope": "Repository implementation; no production migration, merge or deployment claimed",
   "findings": [
@@ -105,8 +105,8 @@
       "proofLimit": "Quellcodebefund; keine Produktivsysteme verändert.",
       "sourceUrl": "https://github.com/oemercam/binso_admin_azure/blob/b398ff7400eb1b2ea90016c25e596261d58c822b/app/api/files/[id]/download/route.ts#L16",
       "remediationStatus": "partial-blocker",
-      "implementation": "Pending/rejected download and PDF-logo use are denied. No scanner release was invented; uploads stay pending until a trusted scanner releases them.",
-      "verification": "Actual pending/clean/rejected handler test; live scanner operation is required before promotion"
+      "implementation": "Download and PDF-logo quarantine enforced. Central fail-closed local ClamAV INSTREAM integration added; clean-only logo/avatar publication and tenant/purpose-scoped company references protected. Scanner infrastructure, real-engine detection, deployed limits/signatures and legacy pending-file rescan remain unproven.",
+      "verification": "scripts/file-scan-test.mjs (protocol peer only; OS socket in CI), scripts/auth-integrity-test.mjs and settings browser cases; docs/security/file-scanning.md defines remaining live scanner acceptance. No production release claim."
     },
     {
       "id": "V224-SEC-004",
@@ -661,7 +661,7 @@
   ],
   "releaseReady": false,
   "releaseBlockers": [
-    "Trusted scanner workflow not proven: pending uploads intentionally blocked",
+    "Local scanner integration exists; actual deployed engine/signatures/limits and historical pending-file release not proven",
     "Original complete V21 approval sources and 432-requirement bindings incomplete",
     "Reviewed pixel baselines and physical installed iOS/Android keyboard/PWA evidence missing",
     "Azure ingress/EasyAuth, deployed database role/RLS and historical data not inspected"
