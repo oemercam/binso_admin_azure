@@ -1,7 +1,8 @@
 import "server-only";
 import {createHash,randomBytes} from "node:crypto";
 import {cookies,headers} from "next/headers";
-import {query} from "@/lib/server/db";
+import {query,withTransaction} from "@/lib/server/db";
+import {ApiError} from "@/lib/server/http";
 import {env} from "@/lib/server/env";
 import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
 
@@ -20,7 +21,7 @@ export type SessionUser={
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
 const ipHash=(value:string)=>createHash("sha256").update(value).digest("hex");
 
-export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;cookieName?:string}){
+export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;cookieName?:string;expectedAuth?:{passwordHash:string;mfaEnabled:boolean;mfaSecretEnc:string|null}}){
  const token=randomBytes(32).toString("base64url");
  const hash=tokenHash(token);
  const ttlHours=Math.max(1,Math.min(input.ttlHours??env.sessionTtlHours,env.sessionTtlHours));
@@ -28,11 +29,18 @@ export async function createSession(input:{userId:string;organizationId:string;e
  const h=await headers();
  const ua=(h.get("user-agent")||"").slice(0,500);
  const ip=(h.get("x-forwarded-for")?.split(",")[0]?.trim()||h.get("x-real-ip")||"unknown");
- const result=await query<{id:string}>(
+ const result=await withTransaction(async client=>{
+  // Serialize issuance with password reset/change and MFA enrollment. A proof of
+  // old credentials must never mint a session after their revocation committed.
+  const current=(await client.query<{status:string;password_hash:string|null;mfa_enabled:boolean;mfa_secret_enc:string|null}>("select status,password_hash,mfa_enabled,mfa_secret_enc from app_users where id=$1 for update",[input.userId])).rows[0];
+  const expected=input.expectedAuth;
+  if(current?.status!=="active"||expected&&(current.password_hash!==expected.passwordHash||current.mfa_enabled!==expected.mfaEnabled||current.mfa_secret_enc!==expected.mfaSecretEnc))throw new ApiError(401,"auth_state_changed","Die Sicherheitsdaten wurden geändert. Bitte erneut anmelden.");
+  return client.query<{id:string}>(
    `insert into auth_sessions(user_id,organization_id,token_hash,expires_at,user_agent,ip_hash)
     values($1,$2,$3,$4,$5,$6) returning id`,
    [input.userId,input.organizationId,hash,expiresAt,ua,ipHash(ip)]
- );
+  );
+ });
  const jar=await cookies();
  jar.set(input.cookieName??env.sessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",expires:expiresAt});
  return result.rows[0]?.id;
@@ -58,7 +66,6 @@ export async function getSession():Promise<SessionUser|null>{
  const demo=jar.get("binso_demo")?.value==="1";
  const token=jar.get(demo?"binso_demo_write":env.sessionCookieName)?.value;
  if(!token)return null;
- await expireUnpaidTrials();
  const result=await query<SessionUser>(
    `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
@@ -70,6 +77,7 @@ export async function getSession():Promise<SessionUser|null>{
    [tokenHash(token),demo]
  );
  const session=result.rows[0]||null;
+ if(session&&!session.isDemo){const expired=await expireUnpaidTrials(session.organizationId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }

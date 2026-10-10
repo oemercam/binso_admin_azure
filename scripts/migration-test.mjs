@@ -244,7 +244,9 @@ try{
  const {expireUnpaidTrials}=await import(dataModule(lifecycleSource));
  const expiredTrial=await provisionOrganization({userId:'expired-trial-user',email:'expired-trial@example.invalid',name:'Expired Trial',companyName:'Expired Trial AG',plan:'start',mode:'trial'});
  await db.query("update organization_subscriptions set trial_until=now()-interval '1 day' where organization_id=$1",[expiredTrial.organizationId]);
- await expireUnpaidTrials();
+ await expireUnpaidTrials(demo);
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[expiredTrial.organizationId])).rows[0].status,'trial','An authenticated tenant check cannot expire another tenant');
+ await expireUnpaidTrials(expiredTrial.organizationId);
  assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[expiredTrial.organizationId])).rows[0].status,'expired');
  assert.equal((await db.query('select status from organizations where id=$1',[expiredTrial.organizationId])).rows[0].status,'read_only');
  assert.equal((await db.query('select platform_status from platform_tenants where organization_id=$1',[expiredTrial.organizationId])).rows[0].platform_status,'read_only');
@@ -367,7 +369,7 @@ try{
  console.log('Timer customer-only start/reload/pause/finish, context lock and internal work passed.');
 
  // Exercise the process implementations against migrated PostgreSQL, not source strings.
- const processHttp=dataModule(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}};export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const validEmail=v=>/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v);export const apiError=e=>({status:e instanceof Response?e.status:e.status??500,data:{error:e.code,message:e.message}});`);
+ const processHttp=dataModule(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}};export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const readBoundedBody=async r=>Buffer.from(await r.arrayBuffer());export const json=(data,status=200)=>({data,status});export const validEmail=v=>/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v);export const apiError=e=>({status:e instanceof Response?e.status:e.status??500,data:{error:e.code,message:e.message}});`);
  const processRbac=dataModule((await fs.readFile('lib/server/rbac.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)));
  const processSession=dataModule('export async function requireSession(){return globalThis.__processSession}');
  const processDb=dataModule('export async function withTenant(org,user,fn){return globalThis.__processTransaction(org,fn)} export async function withPlatform(fn){return globalThis.__processPlatform(fn)}');
@@ -698,10 +700,12 @@ try{
  const fileRelations=dataModule(await fs.readFile('lib/file-associations.ts','utf8'));
  const validation=dataModule((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(processHttp)));
  const limits=dataModule(await fs.readFile('config/limits.ts','utf8'));
- const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-scan':dataModule('export async function scanFile(){return "pending"}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const fileUpload=await fileRoute('app/api/files/route.ts'),fileDownload=await fileRoute('app/api/files/[id]/download/route.ts');
- const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment')=>{const form=new FormData();form.set('purpose','customer_document');form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return {formData:async()=>form};};
+ const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment')=>{const form=new FormData();form.set('purpose','customer_document');form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':crypto.randomUUID()},body:form});};
  const uploaded=await fileUpload.POST(uploadRequest(documentArgs.p_customer_id));assert.equal(uploaded.status,201,JSON.stringify(uploaded));assert.equal(uploaded.data.item.customer_id,documentArgs.p_customer_id);
+ const pendingDownload=await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})});assert.equal(pendingDownload.status,423);
+ await db.query("update file_objects set scan_status='clean' where id=$1",[uploaded.data.item.id]);
  const downloaded=await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})});assert.equal(downloaded.status,200);assert.equal(await downloaded.text(),'synthetic attachment');assert.equal(downloaded.headers.get('cache-control'),'private, no-store');
  const listed=await fileUpload.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+documentArgs.p_customer_id)});assert.ok(listed.data.items.some(row=>row.id===uploaded.data.item.id));
  assert.equal((await fileUpload.POST(uploadRequest(documentArgs.p_customer_id,'application/pdf','not a PDF'))).status,400);

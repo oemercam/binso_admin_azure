@@ -14,7 +14,7 @@
     "db:check": "node scripts/check-db.mjs",
     "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
     "permissions:test": "node scripts/permission-selfcheck.mjs",
-    "test": "node scripts/registration-test.mjs && node scripts/statistics-test.mjs && node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/pwa-lifecycle-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs && node scripts/data-foundation-test.mjs && node scripts/foundation-integration-test.mjs && node scripts/process-draft-test.mjs",
+    "test": "node scripts/security-exception-test.mjs && node scripts/runtime-integrity-test.mjs && node scripts/file-scan-test.mjs && node scripts/auth-integrity-test.mjs && node scripts/registration-test.mjs && node scripts/statistics-test.mjs && node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/pwa-lifecycle-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs && node scripts/data-foundation-test.mjs && node scripts/foundation-integration-test.mjs && node scripts/process-draft-test.mjs",
     "tenant:test": "node scripts/migration-test.mjs",
     "release:check": "node scripts/release-check.mjs",
     "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
@@ -41,7 +41,11 @@
     "ui:check": "node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs",
     "data:inventory": "node scripts/data-inventory.mjs",
     "data:test": "node scripts/data-foundation-test.mjs",
-    "architecture:inventory": "node scripts/foundation-integration-report.mjs"
+    "architecture:inventory": "node scripts/foundation-integration-report.mjs",
+    "ux:compliance:fast": "node scripts/runtime-integrity-test.mjs && node scripts/compliance/selftest.mjs && node scripts/compliance/report-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/navigation-foundation-test.mjs",
+    "ux:compliance:report": "node scripts/compliance/report.mjs --static",
+    "ux:compliance:pr": "node scripts/compliance/report.mjs --static --gate",
+    "ux:compliance:release": "node scripts/compliance/report.mjs --static --gate --release"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",

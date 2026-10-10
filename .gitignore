@@ -9,3 +9,8 @@ deploy/
 *.log
 
 tsconfig.tsbuildinfo
+
+# Generated compliance measurements and large inventories are CI artifacts.
+docs/ux-compliance/report.json
+docs/ux-compliance/inventory.json
+docs/ux-compliance/evidence/

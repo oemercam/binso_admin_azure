@@ -92,7 +92,6 @@ export async function tenantUpdate<T extends Row>(table:string,id:string,data:T)
  return (await c.query(`update ${translated.target} set ${keys.map((k,i)=>k+'=$'+(i+1)).join(',')},updated_at=now() where id::text=$${keys.length+1} and organization_id=$${keys.length+2}${own?` and created_by_user_id=$${keys.length+3}`:''} returning id`,[...Object.values(translated.data),id,s.organizationId,...(own?[s.userId]:[])])).rows;});
 }
 export async function currentCompany(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select * from organizations where id=$1",[s.organizationId])).rows[0])}
-export async function updateCompany(data:Row){const s=await requireSession();authorize(s,"organization:write");const keys=Object.keys(data).filter(k=>/^[a-z_]+$/.test(k));const vals=keys.map(k=>data[k]);return withTenant(s.organizationId,s.userId,async c=>(await c.query(`update organizations set ${keys.map((k,i)=>k+"=$"+(i+1)).join(",")},updated_at=now() where id=$${keys.length+1} returning *`,[...vals,s.organizationId])).rows)}
 export async function currentProfile(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select id,email,display_name,first_name,last_name,phone,job_title,language,theme,avatar_url from app_users where id=$1",[s.userId])).rows[0]??null)}
 export async function updateProfile(data:Row){
  const s=await requireSession();const map:Row={};

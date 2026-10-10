@@ -1,4 +1,4 @@
-const CACHE = "binso-one-shell-v6";
+const CACHE = "binso-one-shell-v7";
 const OFFLINE_URL = "/offline";
 const SHELL_ASSETS = [
   OFFLINE_URL,
@@ -19,7 +19,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.filter(key => key.startsWith("binso-one-shell-") && key !== CACHE).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -40,7 +40,7 @@ self.addEventListener("fetch", event => {
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request, { cache: "no-store" })
-        .catch(() => caches.match(OFFLINE_URL))
+        .catch(() => caches.open(CACHE).then(cache => cache.match(OFFLINE_URL)))
     );
     return;
   }
@@ -54,7 +54,7 @@ self.addEventListener("fetch", event => {
           caches.open(CACHE).then(cache => cache.put(request, clone));
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() => caches.open(CACHE).then(cache => cache.match(request)))
     );
   }
 });

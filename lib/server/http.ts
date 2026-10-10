@@ -9,13 +9,28 @@ export function json(data:unknown,status=200,headers?:HeadersInit){
   return NextResponse.json(data,{status,headers:{...jsonHeaders,...(headers??{})}});
 }
 
+/** Enforce byte limits while reading, including chunked bodies without Content-Length. */
+export async function readBoundedBody(request:Request,maxBytes:number):Promise<Buffer>{
+  const length=Number(request.headers.get("content-length")??"0");
+  if(length>maxBytes)throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
+  if(!request.body)return Buffer.alloc(0);
+  const reader=request.body.getReader(),chunks:Uint8Array[]=[];
+  let bytes=0;
+  try{
+    for(;;){
+      const {done,value}=await reader.read();if(done)break;
+      bytes+=value.byteLength;
+      if(bytes>maxBytes){await reader.cancel().catch(()=>{});throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");}
+      chunks.push(value);
+    }
+    return Buffer.concat(chunks,bytes);
+  }finally{reader.releaseLock();}
+}
+
 export async function readJson<T>(request:NextRequest,maxBytes=32768):Promise<T>{
-  const length=Number(request.headers.get("content-length") ?? "0");
-  if(length && length>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
-  const raw=await request.text();
-  if(Buffer.byteLength(raw,"utf8")>maxBytes) throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
-  try { return JSON.parse(raw) as T; }
-  catch { throw new ApiError(400,"invalid_json","Ungültige Anfrage."); }
+  const raw=(await readBoundedBody(request,maxBytes)).toString("utf8");
+  try{return JSON.parse(raw) as T;}
+  catch{throw new ApiError(400,"invalid_json","Ungültige Anfrage.");}
 }
 
 export function assertSameOrigin(request:NextRequest){
@@ -66,7 +81,7 @@ export function apiError(error:unknown){
   };
   const mapped=databaseErrors[code];
   if(mapped)return json({error:mapped.code,message:mapped.message},mapped.status);
-  console.error("Unhandled API error",error instanceof Error ? error.message : "unknown");
+  console.error("Unhandled API error",{category:error instanceof Error?error.name:"unknown"});
   return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden."},500);
 }
 

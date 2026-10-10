@@ -15,7 +15,7 @@ export async function GET(request:NextRequest){try{
   if(request.nextUrl.searchParams.get('include')!=='workspace')return summary;
   authorize(s,'documents:read');authorize(s,'accounting:read');
   const documents=await listApiBusiness(c,s,'documents',customerId?'customer_id=eq.'+encodeURIComponent(customerId):'');
-  const data=tenantCan(s.role,'accounting:read')?await financeData(c,s.organizationId):{};
+  const data=tenantCan(s.role,'accounting:read')&&request.nextUrl.searchParams.get('view')!=='cash'?await financeData(c,s.organizationId):{};
   const cash=tenantCan(s.role,'accounting:read')?await cashStatisticsData(c,s.organizationId):null;
   return {...summary,documents,data,cash};
  },{snapshot:true}));

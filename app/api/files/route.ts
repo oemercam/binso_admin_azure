@@ -1,5 +1,7 @@
+import {idempotentBusiness} from "@/lib/server/business-idempotency";
 import {fileRelations} from "@/lib/server/file-relations";
 import {validateFileContent} from "@/lib/server/file-validation";
+import {scanFile} from "@/lib/server/file-scan";
 import {createHash,randomUUID} from "node:crypto";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {NextRequest} from "next/server";
@@ -7,7 +9,7 @@ import {requireSession} from "@/lib/server/session";
 import {tenantCan} from "@/lib/permissions";
 import {authorize} from "@/lib/server/rbac";
 import {withTenant} from "@/lib/server/db";
-import {ApiError,apiError,assertSameOrigin,json} from "@/lib/server/http";
+import {ApiError,apiError,assertSameOrigin,json,readBoundedBody} from "@/lib/server/http";
 export const runtime="nodejs";
 const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
 
@@ -25,7 +27,10 @@ export async function GET(request:NextRequest){try{
 export async function POST(request:NextRequest){
  try{
   assertSameOrigin(request);const s=await requireSession();
-  const form=await request.formData(),file=form.get('file'),purpose=String(form.get('purpose')||'document'),entityId=String(form.get('entityId')||'');
+  const replayKey=request.headers.get("idempotency-key")||"";
+  if(replayKey.length<8||replayKey.length>128)throw new ApiError(400,"idempotency_required","Idempotency-Key fehlt oder ist ungültig.");
+  const bytes=await readBoundedBody(request,limitsConfig.maxFileUploadBytes+64*1024);
+  const form=await new Response(new Uint8Array(bytes),{headers:{'content-type':request.headers.get('content-type')||''}}).formData(),file=form.get('file'),purpose=String(form.get('purpose')||'document'),entityId=String(form.get('entityId')||'');
   if(!(file instanceof File))throw new ApiError(400,'file_required','Datei fehlt.');
   if(file.size>limitsConfig.maxFileUploadBytes)throw new ApiError(413,'file_too_large',`Datei ist grösser als ${megabytes(limitsConfig.maxFileUploadBytes)} MB.`);
   if(!allowed.has(file.type))throw new ApiError(400,'file_type_invalid','Dateityp ist nicht erlaubt.');
@@ -43,19 +48,21 @@ export async function POST(request:NextRequest){
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
   validateFileContent(buffer,file.type);
   const sha256=createHash('sha256').update(buffer).digest('hex');
-  const item=await withTenant(s.organizationId,s.userId,async c=>{
+  const item=await withTenant(s.organizationId,s.userId,async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:"file-upload",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{
    if(purpose==='expense_receipt'){
     const expense=(await c.query("select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update",[s.organizationId,entityId])).rows[0];
     if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
     if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');
    }
+   const scanStatus=await scanFile(buffer);
+   if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');
    const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)
-    values($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null]);
+    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
-   if(purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
-   if(purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
+   if(scanStatus==='clean'&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
+   if(scanStatus==='clean'&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
    return result.rows[0];
-  });
+  }));
   return json({item},201);
  }catch(e){return apiError(e)}
 }

@@ -31,7 +31,7 @@ globalThis.__registrationQuery=client.query;
 globalThis.__registrationTransaction=async fn=>{await db.exec('begin');try{const result=await fn(client);await db.exec('commit');return result}catch(e){await db.exec('rollback');throw e}};
 globalThis.__registrationCookies={get:name=>jar.has(name)?{value:jar.get(name).value}:undefined,set:(name,value,options)=>jar.set(name,{value,options}),delete:name=>jar.delete(name)};
 globalThis.__registrationMail=sent;globalThis.__registrationDelivered=false;globalThis.__registrationLimits=[];
-const request=(method,body,url='https://example.invalid/api/auth/register')=>({method,nextUrl:new URL(url),headers:new Headers({'origin':'https://example.invalid'}),text:async()=>JSON.stringify(body)});
+const request=(method,body,url='https://example.invalid/api/auth/register')=>({method,nextUrl:new URL(url),headers:new Headers({'origin':'https://example.invalid'}),body:body===null?null:new Response(JSON.stringify(body)).body});
 try{
  await db.exec('create extension pgcrypto; create role schema_owner; grant usage,create on schema public to schema_owner; set role schema_owner');
  for(const file of (await fs.readdir('database/migrations')).filter(file=>file.endsWith('.sql')).sort())await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
