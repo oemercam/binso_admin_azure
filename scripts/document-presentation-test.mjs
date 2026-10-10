@@ -75,11 +75,11 @@ await writeTestOutput(path.join(pdfOutput,'fixture.json'),JSON.stringify({pages:
 const protectedTarget=path.join(pdfOutput,'existing-target');
 await fs.writeFile(protectedTarget,'original',{mode:0o600,flag:'wx'});
 const outputLink=path.join(pdfOutput,'linked-output');
-await fs.symlink(protectedTarget,outputLink);
+if(process.platform==='win32')await fs.link(protectedTarget,outputLink);else await fs.symlink(protectedTarget,outputLink);
 await writeTestOutput(outputLink,'new evidence');
 assert.equal(await fs.readFile(protectedTarget,'utf8'),'original','Evidence writes cannot follow an existing target symlink');
 assert.equal(await fs.readFile(outputLink,'utf8'),'new evidence');
-assert.equal((await fs.stat(outputLink)).mode&0o777,0o600,'Evidence files remain owner-only');
+if(process.platform!=='win32')assert.equal((await fs.stat(outputLink)).mode&0o777,0o600,'Evidence files remain owner-only');
 console.log('Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.');
 
 const billingCompany={name:'Binso GmbH',street:'Weissbadstrasse',building_number:'8b',postal_code:'9050',city:'Appenzell',uid:'CHE-173.401.068'};
