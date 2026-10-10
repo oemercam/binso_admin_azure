@@ -11,13 +11,15 @@ await fs.mkdir(output,{recursive:true});
 try{if((await fetch(base+'/api/health')).ok)throw new Error('Registration test port is occupied')}catch(e){if(e.message.includes('occupied'))throw e;}
 const server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,DATABASE_URL:'',APP_MODE:'local',PORT:port,HOSTNAME:'127.0.0.1'}});let logs='';server.stdout.on('data',chunk=>logs+=chunk);server.stderr.on('data',chunk=>logs+=chunk);
 let browser;
+// Synthetic routing must never be bypassed by a claimed service-worker client.
+// Installed-PWA/offline behavior is exercised separately with workers enabled.
 const evidence=[];
 try{
  for(let attempt=0;;attempt++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(attempt>120||server.exitCode!==null)throw new Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}:{})});
  const widths=process.env.BINSO_REGISTRATION_WIDTHS?.split(',').map(Number)??[320,360,375,390,430,768,820,1024,1280,1440,1920];
  for(const theme of ['light','dark'])for(const width of widths){
-  const context=await browser.newContext({viewport:{width,height:width<768?580:900}});
+  const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:width<768?580:900}});
   await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-10'}))},theme);
   const page=await context.newPage();await page.goto(base+'/registrieren?plan=business&billing=yearly');
   const sheet=page.getByRole('dialog',{name:'Binso One einrichten'});await sheet.waitFor();
@@ -31,7 +33,7 @@ try{
   evidence.push({theme,width,phase:'review',observed:'passed'});await context.close();
  }
  for(const locale of ['de','fr','it','en','tr']){
-  const t=key=>catalog.registrationText(key,locale),context=await browser.newContext({viewport:{width:390,height:640}});await context.addInitScript(()=>localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-10'})));
+  const t=key=>catalog.registrationText(key,locale),context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:640}});await context.addInitScript(()=>localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-10'})));
   const page=await context.newPage();let posts=0,fail=true,resends=0,created=false;
   const fixtureContext=(await (await fetch(base+'/api/auth/register')).json()).context;
   await context.route('**/api/auth/register*',async route=>{if(route.request().method()!=='POST'){if(created)return route.fulfill({json:{state:'pending',context:fixtureContext,pending:{company:'Synthetic Company GmbH',email:'synthetic@example.invalid',locale}}});return route.continue();}posts++;await new Promise(resolve=>setTimeout(resolve,100));const body=JSON.parse(route.request().postData());assert.equal(body.locale,locale);assert.equal(body.acceptedDpa,true);assert.ok(body.termsVersion&&body.dpaVersion&&body.privacyVersion);if(!fail)created=true;return route.fulfill({status:fail?503:201,json:fail?{error:'service_unavailable'}:{ok:true,emailSent:false}})});

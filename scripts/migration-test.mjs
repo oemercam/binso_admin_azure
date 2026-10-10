@@ -583,13 +583,18 @@ try{
  console.log('Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.');
 
  // Full business process and short paths use actual handlers against isolated PostgreSQL fixtures.
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const projectHandler=await loadProcessRoute('app/api/projects/route.ts');
  globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
  const projectCreated=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
  assert.equal(projectCreated.status,201,JSON.stringify(projectCreated));
  const projectReplay=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
  assert.equal(projectCreated.data.item.id,projectReplay.data.item.id,'An offer starts exactly one project');
+ const internalProjectRequest={headers:new Headers({'idempotency-key':'internal-project-fixture-key'}),body:{name:'Internal project with a lost response'}};
+ const internalCreated=await projectHandler.POST(internalProjectRequest);assert.equal(internalCreated.status,201);
+ const internalReplay=await projectHandler.POST(internalProjectRequest);assert.equal(internalReplay.status,201);assert.equal(internalReplay.data.item.id,internalCreated.data.item.id,'Retrying after a lost response returns the original internal project');
+ assert.equal((await db.query('select count(*)::int n from projects where organization_id=$1 and name=$2',[demo,internalProjectRequest.body.name])).rows[0].n,1,'The replay never creates a second project');
+ assert.equal((await projectHandler.POST({...internalProjectRequest,body:{name:'Changed payload'}})).status,409,'A replay key cannot be reused for different project data');
  assert.equal((await projectHandler.POST({body:{name:'Wrong tenant',customerId:'10000000-0000-4000-8000-000000000002',sourceOffer:processQuote.number}})).status,409);
  const timeCreated=await manualTimeHandler.POST({body:{projectId:projectCreated.data.item.id,description:'Migration and rollout',durationMinutes:750,startedAt:'2026-10-01',billable:true,salesRate:180}});
  assert.equal(timeCreated.status,201,JSON.stringify(timeCreated));assert.equal(timeCreated.data.item.customer_id,documentArgs.p_customer_id,'Project supplies customer without redundant selection');
