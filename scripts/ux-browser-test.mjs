@@ -292,6 +292,7 @@ try{
     await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Unsaved customer');await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Unsaved customer');await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL(base+'/kunden');
     await navigate(base+'/kunden');await page.waitForLoadState('networkidle');
     const listActions=page.locator('.page-actions');
+    await listActions.getByRole('button',{name:'Kunden suchen...',exact:true}).waitFor({state:'visible'});
     assert.deepEqual(await listActions.locator('button,a').evaluateAll(elements=>elements.map(el=>el.getAttribute('aria-label'))),['Kunden suchen...','Filter und Sortierung','Neuer Kunde'],'Customer header exposes search, filters and create in that order');
     assert.equal(await page.locator('main .chips,main select,main input[type="search"]').count(),0,'Status and sort controls live exclusively in their sheet');
     await page.getByRole('button',{name:'Kunden suchen...',exact:true}).click();await page.getByPlaceholder('Kunden suchen...').fill('not-present');await page.getByRole('dialog').getByRole('button',{name:'Anwenden',exact:true}).click();await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
