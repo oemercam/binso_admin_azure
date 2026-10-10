@@ -97,7 +97,7 @@ assert.ok(!marketing.includes('href="/portal/login"'),"Public login links must u
 assert.ok(marketing.includes('href="/login"'),"Public marketing must link to the canonical customer login");
 assert.ok(portalLoginRoute.includes('redirect("/login")'),"Legacy portal login route must redirect to canonical login");
 assert.ok(portalRegisterRoute.includes('redirect("/registrieren")'),"Legacy portal registration route must redirect to canonical registration");
-assert.ok(!verifyEmailRoute.includes("consumeAuthToken"),"Email verification must use the six-digit code flow only");
+assert.ok(verifyEmailRoute.includes("consumeEmailCode")&&verifyEmailRoute.includes("t.token_type='verify_email'")&&verifyEmailRoute.includes("for update of t"),"The canonical verification endpoint must handle existing codes and transactionally consumed links");
 assert.ok(!verifyEmailRoute.includes("invalid_or_expired_token"),"Retired verification-link compatibility must not return");
 assert.ok(rootLayout.includes("<PrivacyConsent"),"Privacy consent controls must be mounted globally");
 assert.ok(privacyConsent.includes("Nur notwendige")&&privacyConsent.includes("Alle erlauben"),"Privacy controls must offer explicit choices");
@@ -107,7 +107,8 @@ assert.ok(privacyPage.includes("Optionale Performance-Messungen")&&privacyPage.i
 assert.ok(portalRootRoute.includes('redirect("/login")'),"Legacy portal root must redirect to canonical login");
 assert.ok(!marketing.includes('href="/operator"'),"Public marketing must not advertise the internal admin route");
 assert.ok(!marketing.includes('"/preview/rechnungen"')&&!marketing.includes('"/preview/zeit"'),"Marketing must not label the dashboard capture as module-specific screenshots");
-assert.ok(registerRoute.includes("legalConfig.termsVersion")&&registerRoute.includes("legalConfig.privacyVersion"),"Registration API must enforce the current legal document versions");
+const registrationOwner=await fs.readFile("lib/server/registration.ts","utf8");
+assert.ok(registrationOwner.includes("legalConfig.termsVersion")&&registrationOwner.includes("legalConfig.privacyVersion")&&registrationOwner.includes("legalConfig.dpaVersion")&&registerRoute.includes("body.dpaVersion!==context.dpaVersion"),"Registration API must enforce all current legal document versions through the central context");
 await fs.access("app/einstellungen/datenschutz/page.tsx");
 try{
   await fs.access("components/portal.tsx");

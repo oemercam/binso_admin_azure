@@ -1,3 +1,4 @@
+import {clearListState} from './list-state';
 import {clearProcessDrafts} from './process-draft';
 /** Metadata-only invalidation; business responses are never persisted in the browser. */
 export type DataDomain = 'customers'|'documents'|'payments'|'finance'|'dashboard'|'projects'|'time'|'timer'|'expenses'|'employees'|'files'|'support'|'notifications'|'settings'|'billing'|'operator'|'records'|'session'|'products'|'identity';
@@ -44,4 +45,4 @@ function connect(){
 export function subscribeClientData(listener:()=>void){connect();listeners.add(listener);return()=>{listeners.delete(listener);};}
 export function dataRevision(paths:readonly string[]){return paths.flatMap(dataDomains).concat('session').map(domain=>{if(!revisions.has(domain))revisions.set(domain,0);return revisions.get(domain)??0;}).join(':');}
 export function publishMutation(path:string){connect();const domains=affectedDomains(path);apply(domains);channel?.postMessage({type:'changed',domains});}
-export function resetClientData(broadcast=true){connect();clearProcessDrafts();apply(['session','identity']);if(broadcast)channel?.postMessage({type:'session'});}
+export function resetClientData(broadcast=true){connect();clearProcessDrafts();clearListState();apply(['session','identity']);if(broadcast)channel?.postMessage({type:'session'});}

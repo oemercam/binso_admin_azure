@@ -1,0 +1,13 @@
+Checking light 320px
+Checking light 375px
+Checking light 1440px
+Route /projekte/neu
+Route /projekte/neu
+Route /projekte/neu
+Checking dark 320px
+Checking dark 375px
+Checking dark 1440px
+Route /projekte/neu
+Route /projekte/neu
+Route /projekte/neu
+UX browser checks passed: 6 route/theme/viewport combinations ; interactions: time. Artifacts: /tmp/binso-v22-project-replay-browser-final

@@ -8,6 +8,7 @@ import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
 import { hasBlockingModal, useDialogFocus } from "./use-dialog-focus";
+import {safeAppPath} from "@/lib/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
@@ -75,6 +76,10 @@ function AppShellFrame({
   unsavedChanges?: boolean;
 }) {
   const pathname=usePathname();
+  const [navigationQuery,setNavigationQuery]=useState("");
+  useEffect(()=>{const update=()=>setNavigationQuery(window.location.search);queueMicrotask(update);window.addEventListener('popstate',update);return()=>window.removeEventListener('popstate',update);},[pathname]);
+  const searchParams=useMemo(()=>new URLSearchParams(navigationQuery),[navigationQuery]);
+  if(pathname.startsWith("/einstellungen/")&&searchParams.has("accountReturn"))backHref=safeAppPath(searchParams.get("accountReturn"),backHref??"/dashboard");
   const identityRevision=useDataRevision(["/api/auth/session"]);
   const router=useRouter();
   const formActive=editing||pathname.endsWith("/neu");
@@ -144,6 +149,7 @@ function AppShellFrame({
   const [confirmLogout,setConfirmLogout]=useState(false);
   const [logoutError,setLogoutError]=useState<string|null>(null);
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
+  useEffect(()=>{if(searchParams.get("panel")==="account")queueMicrotask(()=>setSheet("account"));},[searchParams]);
   const headerPanel=sheet==="search"||sheet==="notifications"||sheet==="account";
   const dialogRef = useDialogFocus(sheet !== null&&!headerPanel, () => setSheet(null));
   const production=useBackendMode();

@@ -8,7 +8,6 @@ export function ThemeRuntime(){
    const root=document.documentElement;
    const focused=document.activeElement;
    const typing=focused instanceof HTMLElement&&focused.matches('input,textarea,select');
-   root.style.setProperty('--sheet-available-height',`${viewport?.height??window.innerHeight}px`);
    root.style.setProperty('--sheet-keyboard-offset',`${typing&&viewport?Math.max(0,window.innerHeight-viewport.height-viewport.offsetTop):0}px`);
   };
   syncViewport();

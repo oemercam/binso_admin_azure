@@ -27,7 +27,7 @@ export default function Page() {
     <section className="auth-card">
       <Logo/>
       <h1>Passwort zurücksetzen</h1>
-      {sent?<><p>Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir einen Link zum Zurücksetzen gesendet.</p><Button href="/login">Zur Anmeldung</Button></>:<>
+      {sent?<><p>Die Anfrage wurde entgegengenommen. Prüfe deinen Posteingang. Wenn kein Link ankommt, versuche es später erneut.</p><Button href="/login">Zur Anmeldung</Button></>:<>
         <p>Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.</p>
         <form onSubmit={submit}>
           <Field label="E-Mail"><Input required autoFocus value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>

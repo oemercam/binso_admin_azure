@@ -6,3 +6,8 @@ export async function dashboardAnalytics(c:PoolClient,organizationId:string){
  const customers=await c.query('select count(*)::int customer_count from customers where organization_id=$1 and archived_at is null',[organizationId]);
  return {analyticsInvoices:invoices.rows,analyticsPayments:payments.rows,customerCount:Number(customers.rows[0].customer_count)};
 }
+
+/** Query the full population before limiting; a recent-list cap cannot hide overdue invoices. */
+export async function dashboardAttention(c:PoolClient,organizationId:string){
+ return (await c.query(`select id from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and total_amount>paid_amount and due_date<(now() at time zone 'Europe/Zurich')::date order by due_date,id limit 5`,[organizationId])).rows;
+}

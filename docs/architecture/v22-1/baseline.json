@@ -1,0 +1,21 @@
+{
+  "branch": "feat/v22-1-customer-standard-enforcement",
+  "base_sha": "cf1a98a6e783ca4f7a2c06199002d5398fd5edd4",
+  "main_confirmed_again": "2026-10-10",
+  "integrated_pr": 232,
+  "reviewed_open_prs": [
+    214,
+    222,
+    231,
+    233
+  ],
+  "pr231_head": "3377b50be56df4b97fbf784a6825161d686b2d6e",
+  "pr233_head": "a5477dcb6c19f1fe5a7367a5b198e923ea1364ff",
+  "baseline_deployment_run": 38038884445,
+  "baseline_health_sha": "cf1a98a6e783ca4f7a2c06199002d5398fd5edd4",
+  "new_version_merged": false,
+  "new_version_deployed": false,
+  "pr": 234,
+  "implementation_sha": "7fe2bfb00b5ce33ec276b16d779b9bcb10d68e04",
+  "first_quality_run": 38046185491
+}

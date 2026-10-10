@@ -1,0 +1,21 @@
+Checking light 390px
+Checking light 430px
+Route /dashboard
+Route /dashboard
+Route /finanzen
+Route /finanzen
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /kunden/customer-one
+Route /kunden/customer-one
+Checking dark 390px
+Checking dark 430px
+Route /dashboard
+Route /dashboard
+Route /finanzen
+Route /finanzen
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /kunden/customer-one
+Route /kunden/customer-one
+UX browser checks passed: 16 route/theme/viewport combinations ; interactions: finance. Artifacts: /tmp/binso-v22-calendar

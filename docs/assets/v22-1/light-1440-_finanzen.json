@@ -1,0 +1,377 @@
+{
+  "url": "http://127.0.0.1:3200/finanzen",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "documentWidth": 1440,
+  "elements": [
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "FinanzenÜbersichtAngeboteRechnungenZahlungenFinanzentwicklungErfasste Zahlungseingänge und nachgewiesene Auszahlungen · CHF1 M3 M6 M12 M01.05.2026 – 10.10.2026EinnahmenCHF 320.00AusgabenCHF 50.00Ergeb",
+      "inline": null,
+      "rect": {
+        "x": 228,
+        "y": 56,
+        "width": 1212,
+        "height": 1152.6875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1212px",
+        "min-width": "0px",
+        "max-width": "1760px",
+        "height": "1152.69px",
+        "min-height": "0px",
+        "padding": "20px 34.56px 48px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/ec73490318c1b0d3.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 13,
+          "order": 318,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 20,
+          "order": 1360,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 4,
+          "order": 1395,
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 12,
+          "order": 1403,
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 129,
+          "order": 1520,
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 120,
+          "order": 1687,
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 322,
+          "order": 1889,
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 501,
+          "order": 2068,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 520,
+          "order": 2087,
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 3,
+          "order": 2378,
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "media (max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 63,
+          "order": 2423,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtAngeboteRechnungenZahlungen",
+      "inline": null,
+      "rect": {
+        "x": 262.546875,
+        "y": 125.109375,
+        "width": 1142.90625,
+        "height": 43
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "1142.91px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "43px",
+        "min-height": "0px",
+        "padding": "0px 0px 8px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px 0px 12px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "auto",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/ec73490318c1b0d3.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 59,
+          "order": 363,
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 98,
+          "order": 402,
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 156,
+          "order": 1547,
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 163,
+          "order": 1730,
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/165bacc60408c16f.css",
+          "index": 63,
+          "order": 2423,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".person-avatar",
+      "tag": "SPAN",
+      "classes": "person-avatar person-avatar-small person-avatar-tone-0",
+      "text": "TP",
+      "inline": null,
+      "rect": {
+        "x": 1370.453125,
+        "y": 12.5,
+        "width": 30,
+        "height": 30
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "30px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "30px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "50%",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "30px / 30px / none / row / auto / auto",
+        "grid-template-columns": "30px",
+        "grid-template-rows": "30px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "center",
+        "font-size": "11px",
+        "font-weight": "600",
+        "line-height": "11px",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(52, 95, 148)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/ec73490318c1b0d3.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 266,
+          "order": 569,
+          "selector": ".person-avatar",
+          "css": "width: 36px; height: 36px; flex: 0 0 auto; display: inline-grid; place-items: center; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 600; color: rgb(255, 255, 255); line-height: 1;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 267,
+          "order": 570,
+          "selector": ".person-avatar-small",
+          "css": "width: 30px; height: 30px; font-size: 11px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/00f7cec9eceb3f31.css",
+          "index": 271,
+          "order": 574,
+          "selector": ".person-avatar-tone-0",
+          "css": "background: rgb(52, 95, 148);",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

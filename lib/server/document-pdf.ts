@@ -56,9 +56,11 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   pdf.moveTo(left,y+18).lineTo(right,y+18).strokeColor('#aaa').lineWidth(.5).stroke();pdf.y=y+28;};
  tableHead();
  for(const item of (document.items||[]) as Row[]){
-  const description=String(item.description||'');pdf.font('Liberation Sans').fontSize(10);
+  const description=String(item.description||'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const h=pdf.heightOfString(description,{width:235,lineGap:2});
   if(h<bottom-80&&pdf.y+Math.max(h,34)+12>bottom){pdf.addPage();tableHead();}
+  // A repeated table header changes PDFKit's shared drawing state.
+  pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const y=pdf.y,startPage=pdf.page;pdf.text(description,left,y,{width:235,lineGap:2});const after=pdf.y;
   const quantity=Number(item.quantity||0).toLocaleString('de-CH',{maximumFractionDigits:3})+' '+String(item.unit||'');
   const amount=item.line_total;

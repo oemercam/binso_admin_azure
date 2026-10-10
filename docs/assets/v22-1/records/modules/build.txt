@@ -1,0 +1,199 @@
+
+> binso-one@0.11.0 build /workspace/scratch/bd6a0d67a03d/binso_admin_azure
+> next build --webpack
+
+▲ Next.js 16.3.8 (webpack)
+✓ Running next.config.ts took 29ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 14.6s
+  Running TypeScript ...
+  Finished TypeScript in 5.8s ...
+  Collecting page data using 8 workers ...
+  Generating static pages using 8 workers (0/134) ...
+  Generating static pages using 8 workers (33/134) 
+  Generating static pages using 8 workers (66/134) 
+  Generating static pages using 8 workers (100/134) 
+✓ Generating static pages using 8 workers (134/134) in 1733ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /agb
+├ ○ /angebote
+├ ƒ /angebote/[id]
+├ ○ /angebote/neu
+├ ƒ /api/auth/invitation
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/mfa
+├ ƒ /api/auth/mfa/confirm
+├ ƒ /api/auth/mfa/setup
+├ ƒ /api/auth/password
+├ ƒ /api/auth/recover
+├ ƒ /api/auth/register
+├ ƒ /api/auth/resend-verification
+├ ƒ /api/auth/session
+├ ƒ /api/auth/sessions
+├ ƒ /api/auth/sessions/[id]
+├ ƒ /api/auth/verify-email
+├ ƒ /api/billing/catalog
+├ ƒ /api/billing/checkout
+├ ƒ /api/billing/portal
+├ ƒ /api/billing/webhook
+├ ƒ /api/customers
+├ ƒ /api/customers/[id]
+├ ƒ /api/customers/[id]/activity
+├ ƒ /api/customers/[id]/contacts
+├ ƒ /api/customers/[id]/contacts/[contactId]
+├ ƒ /api/customers/[id]/documents
+├ ƒ /api/dashboard
+├ ƒ /api/demo/dashboard
+├ ƒ /api/demo/data
+├ ƒ /api/demo/finance
+├ ƒ /api/demo/platform-finance
+├ ƒ /api/demo/session
+├ ƒ /api/documents
+├ ƒ /api/documents/[number]
+├ ƒ /api/documents/[number]/pdf
+├ ƒ /api/documents/[number]/send
+├ ƒ /api/documents/[number]/status
+├ ƒ /api/documents/preview
+├ ƒ /api/employees
+├ ƒ /api/employees/[id]
+├ ƒ /api/expenses
+├ ƒ /api/expenses/[id]
+├ ƒ /api/expenses/[id]/reimbursement
+├ ƒ /api/expenses/billing
+├ ƒ /api/expenses/options
+├ ƒ /api/expenses/scan-receipt
+├ ƒ /api/files
+├ ƒ /api/files/[id]/download
+├ ƒ /api/finance
+├ ƒ /api/finance/overview
+├ ƒ /api/health
+├ ƒ /api/health/ready
+├ ƒ /api/integrations/status
+├ ƒ /api/notifications
+├ ƒ /api/notifications/[id]
+├ ƒ /api/operator/accounts
+├ ƒ /api/operator/accounts/[id]
+├ ƒ /api/operator/announcements
+├ ƒ /api/operator/audit
+├ ƒ /api/operator/customers
+├ ƒ /api/operator/customers/[id]
+├ ƒ /api/operator/dashboard
+├ ƒ /api/operator/demo-session
+├ ƒ /api/operator/finance
+├ ƒ /api/operator/integrations/email-test
+├ ƒ /api/operator/logout
+├ ƒ /api/operator/monitoring
+├ ƒ /api/operator/payments
+├ ƒ /api/operator/restrictions
+├ ƒ /api/operator/restrictions/[id]
+├ ƒ /api/operator/sso/callback
+├ ƒ /api/operator/tickets
+├ ƒ /api/operator/tickets/[id]
+├ ƒ /api/operator/tickets/[id]/messages
+├ ƒ /api/operator/users
+├ ƒ /api/payments
+├ ƒ /api/payments/[id]
+├ ƒ /api/products
+├ ƒ /api/products/[id]
+├ ƒ /api/projects
+├ ƒ /api/search
+├ ƒ /api/settings/company
+├ ƒ /api/settings/documents
+├ ƒ /api/settings/notifications
+├ ƒ /api/settings/profile
+├ ƒ /api/settings/subscription
+├ ƒ /api/settings/team/invitations
+├ ƒ /api/settings/team/invitations/[id]
+├ ƒ /api/settings/team/members/[userId]
+├ ƒ /api/support/tickets
+├ ƒ /api/support/tickets/[id]/messages
+├ ƒ /api/telemetry/web-vitals
+├ ƒ /api/time-entries
+├ ƒ /api/time-entries/[id]
+├ ƒ /api/time-entries/billing
+├ ƒ /api/time-entries/policy
+├ ƒ /api/time-tracker
+├ ○ /auftragsbearbeitung
+├ ○ /belege
+├ ○ /benachrichtigungen
+├ ○ /dashboard
+├ ○ /datenschutz
+├ ○ /demo
+├ ○ /dev/ux-lab
+├ ○ /einladung
+├ ○ /einstellungen
+├ ○ /einstellungen/abonnement
+├ ○ /einstellungen/benachrichtigungen
+├ ○ /einstellungen/darstellung
+├ ○ /einstellungen/datenschutz
+├ ○ /einstellungen/dokumente
+├ ○ /einstellungen/firma
+├ ○ /einstellungen/konto
+├ ○ /einstellungen/sicherheit
+├ ○ /einstellungen/sprache
+├ ○ /einstellungen/team
+├ ○ /einstellungen/zeiterfassung
+├ ○ /email-bestaetigen
+├ ○ /finanzen
+├ ○ /finanzen/analyse
+├ ○ /impressum
+├ ○ /kunden
+├ ƒ /kunden/[id]
+├ ƒ /kunden/[id]/bearbeiten
+├ ○ /kunden/neu
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /mitarbeiter
+├ ƒ /mitarbeiter/[id]
+├ ○ /mitarbeiter/neu
+├ ○ /offline
+├ ○ /opengraph-image
+├ ƒ /operator
+├ ƒ /operator/[...section]
+├ ○ /operator/login
+├ ○ /passwort-vergessen
+├ ○ /passwort-zuruecksetzen
+├ ○ /portal
+├ ○ /portal/login
+├ ○ /portal/registrieren
+├ ○ /preise
+├ ○ /preview/dashboard
+├ ○ /preview/rechnungen
+├ ○ /preview/zeit
+├ ○ /produkt
+├ ○ /produkte
+├ ƒ /produkte/[id]
+├ ○ /produkte/neu
+├ ○ /projekte/neu
+├ ○ /rechnungen
+├ ƒ /rechnungen/[id]
+├ ○ /rechnungen/neu
+├ ○ /registrieren
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+├ ○ /spesen
+├ ƒ /spesen/[id]
+├ ○ /spesen/neu
+├ ○ /support
+├ ƒ /support/[id]
+├ ○ /support/neu
+├ ○ /unterauftragsbearbeiter
+├ ○ /willkommen
+├ ○ /zahlungen
+├ ƒ /zahlungen/[id]
+├ ○ /zahlungen/neu
+└ ○ /zeit
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

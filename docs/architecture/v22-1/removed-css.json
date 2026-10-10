@@ -1,0 +1,602 @@
+[
+  {
+    "file": "app/styles/app.css",
+    "line": 1263,
+    "selector": ".revenue-insight"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1264,
+    "selector": ".revenue-insight-head"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1265,
+    "selector": ".revenue-insight-head h2"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1266,
+    "selector": ".revenue-total"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1267,
+    "selector": ".revenue-period"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1269,
+    "selector": ".revenue-chart"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1269,
+    "selector": ".revenue-chart svg"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1270,
+    "selector": ".revenue-line"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1270,
+    "selector": ".revenue-line.current"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1270,
+    "selector": ".revenue-line.previous"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1271,
+    "selector": ".revenue-dot"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1272,
+    "selector": ".revenue-axis"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1280,
+    "selector": ".revenue-chart"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1281,
+    "selector": ".revenue-tooltip"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1282,
+    "selector": ".revenue-tooltip b"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1282,
+    "selector": ".revenue-tooltip span"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1283,
+    "selector": ".revenue-guide"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1284,
+    "selector": ".revenue-dot.active"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1300,
+    "selector": ".revenue-bars"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1301,
+    "selector": ".revenue-bars button"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1302,
+    "selector": ".revenue-bars i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1303,
+    "selector": ".revenue-bars button.active i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1303,
+    "selector": ".revenue-bars button:hover i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1304,
+    "selector": ".revenue-bars button:focus-visible"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1306,
+    "selector": ".revenue-bar-detail"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1306,
+    "selector": ".revenue-bar-detail>span"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1306,
+    "selector": ".revenue-bar-detail b"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1307,
+    "selector": ".revenue-bars"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1308,
+    "selector": ".revenue-bars button.up i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1308,
+    "selector": ".revenue-bars button.down i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1308,
+    "selector": ".revenue-bars button.neutral i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1309,
+    "selector": ".revenue-bars button.active i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1309,
+    "selector": ".revenue-bars button.up"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1309,
+    "selector": ".revenue-bars button.down"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1309,
+    "selector": ".revenue-bars button.neutral"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1316,
+    "selector": ".finance-custom-range"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1317,
+    "selector": ".finance-custom-range>small"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1318,
+    "selector": ".finance-flow"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1328,
+    "selector": ".finance-flow-primary"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1328,
+    "selector": ".finance-flow-result"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1335,
+    "selector": ".finance-flow-primary span"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1335,
+    "selector": ".finance-flow-result span"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1335,
+    "selector": ".finance-flow-costs span"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1338,
+    "selector": ".finance-flow-primary strong"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1338,
+    "selector": ".finance-flow-result strong"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1340,
+    "selector": ".finance-flow-result small"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1341,
+    "selector": ".finance-flow-costs"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1346,
+    "selector": ".finance-flow-costs>div"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1353,
+    "selector": ".finance-flow-costs strong"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1354,
+    "selector": ".finance-period-table"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1355,
+    "selector": ".finance-period-head"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1355,
+    "selector": ".finance-period-table>button"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1369,
+    "selector": ".finance-period-head"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1370,
+    "selector": ".finance-period-head span:first-child"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1370,
+    "selector": ".finance-period-table>button b"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1372,
+    "selector": ".finance-period-table>button"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1373,
+    "selector": ".finance-period-table>button:hover"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1374,
+    "selector": ".finance-period-table>button strong"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1417,
+    "selector": ".finance-overview-toolbar"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1509,
+    "selector": ".finance-overview-chart"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1510,
+    "selector": ".finance-overview-chart>button"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1511,
+    "selector": ".finance-bar-pair"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1512,
+    "selector": ".finance-bar-pair>i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1513,
+    "selector": ".finance-bar-pair>i+ i"
+  },
+  {
+    "file": "app/styles/app.css",
+    "line": 1514,
+    "selector": ".finance-overview-chart small"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 555,
+    "selector": ".revenue-insight"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 564,
+    "selector": ".revenue-chart svg"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 994,
+    "selector": ".revenue-chart svg"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1750,
+    "selector": ".finance-overview-months .finance-period-head"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1750,
+    "selector": ".finance-overview-months .finance-period-table>button"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1752,
+    "selector": ".finance-overview-months .finance-period-table"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1753,
+    "selector": ".finance-overview-months .finance-period-head"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1754,
+    "selector": ".finance-overview-months .finance-period-table>button>b"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1755,
+    "selector": ".finance-overview-months .finance-period-table>button>span"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1755,
+    "selector": ".finance-overview-months .finance-period-table>button>strong"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1757,
+    "selector": ".finance-overview-months .finance-period-table>button>span::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 1757,
+    "selector": ".finance-overview-months .finance-period-table>button>strong::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2386,
+    "selector": ".revenue-insight"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2387,
+    "selector": ".revenue-insight-head h2"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2387,
+    "selector": ".revenue-total"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2387,
+    "selector": ".revenue-period"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2388,
+    "selector": ".revenue-chart"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2388,
+    "selector": ".revenue-chart svg"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2389,
+    "selector": ".revenue-axis span:nth-child(even)"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2398,
+    "selector": ".revenue-insight"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2399,
+    "selector": ".revenue-insight-head"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2399,
+    "selector": ".revenue-insight-head h2"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2399,
+    "selector": ".revenue-total"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2399,
+    "selector": ".revenue-period"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2400,
+    "selector": ".revenue-chart"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2400,
+    "selector": ".revenue-chart svg"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2400,
+    "selector": ".revenue-tooltip"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2401,
+    "selector": ".revenue-axis"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2510,
+    "selector": ".revenue-bars"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2510,
+    "selector": ".revenue-bars button"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2510,
+    "selector": ".revenue-bars i"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2512,
+    "selector": ".revenue-bar-detail"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2512,
+    "selector": ".revenue-bar-detail b"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2512,
+    "selector": ".revenue-bars"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2512,
+    "selector": ".revenue-bars button"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2721,
+    "selector": ".finance-flow"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2722,
+    "selector": ".finance-flow-primary"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2722,
+    "selector": ".finance-flow-result"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2724,
+    "selector": ".finance-flow-result"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2725,
+    "selector": ".finance-flow-costs"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2726,
+    "selector": ".finance-flow-costs>div"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2727,
+    "selector": ".finance-period-head"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2727,
+    "selector": ".finance-period-table>button"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2732,
+    "selector": ".finance-period-table"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2754,
+    "selector": ".finance-period-table"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2755,
+    "selector": ".finance-period-head"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2756,
+    "selector": ".finance-period-table>button"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2763,
+    "selector": ".finance-period-table>button>b"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2769,
+    "selector": ".finance-period-table>button>span"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2769,
+    "selector": ".finance-period-table>button>strong"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2776,
+    "selector": ".finance-period-table>button>span:nth-of-type(1)::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2777,
+    "selector": ".finance-period-table>button>span:nth-of-type(2)::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2778,
+    "selector": ".finance-period-table>button>strong::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2779,
+    "selector": ".finance-period-table>button>span::before"
+  },
+  {
+    "file": "app/styles/responsive.css",
+    "line": 2779,
+    "selector": ".finance-period-table>button>strong::before"
+  }
+]

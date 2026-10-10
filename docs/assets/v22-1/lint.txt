@@ -1,0 +1,3 @@
+
+> binso-one@0.11.0 lint /workspace/scratch/bd6a0d67a03d/binso_admin_azure
+> eslint . --max-warnings=0

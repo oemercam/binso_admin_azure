@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { tenantList, tenantRpc } from "@/lib/server/database";
+import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
 
 type PaymentBody={invoiceId?:unknown;invoiceNumber?:unknown;customerId?:unknown;customerName?:unknown;paidOn?:unknown;amount?:unknown;method?:unknown;note?:unknown};
 
-export async function GET(){
-  try{return json({items:await tenantList("payments","id,invoice_id,customer_id,paid_on,amount,method,note,status,created_at,customer:customers(name),invoice:documents(number)","order=paid_on.desc")});}
+export async function GET(request:NextRequest){
+  try{return json(await tenantListPage("payments",request.nextUrl.searchParams,"paid_on.desc"));}
   catch(error){return apiError(error);}
 }
 

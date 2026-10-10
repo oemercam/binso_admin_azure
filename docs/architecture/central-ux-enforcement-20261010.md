@@ -41,6 +41,8 @@ Protected Bottom-Navigation and its navigation sheets are not migrated. The unch
 
 ## Existing foundations inspected
 
+UX-11: Visual review of a real three-page production-generator fixture found the first item after a table page break rendered bold at 8pt rather than regular 10pt. `tableHead()` mutates PDFKit's shared font state after the row initially selects its font. The item loop now restores regular 10pt and foreground color after any repeated header; it also resets the previous VAT line's grey color for each row. A real PDF.js text-item assertion reproduced the failure (bold resource, 8pt) before the fix and checks all 14 positions across content pages afterward. This is a renderer fix shared by preview/download/mail, not a second layout. Follow-up PR is required because this additional issue was found during final visual evidence review after PR #232 merged.
+
 FormWizard already renders Cancel/Next on the first step and Back/Next or Back/Save subsequently. FormSheet owns guarded close and unchanged values do not trigger discard. Existing component/process tests are rerun; no new parallel wizard is introduced.
 
 DocumentPageViewer renders exactly one PDF canvas/page and switches by the actual PDF page count. Preview/download/mail use the same PDF generator. Existing tests execute that generator and inspect A4 size, company/customer snapshots, introductions/closings, totals, partial payments and dedicated QR page. Long documents may legitimately require additional content pages before the final QR payment page; truncating them to two pages would lose information.

@@ -187,6 +187,15 @@ jobs:
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
+      - name: Guided registration, languages and responsive regression
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_AXE_MODULE: ${{ runner.temp }}/binso-browser/node_modules/axe-core/axe.min.js
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_REGISTRATION_WIDTHS: ${{ matrix.engine == 'webkit' && '375,390,430' || '320,360,375,390,430,768,820,1024,1280,1440,1920' }}
+          BINSO_REGISTRATION_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/registration
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+        run: node scripts/registration-browser-test.mjs
       - name: Development-only shared component reference regression
         if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:

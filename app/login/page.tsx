@@ -4,6 +4,7 @@ import Link from "next/link";
 import {FormEvent,useState} from "react";
 import {Button, Icon, Logo, Input, Field, ErrorState} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
+import {safeAppPath} from "@/lib/navigation";
 
 type Stage="credentials"|"email"|"totp"|"verify";
 
@@ -15,12 +16,13 @@ export default function Login(){
   const [stage,setStage]=useState<Stage>("credentials");
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
-  const nextPath=()=>{const next=new URLSearchParams(window.location.search).get("next");return next&&next.startsWith("/")&&!next.startsWith("//")?next:"/dashboard"};
+  const nextPath=()=>safeAppPath(new URLSearchParams(window.location.search).get("next"));
 
   const finish=(payload:Record<string,unknown>)=>{
     clearDemoClientSession();
-    const next=nextPath();
-    window.location.replace(payload.mfaSetupRequired===true?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
+    const explicitNext=new URLSearchParams(window.location.search).get("next");
+    const next=explicitNext?nextPath():safeAppPath(payload.next,nextPath());
+    window.location.replace(payload.mfaSetupRequired===true&&!next.startsWith("/einstellungen/sicherheit?setup=1")?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
@@ -89,6 +91,6 @@ export default function Login(){
       <Button type="submit" disabled={loading}>{loading?"Anmeldung läuft…":"Weiter"}</Button>
     </form>
     <div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button>
-    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Account erstellen</Link></p>
+    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Konto erstellen</Link></p>
   </section></main>;
 }

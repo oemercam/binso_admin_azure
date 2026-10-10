@@ -1,0 +1,1 @@
+Registration browser passed: 7 responsive/theme and five-language workflow cases. Synthetic POST fixtures; real backend integration is separate. Evidence: /tmp/binso-v22-registration-ci-final

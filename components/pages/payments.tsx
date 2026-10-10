@@ -5,19 +5,20 @@ import { openAmount, formatCurrency, businessDate } from "@/lib/financial-status
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
-import { RecordsView } from "../records";
-import { payments } from "@/lib/demo-data";
+import { RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { AccessLink, Button, EmptyState, ErrorState, Field, Icon, Status, Toast, Select, Input, FormActions } from "../ui";
 import { CreateAction } from "../binso-ux";
-import { useDemoRows, swissDate, paymentMethodLabel } from "./shared";
+import { useRecordList, swissDate, paymentMethodLabel } from "./shared";
 
 export function PaymentsPage() {
-  const {rows:paymentRows,loading,error}=useDemoRows("payments",payments);
-  return <AppShell title="Zahlungen" subtitle="Erfasste Zahlungseingänge übersichtlich verwalten." active="zahlungen" actions={<CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/>}>
-    <FinanceTabs/><RecordsView countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={["Alle","Verbucht","Storniert"]} columns={[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}]} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={`/zahlungen/${id}`} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
+  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}];
+  const chips=["Alle","Verbucht","Ausstehend"];
+  const {rows:paymentRows,total,controller,pagination,loading,error}=useRecordList("payments",{placeholder:"Zahlungen suchen...",chips,columns,sortFields:{1:"paid_on",2:"customer_name",3:"invoice_number",4:"amount",5:"status"},defaultOrder:"paid_on.desc",filterValues:{Verbucht:{field:"status",value:"booked"},Ausstehend:{field:"status",value:"pending"}}});
+  return <AppShell title="Zahlungen" subtitle={loading?"Wird geladen…":`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
+    <FinanceTabs/><RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={`/zahlungen/${id}`} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
   </AppShell>;
 }
 

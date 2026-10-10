@@ -23,7 +23,13 @@ export async function PATCH(request:NextRequest){
   const data:Record<string,unknown>={};
   for(const [key,[column,max]] of Object.entries(textFields))if(b[key]!==undefined){const value=cleanText(b[key],max);if(key==='name'&&!value)return json({error:'name_required',message:'Firmenname ist erforderlich.'},400);if(key==='email'&&value&&!validEmail(value))return json({error:'email_invalid',message:'Ungültige Firmen-E-Mail.'},400);data[column]=key==='countryCode'?(value||'CH').toUpperCase():value||null;}
   const keys=Object.keys(data);if(!keys.length)return json({error:'empty_update',message:'Keine Änderungen angegeben.'},400);
-  const item=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`,[...Object.values(data),s.organizationId])).rows[0]);
+  const item=await withTenant(s.organizationId,s.userId,async c=>{
+   const item=(await c.query(`update organizations set ${keys.map((key,i)=>key+'=$'+(i+1)).join(',')},updated_at=now() where id=$${keys.length+1} returning ${fields}`,[...Object.values(data),s.organizationId])).rows[0];
+   if(b.completeOnboarding===true&&item){
+    await c.query("insert into organization_milestones(organization_id,milestone,source) values($1,'onboarding_completed','company_setup') on conflict do nothing",[s.organizationId]);
+   }
+   return item;
+  });
   return json({item});
  }catch(error){return apiError(error);}
 }

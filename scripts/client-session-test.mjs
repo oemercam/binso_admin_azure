@@ -11,7 +11,8 @@ const originalBroadcastChannel=globalThis.BroadcastChannel;globalThis.BroadcastC
 const originalFetch=globalThis.fetch;
 try{
  const draftUrl=moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8'));
- const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)));
+ const listStateUrl=moduleUrl(await fs.readFile('lib/client/list-state.ts','utf8'));
+ const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)).replace("'./list-state'",JSON.stringify(listStateUrl)));
  const cacheUrl=moduleUrl((await fs.readFile('lib/client/session-cache.ts','utf8')).replace('"./data-events"',JSON.stringify(eventsUrl)));
  const cache=await import(cacheUrl);
  let resolveSession;let reads=0;

@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises';
+import {writeTestOutput} from './test-output.mjs';
 
 /** Read the rendered CSSOM, including inactive media and overridden candidates. */
 export async function saveDomEvidence(page, filename) {
@@ -14,5 +14,5 @@ export async function saveDomEvidence(page, filename) {
    return {selector,tag:el.tagName,classes:el.className,text:el.textContent?.slice(0,200),inline:el.getAttribute('style'),rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},computed:Object.fromEntries(properties.map(p=>[p,computed.getPropertyValue(p)])),matchedRules:rules.filter(rule=>{try{return el.matches(rule.selector)}catch{return false}})};
   }))};
  });
- await fs.writeFile(filename,JSON.stringify(evidence,null,2)+'\n');
+ await writeTestOutput(filename,JSON.stringify(evidence,null,2)+'\n');
 }

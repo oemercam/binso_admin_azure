@@ -1,0 +1,31 @@
+Checking light 320px
+Checking light 375px
+Checking light 1440px
+Route /kunden/neu
+Route /kunden/neu
+Route /kunden/neu
+Route /kunden/customer-one/bearbeiten
+Route /kunden/customer-one/bearbeiten
+Route /kunden/customer-one/bearbeiten
+Route /projekte/neu
+Route /projekte/neu
+Route /projekte/neu
+Route /kunden
+Route /kunden
+Route /kunden
+Checking dark 320px
+Checking dark 375px
+Checking dark 1440px
+Route /kunden/neu
+Route /kunden/neu
+Route /kunden/neu
+Route /kunden/customer-one/bearbeiten
+Route /kunden/customer-one/bearbeiten
+Route /kunden/customer-one/bearbeiten
+Route /projekte/neu
+Route /projekte/neu
+Route /projekte/neu
+Route /kunden
+Route /kunden
+Route /kunden
+UX browser checks passed: 24 route/theme/viewport combinations ; interactions: customers,time. Artifacts: /tmp/binso-v22-customer-sheet-browser-verified

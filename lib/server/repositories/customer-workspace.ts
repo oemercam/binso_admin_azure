@@ -16,5 +16,13 @@ export async function customerWorkspace(c:PoolClient,s:SessionUser,id:string){
  const documents=tenantCan(s.role,'invoices:read')||tenantCan(s.role,'sales:read')?await listApiBusiness(c,s,'documents',filter):[];
  const summary=await financialSummary(c,s,String(item.id));
  const activity=await customerActivity(c,s,String(item.id));
- return {item,contacts,documents,summary,activity};
+ const statistics=tenantCan(s.role,'invoices:read')&&tenantCan(s.role,'payments:read')?(await c.query(`
+  select currency,issue_date::text date,sum(total_amount) billed,count(*)::int invoice_count,0::numeric paid
+  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') group by currency,issue_date
+  union all
+  select i.currency,p.payment_date::text date,0::numeric billed,0::int invoice_count,sum(p.amount) paid
+  from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id
+  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' group by i.currency,p.payment_date
+ `,[s.organizationId,String(item.id)])).rows:null;
+ return {item,contacts,documents,summary,activity,statistics};
 }

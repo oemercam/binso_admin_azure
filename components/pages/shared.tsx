@@ -5,6 +5,7 @@ import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { type DemoCollection } from "@/lib/demo-storage";
 import { isProductionBackendEnabled } from "@/lib/client/backend";
+import {useRecordsController} from "../records";
 
 export function moneyChf(value:unknown){
   const amount=Number(value);
@@ -26,7 +27,7 @@ export function swissDate(value:unknown){
 
 export function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
-    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
+    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??"")
   ]);
   if(collection==="products") return items.map(item=>[
     String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",withPriceUnit(moneyChf(item.unit_price),item.unit),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
@@ -49,9 +50,22 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
   return [];
 }
 
-export function useDemoRows(collection:DemoCollection, defaults:string[][]) {
+export function useDemoRows(collection:DemoCollection, defaults:string[][],filters="") {
   void defaults;
-  const path=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
-  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[]}>(path);
-  return {rows:mapRemoteRows(collection,data?.items??[]),loading,error};
+  const base=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
+  const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
+  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
+  return {rows:mapRemoteRows(collection,data?.items??[]),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading,error};
+}
+
+/** Module configuration changes domain fields, never the committed list state owner. */
+export function useRecordList(collection:DemoCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;filterValues:Record<string,{field:'status'|'kind';value:string}>}){
+ const controller=useRecordsController(options),pageSize=50;
+ const {sortFields,defaultOrder='created_at.desc',filterValues}=options;
+ const field=sortFields[controller.sortIndex];
+ const filters=new URLSearchParams({limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'||!field?defaultOrder:field+'.'+controller.sort});
+ if(controller.query.trim())filters.set('q',controller.query.trim());
+ const selected=filterValues[controller.activeChip];if(selected)filters.set(selected.field,selected.value);
+ const data=useDemoRows(collection,[],filters.toString());
+ return {...data,controller,pagination:{total:data.total,page:controller.page,pageSize,onPage:controller.setPage}};
 }

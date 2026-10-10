@@ -1,0 +1,338 @@
+Checking light 320px
+Checking light 360px
+Checking light 375px
+Checking light 390px
+Checking light 430px
+Checking light 768px
+Checking light 820px
+Checking light 1024px
+Checking light 1280px
+Checking light 1440px
+Checking light 1920px
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /dashboard
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /portal
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /login
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /registrieren
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /preise
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /produkt
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /demo
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator/login
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/kunden
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/tickets
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/zahlungen
+Route /operator/monitoring
+Route /operator/zahlungen
+Route /operator/zahlungen
+Route /operator/zahlungen
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/zahlungen
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/monitoring
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/zahlungen
+Route /operator/zahlungen
+Route /operator/zahlungen
+Route /operator/sicherheit
+Route /operator/zahlungen
+Route /operator/zahlungen
+Route /operator/sicherheit
+Route /operator/audit
+Route /operator/zahlungen
+Route /operator/audit
+Route /operator/audit
+Route /operator/audit
+Route /kunden
+Route /operator/audit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /operator/sicherheit
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /operator/audit
+Route /produkte
+Route /operator/audit
+Route /operator/audit
+Route /operator/audit
+Route /operator/audit
+Route /operator/audit
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /kunden
+Route /kunden
+Route /mitarbeiter
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /mitarbeiter
+Route /produkte
+Route /mitarbeiter
+Route /mitarbeiter
+Route /produkte
+Route /mitarbeiter
+Route /spesen
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /mitarbeiter
+Route /spesen
+Route /mitarbeiter
+Route /spesen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /angebote
+Route /spesen
+Route /spesen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /rechnungen
+Route /angebote
+Route /angebote
+Route /angebote
+Route /angebote
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /angebote
+Route /angebote
+Route /rechnungen
+Route /rechnungen
+Route /finanzen
+Route /rechnungen
+Route /rechnungen
+Route /angebote
+Route /angebote
+Route /angebote
+Route /angebote
+Route /rechnungen
+Route /rechnungen
+Route /finanzen/analyse
+Route /rechnungen
+Route /rechnungen
+Route /rechnungen
+Route /rechnungen
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /support
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /finanzen
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /zeit
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /support
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /einstellungen
+Route /support
+Route /support
+Route /support
+Route /zeit
+Route /support
+Route /einstellungen/darstellung
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Browser runtime errors
++ actual - expected
+
++ [
++   'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
++     '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
++   'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
++     '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
++   'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
++     '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
++   'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
++     '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)'
++ ]
+- []
+
+    at file:///workspace/scratch/bd6a0d67a03d/binso_admin_azure/scripts/ux-browser-test.mjs:238:10
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:502:9)
+    at async Promise.all (index 10)
+    at async file:///workspace/scratch/bd6a0d67a03d/binso_admin_azure/scripts/ux-browser-test.mjs:172:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [
+    'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
+      '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
+    'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
+      '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
+    'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
+      '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)',
+    'http://127.0.0.1:3200/support: Loading chunk 1166 failed.\n' +
+      '(error: http://127.0.0.1:3200/_next/static/chunks/1166-1be86f9ec92482b9.js)'
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

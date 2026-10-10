@@ -1,0 +1,5924 @@
+[
+  {
+    "route": "/angebote/[id]",
+    "file": "app/angebote/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/angebote/neu",
+    "file": "app/angebote/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/angebote",
+    "file": "app/angebote/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/belege",
+    "file": "app/belege/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/benachrichtigungen",
+    "file": "app/benachrichtigungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/dashboard",
+    "file": "app/dashboard/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Bestanden",
+        "observed": "Synthetischer Normalzustand gerendert, 11 Breiten × 2 Themes; kein Nachweis sämtlicher V22.1-Stil-/Prozesskriterien.",
+        "evidence": "docs/assets/v22-1/results-light-dark.json; vollständige 88 Screenshots/DOM im Review-Paket"
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/abonnement",
+    "file": "app/einstellungen/abonnement/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/benachrichtigungen",
+    "file": "app/einstellungen/benachrichtigungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/darstellung",
+    "file": "app/einstellungen/darstellung/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/datenschutz",
+    "file": "app/einstellungen/datenschutz/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/dokumente",
+    "file": "app/einstellungen/dokumente/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/firma",
+    "file": "app/einstellungen/firma/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/konto",
+    "file": "app/einstellungen/konto/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen",
+    "file": "app/einstellungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/sicherheit",
+    "file": "app/einstellungen/sicherheit/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/sprache",
+    "file": "app/einstellungen/sprache/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/team",
+    "file": "app/einstellungen/team/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/einstellungen/zeiterfassung",
+    "file": "app/einstellungen/zeiterfassung/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/finanzen/analyse",
+    "file": "app/finanzen/analyse/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Bestanden",
+        "observed": "Synthetischer Normalzustand gerendert, 11 Breiten × 2 Themes; kein Nachweis sämtlicher V22.1-Stil-/Prozesskriterien.",
+        "evidence": "docs/assets/v22-1/results-light-dark.json; vollständige 88 Screenshots/DOM im Review-Paket"
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/finanzen",
+    "file": "app/finanzen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Bestanden",
+        "observed": "Synthetischer Normalzustand gerendert, 11 Breiten × 2 Themes; kein Nachweis sämtlicher V22.1-Stil-/Prozesskriterien.",
+        "evidence": "docs/assets/v22-1/results-light-dark.json; vollständige 88 Screenshots/DOM im Review-Paket"
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/kunden/[id]/bearbeiten",
+    "file": "app/kunden/[id]/bearbeiten/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/kunden/[id]",
+    "file": "app/kunden/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Bestanden",
+        "observed": "Synthetischer Normalzustand gerendert, 11 Breiten × 2 Themes; kein Nachweis sämtlicher V22.1-Stil-/Prozesskriterien.",
+        "evidence": "docs/assets/v22-1/results-light-dark.json; vollständige 88 Screenshots/DOM im Review-Paket"
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/kunden/neu",
+    "file": "app/kunden/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/kunden",
+    "file": "app/kunden/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/mitarbeiter/[id]",
+    "file": "app/mitarbeiter/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/mitarbeiter/neu",
+    "file": "app/mitarbeiter/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/mitarbeiter",
+    "file": "app/mitarbeiter/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/preview/dashboard",
+    "file": "app/preview/dashboard/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/preview/rechnungen",
+    "file": "app/preview/rechnungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/preview/zeit",
+    "file": "app/preview/zeit/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/produkte/[id]",
+    "file": "app/produkte/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/produkte/neu",
+    "file": "app/produkte/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/produkte",
+    "file": "app/produkte/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/projekte/neu",
+    "file": "app/projekte/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/rechnungen/[id]",
+    "file": "app/rechnungen/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/rechnungen/neu",
+    "file": "app/rechnungen/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/rechnungen",
+    "file": "app/rechnungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/spesen/[id]",
+    "file": "app/spesen/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/spesen/neu",
+    "file": "app/spesen/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/spesen",
+    "file": "app/spesen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/support/[id]",
+    "file": "app/support/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/support/neu",
+    "file": "app/support/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/support",
+    "file": "app/support/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/zahlungen/[id]",
+    "file": "app/zahlungen/[id]/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/zahlungen/neu",
+    "file": "app/zahlungen/neu/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/zahlungen",
+    "file": "app/zahlungen/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  },
+  {
+    "route": "/zeit",
+    "file": "app/zeit/page.tsx",
+    "states": [
+      {
+        "state": "Normal",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Leer",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Laden",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Fehler",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Erstellen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Bearbeiten",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Read-only",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Berechtigung verweigert",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungespeicherte Änderungen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Netzwerkunterbruch",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Session abgelaufen",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Ungültige Eingabe",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Doppelte Speicherung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Unvollständig",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Deep Link",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Browser-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "PWA-Zurück",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Tastatur",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Orientierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      },
+      {
+        "state": "Textskalierung",
+        "status": "Nicht bestanden",
+        "observed": "Noch nicht vollständig geprüft",
+        "evidence": null
+      }
+    ]
+  }
+]

@@ -1,0 +1,2 @@
+Approved bottom-navigation markup and all responsive selector declarations are unchanged.
+Customer and operator bottom navigation: markup, access/display/scroll logic, icons, styles and transitive tokens unchanged against 1eef9fb1d005d4752f12a9dd5c0e620decca4444.

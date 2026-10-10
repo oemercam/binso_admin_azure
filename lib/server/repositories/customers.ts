@@ -3,9 +3,12 @@ import {randomUUID} from "node:crypto";
 import {withTenant} from "@/lib/server/db";
 import {audit} from "@/lib/server/audit";
 import {ApiError} from "@/lib/server/http";
+import {idempotentBusiness} from "../business-idempotency";
+import {listApiBusiness} from "./business-api";
+import type {SessionUser} from "@/lib/server/session";
 
 export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string};
-const columns=`id,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
+const columns=`id,customer_no,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
 export function customerInput(body:Record<string,unknown>,partial=false):Partial<CustomerInput>{
  const out:Partial<CustomerInput>={};
  for(const key of ['name','contact','email','phone','address','zipCity','postalCode','city','sector','uid','language','status','notes'] as const){
@@ -29,13 +32,14 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
  return {zip,city};
 }
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
-export async function listCustomers(organizationId:string,userId:string){return withTenant(organizationId,userId,async client=>(await client.query(`select ${columns} from customers where organization_id=$1 and archived_at is null order by lower(name) limit 1000`,[organizationId])).rows)}
-export async function createCustomer(organizationId:string,userId:string,input:CustomerInput){return withTenant(organizationId,userId,async client=>{
+export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
+export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey=""){return withTenant(organizationId,userId,async client=>{const write=async()=>{
  const id=randomUUID(),{zip,city}=addressParts(input);
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);
  const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');
  const result=await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',input.paymentDays??30,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return result.rows[0];
+};return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();
 })}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;

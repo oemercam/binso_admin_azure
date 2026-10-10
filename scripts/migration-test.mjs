@@ -68,6 +68,28 @@ try{
  const mutateApiBusiness=(c,s,operation,args)=>rawMutation(c,s,operation,{...args,p_idempotency_key:args.p_idempotency_key??randomUUID()});
  const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length}}};
  const session={organizationId:demo,userId:'demo-readonly',role:'owner'};
+ {
+ const {cashStatisticsData}=await import(dataModule((await fs.readFile('lib/server/repositories/finance.ts','utf8')).replaceAll("import 'server-only';",'')));
+ const cashBefore=await cashStatisticsData(client,demo);
+ assert.equal(cashBefore.incomplete,true,'Legacy payroll/operating records cannot be relabelled as proven cash outflows');
+ assert.equal(cashBefore.outflows.length,0,'Approved but not reimbursed expenses are not cash outflows');
+ assert.ok(cashBefore.payments.length>0,'Actual matched payment dates populate income');
+ const foreignCash=await cashStatisticsData(client,'00000000-0000-4000-8000-000000000001');
+ assert.deepEqual(foreignCash,{payments:[],outflows:[],incomplete:false},'Cash queries do not leak a different tenant population');
+ const fixtureExpense=(await db.query("select id from expenses where organization_id=$1 and currency='CHF' and status in ('approved','posted') limit 1",[demo])).rows[0];
+ if(fixtureExpense){await db.query("update expenses set reimbursed_at='2026-10-25T23:30:00Z' where id=$1",[fixtureExpense.id]);const reimbursed=await cashStatisticsData(client,demo);assert.ok(reimbursed.outflows.some(row=>row.payment_date==='2026-10-26'),'Reimbursement uses Europe/Zurich calendar day, not expense date or UTC date');await db.query('update expenses set reimbursed_at=null where id=$1',[fixtureExpense.id]);}
+ const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions))))).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)))));
+ const {customerWorkspace}=await import(dataModule(workspaceSource));
+ const statisticsCustomer=(await db.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[demo])).rows[0].id;
+ const customerStatistics=await customerWorkspace(client,session,statisticsCustomer);
+ assert.ok(customerStatistics.statistics!==null,'Owner can read customer statistics');
+ const totals=(await db.query("select currency,sum(total_amount)::text total,count(*)::int n from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') group by currency",[demo,statisticsCustomer])).rows;
+ for(const row of totals){const own=customerStatistics.statistics.filter(event=>event.currency===row.currency);assert.equal(own.reduce((sum,event)=>sum+Number(event.invoice_count),0),row.n);assert.equal(Math.round(own.reduce((sum,event)=>sum+Number(event.billed),0)*100),Math.round(Number(row.total)*100));}
+ const limitedStatistics=await customerWorkspace(client,{...session,role:'member'},statisticsCustomer);
+ assert.equal(limitedStatistics.statistics,null,'No finance aggregates exposed to a role without payment rights');
+ console.log('V22 statistics: real cash dates, expense reimbursement day, currency-separated invoice totals and role/tenant isolation passed.');
+ }
+
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  for(const table of ['customers','customer_contacts','products','employees','expenses','documents','payments'])assert.ok((await listApiBusiness(client,session,table,'')).length>0,table+' must have readable canonical fixture data');
  assert.equal((await listApiBusiness(client,session,'documents','number=eq.RE-2026-019')).length,1);
@@ -117,6 +139,14 @@ try{
  assert.equal((await db.query('select status from invoices where id=$1',[document.id])).rows[0].status,'paid');
  await assert.rejects(mutateApiBusiness(client,session,'create_payment_idempotent',{...paymentArgs,p_amount:2}),e=>e.status===409);
  await assert.rejects(db.query("insert into tasks(organization_id,external_id,title,project_id) values('00000000-0000-4000-8000-000000000001','cross-tenant','Blocked','30000000-0000-4000-8000-000000000001')"),e=>e.code==='23503');
+ const paidList=await listApiBusiness(client,session,'documents','kind=eq.invoice&display_status=eq.paid&q='+encodeURIComponent(document.number)+'&order=total.desc&limit=1');
+ assert.equal(paidList[0]?.id,document.id);assert.equal(Number(paidList[0]?.total_count),1,'Document status/search runs before pagination');
+ const latePartial=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_due_date:'2000-01-01',p_idempotency_key:'late-partial-list-test'});
+ await db.query("update invoices set paid_amount=1,status='partial' where id=$1",[latePartial.id]);
+ for(const filter of ['open','overdue'])assert.equal((await listApiBusiness(client,session,'documents','display_status=eq.'+filter+'&q='+encodeURIComponent(latePartial.number)))[0]?.id,latePartial.id,'Derived '+filter+' filter includes late partial invoice');
+ await db.query('update invoices set archived_at=now() where id=$1',[latePartial.id]);
+ await assert.rejects(()=>listApiBusiness(client,session,'documents','display_status=eq.invalid'),e=>e.code==='invalid_filter');
+ await assert.rejects(()=>listApiBusiness(client,session,'documents','order=total.desc;drop table invoices'),e=>e.code==='invalid_order');
  const {dashboardAnalytics}=await import(dataModule((await fs.readFile('lib/server/repositories/dashboard.ts','utf8')).replace("import 'server-only';",'')));
  const analytics=await dashboardAnalytics(client,demo);
  const october=analytics.analyticsInvoices.find(row=>new Date(row.issue_date).toISOString().startsWith('2026-10'));
@@ -150,13 +180,16 @@ try{
  assert.equal(loadedExpense.category,'Reise');assert.equal(loadedExpense.status,'submitted');assert.equal(Number(loadedExpense.amount),123.45);
  const tenantWrapper=dataModule('export async function withTenant(org,user,fn){return globalThis.__customerPersistenceTest(org,user,fn)}');
  globalThis.__customerPersistenceTest=async(org,user,fn)=>{await db.query("select set_config('app.organization_id',$1,false)",[org]);return fn(client)};
- const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http));
+ const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"../business-idempotency"',JSON.stringify(idempotencyModule));
  const customerRepository=await import(dataModule(customerSource));
  const input={name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
  const created=await customerRepository.createCustomer(sandbox,'sandbox-user',input);
+ assert.match(created.customer_no,/^K-\d{6,}$/,'Only the successful server creation returns the assigned business number');
+ const minimalInput=customerRepository.customerInput({name:'Minimal private or business customer'});const minimalCreated=await customerRepository.createCustomer(sandbox,'sandbox-user',minimalInput,'minimal-customer-fixture-key');const minimalReplay=await customerRepository.createCustomer(sandbox,'sandbox-user',minimalInput,'minimal-customer-fixture-key');assert.equal(minimalReplay.id,minimalCreated.id);assert.equal(minimalReplay.customer_no,minimalCreated.customer_no,'A retried create does not allocate another business number');assert.ok(!minimalCreated.city,'A first valid customer needs no artificial mandatory city');assert.equal((await db.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[sandbox,minimalInput.name])).rows[0].n,1);await assert.rejects(()=>customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Different customer'},'minimal-customer-fixture-key'),e=>e.status===409);
  const updated=await customerRepository.updateCustomer(sandbox,'sandbox-user',created.id,{city:'Bern',sector:'Handel'});
+ assert.equal(updated.customer_no,created.customer_no,'Editing master data preserves the original business number');
  assert.equal(updated.notes,input.notes);assert.equal(updated.uid,input.uid);assert.equal(updated.address,input.address);assert.equal(updated.city,'Bern');assert.equal(updated.sector,'Handel');assert.equal(updated.email,input.email);assert.equal(Number(updated.paymentDays),45);
- assert.equal((await customerRepository.listCustomers(sandbox,'sandbox-user')).find(row=>row.id===created.id).postal_code,'8000');
+ assert.equal((await customerRepository.listCustomers({...clonedSession,userId:'sandbox-user'})).find(row=>row.id===created.id).postal_code,'8000');
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await listApiBusiness(client,session,'customers','id=eq.'+created.id)).length,0);
  const fileId='f0000000-0000-4000-8000-000000000031';
@@ -417,6 +450,11 @@ try{
  const employeeEdit=await import(dataModule(employeeEditSource));
  assert.equal((await employeeEdit.PATCH({body:{...employeeBody,weeklyHours:38}},{params:Promise.resolve({id:createdEmployee.data.item.id})})).status,200);
  assert.equal(String((await db.query('select start_date::text from employees where id=$1',[createdEmployee.data.item.id])).rows[0].start_date),'2026-10-08','Editing hours must not clear the employee entry date');
+ for(const [table,input] of [['products',{name:'Replay product fixture',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'}],['employees',{first_name:'Replay',last_name:'Person',email:'replay-person@example.invalid',job_title:'ICT',workload_percent:100,weekly_hours:42,vacation_days:25,status:'active'}]]){
+  const key=table+'-creation-replay',first=(await databaseProcess.tenantInsert(table,input,key))[0];
+  const again=(await databaseProcess.tenantInsert(table,input,key))[0];assert.equal(again.id,first.id,'Lost-reply retry returns the same '+table+' identity');
+  await assert.rejects(()=>databaseProcess.tenantInsert(table,{...input,...(table==='products'?{name:'Changed product'}:{first_name:'Changed person'})},key),e=>e.code==='idempotency_conflict');
+ }
  const expenseBody={employee_id:null,customer_id:documentArgs.p_customer_id,billable:true,merchant:'Fixture meal',expense_date:'2026-10-06',category:'Verpflegung',amount:42,currency:'CHF',vat_rate:8.1,status:'submitted'};
  const expenseId=(await databaseProcess.tenantInsert('expenses',expenseBody))[0].id;
  const repeatedExpense=(await databaseProcess.tenantInsert('expenses',expenseBody,'expense-process-retry'))[0].id;
@@ -559,13 +597,18 @@ try{
  console.log('Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.');
 
  // Full business process and short paths use actual handlers against isolated PostgreSQL fixtures.
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const projectHandler=await loadProcessRoute('app/api/projects/route.ts');
  globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
  const projectCreated=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
  assert.equal(projectCreated.status,201,JSON.stringify(projectCreated));
  const projectReplay=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
  assert.equal(projectCreated.data.item.id,projectReplay.data.item.id,'An offer starts exactly one project');
+ const internalProjectRequest={headers:new Headers({'idempotency-key':'internal-project-fixture-key'}),body:{name:'Internal project with a lost response'}};
+ const internalCreated=await projectHandler.POST(internalProjectRequest);assert.equal(internalCreated.status,201);
+ const internalReplay=await projectHandler.POST(internalProjectRequest);assert.equal(internalReplay.status,201);assert.equal(internalReplay.data.item.id,internalCreated.data.item.id,'Retrying after a lost response returns the original internal project');
+ assert.equal((await db.query('select count(*)::int n from projects where organization_id=$1 and name=$2',[demo,internalProjectRequest.body.name])).rows[0].n,1,'The replay never creates a second project');
+ assert.equal((await projectHandler.POST({...internalProjectRequest,body:{name:'Changed payload'}})).status,409,'A replay key cannot be reused for different project data');
  assert.equal((await projectHandler.POST({body:{name:'Wrong tenant',customerId:'10000000-0000-4000-8000-000000000002',sourceOffer:processQuote.number}})).status,409);
  const timeCreated=await manualTimeHandler.POST({body:{projectId:projectCreated.data.item.id,description:'Migration and rollout',durationMinutes:750,startedAt:'2026-10-01',billable:true,salesRate:180}});
  assert.equal(timeCreated.status,201,JSON.stringify(timeCreated));assert.equal(timeCreated.data.item.customer_id,documentArgs.p_customer_id,'Project supplies customer without redundant selection');
@@ -673,6 +716,36 @@ try{
  // alternate PATCH/DELETE ledger writer that can bypass canonical transitions.
  for(const file of ['app/api/payments/[id]/route.ts','app/api/payments/route.ts']){const source=await fs.readFile(file,'utf8');assert.ok(!/export async function (PATCH|DELETE)/.test(source));}
  console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
+ await db.exec('begin');
+ try{
+  for(const [table,fields] of Object.entries({products:['name','kind','unit_price','status'],employees:['name','job_title','workload_percent','status'],expenses:['merchant','employee_name','amount','status'],payments:['paid_on','customer_name','invoice_number','amount','status']})){
+   for(const field of fields)for(const direction of ['asc','desc'])assert.ok((await listApiBusiness(client,session,table,'order='+field+'.'+direction+'&limit=1')).length>0,'Every offered module sort resolves against actual authorized database fields');
+  }
+  await db.query("insert into products_services(organization_id,external_id,name,item_type,sku,unit,unit_price,vat_rate,status) values($1,'native-sort-low','Native money sort low','service','SKU-V22-11','hour',9,8.1,'active'),($1,'native-sort-high','Native money sort high','service','SKU-V22-22','hour',10000,8.1,'active')",[demo]);
+  const nativePrice=await listApiBusiness(client,session,'products','q=Native%20money%20sort&order=unit_price.desc&limit=1');
+  assert.equal(Number(nativePrice[0].unit_price),10000,'Money is sorted numerically in SQL before the page limit');
+  assert.equal((await listApiBusiness(client,session,'products','q=SKU%20V22%2022&kind=eq.service'))[0].name,'Native money sort high','Search includes actual SKU values absent from displayed list rows');
+  assert.equal((await listApiBusiness(client,session,'products','q=SKU%20V22%2022&kind=eq.product')).length,0,'Only the selected product type is returned');
+  assert.equal((await listApiBusiness(client,{...session,organizationId:sandbox},'products','q=SKU%20V22%2022')).length,0,'Module search cannot expose another tenant inventory');
+  await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) select $1,'search-bulk-'||i,'K-SYN-'||i,'Search bulk '||i,'active',now()-interval '1 day' from generate_series(1,1001) i",[demo]);
+  const target=(await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) values($1,'search-target','K-998877','Search target Zürich AG','active',now()-interval '2 days') returning id",[demo])).rows[0];
+  assert.equal((await listApiBusiness(client,session,'customers','')).some(row=>row.id===target.id),false,'The target is beyond the old 1000-record loaded window');
+  assert.equal((await listApiBusiness(client,session,'customers','q=K998%20877&limit=1'))[0].id,target.id,'Normalized business numbers are searched before the limit');
+  const firstPage=await listApiBusiness(client,session,'customers','q=search%20bulk&limit=50&offset=0&order=name.asc');
+  const secondPage=await listApiBusiness(client,session,'customers','q=search%20bulk&limit=50&offset=50&order=name.asc');
+  assert.equal(Number(firstPage[0].total_count),1001,'A page reports the complete authorized matching population');
+  assert.equal(firstPage.length,50);assert.equal(secondPage.length,50);assert.ok(secondPage.every(row=>!firstPage.some(first=>first.id===row.id)),'Stable pages do not duplicate records');
+  await assert.rejects(()=>listApiBusiness(client,session,'customers','offset=-1'),error=>error.status===400);
+  assert.ok((await listApiBusiness(client,session,'customers','q='+encodeURIComponent('Zürich'))).some(row=>row.id===target.id),'Swiss text remains searchable alongside other customers from the same city');
+  assert.equal((await listApiBusiness(client,{...session,organizationId:sandbox},'customers','q=K998877')).length,0,'A full-population search cannot cross the tenant boundary');
+  assert.equal((await listApiBusiness(client,session,'customers','q='+encodeURIComponent('%__--'))).length,0,'Punctuation and wildcards cannot match every record');
+  const numbered=(await listApiBusiness(client,session,'documents','q=RE%202026%20019&kind=eq.invoice&limit=1'))[0];
+  assert.equal(numbered.number,'RE-2026-019','Usual invoice separators are normalized');
+  await db.query('update customers set customer_no=$2 where id=$1',[numbered.customer_id,'K-112233']);
+  const byCustomer=await listApiBusiness(client,session,'documents','q=K112%20233&kind=eq.invoice');
+  assert.ok(byCustomer.length>0&&byCustomer.every(row=>row.customer_id===numbered.customer_id),'Invoice search joins the actual related customer number');
+  console.log('V22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.');
+ }finally{await db.exec('rollback')}
  delete globalThis.__processSession;delete globalThis.__processTransaction;delete globalThis.__processPlatform;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}

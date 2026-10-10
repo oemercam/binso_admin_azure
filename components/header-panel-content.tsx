@@ -1,5 +1,7 @@
 "use client";
 
+import {usePathname,useSearchParams} from "next/navigation";
+import {safeAppPath} from "@/lib/navigation";
 import type {SearchItem} from "@/lib/search";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
@@ -41,8 +43,12 @@ export function NotificationPanel({items,loading,error,filter,onFilter,onRead,on
 }
 
 export function AccountPanel({profile,demo,logoutBusy,onLogout,onClose}:{profile:{name:string;identity:string;avatar:string};demo:boolean;logoutBusy:boolean;onLogout:()=>void;onClose:()=>void}){
+ const pathname=usePathname(),params=useSearchParams();
+ const origin=safeAppPath(params.get("accountReturn"),pathname);
+ const target=new URL(origin,"https://binso.invalid");target.searchParams.set("panel","account");
+ const back=target.pathname+target.search;
  return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b>{profile.name||"Persönliches Konto"}</b><small>Persönliches Konto</small></div></div>
-  <h3>Persönlich</h3><div>{[["/einstellungen/konto","user","Mein Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","moon","Darstellung & Sprache"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div>
+  <h3>Persönlich</h3><div>{[["/einstellungen/konto","user","Mein Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","moon","Darstellung & Sprache"]].map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={title} onClose={onClose}/>)}</div>
   <h3>Unternehmen</h3><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/>{demo&&<PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/>}</div>
   <h3>Sitzung</h3><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div>
  </div>;

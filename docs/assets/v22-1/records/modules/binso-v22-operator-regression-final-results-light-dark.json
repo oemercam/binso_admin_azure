@@ -1,0 +1,35 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "operator"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "route": "/operator/abonnemente",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/operator/abonnemente",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

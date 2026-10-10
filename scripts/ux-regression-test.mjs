@@ -8,6 +8,11 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
+const {safeAppPath}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/navigation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+for(const attack of ['//external.example','/\\external.example','/\n/external.example','https://external.example','/%2fexternal.example','/%5cexternal.example','/%00external.example'])assert.equal(safeAppPath(attack),'/dashboard','Auth handoffs cannot resolve an external or malformed URL');
+assert.equal(safeAppPath('/einstellungen/sicherheit?setup=1&next=%2Feinstellungen%2Ffirma%3Fonboarding%3D1'),'/einstellungen/sicherheit?setup=1&next=%2Feinstellungen%2Ffirma%3Fonboarding%3D1');
+assert.equal(safeAppPath('/kunden/customer-one?tab=finances#details'),'/kunden/customer-one?tab=finances#details');
+console.log('Auth and onboarding handoffs preserve local paths and reject URL-normalization redirect attacks.');
 const read=path=>requireReadCache.get(path)??'';
 const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await readPageFile(path,'utf8')])));
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
@@ -28,7 +33,7 @@ const client={query:async(sql,values)=>{calls.push({sql,values});return {rows:[]
 await listApiBusiness(client,session,'documents','kind=eq.invoice&order=issue_date.desc&limit=5');
 assert.match(calls[0].sql,/order by q\.issue_date desc,q\.id desc limit 5/);
 assert.match(calls[0].sql,/organization_id=\$1/);
-assert.deepEqual(calls[0].values,['tenant-under-test']);
+assert.deepEqual(calls[0].values,['tenant-under-test',(await import(financialModuleUrl)).businessDate()]);
 await listApiBusiness(client,session,'payments','order=paid_on.desc&limit=5');
 assert.match(calls[1].sql,/order by q\.paid_on desc,q\.id desc limit 5/);
 for(const order of ['paid_on.desc;drop table payments','paid_on.sideways','secret.desc','issue_date.desc','created_at.desc.nullslast']){
@@ -40,6 +45,12 @@ assert.match(calls[2].sql,/order by q\.expense_date desc,q\.id desc/);
 await listApiBusiness(client,session,'customer_contacts','order=is_primary.desc,created_at.asc');
 assert.match(calls[3].sql,/order by q\.is_primary desc,q\.created_at asc,q\.id desc/);
 console.log('Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.');
+await listApiBusiness(client,session,'documents','q='+encodeURIComponent('RE 2026-019')+'&kind=eq.invoice&limit=5');
+assert.deepEqual(calls[4].values,['tenant-under-test',(await import(financialModuleUrl)).businessDate(),'RE 2026-019']);
+assert.ok(calls[4].sql.lastIndexOf(' where ')<calls[4].sql.lastIndexOf(' order by '),'Search runs before result limiting');
+assert.ok(calls[4].sql.includes("q.customer->>'number'"),'Invoice search includes the related customer number');
+await assert.rejects(()=>listApiBusiness(client,session,'customers','q='+encodeURIComponent('x'.repeat(201))),error=>error.code==='invalid_search');
+assert.equal(calls.length,5,'An overlong search must not execute SQL');
 
 const searchSource=await readPageFile('lib/search.ts','utf8');
 const {searchSources,searchItem}=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
@@ -104,7 +115,7 @@ assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables mus
 assert.ok(responsiveCss.includes('Primary layout states:'),'Viewport contract must stay explicit and centralized');
 assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
 assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
-assert.ok(appCss.includes('.finance-flow{'),'Single-period finance view must use the finance-flow presentation');
+assert.ok(appCss.includes('.bo-statistics{'),'Single and multiple periods use the same central statistics presentation');
 console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
 
 const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
@@ -208,15 +219,15 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 }
 
 
-// Finance periods: presets are shortcuts, not a limitation.
+// Period controls moved from individual pages to the single statistics owner.
 {
-  const pages=read("components/app-pages.tsx");
-  assert(pages.includes("Zeitraum wählen"),"Finance must offer a custom period in addition to presets.");
-  assert(pages.includes('Field label="Von"')&&pages.includes('Field label="Bis"'),"Custom finance periods must expose from/to date controls.");
-  assert(pages.includes('range==="custom"'),"Finance calculations must support the custom range mode.");
-  console.log("Finance supports free from/to periods alongside quick presets.");
+ const statistics=await fs.readFile('components/statistics.tsx','utf8');
+ assert(statistics.includes('statisticPeriods.map'), 'All statistics consume central month presets');
+ assert(statistics.includes('type="date" required')&&statistics.includes('Eigenen Statistikzeitraum wählen'), 'Actual date controls and calendar action exist');
+ assert(statistics.includes('aggregateStatistics')&&statistics.includes('metrics(aggregated.totals)'), 'KPIs and bars share aggregation');
+ for(const page of ['components/pages/dashboard.tsx','components/pages/finance.tsx'])assert((await fs.readFile(page,'utf8')).includes('CashStatistics'), page+' renders central cash statistics');
+ console.log('Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.');
 }
-
 
 // Desktop process integrity: time tracking must persist explicit customer/project identity and customer detail has one info pane per path.
 {
@@ -313,16 +324,16 @@ console.log('Project-linked idle timer context survives synchronization without 
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
  const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
- const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['useRecordsController','RecordsControls','RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
- const render=(chip='Alle',sort='default',sortIndex=1)=>{
-  let hook=0;const states=['',chip,sort,sortIndex,true];const exports={};
-  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch','Children','cloneElement','isValidElement',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}),React.Children,React.cloneElement,React.isValidElement);
+ const render=(chip='Alle',sort='default',sortIndex=1,filtersOpen=false)=>{
+  let hook=0;const states=['',chip,sort,sortIndex,true,0,false,filtersOpen,{activeChip:chip,sort,sortIndex}];const exports={};
+  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch','Children','cloneElement','isValidElement','useId','FilterSheet','Button','Field','Select','Input','useRef',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}),React.Children,React.cloneElement,React.isValidElement,React.useId,({open,children})=>open?React.createElement('div',null,children):null,({children})=>React.createElement('button',null,children),({label,children})=>React.createElement('label',null,label,children),'select','input',React.useRef);
   return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
- const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(sorted.includes('Betrag ↑'));assert.ok(sorted.includes('Betrag ↓'));
+ const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(!sorted.includes('<select'),'Sort fields are closed with the filter sheet');const options=render('Alle','desc',2,true);assert.ok(options.includes('Betrag ↑'));assert.ok(options.includes('Betrag ↓'));assert.ok(!sorted.includes('class="chips"'),'Status selection belongs to the filter sheet');
  const empty=render('Bezahlt');assert.ok(empty.includes('data-empty-state="compact"'));assert.ok(!empty.includes('empty-icon'),'Empty lists remain one-line status messages');
  console.log('Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.');
 }
@@ -331,32 +342,30 @@ console.log('Project-linked idle timer context survives synchronization without 
 {
  const pages=await readPageFile('components/app-pages.tsx','utf8');
  const ast=ts.createSourceFile('pages.tsx',pages,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
- const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','RevenueInsight','moneyChf'].includes(node.name?.text));
- const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n')+'\nexport {RevenueInsight};',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','moneyChf'].includes(node.name?.text));
+ const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  let values={},hook=0,calls=0,resolveSave,rejectSave;const scheduled=[];const navigations=[];
- const exports={};const Toast=()=>null;
+ const exports={};const Toast=()=>null,FormError=()=>null;
  const write=()=>{++calls;return new Promise((resolve,reject)=>{resolveSave=resolve;rejectSave=reject});};
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}));
-  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',3:'Bern'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState','FormSection',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError,({children})=>children);
+  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH'},10],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;
-   const getSave=view=>{if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
+   const getSave=view=>{if(view?.props?.onSubmit)return ()=>view.props.onSubmit({preventDefault(){}});if(view?.props?.onClick&&typeof view.props.children==='string'&&/speichern/i.test(view.props.children))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
-   const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
+   const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true,item:{id:"fixture-saved"}});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
    values={...seeds,[toastIndex]:'Server nicht erreichbar.'};hook=0;
-   const errorView=exports[name]({});assert.equal(errorView.props.children.find(child=>child?.type===Toast).props.tone,'danger',name+' must not render an error as success');
+   const errorView=exports[name]({});if(name==='CustomerForm'){const findError=view=>view?.type===FormError?view:React.Children.toArray(view?.props?.children).map(findError).find(Boolean);assert.equal(findError(errorView)?.props.children,'Server nicht erreichbar.','Customer errors remain inside the shared sheet');assert.equal(errorView.props.children.filter(child=>child?.type===Toast).length,0,'No customer error is rendered as a success toast');}else assert.equal(errorView.props.children.find(child=>child?.type===Toast).props.tone,'danger',name+' must not render an error as success');
    values=seeds;hook=0;calls=0;
    const retry=getSave(exports[name]({}));
-   const failed=retry();rejectSave(new Error('offline'));await failed;const again=retry();assert.equal(calls,2,name+' can retry a failed mutation');resolveSave({ok:true});await again;
+   const failed=retry();rejectSave(new Error('offline'));await failed;const again=retry();assert.equal(calls,2,name+' can retry a failed mutation');resolveSave({ok:true,item:{id:"fixture-saved"}});await again;
   }
   assert.ok(navigations.includes('/dashboard'),'Customer created from quick access returns to the dashboard');
   values={};hook=0;
-  const chart=renderToStaticMarkup(React.createElement(exports.RevenueInsight,{invoices:[{issue_date:'2026-01-01',total:50},{issue_date:'2025-01-01',total:100}]}));
-  assert.ok(chart.includes('trend-negative'));assert.ok(chart.includes('Jan–Sep'));assert.ok(chart.includes('Laufender Monat'));assert.ok(!chart.includes('↗'));
-  console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts; revenue uses completed-month comparisons.');
+  console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.');
  }finally{if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow;}
 }
 
@@ -445,3 +454,9 @@ console.log('Project-linked idle timer context survives synchronization without 
  for(const [,hex] of palette){const h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
  console.log('Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.');
 }
+
+const {companyLogoSource}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/image-url.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+for(const source of ['javascript:alert(1)','data:image/svg+xml,<svg onload=alert(1)>','//foreign.example/logo.png','/api/files/../secret/download','blob:https://example.invalid/<script>'])assert.equal(companyLogoSource(source),'');
+assert.equal(companyLogoSource('/api/files/12345678-1234-1234-1234-123456789abc/download'),'/api/files/12345678-1234-1234-1234-123456789abc/download');
+assert.equal(companyLogoSource('blob:https://example.invalid/12345678-1234-1234-1234-123456789abc'),'blob:https://example.invalid/12345678-1234-1234-1234-123456789abc');
+console.log('Company logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.');

@@ -80,6 +80,7 @@ export function Button({
   disabled = false,
   ariaLabel,
   requiresWrite=false,
+  form,
 }: {
   href?: string;
   children?: React.ReactNode;
@@ -91,13 +92,14 @@ export function Button({
   disabled?: boolean;
   ariaLabel?: string;
   requiresWrite?:boolean;
+  form?:string;
 }) {
   const access=usePageAccess();
   disabled=disabled||requiresWrite&&!access.write;
   if(href&&!access.canOpen(href))return null;
   const cls = `button button-${variant} ${className}`.trim();
   const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
-  return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
+  return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} form={form} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
 }
 
 /** Related-record navigation must consume access inside the AppShell provider. */
@@ -131,7 +133,12 @@ export function TimeInput(props:React.ComponentProps<"input">){return <Input inp
 export function CurrencyInput(props:React.ComponentProps<"input">){return <Input inputMode="decimal" {...props}/>}
 export function FormLabel({children,id}:{children:React.ReactNode;id?:string}){return <span id={id}>{children}</span>}
 export function FormError({children,id}:{children?:React.ReactNode;id?:string}){return children?<span className="form-error" id={id} role="alert">{children}</span>:null}
-export function FormActions({children,sheet=false}:{children:React.ReactNode;sheet?:boolean}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"}>{children}</div>}
+/** Logical field groups share spacing and headings across editors and wizard steps. */
+export function FormSection({title,children,hidden=false}:{title?:string;children:React.ReactNode;hidden?:boolean}){
+ return <section className="form-section" hidden={hidden}>{title&&<SectionTitle title={title}/>} {children}</section>;
+}
+
+export function FormActions({children,sheet=false,onClickCapture}:{children:React.ReactNode;sheet?:boolean;onClickCapture?:React.MouseEventHandler<HTMLDivElement>}){return <div className={sheet?"filter-sheet-actions":"mobile-sticky-save"} onClickCapture={onClickCapture}>{children}</div>}
 
 export function Field({ label, children, className = "",allowReadOnlyInput=false,error,hint }: { label: React.ReactNode; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean;error?:string;hint?:string }) {
   const access=usePageAccess();

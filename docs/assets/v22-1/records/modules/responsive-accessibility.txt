@@ -1,0 +1,133 @@
+Checking light 320px
+Checking light 360px
+Checking light 375px
+Checking light 390px
+Checking light 430px
+Checking light 768px
+Checking light 820px
+Checking light 1024px
+Checking light 1280px
+Checking light 1440px
+Checking light 1920px
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /spesen
+Route /spesen
+Route /spesen
+Route /mitarbeiter
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /spesen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Checking dark 320px
+Checking dark 360px
+Checking dark 375px
+Checking dark 390px
+Checking dark 430px
+Checking dark 768px
+Checking dark 820px
+Checking dark 1024px
+Checking dark 1280px
+Checking dark 1440px
+Checking dark 1920px
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /kunden
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /produkte
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /spesen
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /mitarbeiter
+Route /spesen
+Route /spesen
+Route /spesen
+Route /mitarbeiter
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /spesen
+Route /spesen
+Route /spesen
+Route /spesen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+Route /zahlungen
+UX browser checks passed: 110 route/theme/viewport combinations ; interactions: customers,products,employees,expenses. Artifacts: /tmp/binso-v22-module-browser

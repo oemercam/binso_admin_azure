@@ -1,0 +1,4 @@
+Finance and operator permission matrix passed.
+Search respects member record ownership.
+Expense approval/rejection rejects unauthorized roles before either mutation writes.
+Related-record links respect the AppShell context and retain a text fallback.

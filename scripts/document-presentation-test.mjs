@@ -1,3 +1,6 @@
+import os from 'node:os';
+import path from 'node:path';
+import {writeTestOutput} from './test-output.mjs';
 import {financialModuleUrl,moneyModuleUrl,moduleUrl} from "./data-test-modules.mjs";
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -53,18 +56,36 @@ assert.ok(snap.pages[0].includes('Historische Firma AG'));assert.ok(snap.pages[0
 const matrix={logo:withLogo,partial:generated,invalid,long:unusual,snapshot:snap};
 for(const status of ['draft','sent','partial','paid','cancelled'])matrix[status]=await inspectPdf({...data,status,paid_amount:status==='sent'?0:status==='paid'?216.2:100});
 for(const status of ['draft','sent'])matrix['offer-'+status]=await inspectPdf({...data,kind:'offer',status});
-if(process.env.BINSO_PDF_MATRIX_OUTPUT){await fs.mkdir(process.env.BINSO_PDF_MATRIX_OUTPUT,{recursive:true});for(const [name,result] of Object.entries(matrix))await fs.writeFile(process.env.BINSO_PDF_MATRIX_OUTPUT+'/'+name+'.pdf',result.bytes);await fs.writeFile(process.env.BINSO_PDF_MATRIX_OUTPUT+'/matrix.json',JSON.stringify(Object.fromEntries(Object.entries(matrix).map(([name,result])=>[name,{pages:result.pages.length,text:result.pages}])),null,2));}
+if(process.env.BINSO_PDF_MATRIX_OUTPUT){await fs.mkdir(process.env.BINSO_PDF_MATRIX_OUTPUT,{recursive:true});for(const [name,result] of Object.entries(matrix))await writeTestOutput(process.env.BINSO_PDF_MATRIX_OUTPUT+'/'+name+'.pdf',result.bytes);await writeTestOutput(process.env.BINSO_PDF_MATRIX_OUTPUT+'/matrix.json',JSON.stringify(Object.fromEntries(Object.entries(matrix).map(([name,result])=>[name,{pages:result.pages.length,text:result.pages}])),null,2));}
 const quote=await inspectPdf({...data,kind:'offer',number:'AN-TEST',valid_until:'2026-10-31'});assert.ok(quote.pages.join(' ').includes('Individuelle Angebotseinleitung'));assert.ok(!quote.pages.join(' ').includes('Empfangsschein'));
 const multipage=await inspectPdf({...data,subtotal:2800,vat_amount:226.8,total:3026.8,items:Array.from({length:14},(_,i)=>({...data.items[0],description:'Position '+(i+1)+' – Prüfung des vollständigen Dokumentinhalts'}))});
 assert.ok(multipage.pages.length>1);assert.ok(multipage.pages.at(-1).includes('Zahlteil'),'Separate QR page remains reachable through document page count');
-await fs.writeFile(process.env.BINSO_PDF_FIXTURE_OUTPUT??'/tmp/binso-production-pdf-fixture.pdf',multipage.bytes);
-await fs.writeFile('/tmp/binso-production-pdf-fixture.json',JSON.stringify({pages:multipage.pages.length,size:multipage.bytes.length}));
+const paginated=await getDocument({data:new Uint8Array(multipage.bytes),useSystemFonts:true}).promise;
+const positionStyles=[];
+for(let pageNumber=1;pageNumber<=paginated.numPages;pageNumber++){
+ const page=await paginated.getPage(pageNumber),content=await page.getTextContent();
+ for(const item of content.items)if(item.str?.startsWith('Position '))positionStyles.push({font:item.fontName,size:item.transform[0]});
+}
+await paginated.destroy();
+assert.equal(positionStyles.length,14,'Every paginated position remains present');
+for(const style of positionStyles)assert.deepEqual(style,positionStyles[0],'Table headers must not leak bold/small typography into a position after a page break');
+const pdfOutput=await fs.mkdtemp(path.join(os.tmpdir(),'binso-pdf-'));
+await writeTestOutput(process.env.BINSO_PDF_FIXTURE_OUTPUT??path.join(pdfOutput,'fixture.pdf'),multipage.bytes);
+await writeTestOutput(path.join(pdfOutput,'fixture.json'),JSON.stringify({pages:multipage.pages.length,size:multipage.bytes.length}));
+const protectedTarget=path.join(pdfOutput,'existing-target');
+await fs.writeFile(protectedTarget,'original',{mode:0o600,flag:'wx'});
+const outputLink=path.join(pdfOutput,'linked-output');
+if(process.platform==='win32')await fs.link(protectedTarget,outputLink);else await fs.symlink(protectedTarget,outputLink);
+await writeTestOutput(outputLink,'new evidence');
+assert.equal(await fs.readFile(protectedTarget,'utf8'),'original','Evidence writes cannot follow an existing target symlink');
+assert.equal(await fs.readFile(outputLink,'utf8'),'new evidence');
+if(process.platform!=='win32')assert.equal((await fs.stat(outputLink)).mode&0o777,0o600,'Evidence files remain owner-only');
 console.log('Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.');
 
 const billingCompany={name:'Binso GmbH',street:'Weissbadstrasse',building_number:'8b',postal_code:'9050',city:'Appenzell',uid:'CHE-173.401.068'};
 if(process.env.BINSO_BILLING_SAMPLE_DIR){
  await fs.mkdir(process.env.BINSO_BILLING_SAMPLE_DIR,{recursive:true});
- for(const month of ['09','10']){const bytes=await documentPdf({...data,number:'BO-2026-'+month,status:'paid',total:49,subtotal:49,vat_amount:0,paid_amount:49,issue_date:'2026-'+month+'-01',customer:{name:'Musterwerk AG',city:'Bern'},items:[{description:'Binso One Business · Demo-Abonnement',quantity:1,unit:'Monat',unit_price:49,line_total:49,vat_rate:0}]},billingCompany);await fs.writeFile(process.env.BINSO_BILLING_SAMPLE_DIR+'/billing-2026-'+month+'.pdf',bytes);}
+ for(const month of ['09','10']){const bytes=await documentPdf({...data,number:'BO-2026-'+month,status:'paid',total:49,subtotal:49,vat_amount:0,paid_amount:49,issue_date:'2026-'+month+'-01',customer:{name:'Musterwerk AG',city:'Bern'},items:[{description:'Binso One Business · Demo-Abonnement',quantity:1,unit:'Monat',unit_price:49,line_total:49,vat_rate:0}]},billingCompany);await writeTestOutput(process.env.BINSO_BILLING_SAMPLE_DIR+'/billing-2026-'+month+'.pdf',bytes);}
 }
 
 const financial=await import(financialModuleUrl);
@@ -98,7 +119,7 @@ const listExports={};
 Function('require','exports','RecordsView','RecordRow','financialStatus','financialStatusLabels','documentDateLabel','formatCurrency',listCompiled)(require,listExports,()=>null,()=>null,financial.financialStatus,financial.financialStatusLabels,financial.documentDateLabel,financial.formatCurrency);
 const outstandingList=listExports.DocumentList({items:[],kind:'invoice',outstanding:true});
 assert.deepEqual(outstandingList.props.chips,['Alle','Überfällig']);assert.equal(outstandingList.props.emptyLabel('Alle'),'Keine offenen Rechnungen');
-assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt']);
+assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt','Storniert']);
 console.log('Optional outstanding lists retain scoped filters; the full invoice list retains all main filters.');
 
 assert.throws(()=>qr.createQrBillData({...company.raw,name:'Firma 🚀'},{number:'RE-CHAR',total:100}),/Zeichen/);
