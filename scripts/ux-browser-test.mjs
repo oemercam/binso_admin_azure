@@ -77,7 +77,7 @@ const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
-  teamMemberRole='member';supportMessages=[];
+  teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
@@ -101,6 +101,7 @@ try{
     if(p==='/api/time-entries/policy'){policyPosts++;await new Promise(resolve=>setTimeout(resolve,150));if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});policyRequired=JSON.parse(req.postData()).required;return route.fulfill({json:{time_approval_required:policyRequired}});}
     if(p==='/api/settings/notifications'){notificationWrites++;preferencePosts++;await new Promise(resolve=>setTimeout(resolve,100));return route.fulfill({status:(failNotificationWrite||failPreferences)?503:200,json:(failNotificationWrite||failPreferences)?{message:'Fixture notification unavailable'}:{ok:true}});}
     if(p.startsWith('/api/auth/sessions')){sessionDeletes++;return route.fulfill({json:{ok:true,revoked:1}});}
+    if(p==='/api/settings/profile'&&req.method()==='PATCH'){const body=JSON.parse(req.postData());if(body.theme)preferenceTheme=body.theme;return route.fulfill({json:{ok:true,item:{theme:preferenceTheme,language:'de'}}});}
     if(p==='/api/operator/logout')return route.fulfill({status:503,json:{message:'Fixture logout unavailable'}});
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
@@ -114,7 +115,7 @@ try{
    else if(p==='/api/notifications')data={items:[{id:'notification-one',kind:'document',title:'Neue Rechnung',body:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',read_at:null,created_at:'2026-10-09T09:00:00Z'},{id:'notification-two',kind:'announcement',title:'Produktinformation',body:'Testinformation',read_at:'2026-10-08T10:00:00Z',created_at:'2026-10-08T09:00:00Z'}]};
    else if(p==='/api/time-entries/policy')data={time_approval_required:policyRequired};
    else if(p==='/api/time-tracker')data={tracker:null};
-   else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme,language:'de',avatar_url:null},email:'test@example.invalid'};
+   else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme:preferenceTheme,language:'de',avatar_url:null},email:'test@example.invalid'};
    else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
 
    else if(p==='/api/operator/accounts')data={items:[operatorAccount]};
@@ -491,6 +492,7 @@ try{
     const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
     const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
+    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).count(),0,'Search has only the central close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
     const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.y>=bar.y+bar.height-1&&box.x>=0&&box.x+box.width<=width+1,'Panel begins under the fixed header inside viewport');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
@@ -505,10 +507,26 @@ try{
     assert.equal(await page.evaluate(()=>scrollY),scroll,'Closing panel retains document scroll position');
     await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();await assertAccountAvatarSpacing(account);
     assert.equal(await account.locator('.person-avatar').innerText(),'TP');assert.equal(await account.getByRole('link',{name:'Abonnement',exact:true}).count(),0,'Account panel does not duplicate company billing');
+    const accountRows=await account.locator('.action-row').evaluateAll(rows=>rows.map(row=>{const css=getComputedStyle(row),box=row.getBoundingClientRect(),icon=row.firstElementChild.getBoundingClientRect(),text=row.children[1].getBoundingClientRect();return {height:box.height,font:css.fontSize,weight:css.fontWeight,display:css.display,grid:css.gridTemplateColumns,iconLeft:icon.left,textLeft:text.left,iconWidth:icon.width}}));
+    assert.ok(accountRows.length>=6);for(const row of accountRows)assert.deepEqual(row,accountRows[0],'Personal, company, create-account and logout rows share the same geometry and typography');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
     await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
     await notifications.getByRole('button',{name:'Ungelesen',exact:true}).click();assert.equal(await notifications.getByText('Produktinformation',{exact:true}).count(),0);
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-notifications.png`)});await page.keyboard.press('Escape');
+   }
+   for(const width of [320,390,768,1440]){
+    await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
+    const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
+    const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
+    assert.equal(await page.getByLabel('Sprache',{exact:true}).locator('option').count(),1,'Offer only the translated language');
+    await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
+    await choices.getByRole('radio',{name:/^Dunkel/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark');
+    await choices.getByRole('radio',{name:/^Dunkel/}).press('ArrowDown');await page.waitForFunction(()=>document.documentElement.dataset.themeMode==='system');
+    await page.emulateMedia({colorScheme:'light'});await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
+    await page.emulateMedia({colorScheme:'dark'});await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark');
+    await page.waitForLoadState('networkidle');await page.reload();await choices.waitFor();await page.waitForLoadState('networkidle');assert.equal(await choices.getByRole('radio',{name:/^System/}).getAttribute('aria-checked'),'true','System selection survives reload');
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-appearance-rows.png`)});
+    await choices.getByRole('radio',{name:theme==='light'?/^Hell/:/^Dunkel/}).click();await page.waitForLoadState('networkidle');
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
    await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();

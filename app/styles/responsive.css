@@ -839,8 +839,6 @@
     column-gap:32px;
     border-top:0;
   }
-  .settings-list>a{border-top:1px solid var(--color-line)}
-  .settings-list>a:nth-last-child(-n+2){border-bottom:1px solid var(--color-line)}
 
 
 /* Binso One Desktop UI Standard V1 */
@@ -1785,7 +1783,6 @@
   .notification-center,
   .preference-table,
   .security-card{max-width:none}
-  .settings-list>a{min-height:64px}
   .subscription-panel{display:block}
   .subscription-panel .button{width:100%;margin-top:14px}
   .settings-profile,
@@ -1799,9 +1796,6 @@
   .choice-list button{min-height:64px}
   .choice-list button:first-child{border-top:0}
   .settings-note{font-size:11px;line-height:1.5}
-  .appearance-grid{grid-template-columns:1fr;gap:10px}
-  .appearance-card{padding:10px;border-radius:12px}
-  .theme-preview{height:96px}
   .security-card{margin:0;padding:18px 0;border-left:0;border-right:0;border-radius:0}
   .security-card+.security-card{border-top:1px solid var(--color-line)}
   .security-card .section-title{margin-bottom:var(--heading-content-gap)}
@@ -1868,7 +1862,7 @@
   .sheet-menu b{font-size:11.5px}
   .sheet-menu small{font-size:10px}
   .sheet-secondary{margin-top:8px;padding-top:8px}
-  .sheet-secondary :is(button,a){min-height:44px;font-size:11px}
+  .sheet-secondary :is(button,a):not(.action-row){min-height:44px;font-size:11px}
   .filter-sheet-actions{
     margin-left:calc(-1 * var(--mobile-page-x));
     margin-right:calc(-1 * var(--mobile-page-x));

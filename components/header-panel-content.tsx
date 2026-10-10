@@ -1,29 +1,28 @@
 "use client";
 
-import Link from "next/link";
 import type {SearchItem} from "@/lib/search";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
+import {ActionRow} from "./binso-ux";
 import {Button, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
 
 export type PanelNotification={id:string;kind:string;title:string;body:string;href?:string|null;read_at?:string|null;created_at:string};
 
 function PanelLink({href,icon,title,onClose}:{href:string;icon:string;title:string;onClose:()=>void}){
- const access=usePageAccess();if(!access.canOpen(href))return null;
- return <Link prefetch={false} href={href} className="action-row" onClick={onClose}><Icon name={icon} size={18}/><span>{title}</span><Icon name="arrow" size={16}/></Link>;
+ return <ActionRow href={href} icon={icon} title={title} onClick={onClose}/>;
 }
 
 export function SearchPanel({query,onQuery,items,loading,error,onClose}:{query:string;onQuery:(query:string)=>void;items:SearchItem[];loading:boolean;error:string|null;onClose:()=>void}){
  const access=usePageAccess();const visible=items.filter(item=>access.canOpen(item.href));
  const groups=Array.from(new Set(visible.map(item=>item.type)));
  return <div className="global-search">
-  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…"/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div><button type="button" className="text-action" onClick={onClose}>Abbrechen</button></div>
+  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…"/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div></div>
   <div className="search-results">
    {!query.trim()&&<><h3>Schnellzugriff</h3><div>{[["/kunden","users","Kunden öffnen"],["/rechnungen","receipt","Rechnungen öffnen"],["/angebote","file","Angebote öffnen"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div></>}
    {loading&&<LoadingState className="technical-hint">Suche läuft …</LoadingState>}
    {query.trim().length>=2&&!loading&&error&&<ErrorState className="technical-hint">{error}</ErrorState>}
    {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState compact title="Keine Treffer gefunden" text=""/>}
-   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><Link key={item.href} href={item.href} onClick={onClose}><span className="activity-icon"><Icon name={item.icon}/></span><div><b>{item.title}</b><span>{item.meta}</span></div><Icon name="arrow" size={16}/></Link>)}</section>)}
+   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={onClose}/>)}</section>)}
   </div>
  </div>;
 }
@@ -35,16 +34,16 @@ export function NotificationPanel({items,loading,error,filter,onFilter,onRead,on
   {loading&&<LoadingState>Wird geladen …</LoadingState>}
   {error&&<ErrorState onRetry={onRetry} retryLabel="Erneut laden">{error}</ErrorState>}
   {!loading&&!error&&!visible.length&&<EmptyState compact title={filter==="unread"?"Keine ungelesenen Benachrichtigungen":"Keine Benachrichtigungen"} text=""/>}
-  {!error&&visible.map(item=><Link prefetch={false} href={item.href||"/benachrichtigungen"} key={item.id} onClick={()=>{onRead(item.id);onClose()}}><span className="activity-icon"><Icon name={item.kind==="support"?"support":item.kind==="payment"?"wallet":"bell"}/></span><div><b>{item.title}</b><p>{item.body}</p><small>{new Date(item.created_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</small></div>{!item.read_at&&<i className="unread-dot"/>}</Link>)}
-  <Link className="notification-settings-link" href="/benachrichtigungen" onClick={onClose}><span>Alle Benachrichtigungen</span><Icon name="arrow" size={15}/></Link>
+  {!error&&visible.map(item=><ActionRow href={item.href||"/benachrichtigungen"} key={item.id} icon={item.kind==="support"?"support":item.kind==="payment"?"wallet":"bell"} title={item.title} description={item.body} metadata={new Date(item.created_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})} endAdornment={!item.read_at?<i className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>{onRead(item.id);onClose()}}/>)}
+  <ActionRow href="/benachrichtigungen" title="Alle Benachrichtigungen" icon="bell" onClick={onClose}/>
+
  </div>;
 }
 
 export function AccountPanel({profile,demo,logoutBusy,onLogout,onClose}:{profile:{name:string;identity:string;avatar:string};demo:boolean;logoutBusy:boolean;onLogout:()=>void;onClose:()=>void}){
  return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b>{profile.name||"Persönliches Konto"}</b><small>Persönliches Konto</small></div></div>
   <h3>Persönlich</h3><div>{[["/einstellungen/konto","user","Mein Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","moon","Darstellung & Sprache"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div>
-  <div className="sheet-secondary"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/></div>
-  {demo&&<div className="sheet-secondary"><PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/></div>}
-  <div className="sheet-secondary"><button type="button" disabled={logoutBusy} onClick={onLogout}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button></div>
+  <h3>Unternehmen</h3><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/>{demo&&<PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/>}</div>
+  <h3>Sitzung</h3><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div>
  </div>;
 }

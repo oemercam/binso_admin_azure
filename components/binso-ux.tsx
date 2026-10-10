@@ -10,15 +10,23 @@ import {useBrowserBackGuard} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 
 /** Action rows have one DOM shape; navigation and destructive intent are explicit. */
-export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false}: {
- title:string;icon:string;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;
+export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
+ title:string;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
 }) {
  const access=usePageAccess();
  if(href&&!access.canOpen(href))return null;
  const blocked=disabled||(requiresWrite&&!access.write);
  const className=`action-row${danger?" action-row-danger":""}`;
- const body=<><Icon name={icon} size={18}/><span>{title}</span>{!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>}</>;
- return href&&!blocked?<Link href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick}>{body}</button>;
+ const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span>{title}</span>:title}{description&&<small className="action-row-description">{description}</small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
+ return href&&!blocked?<Link prefetch={false} href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
+}
+
+/** Compact single selection extends the action-row contract, including keyboard navigation. */
+export function SelectionRows<T extends string>({label,value,options,onChange}:{label:string;value:T;options:readonly {value:T;title:string;description:string;icon:ReactNode}[];onChange:(value:T)=>void}){
+ return <div className="action-list selection-rows" role="radiogroup" aria-label={label}>{options.map((option,index)=><ActionRow key={option.value} title={option.title} description={option.description} icon={option.icon} role="radio" selected={value===option.value} tabIndex={value===option.value?0:-1} onClick={()=>onChange(option.value)} onKeyDown={event=>{
+  const next=event.key==='Home'?0:event.key==='End'?options.length-1:['ArrowDown','ArrowRight'].includes(event.key)?(index+1)%options.length:['ArrowUp','ArrowLeft'].includes(event.key)?(index+options.length-1)%options.length:null;
+  if(next===null)return;event.preventDefault();onChange(options[next].value);(event.currentTarget.parentElement?.children[next] as HTMLElement|undefined)?.focus();
+ }}/>)}</div>;
 }
 
 /** Shared visual contract for Binso One. Existing page navigation is intentionally untouched. */

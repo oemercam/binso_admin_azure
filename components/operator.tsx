@@ -1,6 +1,6 @@
 "use client";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {FormSheet, ListSearch} from "./binso-ux";
+import {ActionRow, FormSheet, ListSearch} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
@@ -141,7 +141,7 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
       </header>
       <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)}/></div>
-      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>One Admin</b><small>Administration</small></div></div><div className="sheet-menu"><Link href="/dashboard" onClick={()=>setAccountOpen(false)}><Icon name="home"/><span><b>Zum Kundenportal</b><small>Binso One öffnen</small></span><Icon name="arrow" size={15}/></Link></div><div className="sheet-secondary"><button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>Abmelden</span></button></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
+      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>One Admin</b><small>Administration</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
