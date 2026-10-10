@@ -36,7 +36,9 @@ globalThis.document={addEventListener:(name,fn)=>listeners[name]=fn,querySelecto
 globalThis.BroadcastChannel=class {set onmessage(fn){received=fn}postMessage(value){messages.push(value)}};
 try{
  const draftUrl=moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8'));
- const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)));
+ const listStateUrl=moduleUrl(await fs.readFile('lib/client/list-state.ts','utf8'));
+ const listState=await import(listStateUrl);
+ const eventsUrl=moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)).replace("'./list-state'",JSON.stringify(listStateUrl)));
  const events=await import(eventsUrl);
  const cacheUrl=moduleUrl((await fs.readFile('lib/client/session-cache.ts','utf8')).replace('"./data-events"',JSON.stringify(eventsUrl)));
  const backend=await import(moduleUrl((await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./data-events"',JSON.stringify(eventsUrl)).replace('"./session-cache"',JSON.stringify(cacheUrl))));
@@ -80,7 +82,7 @@ try{
  globalThis.fetch=()=>{reads++;return new Promise(resolve=>{resolveRead=resolve})};
  const a=backend.apiGet('/api/documents'),b=backend.apiGet('/api/documents');
  assert.equal(reads,1);resolveRead(new Response(JSON.stringify({items:[]})));await Promise.all([a,b]);
- const stale=backend.apiGet('/api/documents');events.resetClientData();resolveRead(new Response(JSON.stringify({items:[{id:'old-tenant'}]})));
+ const stale=backend.apiGet('/api/documents');listState.listStateStore.set('private-search','customer@example.invalid');events.resetClientData();assert.equal(listState.listStateStore.size,0,'Session changes purge in-memory search context');resolveRead(new Response(JSON.stringify({items:[{id:'old-tenant'}]})));
  await assert.rejects(stale,error=>error.code==='session_changed','Old tenant response rejected after logout');
  const cachedSession=await import(cacheUrl);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:true,tenant:{id:'one',role:'owner'}}));await cachedSession.readClientSession();

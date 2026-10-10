@@ -1,5 +1,6 @@
 import {readPageFile} from "./page-source.mjs";
 import fs from 'node:fs/promises';
+import ts from 'typescript';
 import assert from 'node:assert/strict';
 const deploy=await readPageFile('.github/workflows/deploy-azure.yml','utf8');
 assert.ok(deploy.indexOf('pnpm db:migrate')<deploy.indexOf('pnpm db:check'),'Migrate before checking latest schema');
@@ -34,7 +35,12 @@ assert.ok(operatorSource.includes('demoPlan("start")')&&operatorSource.includes(
 console.log('Release gates passed.');
 
 const email=await readPageFile('lib/server/email.ts','utf8');
-assert.ok(email.includes('graph.microsoft.com')&&email.includes('sendMail'),'Microsoft Graph must remain the only production mail path');
+const mailAst=ts.createSourceFile('email.ts',email,ts.ScriptTarget.Latest,true);
+const mailEndpoints=[];
+const collectMailEndpoints=node=>{if(ts.isCallExpression(node)&&node.expression.getText(mailAst)==='fetch'){const target=node.arguments[0];assert.ok(ts.isTemplateExpression(target)||ts.isStringLiteralLike(target),'Mail endpoint must have a fixed scheme and host');mailEndpoints.push(new URL(ts.isTemplateExpression(target)?target.head.text:target.text));}ts.forEachChild(node,collectMailEndpoints)};
+collectMailEndpoints(mailAst);
+assert.deepEqual(mailEndpoints.map(url=>[url.protocol,url.hostname]),[['https:','login.microsoftonline.com'],['https:','graph.microsoft.com']],'Mail must use exact HTTPS Microsoft token and Graph hosts');
+assert.equal(mailEndpoints[1].pathname,'/v1.0/users/','Graph sendMail endpoint retains its fixed API path');
 const envExample=await readPageFile('.env.example','utf8');
 for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GRAPH_SENDER_USER_ID']){
   assert.ok(envExample.includes(name+'='),'.env.example must document '+name);

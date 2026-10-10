@@ -1,3 +1,4 @@
+import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -29,7 +30,7 @@ try{
   await sheet.locator('input[name="password"]').fill('a sufficiently long test password');await sheet.getByRole('button',{name:'Weiter',exact:true}).click();
   const geometry=await sheet.evaluate(el=>{const footer=el.querySelector('.mobile-sticky-save').getBoundingClientRect(),box=el.getBoundingClientRect();return {overflow:document.documentElement.scrollWidth>innerWidth+1,footerBottom:footer.bottom,footerTop:footer.top,height:innerHeight,boxBottom:box.bottom,inputs:Array.from(el.querySelectorAll('input')).map(input=>({name:input.name,type:input.type,value:input.type==='password'?'[omitted]':input.value}))}});
   assert.equal(geometry.overflow,false);assert.ok(geometry.footerBottom<=geometry.height+1&&geometry.footerTop>=0,'The wizard footer stays reachable in short viewports');
-  if(width===320||width===390||width===1440){await page.screenshot({path:path.join(output,`${theme}-${width}-registration.png`),animations:'disabled'});await fs.writeFile(path.join(output,`${theme}-${width}-geometry.json`),JSON.stringify(geometry,null,2));}
+  if(width===320||width===390||width===1440){await page.screenshot({path:path.join(output,`${theme}-${width}-registration.png`),animations:'disabled'});await writeTestOutput(path.join(output,`${theme}-${width}-geometry.json`),JSON.stringify(geometry,null,2));}
   if(process.env.BINSO_AXE_MODULE&&[375,1440].includes(width)){await page.addScriptTag({path:process.env.BINSO_AXE_MODULE});const issues=await page.evaluate(async()=>{const result=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return result.violations.filter(issue=>['serious','critical'].includes(issue.impact)).map(issue=>({id:issue.id,nodes:issue.nodes.map(node=>node.target)}))});assert.deepEqual(issues,[]);}
   evidence.push({theme,width,phase:'review',observed:'passed'});await context.close();
  }
@@ -61,5 +62,5 @@ try{
   await page.screenshot({path:path.join(output,`${locale}-verification.png`),animations:'disabled'});
   evidence.push({locale,phase:'guided-validation-back-legal-network-create-resend',observed:'passed',provider:'synthetic UI fixture, no real mail'});await context.close();
  }
- await fs.writeFile(path.join(output,'results.json'),JSON.stringify(evidence,null,2));console.log(`Registration browser passed: ${evidence.length} responsive/theme and five-language workflow cases. Synthetic POST fixtures; real backend integration is separate. Evidence: ${output}`);
+ await writeTestOutput(path.join(output,'results.json'),JSON.stringify(evidence,null,2));console.log(`Registration browser passed: ${evidence.length} responsive/theme and five-language workflow cases. Synthetic POST fixtures; real backend integration is separate. Evidence: ${output}`);
 }finally{await browser?.close();server.kill();}

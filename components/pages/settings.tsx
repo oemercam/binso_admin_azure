@@ -1,4 +1,5 @@
 "use client";
+import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
@@ -158,7 +159,7 @@ export function CompanySettingsPage() {
 
   return <AppShell title="Firma" subtitle="Unternehmensdaten für Dokumente und Kommunikation." active="einstellungen" editing={false} unsavedChanges={false} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}>Bearbeiten</Button>:undefined}>
     {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
-      <section className="surface company-logo-card">{(logoPreview||logoUrl)?<img src={logoPreview||logoUrl} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div></section>
+      <section className="surface company-logo-card">{companyLogoSource(logoPreview||logoUrl)?<img src={companyLogoSource(logoPreview||logoUrl)} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div></section>
       {editing?<FormSheet open={editing} label={onboarding?"Unternehmen einrichten":"Firmendaten bearbeiten"} description={onboarding?"Weitere Unternehmensdaten kannst du jetzt oder später ergänzen.":undefined} onClose={()=>setEditing(false)} busy={saving} dirty={currentValues!==baseline||pendingLogo!==null}><section className="settings-form">
         <Field label="Firmenlogo"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field><div className="form-grid two">
           <Field label="Firmenname *"><Input required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>

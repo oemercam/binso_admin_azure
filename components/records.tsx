@@ -1,4 +1,5 @@
 "use client";
+import {listStateStore} from "@/lib/client/list-state";
 import {compareRecordValues} from "@/lib/record-sort";
 import {matchesRecordChip} from "@/lib/list-filter";
 
@@ -52,7 +53,7 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
   useEffect(()=>{
     if(!enabled)return;
     const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
-    try{const saved=JSON.parse(window.sessionStorage.getItem(key)??"null");if(saved&&Number.isFinite(saved.y)&&saved.y>=0&&typeof saved.context==="string")scrollSnapshot.current=saved;}catch{}
+    try{const saved=JSON.parse(listStateStore.get(key)??"null");if(saved&&Number.isFinite(saved.y)&&saved.y>=0&&typeof saved.context==="string")scrollSnapshot.current=saved;}catch{}
   },[enabled,placeholder]);
   useEffect(()=>{
     if(!enabled||!restored)return;
@@ -60,13 +61,13 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
     const remember=(event:MouseEvent)=>{
       const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>(".mobile-record-list a,.desktop-record-row[href]"):null;
       if(!link||link.closest("[data-records-owner]")?.getAttribute("data-records-owner")!==placeholder||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.target==="_blank")return;
-      try{const target=new URL(link.href);if(target.origin===window.location.origin&&target.pathname!==window.location.pathname)window.sessionStorage.setItem(key,JSON.stringify({y:window.scrollY,context:listContext}));}catch{}
+      try{const target=new URL(link.href);if(target.origin===window.location.origin&&target.pathname!==window.location.pathname)listStateStore.set(key,JSON.stringify({y:window.scrollY,context:listContext}));}catch{}
     };
     document.addEventListener("click",remember,true);
     return()=>document.removeEventListener("click",remember,true);
   },[enabled,restored,placeholder,listContext]);
-  useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);try{const saved=JSON.parse(window.sessionStorage.getItem("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle");setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>setRestored(true));},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
-  useEffect(()=>{if(!enabled||!restored)return;try{window.sessionStorage.setItem("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
+  useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);try{const saved=JSON.parse(listStateStore.get("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle");setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>setRestored(true));},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
+  useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
 
 
   const [searchOpen,setSearchOpen]=useState(false),[filterOpen,setFilterOpen]=useState(false);

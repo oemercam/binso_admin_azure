@@ -454,3 +454,9 @@ console.log('Project-linked idle timer context survives synchronization without 
  for(const [,hex] of palette){const h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
  console.log('Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.');
 }
+
+const {companyLogoSource}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/image-url.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+for(const source of ['javascript:alert(1)','data:image/svg+xml,<svg onload=alert(1)>','//foreign.example/logo.png','/api/files/../secret/download','blob:https://example.invalid/<script>'])assert.equal(companyLogoSource(source),'');
+assert.equal(companyLogoSource('/api/files/12345678-1234-1234-1234-123456789abc/download'),'/api/files/12345678-1234-1234-1234-123456789abc/download');
+assert.equal(companyLogoSource('blob:https://example.invalid/12345678-1234-1234-1234-123456789abc'),'blob:https://example.invalid/12345678-1234-1234-1234-123456789abc');
+console.log('Company logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.');
