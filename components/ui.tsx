@@ -80,6 +80,7 @@ export function Button({
   disabled = false,
   ariaLabel,
   requiresWrite=false,
+  form,
 }: {
   href?: string;
   children?: React.ReactNode;
@@ -91,13 +92,14 @@ export function Button({
   disabled?: boolean;
   ariaLabel?: string;
   requiresWrite?:boolean;
+  form?:string;
 }) {
   const access=usePageAccess();
   disabled=disabled||requiresWrite&&!access.write;
   if(href&&!access.canOpen(href))return null;
   const cls = `button button-${variant} ${className}`.trim();
   const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
-  return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
+  return href && !disabled ? <Link className={cls} href={href} aria-label={ariaLabel}>{body}</Link> : <button className={cls} onClick={onClick} type={type} form={form} disabled={disabled} aria-label={ariaLabel}>{body}</button>;
 }
 
 /** Related-record navigation must consume access inside the AppShell provider. */

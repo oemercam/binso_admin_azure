@@ -1,14 +1,17 @@
 # Binso One – Authentifizierungs- und Sicherheitsablauf
 
-Stand: 5. Oktober 2026
+Stand: 10. Oktober 2026 (V22.2, noch keine produktive Gesamtabnahme)
 
 ## Registrierung
-1. Die Firma erfasst Firmenname, E-Mail-Adresse, Passwort, Tarif und die erforderlichen rechtlichen Zustimmungen.
+1. Alle Registrierungs-CTAs führen zu `/registrieren`, das dieselbe zentrale `RegistrationSheet` mit `FormSheet`, `FormWizard` und `Field` verwendet. Firmenname, Zugang und Vertragsprüfung sind drei Schritte; Tarif und Intervall stammen aus dem serverseitigen Registrierungskontext. Ohne Tarif wird ausdrücklich eine kostenlose Testphase angeboten, kein kostenpflichtiger Abschluss.
 2. Vor der E-Mail-Bestätigung wird keine produktive Benutzersitzung freigegeben.
-3. Binso One versendet über Microsoft Graph einen sechsstelligen E-Mail-Bestätigungscode, der 10 Minuten gültig ist.
+3. Binso One verwendet Microsoft Graph für einen Bestätigungslink (24 Stunden) und einen sechsstelligen E-Mail-Bestätigungscode (10 Minuten). Der Link wird als SHA-256-Hash in der bestehenden Tabelle `auth_tokens` gespeichert. Beide Methoden laufen ausschliesslich über `/api/auth/verify-email`. Ein nicht bestätigter Versand wird nicht als Erfolg angezeigt.
 4. Der Code ist rate-limitiert, wird nur als keyed Hash gespeichert und nach fünf Fehlversuchen oder erfolgreicher Verwendung ungültig.
 5. Nach erfolgreicher Bestätigung wird die E-Mail-Adresse als verifiziert markiert und die 14-tägige Testphase startet.
-6. Owner-Konten werden vor dem Zugriff auf geschützte Produkt-APIs zur Authenticator-Einrichtung geführt.
+6. Owner-Konten werden vor dem Zugriff auf geschützte Produkt-APIs zur Authenticator-Einrichtung geführt. Danach erfolgt die Übergabe an die bestehende Firmeneinrichtung. Der explizite Abschluss schreibt transaktional den vorhandenen `onboarding_completed`-Meilenstein; später führt der Einstieg zum Dashboard.
+7. Ein HttpOnly-/SameSite-Receipt erlaubt die Wiederaufnahme der angelegten, unbestätigten Registrierung im selben Browser. Es erzeugt keine authentifizierte Sitzung und enthält kein Passwort. Gerätewechsel erfolgt über den E-Mail-Link oder die bestehende Anmeldung.
+8. Link-Verbrauch und Bestätigung werden gemeinsam gesperrt und transaktional geschrieben. Erneute Link-Verwendung bestätigt den bereits verarbeiteten Zustand, erzeugt aber keine neue Sitzung. Der Trial wird nicht verlängert. AGB-/DPA-Version, Datenschutzhinweis, Intervall und Zeitnachweis liegen im bestehenden Audit-Event; die AGB-Version bleibt zusätzlich im Benutzerprofil.
+9. Die deutsche, französische, italienische, englische und türkische Registrierung sowie ihre Mailtexte nutzen den zentralen Katalog `lib/i18n.ts`. Die bisherige `mail-i18n`-Schnittstelle re-exportiert diesen Katalog.
 
 ## Anmeldung
 1. E-Mail-Adresse und Passwort sind immer erforderlich.

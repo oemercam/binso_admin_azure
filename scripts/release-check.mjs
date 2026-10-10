@@ -19,7 +19,9 @@ for(const legacy of ['CHF 19','CHF 49','CHF 89']){
   assert.ok(!home.includes(legacy)&&!pricing.includes(legacy),'Public pages must not contain legacy price '+legacy);
 }
 assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.map'),'Pricing page must use canonical trial and plan configuration');
-assert.ok(register.includes('billingCycle')&&register.includes('selectedPlan'),'Registration must preserve selected plan and billing cycle');
+assert.ok(register.includes('RegistrationSheet'),'Registration must mount the shared sheet entry');
+const registrationSheet=await fs.readFile('components/registration/registration-sheet.tsx','utf8');
+assert.ok(registrationSheet.includes("search.get(\"plan\")")&&registrationSheet.includes("search.get(\"billing\")")&&registrationSheet.includes('billingCycle:context.billingCycle'),'Registration must preserve selected plan and billing cycle through the server context');
 assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue a fresh login code after first email verification');
 assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
 assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');

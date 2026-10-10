@@ -1,0 +1,1122 @@
+[
+  {
+    "id": "V22.2-REQ-01",
+    "requirement": "Absolute Vorgaben und geschützte Navigation",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 1",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-02",
+    "requirement": "Ist-Analyse aller Registrierung-/Auth-/Onboarding-Pfade",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 2",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-03",
+    "requirement": "Eindeutige zentrale Ownership",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 3",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-04",
+    "requirement": "Tarif-/Trial-/Vertragskontext vom Server",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 4",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-05",
+    "requirement": "Geführtes responsives Bottom-Sheet als einziger Registrierungspfad",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 5",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-06",
+    "requirement": "Drei fachliche Registrierungsschritte",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 6",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-07",
+    "requirement": "Echte serverseitige E-Mail-Bestätigung",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 7",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-08",
+    "requirement": "Bestehendes Zustandsmodell konsolidieren",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 8",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-09",
+    "requirement": "Dirty-State und sichere Wiederaufnahme",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 9",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-10",
+    "requirement": "Identität, Mandant, Dubletten und Wiederholung unterscheiden",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 10",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-11",
+    "requirement": "Vertragsannahme und juristische Freigabe",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 11",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-REQ-12",
+    "requirement": "Keyboard, Safe Areas und echte Gerätematrix",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 12",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-13",
+    "requirement": "Zentraler Formularstandard",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 13",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-14",
+    "requirement": "Sicherer MFA-/Onboarding-/Mandanten-Handoff",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 14",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-15",
+    "requirement": "Graph-Versand und tatsächliche Zustellung",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 15",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-REQ-16",
+    "requirement": "Fünf vollständige Sprachfassungen",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 16",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-17",
+    "requirement": "Legacy entfernen und Links erhalten",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 17",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-18",
+    "requirement": "Nachgewiesene fachliche und visuelle Tests",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 18",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-REQ-19",
+    "requirement": "Kontrollierter Merge, Actions und Live-Deployment",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 19",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-REQ-20",
+    "requirement": "Vollständiger belegter Abschlussbericht",
+    "routes": [
+      "/registrieren",
+      "/email-bestaetigen",
+      "/api/auth/register",
+      "/api/auth/verify-email",
+      "/einstellungen/firma"
+    ],
+    "implementation": [
+      "components/registration/registration-sheet.tsx",
+      "lib/server/registration.ts"
+    ],
+    "fileCodeLocation": "Siehe report.md und aktuelle Quellinventur; keine frühere Abnahme übernommen",
+    "method": "Statische Pfadprüfung, reale Handler mit isolierter Datenbank, Browserfixture und externe Abnahme nach Bereich",
+    "testCase": "V22.2 Bereich 20",
+    "expected": "Gesamte Anforderung erfüllt und belegt",
+    "observed": "Implementiert beziehungsweise weiter in Prüfung; Gesamtbeweis noch nicht vollständig",
+    "evidence": "docs/architecture/v22-2/report.md",
+    "status": "Nicht bestanden"
+  },
+  {
+    "id": "V22.2-TEST-01",
+    "requirement": "Hero-Einstieg",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 1",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Hero-Einstieg",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-02",
+    "requirement": "Tarif-Einstieg",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 2",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Tarif-Einstieg",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-03",
+    "requirement": "Direkter Link",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 3",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Direkter Link",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-04",
+    "requirement": "Firmenname",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 4",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Firmenname",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-05",
+    "requirement": "E-Mail",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 5",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "E-Mail",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-06",
+    "requirement": "Passwort/Autofill",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 6",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Passwort/Autofill",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Nicht ausgeführt beziehungsweise Browserlauf noch nicht abgeschlossen",
+    "evidence": "Noch kein bestandener Nachweis",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-TEST-07",
+    "requirement": "Schritte zurück",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 7",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Schritte zurück",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-08",
+    "requirement": "Eingaben erhalten",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 8",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Eingaben erhalten",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-09",
+    "requirement": "Pflichtfelder",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 9",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Pflichtfelder",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-10",
+    "requirement": "Ungültige E-Mail",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 10",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Ungültige E-Mail",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-11",
+    "requirement": "Schwaches Passwort",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 11",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Schwaches Passwort",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-12",
+    "requirement": "Bestehende E-Mail",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 12",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Bestehende E-Mail",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-13",
+    "requirement": "Vertragsdokument öffnen/zurück",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 13",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Vertragsdokument öffnen/zurück",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-14",
+    "requirement": "Vertragsannahme fehlt",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 14",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Vertragsannahme fehlt",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-15",
+    "requirement": "Konto erstellen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 15",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Konto erstellen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-16",
+    "requirement": "Mehrfach-Taps",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 16",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Mehrfach-Taps",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-17",
+    "requirement": "Netzwerkunterbruch",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 17",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Netzwerkunterbruch",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-18",
+    "requirement": "E-Mail bestätigen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 18",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "E-Mail bestätigen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-19",
+    "requirement": "Link abgelaufen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 19",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Link abgelaufen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-20",
+    "requirement": "Link erneut verwenden",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 20",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Link erneut verwenden",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-21",
+    "requirement": "Anderer Browser",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 21",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Anderer Browser",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-22",
+    "requirement": "Registrierung fortsetzen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 22",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Registrierung fortsetzen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-23",
+    "requirement": "Ohne Änderung schliessen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 23",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Ohne Änderung schliessen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-24",
+    "requirement": "Mit Änderung schliessen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 24",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Mit Änderung schliessen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-25",
+    "requirement": "Browser-Zurück",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 25",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Browser-Zurück",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-26",
+    "requirement": "Bestehender Login",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 26",
+    "method": "Bestehender Login-Handler gegen isolierte PGlite-Datenbank mit tatsächlicher OTP- und Sitzungslogik",
+    "testCase": "Bestehender Login",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Providerfehler erzeugt 503 ohne Sitzung; erfolgreicher OTP-Login erstellt Sitzung und verlangt weiterhin MFA-Einrichtung. Login bleibt eigenständige Route.",
+    "evidence": "docs/assets/v22-2/registration-integration.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-27",
+    "requirement": "Onboarding-Handoff",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 27",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Onboarding-Handoff",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-28",
+    "requirement": "Mandantenanlage",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 28",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Mandantenanlage",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-29",
+    "requirement": "Tarifzuordnung",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 29",
+    "method": "Reale Handler/isolierte Datenbank",
+    "testCase": "Tarifzuordnung",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Im isolierten Backend nachgewiesen; keine Graph-Zustellung behauptet",
+    "evidence": "/tmp/binso-registration-test-company.log",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-30",
+    "requirement": "Responsive",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 30",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Responsive",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-31",
+    "requirement": "iOS-Tastatur",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 31",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "iOS-Tastatur",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Nicht ausgeführt beziehungsweise Browserlauf noch nicht abgeschlossen",
+    "evidence": "Noch kein bestandener Nachweis",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-TEST-32",
+    "requirement": "PWA-Safe-Area",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 32",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "PWA-Safe-Area",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Nicht ausgeführt beziehungsweise Browserlauf noch nicht abgeschlossen",
+    "evidence": "Noch kein bestandener Nachweis",
+    "status": "Blockiert"
+  },
+  {
+    "id": "V22.2-TEST-33",
+    "requirement": "Fünf Sprachen",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 33",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Fünf Sprachen",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "Gezielter Chromium-Browserlauf mit synthetischen POST-Antworten; keine echte Zustellung oder physische Geräteeingabe behauptet",
+    "evidence": "docs/assets/v22-2/results.json; docs/assets/v22-2/registration-browser.txt",
+    "status": "Bestanden"
+  },
+  {
+    "id": "V22.2-TEST-34",
+    "requirement": "Kunden-App/Admin-Regression",
+    "routes": [
+      "/registrieren",
+      "/api/auth/register",
+      "/api/auth/verify-email"
+    ],
+    "implementation": [
+      "scripts/registration-test.mjs",
+      "scripts/registration-browser-test.mjs"
+    ],
+    "fileCodeLocation": "scripts/registration-test.mjs; scripts/registration-browser-test.mjs – Test 34",
+    "method": "Browserfixture/physische Prüfung/externer Nachweis",
+    "testCase": "Kunden-App/Admin-Regression",
+    "expected": "Korrekter Zustand, keine doppelte Anlage, keine unberechtigte Sitzung und erreichbare Bedienelemente",
+    "observed": "16 Kombinationen und Finance/Settings-Interaktionen mit Axe bestanden; breiter aktueller Gesamt-/Admin-Lauf noch ausstehend",
+    "evidence": "docs/assets/v22-2/statistics-settings-regression.txt",
+    "status": "Nicht bestanden"
+  }
+]

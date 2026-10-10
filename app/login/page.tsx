@@ -19,8 +19,9 @@ export default function Login(){
 
   const finish=(payload:Record<string,unknown>)=>{
     clearDemoClientSession();
-    const next=nextPath();
-    window.location.replace(payload.mfaSetupRequired===true?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
+    const explicitNext=new URLSearchParams(window.location.search).get("next");
+    const next=explicitNext?nextPath():typeof payload.next==="string"&&payload.next.startsWith("/")&&!payload.next.startsWith("//")?payload.next:nextPath();
+    window.location.replace(payload.mfaSetupRequired===true&&!next.startsWith("/einstellungen/sicherheit?setup=1")?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
@@ -89,6 +90,6 @@ export default function Login(){
       <Button type="submit" disabled={loading}>{loading?"Anmeldung läuft…":"Weiter"}</Button>
     </form>
     <div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button>
-    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Account erstellen</Link></p>
+    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Konto erstellen</Link></p>
   </section></main>;
 }

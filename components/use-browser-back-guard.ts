@@ -2,7 +2,7 @@
 
 import {useLayoutEffect,useRef} from "react";
 
-type DraftGuard={blocked:()=>void};
+type DraftGuard={blocked:()=>void;protectUnload:()=>boolean};
 const guards=new Set<DraftGuard>();
 let boundary:{release:()=>void;allow:()=>void;cleanup:()=>void}|null=null;
 
@@ -13,7 +13,7 @@ function armBoundary(){
  const state={...base,binsoDraftBoundary:owner};
  if(existing)history.replaceState(state,"",url);else history.pushState(state,"",url);
  let leaving=false;
- const unload=(event:BeforeUnloadEvent)=>{if(!leaving){event.preventDefault();event.returnValue=""}};
+ const unload=(event:BeforeUnloadEvent)=>{if(!leaving&&[...guards].some(guard=>guard.protectUnload())){event.preventDefault();event.returnValue=""}};
  const back=(event:PopStateEvent)=>{
   if(leaving||location.href!==url||event.state?.binsoDraftBoundary===owner)return;
   event.stopImmediatePropagation();history.pushState(state,"",url);[...guards].at(-1)?.blocked();
@@ -33,13 +33,15 @@ function armBoundary(){
  };
 }
 
-export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void){
+export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void,protectUnload=true){
  // Register before paint: browser back may follow the input commit before passive effects run.
  const blocked=useRef(onBlocked);
+ const unload=useRef(protectUnload);
+ useLayoutEffect(()=>{unload.current=protectUnload},[protectUnload]);
  useLayoutEffect(()=>{blocked.current=onBlocked},[onBlocked]);
  useLayoutEffect(()=>{
   if(!dirty)return;
-  const guard:DraftGuard={blocked:()=>blocked.current()};guards.add(guard);
+  const guard:DraftGuard={blocked:()=>blocked.current(),protectUnload:()=>unload.current};guards.add(guard);
   if(!boundary)boundary=armBoundary();
   return()=>{
    guards.delete(guard);

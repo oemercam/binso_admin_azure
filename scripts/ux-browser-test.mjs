@@ -118,7 +118,8 @@ try{
    if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
    if(projectSourceMode&&p==='/api/documents/AN-TEST-1')return route.fulfill({status:failProjectSource?503:200,json:failProjectSource?{message:'Synthetic source unavailable'}:{item:{...offer,status:'accepted',title:projectSourceTitle}}});
    let data;
-   if(p==='/api/auth/session')data={authenticated:true,...(processRecoveryMode?{user:{id:'process-fixture-user'}}:{}),tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
+   if(p==='/api/auth/register')data={state:'new',context:{plan:null,billingCycle:'monthly',trialDays:14,termsVersion:'2026-10-05',privacyVersion:'2026-10-05.2',dpaVersion:'2026-10-05'}};
+   else if(p==='/api/auth/session')data={authenticated:true,...(processRecoveryMode?{user:{id:'process-fixture-user'}}:{}),tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
    else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:teamMemberRole,created_at:'2026-10-08'}],invitations:[],userLimit:10,plan:'pro'};
    else if(p==='/api/notifications')data={items:[{id:'notification-one',kind:'document',title:'Neue Rechnung',body:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',read_at:null,created_at:'2026-10-09T09:00:00Z'},{id:'notification-two',kind:'announcement',title:'Produktinformation',body:'Testinformation',read_at:'2026-10-08T10:00:00Z',created_at:'2026-10-08T09:00:00Z'}]};
    else if(p==='/api/time-entries/policy')data={time_approval_required:policyRequired};
@@ -329,7 +330,7 @@ try{
    await periodSheet.getByRole('button',{name:'Anwenden',exact:true}).click();
    assert.equal(await statistics.locator('dd').first().textContent(),'CHF 120.00');
    assert.equal(await statistics.locator('dd').nth(1).textContent(),'CHF 0.00');
-   assert.equal(await statistics.locator('dd').nth(2).textContent(),'CHF 120.00');
+   assert.equal(await statistics.locator('dd').nth(2).evaluate(el=>el.firstChild.textContent),'CHF 120.00');
    assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Chart period does not hide a directly searched invoice');
    await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
    await page.locator('.bo-statistics dd').first().getByText('CHF 120.00',{exact:true}).waitFor();

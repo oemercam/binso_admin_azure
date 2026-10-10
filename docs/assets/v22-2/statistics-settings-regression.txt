@@ -1,0 +1,21 @@
+Checking light 375px
+Checking light 1440px
+Route /dashboard
+Route /dashboard
+Route /finanzen
+Route /finanzen
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /kunden/customer-one
+Route /kunden/customer-one
+Checking dark 375px
+Checking dark 1440px
+Route /dashboard
+Route /dashboard
+Route /finanzen
+Route /finanzen
+Route /finanzen/analyse
+Route /finanzen/analyse
+Route /kunden/customer-one
+Route /kunden/customer-one
+UX browser checks passed: 16 route/theme/viewport combinations ; interactions: finance,settings. Artifacts: /tmp/binso-v22-2-regression-final

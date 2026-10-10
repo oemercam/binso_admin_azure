@@ -33,7 +33,7 @@ async function uniqueSlug(client:PoolClient,name:string){
 
 export async function provisionOrganization(input:{
  userId:string;email:string;name:string;companyName:string;plan:PlanId;billingCycle?:BillingCycle;mode:"trial"|"demo"|"subscription";
- passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;
+ passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;dpaVersion?:string|null;
 }){
  return withTransaction(async client=>{
    const email=input.email.trim().toLowerCase();
@@ -90,7 +90,7 @@ export async function provisionOrganization(input:{
    await client.query(
      `insert into audit_events(organization_id,actor_user_id,actor_name,action,entity_type,entity_id,detail)
       values($1::uuid,$2,$3,$4,'organization',$1::text,$5)`,
-     [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId})]
+     [organizationId,input.userId,displayName,input.mode==="demo"?"organization.demo_created":"organization.created",JSON.stringify({mode:input.mode,plan:planId,billingCycle,termsVersion:input.termsVersion??null,privacyVersion:input.privacyVersion??null,dpaVersion:input.dpaVersion??null,contractAccepted:!!input.termsVersion,privacyNoticeAcknowledged:!!input.privacyVersion})]
    );
    if(input.mode==="demo"){
      await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
