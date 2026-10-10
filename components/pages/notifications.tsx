@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import {ActionRow} from "../binso-ux";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { useState } from "react";
 import { AppShell } from "../app-shell";
 import { apiPatch, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, Icon } from "../ui";
+import { Button, EmptyState, Icon, LoadingState, ErrorState } from "../ui";
 
 export type NotificationRecord={
   id:string;
@@ -61,15 +62,10 @@ export function NotificationsPage() {
     return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={unreadCount>0?<Button variant="secondary" onClick={()=>void markAll()}>Alle gelesen</Button>:undefined}>
       <div className="notification-center">
         <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}>Alle</button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}>Ungelesen{unreadCount>0?` (${unreadCount})`:""}</button></div>
-        {loading&&remoteItems.length===0&&<EmptyState icon="bell" title="Benachrichtigungen werden geladen" text="Aktuelle Aktivitäten werden abgerufen."/>}
-        {error&&<EmptyState icon="bell" title="Benachrichtigungen nicht verfügbar" text={error} action={<Button variant="secondary" onClick={()=>void load()}>Erneut laden</Button>}/>}
+        {loading&&remoteItems.length===0&&<LoadingState>Benachrichtigungen werden geladen …</LoadingState>}
+        {error&&<ErrorState onRetry={load} retryLabel="Erneut laden">{error}</ErrorState>}
         {!loading&&!error&&visible.length===0&&<EmptyState icon="bell" title={view==="unread"?"Alles gelesen":"Noch keine Benachrichtigungen"} text={view==="unread"?"Es gibt aktuell keine ungelesenen Benachrichtigungen.":"Neue Aktivitäten erscheinen hier automatisch."}/>}
-        {!error&&visible.length>0&&<div className="notification-center-list">{visible.map(item=><Link href={item.href||"/dashboard"} className={item.read_at?"notification-center-row":"notification-center-row unread"} key={item.id} onClick={()=>void markRead(item.id)}>
-          <span className="activity-icon"><Icon name={notificationIcon(item.kind)}/></span>
-          <div><b>{item.title}</b><p>{item.body}</p><small>{notificationDate(item.created_at)}</small></div>
-          {!item.read_at&&<i className="unread-dot"/>}
-          <Icon name="arrow" size={16}/>
-        </Link>)}</div>}
+        {!error&&visible.length>0&&<div className="action-list">{visible.map(item=><ActionRow href={item.href||"/dashboard"} key={item.id} icon={notificationIcon(item.kind)} title={item.title} description={item.body} metadata={notificationDate(item.created_at)} endAdornment={!item.read_at?<i className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>void markRead(item.id)}/>)}</div>}
         <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
       </div>
     </AppShell>;
@@ -80,15 +76,7 @@ export function NotificationsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}>Alle gelesen</Button>}>
     <div className="notification-center">
       <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}>Alle</button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}>Ungelesen{unreadCount>0?` (${unreadCount})`:""}</button></div>
-      {visible.length?<div className="notification-center-list">{visible.map(([id,icon,title,text,time,href])=>{
-        const isRead=read.includes(id);
-        return <Link href={href} className={isRead?"notification-center-row":"notification-center-row unread"} key={id} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}>
-          <span className="activity-icon"><Icon name={icon}/></span>
-          <div><b>{title}</b><p>{text}</p><small>{time}</small></div>
-          {!isRead&&<i className="unread-dot"/>}
-          <Icon name="arrow" size={16}/>
-        </Link>;
-      })}</div>:<EmptyState icon="bell" title="Alles gelesen" text="Es gibt aktuell keine ungelesenen Benachrichtigungen."/>}
+      {visible.length?<div className="action-list">{visible.map(([id,icon,title,text,time,href])=><ActionRow href={href} key={id} icon={icon} title={title} description={text} metadata={time} endAdornment={!read.includes(id)?<i className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}/>)}</div>:<EmptyState icon="bell" title="Alles gelesen" text="Es gibt aktuell keine ungelesenen Benachrichtigungen."/>}
       <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span>Benachrichtigungseinstellungen</span><Icon name="arrow" size={15}/></Link>
     </div>
   </AppShell>;

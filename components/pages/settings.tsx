@@ -3,10 +3,11 @@ import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
-import {ActionSheet,FormSheet,ListRow} from "../binso-ux";
+import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows} from "../binso-ux";
 
 import Link from "next/link";
-import { loadTheme, saveTheme } from "@/lib/client/theme";
+import {Monitor} from "lucide-react";
+import { saveTheme, type ThemeMode } from "@/lib/client/theme";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
@@ -29,7 +30,7 @@ function SettingsNavigation(){
   {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
   {title:"Weitere Einstellungen",rows:[["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
  ];
- return <>{groups.map(group=><section className="settings-section" key={group.title}><SectionTitle title={group.title}/><div className="settings-list">{group.rows.filter(([href])=>access.canOpen(href)).map(([href,icon,title])=><Link prefetch={false} href={href} key={href}><span className="settings-icon"><Icon name={icon}/></span><div><b>{title}</b></div><Icon name="arrow" size={17}/></Link>)}</div></section>)}</>;
+ return <>{groups.map(group=><section className="settings-section" key={group.title}><SectionTitle title={group.title}/><div className="settings-list">{group.rows.filter(([href])=>access.canOpen(href)).map(([href,icon,title])=><ActionRow href={href} key={href} icon={icon} title={title}/>)}</div></section>)}</>;
 }
 
 export function AccountSettingsPage() {
@@ -342,41 +343,36 @@ export function NotificationSettingsPage() {
   </AppShell>;
 }
 
-export function LanguageSettingsPage() {
-  const [language,setLanguage] = useState("de-CH");
-  const [error,setError]=useState("");
-  useEffect(()=>{if(isProductionBackendEnabled())apiGet<{item?:{language?:string}}>("/api/settings/profile").then(data=>{const value=data.item?.language??"de-CH";setLanguage(value==="de"?"de-CH":value)}).catch(()=>setError("Sprache konnte nicht geladen werden."));},[]);
-  const choose=async(code:string)=>{try{if(!isProductionBackendEnabled())throw new Error("Schreibgeschützte Vorschau");await apiPatch("/api/settings/profile",{language:code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
-  const languages=[["Deutsch (Schweiz)","de-CH"],["Français","fr"],["Italiano","it"],["English","en"],["Türkçe","tr"]];
-  return <AppShell title="Sprache" subtitle="Sprache der Benutzeroberfläche." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <div className="choice-list">{languages.map(([label,code])=><button className={language===code?"selected":""} disabled={code!=="de-CH"} onClick={()=>void choose(code)} type="button" key={code}><span>{code.toUpperCase()}</span><div><b>{label}</b><small>{code!=="de-CH"?"Noch nicht vollständig verfügbar":language===code?"Aktiv":"Auswählen"}</small></div>{language===code?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>
-    {error&&<ErrorState>{error}</ErrorState>}
-    <p className="settings-note">Die Oberfläche ist derzeit vollständig auf Deutsch verfügbar. Weitere Sprachen werden erst nach vollständiger Übersetzung freigeschaltet.</p>
-  </AppShell>;
+/** Language availability reflects the translated interface, not the database enum. */
+function LanguagePreference(){
+ const production=useBackendMode();
+ const [language,setLanguage]=useState("de-CH"),[error,setError]=useState("");
+ const query=useApiQuery<{item?:{language?:string}}>(production?"/api/settings/profile":null);
+ useEffect(()=>{if(!query.data)return;const value=query.data.item?.language??"de";queueMicrotask(()=>setLanguage(value==="de"?"de-CH":value));},[query.data]);
+ const choose=async(code:string)=>{try{await apiPatch("/api/settings/profile",{language:code==="de-CH"?"de":code});setLanguage(code);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
+ return <><Field label="Sprache" allowReadOnlyInput><Select value={language==="de-CH"?language:"de-CH"} onChange={event=>void choose(event.target.value)} disabled={query.loading||!!query.error}><option value="de-CH">Deutsch (Schweiz)</option></Select></Field>{(error||query.error)&&<ErrorState>{error||query.error}</ErrorState>}<p className="settings-note">Die Oberfläche ist derzeit vollständig auf Deutsch verfügbar. Weitere Sprachen werden erst nach vollständiger Übersetzung freigeschaltet.</p></>;
 }
 
-export function AppearanceSettingsPage() {
-  const [theme,setTheme] = useState<"light"|"dark"|"system">("light");
+export function LanguageSettingsPage(){
+ return <AppShell title="Sprache" subtitle="Sprache der Benutzeroberfläche." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><LanguagePreference/></AppShell>;
+}
 
-  useEffect(()=>{
-    const storedMode=document.documentElement.dataset.themeMode;
-    const storedResolved=document.documentElement.dataset.theme;
-    const next=storedMode==="system"||storedMode==="dark"||storedMode==="light"
-      ? storedMode
-      : storedResolved==="dark" ? "dark" : "light";
-    queueMicrotask(()=>setTheme(next));
-  },[]);
-
-  const [error,setError]=useState("");
-  useEffect(()=>{void loadTheme().then(mode=>{if(mode)setTheme(mode)}).catch(()=>setError("Darstellung konnte nicht geladen werden."));},[]);
-  const choose=async(next:"light"|"dark"|"system")=>{try{await saveTheme(next);setTheme(next);setError("");}catch{setError("Darstellung konnte nicht gespeichert werden.")}};
-  return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    {error&&<ErrorState>{error}</ErrorState>}
-    <Link className="text-action" href="/einstellungen/sprache">Sprache wählen</Link>
-    <div className="appearance-grid">
-      <button className={`appearance-card ${theme==="light"?"selected":""}`} onClick={()=>void choose("light")}><div className="theme-preview light"><i/><i/><i/></div><b>Hell</b><small>Klar und kontrastreich</small></button>
-      <button className={`appearance-card ${theme==="dark"?"selected":""}`} onClick={()=>void choose("dark")}><div className="theme-preview dark"><i/><i/><i/></div><b>Dunkel</b><small>Reines Schwarz und Weiss</small></button>
-      <button className={`appearance-card ${theme==="system"?"selected":""}`} onClick={()=>void choose("system")}><div className="theme-preview system"><i/><i/><i/></div><b>System</b><small>Geräteeinstellung übernehmen</small></button>
-    </div>
-  </AppShell>;
+const themeOptions=[
+ {value:"light",title:"Hell",description:"Helle Oberfläche",icon:"sun"},
+ {value:"dark",title:"Dunkel",description:"Dunkle Oberfläche",icon:"moon"},
+ {value:"system",title:"System",description:"Geräteeinstellung übernehmen",icon:<Monitor size={18} aria-hidden="true"/>},
+] as const;
+export function AppearanceSettingsPage(){
+ const [theme,setTheme]=useState<ThemeMode>("system"),[error,setError]=useState("");
+ useEffect(()=>{
+  const sync=()=>{const mode=document.documentElement.dataset.themeMode;setTheme(mode==="light"||mode==="dark"?mode:"system")};
+  queueMicrotask(sync);window.addEventListener("binso-theme",sync);
+  return()=>window.removeEventListener("binso-theme",sync);
+ },[]);
+ const choose=(next:ThemeMode)=>{setError("");void saveTheme(next).catch(()=>setError("Darstellung konnte nicht gespeichert werden."))};
+ return <AppShell title="Darstellung & Sprache" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+  {error&&<ErrorState>{error}</ErrorState>}
+  <section className="settings-section"><SectionTitle title="Darstellung"/><SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/></section>
+  <section className="settings-section"><SectionTitle title="Sprache"/><LanguagePreference/></section>
+ </AppShell>;
 }
