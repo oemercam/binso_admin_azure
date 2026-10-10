@@ -75,6 +75,8 @@ jobs:
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
+      - name: Fast UX compliance contracts
+        run: pnpm ux:compliance:fast
       - name: Real isolated PostgreSQL parallel process gate
         env:
           BINSO_DB_PARALLEL_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_v213_test
@@ -82,6 +84,17 @@ jobs:
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck
+      - name: Record successful scoped architecture lint evidence
+        run: |
+          mkdir -p evidence/static
+          node --input-type=module -e 'import fs from "node:fs";import {identity} from "./scripts/compliance/identity.mjs";fs.writeFileSync("evidence/static/compliance-lint.json",JSON.stringify({schemaVersion:1,...identity(),route:"customer-app",state:"source",checks:[{id:"UX-ARC-001",status:"passed",observed:{command:"pnpm lint",exit:0,scope:"existing central-ui owner rules; full lint"}}]}));'
+      - name: Upload architecture lint evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ux-static-${{ github.sha }}
+          path: evidence/static
+          if-no-files-found: error
+          retention-days: 7
       - run: pnpm security:scan
       - name: Full dependency audit including development tooling
         run: pnpm security:scan:all
@@ -184,9 +197,35 @@ jobs:
           BINSO_UX_SCREENSHOTS: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_DOM_EVIDENCE: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_COMPLIANCE: '1'
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
+      - name: Deterministic synthetic data and role variants
+        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_UX_COMPLIANCE: '1'
+          BINSO_UX_MATRIX_ONLY: '1'
+          BINSO_UX_THEMES: light
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_SCREENSHOTS: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          INDEX=0
+          for FIXTURE in empty large partial negative no-expenses admin finance employee; do
+            ROUTES=/kunden
+            case "$FIXTURE" in
+              empty) ROUTES=/kunden,/finanzen ;;
+              partial) ROUTES=/rechnungen ;;
+              negative|no-expenses|finance) ROUTES=/finanzen ;;
+              employee) ROUTES=/zeit ;;
+            esac
+            BINSO_UX_FIXTURE_CASE="$FIXTURE" BINSO_UX_ROUTES="$ROUTES" BINSO_UX_PORT="$((3600 + INDEX * 2))" BINSO_UX_OUTPUT="$RUNNER_TEMP/binso-ux-chromium/fixtures/$FIXTURE" node scripts/ux-browser-test.mjs
+            INDEX=$((INDEX + 1))
+          done
       - name: Guided registration, languages and responsive regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
@@ -223,9 +262,49 @@ jobs:
           path: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           if-no-files-found: warn
           retention-days: 7
+  ux-compliance:
+    needs: [plan, checks, browser]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - name: Collect current browser measurements
+        if: needs.plan.outputs.browser == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ux-browser-*-${{ github.sha }}
+          path: evidence/ux
+      - name: Collect successful architecture lint evidence
+        if: needs.checks.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: ux-static-${{ github.sha }}
+          path: evidence/ux/static
+      - name: Generate individual requirement coverage and enforce measured failures
+        env:
+          RELEASE_GATE: ${{ github.event_name == 'release' || inputs.level == 'full' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXTRA=()
+          if [ "$RELEASE_GATE" = true ]; then EXTRA+=(--release); fi
+          node scripts/compliance/visual.mjs evidence/ux ux-compliance/visual-baselines.v1.json evidence/ux/compliance-visual.json
+          node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
+      - name: Publish compliance report including failures and missing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ux-compliance-${{ github.sha }}
+          path: docs/ux-compliance
+          if-no-files-found: error
+          retention-days: 30
+      - name: Add coverage summary
+        if: always()
+        run: cat docs/ux-compliance/report.md >> "$GITHUB_STEP_SUMMARY"
   quality:
     # Keep the existing required job name. Failure, cancellation or an unexpected skip is blocking.
-    needs: [plan, checks, build, browser]
+    needs: [plan, checks, build, browser, ux-compliance]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -233,12 +312,13 @@ jobs:
         env:
           PLAN_RESULT: ${{ needs.plan.result }}
           CHECKS_RESULT: ${{ needs.checks.result }}
+          UX_COMPLIANCE_RESULT: ${{ needs.ux-compliance.result }}
           BUILD_RESULT: ${{ needs.build.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
           BROWSER_REQUIRED: ${{ needs.plan.outputs.browser }}
         run: |
           set -euo pipefail
-          for result in "$PLAN_RESULT" "$CHECKS_RESULT" "$BUILD_RESULT"; do
+          for result in "$PLAN_RESULT" "$CHECKS_RESULT" "$BUILD_RESULT" "$UX_COMPLIANCE_RESULT"; do
             if [ "$result" != success ]; then echo "::error::Required job ended with $result"; exit 1; fi
           done
           if [ "$BROWSER_REQUIRED" != true ] && [ "$BROWSER_REQUIRED" != false ]; then

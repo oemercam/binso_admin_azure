@@ -1,3 +1,6 @@
+import {identity as complianceIdentity} from './compliance/identity.mjs';
+import {measureCompliance} from './compliance/measure.mjs';
+import {fixtureCase} from './compliance/fixtures.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -18,11 +21,12 @@ const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',y
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
-const cashFixture=(income=200)=>({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
+const cashFixture=(income=200)=>process.env.BINSO_UX_FIXTURE_CASE?{...fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash,payments:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
 
 await fs.mkdir(output,{recursive:true});
 const port=process.env.BINSO_UX_PORT??'3200';
 const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:'+port;
+if(process.env.BINSO_UX_COMPLIANCE==='1'&&!['127.0.0.1','localhost','[::1]'].includes(new URL(base).hostname))throw Error('Compliance fixtures require an isolated loopback test server');
 let server;
 if(!process.env.BINSO_BASE_URL){
   let occupied=false;try{occupied=(await fetch(base+'/api/health')).ok;}catch{}
@@ -50,6 +54,12 @@ const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'s
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
+if(process.env.BINSO_UX_FIXTURE_CASE){
+ if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Alternative fixtures require matrix-only mode; interaction suites own their mutation fixtures');
+ const fixture=fixtureCase(process.env.BINSO_UX_FIXTURE_CASE);
+ collections.customers=fixture.customers.map((item,index)=>({...customer,...item,customer_no:'K-'+String(index+1).padStart(6,'0')}));
+ collections.documents=fixture.invoices.map((item,index)=>({...invoice,...item,customer:{...customer,...fixture.customers[0]},customer_id:fixture.customers[0]?.id??null,number:'RE-UX-'+String(index+1).padStart(4,'0')}));
+}
 function customerListFixture(params){
  const normalize=value=>String(value??'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
  const query=normalize(params.get('q'));
@@ -74,6 +84,7 @@ const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['dat
 const hasInteraction=name=>requestedInteractions.includes(name);
 let captureQueue=Promise.resolve();
 async function capture(page,options,target=page){
+ if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route:new URL(page.url()).pathname,theme:await page.locator('html').getAttribute('data-theme'),width:page.viewportSize().width,state:'interaction:'+path.basename(options.path),engine:process.env.BINSO_UX_BROWSER??'chromium'});
  const pending=captureQueue.then(async()=>{await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await target.screenshot(process.env.BINSO_UX_BROWSER==='webkit'?{...options,animations:'allow'}:options);if(target===page&&process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));});
  captureQueue=pending.catch(()=>{});return pending;
 }
@@ -93,7 +104,7 @@ async function actionEvidence(page,name,theme){
  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${name}-actions.png`)});
 }
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
-let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
+let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
@@ -216,6 +227,7 @@ try{
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
+    if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route,theme,width,state:process.env.BINSO_UX_FIXTURE_CASE??'normal',engine:process.env.BINSO_UX_BROWSER??'chromium'});
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
@@ -232,7 +244,7 @@ try{
       assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(23, 25, 29)','Statistics retain their dark design in both themes');
-      assert.ok(await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
+      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
@@ -763,6 +775,11 @@ try{
   await context.close();context=null;await browser.close();browser=null;
  }
  assert.deepEqual(accessibilityFailures,[],'Blocking accessibility violations');
+ if(process.env.BINSO_UX_COMPLIANCE==='1'&&process.env.BINSO_UX_MATRIX_ONLY!=='1'){
+  const groups={customers:['UX-INT-001','UX-INT-004'],header:['UX-INT-002'],time:['UX-INT-003'],finance:['UX-FIN-005','UX-FIN-007'],documents:['UX-PDF-001'],data:['UX-FIN-006']};
+  const checks=requestedInteractions.flatMap(group=>(groups[group]??[]).map(id=>({id,status:'partial',observed:{suite:group,completed:true,source:'scripts/ux-browser-test.mjs',limitation:'Existing representative assertion suite passed; individual route/state coverage is incomplete'},selector:null})));
+  await writeTestOutput(path.join(output,'compliance-interactions-'+(process.env.BINSO_UX_BROWSER??'chromium')+'.json'),JSON.stringify({schemaVersion:1,...complianceIdentity(),route:'representative interaction suites',state:'interaction',engine:process.env.BINSO_UX_BROWSER??'chromium',checks},null,2));
+ }
  await writeTestOutput(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',interactions:requestedInteractions,results,errors},null,2));
  await fs.copyFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),path.join(output,`results-${process.env.BINSO_UX_BROWSER??'chromium'}-${process.env.BINSO_UX_THEMES??'light-dark'}.json`));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);

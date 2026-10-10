@@ -41,7 +41,11 @@
     "ui:check": "node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs",
     "data:inventory": "node scripts/data-inventory.mjs",
     "data:test": "node scripts/data-foundation-test.mjs",
-    "architecture:inventory": "node scripts/foundation-integration-report.mjs"
+    "architecture:inventory": "node scripts/foundation-integration-report.mjs",
+    "ux:compliance:fast": "node scripts/compliance/selftest.mjs && node scripts/compliance/report-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/navigation-foundation-test.mjs",
+    "ux:compliance:report": "node scripts/compliance/report.mjs --static",
+    "ux:compliance:pr": "node scripts/compliance/report.mjs --static --gate",
+    "ux:compliance:release": "node scripts/compliance/report.mjs --static --gate --release"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",
