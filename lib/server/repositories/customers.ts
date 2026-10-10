@@ -3,6 +3,8 @@ import {randomUUID} from "node:crypto";
 import {withTenant} from "@/lib/server/db";
 import {audit} from "@/lib/server/audit";
 import {ApiError} from "@/lib/server/http";
+import {listApiBusiness} from "./business-api";
+import type {SessionUser} from "@/lib/server/session";
 
 export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string};
 const columns=`id,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
@@ -29,7 +31,7 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
  return {zip,city};
 }
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
-export async function listCustomers(organizationId:string,userId:string){return withTenant(organizationId,userId,async client=>(await client.query(`select ${columns} from customers where organization_id=$1 and archived_at is null order by lower(name) limit 1000`,[organizationId])).rows)}
+export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
 export async function createCustomer(organizationId:string,userId:string,input:CustomerInput){return withTenant(organizationId,userId,async client=>{
  const id=randomUUID(),{zip,city}=addressParts(input);
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);

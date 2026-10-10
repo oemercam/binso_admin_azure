@@ -8,6 +8,11 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
+const {safeAppPath}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/navigation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
+for(const attack of ['//external.example','/\\external.example','/\n/external.example','https://external.example','/%2fexternal.example','/%5cexternal.example','/%00external.example'])assert.equal(safeAppPath(attack),'/dashboard','Auth handoffs cannot resolve an external or malformed URL');
+assert.equal(safeAppPath('/einstellungen/sicherheit?setup=1&next=%2Feinstellungen%2Ffirma%3Fonboarding%3D1'),'/einstellungen/sicherheit?setup=1&next=%2Feinstellungen%2Ffirma%3Fonboarding%3D1');
+assert.equal(safeAppPath('/kunden/customer-one?tab=finances#details'),'/kunden/customer-one?tab=finances#details');
+console.log('Auth and onboarding handoffs preserve local paths and reject URL-normalization redirect attacks.');
 const read=path=>requireReadCache.get(path)??'';
 const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await readPageFile(path,'utf8')])));
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
@@ -40,6 +45,12 @@ assert.match(calls[2].sql,/order by q\.expense_date desc,q\.id desc/);
 await listApiBusiness(client,session,'customer_contacts','order=is_primary.desc,created_at.asc');
 assert.match(calls[3].sql,/order by q\.is_primary desc,q\.created_at asc,q\.id desc/);
 console.log('Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.');
+await listApiBusiness(client,session,'documents','q='+encodeURIComponent('RE 2026-019')+'&kind=eq.invoice&limit=5');
+assert.deepEqual(calls[4].values,['tenant-under-test','RE 2026-019']);
+assert.ok(calls[4].sql.lastIndexOf(' where regexp_replace')<calls[4].sql.lastIndexOf(' order by '),'Search runs before result limiting');
+assert.ok(calls[4].sql.includes("q.customer->>'number'"),'Invoice search includes the related customer number');
+await assert.rejects(()=>listApiBusiness(client,session,'customers','q='+encodeURIComponent('x'.repeat(201))),error=>error.code==='invalid_search');
+assert.equal(calls.length,5,'An overlong search must not execute SQL');
 
 const searchSource=await readPageFile('lib/search.ts','utf8');
 const {searchSources,searchItem}=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
@@ -313,16 +324,16 @@ console.log('Project-linked idle timer context survives synchronization without 
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
  const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
- const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['useRecordsController','RecordsControls','RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
- const render=(chip='Alle',sort='default',sortIndex=1)=>{
-  let hook=0;const states=['',chip,sort,sortIndex,true];const exports={};
-  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch','Children','cloneElement','isValidElement',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}),React.Children,React.cloneElement,React.isValidElement);
+ const render=(chip='Alle',sort='default',sortIndex=1,filtersOpen=false)=>{
+  let hook=0;const states=['',chip,sort,sortIndex,true,0,false,filtersOpen,{activeChip:chip,sort,sortIndex}];const exports={};
+  Function('require','exports','useState','useEffect','useMemo','Icon','Status','Link','matchesRecordChip','compareRecordValues','ListSearch','Children','cloneElement','isValidElement','useId','FilterSheet','Button','Field','Select','Input',listCompiled)(createRequire(import.meta.url),exports,()=>[states[hook++],()=>{}],()=>{},fn=>fn(),()=>null,({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),matchesRecordChip,compareRecordValues,({value,onChange,placeholder})=>React.createElement("input",{type:"search",value,onChange,placeholder}),React.Children,React.cloneElement,React.isValidElement,React.useId,({open,children})=>open?React.createElement('div',null,children):null,({children})=>React.createElement('button',null,children),({label,children})=>React.createElement('label',null,label,children),'select','input');
   return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
- const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(sorted.includes('Betrag ↑'));assert.ok(sorted.includes('Betrag ↓'));
+ const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(!sorted.includes('<select'),'Sort fields are closed with the filter sheet');const options=render('Alle','desc',2,true);assert.ok(options.includes('Betrag ↑'));assert.ok(options.includes('Betrag ↓'));assert.ok(!sorted.includes('class="chips"'),'Status selection belongs to the filter sheet');
  const empty=render('Bezahlt');assert.ok(empty.includes('data-empty-state="compact"'));assert.ok(!empty.includes('empty-icon'),'Empty lists remain one-line status messages');
  console.log('Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.');
 }

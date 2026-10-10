@@ -1,0 +1,15 @@
+V22 statistics: real cash dates, expense reimbursement day, currency-separated invoice totals and role/tenant isolation passed.
+Document snapshots: creation defaults, individual replacement/reset, later template changes, invoice/offer issue and immutable payment/history passed.
+50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).
+Stripe signature, persisted checkout retries, duplicate/stale events, rollback, billing ledger, entitlements and tenant mapping passed (HTTP fixtures).
+Timer customer-only start/reload/pause/finish, context lock and internal work passed.
+Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.
+Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.
+PDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.
+Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.
+All ten canonical business repository sources reject foreign direct IDs with positive source fixtures.
+V21.3 document idempotency/payload conflict, immutable server numbers, transaction/counter rollback, quote precision and cash/open-balance parity passed.
+Actual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.
+Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.
+V22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.
+PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.

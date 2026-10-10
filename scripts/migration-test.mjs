@@ -172,13 +172,13 @@ try{
  assert.equal(loadedExpense.category,'Reise');assert.equal(loadedExpense.status,'submitted');assert.equal(Number(loadedExpense.amount),123.45);
  const tenantWrapper=dataModule('export async function withTenant(org,user,fn){return globalThis.__customerPersistenceTest(org,user,fn)}');
  globalThis.__customerPersistenceTest=async(org,user,fn)=>{await db.query("select set_config('app.organization_id',$1,false)",[org]);return fn(client)};
- const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http));
+ const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource)));
  const customerRepository=await import(dataModule(customerSource));
  const input={name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
  const created=await customerRepository.createCustomer(sandbox,'sandbox-user',input);
  const updated=await customerRepository.updateCustomer(sandbox,'sandbox-user',created.id,{city:'Bern',sector:'Handel'});
  assert.equal(updated.notes,input.notes);assert.equal(updated.uid,input.uid);assert.equal(updated.address,input.address);assert.equal(updated.city,'Bern');assert.equal(updated.sector,'Handel');assert.equal(updated.email,input.email);assert.equal(Number(updated.paymentDays),45);
- assert.equal((await customerRepository.listCustomers(sandbox,'sandbox-user')).find(row=>row.id===created.id).postal_code,'8000');
+ assert.equal((await customerRepository.listCustomers({...clonedSession,userId:'sandbox-user'})).find(row=>row.id===created.id).postal_code,'8000');
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await listApiBusiness(client,session,'customers','id=eq.'+created.id)).length,0);
  const fileId='f0000000-0000-4000-8000-000000000031';
@@ -695,6 +695,27 @@ try{
  // alternate PATCH/DELETE ledger writer that can bypass canonical transitions.
  for(const file of ['app/api/payments/[id]/route.ts','app/api/payments/route.ts']){const source=await fs.readFile(file,'utf8');assert.ok(!/export async function (PATCH|DELETE)/.test(source));}
  console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
+ await db.exec('begin');
+ try{
+  await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) select $1,'search-bulk-'||i,'K-SYN-'||i,'Search bulk '||i,'active',now()-interval '1 day' from generate_series(1,1001) i",[demo]);
+  const target=(await db.query("insert into customers(organization_id,external_id,customer_no,name,status,created_at) values($1,'search-target','K-998877','Search target Zürich AG','active',now()-interval '2 days') returning id",[demo])).rows[0];
+  assert.equal((await listApiBusiness(client,session,'customers','')).some(row=>row.id===target.id),false,'The target is beyond the old 1000-record loaded window');
+  assert.equal((await listApiBusiness(client,session,'customers','q=K998%20877&limit=1'))[0].id,target.id,'Normalized business numbers are searched before the limit');
+  const firstPage=await listApiBusiness(client,session,'customers','q=search%20bulk&limit=50&offset=0&order=name.asc');
+  const secondPage=await listApiBusiness(client,session,'customers','q=search%20bulk&limit=50&offset=50&order=name.asc');
+  assert.equal(Number(firstPage[0].total_count),1001,'A page reports the complete authorized matching population');
+  assert.equal(firstPage.length,50);assert.equal(secondPage.length,50);assert.ok(secondPage.every(row=>!firstPage.some(first=>first.id===row.id)),'Stable pages do not duplicate records');
+  await assert.rejects(()=>listApiBusiness(client,session,'customers','offset=-1'),error=>error.status===400);
+  assert.ok((await listApiBusiness(client,session,'customers','q='+encodeURIComponent('Zürich'))).some(row=>row.id===target.id),'Swiss text remains searchable alongside other customers from the same city');
+  assert.equal((await listApiBusiness(client,{...session,organizationId:sandbox},'customers','q=K998877')).length,0,'A full-population search cannot cross the tenant boundary');
+  assert.equal((await listApiBusiness(client,session,'customers','q='+encodeURIComponent('%__--'))).length,0,'Punctuation and wildcards cannot match every record');
+  const numbered=(await listApiBusiness(client,session,'documents','q=RE%202026%20019&kind=eq.invoice&limit=1'))[0];
+  assert.equal(numbered.number,'RE-2026-019','Usual invoice separators are normalized');
+  await db.query('update customers set customer_no=$2 where id=$1',[numbered.customer_id,'K-112233']);
+  const byCustomer=await listApiBusiness(client,session,'documents','q=K112%20233&kind=eq.invoice');
+  assert.ok(byCustomer.length>0&&byCustomer.every(row=>row.customer_id===numbered.customer_id),'Invoice search joins the actual related customer number');
+  console.log('V22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.');
+ }finally{await db.exec('rollback')}
  delete globalThis.__processSession;delete globalThis.__processTransaction;delete globalThis.__processPlatform;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}

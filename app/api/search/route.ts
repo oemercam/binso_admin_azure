@@ -20,10 +20,10 @@ export async function GET(request:NextRequest) {
       for(const source of searchSources){
         const permission=permissionForModule(source.module,"read");
         if(!permission||!tenantCan(session.role,permission)||!planAllowsModule(plan,source.module))continue;
-        const filters="kind" in source?"kind=eq."+source.kind:"";
-        const rows=await listApiBusiness(client,session,source.table,filters);
+        const filters=new URLSearchParams({q:query,limit:String(12-results.length)});
+        if("kind" in source)filters.set("kind","eq."+source.kind);
+        const rows=await listApiBusiness(client,session,source.table,filters.toString());
         for(const row of rows){
-          if(!JSON.stringify(row).toLocaleLowerCase("de-CH").includes(query))continue;
           results.push(searchItem(source,row));
           if(results.length>=12)return results;
         }

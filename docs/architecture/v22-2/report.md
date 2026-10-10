@@ -38,6 +38,8 @@ Der erneute lokale vollständige CI-Lauf nach Konsolidierung der Login-Verifikat
 
 ## Offene/blockierte Abnahme
 
+Aktualisierung nach Commit `e0d97e3`: GitHub-Run `38049876342` bestand Checks, Build, Plan und den Chromium-Job. WebKit bestand die allgemeinen Routen-/Prozessprüfungen, scheiterte im Registrierungs-Resend-Test an einer bereits vorher sichtbaren Statusmeldung. Der Test wartet nun auf den tatsächlichen POST-Abschluss und prüft weiterhin genau einen Request. Der erneute lokale Chromium-Lauf bestand 27 Fälle; das beweist noch keinen grünen neuen GitHub-WebKit-Lauf. Auth-Rücksprünge in Registrierung, Login und MFA verwenden jetzt gemeinsam `lib/navigation.ts`, inklusive Regression gegen URL-Normalisierungsangriffe.
+
 - Echte Graph-Zustellung, produktiver Link in realem Postfach, SPF/DKIM/DMARC und aktueller Provider-Konfigurationsnachweis.
 - Fachliche/juristische Freigabe der vorhandenen AGB/DPA/Datenschutzerklärung. Texte werden nicht stillschweigend als freigegeben erklärt.
 - Physisches iPhone Safari, Android Chrome, installierte PWA, echtes Password-Autofill und virtuelle Tastatur. Browseremulation ersetzt diese Nachweise nicht.

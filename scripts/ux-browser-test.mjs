@@ -49,6 +49,15 @@ const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'s
 const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
+function customerListFixture(params){
+ const normalize=value=>String(value??'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+ const query=normalize(params.get('q'));
+ const status=params.get('status')?.replace(/^eq\./,'');
+ const [field='name',direction='asc']=(params.get('order')??'name.asc').split('.');
+ const rows=collections.customers.filter(item=>(!status||item.status===status)&&(!query||normalize([item.name,item.customer_no,item.contact_name,item.email,item.phone,item.city].join(' ')).includes(query))).sort((a,b)=>String(a[field]??'').localeCompare(String(b[field]??''),'de-CH')*(direction==='desc'?-1:1));
+ const offset=Number(params.get('offset')??0),limit=Number(params.get('limit')??1000);
+ return {items:rows.slice(offset,offset+limit),total:rows.length};
+}
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings'];
@@ -150,6 +159,7 @@ try{
    else if(p==='/api/finance/overview')data=url.searchParams.get('include')==='workspace'?{...summary,documents:collections.documents,cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),data:{payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]}}:summary;
    else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
+   else if(p==='/api/customers'||p==='/api/demo/data'&&url.searchParams.get('collection')==='customers')data=customerListFixture(url.searchParams);
    else if(p==='/api/demo/data')data={items:(collections[url.searchParams.get('collection')]??[]).filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
    else if(p==='/api/dashboard'||p==='/api/demo/dashboard')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),canFinance:true,recent:[invoice],attention:[],invoices:[invoice],payments:[payment],stats:{customer_count:2},analyticsInvoices:[{issue_date:'2026-10-01',total:135.13,invoice_count:1}],analyticsPayments:[{paid_on:'2026-10-01',amount:dataPaymentMode?invoice.paid_amount:100}]};
@@ -257,6 +267,23 @@ try{
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
   if(hasInteraction('customers')){
+    await navigate(base+'/kunden');await page.waitForLoadState('networkidle');
+    const listActions=page.locator('.page-actions');
+    assert.deepEqual(await listActions.locator('button,a').evaluateAll(elements=>elements.map(el=>el.getAttribute('aria-label'))),['Kunden suchen...','Filter und Sortierung','Neuer Kunde'],'Customer header exposes search, filters and create in that order');
+    assert.equal(await page.locator('main .chips,main select,main input[type="search"]').count(),0,'Status and sort controls live exclusively in their sheet');
+    await page.getByRole('button',{name:'Kunden suchen...',exact:true}).click();await page.getByPlaceholder('Kunden suchen...').fill('not-present');await page.getByRole('dialog').getByRole('button',{name:'Anwenden',exact:true}).click();await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Filter zurücksetzen',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const filters=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await filters.getByLabel('Status / Typ',{exact:true}).selectOption('Inaktiv');await filters.getByRole('button',{name:'Schliessen',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByLabel('Status / Typ',{exact:true}).selectOption('Inaktiv');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();await page.getByText('Keine inaktiven Kunden',{exact:true}).waitFor();await page.getByRole('button',{name:'Filter zurücksetzen',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByLabel('Sortierung',{exact:true}).selectOption('0:desc');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();await page.locator('.records-active-filters').getByText('Kunde ↓',{exact:true}).waitFor();
+    await page.locator('.mobile-record-list a').first().click();await page.waitForURL('**/kunden/customer-one');await page.goBack();await page.waitForURL('**/kunden');await page.locator('.records-active-filters').getByText('Kunde ↓',{exact:true}).waitFor();
+    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-customer-list-standard.png`)});
+    const originalCustomers=[...collections.customers];
+    await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByLabel('Sortierung',{exact:true}).selectOption('0:asc');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();
+    collections.customers.push(...Array.from({length:55},(_,index)=>({...customer,id:'pagination-'+index,name:'Paging customer '+String(index).padStart(2,'0'),city:'Bern'})));
+    await page.reload();await page.getByRole('navigation',{name:'Listenseiten',exact:true}).getByRole('button',{name:'Weiter',exact:true}).click();await page.getByText('Seite 2 von 2',{exact:true}).waitFor();assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'The second customer page exposes the remaining authorized rows');
+    await page.locator('.mobile-record-list a[href="/kunden/customer-one"]').click();await page.waitForURL('**/kunden/customer-one');await page.goBack();await page.waitForURL('**/kunden');await page.getByText('Seite 2 von 2',{exact:true}).waitFor();assert.equal(await page.locator('.mobile-record-list .record-wrapper').count(),6,'Returning from details restores the active page');
+    collections.customers.splice(0,collections.customers.length,...originalCustomers);await page.reload();await page.getByRole('navigation',{name:'Listenseiten',exact:true}).getByRole('button',{name:'Zurück',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
     await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
     await page.getByRole('button',{name:'Kundenaktionen',exact:true}).filter({visible:true}).click();
     const actions=page.getByRole('dialog',{name:'Kundenaktionen',exact:true});await actions.waitFor();await actionEvidence(page,'Kundenaktionen',theme);
@@ -443,9 +470,9 @@ try{
   await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');
   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
   await page.setViewportSize({width:430,height:900});
-  await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('not-present');
+  await page.waitForLoadState("networkidle");await navigate(base+'/produkte');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Produkte suchen...',exact:true}).click();await page.getByPlaceholder('Produkte suchen...').fill('not-present');await page.getByRole('dialog').getByRole('button',{name:'Anwenden',exact:true}).click();
   await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
-  await page.getByRole('searchbox',{name:'Produkte suchen...'}).fill('Beratung');
+  await page.getByRole('button',{name:'Produkte suchen...',exact:true}).click();await page.getByPlaceholder('Produkte suchen...').fill('Beratung');await page.getByRole('dialog').getByRole('button',{name:'Anwenden',exact:true}).click();
   await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();
   await page.waitForLoadState("networkidle");await navigate(base+'/produkte/product-one');await page.waitForLoadState('networkidle');await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();
   const dialog=page.getByRole('dialog',{name:'Produktaktionen'});await dialog.waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-action-sheet.png`)});

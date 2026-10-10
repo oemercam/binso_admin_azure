@@ -1,0 +1,60 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "customers",
+    "products"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/kunden",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "route": "/produkte",
+      "passed": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "route": "/produkte",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

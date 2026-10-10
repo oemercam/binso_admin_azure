@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useId } from "react";
 import ConfirmDialog from "../confirm-dialog";
 import { AppShell } from "../app-shell";
-import { RecordRow, RecordsView } from "../records";
+import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { customers } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -23,15 +23,16 @@ export function formatSwissPhone(value:unknown){const raw=String(value??"").trim
 
 export function formatSwissUid(value:unknown){const raw=String(value??"").trim().toUpperCase();const digits=raw.replace(/\D/g,"");if(digits.length===9)return `CHE-${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}`;return raw;}
 
+const customerColumns=[{label:"Kunde",index:0},{label:"Kontakt",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}];
+const customerSortColumns=customerColumns.filter(column=>column.index!==1);
 export function CustomersPage() {
-  const {rows:customerRows,loading,error}=useDemoRows("customers",customers);
-  return <AppShell title="Kunden" subtitle="Kunden, Kontakte und Aktivitäten zentral verwalten." active="kunden" actions={<CreateAction href="/kunden/neu" label="Neuer Kunde"/>}>
-    <div className="customer-records-layout">
-      <div>
-        <RecordsView loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={[{label:"Kunde",index:0},{label:"Kontakt",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}]} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,sector,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={[city,sector].filter(value=>value&&value!=="—").join(" · ")} status={status}/>}}</RecordsView>
-      </div>
-
-    </div>
+  const controller=useRecordsController({placeholder:"Kunden suchen...",columns:customerSortColumns});
+  const query=new URLSearchParams({limit:"50",offset:String(controller.page*50),order:({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]?(controller.sort==='default'?'name.asc':({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]+'.'+controller.sort):'name.asc'});
+  if(controller.query.trim())query.set('q',controller.query.trim());
+  if(controller.activeChip==='Aktiv'||controller.activeChip==='Inaktiv')query.set('status',controller.activeChip==='Aktiv'?'active':'inactive');
+  const {rows:customerRows,total,loading,error}=useDemoRows("customers",customers,query.toString());
+  return <AppShell title="Kunden" subtitle={loading?"Wird geladen…":`${total} ${total===1?'Kunde':'Kunden'}`} active="kunden" actions={<RecordsControls controller={controller} placeholder="Kunden suchen..." columns={customerSortColumns}><CreateAction href="/kunden/neu" label="Neuer Kunde"/></RecordsControls>}>
+    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize:50,onPage:controller.setPage}} loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={customerColumns} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,contact,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} personIdentity={id} title={name} meta={[city,contact].filter(value=>value&&value!=="—").join(" · ")} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 

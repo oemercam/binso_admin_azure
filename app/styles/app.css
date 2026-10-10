@@ -1471,3 +1471,12 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .registration-summary dd{margin:0;overflow-wrap:anywhere}
 .registration-summary dd p:first-child{margin-top:0}
 .registration-legal-links{display:flex;flex-wrap:wrap;gap:var(--field-group-gap)}
+
+/* Central records controls own their layout; legacy toolbar grids do not apply. */
+.records-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--mobile-toolbar-gap);margin-bottom:var(--heading-content-gap);min-width:0}
+.records-toolbar .records-count{margin-left:auto}
+.records-active-filters{min-width:0;overflow-wrap:anywhere;color:var(--color-muted);font-size:.875rem}
+.records-search-action.icon-button,.records-filter-action.icon-button{width:var(--touch);height:var(--touch);min-width:var(--touch);border:0;background:transparent;box-shadow:none}
+.records-filter-action[aria-pressed="true"]{color:var(--status-info-fg)}
+.records-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--mobile-toolbar-gap);margin-top:var(--mobile-section-gap)}
+.records-pagination>span{font-size:.875rem;color:var(--color-muted)}

@@ -10,6 +10,7 @@ import {FormWizard} from "@/components/form-wizard";
 import {allowDraftNavigation} from "@/components/use-browser-back-guard";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {registrationLocale,registrationText,type RegistrationTextKey} from "@/lib/i18n";
+import {safeAppPath} from "@/lib/navigation";
 
 type Context={plan:{id:string;name:string;monthly:number;yearly:number}|null;billingCycle:"monthly"|"yearly";trialDays:number;termsVersion:string;privacyVersion:string;dpaVersion:string};
 type Stage="new"|"pending"|"verified";
@@ -30,7 +31,7 @@ export function RegistrationSheet(){
   const params=new URLSearchParams();if(planParam)params.set('plan',planParam);if(billingParam)params.set('billing',billingParam);
   fetch('/api/auth/register?'+params,{cache:'no-store'}).then(async response=>{
    const payload=await response.json();if(!response.ok)throw new Error();if(!active)return;
-   if(payload.state==='authenticated'&&typeof payload.next==='string'){allowDraftNavigation();window.location.replace(payload.next);return;}
+   if(payload.state==='authenticated'&&typeof payload.next==='string'){allowDraftNavigation();window.location.replace(safeAppPath(payload.next));return;}
    setContext(payload.context);setOpen(true);setError('');
    if(payload.pending){if(!search.get('lang')&&payload.pending.locale&&payload.pending.locale!=='de'){const restored=new URLSearchParams(search);restored.set('lang',payload.pending.locale);router.replace('/registrieren?'+restored,{scroll:false});}setCompany(payload.pending.company);setEmail(payload.pending.email);setStage(payload.state==='verified'?'verified':'pending');setStatus('deliveryUnconfirmed');}
   }).catch(()=>{if(active)setError('failure')});
@@ -47,7 +48,7 @@ export function RegistrationSheet(){
  const finish=(payload:Record<string,unknown>)=>{
   setPassword('');clearDemoClientSession();allowDraftNavigation();
   if(payload.alreadyVerified){setStage('verified');setStatus('alreadyVerified');return;}
-  if(typeof payload.next==='string'&&payload.next.startsWith('/')&&!payload.next.startsWith('//'))window.location.replace(payload.next);
+  if(typeof payload.next==='string')window.location.replace(safeAppPath(payload.next));
   else window.location.replace('/login');
  };
  const submit=async(event:FormEvent<HTMLFormElement>)=>{

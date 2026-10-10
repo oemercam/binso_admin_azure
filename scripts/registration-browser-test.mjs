@@ -53,7 +53,7 @@ try{
   assert.equal(await sheet.locator('input[type="password"]').count(),0,'The password is cleared after confirmed account creation');
   assert.equal(await page.evaluate(()=>JSON.stringify([Object.entries(localStorage),Object.entries(sessionStorage)]).includes('a sufficiently long test password')),false,'Passwords never enter browser draft storage');
   await page.reload();await sheet.getByRole('heading',{name:t('verification'),exact:true}).waitFor();assert.equal(await sheet.locator('input[name="password"]').count(),0,'Pending setup resumes without a password draft');
-  await sheet.getByRole('button',{name:t('resend'),exact:true}).click();await sheet.getByText(t('deliveryUnconfirmed'),{exact:true}).waitFor();assert.equal(resends,1);
+  const [resendResponse]=await Promise.all([page.waitForResponse(response=>new URL(response.url()).pathname==='/api/auth/resend-verification'&&response.request().method()==='POST'),sheet.getByRole('button',{name:t('resend'),exact:true}).click()]);await resendResponse.finished();assert.equal(resendResponse.status(),200);assert.equal(resends,1);await sheet.getByText(t('deliveryUnconfirmed'),{exact:true}).waitFor();
   await page.screenshot({path:path.join(output,`${locale}-verification.png`),animations:'disabled'});
   evidence.push({locale,phase:'guided-validation-back-legal-network-create-resend',observed:'passed',provider:'synthetic UI fixture, no real mail'});await context.close();
  }

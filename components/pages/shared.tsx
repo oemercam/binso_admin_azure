@@ -49,9 +49,10 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
   return [];
 }
 
-export function useDemoRows(collection:DemoCollection, defaults:string[][]) {
+export function useDemoRows(collection:DemoCollection, defaults:string[][],filters="") {
   void defaults;
-  const path=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
-  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[]}>(path);
-  return {rows:mapRemoteRows(collection,data?.items??[]),loading,error};
+  const base=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
+  const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
+  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
+  return {rows:mapRemoteRows(collection,data?.items??[]),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading,error};
 }

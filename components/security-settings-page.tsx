@@ -6,6 +6,7 @@ import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
 import {Button, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
+import {safeAppPath} from "@/lib/navigation";
 
 type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
 type SessionItem={id:string;userAgent:string|null;lastSeenAt:string|null;expiresAt:string;current:boolean};
@@ -121,7 +122,7 @@ export function SecuritySettingsPage(){
         <Button onClick={()=>void confirmSetup()} disabled={code.length!==6}>Authenticator bestätigen</Button>
       </div>}
       {recovery.length>0&&<div className="context-block"><Status tone="warning">Einmal anzeigen</Status><b>Recovery Codes sicher speichern</b><span>Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf.</span><pre>{recovery.join("\n")}</pre></div>}
-      {mfa?.enabled&&next&&<Button onClick={()=>router.push(next.startsWith("/")?next:"/dashboard")}>Weiter zu Binso One</Button>}
+      {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}>Weiter zu Binso One</Button>}
     </section>
 
     <section className="surface security-card">

@@ -78,7 +78,7 @@ Die Bottom-Navigation bleibt in Markup, Access-/Display-/Scroll-Logik, Icons, St
 | A | Vollständiges statisches Quell-/API-/Schema-Inventar und Requirements-Register; vollständige zustandsbezogene Root-Cause-Abnahme noch offen |
 | B | Zentraler Tab-Owner erweitert; vollständiges Raster/Header/Section/Divider-Enforcement offen |
 | C | Ein Statistik-Owner; Übersicht, Finanzen, Analyse und Kunden migriert; weitere geeignete Module offen |
-| D | Durchgängige Kontextsuche über den Gesamtbestand, Filter-/Sort-Sheet und Headervertrag offen |
+| D | Gemeinsamer Records-Sheet-/Zustandsowner, globale SQL-Suche und serverseitige Kundenliste implementiert und gezielt geprüft; übrige Module, fachliche Filter und Scrollwiederherstellung offen. Details: `records-progress.md` |
 | E | Offizielle Normgrundlagen begonnen; fachliches Feldregister und vollständige Normabnahme offen |
 | F | Vorhandene Sheet-/Wizard-Owner überprüft; sämtliche Geschäftsprozesse noch nicht migriert |
 | G | Lesende Finanz-/Kundenprojektionen korrigiert und getestet; strukturierte Modell-/API-/Migrationsarbeit offen |

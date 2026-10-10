@@ -1,0 +1,2 @@
+UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.
+Wizard first/middle/final actions and architecture ownership passed.

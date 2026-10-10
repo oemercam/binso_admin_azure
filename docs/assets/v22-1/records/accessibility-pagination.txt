@@ -1,0 +1,13 @@
+Checking light 375px
+Checking light 1440px
+Route /kunden
+Route /kunden
+Route /produkte
+Route /produkte
+Checking dark 375px
+Checking dark 1440px
+Route /kunden
+Route /kunden
+Route /produkte
+Route /produkte
+UX browser checks passed: 8 route/theme/viewport combinations ; interactions: customers,products. Artifacts: /tmp/binso-v22-records-a11y-final
