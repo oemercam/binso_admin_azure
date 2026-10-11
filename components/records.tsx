@@ -27,7 +27,7 @@ export function DataTable({children,label,variant="records",owner}:{children:Rea
   const statusIndex=cells.findIndex(cell=>isValidElement(cell)&&cell.type===Status);
   const status=cells[statusIndex];
   const badge=isValidElement<{children:string;tone?:"success"|"warning"|"danger"|"neutral"|"info"}>(status)?status.props:null;
-  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
+  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
  })}</div>}</>;
 }
 function tableCells(children:ReactNode,header=false){

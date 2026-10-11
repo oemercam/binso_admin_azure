@@ -109,28 +109,12 @@
 .monitoring-panel,
 .announcement-card,
 .operator-root .security-card,
-.subscription-card{
-  border:0;
-  border-radius:0;
-  background:var(--color-bg);
-  padding:0;
-  box-shadow:none;
-}
 .operator-ticket-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px}
 .operator-reply{margin-top:14px;padding-top:12px;border-top:1px solid var(--color-line)}
 
 .context-block{display:grid;gap:5px;padding:14px 0;border-top:1px solid var(--color-line)}
 .context-block small,.context-block span{color:var(--color-muted);font-size:10px}
 .context-block .status{width:max-content}
-
-.subscription-card{display:flex;flex-direction:column;gap:8px}
-.subscription-card small,.subscription-card p,.subscription-card span{color:var(--color-muted);font-size:11px}
-.subscription-card h2{margin:0;font-size:22px}
-.subscription-card>strong{font-size:15px}
-.subscription-card .button{margin-top:12px}
-
-.restriction-form{max-width:760px}
-.restriction-form .form-grid{margin:18px 0}
 
 .monitoring-panel{
   padding:0;

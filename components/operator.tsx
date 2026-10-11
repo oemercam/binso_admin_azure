@@ -83,7 +83,7 @@ function operatorStatus(value:string){
   const map:Record<string,string>={
     new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Wartet auf Kunde",
     resolved:"Gelöst",closed:"Geschlossen",active:"Aktiv",past_due:"Überfällig",suspended:"Gesperrt",
-    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase"
+    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase",expired:"Abgelaufen"
   };
   return map[value]??value;
 }
@@ -118,13 +118,15 @@ function useOperatorCustomers(){
 }
 
 
-export function OperatorPage({ section = "", demo = false }: { section?: string; demo?: boolean }) {
+export function OperatorPage({ section = "", demo = false, identity }: { section?: string; demo?: boolean;identity?:{name:string;email:string}|null }) {
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
   const mobileMoreDialog=useDialogFocus(mobileMore,()=>setMobileMore(false));
   const [accountOpen,setAccountOpen]=useState(false);
+  const [createOpen,setCreateOpen]=useState(false);
+  useEffect(()=>{queueMicrotask(()=>setCreateOpen(false));},[section]);
   const [logoutBusy,setLogoutBusy]=useState(false);
   const [logoutError,setLogoutError]=useState("");
   const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const payload=await logoutOperatorClientSession();const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
@@ -140,8 +142,8 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         <div className="operator-header-brand"><Logo/><span>Admin</span></div>
         <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
       </header>
-      <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)}/></div>
-      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>One Admin</b><small>Administration</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
+      <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={!detail&&(key==="sperrungen"||key==="ankuendigungen")?<Button className="bo-create-action" ariaLabel={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} icon="plus" onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
+      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>{identity?.name||"One Admin"}</b><small>{identity?.email||"Administration"}</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
@@ -161,9 +163,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         key === "zahlungen" ? <PaymentsView/> :
         key === "finanzen" ? <OperatorFinanceView demo={demo}/> :
         key === "abonnemente" ? <SubscriptionsView/> :
-        key === "sperrungen" ? <RestrictionsView/> :
+        key === "sperrungen" ? <RestrictionsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "monitoring" ? <MonitoringView/> :
-        key === "ankuendigungen" ? <AnnouncementsView/> :
+        key === "ankuendigungen" ? <AnnouncementsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "sicherheit" ? <SecurityView/> :
         key === "audit" ? <AuditView/> :
         <OperatorDashboard/>}
@@ -475,11 +477,7 @@ function SubscriptionsView() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  if(!production){
-    return <>
-      <div className="operator-grid thirds">{[["Start","1’128","CHF 19","21’432"],["Business","1’462","CHF 49","71’638"],["Pro","251","CHF 89","22’339"]].map(([plan,count,price,mrr])=><WorkspaceSection className="subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary">Demo</Button></WorkspaceSection>)}</div>
-    </>;
-  }
+  if(!production)return <MetricTiles>{plans.map(plan=><MetricTile key={plan.id} label={plan.name} value={demoCustomers.filter(customer=>customer.plan===plan.name).length+" Kunden"} hint={moneyChf(plan.monthly)+" / Monat · Demo"}/>)}</MetricTiles>;
 
   const grouped=["trial","start","business","pro"].map(plan=>({plan,items:items.filter(item=>item.plan===plan)}));
   const price:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
@@ -487,9 +485,7 @@ function SubscriptionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <div className="operator-grid thirds">
-      {grouped.map(group=><WorkspaceSection className="subscription-card" key={group.plan}><small>Plan</small><h2>{operatorPlan(group.plan)}</h2><strong>{group.items.length} Kunden</strong><p>{group.items.filter(item=>item.subscription_status==="active").length} aktiv</p><span>{price[group.plan]} / Monat</span><Button variant="secondary" onClick={()=>setSelected(group.items[0]??null)}>Kundenstatus</Button></WorkspaceSection>)}
-    </div>
+    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+" Kunden"} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
     <WorkspaceSection className="operator-table-card">
       <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b><small>{String(item.tenant_id).slice(0,8)}</small></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
     </WorkspaceSection>
@@ -498,7 +494,7 @@ function SubscriptionsView() {
   </>;
 }
 
-function RestrictionsView() {
+function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const production=useBackendMode();
   
   const {items:customers}=useOperatorCustomers();
@@ -519,10 +515,10 @@ function RestrictionsView() {
   useEffect(()=>{if(production&&!tenantId&&customers[0]) queueMicrotask(()=>setTenantId(customers[0].id));},[production,tenantId,customers]);
 
   const createRestriction=async()=>{
-    if(!production){setConfirm(null);setToast("Einschränkung im Demo-Modus simuliert.");window.setTimeout(()=>setToast(null),2200);return;}
+    if(!production){setConfirm(null);onClose();setToast("Einschränkung im Demo-Modus simuliert.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       await apiPost("/api/operator/restrictions",{tenantId,scope,reason,note:note.trim()||reason,endsAt:endsAt||null});
-      setConfirm(null);setNote("");setEndsAt("");
+      setConfirm(null);setNote("");setEndsAt("");onClose();
       await load();
       setToast("Einschränkung erstellt und im Audit protokolliert.");
     }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht erstellt werden.");}
@@ -542,9 +538,7 @@ function RestrictionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <div className="operator-grid">
-      <WorkspaceSection className="restriction-form">
-        <SectionTitle title="Einschränkung erstellen"/>
+    <FormSheet open={open} onClose={onClose} label="Einschränkung erstellen" actions={<Button variant="danger" onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung prüfen</Button>}>
         <div className="form-grid two">
           <Field label="Kunde"><Select value={tenantId} onChange={e=>setTenantId(e.target.value)}>{production?customers.map(customer=><option value={customer.id} key={customer.id}>{customer.name}</option>):<option>Meier Handel AG</option>}</Select></Field>
           <Field label="Grund"><Select value={reason} onChange={e=>setReason(e.target.value)}><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option><option>Manuelle Prüfung</option></Select></Field>
@@ -552,13 +546,11 @@ function RestrictionsView() {
           <Field label="Ablaufdatum"><Input type="date" value={endsAt} onChange={e=>setEndsAt(e.target.value)}/></Field>
           <Field label="Interne Begründung" className="full"><Textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Begründung für Audit und interne Nachvollziehbarkeit"/></Field>
         </div>
-        <Button variant="danger" onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung erstellen</Button>
-      </WorkspaceSection>
+    </FormSheet>
       <WorkspaceSection>
         <SectionTitle title="Aktive Einschränkungen"/>
         {production?(active.length?active.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <div className="notice" key={String(item.id)}><Status tone="warning">{item.scope==="all"?"Gesperrt":"Eingeschränkt"}</Status><b>{tenant?.name??"Kunde"}</b><span>{String(item.reason??"")} · seit {new Date(String(item.starts_at)).toLocaleDateString("de-CH")}</span><Button variant="secondary" onClick={()=>setConfirm(String(item.id))}>Aufheben</Button></div>}):<EmptyState compact icon="lock" title="Keine aktiven Einschränkungen" text="Alle Kundenkonten sind ohne Operator-Einschränkung."/>):<div className="notice"><Status tone="warning">Demo</Status><b>Meier Handel AG</b><span>Zahlungsausstand · Beispiel</span><Button variant="secondary" onClick={()=>setConfirm("demo")}>Aufheben</Button></div>}
       </WorkspaceSection>
-    </div>
     {confirm&&<ConfirmDialog open={Boolean(confirm)} title={confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"} message={confirm==="create"?"Der Zugriff wird gemäss Umfang eingeschränkt. Grund, Operator und Zeitpunkt werden im Audit protokolliert.":"Der normale Zugriff wird wiederhergestellt, sofern keine weitere aktive Einschränkung besteht."} confirmLabel={confirm==="create"?"Einschränken":"Aufheben"} danger={confirm==="create"} onCancel={()=>setConfirm(null)} onConfirm={()=>confirm==="create"?void createRestriction():confirm&&void removeRestriction(confirm)}/>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
@@ -627,7 +619,7 @@ function MonitoringView() {
   </>;
 }
 
-function AnnouncementsView() {
+function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const production=useBackendMode();
   
   const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/announcements":null);
@@ -650,14 +642,14 @@ function AnnouncementsView() {
       return;
     }
     if(!production){
-      setToast("Ankündigung im Demo-Modus simuliert.");
+      onClose();setToast("Ankündigung im Demo-Modus simuliert.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
     try{
       await apiPost<{item:Record<string,unknown>}>("/api/operator/announcements",{title,body,kind,audience,published:true});
       refresh();
-      setTitle("");setBody("");
+      setTitle("");setBody("");onClose();
       setToast("Ankündigung veröffentlicht.");
     }catch(error){
       setToast(error instanceof Error?error.message:"Ankündigung konnte nicht veröffentlicht werden.");
@@ -670,18 +662,16 @@ function AnnouncementsView() {
 
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
-  return <div className="operator-grid">
-    <WorkspaceSection>
-      <SectionTitle title="Neue Ankündigung"/>
+  return <>
+    <FormSheet open={open} onClose={onClose} label="Ankündigung erstellen" actions={<Button onClick={()=>void publish()}>Veröffentlichen</Button>}>
       <div className="form-grid"><Field label="Titel" className="full"><Input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Kurzer Titel"/></Field><Field label="Typ" className="full"><Select value={kind} onChange={e=>setKind(e.target.value)}><option value="information">Information</option><option value="maintenance">Wartung</option><option value="incident">Störung</option><option value="feature">Neue Funktion</option></Select></Field><Field label="Zielgruppe" className="full"><Select value={audience} onChange={e=>setAudience(e.target.value)}><option value="all">Alle Kunden</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Nachricht" className="full"><Textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="Nachricht..."/></Field></div>
-      <Button onClick={()=>void publish()}>Veröffentlichen</Button>
-    </WorkspaceSection>
+    </FormSheet>
     <WorkspaceSection>
       <SectionTitle title="Ankündigungen"/>
       {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.published===true?"success":"neutral"}>{item.published===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.body??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {audienceLabel[String(item.audience)]??String(item.audience)} · {new Date(String(item.created_at)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState compact icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
     </WorkspaceSection>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
-  </div>;
+  </>;
 }
 
 function SecurityView() {
@@ -715,15 +705,15 @@ function SecurityView() {
       <p className="technical-hint">Interne Identitäten, MFA und Rollen werden in Microsoft Entra ID verwaltet. Binso One zeigt hier nur die zuletzt synchronisierte Berechtigung.</p>
       {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head security"><span>Benutzer</span><span>Rolle</span><span>Status</span><span>Synchronisiert</span></DataTableHead>{items.map(item=><DataTableRow className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.display_name??item.email??"")}</b><small>{String(item.email??"")}</small></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{item.last_entra_sync_at?new Date(String(item.last_entra_sync_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"—"}</span></DataTableRow>)}</DataTable>:<EmptyState compact icon="lock" title="Noch keine Entra-Anmeldung" text="Sobald ein berechtigter Binso-Mitarbeiter sich über Microsoft anmeldet, erscheint die Identität hier."/>}
     </WorkspaceSection>
-    <WorkspaceSection className="security-card"><div className="security-row"><div><b>Berechtigungen in Azure verwalten</b><p>Zuweisungen erfolgen ausschliesslich über die Binso-One-App-Rollen in Microsoft Entra ID. Lokale Operator-Passwörter und lokale Rollenzuweisungen sind für Produktion deaktiviert.</p></div><Status tone="success">Entra verwaltet</Status><Button variant="secondary" disabled>Azure / Entra</Button></div></WorkspaceSection>
+    <WorkspaceSection><SectionTitle title="Berechtigungen verwalten"/><p className="technical-hint">Rollen und MFA werden in Microsoft Entra ID verwaltet. Die Liste zeigt den zuletzt synchronisierten Stand.</p></WorkspaceSection>
   </>;
 }
 
 function AuditView() {
  const production=useBackendMode();
- const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?'/api/operator/audit':null);
+ const resource=useApiQuery<{items:Array<{id:string;createdAt:string|null;userName:string|null;userEmail:string|null;action:string;entityType:string|null;entityId:string|null}>}>(production?'/api/operator/audit':null);
  const columns=[{label:'Zeit',index:0},{label:'Operator',index:1},{label:'Aktion',index:2},{label:'Ziel',index:3}];
  const controller=useRecordsController({placeholder:'Audit durchsuchen...',chips:['Alle'],columns});
- const rows=production?(resource.data?.items??[]).map(item=>[new Date(String(item.created_at)).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}),String(item.operator_user_id).slice(0,8),String(item.action),[item.target_type,item.target_id].filter(Boolean).map(String).join(' · ')||'—']):[['10:42','ocam','Kunde aktualisiert','Acme AG (Demo)'],['09:18','lschneider','Sperrung erstellt','Demo'],['Gestern','mbianchi','Ticket Status geändert','#8419 → In Bearbeitung']];
+ const rows=production?(resource.data?.items??[]).map(item=>[item.createdAt&&Number.isFinite(Date.parse(item.createdAt))?new Date(item.createdAt).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}):'Zeitpunkt nicht verfügbar',item.userName||item.userEmail||'System',item.action==='operator.entra_login'?'Microsoft-Anmeldung':item.action,[item.entityType,item.entityId].filter(Boolean).map(String).join(' · ')||'—']):[['10:42','ocam','Kunde aktualisiert','Acme AG (Demo)'],['09:18','lschneider','Sperrung erstellt','Demo'],['Gestern','mbianchi','Ticket Status geändert','#8419 → In Bearbeitung']];
  return <><RecordsControls inline controller={controller} placeholder="Audit durchsuchen..." chips={['Alle']} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&resource.loading} error={resource.error} placeholder="Audit durchsuchen..." countLabel="Audit-Einträge" chips={['Alle']} columns={columns}>{row=><RecordRow compact valuePlacement="metadata" title={row[2]} meta={[row[0],row[1],row[3]].join(' · ')}/>}</RecordsView>{resource.error&&<Button variant="secondary" onClick={resource.refresh}>Erneut versuchen</Button>}</>;
 }
