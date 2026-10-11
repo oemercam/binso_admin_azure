@@ -296,7 +296,7 @@
 
 
 /* Monitoring: compact 2x2 technical dashboard without nested chart cards. */
-.monitoring-technical-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 28px;margin-top:26px}
+.monitoring-technical-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 28px;margin-top:26px}
 .monitoring-technical-chart{min-width:0;padding:0;background:transparent;border:0;box-shadow:none}
 .monitoring-chart-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
 .monitoring-chart-title b{font-size:13px}.monitoring-chart-title strong{font-size:18px;letter-spacing:-.03em;white-space:nowrap}
