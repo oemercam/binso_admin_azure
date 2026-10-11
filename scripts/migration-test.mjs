@@ -67,6 +67,31 @@ try{
  const {listApiBusiness,mutateApiBusiness:rawMutation}=await import(dataModule(businessSource));
  const mutateApiBusiness=(c,s,operation,args)=>rawMutation(c,s,operation,{...args,p_idempotency_key:args.p_idempotency_key??randomUUID()});
  const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length}}};
+ {
+ // Execute the dashboard's actual queries against the fully migrated schema.
+ globalThis.operatorDashboardClient=client;
+ const runtime=dataModule(`export async function requireOperatorSession(){return {role:'platform_owner'}}; export function authorizeOperator(){}; export async function withPlatform(fn){return fn(globalThis.operatorDashboardClient)}; export const json=Response.json; export function apiError(error){throw error}`);
+ const dashboardSource=(await fs.readFile('app/api/operator/dashboard/route.ts','utf8')).replace(/'@\/lib\/server\/(?:operator\/session|operator\/rbac|db|http)'/g,JSON.stringify(runtime));
+ const {GET}=await import(dataModule(dashboardSource));
+ await db.exec('begin');
+ try{
+ const organization=randomUUID();
+ await db.query("insert into organizations(id,name,slug,is_demo) values($1,'Dashboard probe',$2,false)",[organization,'dashboard-'+organization]);
+ const before=Number((await (await GET()).json()).stats.payments_30d);
+ await db.query(`insert into platform_billing_payments(organization_id,provider,external_id,payment_date,amount,currency) values
+ ($1,'manual','dashboard-chf',current_date,123.45,'CHF'),
+ ($1,'manual','dashboard-eur',current_date,500,'EUR'),
+ ($1,'manual','dashboard-old',current_date-31,600,'CHF'),
+ ($1,'manual','dashboard-future',current_date+1,700,'CHF'),
+ ($1,'demo','dashboard-demo-provider',current_date,800,'CHF'),
+ ($2,'manual','dashboard-demo-organization',current_date,900,'CHF')`,[organization,demo]);
+ const response=await GET();assert.equal(response.status,200);
+ const dashboard=await response.json();
+ assert.equal(Math.round((Number(dashboard.stats.payments_30d)-before)*100),12345,'Dashboard counts only recent non-demo CHF payments');
+ assert.ok(Array.isArray(dashboard.tickets)&&Array.isArray(dashboard.incidents));
+ }finally{await db.exec('rollback');delete globalThis.operatorDashboardClient;}
+ console.log('Operator dashboard: migrated schema and real CHF payment isolation passed.');
+ }
  const session={organizationId:demo,userId:'demo-readonly',role:'owner'};
  {
  const {cashStatisticsData}=await import(dataModule((await fs.readFile('lib/server/repositories/finance.ts','utf8')).replaceAll("import 'server-only';",'')));
