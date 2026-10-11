@@ -1564,3 +1564,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bo-monitor-detail-metrics small{display:block;color:var(--color-muted);font-size:12px}
 .bo-monitor-detail-metrics a{display:inline-block;font-size:13px;margin-top:8px}
 .bo-monitor-details code{overflow-wrap:anywhere}
+
+.bo-monitor-headline{min-width:0;margin-bottom:16px}
+.bo-monitor-alert-summary{margin:12px 0;font-size:13px;color:var(--color-fg)}
