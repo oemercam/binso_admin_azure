@@ -1,0 +1,556 @@
+[
+  {
+    "id": "V23-A-001",
+    "requirement": "Current repository and live commit",
+    "files": [
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "GitHub REST main, workflow runs; live health GET",
+    "expected": "Exact SHAs and run results",
+    "actual": "main=live=e33af01; main CI/deploy green",
+    "status": "verified",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-A-002",
+    "requirement": "Open PRs and concurrent work",
+    "files": [
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "PR files and main comparison",
+    "expected": "Avoid silent overlap or security merge",
+    "actual": "237 diverged 10 ahead/20 behind; 231/222 reviewed as existing independent work",
+    "status": "verified",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-A-003",
+    "requirement": "Azure resources and readiness",
+    "files": [
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "Azure Actions read-only inventory and latest readiness logs",
+    "expected": "No resources presumed from config",
+    "actual": "App/DB present; storage/Insights/alerts absent; security checks fail",
+    "status": "blocked",
+    "evidence": [
+      "https://github.com/oemercam/binso_admin_azure/actions/runs/38128629567"
+    ]
+  },
+  {
+    "id": "V23-B-001",
+    "requirement": "Complete source inventory",
+    "files": [
+      "scripts/v23-admin-inventory.mjs",
+      "docs/architecture/v23/function-inventory.json"
+    ],
+    "method": "Existing AST rendering/import graph plus API/workflow closure",
+    "expected": "Identify every reachable element and operator API",
+    "actual": "14 views; 20 endpoints; 9 workflows; 2504 element occurrences; no full business acceptance inferred",
+    "status": "verified",
+    "evidence": [
+      "function-inventory.json",
+      "function-inventory.md"
+    ]
+  },
+  {
+    "id": "V23-C-001",
+    "requirement": "Frozen navigation and More",
+    "files": [
+      "components/operator.tsx",
+      "app/styles/app.css",
+      "app/styles/responsive.css"
+    ],
+    "method": "Byte comparison and navigation contract tests",
+    "expected": "No protected markup/style/token changes",
+    "actual": "Markup identical; navigation-foundation passes",
+    "status": "verified",
+    "evidence": [
+      "navigation-evidence.json",
+      "scripts/navigation-foundation-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-C-002",
+    "requirement": "Shared UX foundation",
+    "files": [
+      "components/monitoring.tsx",
+      "components/binso-ux.tsx"
+    ],
+    "method": "Imports, CSS architecture, responsive browser regression",
+    "expected": "Reuse WorkspaceSection/MetricTile/Status/controls",
+    "actual": "Existing six CSS files and 760px breakpoint reused; browser CI pending",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/check-css-architecture.mjs"
+    ]
+  },
+  {
+    "id": "V23-D-001",
+    "requirement": "Chart architecture",
+    "files": [
+      "components/statistics.tsx",
+      "components/monitoring-chart.tsx"
+    ],
+    "method": "Dependency and component audit; browser scenarios",
+    "expected": "Reuse existing statistics; only needed time-series primitive",
+    "actual": "Statistics/CashStatistics kept; one new measured hourly time-series component shared by portal/wallboard; no dependency added",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-D-002",
+    "requirement": "No fabricated charts",
+    "files": [
+      "components/monitoring-chart.tsx",
+      "lib/server/observability.ts"
+    ],
+    "method": "Measured SQL history; empty/outage browser cases",
+    "expected": "No invented samples or missing-data success",
+    "actual": "Measured hourly vital p75; empty state and missing-hour gaps; no fabricated uptime/history",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-D-003",
+    "requirement": "Chart loading/error/permission/unavailable",
+    "files": [
+      "components/monitoring.tsx",
+      "components/monitoring-chart.tsx"
+    ],
+    "method": "Query-state and model tests plus browser CI",
+    "expected": "Show real query state and role mask",
+    "actual": "Loading/error handled centrally; unavailable/stale empty plot; permission-masked business metrics",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-test.mjs",
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-001",
+    "requirement": "Monthly subscription value",
+    "files": [
+      "app/api/operator/dashboard/route.ts",
+      "components/operator.tsx",
+      "scripts/migration-test.mjs"
+    ],
+    "method": "Actual GET over migrated isolated DB",
+    "expected": "Yearly amount normalized to month",
+    "actual": "1200 CHF yearly contributes 100 CHF/month; label explicit",
+    "status": "verified",
+    "evidence": [
+      "scripts/migration-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-002",
+    "requirement": "30-day payments",
+    "files": [
+      "app/api/operator/dashboard/route.ts",
+      "lib/server/repositories/observability.ts"
+    ],
+    "method": "Migrated SQL fixtures at boundary/currency/demo",
+    "expected": "30 inclusive calendar days; real CHF only",
+    "actual": "Dashboard uses today-29; today-30 excluded; monitoring uses same window",
+    "status": "verified",
+    "evidence": [
+      "scripts/migration-test.mjs",
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-003",
+    "requirement": "Customer activation/status/profile/subscriptions/history",
+    "files": [
+      "components/operator.tsx",
+      "app/api/operator/customers/[id]/route.ts"
+    ],
+    "method": "Source inventory plus existing migrated/HTTP tests",
+    "expected": "Every business transition proven end-to-end",
+    "actual": "Rendering/API/database paths recorded; full operator mutation/provider matrix not yet proven. No production mutations performed.",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json",
+      "scripts/api-tenant-postgres-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-004",
+    "requirement": "Payments/invoices/subscriptions/refunds/exports",
+    "files": [
+      "components/operator.tsx",
+      "lib/server/repositories/operator-api.ts"
+    ],
+    "method": "Source inventory plus existing migrated/HTTP tests",
+    "expected": "Every business transition proven end-to-end",
+    "actual": "Rendering/API/database paths recorded; full operator mutation/provider matrix not yet proven. No production mutations performed.",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json",
+      "scripts/api-tenant-postgres-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-005",
+    "requirement": "Internal users/roles/config/notifications/audit",
+    "files": [
+      "components/operator.tsx",
+      "app/api/operator/users/route.ts"
+    ],
+    "method": "Source inventory plus existing migrated/HTTP tests",
+    "expected": "Every business transition proven end-to-end",
+    "actual": "Rendering/API/database paths recorded; full operator mutation/provider matrix not yet proven. No production mutations performed.",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json",
+      "scripts/api-tenant-postgres-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-006",
+    "requirement": "Restrictions/reactivation and audit atomicity",
+    "files": [
+      "app/api/operator/accounts/[id]/route.ts",
+      "lib/server/database.ts"
+    ],
+    "method": "Source inventory plus existing migrated/HTTP tests",
+    "expected": "Every business transition proven end-to-end",
+    "actual": "Rendering/API/database paths recorded; full operator mutation/provider matrix not yet proven. No production mutations performed.",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json",
+      "scripts/api-tenant-postgres-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-F-001",
+    "requirement": "Shared monitoring contract",
+    "files": [
+      "lib/observability/model.ts",
+      "lib/server/observability.ts",
+      "lib/server/repositories/observability.ts"
+    ],
+    "method": "PGlite migrated SQL and status tests",
+    "expected": "Every metric has source/unit/time/window/freshness",
+    "actual": "Typed aggregate contract; null is Unknown; read-only repeatable snapshot; 120s stale",
+    "status": "verified",
+    "evidence": [
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-F-002",
+    "requirement": "Azure Monitor/Insights/Log Analytics",
+    "files": [
+      "lib/server/observability.ts",
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "Actual Azure audit logs",
+    "expected": "Real resources/access before claiming telemetry",
+    "actual": "No Insights/alerts/action groups in observed group; no authenticated control-plane; Azure metrics unavailable",
+    "status": "blocked",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-F-003",
+    "requirement": "Application telemetry completeness",
+    "files": [
+      "lib/server/observability.ts"
+    ],
+    "method": "Actual source instrumentation audit",
+    "expected": "Real requests/errors/auth/jobs data",
+    "actual": "Worker uptime, measured snapshot/SQL durations, logged application events, queue counts, vital history available; full request/error/auth streams absent",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json"
+    ]
+  },
+  {
+    "id": "V23-F-004",
+    "requirement": "Business process telemetry",
+    "files": [
+      "lib/server/repositories/observability.ts"
+    ],
+    "method": "Migrated non-demo/currency fixtures",
+    "expected": "No replacement of failures with successful counts",
+    "actual": "Accounts/subscriptions/payments/past_due/webhook failures measured; failed signup/invoice streams unavailable",
+    "status": "partially_verified",
+    "evidence": [
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-F-005",
+    "requirement": "Deployment telemetry",
+    "files": [
+      "lib/server/observability.ts"
+    ],
+    "method": "Build metadata and pipeline baseline",
+    "expected": "Commit plus actual deployment outcome/history",
+    "actual": "Worker SHA present; live deployment history not integrated; no success inferred from SHA",
+    "status": "partially_verified",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-G-001",
+    "requirement": "All monitoring sections",
+    "files": [
+      "components/monitoring.tsx"
+    ],
+    "method": "Component inventory; browser screenshots",
+    "expected": "11 sections using shared foundation",
+    "actual": "Overview, infrastructure, app/API, DB, jobs, integrations, events, security, deployments, alarm centre, history rendered",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-G-002",
+    "requirement": "Central health states",
+    "files": [
+      "lib/observability/model.ts"
+    ],
+    "method": "Healthy/Warning/Critical/Unknown/Maintenance model tests",
+    "expected": "Unknown cannot yield Healthy",
+    "actual": "Explicit states; unknown, stale, future timestamps and denied data fail closed",
+    "status": "verified",
+    "evidence": [
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-G-003",
+    "requirement": "Alarm boundaries/dedup/recovery",
+    "files": [
+      "lib/observability/model.ts",
+      "lib/server/observability.ts"
+    ],
+    "method": "Threshold fixtures and fresh recovery",
+    "expected": "Stable rule IDs; actual counts/windows; no unknown recovery",
+    "actual": "Local rule evaluation; mail/billing failures; rule key dedup; fresh 0 recovers",
+    "status": "verified",
+    "evidence": [
+      "scripts/observability-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-G-004",
+    "requirement": "Persistent alerts/owners/escalation",
+    "files": [
+      "lib/server/observability.ts"
+    ],
+    "method": "Configuration and Azure resource audit",
+    "expected": "Approved recipients/channels/history",
+    "actual": "Not activated; owners/escalation unset; no messages sent; no persistent acknowledgement history",
+    "status": "decision_required",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-H-001",
+    "requirement": "Authenticated standalone wallboard",
+    "files": [
+      "app/operator/wallboard/page.tsx",
+      "components/monitoring.tsx"
+    ],
+    "method": "Real five-role HTTP/browser matrix",
+    "expected": "No demo/anonymous access; platform read required",
+    "actual": "Server requireOperatorSession and authorizeOperator; positive/negative CI pending",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-H-002",
+    "requirement": "Profiles, fullscreen, themes, responsive",
+    "files": [
+      "components/monitoring.tsx",
+      "app/styles/app.css",
+      "app/styles/responsive.css"
+    ],
+    "method": "Both engines; three profiles; 390–3840px",
+    "expected": "Technical/Business/Combined; shared metric/chart logic",
+    "actual": "Implemented; no personal details; native fullscreen with truthful unsupported state",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-H-003",
+    "requirement": "Refresh and connection status",
+    "files": [
+      "components/monitoring.tsx",
+      "lib/client/use-api-query.ts"
+    ],
+    "method": "Actual interval, forced API outage/recovery",
+    "expected": "60s refresh; last successful fetch; stale is Unknown",
+    "actual": "Existing hook reused; timestamp+offline/error/stale labels; CI pending",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-I-001",
+    "requirement": "Monitoring privacy/role boundaries",
+    "files": [
+      "lib/server/observability.ts",
+      "app/api/operator/monitoring/route.ts"
+    ],
+    "method": "SQL projection and actual role matrix",
+    "expected": "No names/emails/payloads/secrets; financial/audit grants",
+    "actual": "Aggregate-only; financial/audit metrics masked; no new grants",
+    "status": "verified",
+    "evidence": [
+      "scripts/observability-test.mjs",
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-I-002",
+    "requirement": "Production DB privileges/RLS",
+    "files": [
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "Latest Azure SQL check",
+    "expected": "Runtime role cannot bypass RLS or administer",
+    "actual": "Check fails for binsoadmin; production role change explicitly requires approval; PR237 contains separate remediation",
+    "status": "blocked",
+    "evidence": [
+      "https://github.com/oemercam/binso_admin_azure/actions/runs/38128629567"
+    ]
+  },
+  {
+    "id": "V23-I-003",
+    "requirement": "Production Entra boundary",
+    "files": [
+      "docs/architecture/v23/baseline.json"
+    ],
+    "method": "Latest Easy Auth/AAD readiness",
+    "expected": "Pinned tenant issuer and valid registration",
+    "actual": "Latest readiness fails; no production authentication change attempted",
+    "status": "blocked",
+    "evidence": [
+      "https://github.com/oemercam/binso_admin_azure/actions/runs/38128629567"
+    ]
+  },
+  {
+    "id": "V23-I-004",
+    "requirement": "Administrative audit and races",
+    "files": [
+      "lib/server/database.ts",
+      "app/api/operator/accounts/[id]/route.ts"
+    ],
+    "method": "Transaction/import-path audit",
+    "expected": "Critical action plus audit atomicity; no race bypass",
+    "actual": "Existing routes audited in source; exhaustive concurrency/audit-failure scenarios unresolved; avoid unreviewed workflow replacement",
+    "status": "partially_verified",
+    "evidence": [
+      "function-inventory.json"
+    ]
+  },
+  {
+    "id": "V23-J-001",
+    "requirement": "Quality gates",
+    "files": [
+      "package.json",
+      ".github/workflows/quality.yml"
+    ],
+    "method": "Existing full suite plus new isolated model/SQL/HTTP/browser tests",
+    "expected": "All lint/type/build/security/UX gates retained",
+    "actual": "Local suite in progress; PR CI pending; no assertions/gates disabled",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-test.mjs",
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-J-002",
+    "requirement": "Physical device/PWA acceptance",
+    "files": [
+      "components/monitoring.tsx"
+    ],
+    "method": "Existing PWA/browser suite",
+    "expected": "Desktop/tablet/mobile/PWA verified",
+    "actual": "Responsive/PWA automated tests retained; physical kiosk/27–55 inch devices unavailable",
+    "status": "partially_verified",
+    "evidence": [
+      "scripts/pwa-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-K-001",
+    "requirement": "Evidence-driven cleanup",
+    "files": [
+      "components/operator.tsx"
+    ],
+    "method": "Dependency graph and exact endpoint callers",
+    "expected": "Remove only superseded consumers",
+    "actual": "Old MonitoringCockpit/MonitoringView implementation removed after caller check; wrapper reuses one MonitoringPanel; no unrelated legacy deletion",
+    "status": "verified",
+    "evidence": [
+      "function-inventory.json"
+    ]
+  },
+  {
+    "id": "V23-L-001",
+    "requirement": "Feature branch/PR/release controls",
+    "files": [
+      "docs/architecture/v23/report.md"
+    ],
+    "method": "Current main base; expected SHA lease; PR gates",
+    "expected": "No unapproved merge/deploy; rollback documented",
+    "actual": "Feature branch from e33af01; no migrations; merge/deploy awaiting explicit approval",
+    "status": "pending_review",
+    "evidence": [
+      "report.md"
+    ]
+  },
+  {
+    "id": "V23-L-002",
+    "requirement": "Post-deployment verification",
+    "files": [
+      "docs/architecture/v23/report.md"
+    ],
+    "method": "health/ready/live commit and smoke after approved deploy",
+    "expected": "Actual release commit and error trend",
+    "actual": "V23 not deployed; cannot claim post-release success",
+    "status": "not_started",
+    "evidence": [
+      "baseline.json"
+    ]
+  },
+  {
+    "id": "V23-M-001",
+    "requirement": "Traceable acceptance report",
+    "files": [
+      "docs/architecture/v23/report.md",
+      "docs/architecture/v23/requirements.json"
+    ],
+    "method": "ID/files/method/expected/actual/evidence ledger",
+    "expected": "No blanket acceptance",
+    "actual": "Partial verified implementation; blockers and decisions remain explicit",
+    "status": "partially_verified",
+    "evidence": [
+      "requirements.json"
+    ]
+  }
+]

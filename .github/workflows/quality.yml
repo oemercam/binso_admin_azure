@@ -130,6 +130,17 @@ jobs:
           compression-level: 0
           retention-days: 2
   browser:
+    services:
+      postgres:
+        image: public.ecr.aws/docker/library/postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_observability_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_observability_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     needs: [plan, build]
     if: needs.plan.outputs.browser == 'true'
     runs-on: ubuntu-latest
@@ -187,6 +198,14 @@ jobs:
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
+      - name: Authenticated observability and wallboard regression
+        env:
+          BINSO_OBSERVABILITY_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_observability_test
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_OBSERVABILITY_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/observability
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+        run: node scripts/observability-browser-test.mjs
       - name: Guided registration, languages and responsive regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs

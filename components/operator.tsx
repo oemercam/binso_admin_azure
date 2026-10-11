@@ -1,4 +1,5 @@
 "use client";
+import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
@@ -217,7 +218,7 @@ function OperatorDashboard() {
       ["Aktive Nutzer",Number(stats.users_active??0),"/operator/kunden"],
     ].map(([label,value,href])=><Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
     <div className="operator-insight-grid">
-      <WorkspaceSection><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Aktiver Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></WorkspaceSection>
       <WorkspaceSection><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></WorkspaceSection>
     </div>
     <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></WorkspaceSection>
@@ -561,68 +562,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
 }
 
 
-function MonitoringCockpit({services,api,database,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;errorRate:string;incidents:Array<Record<string,unknown>>}) {
- const healthy=services.filter(service=>service.status==='operational').length;
- const degraded=services.filter(service=>service.status==='degraded').length;
- const health=services.length?Math.round(healthy/services.length*100):0;
- return <div className="monitoring-cockpit">
-  <MetricTiles><MetricTile label="Verfügbarkeit" value={services.length?health+' %':'—'} hint={healthy+'/'+services.length+' Services verfügbar'}/><MetricTile label="API-Antwortzeit" value={api==null?'—':api+' ms'} hint="Aktuelle Messung"/><MetricTile label="Datenbank" value={database==null?'—':database+' ms'} hint="Aktuelle Abfrage"/><MetricTile label="Aktive Störungen" value={String(incidents.length)} hint={degraded+' Services beeinträchtigt'}/></MetricTiles>
-  <div className="monitoring-technical-grid">
-   {[['API-Latenz',api],['Datenbank',database]].map(([label,value],index)=><section className="monitoring-technical-chart" key={String(label)}><div className="monitoring-chart-title"><b>{label}</b><strong>{value==null?'—':value+' ms'}</strong></div><div className={'monitoring-compact-bars'+(index?' database':'')} aria-hidden="true">{value!=null&&<i style={{height:Math.min(100,Math.max(1,Number(value)/10))+'%'}}/>}</div></section>)}
-   <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Verfügbarkeit</b><strong>{services.length?health+' %':'—'}</strong></div><div className="monitoring-compact-ring" style={{'--health':health+'%'} as React.CSSProperties}><span>{healthy}/{services.length}</span></div></section>
-  </div>
-  <p className="technical-hint">Aktuelle Messung · keine historischen Daten. Langsame Interaktionen (INP): {errorRate}.</p>
- </div>;
-}
-
-function MonitoringView() {
-  const production=useBackendMode();
-  
-  const resource=useApiQuery<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;mailQueue?:Array<{status:string;count:number;oldest:string}>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>(production?"/api/operator/monitoring":null);
-  const data=resource.data??{};
-  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
-  const [toast,setToast]=useState<string|null>(null);
-
-  
-
-  const testEmail=async()=>{
-    try{
-      await apiPost("/api/operator/integrations/email-test",{});
-      setToast("Test-E-Mail wurde an dein Operator-Konto gesendet.");
-    }catch(error){
-      setToast(error instanceof Error?error.message:"Test-E-Mail konnte nicht gesendet werden.");
-    }
-    window.setTimeout(()=>setToast(null),2600);
-  };
-
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} errorRate="—" incidents={[]}/>;
-
-  const services=data.services??[];
-  const incidents=data.incidents??[];
-  const operational=services.filter(service=>service.status==="operational").length;
-  const configured=services.filter(service=>service.status==="configured").length;
-  const missing=services.filter(service=>service.status==="not_connected"||service.status==="not_implemented").length;
-  const emailReady=services.some(service=>service.key==="email"&&(service.status==="configured"||service.status==="operational"));
-  const label=(status:string)=>status==="operational"?"Verfügbar":status==="degraded"?"Beeinträchtigt":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht verfügbar":"Nicht verbunden";
-  const vitals=data.webVitals??{};
-  const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
-
-  return <>
-    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor):"—"} incidents={incidents}/>
-    <WorkspaceSection className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} verfügbar · {configured} konfiguriert · {missing} nicht eingerichtet</small></div>
-      <div className="monitoring-list">{services.map(service=><div data-service-status={service.status} key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:null}</div>)}</div>
-    </WorkspaceSection>
-    {!!data.mailQueue?.length&&<WorkspaceSection><SectionTitle title="Ausstehender E-Mail-Versand"/><p>Unklarer oder unterbrochener Versand muss beim Anbieter geprüft werden, bevor er erneut ausgelöst wird.</p><dl className="detail-list">{data.mailQueue.map(item=><div key={item.status}><dt>{{queued:"Wartend",failed:"Fehlgeschlagen",uncertain:"Zustellung unklar",sending:"Versand unterbrochen"}[item.status]??item.status}</dt><dd>{item.count} · seit {new Date(item.oldest).toLocaleString("de-CH")}</dd></div>)}</dl></WorkspaceSection>}
-    <WorkspaceSection className="incident-history">
-      <SectionTitle title="Ereignisse"/>
-      {incidents.length?incidents.map(item=><div className="incident-row" key={String(item.id)}><span className={"incident-dot "+(String(item.status)==="resolved"?"resolved":"maintenance")}/><div><b>{String(item.title??"Ereignis")}</b><small>{String(item.service??"")} · {new Date(String(item.started_at)).toLocaleString("de-CH")}</small></div><Status tone={String(item.status)==="resolved"?"success":"warning"}>{operatorStatus(String(item.status))}</Status></div>):<EmptyState compact icon="chart" title="Keine Ereignisse" text="Es sind keine Plattform-Ereignisse erfasst."/>}
-    </WorkspaceSection>
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
-  </>;
-}
+function MonitoringView(){return <MonitoringPanel/>;}
 
 function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const production=useBackendMode();
