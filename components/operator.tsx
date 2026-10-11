@@ -1,6 +1,6 @@
 "use client";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionRow, FormSheet, MetricTiles, MetricTile, WorkspaceSection} from "./binso-ux";
+import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
@@ -248,7 +248,7 @@ function TicketsView() {
  const columns=[{label:'Ticket',index:0},{label:'Kunde',index:1},{label:'Priorität',index:2},{label:'Status',index:3,status:true},{label:'Aktualisiert',index:4}];
  const controller=useRecordsController({placeholder:'Tickets suchen...',chips,columns});
  const rows=production?items.map(item=>[item.subject,item.tenant?.name??'Kunde',item.priority==='critical'?'Kritisch':item.priority==='high'?'Hoch':item.priority==='low'?'Niedrig':'Normal',operatorStatus(item.status),new Date(item.updated_at).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}),item.id]):tickets.map(([nr,subject,customer,status])=>[subject,customer,'Normal',status,'Demo',nr.replace('#','')]);
- return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
+ return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function TicketDetail({ticketId}:{ticketId:string}) {
@@ -338,7 +338,7 @@ function CustomersView() {
  const controller=useRecordsController({placeholder:'Kunden suchen...',chips,columns});
  const price=Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]));
  const rows=production?items.map(item=>[item.name,operatorPlan(item.account?.plan??'trial'),price[item.account?.plan??'trial']??moneyChf(0),operatorStatus(item.account?.account_status??'active'),new Date(item.created_at).toLocaleDateString('de-CH'),item.id,[item.uid,item.city].filter(Boolean).join(' · ')]):demoCustomers.map(item=>[item.name,item.plan,item.mrr,item.status,'Demo',item.id,'Demo']);
- return <><RecordsControls inline controller={controller} placeholder="Kunden suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Kunden suchen..." countLabel="Kunden" statusGroups={{Aktiv:["Aktiv","Testphase"]}} chips={chips} columns={columns} rowHref={row=>'/operator/kunden/'+row[5]}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/kunden/'+row[5]} title={row[0]} meta={[row[6],row[1],row[4]].filter(Boolean).join(' · ')} status={row[3]} value={row[2]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
+ return <><RecordsControls inline controller={controller} placeholder="Kunden suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Kunden suchen..." countLabel="Kunden" emptyLabel={chip=>({Aktiv:"Keine aktiven Kunden",Eingeschränkt:"Keine eingeschränkten Kunden",Gesperrt:"Keine gesperrten Kunden"}[chip]??"Keine Kunden erfasst")} statusGroups={{Aktiv:["Aktiv","Testphase"]}} chips={chips} columns={columns} rowHref={row=>'/operator/kunden/'+row[5]}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/kunden/'+row[5]} title={row[0]} meta={[row[6],row[1],row[4]].filter(Boolean).join(' · ')} status={row[3]} value={row[2]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
@@ -393,9 +393,9 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
 }
 
 function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:string;kind:"trend"|"donut"|"status";bars?:number[];ratio?:number}) {
-  return <section className={"operator-payment-insight "+kind}>
+  return <section className={"operator-payment-insight payment-insight-"+kind}>
     <div><span>{label}</span><strong>{value}</strong></div>
-    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>)}</div>:<div className={"payment-ring "+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
+    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.some(height=>height>0)?bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>):<span>Keine Zahlungen</span>}</div>:<div className={"payment-ring payment-ring-"+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
   </section>;
 }
 
@@ -406,16 +406,17 @@ function OperatorFinanceView({demo=false}:{demo?:boolean}){
   const error=resource.error,refresh=resource.refresh;
   
   const [range,setRange]=useState("month");
+  const [filterOpen,setFilterOpen]=useState(false),[draftRange,setDraftRange]=useState("month");
   if(resource.loading||error)return <OperatorLoadState loading={resource.loading} error={error} onRetry={refresh}/>;
   
   const ranges:Record<string,{label:string}>={month:{label:"Dieser Monat"},last:{label:"Letzter Monat"},three:{label:"3 Monate"},year:{label:"12 Monate"},previous:{label:"Letztes Jahr"}};
   const {volume,platformRevenue,costs,result,monthly}=platformFinanceInsights(data,range,businessDate()),max=Math.max(1,...monthly.map(x=>x.value));
-  return <div>
-    {error&&<ErrorState onRetry={refresh}>{error}</ErrorState>}
-    <div className="finance-range">{Object.entries(ranges).map(([key,x])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{x.label}</button>)}</div>
+  return <div className="operator-finance">
+    <div className="section-title"><span>{ranges[range].label}</span><button type="button" className="icon-button records-filter-action" aria-label="Zeitraum filtern" onClick={()=>{setDraftRange(range);setFilterOpen(true)}}><Icon name="filter" size={20}/></button></div>
+    <FilterSheet label="Zeitraum" open={filterOpen} onClose={()=>setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>setDraftRange("month")}>Zurücksetzen</Button><Button onClick={()=>{setRange(draftRange);setFilterOpen(false)}}>Anwenden</Button></>}><Field label="Zeitraum"><Select value={draftRange} onChange={event=>setDraftRange(event.target.value)}>{Object.entries(ranges).map(([key,x])=><option key={key} value={key}>{x.label}</option>)}</Select></Field></FilterSheet>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="donut" ratio={platformRevenue+costs?Math.round(platformRevenue/(platformRevenue+costs)*100):0}/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="status" ratio={platformRevenue+costs?Math.round(costs/(platformRevenue+costs)*100):0}/></div>
-    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/><div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div></section>
-    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden aus Azure PostgreSQL geladen und nach dem gewählten Zeitraum ausgewertet.</p></section></div>
+    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/>{monthly.some(x=>x.value>0)?<div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div>:<EmptyState compact title="Keine Kundenzahlungen im gewählten Zeitraum" text="Erfasste Zahlungen erscheinen in der Finanzentwicklung."/>}</section>
+    <div className="finance-breakdown"><section><h3>Zusammenfassung</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden nach dem gewählten Zeitraum ausgewertet.</p></section></div>
   </div>
 }
 
@@ -437,17 +438,20 @@ function PaymentsView() {
 
   const booked=items.filter(item=>item.status==="booked");
   const total=booked.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const paymentMonths=platformFinanceInsights({payments:booked.map(item=>({...item,payment_date:item.paid_on}))},"year",businessDate()).monthly;
+  const paymentMax=Math.max(1,...paymentMonths.map(item=>item.value));
+  const paymentBars=paymentMonths.map(item=>item.value/paymentMax*100);
   const pending=items.filter(item=>item.status==="pending").length;
   const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
     <div className="operator-payment-insights">
-      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={[32,46,41,58,52,67,61,78]}/>
+      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={paymentBars}/>
       <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
       <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
     </div>
     <WorkspaceSection className="operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
-      <p className="technical-hint">Diese Liste zeigt Zahlungen zu Kundenrechnungen. SaaS-Abonnementzahlungen über Stripe sind noch nicht angebunden.</p>
+      <p className="technical-hint">Zahlungen zu Kundenrechnungen. Abonnementzahlungen werden separat verwaltet.</p>
       {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <DataTableRow className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{"CHF "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></DataTableRow>})}</DataTable>:<EmptyState compact icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
     </WorkspaceSection>
   </>;
@@ -485,9 +489,9 @@ function SubscriptionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+" Kunden"} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
+    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+(group.items.length===1?" Kunde":" Kunden")} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
     <WorkspaceSection className="operator-table-card">
-      <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b><small>{String(item.tenant_id).slice(0,8)}</small></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
+      <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
     </WorkspaceSection>
     {selected&&<FormSheet open={Boolean(selected)} label={String((selected?.tenant as {name?:string}|undefined)?.name??"Kunde")} description="Plan und interner Kontostatus. Stripe-Abonnements werden über Stripe verwaltet; interne Kontosperren ändern keine Stripe-Zahlungen." dirty={false} onClose={()=>setSelected(null)} actions={<><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected?.tenant_id)}>Kunde öffnen</Button></>}><Field label="Plan"><Select value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial">Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Abonnement"><Select value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></Select></Field><Field label="Benutzerlimit"><Input type="number" min="1" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></Field></FormSheet>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
@@ -538,7 +542,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <FormSheet open={open} onClose={onClose} label="Einschränkung erstellen" actions={<Button variant="danger" onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung prüfen</Button>}>
+    <FormSheet open={open} onClose={onClose} label="Einschränkung erstellen" actions={<Button onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung prüfen</Button>}>
         <div className="form-grid two">
           <Field label="Kunde"><Select value={tenantId} onChange={e=>setTenantId(e.target.value)}>{production?customers.map(customer=><option value={customer.id} key={customer.id}>{customer.name}</option>):<option>Meier Handel AG</option>}</Select></Field>
           <Field label="Grund"><Select value={reason} onChange={e=>setReason(e.target.value)}><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option><option>Manuelle Prüfung</option></Select></Field>
@@ -562,11 +566,12 @@ function MonitoringCockpit({services,api,database,errorRate,incidents}:{services
  const degraded=services.filter(service=>service.status==='degraded').length;
  const health=services.length?Math.round(healthy/services.length*100):0;
  return <div className="monitoring-cockpit">
-  <MetricTiles><MetricTile label="Service Health" value={services.length?health+' %':'—'} hint={healthy+'/'+services.length+' Services verfügbar'}/><MetricTile label="API Antwortzeit" value={api==null?'—':api+' ms'} hint="Aktuelle Messung"/><MetricTile label="Datenbank" value={database==null?'—':database+' ms'} hint="Aktuelle Abfrage"/><MetricTile label="Aktive Störungen" value={String(incidents.length)} hint={degraded+' Services beeinträchtigt'}/></MetricTiles>
+  <MetricTiles><MetricTile label="Verfügbarkeit" value={services.length?health+' %':'—'} hint={healthy+'/'+services.length+' Services verfügbar'}/><MetricTile label="API-Antwortzeit" value={api==null?'—':api+' ms'} hint="Aktuelle Messung"/><MetricTile label="Datenbank" value={database==null?'—':database+' ms'} hint="Aktuelle Abfrage"/><MetricTile label="Aktive Störungen" value={String(incidents.length)} hint={degraded+' Services beeinträchtigt'}/></MetricTiles>
   <div className="monitoring-technical-grid">
-   {[['API Latenz',api],['Datenbank',database]].map(([label,value],index)=><section className="monitoring-technical-chart" key={String(label)}><div className="monitoring-chart-title"><b>{label}</b><strong>{value==null?'—':value+' ms'}</strong></div><div className={'monitoring-compact-bars'+(index?' database':'')} aria-hidden="true">{value!=null&&<i style={{height:Math.min(100,Math.max(1,Number(value)/10))+'%'}}/>}</div><small>Momentaufnahme · keine historischen Daten</small></section>)}
-   <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Service Health</b><strong>{services.length?health+' %':'—'}</strong></div><div className="monitoring-compact-ring" style={{'--health':health+'%'} as React.CSSProperties}><span>{healthy}/{services.length}</span></div><small>INP-Stichproben: {errorRate}</small></section>
+   {[['API-Latenz',api],['Datenbank',database]].map(([label,value],index)=><section className="monitoring-technical-chart" key={String(label)}><div className="monitoring-chart-title"><b>{label}</b><strong>{value==null?'—':value+' ms'}</strong></div><div className={'monitoring-compact-bars'+(index?' database':'')} aria-hidden="true">{value!=null&&<i style={{height:Math.min(100,Math.max(1,Number(value)/10))+'%'}}/>}</div></section>)}
+   <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Verfügbarkeit</b><strong>{services.length?health+' %':'—'}</strong></div><div className="monitoring-compact-ring" style={{'--health':health+'%'} as React.CSSProperties}><span>{healthy}/{services.length}</span></div></section>
   </div>
+  <p className="technical-hint">Aktuelle Messung · keine historischen Daten. Langsame Interaktionen (INP): {errorRate}.</p>
  </div>;
 }
 
@@ -600,14 +605,14 @@ function MonitoringView() {
   const configured=services.filter(service=>service.status==="configured").length;
   const missing=services.filter(service=>service.status==="not_connected"||service.status==="not_implemented").length;
   const emailReady=services.some(service=>service.key==="email"&&(service.status==="configured"||service.status==="operational"));
-  const label=(status:string)=>status==="operational"?"Operational":status==="degraded"?"Beeinträchtigt":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht implementiert":"Nicht verbunden";
+  const label=(status:string)=>status==="operational"?"Verfügbar":status==="degraded"?"Beeinträchtigt":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht verfügbar":"Nicht verbunden";
   const vitals=data.webVitals??{};
   const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
 
   return <>
-    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
+    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor):"—"} incidents={incidents}/>
     <WorkspaceSection className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
+      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} verfügbar · {configured} konfiguriert · {missing} nicht eingerichtet</small></div>
       <div className="monitoring-list">{services.map(service=><div data-service-status={service.status} key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:null}</div>)}</div>
     </WorkspaceSection>
     {!!data.mailQueue?.length&&<WorkspaceSection><SectionTitle title="Ausstehender E-Mail-Versand"/><p>Unklarer oder unterbrochener Versand muss beim Anbieter geprüft werden, bevor er erneut ausgelöst wird.</p><dl className="detail-list">{data.mailQueue.map(item=><div key={item.status}><dt>{{queued:"Wartend",failed:"Fehlgeschlagen",uncertain:"Zustellung unklar",sending:"Versand unterbrochen"}[item.status]??item.status}</dt><dd>{item.count} · seit {new Date(item.oldest).toLocaleString("de-CH")}</dd></div>)}</dl></WorkspaceSection>}
@@ -667,7 +672,6 @@ function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
       <div className="form-grid"><Field label="Titel" className="full"><Input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Kurzer Titel"/></Field><Field label="Typ" className="full"><Select value={kind} onChange={e=>setKind(e.target.value)}><option value="information">Information</option><option value="maintenance">Wartung</option><option value="incident">Störung</option><option value="feature">Neue Funktion</option></Select></Field><Field label="Zielgruppe" className="full"><Select value={audience} onChange={e=>setAudience(e.target.value)}><option value="all">Alle Kunden</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Nachricht" className="full"><Textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="Nachricht..."/></Field></div>
     </FormSheet>
     <WorkspaceSection>
-      <SectionTitle title="Ankündigungen"/>
       {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.published===true?"success":"neutral"}>{item.published===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.body??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {audienceLabel[String(item.audience)]??String(item.audience)} · {new Date(String(item.created_at)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState compact icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
     </WorkspaceSection>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
@@ -715,5 +719,5 @@ function AuditView() {
  const columns=[{label:'Zeit',index:0},{label:'Operator',index:1},{label:'Aktion',index:2},{label:'Ziel',index:3}];
  const controller=useRecordsController({placeholder:'Audit durchsuchen...',chips:['Alle'],columns});
  const rows=production?(resource.data?.items??[]).map(item=>[item.createdAt&&Number.isFinite(Date.parse(item.createdAt))?new Date(item.createdAt).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}):'Zeitpunkt nicht verfügbar',item.userName||item.userEmail||'System',item.action==='operator.entra_login'?'Microsoft-Anmeldung':item.action,[item.entityType,item.entityId].filter(Boolean).map(String).join(' · ')||'—']):[['10:42','ocam','Kunde aktualisiert','Acme AG (Demo)'],['09:18','lschneider','Sperrung erstellt','Demo'],['Gestern','mbianchi','Ticket Status geändert','#8419 → In Bearbeitung']];
- return <><RecordsControls inline controller={controller} placeholder="Audit durchsuchen..." chips={['Alle']} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&resource.loading} error={resource.error} placeholder="Audit durchsuchen..." countLabel="Audit-Einträge" chips={['Alle']} columns={columns}>{row=><RecordRow compact valuePlacement="metadata" title={row[2]} meta={[row[0],row[1],row[3]].join(' · ')}/>}</RecordsView>{resource.error&&<Button variant="secondary" onClick={resource.refresh}>Erneut versuchen</Button>}</>;
+ return <><RecordsControls inline controller={controller} placeholder="Audit durchsuchen..." chips={['Alle']} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&resource.loading} error={resource.error} placeholder="Audit durchsuchen..." countLabel="Audit-Einträge" chips={['Alle']} columns={columns}>{row=><RecordRow compact valuePlacement="metadata" title={row[2]} meta={[row[0],row[1],row[3]].join(' · ')}/>}</RecordsView>{resource.error&&<Button variant="secondary" onClick={resource.refresh}>Erneut versuchen</Button>}</>;
 }

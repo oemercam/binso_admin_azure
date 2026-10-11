@@ -27,7 +27,7 @@ export function DataTable({children,label,variant="records",owner}:{children:Rea
   const statusIndex=cells.findIndex(cell=>isValidElement(cell)&&cell.type===Status);
   const status=cells[statusIndex];
   const badge=isValidElement<{children:string;tone?:"success"|"warning"|"danger"|"neutral"|"info"}>(status)?status.props:null;
-  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
+  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex||(isValidElement<{children:ReactNode}>(cell)&&cell.type===Status&&cell.props.children===badge?.children)?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
  })}</div>}</>;
 }
 function tableCells(children:ReactNode,header=false){
@@ -121,6 +121,7 @@ export function RecordsView({
   sortValue,
   controller,
   toolbarActions=true,
+  filterSummary=true,
   remote=false,
   pagination,
   showCount=true,
@@ -129,6 +130,7 @@ export function RecordsView({
   pagination?:{total:number;page:number;pageSize:number;onPage:(page:number)=>void};
   controller?:RecordsController;
   toolbarActions?:boolean;
+  filterSummary?:boolean;
   remote?:boolean;
   sortValue?:(item:string[],index:number)=>string|number;
   countLabel?:string;
@@ -184,11 +186,11 @@ export function RecordsView({
   const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;
 
   return <>
-    {(toolbarActions||showCount||hasFilters)&&<div className="records-toolbar">
+    {(toolbarActions||showCount||(filterSummary&&hasFilters))&&<div className="records-toolbar">
       {toolbarActions&&<RecordsControls controller={state} placeholder={placeholder} chips={chips} columns={columns}/>}
       {showCount&&(loading||visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</span>}
-      {hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
-      {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
+      {filterSummary&&hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
+      {filterSummary&&hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
     </div>}
 
     {loading?<LoadingState>Einträge werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
