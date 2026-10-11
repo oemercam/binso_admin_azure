@@ -78,16 +78,20 @@ try{
  const organization=randomUUID();
  await db.query("insert into organizations(id,name,slug,is_demo) values($1,'Dashboard probe',$2,false)",[organization,'dashboard-'+organization]);
  const before=Number((await (await GET()).json()).stats.payments_30d);
+ const contractBefore=Number((await (await GET()).json()).stats.monthly_contract_value);
+ await db.query("insert into organization_subscriptions(organization_id,plan,status,billing_interval,unit_amount_chf) values($1,'professional','active','yearly',1200)",[organization]);
  await db.query(`insert into platform_billing_payments(organization_id,provider,external_id,payment_date,amount,currency) values
  ($1,'manual','dashboard-chf',current_date,123.45,'CHF'),
  ($1,'manual','dashboard-eur',current_date,500,'EUR'),
  ($1,'manual','dashboard-old',current_date-31,600,'CHF'),
+ ($1,'manual','dashboard-30-excluded',current_date-30,650,'CHF'),
  ($1,'manual','dashboard-future',current_date+1,700,'CHF'),
  ($1,'demo','dashboard-demo-provider',current_date,800,'CHF'),
  ($2,'manual','dashboard-demo-organization',current_date,900,'CHF')`,[organization,demo]);
  const response=await GET();assert.equal(response.status,200);
  const dashboard=await response.json();
  assert.equal(Math.round((Number(dashboard.stats.payments_30d)-before)*100),12345,'Dashboard counts only recent non-demo CHF payments');
+ assert.equal(Number(dashboard.stats.monthly_contract_value)-contractBefore,100,'Yearly subscription prices contribute one twelfth to the monthly contract value');
  assert.ok(Array.isArray(dashboard.tickets)&&Array.isArray(dashboard.incidents));
  }finally{await db.exec('rollback');delete globalThis.operatorDashboardClient;}
  console.log('Operator dashboard: migrated schema and real CHF payment isolation passed.');
@@ -460,7 +464,7 @@ try{
  await db.query("insert into document_deliveries(organization_id,kind,document_id,recipient,status,request_key,created_by_user_id) values($1,'invoice',$2,'fixture@example.invalid','sending','flow-key','fixture')",[demo,pending.id]);
  await assert.rejects(()=>mutateApiBusiness(client,session,'update_document_atomic',{...documentArgs,p_current_number:pending.number,p_number:pending.number}),e=>e.code==='delivery_pending');
  await assert.rejects(()=>changeDocumentStatus(client,session,pending.number,'issue',''),e=>e.code==='delivery_pending');
- const databaseSource=(await fs.readFile('lib/server/database.ts','utf8')).replace('import "server-only";','').replace('"./repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"./plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"./audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./session"',JSON.stringify(processSession)).replace('"./db"',JSON.stringify(processDb)).replace('"./repositories/operator-api"',JSON.stringify(dataModule('export function listOperatorBusiness(){}export function insertOperatorBusiness(){}export function updateOperatorBusiness(){}'))).replace('"./operator/audit"',JSON.stringify(dataModule('export function platformAudit(){}'))).replace('"./operator/session"',JSON.stringify(dataModule('export function requireOperatorSession(){}')));
+ const databaseSource=(await fs.readFile('lib/server/database.ts','utf8')).replace('import "server-only";','').replace('"./repositories/business-api"',JSON.stringify(businessUrlForProcess())).replace('"./plan-access"',JSON.stringify(dataModule('export async function requireModuleEntitlement(){}'))).replace('"./audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"./http"',JSON.stringify(processHttp)).replace('"./rbac"',JSON.stringify(processRbac)).replace('"./session"',JSON.stringify(processSession)).replace('"./db"',JSON.stringify(processDb)).replace('"./repositories/operator-customer-overview"',JSON.stringify(dataModule('export function operatorCustomerReadings(){}'))).replace('"./repositories/operator-api"',JSON.stringify(dataModule('export function listOperatorBusiness(){}export function insertOperatorBusiness(){}export function updateOperatorBusiness(){}'))).replace('"./operator/audit"',JSON.stringify(dataModule('export function platformAudit(){}'))).replace('"./operator/session"',JSON.stringify(dataModule('export function requireOperatorSession(){}')));
  function businessUrlForProcess(){return dataModule(businessSource)}
  const databaseProcess=await import(dataModule(databaseSource));
  const employeeValidation=dataModule(await fs.readFile('lib/employee-validation.ts','utf8'));

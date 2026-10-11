@@ -2671,6 +2671,11 @@ input:not([type="checkbox"]):not([type="radio"]),
 @supports (height:100svh){
   }
   .page-head-detail{display:none}
+
+ .bo-monitoring-wallboard{grid-template-columns:1fr}
+ .bo-monitoring-wallboard .bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bo-monitoring-wallboard .monitoring-list{grid-template-columns:1fr}
+ .bo-monitor-toolbar{gap:var(--mobile-section-gap)}
 }
 
 /* Small mobile refinement */

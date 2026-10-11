@@ -49,8 +49,9 @@ export async function withTenant<T>(organizationId:string,userId:string,fn:(clie
   });
 }
 
-export async function withPlatform<T>(fn:(client:PoolClient)=>Promise<T>):Promise<T>{
+export async function withPlatform<T>(fn:(client:PoolClient)=>Promise<T>,options:{snapshot?:boolean}={}):Promise<T>{
   return withTransaction(async client=>{
+    if(options.snapshot)await client.query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY");
     await client.query("SELECT set_config('app.platform_operator','true',true)");
     return fn(client);
   });
