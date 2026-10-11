@@ -144,7 +144,8 @@ jobs:
     needs: [plan, build]
     if: needs.plan.outputs.browser == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Full UX, real 60-second recovery polling, registration and PWA gates share this job.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
