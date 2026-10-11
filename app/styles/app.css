@@ -101,6 +101,15 @@
   box-shadow:none;
 }
 .surface{padding:20px}
+.bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.records-inline-controls{display:grid;gap:12px;min-width:0;margin-bottom:var(--heading-content-gap)}
+.records-search-row{display:flex;align-items:center;gap:var(--mobile-toolbar-gap);min-width:0}
+.records-search-row>.searchbox{flex:1;min-width:0;max-width:none}
+.records-search-row>.icon-button{flex:0 0 44px;width:44px;height:44px}
+.records-inline-controls>.tabs{min-width:0;max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+.records-inline-controls>.tabs>button{flex:none;white-space:nowrap}
+.record-table-meta{display:inline;overflow-wrap:anywhere}
+.record-table-meta+.record-table-meta::before{content:" · "}
 .section-title{
   min-height:30px;
   margin-bottom:var(--heading-content-gap);

@@ -58,6 +58,11 @@ export function MetricTile({ label, value, hint }: { label: string; value: React
   return <Metric label={label} value={value} hint={hint}/>;
 }
 
+/** Open workspace sections share page spacing without adding nested card chrome. */
+export function WorkspaceSection({children,className=""}:{children:ReactNode;className?:string}){
+ return <section className={`bo-workspace-section ${className}`.trim()}>{children}</section>;
+}
+
 /** Route links and local detail tabs keep their behavior and share one container. */
 export function DetailTabs({children,label,role,panelId}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string}){
  const root=useRef<HTMLDivElement>(null);
