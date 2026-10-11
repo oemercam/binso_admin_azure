@@ -552,5 +552,37 @@
     "evidence": [
       "requirements.json"
     ]
+  },
+  {
+    "id": "V23-E-007",
+    "requirement": "Customer metrics must use real authorized data",
+    "files": [
+      "lib/server/repositories/operator-customer-overview.ts",
+      "lib/server/database.ts",
+      "components/operator.tsx"
+    ],
+    "method": "Migrated PGlite plus five-role actual HTTP/browser matrix",
+    "expected": "Real ticket/payment/restriction values; no permission is null",
+    "actual": "Current support cases, CHF-only payments, normalized actual contract and time-effective restrictions; missing grants clearly labelled",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-test.mjs",
+      "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-E-008",
+    "requirement": "Payment currency and decimal integrity",
+    "files": [
+      "lib/server/repositories/operator-api.ts",
+      "components/operator.tsx"
+    ],
+    "method": "Actual CHF/EUR database fixtures plus UI assertions",
+    "expected": "Never relabel EUR as CHF or add foreign currency to CHF KPI",
+    "actual": "Original currency projected; CHF-only chart/KPI uses sumMoney; KPI explicitly refers to displayed payments",
+    "status": "implemented_pending_ci",
+    "evidence": [
+      "scripts/observability-browser-test.mjs"
+    ]
   }
 ]

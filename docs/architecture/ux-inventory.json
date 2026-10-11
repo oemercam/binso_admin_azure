@@ -57795,9 +57795,9 @@
         "components/operator.tsx#demoCustomers",
         "components/operator.tsx#demoPlan",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -57960,9 +57960,9 @@
         "config/domain.ts#PlanId",
         "config/domain.ts#planIds",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -57997,12 +57997,6 @@
         "components/operator.tsx#OperatorTenant",
         "components/operator.tsx#PaymentsView",
         "components/operator.tsx#PaymentInsight",
-        "lib/finance-periods.ts#platformFinanceInsights",
-        "lib/finance-periods.ts#FinancePeriodData",
-        "lib/finance-periods.ts#Row",
-        "lib/finance-periods.ts#financeWindow",
-        "lib/finance-periods.ts#PeriodBounds",
-        "lib/finance-periods.ts#financeMetrics",
         "lib/money.ts#sumMoney",
         "lib/money.ts#safeNumber",
         "lib/money.ts#moneyMinor",
@@ -58010,6 +58004,12 @@
         "lib/money.ts#Decimal",
         "lib/money.ts#power10",
         "lib/money.ts#decimal",
+        "lib/finance-periods.ts#platformFinanceInsights",
+        "lib/finance-periods.ts#FinancePeriodData",
+        "lib/finance-periods.ts#Row",
+        "lib/finance-periods.ts#financeWindow",
+        "lib/finance-periods.ts#PeriodBounds",
+        "lib/finance-periods.ts#financeMetrics",
         "lib/finance-periods.ts#inFinancePeriod",
         "lib/finance-periods.ts#calendarDate",
         "lib/finance-periods.ts#buildFinanceMonths",
@@ -58248,9 +58248,9 @@
         "components/operator.tsx#demoCustomers",
         "components/operator.tsx#demoPlan",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -58445,9 +58445,9 @@
         "config/domain.ts#PlanId",
         "config/domain.ts#planIds",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -58482,12 +58482,6 @@
         "components/operator.tsx#OperatorTenant",
         "components/operator.tsx#PaymentsView",
         "components/operator.tsx#PaymentInsight",
-        "lib/finance-periods.ts#platformFinanceInsights",
-        "lib/finance-periods.ts#FinancePeriodData",
-        "lib/finance-periods.ts#Row",
-        "lib/finance-periods.ts#financeWindow",
-        "lib/finance-periods.ts#PeriodBounds",
-        "lib/finance-periods.ts#financeMetrics",
         "lib/money.ts#sumMoney",
         "lib/money.ts#safeNumber",
         "lib/money.ts#moneyMinor",
@@ -58495,6 +58489,12 @@
         "lib/money.ts#Decimal",
         "lib/money.ts#power10",
         "lib/money.ts#decimal",
+        "lib/finance-periods.ts#platformFinanceInsights",
+        "lib/finance-periods.ts#FinancePeriodData",
+        "lib/finance-periods.ts#Row",
+        "lib/finance-periods.ts#financeWindow",
+        "lib/finance-periods.ts#PeriodBounds",
+        "lib/finance-periods.ts#financeMetrics",
         "lib/finance-periods.ts#inFinancePeriod",
         "lib/finance-periods.ts#calendarDate",
         "lib/finance-periods.ts#buildFinanceMonths",
@@ -59665,22 +59665,22 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 301,
+          "line": 302,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
           "tag": "Field",
-          "line": 301,
-          "component": "components/operator.tsx#TicketDetail"
-        },
-        {
-          "tag": "Field",
-          "line": 318,
+          "line": 302,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
           "tag": "Field",
           "line": 319,
+          "component": "components/operator.tsx#TicketDetail"
+        },
+        {
+          "tag": "Field",
+          "line": 320,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
@@ -59700,12 +59700,12 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 252,
+          "line": 253,
           "component": "components/operator.tsx#TicketsView"
         },
         {
           "tag": "RecordsView",
-          "line": 252,
+          "line": 253,
           "component": "components/operator.tsx#TicketsView"
         },
         {
@@ -59805,87 +59805,87 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 342,
+          "line": 343,
           "component": "components/operator.tsx#CustomersView"
         },
         {
           "tag": "RecordsView",
-          "line": 342,
+          "line": 343,
           "component": "components/operator.tsx#CustomersView"
         },
         {
           "tag": "DataTable",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTable",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "FilterSheet",
-          "line": 417,
+          "line": 418,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "Field",
-          "line": 417,
+          "line": 418,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "DataTable",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "FormSheet",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
@@ -59895,17 +59895,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 546,
-          "component": "components/operator.tsx#RestrictionsView"
-        },
-        {
-          "tag": "Field",
           "line": 548,
-          "component": "components/operator.tsx#RestrictionsView"
-        },
-        {
-          "tag": "Field",
-          "line": 549,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -59924,73 +59914,83 @@
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
+          "tag": "Field",
+          "line": 553,
+          "component": "components/operator.tsx#RestrictionsView"
+        },
+        {
+          "tag": "Field",
+          "line": 554,
+          "component": "components/operator.tsx#RestrictionsView"
+        },
+        {
           "tag": "ConfirmDialog",
-          "line": 559,
+          "line": 561,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "FormSheet",
-          "line": 611,
+          "line": 613,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "DataTable",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableHead",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableRow",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTable",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableHead",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableRow",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "RecordsControls",
-          "line": 662,
+          "line": 664,
           "component": "components/operator.tsx#AuditView"
         },
         {
           "tag": "RecordsView",
-          "line": 662,
+          "line": 664,
           "component": "components/operator.tsx#AuditView"
         },
         {
@@ -61400,9 +61400,9 @@
         "components/operator.tsx#demoCustomers",
         "components/operator.tsx#demoPlan",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -61565,9 +61565,9 @@
         "config/domain.ts#PlanId",
         "config/domain.ts#planIds",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -61602,12 +61602,6 @@
         "components/operator.tsx#OperatorTenant",
         "components/operator.tsx#PaymentsView",
         "components/operator.tsx#PaymentInsight",
-        "lib/finance-periods.ts#platformFinanceInsights",
-        "lib/finance-periods.ts#FinancePeriodData",
-        "lib/finance-periods.ts#Row",
-        "lib/finance-periods.ts#financeWindow",
-        "lib/finance-periods.ts#PeriodBounds",
-        "lib/finance-periods.ts#financeMetrics",
         "lib/money.ts#sumMoney",
         "lib/money.ts#safeNumber",
         "lib/money.ts#moneyMinor",
@@ -61615,6 +61609,12 @@
         "lib/money.ts#Decimal",
         "lib/money.ts#power10",
         "lib/money.ts#decimal",
+        "lib/finance-periods.ts#platformFinanceInsights",
+        "lib/finance-periods.ts#FinancePeriodData",
+        "lib/finance-periods.ts#Row",
+        "lib/finance-periods.ts#financeWindow",
+        "lib/finance-periods.ts#PeriodBounds",
+        "lib/finance-periods.ts#financeMetrics",
         "lib/finance-periods.ts#inFinancePeriod",
         "lib/finance-periods.ts#calendarDate",
         "lib/finance-periods.ts#buildFinanceMonths",
@@ -61853,9 +61853,9 @@
         "components/operator.tsx#demoCustomers",
         "components/operator.tsx#demoPlan",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -62050,9 +62050,9 @@
         "config/domain.ts#PlanId",
         "config/domain.ts#planIds",
         "components/ui.tsx#Metric",
-        "components/operator.tsx#moneyChf",
         "components/operator.tsx#operatorStatus",
         "components/operator.tsx#operatorPlan",
+        "components/operator.tsx#moneyChf",
         "components/operator.tsx#TicketsView",
         "components/operator.tsx#useOperatorTickets",
         "components/operator.tsx#OperatorTicket",
@@ -62087,12 +62087,6 @@
         "components/operator.tsx#OperatorTenant",
         "components/operator.tsx#PaymentsView",
         "components/operator.tsx#PaymentInsight",
-        "lib/finance-periods.ts#platformFinanceInsights",
-        "lib/finance-periods.ts#FinancePeriodData",
-        "lib/finance-periods.ts#Row",
-        "lib/finance-periods.ts#financeWindow",
-        "lib/finance-periods.ts#PeriodBounds",
-        "lib/finance-periods.ts#financeMetrics",
         "lib/money.ts#sumMoney",
         "lib/money.ts#safeNumber",
         "lib/money.ts#moneyMinor",
@@ -62100,6 +62094,12 @@
         "lib/money.ts#Decimal",
         "lib/money.ts#power10",
         "lib/money.ts#decimal",
+        "lib/finance-periods.ts#platformFinanceInsights",
+        "lib/finance-periods.ts#FinancePeriodData",
+        "lib/finance-periods.ts#Row",
+        "lib/finance-periods.ts#financeWindow",
+        "lib/finance-periods.ts#PeriodBounds",
+        "lib/finance-periods.ts#financeMetrics",
         "lib/finance-periods.ts#inFinancePeriod",
         "lib/finance-periods.ts#calendarDate",
         "lib/finance-periods.ts#buildFinanceMonths",
@@ -63270,22 +63270,22 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 301,
+          "line": 302,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
           "tag": "Field",
-          "line": 301,
-          "component": "components/operator.tsx#TicketDetail"
-        },
-        {
-          "tag": "Field",
-          "line": 318,
+          "line": 302,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
           "tag": "Field",
           "line": 319,
+          "component": "components/operator.tsx#TicketDetail"
+        },
+        {
+          "tag": "Field",
+          "line": 320,
           "component": "components/operator.tsx#TicketDetail"
         },
         {
@@ -63305,12 +63305,12 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 252,
+          "line": 253,
           "component": "components/operator.tsx#TicketsView"
         },
         {
           "tag": "RecordsView",
-          "line": 252,
+          "line": 253,
           "component": "components/operator.tsx#TicketsView"
         },
         {
@@ -63410,87 +63410,87 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 342,
+          "line": 343,
           "component": "components/operator.tsx#CustomersView"
         },
         {
           "tag": "RecordsView",
-          "line": 342,
+          "line": 343,
           "component": "components/operator.tsx#CustomersView"
         },
         {
           "tag": "DataTable",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 437,
+          "line": 438,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTable",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 456,
+          "line": 458,
           "component": "components/operator.tsx#PaymentsView"
         },
         {
           "tag": "FilterSheet",
-          "line": 417,
+          "line": 418,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "Field",
-          "line": 417,
+          "line": 418,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "DataTable",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "DataTableHead",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "DataTableRow",
-          "line": 495,
+          "line": 497,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "FormSheet",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
@@ -63500,17 +63500,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 546,
-          "component": "components/operator.tsx#RestrictionsView"
-        },
-        {
-          "tag": "Field",
           "line": 548,
-          "component": "components/operator.tsx#RestrictionsView"
-        },
-        {
-          "tag": "Field",
-          "line": 549,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -63529,73 +63519,83 @@
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
+          "tag": "Field",
+          "line": 553,
+          "component": "components/operator.tsx#RestrictionsView"
+        },
+        {
+          "tag": "Field",
+          "line": 554,
+          "component": "components/operator.tsx#RestrictionsView"
+        },
+        {
           "tag": "ConfirmDialog",
-          "line": 559,
+          "line": 561,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "FormSheet",
-          "line": 611,
+          "line": 613,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "DataTable",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableHead",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableRow",
-          "line": 635,
+          "line": 637,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTable",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableHead",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "DataTableRow",
-          "line": 650,
+          "line": 652,
           "component": "components/operator.tsx#SecurityView"
         },
         {
           "tag": "RecordsControls",
-          "line": 662,
+          "line": 664,
           "component": "components/operator.tsx#AuditView"
         },
         {
           "tag": "RecordsView",
-          "line": 662,
+          "line": 664,
           "component": "components/operator.tsx#AuditView"
         },
         {
@@ -135907,7 +135907,7 @@
       "key": "components/operator.tsx#OperatorPage",
       "file": "components/operator.tsx",
       "name": "OperatorPage",
-      "line": 122,
+      "line": 123,
       "classes": [
         "operator-root",
         "operator-sidebar",
@@ -135948,7 +135948,7 @@
       "elements": [
         {
           "tag": "div",
-          "line": 135,
+          "line": 136,
           "props": [
             "className=\"operator-root\"",
             "data-operator-demo={demo?\"true\":\"false\"}"
@@ -135956,35 +135956,35 @@
         },
         {
           "tag": "aside",
-          "line": 136,
+          "line": 137,
           "props": [
             "className=\"operator-sidebar\""
           ]
         },
         {
           "tag": "Link",
-          "line": 137,
+          "line": 138,
           "props": [
             "href=\"/operator\""
           ]
         },
         {
           "tag": "Logo",
-          "line": 137,
+          "line": 138,
           "props": [
             "dark"
           ]
         },
         {
           "tag": "nav",
-          "line": 138,
+          "line": 139,
           "props": [
             "className=\"operator-sidebar-groups\""
           ]
         },
         {
           "tag": "div",
-          "line": 138,
+          "line": 139,
           "props": [
             "className=\"operator-sidebar-group\"",
             "key={group.label}"
@@ -135992,14 +135992,14 @@
         },
         {
           "tag": "span",
-          "line": 138,
+          "line": 139,
           "props": [
             "className=\"operator-nav-label\""
           ]
         },
         {
           "tag": "Link",
-          "line": 138,
+          "line": 139,
           "props": [
             "aria-current={slug===key?\"page\":undefined}",
             "className={slug===key?\"active\":\"\"}",
@@ -136009,64 +136009,64 @@
         },
         {
           "tag": "Icon",
-          "line": 138,
+          "line": 139,
           "props": [
             "name={icon}"
           ]
         },
         {
           "tag": "span",
-          "line": 138,
+          "line": 139,
           "props": []
         },
         {
           "tag": "main",
-          "line": 141,
+          "line": 142,
           "props": [
             "className=\"operator-main\""
           ]
         },
         {
           "tag": "header",
-          "line": 142,
+          "line": 143,
           "props": [
             "className=\"operator-app-header\""
           ]
         },
         {
           "tag": "div",
-          "line": 143,
+          "line": 144,
           "props": [
             "className=\"operator-header-brand\""
           ]
         },
         {
           "tag": "Logo",
-          "line": 143,
+          "line": 144,
           "props": []
         },
         {
           "tag": "span",
-          "line": 143,
+          "line": 144,
           "props": []
         },
         {
           "tag": "div",
-          "line": 144,
+          "line": 145,
           "props": [
             "className=\"operator-user\""
           ]
         },
         {
           "tag": "span",
-          "line": 144,
+          "line": 145,
           "props": [
             "className=\"app-demo-badge\""
           ]
         },
         {
           "tag": "Link",
-          "line": 144,
+          "line": 145,
           "props": [
             "className=\"icon-button operator-home-link\"",
             "href=\"/dashboard\"",
@@ -136075,7 +136075,7 @@
         },
         {
           "tag": "Icon",
-          "line": 144,
+          "line": 145,
           "props": [
             "name=\"home\"",
             "size={18}"
@@ -136083,7 +136083,7 @@
         },
         {
           "tag": "button",
-          "line": 144,
+          "line": 145,
           "props": [
             "className=\"avatar avatar-button\"",
             "type=\"button\"",
@@ -136093,19 +136093,19 @@
         },
         {
           "tag": "Avatar",
-          "line": 144,
+          "line": 145,
           "props": []
         },
         {
           "tag": "div",
-          "line": 146,
+          "line": 147,
           "props": [
             "className=\"operator-page-head\""
           ]
         },
         {
           "tag": "PageHeading",
-          "line": 146,
+          "line": 147,
           "props": [
             "title={detail ? (key === \"tickets\" ? \"Ticketdetails\" : key === \"kunden\" ? \"Kundendetails\" : title) : title}",
             "description={operatorSubtitle(key, detail)}",
@@ -136114,7 +136114,7 @@
         },
         {
           "tag": "Button",
-          "line": 146,
+          "line": 147,
           "props": [
             "className=\"bo-create-action\"",
             "ariaLabel={key===\"sperrungen\"?\"Einschränkung erstellen\":\"Ankündigung erstellen\"}",
@@ -136124,7 +136124,7 @@
         },
         {
           "tag": "HeaderPanel",
-          "line": 147,
+          "line": 148,
           "props": [
             "kind=\"account\"",
             "label=\"Konto\"",
@@ -136135,50 +136135,50 @@
         },
         {
           "tag": "div",
-          "line": 147,
+          "line": 148,
           "props": [
             "className=\"account-sheet\""
           ]
         },
         {
           "tag": "div",
-          "line": 147,
+          "line": 148,
           "props": [
             "className=\"account-sheet-profile\""
           ]
         },
         {
           "tag": "Avatar",
-          "line": 147,
+          "line": 148,
           "props": [
             "size=\"large\""
           ]
         },
         {
           "tag": "div",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "b",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "small",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "div",
-          "line": 147,
+          "line": 148,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 147,
+          "line": 148,
           "props": [
             "href=\"/dashboard\"",
             "icon=\"home\"",
@@ -136189,7 +136189,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 147,
+          "line": 148,
           "props": [
             "icon=\"logout\"",
             "title=\"Abmelden\"",
@@ -136199,12 +136199,12 @@
         },
         {
           "tag": "ErrorState",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "nav",
-          "line": 149,
+          "line": 150,
           "props": [
             "className=\"operator-mobile-nav\"",
             "aria-label=\"Operator Navigation\""
@@ -136212,7 +136212,7 @@
         },
         {
           "tag": "Link",
-          "line": 150,
+          "line": 151,
           "props": [
             "aria-current={slug===key?\"page\":undefined}",
             "className={slug===key?\"active\":\"\"}",
@@ -136222,7 +136222,7 @@
         },
         {
           "tag": "Icon",
-          "line": 150,
+          "line": 151,
           "props": [
             "name={icon}",
             "size={19}"
@@ -136230,12 +136230,12 @@
         },
         {
           "tag": "span",
-          "line": 150,
+          "line": 151,
           "props": []
         },
         {
           "tag": "button",
-          "line": 151,
+          "line": 152,
           "props": [
             "type=\"button\"",
             "className={[\"zahlungen\",\"finanzen\",\"abonnemente\",\"sperrungen\",\"ankuendigungen\",\"sicherheit\",\"audit\"].includes(key)?\"active\":\"\"}",
@@ -136244,7 +136244,7 @@
         },
         {
           "tag": "Icon",
-          "line": 151,
+          "line": 152,
           "props": [
             "name=\"more\"",
             "size={19}"
@@ -136252,12 +136252,12 @@
         },
         {
           "tag": "span",
-          "line": 151,
+          "line": 152,
           "props": []
         },
         {
           "tag": "div",
-          "line": 153,
+          "line": 154,
           "props": [
             "className=\"operator-mobile-more-layer\"",
             "role=\"presentation\"",
@@ -136266,7 +136266,7 @@
         },
         {
           "tag": "section",
-          "line": 154,
+          "line": 155,
           "props": [
             "ref={mobileMoreDialog}",
             "tabIndex={-1}",
@@ -136278,27 +136278,27 @@
         },
         {
           "tag": "header",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "p",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "button",
-          "line": 155,
+          "line": 156,
           "props": [
             "type=\"button\"",
             "className=\"icon-button\"",
@@ -136308,21 +136308,21 @@
         },
         {
           "tag": "Icon",
-          "line": 155,
+          "line": 156,
           "props": [
             "name=\"close\""
           ]
         },
         {
           "tag": "nav",
-          "line": 156,
+          "line": 157,
           "props": [
             "className=\"operator-mobile-more-groups\""
           ]
         },
         {
           "tag": "div",
-          "line": 156,
+          "line": 157,
           "props": [
             "className=\"operator-mobile-more-group\"",
             "key={group.label}"
@@ -136330,12 +136330,12 @@
         },
         {
           "tag": "span",
-          "line": 156,
+          "line": 157,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 156,
+          "line": 157,
           "props": [
             "href={`/operator/${slug}`}",
             "key={slug}",
@@ -136344,19 +136344,19 @@
         },
         {
           "tag": "Icon",
-          "line": 156,
+          "line": 157,
           "props": [
             "name={icon}"
           ]
         },
         {
           "tag": "span",
-          "line": 156,
+          "line": 157,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 156,
+          "line": 157,
           "props": [
             "name=\"arrow\"",
             "size={15}"
@@ -136364,48 +136364,48 @@
         },
         {
           "tag": "TicketDetail",
-          "line": 160,
+          "line": 161,
           "props": [
             "ticketId={detail}"
           ]
         },
         {
           "tag": "OperatorCustomerDetail",
-          "line": 161,
+          "line": 162,
           "props": [
             "tenantId={detail}"
           ]
         },
         {
           "tag": "TicketsView",
-          "line": 162,
-          "props": []
-        },
-        {
-          "tag": "CustomersView",
           "line": 163,
           "props": []
         },
         {
-          "tag": "PaymentsView",
+          "tag": "CustomersView",
           "line": 164,
           "props": []
         },
         {
-          "tag": "OperatorFinanceView",
+          "tag": "PaymentsView",
           "line": 165,
+          "props": []
+        },
+        {
+          "tag": "OperatorFinanceView",
+          "line": 166,
           "props": [
             "demo={demo}"
           ]
         },
         {
           "tag": "SubscriptionsView",
-          "line": 166,
+          "line": 167,
           "props": []
         },
         {
           "tag": "RestrictionsView",
-          "line": 167,
+          "line": 168,
           "props": [
             "open={createOpen}",
             "onClose={()=>setCreateOpen(false)}"
@@ -136413,12 +136413,12 @@
         },
         {
           "tag": "MonitoringView",
-          "line": 168,
+          "line": 169,
           "props": []
         },
         {
           "tag": "AnnouncementsView",
-          "line": 169,
+          "line": 170,
           "props": [
             "open={createOpen}",
             "onClose={()=>setCreateOpen(false)}"
@@ -136426,139 +136426,139 @@
         },
         {
           "tag": "SecurityView",
-          "line": 170,
-          "props": []
-        },
-        {
-          "tag": "AuditView",
           "line": 171,
           "props": []
         },
         {
-          "tag": "OperatorDashboard",
+          "tag": "AuditView",
           "line": 172,
+          "props": []
+        },
+        {
+          "tag": "OperatorDashboard",
+          "line": 173,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 133,
+          "line": 134,
           "expression": "logoutBusy"
         },
         {
-          "line": 133,
+          "line": 134,
           "expression": "typeof payload.microsoftLogoutUrl===\"string\""
         },
         {
-          "line": 135,
+          "line": 136,
           "expression": "demo"
         },
         {
-          "line": 138,
+          "line": 139,
           "expression": "!item"
         },
         {
-          "line": 138,
+          "line": 139,
           "expression": "slug===key"
         },
         {
-          "line": 138,
+          "line": 139,
           "expression": "slug===key"
         },
         {
-          "line": 138,
+          "line": 139,
           "expression": "slug"
         },
         {
-          "line": 146,
+          "line": 147,
           "expression": "detail"
         },
         {
-          "line": 146,
+          "line": 147,
           "expression": "key === \"tickets\""
         },
         {
-          "line": 146,
+          "line": 147,
           "expression": "key === \"kunden\""
         },
         {
-          "line": 146,
+          "line": 147,
           "expression": "!detail&&(key===\"sperrungen\"||key===\"ankuendigungen\")"
         },
         {
-          "line": 146,
+          "line": 147,
           "expression": "key===\"sperrungen\""
         },
         {
-          "line": 150,
+          "line": 151,
           "expression": "slug===key"
-        },
-        {
-          "line": 150,
-          "expression": "slug===key"
-        },
-        {
-          "line": 150,
-          "expression": "slug"
         },
         {
           "line": 151,
+          "expression": "slug===key"
+        },
+        {
+          "line": 151,
+          "expression": "slug"
+        },
+        {
+          "line": 152,
           "expression": "[\"zahlungen\",\"finanzen\",\"abonnemente\",\"sperrungen\",\"ankuendigungen\",\"sicherheit\",\"audit\"].includes(key)"
         },
         {
-          "line": 153,
+          "line": 154,
           "expression": "event.target===event.currentTarget"
         },
         {
-          "line": 156,
+          "line": 157,
           "expression": "!items.length"
         },
         {
-          "line": 160,
+          "line": 161,
           "expression": "detail && key === \"tickets\""
         },
         {
-          "line": 161,
+          "line": 162,
           "expression": "detail && key === \"kunden\""
         },
         {
-          "line": 162,
+          "line": 163,
           "expression": "key === \"tickets\""
         },
         {
-          "line": 163,
+          "line": 164,
           "expression": "key === \"kunden\""
         },
         {
-          "line": 164,
+          "line": 165,
           "expression": "key === \"zahlungen\""
         },
         {
-          "line": 165,
+          "line": 166,
           "expression": "key === \"finanzen\""
         },
         {
-          "line": 166,
+          "line": 167,
           "expression": "key === \"abonnemente\""
         },
         {
-          "line": 167,
+          "line": 168,
           "expression": "key === \"sperrungen\""
         },
         {
-          "line": 168,
+          "line": 169,
           "expression": "key === \"monitoring\""
         },
         {
-          "line": 169,
+          "line": 170,
           "expression": "key === \"ankuendigungen\""
         },
         {
-          "line": 170,
+          "line": 171,
           "expression": "key === \"sicherheit\""
         },
         {
-          "line": 171,
+          "line": 172,
           "expression": "key === \"audit\""
         }
       ]
@@ -136567,7 +136567,7 @@
       "key": "components/operator.tsx#operatorNav",
       "file": "components/operator.tsx",
       "name": "operatorNav",
-      "line": 21,
+      "line": 22,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -136618,7 +136618,7 @@
       "key": "components/operator.tsx#operatorNavGroups",
       "file": "components/operator.tsx",
       "name": "operatorNavGroups",
-      "line": 35,
+      "line": 36,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -136630,7 +136630,7 @@
       "key": "components/operator.tsx#operatorSubtitle",
       "file": "components/operator.tsx",
       "name": "operatorSubtitle",
-      "line": 177,
+      "line": 178,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -136638,11 +136638,11 @@
       "elements": [],
       "conditions": [
         {
-          "line": 178,
+          "line": 179,
           "expression": "detail && key === \"tickets\""
         },
         {
-          "line": 179,
+          "line": 180,
           "expression": "detail && key === \"kunden\""
         }
       ]
@@ -136651,7 +136651,7 @@
       "key": "components/operator.tsx#tickets",
       "file": "components/operator.tsx",
       "name": "tickets",
-      "line": 58,
+      "line": 59,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -136663,7 +136663,7 @@
       "key": "components/operator.tsx#TicketDetail",
       "file": "components/operator.tsx",
       "name": "TicketDetail",
-      "line": 255,
+      "line": 256,
       "classes": [
         "operator-ticket-layout",
         "operator-thread",
@@ -136682,25 +136682,25 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 301
+          "line": 302
         },
         {
           "tag": "Field",
-          "line": 301
-        },
-        {
-          "tag": "Field",
-          "line": 318
+          "line": 302
         },
         {
           "tag": "Field",
           "line": 319
+        },
+        {
+          "tag": "Field",
+          "line": 320
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 297,
+          "line": 298,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -136709,105 +136709,105 @@
         },
         {
           "tag": "div",
-          "line": 299,
+          "line": 300,
           "props": [
             "className=\"operator-ticket-layout\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 300,
+          "line": 301,
           "props": [
             "className=\"operator-thread\""
           ]
         },
         {
           "tag": "div",
-          "line": 301,
+          "line": 302,
           "props": [
             "className=\"ticket-meta-bar\""
           ]
         },
         {
           "tag": "Field",
-          "line": 301,
+          "line": 302,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 301,
+          "line": 302,
           "props": [
             "defaultValue=\"progress\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"open\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"progress\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"waiting\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"solved\""
           ]
         },
         {
           "tag": "Field",
-          "line": 301,
+          "line": 302,
           "props": [
             "label=\"Priorität\""
           ]
         },
         {
           "tag": "Select",
-          "line": 301,
+          "line": 302,
           "props": [
             "defaultValue=\"high\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"normal\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"high\""
           ]
         },
         {
           "tag": "option",
-          "line": 301,
+          "line": 302,
           "props": [
             "value=\"critical\""
           ]
         },
         {
           "tag": "MessageBubble",
-          "line": 302,
+          "line": 303,
           "props": [
             "outgoing={false}",
             "time={<>10:24</>}",
@@ -136816,7 +136816,7 @@
         },
         {
           "tag": "MessageBubble",
-          "line": 303,
+          "line": 304,
           "props": [
             "outgoing={true}",
             "time={<>10:37</>}",
@@ -136825,14 +136825,14 @@
         },
         {
           "tag": "div",
-          "line": 304,
+          "line": 305,
           "props": [
             "className=\"operator-reply\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 304,
+          "line": 305,
           "props": [
             "value={reply}",
             "onChange={e=>setReply(e.target.value)}",
@@ -136841,55 +136841,55 @@
         },
         {
           "tag": "div",
-          "line": 304,
+          "line": 305,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 304,
+          "line": 305,
           "props": [
             "onClick={()=>void send()}"
           ]
         },
         {
           "tag": "aside",
-          "line": 306,
+          "line": 307,
           "props": [
             "className=\"surface customer-context\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 306,
+          "line": 307,
           "props": [
             "title=\"Kunde\""
           ]
         },
         {
           "tag": "h3",
-          "line": 306,
+          "line": 307,
           "props": []
         },
         {
           "tag": "p",
-          "line": 306,
+          "line": 307,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 306,
+          "line": 307,
           "props": [
             "title={toast}"
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 309,
+          "line": 310,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 309,
+          "line": 310,
           "props": [
             "compact",
             "icon=\"support\"",
@@ -136899,35 +136899,35 @@
         },
         {
           "tag": "div",
-          "line": 315,
+          "line": 316,
           "props": [
             "className=\"operator-ticket-layout\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 316,
+          "line": 317,
           "props": [
             "className=\"operator-thread\""
           ]
         },
         {
           "tag": "div",
-          "line": 317,
+          "line": 318,
           "props": [
             "className=\"ticket-meta-bar\""
           ]
         },
         {
           "tag": "Field",
-          "line": 318,
+          "line": 319,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 318,
+          "line": 319,
           "props": [
             "value={status}",
             "onChange={e=>void update(\"status\",e.target.value)}"
@@ -136935,49 +136935,49 @@
         },
         {
           "tag": "option",
-          "line": 318,
+          "line": 319,
           "props": [
             "value=\"open\""
           ]
         },
         {
           "tag": "option",
-          "line": 318,
+          "line": 319,
           "props": [
             "value=\"in_progress\""
           ]
         },
         {
           "tag": "option",
-          "line": 318,
+          "line": 319,
           "props": [
             "value=\"waiting_customer\""
           ]
         },
         {
           "tag": "option",
-          "line": 318,
+          "line": 319,
           "props": [
             "value=\"resolved\""
           ]
         },
         {
           "tag": "option",
-          "line": 318,
+          "line": 319,
           "props": [
             "value=\"closed\""
           ]
         },
         {
           "tag": "Field",
-          "line": 319,
+          "line": 320,
           "props": [
             "label=\"Priorität\""
           ]
         },
         {
           "tag": "Select",
-          "line": 319,
+          "line": 320,
           "props": [
             "value={priority}",
             "onChange={e=>void update(\"priority\",e.target.value)}"
@@ -136985,42 +136985,42 @@
         },
         {
           "tag": "option",
-          "line": 319,
+          "line": 320,
           "props": [
             "value=\"low\""
           ]
         },
         {
           "tag": "option",
-          "line": 319,
+          "line": 320,
           "props": [
             "value=\"normal\""
           ]
         },
         {
           "tag": "option",
-          "line": 319,
+          "line": 320,
           "props": [
             "value=\"high\""
           ]
         },
         {
           "tag": "option",
-          "line": 319,
+          "line": 320,
           "props": [
             "value=\"critical\""
           ]
         },
         {
           "tag": "div",
-          "line": 321,
+          "line": 322,
           "props": [
             "className=\"tabs\""
           ]
         },
         {
           "tag": "button",
-          "line": 321,
+          "line": 322,
           "props": [
             "className={!internal?\"active\":\"\"}",
             "onClick={()=>setInternal(false)}"
@@ -137028,7 +137028,7 @@
         },
         {
           "tag": "button",
-          "line": 321,
+          "line": 322,
           "props": [
             "className={internal?\"active\":\"\"}",
             "onClick={()=>setInternal(true)}"
@@ -137036,7 +137036,7 @@
         },
         {
           "tag": "MessageBubble",
-          "line": 322,
+          "line": 323,
           "props": [
             "outgoing={message.author_type!==\"customer\"}",
             "time={<>{new Date(String(message.created_at)).toLocaleString(\"de-CH\",{dateStyle:\"short\",timeStyle:\"short\"})}</>}",
@@ -137047,14 +137047,14 @@
         },
         {
           "tag": "div",
-          "line": 323,
+          "line": 324,
           "props": [
             "className=\"operator-reply\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 323,
+          "line": 324,
           "props": [
             "value={reply}",
             "onChange={e=>setReply(e.target.value)}",
@@ -137063,72 +137063,72 @@
         },
         {
           "tag": "div",
-          "line": 323,
+          "line": 324,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 323,
+          "line": 324,
           "props": [
             "onClick={()=>void send()}"
           ]
         },
         {
           "tag": "aside",
-          "line": 325,
+          "line": 326,
           "props": [
             "className=\"surface customer-context\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 326,
+          "line": 327,
           "props": [
             "title=\"Kunde\""
           ]
         },
         {
           "tag": "h3",
-          "line": 327,
+          "line": 328,
           "props": []
         },
         {
           "tag": "p",
-          "line": 327,
+          "line": 328,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 328,
+          "line": 329,
           "props": [
             "href={\"/operator/kunden/\"+String(tenant?.id)}"
           ]
         },
         {
           "tag": "div",
-          "line": 329,
+          "line": 330,
           "props": [
             "className=\"context-block\""
           ]
         },
         {
           "tag": "small",
-          "line": 329,
+          "line": 330,
           "props": []
         },
         {
           "tag": "b",
-          "line": 329,
+          "line": 330,
           "props": []
         },
         {
           "tag": "span",
-          "line": 329,
+          "line": 330,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 329,
+          "line": 330,
           "props": [
             "variant=\"secondary\"",
             "disabled"
@@ -137136,7 +137136,7 @@
         },
         {
           "tag": "Toast",
-          "line": 331,
+          "line": 332,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -137145,87 +137145,87 @@
       ],
       "conditions": [
         {
-          "line": 257,
+          "line": 258,
           "expression": "production"
         },
         {
-          "line": 266,
+          "line": 267,
           "expression": "!resource.data"
         },
         {
-          "line": 266,
+          "line": 267,
           "expression": "active"
         },
         {
-          "line": 271,
+          "line": 272,
           "expression": "!production"
         },
         {
-          "line": 277,
+          "line": 278,
           "expression": "error instanceof Error"
-        },
-        {
-          "line": 284,
-          "expression": "!value"
         },
         {
           "line": 285,
+          "expression": "!value"
+        },
+        {
+          "line": 286,
           "expression": "!production"
         },
         {
-          "line": 288,
+          "line": 289,
           "expression": "current.some(item=>item.id===payload.item.id)"
         },
         {
-          "line": 290,
+          "line": 291,
           "expression": "internal"
         },
         {
-          "line": 292,
+          "line": 293,
           "expression": "error instanceof Error"
         },
         {
-          "line": 297,
+          "line": 298,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 299,
+          "line": 300,
           "expression": "!production"
         },
         {
-          "line": 309,
+          "line": 310,
           "expression": "!ticket"
         },
         {
-          "line": 321,
+          "line": 322,
           "expression": "!internal"
         },
         {
-          "line": 321,
-          "expression": "internal"
-        },
-        {
           "line": 322,
           "expression": "internal"
         },
         {
-          "line": 322,
+          "line": 323,
+          "expression": "internal"
+        },
+        {
+          "line": 323,
           "expression": "message.author_type===\"customer\""
         },
         {
-          "line": 323,
+          "line": 324,
           "expression": "internal"
         },
         {
-          "line": 323,
+          "line": 324,
           "expression": "internal"
         },
         {
-          "line": 327,
+          "line": 328,
           "expression": "tenant?.city"
         },
         {
-          "line": 331,
+          "line": 332,
           "expression": "toast.includes(\"konnte\")"
         }
       ]
@@ -137234,7 +137234,7 @@
       "key": "components/operator.tsx#OperatorLoadState",
       "file": "components/operator.tsx",
       "name": "OperatorLoadState",
-      "line": 97,
+      "line": 98,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -137242,12 +137242,12 @@
       "elements": [
         {
           "tag": "LoadingState",
-          "line": 98,
+          "line": 99,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 98,
+          "line": 99,
           "props": [
             "onRetry={onRetry}",
             "retryLabel=\"Erneut versuchen\""
@@ -137256,7 +137256,7 @@
       ],
       "conditions": [
         {
-          "line": 98,
+          "line": 99,
           "expression": "loading"
         }
       ]
@@ -137287,7 +137287,7 @@
       "key": "components/operator.tsx#OperatorCustomerDetail",
       "file": "components/operator.tsx",
       "name": "OperatorCustomerDetail",
-      "line": 345,
+      "line": 346,
       "classes": [
         "operator-customer-hero",
         "operator-customer-main",
@@ -137309,64 +137309,64 @@
       "elements": [
         {
           "tag": "p",
-          "line": 358,
+          "line": 359,
           "props": [
             "role=\"status\""
           ]
         },
         {
           "tag": "div",
-          "line": 360,
+          "line": 361,
           "props": [
             "className=\"operator-customer-hero\""
           ]
         },
         {
           "tag": "div",
-          "line": 360,
+          "line": 361,
           "props": [
             "className=\"operator-customer-main\""
           ]
         },
         {
           "tag": "span",
-          "line": 360,
+          "line": 361,
           "props": [
             "className=\"record-avatar large\""
           ]
         },
         {
           "tag": "div",
-          "line": 360,
+          "line": 361,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 360,
+          "line": 361,
           "props": []
         },
         {
           "tag": "p",
-          "line": 360,
+          "line": 361,
           "props": []
         },
         {
           "tag": "div",
-          "line": 360,
+          "line": 361,
           "props": [
             "className=\"operator-customer-actions\""
           ]
         },
         {
           "tag": "Status",
-          "line": 360,
+          "line": 361,
           "props": [
             "tone={demoCustomer.status===\"Aktiv\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "Button",
-          "line": 360,
+          "line": 361,
           "props": [
             "variant=\"secondary\"",
             "disabled"
@@ -137374,7 +137374,7 @@
         },
         {
           "tag": "Button",
-          "line": 360,
+          "line": 361,
           "props": [
             "href=\"/operator/sperrungen\"",
             "variant=\"danger\""
@@ -137382,14 +137382,14 @@
         },
         {
           "tag": "div",
-          "line": 361,
+          "line": 362,
           "props": [
             "className=\"operator-customer-metrics\""
           ]
         },
         {
           "tag": "Metric",
-          "line": 361,
+          "line": 362,
           "props": [
             "label=\"Plan\"",
             "value={demoCustomer.plan}",
@@ -137399,7 +137399,7 @@
         },
         {
           "tag": "Metric",
-          "line": 361,
+          "line": 362,
           "props": [
             "label=\"Benutzer\"",
             "value=\"—\"",
@@ -137409,7 +137409,7 @@
         },
         {
           "tag": "Metric",
-          "line": 361,
+          "line": 362,
           "props": [
             "label=\"Offene Tickets\"",
             "value={String(tickets.filter(item=>item[2]===demoCustomer.name&&item[3]!==\"Gelöst\").length)}",
@@ -137419,7 +137419,7 @@
         },
         {
           "tag": "Metric",
-          "line": 361,
+          "line": 362,
           "props": [
             "label=\"Zahlungsstatus\"",
             "value=\"—\"",
@@ -137429,14 +137429,14 @@
         },
         {
           "tag": "Toast",
-          "line": 362,
+          "line": 363,
           "props": [
             "title={toast}"
           ]
         },
         {
           "tag": "OperatorLoadState",
-          "line": 369,
+          "line": 370,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -137445,12 +137445,12 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 371,
+          "line": 372,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 371,
+          "line": 372,
           "props": [
             "compact",
             "icon=\"users\"",
@@ -137460,57 +137460,57 @@
         },
         {
           "tag": "div",
-          "line": 381,
+          "line": 382,
           "props": [
             "className=\"operator-customer-hero\""
           ]
         },
         {
           "tag": "div",
-          "line": 382,
+          "line": 383,
           "props": [
             "className=\"operator-customer-main\""
           ]
         },
         {
           "tag": "span",
-          "line": 382,
+          "line": 383,
           "props": [
             "className=\"record-avatar large\""
           ]
         },
         {
           "tag": "div",
-          "line": 382,
+          "line": 383,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 382,
+          "line": 383,
           "props": []
         },
         {
           "tag": "p",
-          "line": 382,
+          "line": 383,
           "props": []
         },
         {
           "tag": "div",
-          "line": 383,
+          "line": 384,
           "props": [
             "className=\"operator-customer-actions\""
           ]
         },
         {
           "tag": "Status",
-          "line": 383,
+          "line": 384,
           "props": [
             "tone={accountStatus===\"active\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "Button",
-          "line": 383,
+          "line": 384,
           "props": [
             "variant=\"secondary\"",
             "disabled"
@@ -137518,7 +137518,7 @@
         },
         {
           "tag": "Button",
-          "line": 383,
+          "line": 384,
           "props": [
             "href=\"/operator/sperrungen\"",
             "variant=\"danger\""
@@ -137526,24 +137526,24 @@
         },
         {
           "tag": "div",
-          "line": 385,
+          "line": 386,
           "props": [
             "className=\"operator-customer-metrics\""
           ]
         },
         {
           "tag": "Metric",
-          "line": 385,
+          "line": 386,
           "props": [
             "label=\"Plan\"",
             "value={operatorPlan(plan)}",
-            "hint={planPrice[plan]+\" / Monat\"}",
+            "hint={overview.monthly_contract_value==null?\"Vertragswert: \"+(access?.billing?\"Keine Daten\":\"Keine Berechtigung\"):\"Vertragswert: \"+moneyChf(Number(overview.monthly_contract_value))+\" / Monat\"}",
             "icon=\"card\""
           ]
         },
         {
           "tag": "Metric",
-          "line": 385,
+          "line": 386,
           "props": [
             "label=\"Benutzer\"",
             "value={String(users)+\" / \"+String(userLimit||\"—\")}",
@@ -137553,210 +137553,215 @@
         },
         {
           "tag": "Metric",
-          "line": 385,
+          "line": 386,
           "props": [
             "label=\"Offene Tickets\"",
-            "value={String(openTickets)}",
-            "hint=\"Aktuelle Anfragen\"",
+            "value={openTickets===null?\"—\":String(openTickets)}",
+            "hint={access?.support?\"Aktuelle Anfragen\":\"Keine Berechtigung\"}",
             "icon=\"support\""
           ]
         },
         {
           "tag": "Metric",
-          "line": 385,
+          "line": 386,
           "props": [
             "label=\"Kundenzahlungen\"",
-            "value={\"CHF \"+Number(overview.payments_total??0).toLocaleString(\"de-CH\",{minimumFractionDigits:2,maximumFractionDigits:2})}",
-            "hint=\"Erfasste Rechnungszahlungen\"",
+            "value={overview.payments_total==null?\"—\":moneyChf(Number(overview.payments_total))}",
+            "hint={access?.billing?\"Erfasste CHF-Plattformzahlungen\":\"Keine Berechtigung\"}",
             "icon=\"wallet\""
           ]
         },
         {
           "tag": "div",
-          "line": 386,
+          "line": 387,
           "props": [
             "className=\"operator-customer-grid\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 387,
+          "line": 388,
           "props": [
             "title=\"Konto\""
           ]
         },
         {
           "tag": "dl",
-          "line": 387,
+          "line": 388,
           "props": [
             "className=\"operator-detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "div",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "div",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "div",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "div",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 387,
+          "line": 388,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 388,
+          "line": 389,
           "props": [
             "title=\"Abonnement\""
           ]
         },
         {
           "tag": "div",
-          "line": 388,
+          "line": 389,
           "props": [
             "className=\"context-block\""
           ]
         },
         {
           "tag": "small",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "b",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "span",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 388,
+          "line": 389,
           "props": [
             "tone={String(account?.subscription_status)===\"active\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "div",
-          "line": 388,
+          "line": 389,
           "props": [
             "className=\"context-block\""
           ]
         },
         {
           "tag": "small",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "b",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "span",
-          "line": 388,
+          "line": 389,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 389,
+          "line": 390,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 389,
+          "line": 390,
           "props": [
             "title=\"Support\""
           ]
         },
         {
+          "tag": "p",
+          "line": 390,
+          "props": []
+        },
+        {
           "tag": "div",
-          "line": 389,
+          "line": 390,
           "props": [
             "className=\"compact-list\""
           ]
         },
         {
           "tag": "Link",
-          "line": 389,
+          "line": 390,
           "props": [
             "href={\"/operator/tickets/\"+String(ticket.id)}",
             "key={String(ticket.id)}"
@@ -137764,24 +137769,24 @@
         },
         {
           "tag": "b",
-          "line": 389,
+          "line": 390,
           "props": []
         },
         {
           "tag": "span",
-          "line": 389,
+          "line": 390,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 389,
+          "line": 390,
           "props": [
             "tone={String(ticket.status)===\"resolved\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 389,
+          "line": 390,
           "props": [
             "compact",
             "icon=\"support\"",
@@ -137791,43 +137796,48 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 390,
+          "line": 391,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 390,
+          "line": 391,
           "props": [
             "title=\"Audit\""
           ]
         },
         {
+          "tag": "p",
+          "line": 391,
+          "props": []
+        },
+        {
           "tag": "div",
-          "line": 390,
+          "line": 391,
           "props": [
             "className=\"audit-list\""
           ]
         },
         {
           "tag": "span",
-          "line": 390,
+          "line": 391,
           "props": [
             "key={String(item.id)}"
           ]
         },
         {
           "tag": "b",
-          "line": 390,
+          "line": 391,
           "props": []
         },
         {
           "tag": "p",
-          "line": 390,
+          "line": 391,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 392,
+          "line": 393,
           "props": [
             "title={toast}"
           ]
@@ -137835,63 +137845,111 @@
       ],
       "conditions": [
         {
-          "line": 349,
+          "line": 350,
           "expression": "production"
         },
         {
-          "line": 358,
+          "line": 359,
           "expression": "!production&&!demoCustomer"
         },
         {
-          "line": 359,
+          "line": 360,
           "expression": "!production&&demoCustomer"
         },
         {
-          "line": 360,
+          "line": 361,
           "expression": "demoCustomer.status===\"Aktiv\""
         },
         {
-          "line": 368,
+          "line": 369,
           "expression": "Array.isArray(overview.active_restrictions)"
         },
         {
-          "line": 369,
+          "line": 370,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 371,
+          "line": 372,
           "expression": "!tenant"
         },
         {
-          "line": 382,
-          "expression": "tenant.city"
+          "line": 378,
+          "expression": "overview.open_tickets==null"
         },
         {
           "line": 383,
+          "expression": "tenant.city"
+        },
+        {
+          "line": 384,
           "expression": "accountStatus===\"active\""
         },
         {
-          "line": 385,
+          "line": 386,
+          "expression": "overview.monthly_contract_value==null"
+        },
+        {
+          "line": 386,
+          "expression": "access?.billing"
+        },
+        {
+          "line": 386,
           "expression": "userLimit"
         },
         {
-          "line": 388,
+          "line": 386,
+          "expression": "openTickets===null"
+        },
+        {
+          "line": 386,
+          "expression": "access?.support"
+        },
+        {
+          "line": 386,
+          "expression": "overview.payments_total==null"
+        },
+        {
+          "line": 386,
+          "expression": "access?.billing"
+        },
+        {
+          "line": 389,
+          "expression": "overview.monthly_contract_value==null"
+        },
+        {
+          "line": 389,
+          "expression": "access?.billing"
+        },
+        {
+          "line": 389,
           "expression": "String(account?.subscription_status)===\"active\""
         },
         {
-          "line": 388,
+          "line": 389,
+          "expression": "access?.restrictions"
+        },
+        {
+          "line": 389,
           "expression": "restrictions.length"
         },
         {
-          "line": 389,
-          "expression": "(data.tickets??[]).length"
-        },
-        {
-          "line": 389,
-          "expression": "String(ticket.status)===\"resolved\""
+          "line": 390,
+          "expression": "!access?.support"
         },
         {
           "line": 390,
+          "expression": "(data.tickets??[]).length"
+        },
+        {
+          "line": 390,
+          "expression": "String(ticket.status)===\"resolved\""
+        },
+        {
+          "line": 391,
+          "expression": "!access?.audit"
+        },
+        {
+          "line": 391,
           "expression": "(data.audit??[]).length"
         }
       ]
@@ -137900,7 +137958,7 @@
       "key": "components/operator.tsx#demoCustomers",
       "file": "components/operator.tsx",
       "name": "demoCustomers",
-      "line": 51,
+      "line": 52,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -137912,7 +137970,7 @@
       "key": "components/operator.tsx#demoPlan",
       "file": "components/operator.tsx",
       "name": "demoPlan",
-      "line": 46,
+      "line": 47,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -137920,7 +137978,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 48,
+          "line": 49,
           "expression": "!plan"
         }
       ]
@@ -137979,22 +138037,10 @@
       "conditions": []
     },
     {
-      "key": "components/operator.tsx#moneyChf",
-      "file": "components/operator.tsx",
-      "name": "moneyChf",
-      "line": 42,
-      "classes": [],
-      "apis": [],
-      "collections": [],
-      "widgets": [],
-      "elements": [],
-      "conditions": []
-    },
-    {
       "key": "components/operator.tsx#operatorStatus",
       "file": "components/operator.tsx",
       "name": "operatorStatus",
-      "line": 83,
+      "line": 84,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -138006,7 +138052,19 @@
       "key": "components/operator.tsx#operatorPlan",
       "file": "components/operator.tsx",
       "name": "operatorPlan",
-      "line": 92,
+      "line": 93,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/operator.tsx#moneyChf",
+      "file": "components/operator.tsx",
+      "name": "moneyChf",
+      "line": 43,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -138018,24 +138076,24 @@
       "key": "components/operator.tsx#TicketsView",
       "file": "components/operator.tsx",
       "name": "TicketsView",
-      "line": 246,
+      "line": 247,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 252
+          "line": 253
         },
         {
           "tag": "RecordsView",
-          "line": 252
+          "line": 253
         }
       ],
       "elements": [
         {
           "tag": "RecordsControls",
-          "line": 252,
+          "line": 253,
           "props": [
             "inline",
             "controller={controller}",
@@ -138046,7 +138104,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 252,
+          "line": 253,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -138066,7 +138124,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 252,
+          "line": 253,
           "props": [
             "compact",
             "valuePlacement=\"metadata\"",
@@ -138078,7 +138136,7 @@
         },
         {
           "tag": "Button",
-          "line": 252,
+          "line": 253,
           "props": [
             "variant=\"secondary\"",
             "onClick={refresh}"
@@ -138087,19 +138145,19 @@
       ],
       "conditions": [
         {
-          "line": 251,
+          "line": 252,
           "expression": "production"
         },
         {
-          "line": 251,
+          "line": 252,
           "expression": "item.priority==='critical'"
         },
         {
-          "line": 251,
+          "line": 252,
           "expression": "item.priority==='high'"
         },
         {
-          "line": 251,
+          "line": 252,
           "expression": "item.priority==='low'"
         }
       ]
@@ -138108,7 +138166,7 @@
       "key": "components/operator.tsx#useOperatorTickets",
       "file": "components/operator.tsx",
       "name": "useOperatorTickets",
-      "line": 101,
+      "line": 102,
       "classes": [],
       "apis": [
         "/api/operator/tickets"
@@ -138118,7 +138176,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 104,
+          "line": 105,
           "expression": "production"
         }
       ]
@@ -138127,7 +138185,7 @@
       "key": "components/operator.tsx#OperatorTicket",
       "file": "components/operator.tsx",
       "name": "OperatorTicket",
-      "line": 65,
+      "line": 66,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -138139,24 +138197,24 @@
       "key": "components/operator.tsx#CustomersView",
       "file": "components/operator.tsx",
       "name": "CustomersView",
-      "line": 335,
+      "line": 336,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 342
+          "line": 343
         },
         {
           "tag": "RecordsView",
-          "line": 342
+          "line": 343
         }
       ],
       "elements": [
         {
           "tag": "RecordsControls",
-          "line": 342,
+          "line": 343,
           "props": [
             "inline",
             "controller={controller}",
@@ -138167,7 +138225,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 342,
+          "line": 343,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -138187,7 +138245,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 342,
+          "line": 343,
           "props": [
             "compact",
             "valuePlacement=\"metadata\"",
@@ -138200,7 +138258,7 @@
         },
         {
           "tag": "Button",
-          "line": 342,
+          "line": 343,
           "props": [
             "variant=\"secondary\"",
             "onClick={refresh}"
@@ -138209,7 +138267,7 @@
       ],
       "conditions": [
         {
-          "line": 341,
+          "line": 342,
           "expression": "production"
         }
       ]
@@ -138218,7 +138276,7 @@
       "key": "components/operator.tsx#useOperatorCustomers",
       "file": "components/operator.tsx",
       "name": "useOperatorCustomers",
-      "line": 111,
+      "line": 112,
       "classes": [],
       "apis": [
         "/api/operator/customers"
@@ -138228,7 +138286,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 114,
+          "line": 115,
           "expression": "production"
         }
       ]
@@ -138237,7 +138295,7 @@
       "key": "components/operator.tsx#OperatorTenant",
       "file": "components/operator.tsx",
       "name": "OperatorTenant",
-      "line": 74,
+      "line": 75,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -138249,7 +138307,7 @@
       "key": "components/operator.tsx#PaymentsView",
       "file": "components/operator.tsx",
       "name": "PaymentsView",
-      "line": 424,
+      "line": 425,
       "classes": [
         "operator-payment-insights",
         "operator-table-card",
@@ -138265,33 +138323,33 @@
       "widgets": [
         {
           "tag": "DataTable",
-          "line": 437
+          "line": 438
         },
         {
           "tag": "DataTableHead",
-          "line": 437
+          "line": 438
         },
         {
           "tag": "DataTableRow",
-          "line": 437
+          "line": 438
         },
         {
           "tag": "DataTable",
-          "line": 456
+          "line": 458
         },
         {
           "tag": "DataTableHead",
-          "line": 456
+          "line": 458
         },
         {
           "tag": "DataTableRow",
-          "line": 456
+          "line": 458
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 433,
+          "line": 434,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -138300,14 +138358,14 @@
         },
         {
           "tag": "div",
-          "line": 436,
+          "line": 437,
           "props": [
             "className=\"operator-payment-insights\""
           ]
         },
         {
           "tag": "PaymentInsight",
-          "line": 436,
+          "line": 437,
           "props": [
             "label=\"Kundenzahlungen\"",
             "value=\"CHF 49’820\"",
@@ -138317,7 +138375,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 436,
+          "line": 437,
           "props": [
             "label=\"Verbucht\"",
             "value=\"184\"",
@@ -138327,7 +138385,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 436,
+          "line": 437,
           "props": [
             "label=\"Offen / storniert\"",
             "value=\"2\"",
@@ -138337,14 +138395,14 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 437,
+          "line": 438,
           "props": [
             "className=\"operator-table-card\""
           ]
         },
         {
           "tag": "DataTable",
-          "line": 437,
+          "line": 438,
           "props": [
             "variant=\"operator\"",
             "label=\"Operator-Daten\""
@@ -138352,39 +138410,39 @@
         },
         {
           "tag": "DataTableHead",
-          "line": 437,
+          "line": 438,
           "props": [
             "className=\"operator-table-head payment\""
           ]
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": []
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": []
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": []
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": []
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": []
         },
         {
           "tag": "DataTableRow",
-          "line": 437,
+          "line": 438,
           "props": [
             "className=\"operator-table-row payment\"",
             "key={r[1]}"
@@ -138392,30 +138450,30 @@
         },
         {
           "tag": "span",
-          "line": 437,
+          "line": 438,
           "props": [
             "key={i}"
           ]
         },
         {
           "tag": "Status",
-          "line": 437,
+          "line": 438,
           "props": [
             "tone={x===\"Verbucht\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "div",
-          "line": 448,
+          "line": 450,
           "props": [
             "className=\"operator-payment-insights\""
           ]
         },
         {
           "tag": "PaymentInsight",
-          "line": 449,
+          "line": 451,
           "props": [
-            "label=\"Kundenzahlungen\"",
+            "label=\"Angezeigte Zahlungen · CHF\"",
             "value={\"CHF \"+total.toLocaleString(\"de-CH\",{minimumFractionDigits:2,maximumFractionDigits:2})}",
             "kind=\"trend\"",
             "bars={paymentBars}"
@@ -138423,7 +138481,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 450,
+          "line": 452,
           "props": [
             "label=\"Verbucht\"",
             "value={String(booked.length)}",
@@ -138433,7 +138491,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 451,
+          "line": 453,
           "props": [
             "label=\"Offen / storniert\"",
             "value={String(pending+reversed)}",
@@ -138443,28 +138501,28 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 453,
+          "line": 455,
           "props": [
             "className=\"operator-table-card\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 454,
+          "line": 456,
           "props": [
             "title=\"Kundenzahlungen\""
           ]
         },
         {
           "tag": "p",
-          "line": 455,
+          "line": 457,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "DataTable",
-          "line": 456,
+          "line": 458,
           "props": [
             "variant=\"operator\"",
             "label=\"Operator-Daten\""
@@ -138472,39 +138530,39 @@
         },
         {
           "tag": "DataTableHead",
-          "line": 456,
+          "line": 458,
           "props": [
             "className=\"operator-table-head payment\""
           ]
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "DataTableRow",
-          "line": 456,
+          "line": 458,
           "props": [
             "className=\"operator-table-row payment\"",
             "key={String(item.id)}"
@@ -138512,49 +138570,49 @@
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "b",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "small",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 456,
+          "line": 458,
           "props": [
             "tone={status===\"booked\"?\"success\":status===\"reversed\"?\"danger\":\"warning\"}"
           ]
         },
         {
           "tag": "span",
-          "line": 456,
+          "line": 458,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 456,
+          "line": 458,
           "props": [
             "compact",
             "icon=\"wallet\"",
@@ -138565,51 +138623,55 @@
       ],
       "conditions": [
         {
-          "line": 427,
+          "line": 428,
           "expression": "production"
         },
         {
-          "line": 433,
+          "line": 434,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 435,
+          "line": 436,
           "expression": "!production"
         },
         {
-          "line": 437,
+          "line": 438,
           "expression": "i===3"
         },
         {
-          "line": 437,
+          "line": 438,
           "expression": "x===\"Verbucht\""
         },
         {
-          "line": 450,
+          "line": 452,
           "expression": "items.length"
         },
         {
-          "line": 451,
+          "line": 453,
           "expression": "items.length"
         },
         {
-          "line": 456,
+          "line": 458,
           "expression": "items.length"
         },
         {
-          "line": 456,
+          "line": 458,
+          "expression": "item.currency"
+        },
+        {
+          "line": 458,
           "expression": "status===\"booked\""
         },
         {
-          "line": 456,
+          "line": 458,
           "expression": "status===\"reversed\""
         },
         {
-          "line": 456,
+          "line": 458,
           "expression": "status===\"booked\""
         },
         {
-          "line": 456,
+          "line": 458,
           "expression": "status===\"reversed\""
         }
       ]
@@ -138618,7 +138680,7 @@
       "key": "components/operator.tsx#PaymentInsight",
       "file": "components/operator.tsx",
       "name": "PaymentInsight",
-      "line": 396,
+      "line": 397,
       "classes": [
         "operator-payment-insight",
         "payment-insight-",
@@ -138632,29 +138694,29 @@
       "elements": [
         {
           "tag": "section",
-          "line": 397,
+          "line": 398,
           "props": [
             "className={\"operator-payment-insight payment-insight-\"+kind}"
           ]
         },
         {
           "tag": "div",
-          "line": 398,
+          "line": 399,
           "props": []
         },
         {
           "tag": "span",
-          "line": 398,
+          "line": 399,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 398,
+          "line": 399,
           "props": []
         },
         {
           "tag": "div",
-          "line": 399,
+          "line": 400,
           "props": [
             "className=\"payment-mini-bars\"",
             "aria-hidden=\"true\""
@@ -138662,7 +138724,7 @@
         },
         {
           "tag": "i",
-          "line": 399,
+          "line": 400,
           "props": [
             "key={index}",
             "style={{height:String(height)+\"%\"}}"
@@ -138670,12 +138732,12 @@
         },
         {
           "tag": "span",
-          "line": 399,
+          "line": 400,
           "props": []
         },
         {
           "tag": "div",
-          "line": 399,
+          "line": 400,
           "props": [
             "className={\"payment-ring payment-ring-\"+kind}",
             "style={{\"--payment-ratio\":String(Math.max(0,Math.min(100,ratio)))+\"%\"} as React.CSSProperties}"
@@ -138683,17 +138745,17 @@
         },
         {
           "tag": "b",
-          "line": 399,
+          "line": 400,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 399,
+          "line": 400,
           "expression": "kind===\"trend\""
         },
         {
-          "line": 399,
+          "line": 400,
           "expression": "bars.some(height=>height>0)"
         }
       ]
@@ -138858,7 +138920,7 @@
       "key": "components/operator.tsx#OperatorFinanceView",
       "file": "components/operator.tsx",
       "name": "OperatorFinanceView",
-      "line": 403,
+      "line": 404,
       "classes": [
         "operator-finance",
         "section-title",
@@ -138877,17 +138939,17 @@
       "widgets": [
         {
           "tag": "FilterSheet",
-          "line": 417
+          "line": 418
         },
         {
           "tag": "Field",
-          "line": 417
+          "line": 418
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 411,
+          "line": 412,
           "props": [
             "loading={resource.loading}",
             "error={error}",
@@ -138896,26 +138958,26 @@
         },
         {
           "tag": "div",
-          "line": 415,
+          "line": 416,
           "props": [
             "className=\"operator-finance\""
           ]
         },
         {
           "tag": "div",
-          "line": 416,
+          "line": 417,
           "props": [
             "className=\"section-title\""
           ]
         },
         {
           "tag": "span",
-          "line": 416,
+          "line": 417,
           "props": []
         },
         {
           "tag": "button",
-          "line": 416,
+          "line": 417,
           "props": [
             "type=\"button\"",
             "className=\"icon-button records-filter-action\"",
@@ -138925,7 +138987,7 @@
         },
         {
           "tag": "Icon",
-          "line": 416,
+          "line": 417,
           "props": [
             "name=\"filter\"",
             "size={20}"
@@ -138933,7 +138995,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 417,
+          "line": 418,
           "props": [
             "label=\"Zeitraum\"",
             "open={filterOpen}",
@@ -138943,7 +139005,7 @@
         },
         {
           "tag": "Button",
-          "line": 417,
+          "line": 418,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setDraftRange(\"month\")}"
@@ -138951,21 +139013,21 @@
         },
         {
           "tag": "Button",
-          "line": 417,
+          "line": 418,
           "props": [
             "onClick={()=>{setRange(draftRange);setFilterOpen(false)}}"
           ]
         },
         {
           "tag": "Field",
-          "line": 417,
+          "line": 418,
           "props": [
             "label=\"Zeitraum\""
           ]
         },
         {
           "tag": "Select",
-          "line": 417,
+          "line": 418,
           "props": [
             "value={draftRange}",
             "onChange={event=>setDraftRange(event.target.value)}"
@@ -138973,7 +139035,7 @@
         },
         {
           "tag": "option",
-          "line": 417,
+          "line": 418,
           "props": [
             "key={key}",
             "value={key}"
@@ -138981,14 +139043,14 @@
         },
         {
           "tag": "div",
-          "line": 418,
+          "line": 419,
           "props": [
             "className=\"operator-payment-insights\""
           ]
         },
         {
           "tag": "PaymentInsight",
-          "line": 418,
+          "line": 419,
           "props": [
             "label=\"Kundenzahlungen\"",
             "value={\"CHF \"+volume.toLocaleString(\"de-CH\",{minimumFractionDigits:2})}",
@@ -138998,7 +139060,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 418,
+          "line": 419,
           "props": [
             "label=\"Plattformumsatz\"",
             "value={\"CHF \"+platformRevenue.toLocaleString(\"de-CH\",{minimumFractionDigits:2})}",
@@ -139008,7 +139070,7 @@
         },
         {
           "tag": "PaymentInsight",
-          "line": 418,
+          "line": 419,
           "props": [
             "label=\"Betriebskosten\"",
             "value={\"CHF \"+costs.toLocaleString(\"de-CH\",{minimumFractionDigits:2})}",
@@ -139018,52 +139080,52 @@
         },
         {
           "tag": "section",
-          "line": 419,
+          "line": 420,
           "props": [
             "className=\"finance-analysis\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 419,
+          "line": 420,
           "props": [
             "title=\"Finanzentwicklung\""
           ]
         },
         {
           "tag": "div",
-          "line": 419,
+          "line": 420,
           "props": [
             "className=\"finance-month-bars\""
           ]
         },
         {
           "tag": "div",
-          "line": 419,
+          "line": 420,
           "props": [
             "key={x.label}"
           ]
         },
         {
           "tag": "i",
-          "line": 419,
+          "line": 420,
           "props": [
             "style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}"
           ]
         },
         {
           "tag": "b",
-          "line": 419,
+          "line": 420,
           "props": []
         },
         {
           "tag": "small",
-          "line": 419,
+          "line": 420,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 419,
+          "line": 420,
           "props": [
             "compact",
             "title=\"Keine Kundenzahlungen im gewählten Zeitraum\"",
@@ -139072,113 +139134,113 @@
         },
         {
           "tag": "div",
-          "line": 420,
+          "line": 421,
           "props": [
             "className=\"finance-breakdown\""
           ]
         },
         {
           "tag": "section",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "h3",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "div",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "span",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "div",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "span",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "div",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "span",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "section",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "h3",
-          "line": 420,
+          "line": 421,
           "props": []
         },
         {
           "tag": "p",
-          "line": 420,
+          "line": 421,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 405,
+          "line": 406,
           "expression": "demo"
         },
         {
-          "line": 405,
+          "line": 406,
           "expression": "production"
         },
         {
-          "line": 411,
+          "line": 412,
           "expression": "resource.loading||error"
         },
         {
-          "line": 418,
+          "line": 419,
           "expression": "max"
         },
         {
-          "line": 418,
-          "expression": "platformRevenue+costs"
-        },
-        {
-          "line": 418,
+          "line": 419,
           "expression": "platformRevenue+costs"
         },
         {
           "line": 419,
+          "expression": "platformRevenue+costs"
+        },
+        {
+          "line": 420,
           "expression": "monthly.some(x=>x.value>0)"
         },
         {
-          "line": 419,
+          "line": 420,
           "expression": "x.value>0"
         }
       ]
@@ -139187,7 +139249,7 @@
       "key": "components/operator.tsx#SubscriptionsView",
       "file": "components/operator.tsx",
       "name": "SubscriptionsView",
-      "line": 461,
+      "line": 463,
       "classes": [
         "operator-table-card",
         "operator-table-head",
@@ -139202,42 +139264,42 @@
       "widgets": [
         {
           "tag": "DataTable",
-          "line": 495
+          "line": 497
         },
         {
           "tag": "DataTableHead",
-          "line": 495
+          "line": 497
         },
         {
           "tag": "DataTableRow",
-          "line": 495
+          "line": 497
         },
         {
           "tag": "FormSheet",
-          "line": 497
+          "line": 499
         },
         {
           "tag": "Field",
-          "line": 497
+          "line": 499
         },
         {
           "tag": "Field",
-          "line": 497
+          "line": 499
         },
         {
           "tag": "Field",
-          "line": 497
+          "line": 499
         }
       ],
       "elements": [
         {
           "tag": "MetricTiles",
-          "line": 485,
+          "line": 487,
           "props": []
         },
         {
           "tag": "MetricTile",
-          "line": 485,
+          "line": 487,
           "props": [
             "key={plan.id}",
             "label={plan.name}",
@@ -139247,7 +139309,7 @@
         },
         {
           "tag": "OperatorLoadState",
-          "line": 490,
+          "line": 492,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -139256,29 +139318,29 @@
         },
         {
           "tag": "MetricTiles",
-          "line": 493,
+          "line": 495,
           "props": []
         },
         {
           "tag": "MetricTile",
-          "line": 493,
+          "line": 495,
           "props": [
             "key={group.plan}",
             "label={operatorPlan(group.plan)}",
             "value={group.items.length+(group.items.length===1?\" Kunde\":\" Kunden\")}",
-            "hint={group.items.filter(item=>item.subscription_status===\"active\").length+\" aktiv · \"+price[group.plan]+\" / Monat\"}"
+            "hint={group.items.filter(item=>item.subscription_status===\"active\").length+\" aktiv · Listenpreis \"+price[group.plan]+\" / Monat\"}"
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 494,
+          "line": 496,
           "props": [
             "className=\"operator-table-card\""
           ]
         },
         {
           "tag": "DataTable",
-          "line": 495,
+          "line": 497,
           "props": [
             "variant=\"operator\"",
             "label=\"Operator-Daten\""
@@ -139286,39 +139348,39 @@
         },
         {
           "tag": "DataTableHead",
-          "line": 495,
+          "line": 497,
           "props": [
             "className=\"operator-table-head customer\""
           ]
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "DataTableRow",
-          "line": 495,
+          "line": 497,
           "props": [
             "className=\"operator-table-row customer\"",
             "key={String(item.tenant_id)}",
@@ -139327,51 +139389,51 @@
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "b",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 495,
+          "line": 497,
           "props": [
             "tone={item.subscription_status===\"active\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 495,
+          "line": 497,
           "props": [
             "tone={item.account_status===\"active\"?\"success\":\"warning\"}"
           ]
         },
         {
           "tag": "span",
-          "line": 495,
+          "line": 497,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 497,
+          "line": 499,
           "props": [
             "open={Boolean(selected)}",
             "label={String((selected?.tenant as {name?:string}|undefined)?.name??\"Kunde\")}",
@@ -139383,7 +139445,7 @@
         },
         {
           "tag": "Button",
-          "line": 497,
+          "line": 499,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setSelected(null)}"
@@ -139391,21 +139453,21 @@
         },
         {
           "tag": "Button",
-          "line": 497,
+          "line": 499,
           "props": [
             "href={\"/operator/kunden/\"+String(selected?.tenant_id)}"
           ]
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "props": [
             "label=\"Plan\""
           ]
         },
         {
           "tag": "Select",
-          "line": 497,
+          "line": 499,
           "props": [
             "value={String(selected.plan)}",
             "onChange={e=>void updateSelected({plan:e.target.value})}"
@@ -139413,42 +139475,42 @@
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"trial\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"start\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"business\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"pro\""
           ]
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "props": [
             "label=\"Abonnement\""
           ]
         },
         {
           "tag": "Select",
-          "line": 497,
+          "line": 499,
           "props": [
             "value={String(selected.subscription_status)}",
             "onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}"
@@ -139456,49 +139518,49 @@
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"trial\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"active\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"past_due\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"suspended\""
           ]
         },
         {
           "tag": "option",
-          "line": 497,
+          "line": 499,
           "props": [
             "value=\"cancelled\""
           ]
         },
         {
           "tag": "Field",
-          "line": 497,
+          "line": 499,
           "props": [
             "label=\"Benutzerlimit\""
           ]
         },
         {
           "tag": "Input",
-          "line": 497,
+          "line": 499,
           "props": [
             "type=\"number\"",
             "min=\"1\"",
@@ -139509,7 +139571,7 @@
         },
         {
           "tag": "Toast",
-          "line": 498,
+          "line": 500,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -139518,47 +139580,47 @@
       ],
       "conditions": [
         {
-          "line": 464,
+          "line": 466,
           "expression": "production"
         },
         {
-          "line": 474,
+          "line": 476,
           "expression": "!selected||!production"
         },
         {
-          "line": 478,
+          "line": 480,
           "expression": "current"
         },
         {
-          "line": 481,
+          "line": 483,
           "expression": "error instanceof Error"
         },
         {
-          "line": 485,
+          "line": 487,
           "expression": "!production"
         },
         {
-          "line": 490,
+          "line": 492,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 493,
+          "line": 495,
           "expression": "group.items.length===1"
         },
         {
-          "line": 495,
+          "line": 497,
           "expression": "item.subscription_status===\"active\""
         },
         {
-          "line": 495,
+          "line": 497,
           "expression": "item.account_status===\"active\""
         },
         {
-          "line": 497,
+          "line": 499,
           "expression": "current"
         },
         {
-          "line": 498,
+          "line": 500,
           "expression": "toast.includes(\"konnte\")"
         }
       ]
@@ -139613,7 +139675,7 @@
       "key": "components/operator.tsx#RestrictionsView",
       "file": "components/operator.tsx",
       "name": "RestrictionsView",
-      "line": 502,
+      "line": 504,
       "classes": [
         "form-grid",
         "two",
@@ -139628,15 +139690,7 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 546
-        },
-        {
-          "tag": "Field",
           "line": 548
-        },
-        {
-          "tag": "Field",
-          "line": 549
         },
         {
           "tag": "Field",
@@ -139651,14 +139705,22 @@
           "line": 552
         },
         {
+          "tag": "Field",
+          "line": 553
+        },
+        {
+          "tag": "Field",
+          "line": 554
+        },
+        {
           "tag": "ConfirmDialog",
-          "line": 559
+          "line": 561
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 543,
+          "line": 545,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -139667,7 +139729,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 546,
+          "line": 548,
           "props": [
             "open={open}",
             "onClose={onClose}",
@@ -139677,7 +139739,7 @@
         },
         {
           "tag": "Button",
-          "line": 546,
+          "line": 548,
           "props": [
             "onClick={()=>setConfirm(\"create\")}",
             "disabled={production&&!tenantId}"
@@ -139685,21 +139747,21 @@
         },
         {
           "tag": "div",
-          "line": 547,
+          "line": 549,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 548,
+          "line": 550,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "Select",
-          "line": 548,
+          "line": 550,
           "props": [
             "value={tenantId}",
             "onChange={e=>setTenantId(e.target.value)}"
@@ -139707,7 +139769,7 @@
         },
         {
           "tag": "option",
-          "line": 548,
+          "line": 550,
           "props": [
             "value={customer.id}",
             "key={customer.id}"
@@ -139715,19 +139777,19 @@
         },
         {
           "tag": "option",
-          "line": 548,
+          "line": 550,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 549,
+          "line": 551,
           "props": [
             "label=\"Grund\""
           ]
         },
         {
           "tag": "Select",
-          "line": 549,
+          "line": 551,
           "props": [
             "value={reason}",
             "onChange={e=>setReason(e.target.value)}"
@@ -139735,34 +139797,34 @@
         },
         {
           "tag": "option",
-          "line": 549,
+          "line": 551,
           "props": []
         },
         {
           "tag": "option",
-          "line": 549,
+          "line": 551,
           "props": []
         },
         {
           "tag": "option",
-          "line": 549,
+          "line": 551,
           "props": []
         },
         {
           "tag": "option",
-          "line": 549,
+          "line": 551,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 550,
+          "line": 552,
           "props": [
             "label=\"Umfang\""
           ]
         },
         {
           "tag": "Select",
-          "line": 550,
+          "line": 552,
           "props": [
             "value={scope}",
             "onChange={e=>setScope(e.target.value)}"
@@ -139770,28 +139832,28 @@
         },
         {
           "tag": "option",
-          "line": 550,
+          "line": 552,
           "props": [
             "value=\"all\""
           ]
         },
         {
           "tag": "option",
-          "line": 550,
+          "line": 552,
           "props": [
             "value=\"write\""
           ]
         },
         {
           "tag": "Field",
-          "line": 551,
+          "line": 553,
           "props": [
             "label=\"Ablaufdatum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 551,
+          "line": 553,
           "props": [
             "type=\"date\"",
             "value={endsAt}",
@@ -139800,7 +139862,7 @@
         },
         {
           "tag": "Field",
-          "line": 552,
+          "line": 554,
           "props": [
             "label=\"Interne Begründung\"",
             "className=\"full\""
@@ -139808,7 +139870,7 @@
         },
         {
           "tag": "Textarea",
-          "line": 552,
+          "line": 554,
           "props": [
             "value={note}",
             "onChange={e=>setNote(e.target.value)}",
@@ -139817,19 +139879,19 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 555,
+          "line": 557,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 556,
+          "line": 558,
           "props": [
             "title=\"Aktive Einschränkungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 557,
+          "line": 559,
           "props": [
             "className=\"notice\"",
             "key={String(item.id)}"
@@ -139837,24 +139899,24 @@
         },
         {
           "tag": "Status",
-          "line": 557,
+          "line": 559,
           "props": [
             "tone=\"warning\""
           ]
         },
         {
           "tag": "b",
-          "line": 557,
+          "line": 559,
           "props": []
         },
         {
           "tag": "span",
-          "line": 557,
+          "line": 559,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 557,
+          "line": 559,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setConfirm(String(item.id))}"
@@ -139862,7 +139924,7 @@
         },
         {
           "tag": "EmptyState",
-          "line": 557,
+          "line": 559,
           "props": [
             "compact",
             "icon=\"lock\"",
@@ -139872,31 +139934,31 @@
         },
         {
           "tag": "div",
-          "line": 557,
+          "line": 559,
           "props": [
             "className=\"notice\""
           ]
         },
         {
           "tag": "Status",
-          "line": 557,
+          "line": 559,
           "props": [
             "tone=\"warning\""
           ]
         },
         {
           "tag": "b",
-          "line": 557,
+          "line": 559,
           "props": []
         },
         {
           "tag": "span",
-          "line": 557,
+          "line": 559,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 557,
+          "line": 559,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setConfirm(\"demo\")}"
@@ -139904,7 +139966,7 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 559,
+          "line": 561,
           "props": [
             "open={Boolean(confirm)}",
             "title={confirm===\"create\"?\"Zugriff einschränken?\":\"Einschränkung aufheben?\"}",
@@ -139917,7 +139979,7 @@
         },
         {
           "tag": "Toast",
-          "line": 560,
+          "line": 562,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -139926,71 +139988,71 @@
       ],
       "conditions": [
         {
-          "line": 506,
+          "line": 508,
           "expression": "production"
         },
         {
-          "line": 520,
+          "line": 522,
           "expression": "production&&!tenantId&&customers[0]"
         },
         {
-          "line": 523,
+          "line": 525,
           "expression": "!production"
         },
         {
-          "line": 529,
+          "line": 531,
           "expression": "error instanceof Error"
         },
         {
-          "line": 534,
+          "line": 536,
           "expression": "!production"
         },
         {
-          "line": 538,
+          "line": 540,
           "expression": "error instanceof Error"
         },
         {
-          "line": 542,
+          "line": 544,
           "expression": "production"
         },
         {
-          "line": 543,
+          "line": 545,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 548,
+          "line": 550,
           "expression": "production"
         },
         {
-          "line": 557,
+          "line": 559,
           "expression": "production"
         },
         {
-          "line": 557,
+          "line": 559,
           "expression": "active.length"
         },
         {
-          "line": 557,
+          "line": 559,
           "expression": "item.scope===\"all\""
         },
         {
-          "line": 559,
+          "line": 561,
           "expression": "confirm===\"create\""
         },
         {
-          "line": 559,
+          "line": 561,
           "expression": "confirm===\"create\""
         },
         {
-          "line": 559,
+          "line": 561,
           "expression": "confirm===\"create\""
         },
         {
-          "line": 559,
+          "line": 561,
           "expression": "confirm===\"create\""
         },
         {
-          "line": 560,
+          "line": 562,
           "expression": "toast.includes(\"konnte\")"
         }
       ]
@@ -139999,7 +140061,7 @@
       "key": "components/operator.tsx#MonitoringView",
       "file": "components/operator.tsx",
       "name": "MonitoringView",
-      "line": 565,
+      "line": 567,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -140007,7 +140069,7 @@
       "elements": [
         {
           "tag": "MonitoringPanel",
-          "line": 565,
+          "line": 567,
           "props": []
         }
       ],
@@ -141019,7 +141081,7 @@
       "key": "components/operator.tsx#AnnouncementsView",
       "file": "components/operator.tsx",
       "name": "AnnouncementsView",
-      "line": 567,
+      "line": 569,
       "classes": [
         "form-grid",
         "full",
@@ -141032,29 +141094,29 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 611
+          "line": 613
         },
         {
           "tag": "Field",
-          "line": 612
+          "line": 614
         },
         {
           "tag": "Field",
-          "line": 612
+          "line": 614
         },
         {
           "tag": "Field",
-          "line": 612
+          "line": 614
         },
         {
           "tag": "Field",
-          "line": 612
+          "line": 614
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 608,
+          "line": 610,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -141063,7 +141125,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 611,
+          "line": 613,
           "props": [
             "open={open}",
             "onClose={onClose}",
@@ -141073,21 +141135,21 @@
         },
         {
           "tag": "Button",
-          "line": 611,
+          "line": 613,
           "props": [
             "onClick={()=>void publish()}"
           ]
         },
         {
           "tag": "div",
-          "line": 612,
+          "line": 614,
           "props": [
             "className=\"form-grid\""
           ]
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "props": [
             "label=\"Titel\"",
             "className=\"full\""
@@ -141095,7 +141157,7 @@
         },
         {
           "tag": "Input",
-          "line": 612,
+          "line": 614,
           "props": [
             "value={title}",
             "onChange={e=>setTitle(e.target.value)}",
@@ -141104,7 +141166,7 @@
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "props": [
             "label=\"Typ\"",
             "className=\"full\""
@@ -141112,7 +141174,7 @@
         },
         {
           "tag": "Select",
-          "line": 612,
+          "line": 614,
           "props": [
             "value={kind}",
             "onChange={e=>setKind(e.target.value)}"
@@ -141120,35 +141182,35 @@
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"information\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"maintenance\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"incident\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"feature\""
           ]
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "props": [
             "label=\"Zielgruppe\"",
             "className=\"full\""
@@ -141156,7 +141218,7 @@
         },
         {
           "tag": "Select",
-          "line": 612,
+          "line": 614,
           "props": [
             "value={audience}",
             "onChange={e=>setAudience(e.target.value)}"
@@ -141164,35 +141226,35 @@
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"all\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"start\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"business\""
           ]
         },
         {
           "tag": "option",
-          "line": 612,
+          "line": 614,
           "props": [
             "value=\"pro\""
           ]
         },
         {
           "tag": "Field",
-          "line": 612,
+          "line": 614,
           "props": [
             "label=\"Nachricht\"",
             "className=\"full\""
@@ -141200,7 +141262,7 @@
         },
         {
           "tag": "Textarea",
-          "line": 612,
+          "line": 614,
           "props": [
             "value={body}",
             "onChange={e=>setBody(e.target.value)}",
@@ -141209,17 +141271,17 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 614,
+          "line": 616,
           "props": []
         },
         {
           "tag": "div",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "div",
-          "line": 615,
+          "line": 617,
           "props": [
             "className=\"announcement-card\"",
             "key={String(item.id)}"
@@ -141227,29 +141289,29 @@
         },
         {
           "tag": "Status",
-          "line": 615,
+          "line": 617,
           "props": [
             "tone={item.published===true?\"success\":\"neutral\"}"
           ]
         },
         {
           "tag": "b",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "p",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "small",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 615,
+          "line": 617,
           "props": [
             "compact",
             "icon=\"bell\"",
@@ -141259,36 +141321,36 @@
         },
         {
           "tag": "div",
-          "line": 615,
+          "line": 617,
           "props": [
             "className=\"announcement-card\""
           ]
         },
         {
           "tag": "Status",
-          "line": 615,
+          "line": 617,
           "props": [
             "tone=\"info\""
           ]
         },
         {
           "tag": "b",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "p",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "small",
-          "line": 615,
+          "line": 617,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 617,
+          "line": 619,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"erforderlich\")||toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -141297,43 +141359,43 @@
       ],
       "conditions": [
         {
-          "line": 570,
+          "line": 572,
           "expression": "production"
         },
         {
-          "line": 584,
+          "line": 586,
           "expression": "!title.trim()||!body.trim()"
         },
         {
-          "line": 589,
+          "line": 591,
           "expression": "!production"
         },
         {
-          "line": 600,
+          "line": 602,
           "expression": "error instanceof Error"
         },
         {
-          "line": 608,
+          "line": 610,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 615,
+          "line": 617,
           "expression": "production"
         },
         {
-          "line": 615,
+          "line": 617,
           "expression": "items.length"
         },
         {
-          "line": 615,
-          "expression": "item.published===true"
-        },
-        {
-          "line": 615,
+          "line": 617,
           "expression": "item.published===true"
         },
         {
           "line": 617,
+          "expression": "item.published===true"
+        },
+        {
+          "line": 619,
           "expression": "toast.includes(\"erforderlich\")||toast.includes(\"konnte\")"
         }
       ]
@@ -141342,7 +141404,7 @@
       "key": "components/operator.tsx#SecurityView",
       "file": "components/operator.tsx",
       "name": "SecurityView",
-      "line": 621,
+      "line": 623,
       "classes": [
         "operator-table-head",
         "security",
@@ -141356,33 +141418,33 @@
       "widgets": [
         {
           "tag": "DataTable",
-          "line": 635
+          "line": 637
         },
         {
           "tag": "DataTableHead",
-          "line": 635
+          "line": 637
         },
         {
           "tag": "DataTableRow",
-          "line": 635
+          "line": 637
         },
         {
           "tag": "DataTable",
-          "line": 650
+          "line": 652
         },
         {
           "tag": "DataTableHead",
-          "line": 650
+          "line": 652
         },
         {
           "tag": "DataTableRow",
-          "line": 650
+          "line": 652
         }
       ],
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 630,
+          "line": 632,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -141391,19 +141453,19 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 633,
+          "line": 635,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 634,
+          "line": 636,
           "props": [
             "title=\"Interne Benutzer\""
           ]
         },
         {
           "tag": "DataTable",
-          "line": 635,
+          "line": 637,
           "props": [
             "variant=\"operator\"",
             "label=\"Operator-Daten\""
@@ -141411,34 +141473,34 @@
         },
         {
           "tag": "DataTableHead",
-          "line": 635,
+          "line": 637,
           "props": [
             "className=\"operator-table-head security\""
           ]
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "DataTableRow",
-          "line": 635,
+          "line": 637,
           "props": [
             "className=\"operator-table-row security\"",
             "key={r[0]}"
@@ -141446,58 +141508,58 @@
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "b",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 635,
+          "line": 637,
           "props": [
             "tone=\"success\""
           ]
         },
         {
           "tag": "span",
-          "line": 635,
+          "line": 637,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 647,
+          "line": 649,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 648,
+          "line": 650,
           "props": [
             "title=\"Microsoft Entra Zugriffe\""
           ]
         },
         {
           "tag": "p",
-          "line": 649,
+          "line": 651,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "DataTable",
-          "line": 650,
+          "line": 652,
           "props": [
             "variant=\"operator\"",
             "label=\"Operator-Daten\""
@@ -141505,34 +141567,34 @@
         },
         {
           "tag": "DataTableHead",
-          "line": 650,
+          "line": 652,
           "props": [
             "className=\"operator-table-head security\""
           ]
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "DataTableRow",
-          "line": 650,
+          "line": 652,
           "props": [
             "className=\"operator-table-row security\"",
             "key={String(item.user_id)}"
@@ -141540,44 +141602,44 @@
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "b",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "small",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 650,
+          "line": 652,
           "props": [
             "tone={item.active===true?\"success\":\"neutral\"}"
           ]
         },
         {
           "tag": "span",
-          "line": 650,
+          "line": 652,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 650,
+          "line": 652,
           "props": [
             "compact",
             "icon=\"lock\"",
@@ -141587,19 +141649,19 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 652,
+          "line": 654,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 652,
+          "line": 654,
           "props": [
             "title=\"Berechtigungen verwalten\""
           ]
         },
         {
           "tag": "p",
-          "line": 652,
+          "line": 654,
           "props": [
             "className=\"technical-hint\""
           ]
@@ -141607,31 +141669,31 @@
       ],
       "conditions": [
         {
-          "line": 624,
+          "line": 626,
           "expression": "production"
         },
         {
-          "line": 630,
+          "line": 632,
           "expression": "production&&(loading||loadError)"
         },
         {
-          "line": 632,
+          "line": 634,
           "expression": "!production"
         },
         {
-          "line": 650,
+          "line": 652,
           "expression": "items.length"
         },
         {
-          "line": 650,
+          "line": 652,
           "expression": "item.active===true"
         },
         {
-          "line": 650,
+          "line": 652,
           "expression": "item.active===true"
         },
         {
-          "line": 650,
+          "line": 652,
           "expression": "item.last_entra_sync_at"
         }
       ]
@@ -141640,7 +141702,7 @@
       "key": "components/operator.tsx#AuditView",
       "file": "components/operator.tsx",
       "name": "AuditView",
-      "line": 656,
+      "line": 658,
       "classes": [],
       "apis": [
         "/api/operator/audit"
@@ -141649,17 +141711,17 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 662
+          "line": 664
         },
         {
           "tag": "RecordsView",
-          "line": 662
+          "line": 664
         }
       ],
       "elements": [
         {
           "tag": "RecordsControls",
-          "line": 662,
+          "line": 664,
           "props": [
             "inline",
             "controller={controller}",
@@ -141670,7 +141732,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 662,
+          "line": 664,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -141687,7 +141749,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 662,
+          "line": 664,
           "props": [
             "compact",
             "valuePlacement=\"metadata\"",
@@ -141697,7 +141759,7 @@
         },
         {
           "tag": "Button",
-          "line": 662,
+          "line": 664,
           "props": [
             "variant=\"secondary\"",
             "onClick={resource.refresh}"
@@ -141706,19 +141768,19 @@
       ],
       "conditions": [
         {
-          "line": 658,
+          "line": 660,
           "expression": "production"
         },
         {
-          "line": 661,
+          "line": 663,
           "expression": "production"
         },
         {
-          "line": 661,
+          "line": 663,
           "expression": "item.createdAt&&Number.isFinite(Date.parse(item.createdAt))"
         },
         {
-          "line": 661,
+          "line": 663,
           "expression": "item.action==='operator.entra_login'"
         }
       ]
@@ -141727,7 +141789,7 @@
       "key": "components/operator.tsx#OperatorDashboard",
       "file": "components/operator.tsx",
       "name": "OperatorDashboard",
-      "line": 196,
+      "line": 197,
       "classes": [
         "operator-dashboard-cockpit",
         "operator-insight-grid",
@@ -141762,7 +141824,7 @@
       "elements": [
         {
           "tag": "OperatorLoadState",
-          "line": 211,
+          "line": 212,
           "props": [
             "loading={loading}",
             "error={loadError}",
@@ -141771,19 +141833,19 @@
         },
         {
           "tag": "div",
-          "line": 213,
+          "line": 214,
           "props": [
             "className=\"operator-dashboard-cockpit\""
           ]
         },
         {
           "tag": "MetricTiles",
-          "line": 214,
+          "line": 215,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 219,
+          "line": 220,
           "props": [
             "href={String(href)}",
             "key={String(label)}"
@@ -141791,7 +141853,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 219,
+          "line": 220,
           "props": [
             "label={String(label)}",
             "value={String(value)}"
@@ -141799,40 +141861,40 @@
         },
         {
           "tag": "div",
-          "line": 220,
+          "line": 221,
           "props": [
             "className=\"operator-insight-grid\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 221,
+          "line": 222,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 221,
+          "line": 222,
           "props": [
             "title=\"Abrechnung\""
           ]
         },
         {
           "tag": "MetricTiles",
-          "line": 221,
+          "line": 222,
           "props": [
             "columns={2}"
           ]
         },
         {
           "tag": "Link",
-          "line": 221,
+          "line": 222,
           "props": [
             "href=\"/operator/zahlungen\""
           ]
         },
         {
           "tag": "MetricTile",
-          "line": 221,
+          "line": 222,
           "props": [
             "label=\"Zahlungen letzte 30 Tage\"",
             "value={moneyChf(Number(stats.payments_30d??0))}"
@@ -141840,14 +141902,14 @@
         },
         {
           "tag": "Link",
-          "line": 221,
+          "line": 222,
           "props": [
             "href=\"/operator/finanzen\""
           ]
         },
         {
           "tag": "MetricTile",
-          "line": 221,
+          "line": 222,
           "props": [
             "label=\"Monatlicher Vertragswert\"",
             "value={moneyChf(Number(stats.monthly_contract_value??0))}"
@@ -141855,26 +141917,26 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 222,
+          "line": 223,
           "props": [
             "title=\"Support\""
           ]
         },
         {
           "tag": "MetricTiles",
-          "line": 222,
+          "line": 223,
           "props": [
             "columns={3}"
           ]
         },
         {
           "tag": "Link",
-          "line": 222,
+          "line": 223,
           "props": [
             "href=\"/operator/tickets\"",
             "key={String(label)}"
@@ -141882,7 +141944,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 222,
+          "line": 223,
           "props": [
             "label={String(label)}",
             "value={String(value)}"
@@ -141890,12 +141952,12 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 224,
+          "line": 225,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 224,
+          "line": 225,
           "props": [
             "title=\"Systemstatus\"",
             "action={<Link href=\"/operator/monitoring\">Monitoring öffnen</Link>}"
@@ -141903,24 +141965,24 @@
         },
         {
           "tag": "Link",
-          "line": 224,
+          "line": 225,
           "props": [
             "href=\"/operator/monitoring\""
           ]
         },
         {
           "tag": "p",
-          "line": 224,
+          "line": 225,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 225,
+          "line": 226,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 225,
+          "line": 226,
           "props": [
             "title=\"Letzte Supportfälle\"",
             "action={<Link href=\"/operator/tickets\">Alle Tickets</Link>}"
@@ -141928,21 +141990,21 @@
         },
         {
           "tag": "Link",
-          "line": 225,
+          "line": 226,
           "props": [
             "href=\"/operator/tickets\""
           ]
         },
         {
           "tag": "div",
-          "line": 225,
+          "line": 226,
           "props": [
             "className=\"compact-list\""
           ]
         },
         {
           "tag": "Link",
-          "line": 225,
+          "line": 226,
           "props": [
             "href={\"/operator/tickets/\"+x.id}",
             "key={x.id}"
@@ -141950,22 +142012,22 @@
         },
         {
           "tag": "b",
-          "line": 225,
+          "line": 226,
           "props": []
         },
         {
           "tag": "span",
-          "line": 225,
+          "line": 226,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 225,
+          "line": 226,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 225,
+          "line": 226,
           "props": [
             "compact",
             "icon=\"support\"",
@@ -141975,21 +142037,21 @@
         },
         {
           "tag": "div",
-          "line": 227,
+          "line": 228,
           "props": [
             "className=\"operator-dashboard-cockpit\""
           ]
         },
         {
           "tag": "section",
-          "line": 228,
+          "line": 229,
           "props": [
             "className=\"operator-health-strip\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 229,
+          "line": 230,
           "props": [
             "title=\"Systemstatus\"",
             "action={<Link className=\"text-action\" href=\"/operator/monitoring\">Alle anzeigen</Link>}"
@@ -141997,7 +142059,7 @@
         },
         {
           "tag": "Link",
-          "line": 229,
+          "line": 230,
           "props": [
             "className=\"text-action\"",
             "href=\"/operator/monitoring\""
@@ -142005,14 +142067,14 @@
         },
         {
           "tag": "div",
-          "line": 230,
+          "line": 231,
           "props": [
             "className=\"operator-health-services\""
           ]
         },
         {
           "tag": "button",
-          "line": 230,
+          "line": 231,
           "props": [
             "type=\"button\"",
             "key={name}",
@@ -142021,36 +142083,36 @@
         },
         {
           "tag": "i",
-          "line": 230,
+          "line": 231,
           "props": [
             "className={i===4?\"warn\":\"\"}"
           ]
         },
         {
           "tag": "b",
-          "line": 230,
+          "line": 231,
           "props": []
         },
         {
           "tag": "span",
-          "line": 230,
+          "line": 231,
           "props": []
         },
         {
           "tag": "small",
-          "line": 230,
+          "line": 231,
           "props": []
         },
         {
           "tag": "div",
-          "line": 232,
+          "line": 233,
           "props": [
             "className=\"operator-pulse-grid\""
           ]
         },
         {
           "tag": "button",
-          "line": 233,
+          "line": 234,
           "props": [
             "type=\"button\"",
             "className={\"operator-pulse \"+(metric===key?\"active\":\"\")}",
@@ -142060,27 +142122,27 @@
         },
         {
           "tag": "div",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "span",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "small",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "div",
-          "line": 233,
+          "line": 234,
           "props": [
             "className={\"operator-stat-ring \"+key}",
             "aria-hidden=\"true\""
@@ -142088,29 +142150,29 @@
         },
         {
           "tag": "b",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "span",
-          "line": 233,
+          "line": 234,
           "props": []
         },
         {
           "tag": "div",
-          "line": 235,
+          "line": 236,
           "props": [
             "className=\"operator-insight-grid\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 236,
+          "line": 237,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 236,
+          "line": 237,
           "props": [
             "title=\"Tickets\"",
             "action={<Link className=\"text-action\" href=\"/operator/tickets\">Alle anzeigen</Link>}"
@@ -142118,7 +142180,7 @@
         },
         {
           "tag": "Link",
-          "line": 236,
+          "line": 237,
           "props": [
             "className=\"text-action\"",
             "href=\"/operator/tickets\""
@@ -142126,14 +142188,14 @@
         },
         {
           "tag": "div",
-          "line": 236,
+          "line": 237,
           "props": [
             "className=\"operator-ticket-stats\""
           ]
         },
         {
           "tag": "Link",
-          "line": 236,
+          "line": 237,
           "props": [
             "href=\"/operator/tickets\"",
             "key={String(label)}",
@@ -142142,31 +142204,31 @@
         },
         {
           "tag": "strong",
-          "line": 236,
+          "line": 237,
           "props": []
         },
         {
           "tag": "span",
-          "line": 236,
+          "line": 237,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 237,
+          "line": 238,
           "props": [
             "className=\"operator-sla\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 237,
+          "line": 238,
           "props": [
             "title=\"SLA Erfüllung\""
           ]
         },
         {
           "tag": "button",
-          "line": 237,
+          "line": 238,
           "props": [
             "type=\"button\"",
             "aria-label=\"SLA Details\"",
@@ -142176,73 +142238,73 @@
         },
         {
           "tag": "span",
-          "line": 237,
+          "line": 238,
           "props": [
             "className=\"sla-ring\""
           ]
         },
         {
           "tag": "b",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "span",
-          "line": 237,
+          "line": 238,
           "props": [
             "className=\"sla-copy\""
           ]
         },
         {
           "tag": "strong",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "small",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "i",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "small",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "i",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "small",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "i",
-          "line": 237,
+          "line": 238,
           "props": []
         },
         {
           "tag": "div",
-          "line": 239,
+          "line": 240,
           "props": [
             "className=\"operator-insight-grid\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 240,
+          "line": 241,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 240,
+          "line": 241,
           "props": [
             "title=\"Offene Anfragen nach Kategorie\"",
             "action={<Link className=\"text-action\" href=\"/operator/tickets\">Alle anzeigen</Link>}"
@@ -142250,7 +142312,7 @@
         },
         {
           "tag": "Link",
-          "line": 240,
+          "line": 241,
           "props": [
             "className=\"text-action\"",
             "href=\"/operator/tickets\""
@@ -142258,14 +142320,14 @@
         },
         {
           "tag": "div",
-          "line": 240,
+          "line": 241,
           "props": [
             "className=\"operator-category-bars\""
           ]
         },
         {
           "tag": "Link",
-          "line": 240,
+          "line": 241,
           "props": [
             "href=\"/operator/tickets\"",
             "key={String(label)}"
@@ -142273,48 +142335,48 @@
         },
         {
           "tag": "span",
-          "line": 240,
+          "line": 241,
           "props": []
         },
         {
           "tag": "i",
-          "line": 240,
+          "line": 241,
           "props": []
         },
         {
           "tag": "b",
-          "line": 240,
+          "line": 241,
           "props": [
             "style={{width:String(Number(value)*6)+\"%\"}}"
           ]
         },
         {
           "tag": "strong",
-          "line": 240,
+          "line": 241,
           "props": []
         },
         {
           "tag": "WorkspaceSection",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 241,
+          "line": 242,
           "props": [
             "title=\"Letzte Aktivitäten\""
           ]
         },
         {
           "tag": "div",
-          "line": 241,
+          "line": 242,
           "props": [
             "className=\"incident-history\""
           ]
         },
         {
           "tag": "div",
-          "line": 241,
+          "line": 242,
           "props": [
             "className=\"incident-row\"",
             "key={x.id}"
@@ -142322,36 +142384,36 @@
         },
         {
           "tag": "span",
-          "line": 241,
+          "line": 242,
           "props": [
             "className={\"incident-dot \"+(x.status===\"resolved\"?\"resolved\":\"maintenance\")}"
           ]
         },
         {
           "tag": "div",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "b",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "small",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "div",
-          "line": 241,
+          "line": 242,
           "props": [
             "className=\"compact-list\""
           ]
         },
         {
           "tag": "Link",
-          "line": 241,
+          "line": 242,
           "props": [
             "href={\"/operator/tickets/\"+x.id}",
             "key={x.id}"
@@ -142359,17 +142421,17 @@
         },
         {
           "tag": "b",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "span",
-          "line": 241,
+          "line": 242,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 241,
+          "line": 242,
           "props": [
             "tone={x.status===\"open\"?\"warning\":\"success\"}"
           ]
@@ -142377,24 +142439,16 @@
       ],
       "conditions": [
         {
-          "line": 199,
+          "line": 200,
           "expression": "production"
         },
         {
-          "line": 205,
+          "line": 206,
           "expression": "production"
         },
         {
-          "line": 205,
+          "line": 206,
           "expression": "status===\"Offen\""
-        },
-        {
-          "line": 207,
-          "expression": "production"
-        },
-        {
-          "line": 207,
-          "expression": "production"
         },
         {
           "line": 208,
@@ -142409,83 +142463,91 @@
           "expression": "production"
         },
         {
-          "line": 211,
-          "expression": "production&&(loading||loadError)"
-        },
-        {
-          "line": 213,
+          "line": 209,
           "expression": "production"
         },
         {
-          "line": 224,
-          "expression": "incidents.length"
+          "line": 210,
+          "expression": "production"
+        },
+        {
+          "line": 212,
+          "expression": "production&&(loading||loadError)"
+        },
+        {
+          "line": 214,
+          "expression": "production"
         },
         {
           "line": 225,
-          "expression": "recent.length"
-        },
-        {
-          "line": 230,
-          "expression": "i===1"
-        },
-        {
-          "line": 230,
-          "expression": "i===2"
-        },
-        {
-          "line": 230,
-          "expression": "i===4"
-        },
-        {
-          "line": 230,
-          "expression": "i===4"
-        },
-        {
-          "line": 230,
-          "expression": "i===0"
-        },
-        {
-          "line": 230,
-          "expression": "i===1"
-        },
-        {
-          "line": 230,
-          "expression": "i===2"
-        },
-        {
-          "line": 230,
-          "expression": "i===3"
-        },
-        {
-          "line": 233,
-          "expression": "metric===key"
-        },
-        {
-          "line": 233,
-          "expression": "key===\"availability\""
-        },
-        {
-          "line": 233,
-          "expression": "key===\"users\""
-        },
-        {
-          "line": 233,
-          "expression": "key===\"availability\""
-        },
-        {
-          "line": 233,
-          "expression": "key===\"users\""
-        },
-        {
-          "line": 241,
           "expression": "incidents.length"
         },
         {
-          "line": 241,
+          "line": 226,
+          "expression": "recent.length"
+        },
+        {
+          "line": 231,
+          "expression": "i===1"
+        },
+        {
+          "line": 231,
+          "expression": "i===2"
+        },
+        {
+          "line": 231,
+          "expression": "i===4"
+        },
+        {
+          "line": 231,
+          "expression": "i===4"
+        },
+        {
+          "line": 231,
+          "expression": "i===0"
+        },
+        {
+          "line": 231,
+          "expression": "i===1"
+        },
+        {
+          "line": 231,
+          "expression": "i===2"
+        },
+        {
+          "line": 231,
+          "expression": "i===3"
+        },
+        {
+          "line": 234,
+          "expression": "metric===key"
+        },
+        {
+          "line": 234,
+          "expression": "key===\"availability\""
+        },
+        {
+          "line": 234,
+          "expression": "key===\"users\""
+        },
+        {
+          "line": 234,
+          "expression": "key===\"availability\""
+        },
+        {
+          "line": 234,
+          "expression": "key===\"users\""
+        },
+        {
+          "line": 242,
+          "expression": "incidents.length"
+        },
+        {
+          "line": 242,
           "expression": "x.status===\"resolved\""
         },
         {
-          "line": 241,
+          "line": 242,
           "expression": "x.status===\"open\""
         }
       ]
@@ -154251,7 +154313,7 @@
     {
       "file": "components/operator.tsx",
       "name": "operatorStatus",
-      "line": 83,
+      "line": 84,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154260,7 +154322,7 @@
     {
       "file": "components/operator.tsx",
       "name": "operatorPlan",
-      "line": 92,
+      "line": 93,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154269,7 +154331,7 @@
     {
       "file": "components/operator.tsx",
       "name": "OperatorLoadState",
-      "line": 97,
+      "line": 98,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154278,7 +154340,7 @@
     {
       "file": "components/operator.tsx",
       "name": "OperatorPage",
-      "line": 122,
+      "line": 123,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154287,7 +154349,7 @@
     {
       "file": "components/operator.tsx",
       "name": "operatorSubtitle",
-      "line": 177,
+      "line": 178,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154296,7 +154358,7 @@
     {
       "file": "components/operator.tsx",
       "name": "OperatorDashboard",
-      "line": 196,
+      "line": 197,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154305,7 +154367,7 @@
     {
       "file": "components/operator.tsx",
       "name": "TicketsView",
-      "line": 246,
+      "line": 247,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154314,7 +154376,7 @@
     {
       "file": "components/operator.tsx",
       "name": "TicketDetail",
-      "line": 255,
+      "line": 256,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154323,7 +154385,7 @@
     {
       "file": "components/operator.tsx",
       "name": "CustomersView",
-      "line": 335,
+      "line": 336,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154332,7 +154394,7 @@
     {
       "file": "components/operator.tsx",
       "name": "OperatorCustomerDetail",
-      "line": 345,
+      "line": 346,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154341,7 +154403,7 @@
     {
       "file": "components/operator.tsx",
       "name": "PaymentInsight",
-      "line": 396,
+      "line": 397,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154350,7 +154412,7 @@
     {
       "file": "components/operator.tsx",
       "name": "OperatorFinanceView",
-      "line": 403,
+      "line": 404,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154359,7 +154421,7 @@
     {
       "file": "components/operator.tsx",
       "name": "PaymentsView",
-      "line": 424,
+      "line": 425,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154368,7 +154430,7 @@
     {
       "file": "components/operator.tsx",
       "name": "SubscriptionsView",
-      "line": 461,
+      "line": 463,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154377,7 +154439,7 @@
     {
       "file": "components/operator.tsx",
       "name": "RestrictionsView",
-      "line": 502,
+      "line": 504,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154386,15 +154448,6 @@
     {
       "file": "components/operator.tsx",
       "name": "MonitoringView",
-      "line": 565,
-      "usedBy": [
-        "/operator/[...section]",
-        "/operator"
-      ]
-    },
-    {
-      "file": "components/operator.tsx",
-      "name": "AnnouncementsView",
       "line": 567,
       "usedBy": [
         "/operator/[...section]",
@@ -154403,8 +154456,17 @@
     },
     {
       "file": "components/operator.tsx",
+      "name": "AnnouncementsView",
+      "line": 569,
+      "usedBy": [
+        "/operator/[...section]",
+        "/operator"
+      ]
+    },
+    {
+      "file": "components/operator.tsx",
       "name": "SecurityView",
-      "line": 621,
+      "line": 623,
       "usedBy": [
         "/operator/[...section]",
         "/operator"
@@ -154413,7 +154475,7 @@
     {
       "file": "components/operator.tsx",
       "name": "AuditView",
-      "line": 656,
+      "line": 658,
       "usedBy": [
         "/operator/[...section]",
         "/operator"

@@ -15,6 +15,7 @@ import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
 import { apiPatch, apiPost, logoutOperatorClientSession, useBackendMode } from "@/lib/client/backend";
 import {platformFinanceInsights} from "@/lib/finance-periods";
+import {sumMoney} from "@/lib/money";
 import {businessDate} from "@/lib/financial-status";
 import { plans } from "@/lib/plans";
 
@@ -335,7 +336,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
 function CustomersView() {
  const {production,items,loading,loadError,refresh}=useOperatorCustomers();
  const chips=['Alle','Aktiv','Eingeschränkt','Gesperrt'];
- const columns=[{label:'Kunde',index:0},{label:'Plan',index:1},{label:'Monatlicher Vertragswert',index:2,align:'right' as const},{label:'Status',index:3,status:true},{label:'Erstellt',index:4}];
+ const columns=[{label:'Kunde',index:0},{label:'Plan',index:1},{label:'Monatlicher Listenpreis',index:2,align:'right' as const},{label:'Status',index:3,status:true},{label:'Erstellt',index:4}];
  const controller=useRecordsController({placeholder:'Kunden suchen...',chips,columns});
  const price=Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]));
  const rows=production?items.map(item=>[item.name,operatorPlan(item.account?.plan??'trial'),price[item.account?.plan??'trial']??moneyChf(0),operatorStatus(item.account?.account_status??'active'),new Date(item.created_at).toLocaleDateString('de-CH'),item.id,[item.uid,item.city].filter(Boolean).join(' · ')]):demoCustomers.map(item=>[item.name,item.plan,item.mrr,item.status,'Demo',item.id,'Demo']);
@@ -372,22 +373,22 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
 
   const plan=String(account?.plan??"trial");
   const accountStatus=String(account?.account_status??"active");
-  const planPrice:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
   const userLimit=Number(account?.user_limit??0);
   const users=Number(overview.users??0);
-  const openTickets=Number(overview.open_tickets??0);
+  const openTickets=overview.open_tickets==null?null:Number(overview.open_tickets);
+  const access=overview.access as {billing?:boolean;support?:boolean;restrictions?:boolean;audit?:boolean}|undefined;
 
   return <>
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} {tenant.city?"· "+String(tenant.city):""}</p></div></div>
       <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled>Support-Zugriff nicht verfügbar</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
     </div>
-    <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={planPrice[plan]+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={String(openTickets)} hint="Aktuelle Anfragen" icon="support"/><Metric label="Kundenzahlungen" value={"CHF "+Number(overview.payments_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="wallet"/></div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):"Vertragswert: "+moneyChf(Number(overview.monthly_contract_value))+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={openTickets===null?"—":String(openTickets)} hint={access?.support?"Aktuelle Anfragen":"Keine Berechtigung"} icon="support"/><Metric label="Kundenzahlungen" value={overview.payments_total==null?"—":moneyChf(Number(overview.payments_total))} hint={access?.billing?"Erfasste CHF-Plattformzahlungen":"Keine Berechtigung"} icon="wallet"/></div>
     <div className="operator-customer-grid">
       <WorkspaceSection><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>{String(tenant.name??"—")}</dd></div><div><dt>E-Mail</dt><dd>{String(tenant.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(tenant.phone??"—")}</dd></div><div><dt>Erstellt</dt><dd>{new Date(String(tenant.created_at)).toLocaleDateString("de-CH")}</dd></div><div><dt>Mandant</dt><dd>{String(tenant.id)}</dd></div></dl></WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{planPrice[plan]??"—"} / Monat</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"trial"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"}</span></div></WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Support"/>{(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Audit"/>{(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):moneyChf(Number(overview.monthly_contract_value))+" / Monat"}</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"trial"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{access?.restrictions?(restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"):"Einschränkungen: Keine Berechtigung"}</span></div></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Support"/>{!access?.support?<p>Keine Berechtigung für Supportfälle.</p>:(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Audit"/>{!access?.audit?<p>Keine Berechtigung für Audit-Einträge.</p>:(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</WorkspaceSection>
     </div>
     {toast&&<Toast title={toast}/>}
   </>;
@@ -438,22 +439,23 @@ function PaymentsView() {
   </>;
 
   const booked=items.filter(item=>item.status==="booked");
-  const total=booked.reduce((sum,item)=>sum+Number(item.amount??0),0);
-  const paymentMonths=platformFinanceInsights({payments:booked.map(item=>({...item,payment_date:item.paid_on}))},"year",businessDate()).monthly;
+  const chfBooked=booked.filter(item=>item.currency==="CHF");
+  const total=sumMoney(chfBooked.map(item=>item.amount));
+  const paymentMonths=platformFinanceInsights({payments:chfBooked.map(item=>({...item,payment_date:item.paid_on}))},"year",businessDate()).monthly;
   const paymentMax=Math.max(1,...paymentMonths.map(item=>item.value));
   const paymentBars=paymentMonths.map(item=>item.value/paymentMax*100);
   const pending=items.filter(item=>item.status==="pending").length;
   const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
     <div className="operator-payment-insights">
-      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={paymentBars}/>
+      <PaymentInsight label="Angezeigte Zahlungen · CHF" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={paymentBars}/>
       <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
       <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
     </div>
     <WorkspaceSection className="operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
-      <p className="technical-hint">Zahlungen zu Kundenrechnungen. Abonnementzahlungen werden separat verwaltet.</p>
-      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <DataTableRow className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{"CHF "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></DataTableRow>})}</DataTable>:<EmptyState compact icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
+      <p className="technical-hint">Erfasste Plattformzahlungen. Kennzahl und Verlauf enthalten CHF; weitere Währungen bleiben in der Liste getrennt.</p>
+      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <DataTableRow className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{(item.currency?String(item.currency):"—")+" "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></DataTableRow>})}</DataTable>:<EmptyState compact icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
     </WorkspaceSection>
   </>;
 }
@@ -490,7 +492,7 @@ function SubscriptionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+(group.items.length===1?" Kunde":" Kunden")} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
+    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+(group.items.length===1?" Kunde":" Kunden")} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · Listenpreis "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
     <WorkspaceSection className="operator-table-card">
       <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
     </WorkspaceSection>

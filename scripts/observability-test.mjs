@@ -42,6 +42,12 @@ try{
  assert.equal(find(owner,'azure_cpu').dataState,'unavailable');
  assert.equal(owner.services.find(s=>s.key==='storage').state,'unknown','Configured is not healthy');
  assert.equal(owner.alarms.find(a=>a.id==='mail-failed').state,'critical');
+ const customerRepository=await import(moduleUrl((await fs.readFile('lib/server/repositories/operator-customer-overview.ts','utf8')).replace("import 'server-only';",'').replace("'@/lib/permissions'",JSON.stringify(permissions))));
+ await db.query("insert into support_cases(case_number,organization_id,created_by_user_id,category,subject,status) values('OBS-open',$1,'fixture','technical','Synthetic ticket','waiting_for_customer'),('OBS-closed',$1,'fixture','technical','Synthetic closed','resolved')",[org]);
+ await db.query("insert into organization_restrictions(organization_id,scope,reason,note,starts_at,ends_at,created_by_user_id) values($1,'write','Synthetic','Fixture',now()-interval '1 hour',now()+interval '1 hour','fixture'),($1,'write','Expired','Fixture',now()-interval '2 hours',now()-interval '1 hour','fixture'),($1,'write','Future','Fixture',now()+interval '1 hour',now()+interval '2 hours','fixture')",[org]);
+ const customer=await customerRepository.operatorCustomerReadings({query:(...args)=>db.query(...args)},{role:'platform_owner'},org);
+ assert.equal(Number(customer.payments_total),12.34);assert.equal(Number(customer.monthly_contract_value),100);assert.equal(customer.open_tickets,1);assert.equal(customer.active_restrictions.length,1,'Only currently effective restriction');
+ const customerSupport=await customerRepository.operatorCustomerReadings({query:(...args)=>db.query(...args)},{role:'platform_support'},org);assert.equal(customerSupport.payments_total,null);assert.equal(customerSupport.active_restrictions,null);assert.equal(customerSupport.open_tickets,1);
  const support=await monitoringSnapshot('platform_support');
  for(const id of ['payments','subscriptions','past_due','billing_failed','audit_events']){assert.equal(find(support,id).value,null);assert.equal(find(support,id).dataState,'no_permission',id);}
  assert.ok(!JSON.stringify(owner).includes('fixture@invalid.test'),'No recipients or payloads');

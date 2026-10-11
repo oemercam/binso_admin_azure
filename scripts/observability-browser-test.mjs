@@ -12,6 +12,10 @@ const base='http://127.0.0.1:3228';let server,browser;const errors=[],results=[]
 try{
  assert.equal(Number((await pool.query("select count(*) n from information_schema.tables where table_schema='public'")).rows[0].n),0,'Never reset existing data');
  for(const name of (await fs.readdir('database/migrations')).filter(n=>n.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
+ const org='00000000-0000-4000-8000-000000000088';
+ await pool.query("insert into organizations(id,name,slug,is_demo) values($1,'Synthetic customer','observability-synthetic',false)",[org]);
+ await pool.query("insert into organization_subscriptions(organization_id,plan,status,billing_interval,unit_amount_chf) values($1,'professional','active','yearly',1200)",[org]);
+ await pool.query("insert into platform_billing_payments(organization_id,provider,external_id,payment_date,amount,currency) values($1,'manual','obs-chf',current_date,12.34,'CHF'),($1,'manual','obs-eur',current_date,9999,'EUR')",[org]);
  const tokens=new Map();
  for(const role of ['platform_owner','platform_admin','platform_support','platform_billing','platform_auditor']){
   const token=randomBytes(32).toString('base64url'),user='obs-'+role;tokens.set(role,token);
@@ -26,9 +30,9 @@ try{
  for(let i=0;;i++){if(server.exitCode!==null)throw Error('Test server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>120)throw Error('Test server unavailable');await new Promise(resolve=>setTimeout(resolve,250));}
  const anon=await fetch(base+'/api/operator/monitoring');assert.equal(anon.status,401);
  const denial=await fetch(base+'/operator/wallboard',{redirect:'manual'});assert.ok([303,307,308].includes(denial.status));assert.equal(denial.headers.get('location'),'/operator/login');
- for(const [role,token] of tokens){const response=await fetch(base+'/api/operator/monitoring',{headers:{cookie:'binso_observability_session='+token}});assert.equal(response.status,200,role);const data=await response.json();assert.equal(data.schemaVersion,1);assert.equal(data.metrics.find(m=>m.id==='payments').dataState,['platform_owner','platform_admin','platform_billing'].includes(role)?'fresh':'no_permission',role+' finance data access');assert.equal(data.metrics.find(m=>m.id==='azure_cpu').state,'unknown');assert.ok(!JSON.stringify(data).includes('@fixture.invalid'),'No operator identity exposed');}
+ for(const [role,token] of tokens){const response=await fetch(base+'/api/operator/monitoring',{headers:{cookie:'binso_observability_session='+token}});assert.equal(response.status,200,role);const data=await response.json();assert.equal(data.schemaVersion,1);const overviewResponse=await fetch(base+'/api/operator/customers/'+org,{headers:{cookie:'binso_observability_session='+token}});assert.equal(overviewResponse.status,200);const overview=(await overviewResponse.json()).overview;assert.equal(overview.payments_total===null,!['platform_owner','platform_admin','platform_billing'].includes(role),role+' customer financial access');assert.equal(data.metrics.find(m=>m.id==='payments').dataState,['platform_owner','platform_admin','platform_billing'].includes(role)?'fresh':'no_permission',role+' finance data access');assert.equal(data.metrics.find(m=>m.id==='azure_cpu').state,'unknown');assert.ok(!JSON.stringify(data).includes('@fixture.invalid'),'No operator identity exposed');}
  const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true});await fs.mkdir(output,{recursive:true});
- const context=await browser.newContext();await context.addCookies([{name:'binso_observability_session',value:tokens.get('platform_owner'),url:base}]);const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ const context=await browser.newContext();await context.addCookies([{name:'binso_observability_session',value:tokens.get('platform_owner'),url:base}]);let page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  for(const theme of ['light','dark'])for(const width of [390,768,1920,2560,3840]){
   await page.setViewportSize({width,height:width>=1920?Math.round(width*9/16):900});await page.goto(base+'/operator/wallboard');await page.getByRole('heading',{name:'Binso One · Monitoring',exact:true}).waitFor();await page.locator('[data-metric-id="customers"]').waitFor();
   await page.evaluate(theme=>{document.documentElement.dataset.theme=theme;},theme);
@@ -40,8 +44,12 @@ try{
    await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
   }
  }
+ await page.setViewportSize({width:390,height:900});await page.goto(base+'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
+ assert.ok((await page.locator('.operator-payment-insights').innerText()).includes('CHF 12.34'),'Foreign currency excluded from CHF KPI');assert.ok((await page.locator('.operator-table-card').innerText()).includes('EUR'),'Original payment currency retained');
+ await page.goto(base+'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
+ await page.close();page=await context.newPage();await page.clock.install();await page.clock.setFixedTime(new Date());await page.goto(base+'/operator/wallboard');await page.locator('[data-metric-id="customers"]').waitFor();
  await page.setViewportSize({width:1920,height:1080});await page.getByLabel('Wallboard-Profil').selectOption('combined');
- let attempts=0;await page.route('**/api/operator/monitoring',route=>{attempts++;return route.fulfill({status:503,json:{message:'Synthetic API outage'}});});await page.clock.install();await page.clock.runFor(61000);await page.getByText(/Verbindung unterbrochen/).waitFor();assert.ok(attempts>0,'Auto refresh actually attempted');assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'unknown');
+ let attempts=0;await page.route('**/api/operator/monitoring',route=>{attempts++;return route.fulfill({status:503,json:{message:'Synthetic API outage'}});});await page.clock.runFor(61000);await page.getByText(/Verbindung unterbrochen/).waitFor();assert.ok(attempts>0,'Auto refresh actually attempted');assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'unknown');
  await page.unroute('**/api/operator/monitoring');await page.clock.runFor(61000);await page.getByText(/Automatische Aktualisierung/).waitFor();assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'healthy','Recovery consumes fresh server data');
  await page.getByRole('button',{name:'Hell / Dunkel'}).click();assert.ok(['light','dark'].includes(await page.evaluate(()=>document.documentElement.dataset.theme)));
  await context.close();assert.deepEqual(errors,[]);

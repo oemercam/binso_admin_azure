@@ -1,6 +1,6 @@
 # V23 Anforderungs- und Prüfinventar
 
-Vollständige Felder (Dateien, Methode, Erwartung, Ergebnis, Nachweis): `requirements.json`. Status bezeichnet den tatsächlichen Nachweisumfang.
+Vollständige Felder: `requirements.json`. Status bezeichnet den tatsächlichen Nachweisumfang.
 
 | ID | Anforderung | Status | Tatsächlicher Stand |
 | --- | --- | --- | --- |
@@ -41,3 +41,5 @@ Vollständige Felder (Dateien, Methode, Erwartung, Ergebnis, Nachweis): `require
 | V23-L-001 | Feature branch/PR/release controls | pending_review | Feature branch from e33af01; no migrations; merge/deploy awaiting explicit approval |
 | V23-L-002 | Post-deployment verification | not_started | V23 not deployed; cannot claim post-release success |
 | V23-M-001 | Traceable acceptance report | partially_verified | Partial verified implementation; blockers and decisions remain explicit |
+| V23-E-007 | Customer metrics must use real authorized data | implemented_pending_ci | Current support cases, CHF-only payments, normalized actual contract and time-effective restrictions; missing grants clearly labelled |
+| V23-E-008 | Payment currency and decimal integrity | implemented_pending_ci | Original currency projected; CHF-only chart/KPI uses sumMoney; KPI explicitly refers to displayed payments |

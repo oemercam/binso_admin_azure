@@ -18,6 +18,8 @@ Offene PRs: #237 (Auth/Runtime-Rolle/Readiness; 10 Commits vor und 20 hinter mai
 
 ## Nachgewiesene Korrekturen und Erweiterungen
 
+- Kundendetails: offene Tickets, CHF-Zahlungen und aktuell wirksame Einschränkungen aus tatsächlichen Tabellen. Nicht berechtigte Rollen erhalten null/Keine Berechtigung statt falscher Nullerfolge. Standardtarife sind als Listenpreise bezeichnet.
+- Zahlungen: Fremdwährungen bleiben in ihrer Originalwährung in der Liste; CHF-Kennzahl und Verlauf summieren nur CHF mit zentraler Dezimalarithmetik.
 - Monatlicher Vertragswert: Jahres-Abopreise werden durch zwölf geteilt; UI bezeichnet die Kennzahl ausdrücklich als monatlich. Migrierter API-Test: 1200 CHF jährlich ergeben 100 CHF monatlich.
 - 30-Tage-Zahlungsfenster: heute minus 29 bis heute, inklusive. Der alte Dashboard-Ausdruck minus 30 enthielt 31 Kalendertage. Grenzwert-, Demo- und Währungsfixtures prüfen den tatsächlichen GET.
 - Monitoring: Servicequote ist kein Verfügbarkeits-SLA mehr; konfiguriert/implementiert ist ohne Probe nicht Healthy. Keine erfundenen historischen Latenzen, Balken oder Uptime-Prozente. Demo zeigt keine simulierten Systemwerte.
