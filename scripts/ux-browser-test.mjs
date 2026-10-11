@@ -205,7 +205,7 @@ try{
   let page=await trackedPage();
   // Hard fixture resets use a new document; real Link navigation stays on the same page.
   // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
-  const navigate=async(...args)=>{await page.waitForLoadState('networkidle');assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);return page.goto(...args)};
+  const navigate=async(...args)=>{await page.waitForLoadState('networkidle');assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);const response=await page.goto(...args);await page.waitForLoadState('networkidle');return response};
   const routes=fullRoutes;
   await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
    console.log(`Checking ${theme} ${width}px`);
