@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import {applyTheme} from '@/lib/client/theme';
-import {useEffect,useState} from 'react';
+import {useEffect,useId,useState} from 'react';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {useBackendMode} from '@/lib/client/backend';
 import {effectiveMetric,evaluateAlarms,formatMonitoringValue,healthLabels,dataLabels,overallHealth,type MonitoringSnapshot,type MonitoringMetric,type MonitoringSeries,type HealthState,type MonitoringArea} from '@/lib/observability/model';
@@ -19,10 +19,16 @@ function MetricReading({metric,wallboard}:{metric:MonitoringMetric;wallboard:boo
 /** Compact portal overview; source explanations stay available on demand. */
 function MonitoringOverview({metrics,services,series,alarms,data,unavailable}:{metrics:MonitoringMetric[];services:MonitoringSnapshot['services'];series:MonitoringSeries[];alarms:ReturnType<typeof evaluateAlarms>;data:MonitoringSnapshot;unavailable:boolean}){
  const [chart,setChart]=useState(series[0]?.id??'');
- const headline=metrics.filter(item=>['db_query_ms','snapshot_ms','app_errors','mail_failed'].includes(item.id));
+ const [expanded,setExpanded]=useState(false),detailsId=useId();
+ const serviceState=overallHealth(services.map(service=>service.state));
+ const headline=['db_query_ms','app_errors','mail_failed'].map(id=>metrics.find(item=>item.id===id));
+ const headlineLabels=['Datenbank-Abfragezeit','Anwendungsfehler · 24 Stunden','Fehlgeschlagene E-Mails'];
  const active=alarms.filter(item=>item.state==='warning'||item.state==='critical'),unknown=alarms.filter(item=>item.state==='unknown').length;
  return <>
-  <MetricTiles>{headline.map(metric=><MetricTile key={metric.id} label={metric.label} value={formatMonitoringValue(metric)} hint={healthLabels[metric.state]}/>)}</MetricTiles>
+  <div className="bo-monitor-headline"><MetricTiles><MetricTile label="Service-Status" value={healthLabels[serviceState]} hint="Aktuelle Service-Prüfungen"/>{headline.map((metric,index)=><MetricTile key={headlineLabels[index]} label={headlineLabels[index]} value={metric?formatMonitoringValue(metric):'—'} hint={metric?dataLabels[metric.dataState]+' · '+healthLabels[metric.state]:'Keine Messdaten'}/>)}</MetricTiles></div>
+  {active.length>0&&<p role="status" className="bo-monitor-alert-summary">{active.length} aktive Warnung(en) oder kritische Meldung(en). Details unter «Mehr anzeigen».</p>}
+  <Button variant="secondary" aria-expanded={expanded} aria-controls={detailsId} onClick={()=>setExpanded(value=>!value)}>{expanded?'Weniger anzeigen':'Mehr anzeigen'}</Button>
+  <div id={detailsId} hidden={!expanded}>
   <WorkspaceSection><SectionTitle title="Performance im Verlauf"/>
    <div className="bo-monitor-chart-tabs"><DetailTabs label="Performance-Diagramm">{series.map(item=><button key={item.id} type="button" className={chart===item.id?'active':''} onClick={()=>setChart(item.id)}>{item.label.split(' ')[0]}</button>)}</DetailTabs></div>
    <div className="bo-monitor-charts">{series.map(item=><div key={item.id} className="bo-monitor-chart-slot" data-selected={chart===item.id}><MonitoringChart series={item} unavailable={unavailable}/></div>)}</div>
@@ -31,6 +37,7 @@ function MonitoringOverview({metrics,services,series,alarms,data,unavailable}:{m
   <WorkspaceSection><SectionTitle title="Alarme"/>{active.length?<div className="bo-monitor-alarms">{active.map(alarm=>{const rule=data.rules.find(item=>item.id===alarm.ruleId)!;return <details key={alarm.id} data-alarm-id={alarm.id}><summary><b>{metrics.find(item=>item.id===rule.metricId)?.label??rule.id}</b><HealthBadge state={alarm.state}/></summary><p>Schwelle ≥ {rule.threshold} · {rule.window} · Wiederherstellung: {rule.recovery} · Zuständigkeit: {rule.owner??'Nicht zugewiesen'} · Eskalation: {rule.escalation??'Nicht eingerichtet'}</p></details>;})}</div>:unknown===0?<p>Keine Regel ausgelöst in den verfügbaren Messdaten.</p>:null}{unknown>0&&<p>{unknown} Prüfungen ohne aktuelle Messdaten. Einzelheiten unter «Messwerte und technische Details».</p>}</WorkspaceSection>
   <details className="bo-monitor-details"><summary>Messwerte und technische Details</summary>{areas.filter(([area])=>area!=='integrations').map(([area,label])=><WorkspaceSection key={area}><SectionTitle title={label}/><div className="bo-monitor-detail-metrics">{metrics.filter(item=>item.area===area).map(metric=><details key={metric.id} data-metric-id={metric.id} data-health={metric.state}><summary><span>{metric.label}</span><strong>{formatMonitoringValue(metric)}</strong><HealthBadge state={metric.state}/></summary><p>{metric.detail}</p><small>{metric.source} · {dataLabels[metric.dataState]} · {metric.window}</small>{metric.href&&metric.dataState==='fresh'&&<Link href={metric.href}>Details öffnen</Link>}</details>)}</div></WorkspaceSection>)}</details>
   <details className="bo-monitor-details"><summary>Datenquellen und Grenzen</summary><p>Lokale Regelauswertung · keine aktive Benachrichtigung oder Eskalation.</p>{data.limitations.map(text=><p key={text}>{text}</p>)}<p>Aktiver Worker: <code>{data.build.sha??'Nicht verfügbar'}</code></p></details>
+  </div>
  </>;
 }
 /** One endpoint, polling policy and presentation for portal and authenticated wallboard. */
