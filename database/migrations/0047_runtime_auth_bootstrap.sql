@@ -22,8 +22,9 @@ BEGIN
   IF NOT FOUND OR EXISTS (SELECT 1 FROM public.organization_memberships WHERE user_id=p_user_id) THEN
     RAISE EXCEPTION 'Organization bootstrap requires a new active user' USING ERRCODE='42501';
   END IF;
-  FOR attempt IN 0..50 LOOP
-    candidate := CASE WHEN attempt=0 THEN p_slug ELSE p_slug||'-'||(attempt+1)::text END;
+  FOR attempt IN 0..59 LOOP
+    candidate := CASE WHEN attempt=0 THEN p_slug WHEN attempt<50 THEN p_slug||'-'||(attempt+1)::text
+      ELSE p_slug||'-'||substr(pg_catalog.gen_random_uuid()::text,1,8) END;
     INSERT INTO public.organizations(name,slug,status,country,currency,locale,is_demo)
       VALUES(p_name,candidate,CASE WHEN p_mode='subscription' THEN 'active' ELSE 'trial' END,'Schweiz','CHF','de-CH',p_mode='demo')
       ON CONFLICT (slug) DO NOTHING RETURNING id INTO new_organization_id;

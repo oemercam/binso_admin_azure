@@ -97,6 +97,16 @@ try{
   await c.query("select set_config('app.organization_id',$1,true)",[id]);
   assert.equal((await c.query('select count(*)::int n from public.organization_roles where organization_id=$1',[id])).rows[0].n,4,'A temporary table cannot shadow the privileged role-seeding trigger');
  });
+ await globalThis.__registrationTransaction(async c=>{
+  const allocated=new Set();
+  for(let i=0;i<55;i++){
+   const user='bootstrap-slug-probe-'+i,email=user+'@example.invalid';
+   await c.query("insert into app_users(id,email,display_name,status) values($1,$2,'Shared Name','active')",[user,email]);
+   const id=(await c.query("select bootstrap_organization($1,$2,'Shared Name','bootstrap-same-slug','trial') as id",[user,email])).rows[0].id;
+   allocated.add(id);
+  }
+  assert.equal(allocated.size,55,'More than 50 independent same-name companies still allocate unique organizations');
+ });
  await assert.rejects(()=>globalThis.__registrationQuery("insert into organizations(name,slug) values('Forbidden Direct Create','forbidden-direct-runtime') returning id"),e=>e.code==='42501','Direct organization bootstrap must remain RLS denied');
  await assert.rejects(()=>globalThis.__registrationQuery("select bootstrap_organization('missing-user','missing@example.invalid','Bad Bootstrap','bad-bootstrap','trial')"),e=>e.code==='42501','The fixed helper cannot attach an unknown account');
  assert.equal(translations.registrationLocale('fr-CH'),'fr');assert.equal(translations.registrationLocale('untrusted'),'de');
