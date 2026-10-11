@@ -1520,22 +1520,19 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bo-monitor-alarms{display:grid;gap:var(--desktop-action-gap)}
 .bo-monitor-alarms>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}
 .bo-monitor-alarms small{flex-basis:100%;color:var(--color-muted);overflow-wrap:anywhere}
+/* Wallboard owns its density instead of inheriting portal row heights. */
 .bo-wallboard-root{min-height:100dvh;padding:clamp(16px,2vw,48px);background:var(--color-bg);color:var(--color-fg)}
+.bo-monitoring-wallboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.bo-monitoring-wallboard>.bo-monitor-toolbar,.bo-monitoring-wallboard>.bo-metric-tiles,.bo-monitoring-wallboard>.bo-workspace-section:last-of-type,.bo-monitoring-wallboard>footer{grid-column:1/-1}
+.bo-monitoring-wallboard .bo-monitor-toolbar{margin-bottom:0}
 .bo-monitoring-wallboard .bo-monitor-toolbar h2{font-size:clamp(24px,2vw,48px)}
 .bo-monitoring-wallboard .metric>strong{font-size:clamp(28px,3vw,64px)}
-.bo-monitoring-wallboard .bo-metric-tiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,2vw,36px)}
-.bo-monitoring-wallboard .monitoring-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.bo-monitoring-wallboard .monitoring-list>div{min-width:0;flex-wrap:wrap}
-.bo-monitor-wallboard-footer{color:var(--color-muted);font-size:13px;overflow-wrap:anywhere}
-
-.bo-monitoring-wallboard .bo-workspace-section{margin-block:12px}
-.bo-monitoring-wallboard .monitoring-list>div{padding:8px 0}
-.bo-monitoring-wallboard .bo-monitor-toolbar{margin-bottom:16px}
-.bo-monitoring-wallboard .bo-metric-tiles{gap:16px}
+.bo-monitoring-wallboard .bo-metric-tiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bo-monitoring-wallboard .bo-workspace-section{margin-block:0}
+.bo-monitoring-wallboard .monitoring-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bo-monitoring-wallboard .monitoring-list>div{min-width:0;min-height:44px;padding:8px 0;gap:12px;grid-template-columns:minmax(0,1fr) auto}
 .bo-monitoring-wallboard .bo-monitor-alarms{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
 .bo-monitoring-wallboard .bo-monitor-chart svg{max-height:140px}
+.bo-monitoring-wallboard .bo-monitor-chart .empty-state{min-height:120px;padding:12px}
 .bo-monitoring-wallboard .bo-monitor-point-list{display:none}
-
-.bo-monitoring-wallboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.bo-monitoring-wallboard>.bo-monitor-toolbar,.bo-monitoring-wallboard>.bo-metric-tiles,.bo-monitoring-wallboard>.bo-workspace-section:last-of-type,.bo-monitoring-wallboard>footer{grid-column:1/-1}
-.bo-monitoring-wallboard .monitoring-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bo-monitor-wallboard-footer{color:var(--color-muted);font-size:13px;overflow-wrap:anywhere}
