@@ -108,7 +108,7 @@
 .operator-thread,
 .monitoring-panel,
 .announcement-card,
-.operator-root .security-card,
+.operator-root .security-card{border:0;border-radius:0;background:var(--color-bg);padding:0;box-shadow:none;min-width:0}
 .operator-ticket-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px}
 .operator-reply{margin-top:14px;padding-top:12px;border-top:1px solid var(--color-line)}
 

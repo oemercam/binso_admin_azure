@@ -83,7 +83,7 @@ function operatorStatus(value:string){
   const map:Record<string,string>={
     new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Wartet auf Kunde",
     resolved:"Gelöst",closed:"Geschlossen",active:"Aktiv",past_due:"Überfällig",suspended:"Gesperrt",
-    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase",expired:"Abgelaufen"
+    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase",expired:"Abgelaufen",read_only:"Eingeschränkt",inactive:"Inaktiv"
   };
   return map[value]??value;
 }
@@ -217,8 +217,8 @@ function OperatorDashboard() {
       ["Aktive Nutzer",Number(stats.users_active??0),"/operator/kunden"],
     ].map(([label,value,href])=><Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
     <div className="operator-insight-grid">
-      <WorkspaceSection><SectionTitle title="Billing"/><div className="operator-ticket-stats"><Link href="/operator/zahlungen"><strong>{moneyChf(Number(stats.payments_30d??0))}</strong><span>Zahlungen letzte 30 Tage</span></Link><Link href="/operator/finanzen"><strong>{moneyChf(Number(stats.monthly_contract_value??0))}</strong><span>Aktiver Vertragswert</span></Link></div></WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Support"/><div className="operator-ticket-stats">{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><strong>{String(value)}</strong><span>{String(label)}</span></Link>)}</div></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Aktiver Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></WorkspaceSection>
     </div>
     <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></WorkspaceSection>
     <WorkspaceSection><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</WorkspaceSection>
@@ -248,7 +248,7 @@ function TicketsView() {
  const columns=[{label:'Ticket',index:0},{label:'Kunde',index:1},{label:'Priorität',index:2},{label:'Status',index:3,status:true},{label:'Aktualisiert',index:4}];
  const controller=useRecordsController({placeholder:'Tickets suchen...',chips,columns});
  const rows=production?items.map(item=>[item.subject,item.tenant?.name??'Kunde',item.priority==='critical'?'Kritisch':item.priority==='high'?'Hoch':item.priority==='low'?'Niedrig':'Normal',operatorStatus(item.status),new Date(item.updated_at).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}),item.id]):tickets.map(([nr,subject,customer,status])=>[subject,customer,'Normal',status,'Demo',nr.replace('#','')]);
- return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
+ return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function TicketDetail({ticketId}:{ticketId:string}) {
@@ -338,7 +338,7 @@ function CustomersView() {
  const controller=useRecordsController({placeholder:'Kunden suchen...',chips,columns});
  const price=Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]));
  const rows=production?items.map(item=>[item.name,operatorPlan(item.account?.plan??'trial'),price[item.account?.plan??'trial']??moneyChf(0),operatorStatus(item.account?.account_status??'active'),new Date(item.created_at).toLocaleDateString('de-CH'),item.id,[item.uid,item.city].filter(Boolean).join(' · ')]):demoCustomers.map(item=>[item.name,item.plan,item.mrr,item.status,'Demo',item.id,'Demo']);
- return <><RecordsControls inline controller={controller} placeholder="Kunden suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Kunden suchen..." countLabel="Kunden" chips={chips} columns={columns} rowHref={row=>'/operator/kunden/'+row[5]}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/kunden/'+row[5]} title={row[0]} meta={[row[6],row[1],row[4]].filter(Boolean).join(' · ')} status={row[3]} value={row[2]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
+ return <><RecordsControls inline controller={controller} placeholder="Kunden suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Kunden suchen..." countLabel="Kunden" statusGroups={{Aktiv:["Aktiv","Testphase"]}} chips={chips} columns={columns} rowHref={row=>'/operator/kunden/'+row[5]}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/kunden/'+row[5]} title={row[0]} meta={[row[6],row[1],row[4]].filter(Boolean).join(' · ')} status={row[3]} value={row[2]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {

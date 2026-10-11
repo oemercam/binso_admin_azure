@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, type ReactNode } from "react";
+import { Children, isValidElement, cloneElement, useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -50,8 +50,8 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
   </div>;
 }
 
-export function MetricTiles({ children }: { children: ReactNode }) {
-  return <div className="metrics-grid bo-metric-tiles">{children}</div>;
+export function MetricTiles({ children, columns=4 }: { children: ReactNode;columns?:2|3|4 }) {
+  return <div className="metrics-grid bo-metric-tiles" style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
 export function MetricTile({ label, value, hint }: { label: string; value: ReactNode; hint?:string }) {
